@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ローン返済 計算機(元利均等・毎月の返済額) | 計算ツールボックス</title>
+  <meta name="description" content="借入額・金利・返済期間から毎月の返済額・総返済額・利息総額を無料で計算(元利均等返済)。住宅ローン・マイカーローンの目安に。計算式も明記しています。">
+  <link rel="stylesheet" href="../../shared/style.css">
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>ローン返済 計算機(元利均等返済)</h1>
+  <p>借入額・年利・返済期間を入力すると、<strong>毎月の返済額・総返済額・利息総額</strong>を計算します。住宅ローンやマイカーローンの「月々いくら返すか」の目安がすぐわかります。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="loan-form">
+    <label>借入額(万円)
+      <span class="field-note">例: 3000(=3,000万円)。対応範囲: 10〜50,000万円</span>
+      <input type="number" id="principal" inputmode="numeric" step="1" min="10" max="50000" placeholder="3000" required>
+    </label>
+    <label>年利(%)
+      <span class="field-note">例: 1.5(対応範囲: 0〜20%)</span>
+      <input type="number" id="rate" inputmode="decimal" step="0.01" min="0" max="20" placeholder="1.5" required>
+    </label>
+    <label>返済期間(年)
+      <span class="field-note">対応範囲: 1〜50年(整数)</span>
+      <input type="number" id="years" inputmode="numeric" step="1" min="1" max="50" placeholder="35" required>
+    </label>
+    <button type="submit">計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    このツールの計算結果は<strong>概算</strong>です。実際のローンには保証料・事務手数料・団体信用生命保険料・金利変動・端数調整などがあるため、正確な返済額は金融機関の試算でご確認ください。
+  </div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>借入額を万円単位で入力します(3,000万円なら「3000」)。</li>
+    <li>年利(%)と返済期間(年)を入力します。</li>
+    <li>「計算する」を押すと、毎月の返済額・総返済額・利息総額が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <p>元利均等返済(毎月の返済額が一定になる、最も一般的な返済方式)の標準的な計算式を使用しています。</p>
+  <ul>
+    <li><strong>毎月返済額 = 借入額 × r × (1+r)ⁿ ÷ ((1+r)ⁿ − 1)</strong><br>
+      r = 年利 ÷ 12(月利)、n = 返済期間 × 12(返済回数)。金利0%の場合は 借入額 ÷ n。</li>
+    <li>総返済額 = 毎月返済額 × 返済回数 / 利息総額 = 総返済額 − 借入額</li>
+    <li>計算例: 3,000万円・年利1.5%・35年 → 毎月返済額 約91,855円、総返済額 約3,858万円</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>上記は元利均等返済の一般的な数学的定義による計算です(毎月返済額は円未満四捨五入、総返済額はその毎月返済額×回数)。</li>
+    <li>返済方式(元利均等・元金均等)の違いなど、ローンの基本は金融機関・公的機関の解説をご参照ください。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>固定金利・ボーナス払いなし・繰上返済なしの前提です。変動金利の場合、将来の返済額は変わります。</li>
+    <li>元金均等返済(毎月の元金が一定)を選ぶ場合は、初回の返済額はこの計算より大きく、次第に減っていきます。</li>
+    <li>借入可能額・審査については金融機関にご相談ください。</li>
+  </ul>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../tsubo/">坪・平米・畳 変換計算機</a></li>
+    <li><a href="../tax/">消費税 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_principal: "借入額は 10〜50,000万円 の範囲で入力してください。",
+    invalid_rate: "年利は " + LoanCalc.RATE_MIN + "〜" + LoanCalc.RATE_MAX + " % の範囲で入力してください。",
+    invalid_years: "返済期間は " + LoanCalc.YEARS_MIN + "〜" + LoanCalc.YEARS_MAX + " 年の整数で入力してください。"
+  };
+  document.getElementById("loan-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var principalMan = parseFloat(document.getElementById("principal").value);
+    var rate = parseFloat(document.getElementById("rate").value);
+    var years = parseFloat(document.getElementById("years").value);
+    var result = LoanCalc.calculate(principalMan * 10000, rate, years);
+    var box = document.getElementById("result");
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">毎月 ' + result.monthlyPayment.toLocaleString() + " 円</div>" +
+        "<p>総返済額: <strong>" + result.totalPayment.toLocaleString() + " 円</strong><br>" +
+        "うち利息: <strong>" + result.totalInterest.toLocaleString() + " 円</strong>(" + (years * 12) + "回払い)</p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
+    }
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

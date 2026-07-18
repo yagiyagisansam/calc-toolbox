@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>純アルコール量 計算機(お酒の適量チェック) | 計算ツールボックス</title>
+  <meta name="description" content="お酒の量と度数から純アルコール量(g)とドリンク数を無料で計算。厚生労働省のガイドラインに基づき、生活習慣病リスクを高める飲酒量かどうかを男女別にチェックできます。">
+  <link rel="stylesheet" href="../../shared/style.css">
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>純アルコール量 計算機</h1>
+  <p>飲んだお酒の量と度数を入力すると、<strong>純アルコール量(g)</strong>と<strong>ドリンク数</strong>を計算し、厚生労働省のガイドラインに基づいて「生活習慣病のリスクを高める量」に達していないかを判定します。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="alcohol-form">
+    <label>飲んだ量(mL)
+      <span class="field-note">例: ビール中びん・ロング缶=500、日本酒1合=180、ワイングラス1杯=約125</span>
+      <input type="number" id="volume" inputmode="decimal" step="1" min="1" max="10000" placeholder="500" required>
+    </label>
+    <label>アルコール度数(%)
+      <span class="field-note">例: ビール=5、日本酒=15、ワイン=12、缶チューハイ=3〜9</span>
+      <input type="number" id="abv" inputmode="decimal" step="0.1" min="0.1" max="96" placeholder="5" required>
+    </label>
+    <label>性別(リスク判定に使用)
+      <select id="sex">
+        <option value="male">男性</option>
+        <option value="female">女性</option>
+      </select>
+    </label>
+    <button type="submit">計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    このツールの計算結果は<strong>概算</strong>です。アルコールの影響には大きな個人差があり、体質的にお酒に弱い方・妊娠中の方・服薬中の方などはこの数値にかかわらず飲酒を控える必要があります。
+  </div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>飲んだ(飲む予定の)お酒の量をmL単位で入力します。</li>
+    <li>お酒のアルコール度数(%)を入力します(缶や瓶のラベルに記載されています)。</li>
+    <li>性別を選んで「計算する」を押すと、純アルコール量と判定が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>純アルコール量(g)</strong> = 量(mL) × 度数(%) ÷ 100 × 0.8(アルコールの比重)<br>
+      例: ビール500mL(5%)= 500 × 0.05 × 0.8 = <strong>20g</strong></li>
+    <li><strong>ドリンク数</strong> = 純アルコール量 ÷ 10(国際的に用いられる 1ドリンク=純アルコール10g)</li>
+  </ul>
+  <p>判定の基準は、厚生労働省「健康に配慮した飲酒に関するガイドライン」が示す<strong>生活習慣病のリスクを高める飲酒量</strong>(1日あたりの純アルコール量)です。</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>1日あたりの純アルコール量の目安(厚生労働省)</caption>
+      <thead><tr><th>区分</th><th>純アルコール量</th></tr></thead>
+      <tbody>
+        <tr><td>生活習慣病のリスクを高める量(男性)</td><td>40g以上</td></tr>
+        <tr><td>生活習慣病のリスクを高める量(女性)</td><td>20g以上</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>厚生労働省 e-ヘルスネット「飲酒量の単位」(計算式・ドリンク換算)<br>
+      <a href="https://kennet.mhlw.go.jp/information/information/alcohol/a-02-001.html" rel="noopener" target="_blank">https://kennet.mhlw.go.jp/information/information/alcohol/a-02-001.html</a>(2026年7月18日参照)</li>
+    <li>厚生労働省「健康に配慮した飲酒に関するガイドライン」(リスク判定の基準)<br>
+      <a href="https://www.mhlw.go.jp/stf/newpage_38541.html" rel="noopener" target="_blank">https://www.mhlw.go.jp/stf/newpage_38541.html</a>(2026年7月18日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>「リスクを高める量」は病気の発症リスクに関する統計的な目安であり、これ未満なら安全という意味ではありません。少量の飲酒でもリスクが上がる病気(高血圧など)もあります。</li>
+    <li>アルコールの分解速度には個人差が大きく、同じ量でも影響は人によって異なります。</li>
+    <li>20歳未満の飲酒・飲酒運転は法律で禁止されています。</li>
+  </ul>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../bmr/">基礎代謝量 計算機</a></li>
+    <li><a href="../bmi/">BMI・適正体重 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_volume: "量は " + AlcoholCalc.VOLUME_MIN_ML + "〜" + AlcoholCalc.VOLUME_MAX_ML + " mL の範囲で入力してください。",
+    invalid_abv: "度数は " + AlcoholCalc.ABV_MIN + "〜" + AlcoholCalc.ABV_MAX + " % の範囲で入力してください。",
+    invalid_sex: "性別を選択してください。"
+  };
+  document.getElementById("alcohol-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var volume = parseFloat(document.getElementById("volume").value);
+    var abv = parseFloat(document.getElementById("abv").value);
+    var sex = document.getElementById("sex").value;
+    var result = AlcoholCalc.calculate(volume, abv, sex);
+    var box = document.getElementById("result");
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">純アルコール量 ' + result.grams.toFixed(1) + " g</div>" +
+        "<p>約 <strong>" + result.drinks.toFixed(1) + " ドリンク</strong>(1ドリンク=10g)</p>" +
+        (result.exceedsRisk
+          ? "<p><strong>生活習慣病のリスクを高める量(1日あたり)に達しています。</strong>飲酒量の見直しを検討してください。</p>"
+          : "<p>生活習慣病のリスクを高める量(1日あたり)には達していません。</p>");
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
+    }
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

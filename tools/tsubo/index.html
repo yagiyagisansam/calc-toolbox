@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>坪・平米(㎡)・畳 変換計算機 | 計算ツールボックス</title>
+  <meta name="description" content="坪⇔平米(㎡)⇔畳を一発で相互変換できる無料計算機。1坪=約3.31㎡、畳1枚=1.62㎡(不動産広告の表示基準)に基づき、根拠と出典も明記しています。">
+  <link rel="stylesheet" href="../../shared/style.css">
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>坪・平米(㎡)・畳 変換計算機</h1>
+  <p>面積の値と単位を入力すると、<strong>坪・平方メートル(㎡)・畳</strong>の3つの単位へ同時に変換します。不動産広告や間取り図でよく使う換算です。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="tsubo-form">
+    <label>面積の値
+      <span class="field-note">例: 100(対応範囲: 0.01〜100,000)</span>
+      <input type="number" id="value" inputmode="decimal" step="0.01" min="0.01" max="100000" placeholder="100" required>
+    </label>
+    <label>入力した値の単位
+      <select id="unit">
+        <option value="sqm">平方メートル(㎡)</option>
+        <option value="tsubo">坪</option>
+        <option value="jo">畳</option>
+      </select>
+    </label>
+    <button type="submit">変換する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    このツールの変換結果は<strong>概算</strong>です。畳は広告表示基準の「1枚=1.62㎡」で換算しており、実際の畳の寸法(京間・中京間・江戸間・団地間)とは異なる場合があります。
+  </div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>変換したい面積の値を入力します(例: 100)。</li>
+    <li>その値の単位(㎡・坪・畳)を選びます。</li>
+    <li>「変換する」を押すと、3つの単位すべての値が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>1坪 = 400/121㎡ ≒ 3.31㎡</strong>(1㎡ ≒ 0.3025坪)<br>
+      1尺=10/33mの定義から、1坪=(6尺)²=400/121㎡となります。なお、取引や証明に尺貫法(坪)を使うことは計量法で認められておらず、坪表記は慣用的な参考値です。</li>
+    <li><strong>畳1枚 = 1.62㎡</strong><br>
+      不動産広告で「◯畳」と表示する場合の基準(壁心面積ベースで畳1枚あたり1.62㎡以上)です。</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>よく使う換算の早見表(概算)</caption>
+      <thead><tr><th>㎡</th><th>坪</th><th>畳</th></tr></thead>
+      <tbody>
+        <tr><td>9.72</td><td>2.94</td><td>6</td></tr>
+        <tr><td>16.2</td><td>4.9</td><td>10</td></tr>
+        <tr><td>33.06</td><td>10</td><td>20.41</td></tr>
+        <tr><td>66.12</td><td>20</td><td>40.81</td></tr>
+        <tr><td>100</td><td>30.25</td><td>61.73</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>計量法(平成4年法律第51号)(取引・証明における法定計量単位)<br>
+      <a href="https://laws.e-gov.go.jp/law/404AC0000000051" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/404AC0000000051</a>(2026年7月18日参照)</li>
+    <li>不動産公正取引協議会連合会「不動産の表示に関する公正競争規約・同施行規則」(畳1枚=1.62㎡の表示基準)<br>
+      <a href="https://www.rftc.jp/koseikyosokiyaku/" rel="noopener" target="_blank">https://www.rftc.jp/koseikyosokiyaku/</a>(2026年7月18日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>実際の畳のサイズは地域・種類で異なります(京間 約1.82㎡、中京間 約1.66㎡、江戸間 約1.55㎡、団地間 約1.45㎡程度)。本ツールは広告表示基準の1.62㎡で統一しています。</li>
+    <li>不動産の正式な面積は登記簿・図面(㎡表記)でご確認ください。</li>
+  </ul>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../loan/">ローン返済 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_value: "面積は " + TsuboCalc.VALUE_MIN + "〜" + TsuboCalc.VALUE_MAX + " の範囲で入力してください。",
+    invalid_unit: "単位を選択してください。"
+  };
+  document.getElementById("tsubo-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var value = parseFloat(document.getElementById("value").value);
+    var unit = document.getElementById("unit").value;
+    var result = TsuboCalc.convert(value, unit);
+    var box = document.getElementById("result");
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">' + result.sqm.toLocaleString() + " ㎡</div>" +
+        "<p><strong>" + result.tsubo.toLocaleString() + " 坪</strong> / <strong>" + result.jo.toLocaleString() + " 畳</strong></p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
+    }
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

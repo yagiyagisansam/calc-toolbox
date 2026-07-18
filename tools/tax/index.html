@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>消費税 計算機(税込⇔税抜・10%/軽減8%) | 計算ツールボックス</title>
+  <meta name="description" content="税抜→税込、税込→税抜を一発計算できる無料の消費税計算機。標準税率10%と軽減税率8%に対応し、税額の内訳も表示。根拠(国税庁)も明記しています。">
+  <link rel="stylesheet" href="../../shared/style.css">
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>消費税 計算機(税込⇔税抜)</h1>
+  <p>金額を入力すると、<strong>税抜→税込</strong>・<strong>税込→税抜</strong>を計算します。標準税率10%と軽減税率8%(飲食料品など)の両方に対応。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="tax-form">
+    <label>金額(円・整数)
+      <input type="number" id="price" inputmode="numeric" step="1" min="1" max="999999999" placeholder="1000" required>
+    </label>
+    <label>計算の向き
+      <select id="direction">
+        <option value="add">税抜 → 税込(税を足す)</option>
+        <option value="remove">税込 → 税抜(税を除く)</option>
+      </select>
+    </label>
+    <label>税率
+      <select id="rate">
+        <option value="10">10%(標準税率)</option>
+        <option value="8">8%(軽減税率: 飲食料品・定期購読新聞)</option>
+      </select>
+    </label>
+    <button type="submit">計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    このツールの計算結果は<strong>概算</strong>です。1円未満の端数は四捨五入で計算していますが、実際の端数処理(切り捨て・切り上げ・四捨五入)は事業者ごとに異なるため、店頭のレシートと1円単位で差が出ることがあります。
+  </div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>金額を円単位の整数で入力します。</li>
+    <li>「税抜→税込」か「税込→税抜」かを選びます。</li>
+    <li>税率(10%または8%)を選んで「計算する」を押すと、税額の内訳つきで表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>税抜→税込</strong>: 消費税額 = 税抜価格 × 税率、税込価格 = 税抜価格 + 消費税額</li>
+    <li><strong>税込→税抜</strong>: 税抜価格 = 税込価格 ÷ (1 + 税率)、消費税額 = 税込価格 − 税抜価格</li>
+    <li>税率は<strong>標準税率10%</strong>、<strong>軽減税率8%</strong>(酒類・外食を除く飲食料品と、週2回以上発行される定期購読新聞)です(2019年10月1日以降)。</li>
+    <li>計算例: 税抜1,980円(軽減8%)→ 税158円・税込2,138円 / 税込1,980円(10%)→ 税抜1,800円・税180円</li>
+  </ul>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>国税庁「消費税の軽減税率制度について」(税率・軽減税率の対象品目)<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/zeimokubetsu/shohi/keigenzeiritsu/index.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/zeimokubetsu/shohi/keigenzeiritsu/index.htm</a>(2026年7月18日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>軽減税率(8%)の対象かどうかは品目・提供方法で細かく決まっています(例: テイクアウトは8%、店内飲食は10%)。正確な区分は国税庁の資料でご確認ください。</li>
+    <li>税率が変更された場合、本ページの対応税率は改定時点のものです(ページ記載の参照日をご確認ください)。</li>
+  </ul>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../loan/">ローン返済 計算機</a></li>
+    <li><a href="../denki/">電気代 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_price: "金額は 1〜999,999,999円 の整数で入力してください。",
+    invalid_rate: "税率を選択してください。",
+    invalid_direction: "計算の向きを選択してください。"
+  };
+  document.getElementById("tax-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var price = parseFloat(document.getElementById("price").value);
+    var rate = parseInt(document.getElementById("rate").value, 10);
+    var direction = document.getElementById("direction").value;
+    var result = TaxCalc.calculate(price, rate, direction);
+    var box = document.getElementById("result");
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">税込 ' + result.taxIncluded.toLocaleString() + " 円</div>" +
+        "<p>税抜: <strong>" + result.taxExcluded.toLocaleString() + " 円</strong> / " +
+        "消費税(" + rate + "%): <strong>" + result.taxAmount.toLocaleString() + " 円</strong></p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
+    }
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

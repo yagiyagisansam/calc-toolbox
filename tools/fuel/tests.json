@@ -1,0 +1,79 @@
+{
+  "tool": "fuel",
+  "module": "calc.js",
+  "global": "FuelCalc",
+  "cases": [
+    {
+      "name": "通勤想定(100km/15km/L/170円): 6.67L・1,133円",
+      "func": "calculate",
+      "args": [100, 15, 170],
+      "expect": { "ok": true, "fuelL": 6.67, "costYen": 1133 }
+    },
+    {
+      "name": "帰省想定(400km/20km/L/165円): 20L・3,300円",
+      "func": "calculate",
+      "args": [400, 20, 165],
+      "expect": { "ok": true, "fuelL": 20, "costYen": 3300 }
+    },
+    {
+      "name": "小数入力(35.5km/12.3km/L/168.4円): 2.89L・486円",
+      "func": "calculate",
+      "args": [35.5, 12.3, 168.4],
+      "expect": { "ok": true, "fuelL": 2.89, "costYen": 486 }
+    },
+    {
+      "name": "長距離(1000km/25.5km/L/155円): 39.22L・6,078円",
+      "func": "calculate",
+      "args": [1000, 25.5, 155],
+      "expect": { "ok": true, "fuelL": 39.22, "costYen": 6078 }
+    },
+    {
+      "name": "境界値: 最小距離0.1kmは計算できる",
+      "func": "calculate",
+      "args": [0.1, 15, 170],
+      "expect": { "ok": true, "fuelL": 0.01, "costYen": 1 }
+    },
+    {
+      "name": "異常入力: 距離0はエラー",
+      "func": "calculate",
+      "args": [0, 15, 170],
+      "expect": { "ok": false, "code": "invalid_distance" }
+    },
+    {
+      "name": "異常入力: 距離が範囲超過(20000km)はエラー",
+      "func": "calculate",
+      "args": [20000, 15, 170],
+      "expect": { "ok": false, "code": "invalid_distance" }
+    },
+    {
+      "name": "異常入力: 燃費0はエラー",
+      "func": "calculate",
+      "args": [100, 0, 170],
+      "expect": { "ok": false, "code": "invalid_efficiency" }
+    },
+    {
+      "name": "異常入力: 燃費61km/L(上限超過)はエラー",
+      "func": "calculate",
+      "args": [100, 61, 170],
+      "expect": { "ok": false, "code": "invalid_efficiency" }
+    },
+    {
+      "name": "異常入力: 単価が下限未満(30円)はエラー",
+      "func": "calculate",
+      "args": [100, 15, 30],
+      "expect": { "ok": false, "code": "invalid_price" }
+    },
+    {
+      "name": "異常入力: 単価が上限超過(600円)はエラー",
+      "func": "calculate",
+      "args": [100, 15, 600],
+      "expect": { "ok": false, "code": "invalid_price" }
+    },
+    {
+      "name": "異常入力: 数値でない距離はエラー",
+      "func": "calculate",
+      "args": ["abc", 15, 170],
+      "expect": { "ok": false, "code": "invalid_distance" }
+    }
+  ]
+}

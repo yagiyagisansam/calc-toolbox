@@ -1,0 +1,85 @@
+{
+  "tool": "denki",
+  "module": "calc.js",
+  "global": "DenkiCalc",
+  "cases": [
+    {
+      "name": "基準ケース(1000W×1h×31円): 1kWh・31円/日",
+      "func": "calculate",
+      "args": [1000, 1, 31],
+      "expect": { "ok": true, "kwhPerDay": 1, "costPerDay": 31, "costPerMonth": 930, "costPerYear": 11315 }
+    },
+    {
+      "name": "エアコン想定(500W×8h): 4kWh・124円/日・3,720円/月",
+      "func": "calculate",
+      "args": [500, 8, 31],
+      "expect": { "ok": true, "kwhPerDay": 4, "costPerDay": 124, "costPerMonth": 3720, "costPerYear": 45260 }
+    },
+    {
+      "name": "冷蔵庫想定・24h稼働(60W×24h): 1.44kWh・44.6円/日",
+      "func": "calculate",
+      "args": [60, 24, 31],
+      "expect": { "ok": true, "kwhPerDay": 1.44, "costPerDay": 44.6, "costPerMonth": 1339, "costPerYear": 16294 }
+    },
+    {
+      "name": "単価カスタム(300W×5h×27円): 1.5kWh・40.5円/日",
+      "func": "calculate",
+      "args": [300, 5, 27],
+      "expect": { "ok": true, "kwhPerDay": 1.5, "costPerDay": 40.5, "costPerMonth": 1215, "costPerYear": 14783 }
+    },
+    {
+      "name": "単価省略時は目安単価31円(1500W×0.5h): 23.3円/日",
+      "func": "calculate",
+      "args": [1500, 0.5],
+      "expect": { "ok": true, "kwhPerDay": 0.75, "costPerDay": 23.3, "costPerMonth": 698, "costPerYear": 8486 }
+    },
+    {
+      "name": "境界値: 24時間ちょうどは計算できる",
+      "func": "calculate",
+      "args": [100, 24, 31],
+      "expect": { "ok": true, "kwhPerDay": 2.4 }
+    },
+    {
+      "name": "異常入力: 消費電力0はエラー",
+      "func": "calculate",
+      "args": [0, 8, 31],
+      "expect": { "ok": false, "code": "invalid_watts" }
+    },
+    {
+      "name": "異常入力: 消費電力が範囲超過(30000W)はエラー",
+      "func": "calculate",
+      "args": [30000, 8, 31],
+      "expect": { "ok": false, "code": "invalid_watts" }
+    },
+    {
+      "name": "異常入力: 使用時間0はエラー",
+      "func": "calculate",
+      "args": [500, 0, 31],
+      "expect": { "ok": false, "code": "invalid_hours" }
+    },
+    {
+      "name": "異常入力: 使用時間25hはエラー",
+      "func": "calculate",
+      "args": [500, 25, 31],
+      "expect": { "ok": false, "code": "invalid_hours" }
+    },
+    {
+      "name": "異常入力: 単価0はエラー",
+      "func": "calculate",
+      "args": [500, 8, 0],
+      "expect": { "ok": false, "code": "invalid_price" }
+    },
+    {
+      "name": "異常入力: 単価101円(上限超過)はエラー",
+      "func": "calculate",
+      "args": [500, 8, 101],
+      "expect": { "ok": false, "code": "invalid_price" }
+    },
+    {
+      "name": "異常入力: 数値でない消費電力はエラー",
+      "func": "calculate",
+      "args": ["abc", 8, 31],
+      "expect": { "ok": false, "code": "invalid_watts" }
+    }
+  ]
+}

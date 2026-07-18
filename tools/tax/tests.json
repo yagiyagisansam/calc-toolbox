@@ -1,0 +1,97 @@
+{
+  "tool": "tax",
+  "module": "calc.js",
+  "global": "TaxCalc",
+  "cases": [
+    {
+      "name": "税抜1000円→税込1100円(10%)",
+      "func": "calculate",
+      "args": [1000, 10, "add"],
+      "expect": { "ok": true, "taxExcluded": 1000, "taxAmount": 100, "taxIncluded": 1100 }
+    },
+    {
+      "name": "税抜1980円→税込2138円(軽減8%・端数四捨五入)",
+      "func": "calculate",
+      "args": [1980, 8, "add"],
+      "expect": { "ok": true, "taxExcluded": 1980, "taxAmount": 158, "taxIncluded": 2138 }
+    },
+    {
+      "name": "税込1100円→税抜1000円(10%)",
+      "func": "calculate",
+      "args": [1100, 10, "remove"],
+      "expect": { "ok": true, "taxExcluded": 1000, "taxAmount": 100, "taxIncluded": 1100 }
+    },
+    {
+      "name": "税込1980円→税抜1800円(10%)",
+      "func": "calculate",
+      "args": [1980, 10, "remove"],
+      "expect": { "ok": true, "taxExcluded": 1800, "taxAmount": 180, "taxIncluded": 1980 }
+    },
+    {
+      "name": "税込1080円→税抜1000円(軽減8%)",
+      "func": "calculate",
+      "args": [1080, 8, "remove"],
+      "expect": { "ok": true, "taxExcluded": 1000, "taxAmount": 80, "taxIncluded": 1080 }
+    },
+    {
+      "name": "端数の出る税抜998円→税込1098円(税99.8→100円)",
+      "func": "calculate",
+      "args": [998, 10, "add"],
+      "expect": { "ok": true, "taxExcluded": 998, "taxAmount": 100, "taxIncluded": 1098 }
+    },
+    {
+      "name": "端数の出る税込999円→税抜908円(10%)",
+      "func": "calculate",
+      "args": [999, 10, "remove"],
+      "expect": { "ok": true, "taxExcluded": 908, "taxAmount": 91, "taxIncluded": 999 }
+    },
+    {
+      "name": "端数の出る税抜538円→税込581円(軽減8%・税43円)",
+      "func": "calculate",
+      "args": [538, 8, "add"],
+      "expect": { "ok": true, "taxExcluded": 538, "taxAmount": 43, "taxIncluded": 581 }
+    },
+    {
+      "name": "境界値: 1円は計算できる",
+      "func": "calculate",
+      "args": [1, 10, "add"],
+      "expect": { "ok": true, "taxExcluded": 1, "taxAmount": 0, "taxIncluded": 1 }
+    },
+    {
+      "name": "異常入力: 0円はエラー",
+      "func": "calculate",
+      "args": [0, 10, "add"],
+      "expect": { "ok": false, "code": "invalid_price" }
+    },
+    {
+      "name": "異常入力: 負の金額はエラー",
+      "func": "calculate",
+      "args": [-100, 10, "add"],
+      "expect": { "ok": false, "code": "invalid_price" }
+    },
+    {
+      "name": "異常入力: 小数の金額はエラー",
+      "func": "calculate",
+      "args": [100.5, 10, "add"],
+      "expect": { "ok": false, "code": "invalid_price" }
+    },
+    {
+      "name": "異常入力: 税率5%(対象外)はエラー",
+      "func": "calculate",
+      "args": [1000, 5, "add"],
+      "expect": { "ok": false, "code": "invalid_rate" }
+    },
+    {
+      "name": "異常入力: 変換方向の指定不正はエラー",
+      "func": "calculate",
+      "args": [1000, 10, "plus"],
+      "expect": { "ok": false, "code": "invalid_direction" }
+    },
+    {
+      "name": "異常入力: 数値でない金額はエラー",
+      "func": "calculate",
+      "args": ["abc", 10, "add"],
+      "expect": { "ok": false, "code": "invalid_price" }
+    }
+  ]
+}

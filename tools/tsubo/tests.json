@@ -1,0 +1,79 @@
+{
+  "tool": "tsubo",
+  "module": "calc.js",
+  "global": "TsuboCalc",
+  "cases": [
+    {
+      "name": "100㎡ → 30.25坪・61.73畳",
+      "func": "convert",
+      "args": [100, "sqm"],
+      "expect": { "ok": true, "sqm": 100, "tsubo": 30.25, "jo": 61.73 }
+    },
+    {
+      "name": "1坪 → 3.31㎡・2.04畳",
+      "func": "convert",
+      "args": [1, "tsubo"],
+      "expect": { "ok": true, "sqm": 3.31, "tsubo": 1, "jo": 2.04 }
+    },
+    {
+      "name": "6畳 → 9.72㎡・2.94坪",
+      "func": "convert",
+      "args": [6, "jo"],
+      "expect": { "ok": true, "sqm": 9.72, "tsubo": 2.94, "jo": 6 }
+    },
+    {
+      "name": "30坪 → 99.17㎡・61.22畳",
+      "func": "convert",
+      "args": [30, "tsubo"],
+      "expect": { "ok": true, "sqm": 99.17, "tsubo": 30, "jo": 61.22 }
+    },
+    {
+      "name": "小数入力(70.5㎡) → 21.33坪・43.52畳",
+      "func": "convert",
+      "args": [70.5, "sqm"],
+      "expect": { "ok": true, "sqm": 70.5, "tsubo": 21.33, "jo": 43.52 }
+    },
+    {
+      "name": "往復変換の整合: 30.25坪 → 100.00㎡",
+      "func": "convert",
+      "args": [30.25, "tsubo"],
+      "expect": { "ok": true, "sqm": 100, "jo": 61.73 }
+    },
+    {
+      "name": "異常入力: 0はエラー",
+      "func": "convert",
+      "args": [0, "sqm"],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 負の値はエラー",
+      "func": "convert",
+      "args": [-5, "sqm"],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 範囲超過(200000)はエラー",
+      "func": "convert",
+      "args": [200000, "sqm"],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 不明な単位はエラー",
+      "func": "convert",
+      "args": [100, "acre"],
+      "expect": { "ok": false, "code": "invalid_unit" }
+    },
+    {
+      "name": "異常入力: 数値でない値はエラー",
+      "func": "convert",
+      "args": ["abc", "sqm"],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 単位未指定はエラー",
+      "func": "convert",
+      "args": [100],
+      "expect": { "ok": false, "code": "invalid_unit" }
+    }
+  ]
+}

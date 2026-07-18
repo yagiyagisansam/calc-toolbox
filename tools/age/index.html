@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>年齢計算機(満年齢・早生まれ判定・干支) | 計算ツールボックス</title>
+  <meta name="description" content="生年月日から満年齢・干支・早生まれかどうかを無料で計算。基準日を指定すれば「その時点で何歳か」も調べられます。うるう年生まれにも対応。">
+  <link rel="stylesheet" href="../../shared/style.css">
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>年齢計算機(満年齢・早生まれ・干支)</h1>
+  <p>生年月日を入力すると、<strong>満年齢・干支(十二支)・早生まれかどうか</strong>を計算します。基準日を変えれば「入学時点の年齢」「過去のある日の年齢」も調べられます。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="age-form">
+    <label>生年月日
+      <input type="date" id="birth" min="1868-01-01" max="2100-12-31" required>
+    </label>
+    <label>基準日(この日時点の年齢を計算)
+      <span class="field-note">初期値は今日の日付</span>
+      <input type="date" id="asof" min="1868-01-01" max="2100-12-31" required>
+    </label>
+    <button type="submit">計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    このツールは通俗的な「誕生日当日に1歳加算」で計算した<strong>概算</strong>です。法律上の満年齢は誕生日の<strong>前日の終了時</strong>に加算されるため、誕生日前日を基準日にした場合など、境界では法律上の年齢と1歳ずれることがあります。
+  </div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>生年月日を選択します。</li>
+    <li>基準日(初期値は今日)を必要に応じて変更します。</li>
+    <li>「計算する」を押すと、満年齢・干支・早生まれ判定が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>満年齢</strong>: 基準日が誕生日(月日)以降なら「基準年−生まれ年」、誕生日前なら1を引いた値。</li>
+    <li><strong>早生まれ</strong>: 1月1日〜4月1日生まれ。同学年の中で誕生日が遅いため、学年の区切り(4月2日〜翌年4月1日)では前の学年になります。4月1日生まれが早生まれになるのは、法律上の加齢が誕生日前日(3月31日)の終了時だからです。</li>
+    <li><strong>干支(十二支)</strong>: 生まれ年の西暦から算出(子・丑・寅・卯・辰・巳・午・未・申・酉・戌・亥の12年周期)。</li>
+    <li><strong>2月29日生まれ</strong>: 平年は3月1日に1歳加算する扱いで計算しています。</li>
+  </ul>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>年齢計算ニ関スル法律(明治35年法律第50号)(満年齢の起算方法)<br>
+      <a href="https://laws.e-gov.go.jp/law/135AC1000000050" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/135AC1000000050</a>(2026年7月18日参照)</li>
+    <li>学校教育法(昭和22年法律第26号)第17条(就学時期=学年の区切りの根拠)<br>
+      <a href="https://laws.e-gov.go.jp/law/322AC0000000026" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/322AC0000000026</a>(2026年7月18日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>契約・行政手続などで法律上の正確な年齢が必要な場合は、「誕生日の前日に加齢する」規定に基づいてご確認ください。</li>
+    <li>干支は年単位(西暦1月1日区切り)で表示しています。旧暦・節分区切りの流儀とは異なる場合があります。</li>
+  </ul>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../wareki/">西暦・和暦 変換計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  // 基準日の初期値に今日を設定
+  var asofInput = document.getElementById("asof");
+  var now = new Date();
+  asofInput.value = now.getFullYear() + "-" +
+    String(now.getMonth() + 1).padStart(2, "0") + "-" +
+    String(now.getDate()).padStart(2, "0");
+
+  var ERROR_MESSAGES = {
+    invalid_birth: "生年月日を正しく入力してください(対応範囲: 1868年以降)。",
+    invalid_asof: "基準日を正しく入力してください。",
+    birth_after_asof: "生年月日が基準日より後になっています。"
+  };
+  document.getElementById("age-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var result = AgeCalc.calculate(document.getElementById("birth").value, asofInput.value);
+    var box = document.getElementById("result");
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">満 ' + result.age + " 歳</div>" +
+        "<p>干支: <strong>" + result.eto + "</strong>年生まれ / " +
+        (result.hayaumare ? "<strong>早生まれ</strong>(1月1日〜4月1日生まれ)" : "早生まれではありません") + "</p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
+    }
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

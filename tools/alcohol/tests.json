@@ -1,0 +1,97 @@
+{
+  "tool": "alcohol",
+  "module": "calc.js",
+  "global": "AlcoholCalc",
+  "cases": [
+    {
+      "name": "ビール中びん・ロング缶相当(500mL/5%/男性): 20g=2ドリンク",
+      "func": "calculate",
+      "args": [500, 5, "male"],
+      "expect": { "ok": true, "grams": 20.0, "drinks": 2.0, "exceedsRisk": false }
+    },
+    {
+      "name": "同量でも女性は閾値20g以上でリスク該当(500mL/5%/女性)",
+      "func": "calculate",
+      "args": [500, 5, "female"],
+      "expect": { "ok": true, "grams": 20.0, "exceedsRisk": true }
+    },
+    {
+      "name": "日本酒1合(180mL/15%/男性): 21.6g",
+      "func": "calculate",
+      "args": [180, 15, "male"],
+      "expect": { "ok": true, "grams": 21.6, "drinks": 2.2, "exceedsRisk": false }
+    },
+    {
+      "name": "ワイングラス1杯(125mL/12%/女性): 12g",
+      "func": "calculate",
+      "args": [125, 12, "female"],
+      "expect": { "ok": true, "grams": 12.0, "drinks": 1.2, "exceedsRisk": false }
+    },
+    {
+      "name": "ストロング系チューハイ(350mL/9%/男性): 25.2g",
+      "func": "calculate",
+      "args": [350, 9, "male"],
+      "expect": { "ok": true, "grams": 25.2, "drinks": 2.5, "exceedsRisk": false }
+    },
+    {
+      "name": "境界値: 男性40gちょうどはリスク該当(1000mL/5%)",
+      "func": "calculate",
+      "args": [1000, 5, "male"],
+      "expect": { "ok": true, "grams": 40.0, "exceedsRisk": true }
+    },
+    {
+      "name": "境界値直下: 男性39.9gは非該当(997mL/5%)",
+      "func": "calculate",
+      "args": [997, 5, "male"],
+      "expect": { "ok": true, "grams": 39.9, "exceedsRisk": false }
+    },
+    {
+      "name": "低アルコール(350mL/3%/女性): 8.4g",
+      "func": "calculate",
+      "args": [350, 3, "female"],
+      "expect": { "ok": true, "grams": 8.4, "drinks": 0.8, "exceedsRisk": false }
+    },
+    {
+      "name": "異常入力: 量0mLはエラー",
+      "func": "calculate",
+      "args": [0, 5, "male"],
+      "expect": { "ok": false, "code": "invalid_volume" }
+    },
+    {
+      "name": "異常入力: 量が範囲超過(20000mL)はエラー",
+      "func": "calculate",
+      "args": [20000, 5, "male"],
+      "expect": { "ok": false, "code": "invalid_volume" }
+    },
+    {
+      "name": "異常入力: 度数0%はエラー",
+      "func": "calculate",
+      "args": [500, 0, "male"],
+      "expect": { "ok": false, "code": "invalid_abv" }
+    },
+    {
+      "name": "異常入力: 度数が負の値はエラー",
+      "func": "calculate",
+      "args": [500, -5, "male"],
+      "expect": { "ok": false, "code": "invalid_abv" }
+    },
+    {
+      "name": "異常入力: 度数97%はエラー",
+      "func": "calculate",
+      "args": [500, 97, "male"],
+      "expect": { "ok": false, "code": "invalid_abv" }
+    },
+    {
+      "name": "異常入力: 性別指定なしはエラー",
+      "func": "calculate",
+      "args": [500, 5],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    },
+    {
+      "name": "異常入力: 数値でない量はエラー",
+      "func": "calculate",
+      "args": ["abc", 5, "male"],
+      "expect": { "ok": false, "code": "invalid_volume" }
+    }
+  ]
+}

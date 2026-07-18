@@ -1,0 +1,91 @@
+{
+  "tool": "loan",
+  "module": "calc.js",
+  "global": "LoanCalc",
+  "cases": [
+    {
+      "name": "住宅ローン想定(3000万円/年1.5%/35年): 月91,855円",
+      "func": "calculate",
+      "args": [30000000, 1.5, 35],
+      "expect": { "ok": true, "monthlyPayment": 91855, "totalPayment": 38579100, "totalInterest": 8579100 }
+    },
+    {
+      "name": "低金利長期(2000万円/年0.5%/30年): 月59,838円",
+      "func": "calculate",
+      "args": [20000000, 0.5, 30],
+      "expect": { "ok": true, "monthlyPayment": 59838, "totalPayment": 21541680, "totalInterest": 1541680 }
+    },
+    {
+      "name": "中期(1000万円/年3%/10年): 月96,561円",
+      "func": "calculate",
+      "args": [10000000, 3, 10],
+      "expect": { "ok": true, "monthlyPayment": 96561, "totalPayment": 11587320, "totalInterest": 1587320 }
+    },
+    {
+      "name": "金利0%(500万円/10年): 月41,667円(単純割り)",
+      "func": "calculate",
+      "args": [5000000, 0, 10],
+      "expect": { "ok": true, "monthlyPayment": 41667, "totalPayment": 5000040, "totalInterest": 40 }
+    },
+    {
+      "name": "高金利短期(100万円/年15%/5年): 月23,790円",
+      "func": "calculate",
+      "args": [1000000, 15, 5],
+      "expect": { "ok": true, "monthlyPayment": 23790, "totalPayment": 1427400, "totalInterest": 427400 }
+    },
+    {
+      "name": "境界値: 最短1年は計算できる(120万円/年12%/1年)",
+      "func": "calculate",
+      "args": [1200000, 12, 1],
+      "expect": { "ok": true }
+    },
+    {
+      "name": "異常入力: 借入額が下限未満(5万円)はエラー",
+      "func": "calculate",
+      "args": [50000, 1.5, 35],
+      "expect": { "ok": false, "code": "invalid_principal" }
+    },
+    {
+      "name": "異常入力: 借入額が上限超過(10億円)はエラー",
+      "func": "calculate",
+      "args": [1000000000, 1.5, 35],
+      "expect": { "ok": false, "code": "invalid_principal" }
+    },
+    {
+      "name": "異常入力: 金利が負の値はエラー",
+      "func": "calculate",
+      "args": [10000000, -1, 35],
+      "expect": { "ok": false, "code": "invalid_rate" }
+    },
+    {
+      "name": "異常入力: 金利21%(上限超過)はエラー",
+      "func": "calculate",
+      "args": [10000000, 21, 35],
+      "expect": { "ok": false, "code": "invalid_rate" }
+    },
+    {
+      "name": "異常入力: 返済年数0はエラー",
+      "func": "calculate",
+      "args": [10000000, 1.5, 0],
+      "expect": { "ok": false, "code": "invalid_years" }
+    },
+    {
+      "name": "異常入力: 返済年数51はエラー",
+      "func": "calculate",
+      "args": [10000000, 1.5, 51],
+      "expect": { "ok": false, "code": "invalid_years" }
+    },
+    {
+      "name": "異常入力: 返済年数が小数はエラー",
+      "func": "calculate",
+      "args": [10000000, 1.5, 10.5],
+      "expect": { "ok": false, "code": "invalid_years" }
+    },
+    {
+      "name": "異常入力: 数値でない借入額はエラー",
+      "func": "calculate",
+      "args": ["abc", 1.5, 35],
+      "expect": { "ok": false, "code": "invalid_principal" }
+    }
+  ]
+}

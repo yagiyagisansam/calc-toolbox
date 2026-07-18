@@ -1,0 +1,103 @@
+{
+  "tool": "wareki",
+  "module": "calc.js",
+  "global": "WarekiCalc",
+  "cases": [
+    {
+      "name": "2026年 → 令和8年",
+      "func": "toWareki",
+      "args": [2026],
+      "expect": { "ok": true, "results": [{ "era": "令和", "eraYear": 8, "label": "令和8年" }] }
+    },
+    {
+      "name": "改元年2019年 → 平成31年と令和元年の両方",
+      "func": "toWareki",
+      "args": [2019],
+      "expect": { "ok": true, "results": [{ "era": "平成", "eraYear": 31, "label": "平成31年" }, { "era": "令和", "eraYear": 1, "label": "令和元年" }] }
+    },
+    {
+      "name": "改元年1989年 → 昭和64年と平成元年の両方",
+      "func": "toWareki",
+      "args": [1989],
+      "expect": { "ok": true, "results": [{ "era": "昭和", "eraYear": 64, "label": "昭和64年" }, { "era": "平成", "eraYear": 1, "label": "平成元年" }] }
+    },
+    {
+      "name": "改元年1912年 → 明治45年と大正元年の両方",
+      "func": "toWareki",
+      "args": [1912],
+      "expect": { "ok": true, "results": [{ "era": "明治", "eraYear": 45, "label": "明治45年" }, { "era": "大正", "eraYear": 1, "label": "大正元年" }] }
+    },
+    {
+      "name": "改元年1926年 → 大正15年と昭和元年の両方",
+      "func": "toWareki",
+      "args": [1926],
+      "expect": { "ok": true, "results": [{ "era": "大正", "eraYear": 15, "label": "大正15年" }, { "era": "昭和", "eraYear": 1, "label": "昭和元年" }] }
+    },
+    {
+      "name": "1950年 → 昭和25年",
+      "func": "toWareki",
+      "args": [1950],
+      "expect": { "ok": true, "results": [{ "era": "昭和", "eraYear": 25, "label": "昭和25年" }] }
+    },
+    {
+      "name": "2000年 → 平成12年",
+      "func": "toWareki",
+      "args": [2000],
+      "expect": { "ok": true, "results": [{ "era": "平成", "eraYear": 12, "label": "平成12年" }] }
+    },
+    {
+      "name": "和暦→西暦: 令和8年 → 2026年",
+      "func": "toSeireki",
+      "args": ["令和", 8],
+      "expect": { "ok": true, "year": 2026 }
+    },
+    {
+      "name": "和暦→西暦: 昭和64年 → 1989年",
+      "func": "toSeireki",
+      "args": ["昭和", 64],
+      "expect": { "ok": true, "year": 1989 }
+    },
+    {
+      "name": "和暦→西暦: 平成31年 → 2019年",
+      "func": "toSeireki",
+      "args": ["平成", 31],
+      "expect": { "ok": true, "year": 2019 }
+    },
+    {
+      "name": "和暦→西暦: 明治元年 → 1868年",
+      "func": "toSeireki",
+      "args": ["明治", 1],
+      "expect": { "ok": true, "year": 1868 }
+    },
+    {
+      "name": "異常入力: 1867年(明治以前)はエラー",
+      "func": "toWareki",
+      "args": [1867],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "異常入力: 小数の年はエラー",
+      "func": "toWareki",
+      "args": [2020.5],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "異常入力: 存在しない元号はエラー",
+      "func": "toSeireki",
+      "args": ["慶応", 3],
+      "expect": { "ok": false, "code": "invalid_era" }
+    },
+    {
+      "name": "異常入力: 明治46年(範囲外)はエラー",
+      "func": "toSeireki",
+      "args": ["明治", 46],
+      "expect": { "ok": false, "code": "invalid_era_year" }
+    },
+    {
+      "name": "異常入力: 和暦0年はエラー",
+      "func": "toSeireki",
+      "args": ["令和", 0],
+      "expect": { "ok": false, "code": "invalid_era_year" }
+    }
+  ]
+}

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>基礎代謝量 計算機(厚生労働省の基準値で計算) | 計算ツールボックス</title>
+  <meta name="description" content="年齢・性別・体重から1日の基礎代謝量(kcal)を無料で計算。厚生労働省「日本人の食事摂取基準」の基礎代謝基準値に基づく計算で、根拠と出典も明記しています。">
+  <link rel="stylesheet" href="../../shared/style.css">
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>基礎代謝量 計算機</h1>
+  <p>年齢・性別・体重を入力すると、<strong>1日の基礎代謝量(kcal)</strong>を計算します。基礎代謝量は、安静にしていても生命維持のために消費されるエネルギーで、ダイエットや食事管理の基準になる数値です。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="bmr-form">
+    <label>年齢(歳)
+      <span class="field-note">対応範囲: 1〜120歳(整数)</span>
+      <input type="number" id="age" inputmode="numeric" step="1" min="1" max="120" placeholder="30" required>
+    </label>
+    <label>性別
+      <select id="sex">
+        <option value="male">男性</option>
+        <option value="female">女性</option>
+      </select>
+    </label>
+    <label>体重(kg)
+      <span class="field-note">対応範囲: 5〜300kg</span>
+      <input type="number" id="weight" inputmode="decimal" step="0.1" min="5" max="300" placeholder="60" required>
+    </label>
+    <button type="submit">計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    このツールの計算結果は<strong>概算</strong>です。基礎代謝基準値は各年齢区分の平均的な体格に基づく値のため、筋肉量が多い方・少ない方では実際の基礎代謝量と差が出ます。
+  </div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>年齢を整数で入力します。</li>
+    <li>性別を選択します。</li>
+    <li>体重をkg単位で入力し「計算する」を押すと、基礎代謝量が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <p><strong>基礎代謝量(kcal/日) = 基礎代謝基準値(kcal/kg体重/日) × 体重(kg)</strong></p>
+  <p>基礎代謝基準値は、厚生労働省「日本人の食事摂取基準(2015年版)」の年齢区分別・男女別の値を使用しています。</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>基礎代謝基準値(kcal/kg体重/日)</caption>
+      <thead><tr><th>年齢</th><th>男性</th><th>女性</th></tr></thead>
+      <tbody>
+        <tr><td>1〜2歳</td><td>61.0</td><td>59.7</td></tr>
+        <tr><td>3〜5歳</td><td>54.8</td><td>52.2</td></tr>
+        <tr><td>6〜7歳</td><td>44.3</td><td>41.9</td></tr>
+        <tr><td>8〜9歳</td><td>40.8</td><td>38.3</td></tr>
+        <tr><td>10〜11歳</td><td>37.4</td><td>34.8</td></tr>
+        <tr><td>12〜14歳</td><td>31.0</td><td>29.6</td></tr>
+        <tr><td>15〜17歳</td><td>27.0</td><td>25.3</td></tr>
+        <tr><td>18〜29歳</td><td>24.0</td><td>22.1</td></tr>
+        <tr><td>30〜49歳</td><td>22.3</td><td>21.7</td></tr>
+        <tr><td>50〜69歳</td><td>21.5</td><td>20.7</td></tr>
+        <tr><td>70歳以上</td><td>21.5</td><td>20.7</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>厚生労働省 e-ヘルスネット「加齢とエネルギー代謝」(基礎代謝基準値表・日本人の食事摂取基準(2015年版)による)<br>
+      <a href="https://kennet.mhlw.go.jp/information/information/food/e-07-002.html" rel="noopener" target="_blank">https://kennet.mhlw.go.jp/information/information/food/e-07-002.html</a>(2026年7月18日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>基礎代謝量は「安静時に消費される最低限のエネルギー」です。1日の消費エネルギー全体は、活動量に応じてこれより大きくなります(基礎代謝量×身体活動レベルで概算されます)。</li>
+    <li>基準値は平均的な体格(参照体重)に基づくため、筋肉量・体組成による個人差があります。</li>
+    <li>食事制限などの健康管理は、数値だけで判断せず医師・管理栄養士にご相談ください。</li>
+  </ul>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../bmi/">BMI・適正体重 計算機</a></li>
+    <li><a href="../alcohol/">純アルコール量 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_age: "年齢は " + BmrCalc.AGE_MIN + "〜" + BmrCalc.AGE_MAX + " 歳の整数で入力してください。",
+    invalid_sex: "性別を選択してください。",
+    invalid_weight: "体重は " + BmrCalc.WEIGHT_MIN_KG + "〜" + BmrCalc.WEIGHT_MAX_KG + " kg の範囲で入力してください。"
+  };
+  document.getElementById("bmr-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var age = parseFloat(document.getElementById("age").value);
+    var sex = document.getElementById("sex").value;
+    var weight = parseFloat(document.getElementById("weight").value);
+    var result = BmrCalc.calculate(age, sex, weight);
+    var box = document.getElementById("result");
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">基礎代謝量 約' + result.bmrKcal.toLocaleString() + " kcal/日</div>" +
+        "<p>適用した基礎代謝基準値: <strong>" + result.standardValue.toFixed(1) + " kcal/kg体重/日</strong></p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
+    }
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

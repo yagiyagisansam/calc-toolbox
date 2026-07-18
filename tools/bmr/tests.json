@@ -1,0 +1,97 @@
+{
+  "tool": "bmr",
+  "module": "calc.js",
+  "global": "BmrCalc",
+  "cases": [
+    {
+      "name": "成人男性(25歳/70kg): 24.0×70=1680kcal",
+      "func": "calculate",
+      "args": [25, "male", 70],
+      "expect": { "ok": true, "standardValue": 24.0, "bmrKcal": 1680 }
+    },
+    {
+      "name": "成人女性(55歳/50kg): 20.7×50=1035kcal",
+      "func": "calculate",
+      "args": [55, "female", 50],
+      "expect": { "ok": true, "standardValue": 20.7, "bmrKcal": 1035 }
+    },
+    {
+      "name": "境界値: 30歳男性は30-49歳区分(22.3)",
+      "func": "calculate",
+      "args": [30, "male", 60],
+      "expect": { "ok": true, "standardValue": 22.3, "bmrKcal": 1338 }
+    },
+    {
+      "name": "境界値: 29歳男性は18-29歳区分(24.0)",
+      "func": "calculate",
+      "args": [29, "male", 60],
+      "expect": { "ok": true, "standardValue": 24.0, "bmrKcal": 1440 }
+    },
+    {
+      "name": "17歳女性(15-17歳区分 25.3): 50kgで1265kcal",
+      "func": "calculate",
+      "args": [17, "female", 50],
+      "expect": { "ok": true, "standardValue": 25.3, "bmrKcal": 1265 }
+    },
+    {
+      "name": "70歳男性(70歳以上区分 21.5): 60kgで1290kcal",
+      "func": "calculate",
+      "args": [70, "male", 60],
+      "expect": { "ok": true, "standardValue": 21.5, "bmrKcal": 1290 }
+    },
+    {
+      "name": "12歳男性(12-14歳区分 31.0): 40kgで1240kcal",
+      "func": "calculate",
+      "args": [12, "male", 40],
+      "expect": { "ok": true, "standardValue": 31.0, "bmrKcal": 1240 }
+    },
+    {
+      "name": "小数の体重(45歳女性/52.5kg): 21.7×52.5=1139kcal(四捨五入)",
+      "func": "calculate",
+      "args": [45, "female", 52.5],
+      "expect": { "ok": true, "standardValue": 21.7, "bmrKcal": 1139 }
+    },
+    {
+      "name": "異常入力: 年齢0はエラー",
+      "func": "calculate",
+      "args": [0, "male", 60],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "異常入力: 年齢121はエラー",
+      "func": "calculate",
+      "args": [121, "male", 60],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "異常入力: 年齢が小数はエラー",
+      "func": "calculate",
+      "args": [25.5, "male", 60],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "異常入力: 性別不正はエラー",
+      "func": "calculate",
+      "args": [25, "man", 60],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    },
+    {
+      "name": "異常入力: 体重0はエラー",
+      "func": "calculate",
+      "args": [25, "male", 0],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 体重が範囲超過(500kg)はエラー",
+      "func": "calculate",
+      "args": [25, "male", 500],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 数値でない年齢はエラー",
+      "func": "calculate",
+      "args": ["abc", "male", 60],
+      "expect": { "ok": false, "code": "invalid_age" }
+    }
+  ]
+}

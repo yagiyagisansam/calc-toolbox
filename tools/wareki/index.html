@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>西暦・和暦 変換計算機(明治〜令和) | 計算ツールボックス</title>
+  <meta name="description" content="西暦⇔和暦(明治・大正・昭和・平成・令和)を一発変換できる無料計算機。改元年は新旧両方の元号を表示。書類記入や年齢確認に便利です。">
+  <link rel="stylesheet" href="../../shared/style.css">
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>西暦・和暦 変換計算機</h1>
+  <p><strong>西暦⇔和暦(明治・大正・昭和・平成・令和)</strong>を相互に変換します。履歴書や役所の書類の記入時に便利です。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="to-wareki-form">
+    <label>西暦 → 和暦
+      <span class="field-note">対応範囲: 1868〜2100年</span>
+      <input type="number" id="year" inputmode="numeric" step="1" min="1868" max="2100" placeholder="2026" required>
+    </label>
+    <button type="submit">和暦に変換</button>
+  </form>
+
+  <form class="tool-form" id="to-seireki-form">
+    <label>和暦 → 西暦
+      <select id="era">
+        <option value="令和">令和</option>
+        <option value="平成">平成</option>
+        <option value="昭和">昭和</option>
+        <option value="大正">大正</option>
+        <option value="明治">明治</option>
+      </select>
+    </label>
+    <label>年(元年は1)
+      <input type="number" id="era-year" inputmode="numeric" step="1" min="1" max="99" placeholder="8" required>
+    </label>
+    <button type="submit">西暦に変換</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    このツールは<strong>年単位</strong>の変換です。改元があった年(1912・1926・1989・2019年)は月日によって元号が異なるため、新旧両方の元号を表示します。
+  </div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>西暦から調べる場合は上の欄に西暦年を入力して「和暦に変換」を押します。</li>
+    <li>和暦から調べる場合は元号と年を選んで「西暦に変換」を押します。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <p>各元号の元年を基準に「西暦 = 元年の西暦 + 和暦年 − 1」で計算しています。</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>元号と西暦の対応</caption>
+      <thead><tr><th>元号</th><th>期間(年単位)</th><th>早見の式</th></tr></thead>
+      <tbody>
+        <tr><td>明治</td><td>1868〜1912年(明治45年まで)</td><td>西暦 = 1867 + 明治N年</td></tr>
+        <tr><td>大正</td><td>1912〜1926年(大正15年まで)</td><td>西暦 = 1911 + 大正N年</td></tr>
+        <tr><td>昭和</td><td>1926〜1989年(昭和64年まで)</td><td>西暦 = 1925 + 昭和N年</td></tr>
+        <tr><td>平成</td><td>1989〜2019年(平成31年まで)</td><td>西暦 = 1988 + 平成N年</td></tr>
+        <tr><td>令和</td><td>2019年〜</td><td>西暦 = 2018 + 令和N年</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>元号法(昭和54年法律第43号)<br>
+      <a href="https://laws.e-gov.go.jp/law/354AC0000000043" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/354AC0000000043</a>(2026年7月18日参照)</li>
+    <li>元号を改める政令(平成31年政令第143号・「令和」の制定)<br>
+      <a href="https://laws.e-gov.go.jp/law/431CO0000000143" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/431CO0000000143</a>(2026年7月18日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>改元日は 明治→大正: 1912年7月30日 / 大正→昭和: 1926年12月25日 / 昭和→平成: 1989年1月8日 / 平成→令和: 2019年5月1日 です。改元年の正確な元号は月日でご確認ください。</li>
+    <li>明治より前の元号(慶応以前)には対応していません。</li>
+  </ul>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../age/">年齢・干支 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  function showError(code) {
+    var messages = {
+      invalid_year: "西暦は " + WarekiCalc.YEAR_MIN + "〜" + WarekiCalc.YEAR_MAX + " 年の整数で入力してください。",
+      invalid_era: "元号を選択してください。",
+      invalid_era_year: "その元号に存在しない年です。年数を確認してください。"
+    };
+    box.innerHTML = '<p class="result-error">' + (messages[code] || "入力値を確認してください。") + "</p>";
+    box.hidden = false;
+  }
+  document.getElementById("to-wareki-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var year = parseFloat(document.getElementById("year").value);
+    var result = WarekiCalc.toWareki(year);
+    if (!result.ok) { showError(result.code); return; }
+    var labels = result.results.map(function (r) { return r.label; }).join(" / ");
+    box.innerHTML = '<div class="result-main">' + labels + "</div>" +
+      (result.results.length > 1 ? "<p>この年は改元年のため、月日によって元号が異なります。</p>" : "");
+    box.hidden = false;
+  });
+  document.getElementById("to-seireki-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var era = document.getElementById("era").value;
+    var eraYear = parseFloat(document.getElementById("era-year").value);
+    var result = WarekiCalc.toSeireki(era, eraYear);
+    if (!result.ok) { showError(result.code); return; }
+    box.innerHTML = '<div class="result-main">西暦 ' + result.year + " 年</div>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

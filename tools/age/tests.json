@@ -1,0 +1,97 @@
+{
+  "tool": "age",
+  "module": "calc.js",
+  "global": "AgeCalc",
+  "cases": [
+    {
+      "name": "誕生日当日(1990-07-18 → 2026-07-18): 36歳・午年",
+      "func": "calculate",
+      "args": ["1990-07-18", "2026-07-18"],
+      "expect": { "ok": true, "age": 36, "hayaumare": false, "eto": "午" }
+    },
+    {
+      "name": "誕生日前日(1990-07-19生まれ → 2026-07-18): まだ35歳",
+      "func": "calculate",
+      "args": ["1990-07-19", "2026-07-18"],
+      "expect": { "ok": true, "age": 35 }
+    },
+    {
+      "name": "誕生日翌日(1990-07-17生まれ → 2026-07-18): 36歳",
+      "func": "calculate",
+      "args": ["1990-07-17", "2026-07-18"],
+      "expect": { "ok": true, "age": 36 }
+    },
+    {
+      "name": "うるう年2/29生まれ・平年2/28時点ではまだ25歳(2000-02-29 → 2026-02-28)",
+      "func": "calculate",
+      "args": ["2000-02-29", "2026-02-28"],
+      "expect": { "ok": true, "age": 25, "eto": "辰" }
+    },
+    {
+      "name": "うるう年2/29生まれ・平年3/1で26歳(2000-02-29 → 2026-03-01)",
+      "func": "calculate",
+      "args": ["2000-02-29", "2026-03-01"],
+      "expect": { "ok": true, "age": 26 }
+    },
+    {
+      "name": "4月1日生まれは早生まれ(1995-04-01)",
+      "func": "calculate",
+      "args": ["1995-04-01", "2026-07-18"],
+      "expect": { "ok": true, "age": 31, "hayaumare": true, "eto": "亥" }
+    },
+    {
+      "name": "4月2日生まれは早生まれではない(1995-04-02)",
+      "func": "calculate",
+      "args": ["1995-04-02", "2026-07-18"],
+      "expect": { "ok": true, "age": 31, "hayaumare": false }
+    },
+    {
+      "name": "1月生まれは早生まれ(2024-01-01 → 2026-07-18): 2歳・辰年",
+      "func": "calculate",
+      "args": ["2024-01-01", "2026-07-18"],
+      "expect": { "ok": true, "age": 2, "hayaumare": true, "eto": "辰" }
+    },
+    {
+      "name": "生まれた日当日は0歳(2026-07-18 → 2026-07-18)",
+      "func": "calculate",
+      "args": ["2026-07-18", "2026-07-18"],
+      "expect": { "ok": true, "age": 0 }
+    },
+    {
+      "name": "異常入力: 存在しない日付(2026-02-30)はエラー",
+      "func": "calculate",
+      "args": ["2026-02-30", "2026-07-18"],
+      "expect": { "ok": false, "code": "invalid_birth" }
+    },
+    {
+      "name": "異常入力: 平年の2/29はエラー(2025-02-29)",
+      "func": "calculate",
+      "args": ["2025-02-29", "2026-07-18"],
+      "expect": { "ok": false, "code": "invalid_birth" }
+    },
+    {
+      "name": "異常入力: 生年月日が基準日より未来はエラー",
+      "func": "calculate",
+      "args": ["2027-01-01", "2026-07-18"],
+      "expect": { "ok": false, "code": "birth_after_asof" }
+    },
+    {
+      "name": "異常入力: 形式不正(2026/07/18)はエラー",
+      "func": "calculate",
+      "args": ["2026/07/18", "2026-07-18"],
+      "expect": { "ok": false, "code": "invalid_birth" }
+    },
+    {
+      "name": "異常入力: 1868年より前はエラー",
+      "func": "calculate",
+      "args": ["1867-12-31", "2026-07-18"],
+      "expect": { "ok": false, "code": "invalid_birth" }
+    },
+    {
+      "name": "異常入力: 基準日が不正はエラー",
+      "func": "calculate",
+      "args": ["1990-07-18", "bad"],
+      "expect": { "ok": false, "code": "invalid_asof" }
+    }
+  ]
+}

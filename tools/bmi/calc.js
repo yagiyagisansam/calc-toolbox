@@ -4,7 +4,7 @@
  * 計算式の根拠(一次情報):
  * - BMI = 体重(kg) ÷ 身長(m)²、適正体重(標準体重) = 22 × 身長(m)²
  *   出典: 厚生労働省 e-ヘルスネット「BMI」
- *   https://www.e-healthnet.mhlw.go.jp/information/dictionary/metabolic/ym-002.html
+ *   https://kennet.mhlw.go.jp/information/information/dictionary/metabolic/ym-002.html
  * - 肥満度判定基準(成人): 日本肥満学会「肥満症診療ガイドライン2016」
  *   (18.5未満=低体重 / 18.5以上25未満=普通体重 / 25以上=肥満(1〜4度))
  *
