@@ -1,0 +1,91 @@
+{
+  "tool": "compound",
+  "module": "calc.js",
+  "global": "CompoundCalc",
+  "cases": [
+    {
+      "name": "一括100万円・年5%・10年 → 約162.9万円",
+      "func": "lumpSum",
+      "args": [1000000, 5, 10],
+      "expect": { "ok": true, "futureValue": 1628895, "profit": 628895 }
+    },
+    {
+      "name": "一括・利回り0%は元本のまま",
+      "func": "lumpSum",
+      "args": [1000000, 0, 10],
+      "expect": { "ok": true, "futureValue": 1000000, "profit": 0 }
+    },
+    {
+      "name": "一括50万円・年3%・20年 → 903,056円",
+      "func": "lumpSum",
+      "args": [500000, 3, 20],
+      "expect": { "ok": true, "futureValue": 903056, "profit": 403056 }
+    },
+    {
+      "name": "積立3万円/月・年5%・20年 → 約1,233万円(元本720万円)",
+      "func": "monthlySaving",
+      "args": [30000, 5, 20],
+      "expect": { "ok": true, "futureValue": 12331010, "totalDeposit": 7200000, "profit": 5131010 }
+    },
+    {
+      "name": "積立1万円/月・年3%・30年 → 約583万円",
+      "func": "monthlySaving",
+      "args": [10000, 3, 30],
+      "expect": { "ok": true, "futureValue": 5827369, "totalDeposit": 3600000, "profit": 2227369 }
+    },
+    {
+      "name": "積立・利回り0%は元本合計のみ(5万円/月・10年=600万円)",
+      "func": "monthlySaving",
+      "args": [50000, 0, 10],
+      "expect": { "ok": true, "futureValue": 6000000, "totalDeposit": 6000000, "profit": 0 }
+    },
+    {
+      "name": "端数の積立額(33,333円/月・年7%・15年)",
+      "func": "monthlySaving",
+      "args": [33333, 7, 15],
+      "expect": { "ok": true, "futureValue": 10565304, "totalDeposit": 5999940, "profit": 4565364 }
+    },
+    {
+      "name": "異常入力: 一括元本が下限未満はエラー",
+      "func": "lumpSum",
+      "args": [5000, 5, 10],
+      "expect": { "ok": false, "code": "invalid_principal" }
+    },
+    {
+      "name": "異常入力: 積立額が下限未満はエラー",
+      "func": "monthlySaving",
+      "args": [500, 5, 10],
+      "expect": { "ok": false, "code": "invalid_monthly" }
+    },
+    {
+      "name": "異常入力: 利回りが負はエラー",
+      "func": "lumpSum",
+      "args": [1000000, -1, 10],
+      "expect": { "ok": false, "code": "invalid_rate" }
+    },
+    {
+      "name": "異常入力: 利回り31%(上限超過)はエラー",
+      "func": "monthlySaving",
+      "args": [30000, 31, 10],
+      "expect": { "ok": false, "code": "invalid_rate" }
+    },
+    {
+      "name": "異常入力: 年数0はエラー",
+      "func": "lumpSum",
+      "args": [1000000, 5, 0],
+      "expect": { "ok": false, "code": "invalid_years" }
+    },
+    {
+      "name": "異常入力: 年数が小数はエラー",
+      "func": "monthlySaving",
+      "args": [30000, 5, 10.5],
+      "expect": { "ok": false, "code": "invalid_years" }
+    },
+    {
+      "name": "異常入力: 数値でない元本はエラー",
+      "func": "lumpSum",
+      "args": ["abc", 5, 10],
+      "expect": { "ok": false, "code": "invalid_principal" }
+    }
+  ]
+}

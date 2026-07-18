@@ -1,0 +1,73 @@
+{
+  "tool": "sleep",
+  "module": "calc.js",
+  "global": "SleepCalc",
+  "cases": [
+    {
+      "name": "23:00就寝→6:30起床 = 7時間30分",
+      "func": "calculate",
+      "args": ["23:00", "06:30"],
+      "expect": { "ok": true, "totalMinutes": 450, "hours": 7, "minutes": 30 }
+    },
+    {
+      "name": "日をまたがない(01:15→07:45)= 6時間30分",
+      "func": "calculate",
+      "args": ["01:15", "07:45"],
+      "expect": { "ok": true, "totalMinutes": 390, "hours": 6, "minutes": 30 }
+    },
+    {
+      "name": "22:30就寝→5:00起床 = 6時間30分",
+      "func": "calculate",
+      "args": ["22:30", "05:00"],
+      "expect": { "ok": true, "totalMinutes": 390, "hours": 6, "minutes": 30 }
+    },
+    {
+      "name": "ほぼ24時間(12:00→11:59)= 23時間59分",
+      "func": "calculate",
+      "args": ["12:00", "11:59"],
+      "expect": { "ok": true, "totalMinutes": 1439, "hours": 23, "minutes": 59 }
+    },
+    {
+      "name": "0時就寝→8:00起床 = 8時間",
+      "func": "calculate",
+      "args": ["00:00", "08:00"],
+      "expect": { "ok": true, "totalMinutes": 480, "hours": 8, "minutes": 0 }
+    },
+    {
+      "name": "1桁時刻の表記も受け付ける(9:00→17:00 = 8時間)",
+      "func": "calculate",
+      "args": ["9:00", "17:00"],
+      "expect": { "ok": true, "totalMinutes": 480, "hours": 8, "minutes": 0 }
+    },
+    {
+      "name": "異常入力: 同時刻はエラー",
+      "func": "calculate",
+      "args": ["23:00", "23:00"],
+      "expect": { "ok": false, "code": "same_time" }
+    },
+    {
+      "name": "異常入力: 存在しない時刻(25:00)はエラー",
+      "func": "calculate",
+      "args": ["25:00", "06:30"],
+      "expect": { "ok": false, "code": "invalid_bed" }
+    },
+    {
+      "name": "異常入力: 分が60はエラー",
+      "func": "calculate",
+      "args": ["23:00", "06:60"],
+      "expect": { "ok": false, "code": "invalid_wake" }
+    },
+    {
+      "name": "異常入力: 形式不正はエラー",
+      "func": "calculate",
+      "args": ["23時", "06:30"],
+      "expect": { "ok": false, "code": "invalid_bed" }
+    },
+    {
+      "name": "異常入力: 空文字はエラー",
+      "func": "calculate",
+      "args": ["", "06:30"],
+      "expect": { "ok": false, "code": "invalid_bed" }
+    }
+  ]
+}

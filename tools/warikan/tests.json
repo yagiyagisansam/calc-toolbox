@@ -1,0 +1,79 @@
+{
+  "tool": "warikan",
+  "module": "calc.js",
+  "global": "WarikanCalc",
+  "cases": [
+    {
+      "name": "28,460円を7人・100円単位 → 1人4,100円(余り240円)",
+      "func": "split",
+      "args": [28460, 7, 100],
+      "expect": { "ok": true, "perPerson": 4100, "collected": 28700, "surplus": 240 }
+    },
+    {
+      "name": "28,460円を7人・1円単位 → 1人4,066円(余り2円)",
+      "func": "split",
+      "args": [28460, 7, 1],
+      "expect": { "ok": true, "perPerson": 4066, "collected": 28462, "surplus": 2 }
+    },
+    {
+      "name": "10,000円を3人・10円単位 → 1人3,340円",
+      "func": "split",
+      "args": [10000, 3, 10],
+      "expect": { "ok": true, "perPerson": 3340, "collected": 10020, "surplus": 20 }
+    },
+    {
+      "name": "9,999円を2人・500円単位 → 1人5,000円",
+      "func": "split",
+      "args": [9999, 2, 500],
+      "expect": { "ok": true, "perPerson": 5000, "collected": 10000, "surplus": 1 }
+    },
+    {
+      "name": "割り切れる場合は余り0(30,000円を6人・1000円単位)",
+      "func": "split",
+      "args": [30000, 6, 1000],
+      "expect": { "ok": true, "perPerson": 5000, "collected": 30000, "surplus": 0 }
+    },
+    {
+      "name": "境界値: 2人で割れる",
+      "func": "split",
+      "args": [1000, 2, 1],
+      "expect": { "ok": true, "perPerson": 500, "surplus": 0 }
+    },
+    {
+      "name": "異常入力: 合計0円はエラー",
+      "func": "split",
+      "args": [0, 3, 100],
+      "expect": { "ok": false, "code": "invalid_total" }
+    },
+    {
+      "name": "異常入力: 合計が小数はエラー",
+      "func": "split",
+      "args": [1000.5, 3, 100],
+      "expect": { "ok": false, "code": "invalid_total" }
+    },
+    {
+      "name": "異常入力: 1人はエラー(割り勘にならない)",
+      "func": "split",
+      "args": [1000, 1, 100],
+      "expect": { "ok": false, "code": "invalid_people" }
+    },
+    {
+      "name": "異常入力: 101人はエラー",
+      "func": "split",
+      "args": [1000, 101, 100],
+      "expect": { "ok": false, "code": "invalid_people" }
+    },
+    {
+      "name": "異常入力: 単位が不正(50円)はエラー",
+      "func": "split",
+      "args": [1000, 3, 50],
+      "expect": { "ok": false, "code": "invalid_unit" }
+    },
+    {
+      "name": "異常入力: 数値でない合計はエラー",
+      "func": "split",
+      "args": ["abc", 3, 100],
+      "expect": { "ok": false, "code": "invalid_total" }
+    }
+  ]
+}

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ランニングペース 計算機(マラソン・ジョギング) | 計算ツールボックス</title>
+  <meta name="description" content="距離と目標タイムから1kmあたりのペースと時速を無料で計算。逆にペースからフルマラソン・ハーフのゴールタイム予測も。5km/10km/ハーフ/フルのプリセット付き。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://yagiyagisansam.github.io/calc-toolbox/tools/pace/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="ランニングペース 計算機(マラソン・ジョギング) | 計算ツールボックス">
+  <meta property="og:description" content="距離と目標タイムから1kmあたりのペースと時速を無料で計算。逆にペースからフルマラソン・ハーフのゴールタイム予測も。5km/10km/ハーフ/フルのプリセット付き。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://yagiyagisansam.github.io/calc-toolbox/tools/pace/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://yagiyagisansam.github.io/calc-toolbox/"},{"@type":"ListItem","position":2,"name":"ランニングペース 計算機(マラソン・ジョギング)","item":"https://yagiyagisansam.github.io/calc-toolbox/tools/pace/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>ランニングペース 計算機</h1>
+  <p>距離と目標タイムから<strong>1kmあたりのペース</strong>と時速を計算します。逆に、ペースから<strong>ゴールタイムの予測</strong>もできます。マラソン・ハーフ・ジョギングのペース配分に。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="pace-form">
+    <label>距離
+      <select id="distance-preset">
+        <option value="42.195">フルマラソン(42.195km)</option>
+        <option value="21.0975">ハーフマラソン(21.0975km)</option>
+        <option value="10" selected>10km</option>
+        <option value="5">5km</option>
+        <option value="custom">距離を入力する</option>
+      </select>
+      <input type="number" id="distance" inputmode="decimal" step="any" min="0.1" max="1000" placeholder="10" hidden>
+    </label>
+    <label>目標タイム(時間・分・秒)
+      <span class="field-note">例: 50分なら「0時間50分0秒」</span>
+    </label>
+    <div style="display:flex; gap:8px;">
+      <input type="number" id="t-h" inputmode="numeric" step="1" min="0" max="99" placeholder="0" aria-label="時間">
+      <input type="number" id="t-m" inputmode="numeric" step="1" min="0" max="59" placeholder="50" aria-label="分">
+      <input type="number" id="t-s" inputmode="numeric" step="1" min="0" max="59" placeholder="0" aria-label="秒">
+    </div>
+    <button type="submit">ペースを計算</button>
+  </form>
+
+  <form class="tool-form" id="time-form">
+    <label>ペースからゴールタイムを予測(分・秒/km)
+      <span class="field-note">上で選んだ距離を使います</span>
+    </label>
+    <div style="display:flex; gap:8px;">
+      <input type="number" id="p-m" inputmode="numeric" step="1" min="1" max="60" placeholder="5" aria-label="分">
+      <input type="number" id="p-s" inputmode="numeric" step="1" min="0" max="59" placeholder="30" aria-label="秒">
+    </div>
+    <button type="submit">タイムを予測</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    一定ペースで走った場合の<strong>概算</strong>です。実際のレースではコースの起伏・給水・混雑などでペースは変動します。
+  </div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>距離を選びます(プリセットにない距離は「距離を入力する」)。</li>
+    <li>目標タイムを入れて「ペースを計算」を押すと、1kmあたりのペースと時速が出ます。</li>
+    <li>逆に普段のペース(例: 5分30秒/km)を入れて「タイムを予測」も使えます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>ペース(秒/km) = 総タイム(秒) ÷ 距離(km)</strong>(秒単位に四捨五入)</li>
+    <li><strong>時速(km/h) = 距離 ÷ 時間</strong></li>
+    <li>計算例: フルマラソン4時間 → 5分41秒/km(時速10.55km)/ 5分00秒/kmでフルを走ると3時間30分59秒</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>距離・時間・速さの定義による算術計算です。フル=42.195km、ハーフ=21.0975kmで計算しています。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>GPSウォッチの距離表示はコース実測と数%ずれることがあります。レースでは距離表示板を基準にしてください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. サブ4(フル4時間切り)に必要なペースは?</h3>
+  <p>単純計算で5分41秒/kmです。ただし給水やトイレのロスを見込み、実際は5分30秒/km前後を目安にする走者が多いようです。本ツールで自分の余裕を計算してみてください。</p>
+  <h3>Q. 「ペース」と「スピード」の違いは?</h3>
+  <p>ペースは「1kmに何分かかるか」(小さいほど速い)、スピードは「1時間に何km進むか」(大きいほど速い)です。本ツールは両方を表示します。</p>
+  <h3>Q. トレッドミルの時速設定に使えますか?</h3>
+  <p>使えます。目標ペースを入れて表示される時速をそのまま設定してください(例: 6分00秒/km=時速10km)。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../tdee/">1日の摂取カロリー目安 計算機</a></li>
+    <li><a href="../bmi/">BMI・適正体重 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var preset = document.getElementById("distance-preset");
+  var custom = document.getElementById("distance");
+  preset.addEventListener("change", function () {
+    custom.hidden = preset.value !== "custom";
+  });
+  function currentDistance() {
+    return preset.value === "custom" ? parseFloat(custom.value) : parseFloat(preset.value);
+  }
+  function fmtTime(sec) {
+    var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    return (h > 0 ? h + "時間" : "") + m + "分" + s + "秒";
+  }
+  function fmtPace(sec) {
+    return Math.floor(sec / 60) + "分" + String(sec % 60).padStart(2, "0") + "秒/km";
+  }
+  var ERROR_MESSAGES = {
+    invalid_distance: "距離は 0.1〜1000km の範囲で入力してください。",
+    invalid_time: "タイムは1分〜100時間の範囲で入力してください。",
+    invalid_pace: "ペースは 1分00秒〜60分00秒/km の範囲で入力してください。"
+  };
+  function showError(code) {
+    box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "入力値を確認してください。") + "</p>";
+    box.hidden = false;
+  }
+  document.getElementById("pace-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var t = (parseInt(document.getElementById("t-h").value || "0", 10)) * 3600 +
+            (parseInt(document.getElementById("t-m").value || "0", 10)) * 60 +
+            (parseInt(document.getElementById("t-s").value || "0", 10));
+    var r = PaceCalc.paceFor(currentDistance(), t);
+    if (!r.ok) { showError(r.code); return; }
+    box.innerHTML = '<div class="result-main">' + fmtPace(r.paceSecPerKm) + "</div>" +
+      "<p>時速: <strong>" + r.speedKmh.toLocaleString() + " km/h</strong></p>";
+    box.hidden = false;
+  });
+  document.getElementById("time-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var p = (parseInt(document.getElementById("p-m").value || "0", 10)) * 60 +
+            (parseInt(document.getElementById("p-s").value || "0", 10));
+    var r = PaceCalc.timeFor(currentDistance(), p);
+    if (!r.ok) { showError(r.code); return; }
+    box.innerHTML = '<div class="result-main">' + fmtTime(r.totalSeconds) + "</div>" +
+      "<p>距離 " + currentDistance() + " km を " + fmtPace(p) + " で走った場合</p>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

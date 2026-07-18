@@ -1,0 +1,79 @@
+{
+  "tool": "tdee",
+  "module": "calc.js",
+  "global": "TdeeCalc",
+  "cases": [
+    {
+      "name": "30歳男性70kg・ふつう(Ⅱ): 1561kcal×1.75=2732kcal",
+      "func": "calculate",
+      "args": [30, "male", 70, "normal"],
+      "expect": { "ok": true, "bmrKcal": 1561, "palValue": 1.75, "tdeeKcal": 2732 }
+    },
+    {
+      "name": "25歳女性50kg・低い(Ⅰ): 1105kcal×1.50=1658kcal",
+      "func": "calculate",
+      "args": [25, "female", 50, "low"],
+      "expect": { "ok": true, "bmrKcal": 1105, "palValue": 1.5, "tdeeKcal": 1658 }
+    },
+    {
+      "name": "45歳男性80kg・高い(Ⅲ): 3568kcal",
+      "func": "calculate",
+      "args": [45, "male", 80, "high"],
+      "expect": { "ok": true, "bmrKcal": 1784, "tdeeKcal": 3568 }
+    },
+    {
+      "name": "55歳女性52kg・ふつう(Ⅱ): 1884kcal",
+      "func": "calculate",
+      "args": [55, "female", 52, "normal"],
+      "expect": { "ok": true, "bmrKcal": 1076, "tdeeKcal": 1884 }
+    },
+    {
+      "name": "70歳男性60kg・低い(Ⅰ): 1935kcal",
+      "func": "calculate",
+      "args": [70, "male", 60, "low"],
+      "expect": { "ok": true, "bmrKcal": 1290, "tdeeKcal": 1935 }
+    },
+    {
+      "name": "境界値: 18歳は計算できる",
+      "func": "calculate",
+      "args": [18, "male", 60, "normal"],
+      "expect": { "ok": true }
+    },
+    {
+      "name": "異常入力: 17歳(未成年区分)はエラー",
+      "func": "calculate",
+      "args": [17, "male", 60, "normal"],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "異常入力: 性別不正はエラー",
+      "func": "calculate",
+      "args": [30, "man", 60, "normal"],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    },
+    {
+      "name": "異常入力: 体重が範囲外はエラー",
+      "func": "calculate",
+      "args": [30, "male", 10, "normal"],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 活動レベル不正はエラー",
+      "func": "calculate",
+      "args": [30, "male", 60, "medium"],
+      "expect": { "ok": false, "code": "invalid_pal" }
+    },
+    {
+      "name": "異常入力: 活動レベル未指定はエラー",
+      "func": "calculate",
+      "args": [30, "male", 60],
+      "expect": { "ok": false, "code": "invalid_pal" }
+    },
+    {
+      "name": "異常入力: 数値でない年齢はエラー",
+      "func": "calculate",
+      "args": ["abc", "male", 60, "normal"],
+      "expect": { "ok": false, "code": "invalid_age" }
+    }
+  ]
+}

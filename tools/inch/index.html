@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>インチ⇔cm・ポンド⇔kg 変換計算機 | 計算ツールボックス</title>
+  <meta name="description" content="インチとセンチ、ポンドとキログラムを一発で相互変換できる無料計算機。テレビ・モニターのサイズ確認、海外通販の服・靴選び、ダンベルの重さ換算に便利です。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://yagiyagisansam.github.io/calc-toolbox/tools/inch/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="インチ⇔cm・ポンド⇔kg 変換計算機 | 計算ツールボックス">
+  <meta property="og:description" content="インチとセンチ、ポンドとキログラムを一発で相互変換できる無料計算機。テレビ・モニターのサイズ確認、海外通販の服・靴選び、ダンベルの重さ換算に便利です。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://yagiyagisansam.github.io/calc-toolbox/tools/inch/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://yagiyagisansam.github.io/calc-toolbox/"},{"@type":"ListItem","position":2,"name":"インチ⇔cm・ポンド⇔kg 変換計算機","item":"https://yagiyagisansam.github.io/calc-toolbox/tools/inch/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>インチ⇔cm・ポンド⇔kg 変換計算機</h1>
+  <p><strong>インチ⇔センチメートル</strong>と<strong>ポンド⇔キログラム</strong>を相互に変換します。テレビ・モニターのサイズや、海外通販・海外のジムでよく出てくる単位の換算に。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="length-form">
+    <label>長さの変換(インチ⇔cm)</label>
+    <label>値
+      <input type="number" id="l-value" inputmode="decimal" step="any" min="0.001" max="1000000" placeholder="65" required>
+    </label>
+    <label>入力した値の単位
+      <select id="l-unit">
+        <option value="in">インチ(in)</option>
+        <option value="cm">センチメートル(cm)</option>
+      </select>
+    </label>
+    <button type="submit">長さを変換</button>
+  </form>
+
+  <form class="tool-form" id="weight-form">
+    <label>重さの変換(ポンド⇔kg)</label>
+    <label>値
+      <input type="number" id="w-value" inputmode="decimal" step="any" min="0.001" max="1000000" placeholder="10">
+    </label>
+    <label>入力した値の単位
+      <select id="w-unit">
+        <option value="lb">ポンド(lb)</option>
+        <option value="kg">キログラム(kg)</option>
+      </select>
+    </label>
+    <button type="submit">重さを変換</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    テレビ・モニターの「◯インチ」は<strong>画面の対角線の長さ</strong>です。横幅ではないのでご注意ください(例: 65インチ=対角約165cm、横幅は約144cm程度)。
+  </div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>変換したい値を入力し、その値の単位を選びます。</li>
+    <li>「長さを変換」または「重さを変換」を押すと、両方の単位の値が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>1インチ = 2.54cm</strong>(国際インチの定義値。誤差のない換算です)</li>
+    <li><strong>1ポンド = 0.45359237kg</strong>(国際ポンドの定義値)</li>
+    <li>いずれも1959年のヤード・ポンド法国際協定による定義値です。結果は小数第2位まで表示します。</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>よく使う換算の早見表</caption>
+      <thead><tr><th>インチ</th><th>cm</th><th></th><th>ポンド</th><th>kg</th></tr></thead>
+      <tbody>
+        <tr><td>24</td><td>60.96</td><td></td><td>1</td><td>0.45</td></tr>
+        <tr><td>27</td><td>68.58</td><td></td><td>5</td><td>2.27</td></tr>
+        <tr><td>32</td><td>81.28</td><td></td><td>10</td><td>4.54</td></tr>
+        <tr><td>55</td><td>139.7</td><td></td><td>45</td><td>20.41</td></tr>
+        <tr><td>65</td><td>165.1</td><td></td><td>100</td><td>45.36</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>計量法(平成4年法律第51号)(取引・証明への非メートル法単位の使用制限)<br>
+      <a href="https://laws.e-gov.go.jp/law/404AC0000000051" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/404AC0000000051</a>(2026年7月18日参照)</li>
+    <li>換算係数は国際協定(1959年)の定義値(1インチ=25.4mm、1ポンド=0.45359237kg)。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>靴・服のサイズ表記(US・UKサイズ等)はインチそのものではなく各国の規格です。メーカーのサイズ表をご確認ください。</li>
+    <li>貴金属で使う「トロイオンス・トロイポンド」は常用ポンドと異なる単位のため、本ツールでは扱いません。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 65インチのテレビの横幅は何cmですか?</h3>
+  <p>65インチは対角約165.1cmで、16:9の画面なら横幅は約144cm・高さ約81cmです(ベゼル幅を除く)。設置場所の確認にはメーカーの外形寸法をご確認ください。</p>
+  <h3>Q. フィートの換算はできますか?</h3>
+  <p>1フィート=12インチなので、フィートを12倍してインチとして入力してください(例: 6フィート=72インチ=182.88cm)。</p>
+  <h3>Q. ジムのダンベルの「45lb」は何kgですか?</h3>
+  <p>約20.4kgです。海外のプレートは45lb(≒20.4kg)が標準的で、日本の20kgプレートとは微妙に異なります。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../tsubo/">坪・平米・畳 変換計算機</a></li>
+    <li><a href="../bmi/">BMI・適正体重 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var ERROR_MESSAGES = {
+    invalid_value: "値は 0.001〜1,000,000 の範囲で入力してください。",
+    invalid_unit: "単位を選択してください。"
+  };
+  function showError(code) {
+    box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "入力値を確認してください。") + "</p>";
+    box.hidden = false;
+  }
+  document.getElementById("length-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var r = InchCalc.convertLength(parseFloat(document.getElementById("l-value").value), document.getElementById("l-unit").value);
+    if (!r.ok) { showError(r.code); return; }
+    box.innerHTML = '<div class="result-main">' + r.inch.toLocaleString() + " in = " + r.cm.toLocaleString() + " cm</div>";
+    box.hidden = false;
+  });
+  document.getElementById("weight-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var r = InchCalc.convertWeight(parseFloat(document.getElementById("w-value").value), document.getElementById("w-unit").value);
+    if (!r.ok) { showError(r.code); return; }
+    box.innerHTML = '<div class="result-main">' + r.lb.toLocaleString() + " lb = " + r.kg.toLocaleString() + " kg</div>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

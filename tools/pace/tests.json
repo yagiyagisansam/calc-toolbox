@@ -1,0 +1,73 @@
+{
+  "tool": "pace",
+  "module": "calc.js",
+  "global": "PaceCalc",
+  "cases": [
+    {
+      "name": "フルマラソン4時間 → 341秒/km(5分41秒)・時速10.55km",
+      "func": "paceFor",
+      "args": [42.195, 14400],
+      "expect": { "ok": true, "paceSecPerKm": 341, "speedKmh": 10.55 }
+    },
+    {
+      "name": "10kmを50分 → 300秒/km(5分00秒)・時速12km",
+      "func": "paceFor",
+      "args": [10, 3000],
+      "expect": { "ok": true, "paceSecPerKm": 300, "speedKmh": 12 }
+    },
+    {
+      "name": "5kmを25分 → 300秒/km",
+      "func": "paceFor",
+      "args": [5, 1500],
+      "expect": { "ok": true, "paceSecPerKm": 300, "speedKmh": 12 }
+    },
+    {
+      "name": "ハーフ1時間45分 → 299秒/km・時速12.06km",
+      "func": "paceFor",
+      "args": [21.0975, 6300],
+      "expect": { "ok": true, "paceSecPerKm": 299, "speedKmh": 12.06 }
+    },
+    {
+      "name": "逆算: フルを5分00秒/kmで走ると12,659秒(3時間30分59秒)",
+      "func": "timeFor",
+      "args": [42.195, 300],
+      "expect": { "ok": true, "totalSeconds": 12659 }
+    },
+    {
+      "name": "逆算: 10kmを5分30秒/km → 3,300秒(55分)",
+      "func": "timeFor",
+      "args": [10, 330],
+      "expect": { "ok": true, "totalSeconds": 3300 }
+    },
+    {
+      "name": "異常入力: 距離0はエラー",
+      "func": "paceFor",
+      "args": [0, 3000],
+      "expect": { "ok": false, "code": "invalid_distance" }
+    },
+    {
+      "name": "異常入力: 距離が範囲超過(2000km)はエラー",
+      "func": "paceFor",
+      "args": [2000, 3000],
+      "expect": { "ok": false, "code": "invalid_distance" }
+    },
+    {
+      "name": "異常入力: タイムが1分未満はエラー",
+      "func": "paceFor",
+      "args": [10, 30],
+      "expect": { "ok": false, "code": "invalid_time" }
+    },
+    {
+      "name": "異常入力: ペースが範囲外(30秒/km)はエラー",
+      "func": "timeFor",
+      "args": [10, 30],
+      "expect": { "ok": false, "code": "invalid_pace" }
+    },
+    {
+      "name": "異常入力: 数値でない距離はエラー",
+      "func": "paceFor",
+      "args": ["abc", 3000],
+      "expect": { "ok": false, "code": "invalid_distance" }
+    }
+  ]
+}

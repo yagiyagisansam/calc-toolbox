@@ -1,0 +1,85 @@
+{
+  "tool": "inch",
+  "module": "calc.js",
+  "global": "InchCalc",
+  "cases": [
+    {
+      "name": "65インチ → 165.1cm(テレビサイズ)",
+      "func": "convertLength",
+      "args": [65, "in"],
+      "expect": { "ok": true, "inch": 65, "cm": 165.1 }
+    },
+    {
+      "name": "100cm → 39.37インチ",
+      "func": "convertLength",
+      "args": [100, "cm"],
+      "expect": { "ok": true, "inch": 39.37, "cm": 100 }
+    },
+    {
+      "name": "27インチ → 68.58cm(モニターサイズ)",
+      "func": "convertLength",
+      "args": [27, "in"],
+      "expect": { "ok": true, "inch": 27, "cm": 68.58 }
+    },
+    {
+      "name": "170cm → 66.93インチ",
+      "func": "convertLength",
+      "args": [170, "cm"],
+      "expect": { "ok": true, "inch": 66.93, "cm": 170 }
+    },
+    {
+      "name": "10ポンド → 4.54kg",
+      "func": "convertWeight",
+      "args": [10, "lb"],
+      "expect": { "ok": true, "lb": 10, "kg": 4.54 }
+    },
+    {
+      "name": "60kg → 132.28ポンド(体重)",
+      "func": "convertWeight",
+      "args": [60, "kg"],
+      "expect": { "ok": true, "lb": 132.28, "kg": 60 }
+    },
+    {
+      "name": "150ポンド → 68.04kg",
+      "func": "convertWeight",
+      "args": [150, "lb"],
+      "expect": { "ok": true, "lb": 150, "kg": 68.04 }
+    },
+    {
+      "name": "小数(0.5kg → 1.1ポンド)",
+      "func": "convertWeight",
+      "args": [0.5, "kg"],
+      "expect": { "ok": true, "lb": 1.1, "kg": 0.5 }
+    },
+    {
+      "name": "異常入力: 0はエラー",
+      "func": "convertLength",
+      "args": [0, "in"],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 負の値はエラー",
+      "func": "convertWeight",
+      "args": [-5, "kg"],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 範囲超過はエラー",
+      "func": "convertLength",
+      "args": [2000000, "cm"],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 不明な単位はエラー",
+      "func": "convertLength",
+      "args": [100, "ft"],
+      "expect": { "ok": false, "code": "invalid_unit" }
+    },
+    {
+      "name": "異常入力: 数値でない値はエラー",
+      "func": "convertWeight",
+      "args": ["abc", "kg"],
+      "expect": { "ok": false, "code": "invalid_value" }
+    }
+  ]
+}

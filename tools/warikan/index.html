@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>割り勘 計算機(端数は切り上げ・幹事向け) | 計算ツールボックス</title>
+  <meta name="description" content="合計金額と人数を入れるだけで1人あたりの支払額を無料で計算。100円単位・500円単位などキリのいい金額に切り上げて集金でき、飲み会・食事会の幹事に便利です。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://yagiyagisansam.github.io/calc-toolbox/tools/warikan/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="割り勘 計算機(端数は切り上げ・幹事向け) | 計算ツールボックス">
+  <meta property="og:description" content="合計金額と人数を入れるだけで1人あたりの支払額を無料で計算。100円単位・500円単位などキリのいい金額に切り上げて集金でき、飲み会・食事会の幹事に便利です。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://yagiyagisansam.github.io/calc-toolbox/tools/warikan/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://yagiyagisansam.github.io/calc-toolbox/"},{"@type":"ListItem","position":2,"name":"割り勘 計算機(端数は切り上げ・幹事向け)","item":"https://yagiyagisansam.github.io/calc-toolbox/tools/warikan/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>割り勘 計算機</h1>
+  <p>合計金額と人数を入力すると、<strong>1人あたりの支払額</strong>を計算します。100円・500円などキリのいい単位に切り上げられるので、集金がラクになります。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="warikan-form">
+    <label>合計金額(円)
+      <input type="number" id="total" inputmode="numeric" step="1" min="1" max="10000000" placeholder="28460" required>
+    </label>
+    <label>人数
+      <input type="number" id="people" inputmode="numeric" step="1" min="2" max="100" placeholder="7" required>
+    </label>
+    <label>切り上げの単位
+      <select id="unit">
+        <option value="100" selected>100円単位</option>
+        <option value="1">1円単位(ぴったり)</option>
+        <option value="10">10円単位</option>
+        <option value="500">500円単位</option>
+        <option value="1000">1000円単位</option>
+      </select>
+    </label>
+    <button type="submit">計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    切り上げ方式のため、集金額の合計が支払額を上回る(余りが出る)ことがあります。余りの扱い(幹事の負担軽減・次回繰越しなど)は事前に決めておくとスムーズです。
+  </div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>レシートの合計金額と参加人数を入力します。</li>
+    <li>集金しやすい単位(100円・500円など)を選びます。小銭を出し合えるなら「1円単位」でぴったり割れます。</li>
+    <li>「計算する」を押すと、1人あたりの金額・集金合計・余りが表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>1人あたり = 合計金額 ÷ 人数</strong> を、選んだ単位で切り上げ</li>
+    <li>余り = (1人あたり × 人数) − 合計金額</li>
+    <li>計算例: 28,460円を7人で(100円単位)→ 1人4,100円・余り240円</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>割り算と切り上げによる算術計算です。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>全員同額の「均等割り」です。飲まない人・遅れて来た人の傾斜配分には対応していません(合計から先に個別分を引いてから残りを割るのがおすすめです)。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 幹事だけ安くしたい(多く払いたい)ときは?</h3>
+  <p>合計金額から「幹事が負担する額」を先に引き、残りを幹事以外の人数で割ってください。例: 30,000円で幹事が5,000円持つなら、25,000円を残りの人数で割ります。</p>
+  <h3>Q. 余りが出たらどうすればいいですか?</h3>
+  <p>切り上げ方式では数十〜数百円の余りが出ます。幹事の立替金・カードのポイント分・次回の会費に充てるのが一般的です。ぴったり割りたい場合は「1円単位」を選んでください。</p>
+  <h3>Q. 先輩・後輩で金額を変えたいのですが。</h3>
+  <p>本ツールは均等割り専用です。傾斜をつける場合は、先に上位者の負担額を決めて合計から引き、残りを均等割りする2段階の計算が簡単です。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../tax/">消費税 計算機</a></li>
+    <li><a href="../percent/">パーセント計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_total: "合計金額は 1〜10,000,000円 の整数で入力してください。",
+    invalid_people: "人数は 2〜100人 の整数で入力してください。",
+    invalid_unit: "切り上げの単位を選択してください。"
+  };
+  document.getElementById("warikan-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var result = WarikanCalc.split(
+      parseFloat(document.getElementById("total").value),
+      parseFloat(document.getElementById("people").value),
+      parseInt(document.getElementById("unit").value, 10));
+    var box = document.getElementById("result");
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">1人 ' + result.perPerson.toLocaleString() + " 円</div>" +
+        "<p>集金合計: <strong>" + result.collected.toLocaleString() + " 円</strong>" +
+        (result.surplus > 0 ? " / 余り: <strong>" + result.surplus.toLocaleString() + " 円</strong>" : "(ぴったり)") + "</p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
+    }
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

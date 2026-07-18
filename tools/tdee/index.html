@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>1日の摂取カロリー目安 計算機(推定エネルギー必要量) | 計算ツールボックス</title>
+  <meta name="description" content="年齢・性別・体重・活動量から、1日に必要な摂取カロリーの目安(推定エネルギー必要量)を無料で計算。厚生労働省の基礎代謝基準値と身体活動レベルに基づき、ダイエットの食事管理に使えます。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://yagiyagisansam.github.io/calc-toolbox/tools/tdee/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="1日の摂取カロリー目安 計算機(推定エネルギー必要量) | 計算ツールボックス">
+  <meta property="og:description" content="年齢・性別・体重・活動量から、1日に必要な摂取カロリーの目安(推定エネルギー必要量)を無料で計算。厚生労働省の基礎代謝基準値と身体活動レベルに基づき、ダイエットの食事管理に使えます。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://yagiyagisansam.github.io/calc-toolbox/tools/tdee/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://yagiyagisansam.github.io/calc-toolbox/"},{"@type":"ListItem","position":2,"name":"1日の摂取カロリー目安 計算機(推定エネルギー必要量)","item":"https://yagiyagisansam.github.io/calc-toolbox/tools/tdee/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>1日の摂取カロリー目安 計算機</h1>
+  <p>年齢・性別・体重・活動量を入力すると、<strong>1日に必要なエネルギー(摂取カロリー)の目安</strong>を計算します。ダイエットや食事管理で「1日何kcalまで?」を考える出発点に。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="tdee-form">
+    <label>年齢(歳)
+      <span class="field-note">対応範囲: 18〜120歳(成人向け)</span>
+      <input type="number" id="age" inputmode="numeric" step="1" min="18" max="120" placeholder="30" required>
+    </label>
+    <label>性別
+      <select id="sex">
+        <option value="male">男性</option>
+        <option value="female">女性</option>
+      </select>
+    </label>
+    <label>体重(kg)
+      <input type="number" id="weight" inputmode="decimal" step="any" min="20" max="300" placeholder="60" required>
+    </label>
+    <label>身体活動レベル
+      <select id="pal">
+        <option value="low">Ⅰ 低い(生活の大部分が座位)</option>
+        <option value="normal" selected>Ⅱ ふつう(通勤・家事・軽い運動あり)</option>
+        <option value="high">Ⅲ 高い(立ち仕事・活発な運動習慣)</option>
+      </select>
+    </label>
+    <button type="submit">計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    このツールの計算結果は<strong>概算</strong>です。体格・筋肉量・活動内容による個人差があり、妊娠中・授乳中の方や疾患のある方には適用できません。食事療法は医師・管理栄養士の指導に従ってください。
+  </div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>年齢・性別・体重を入力します。</li>
+    <li>ふだんの活動量に近い「身体活動レベル」を選びます。迷ったら「Ⅱ ふつう」が目安です。</li>
+    <li>「計算する」を押すと、1日の摂取カロリー目安と基礎代謝量が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>摂取カロリー目安(推定エネルギー必要量) = 基礎代謝量 × 身体活動レベル</strong></li>
+    <li>基礎代謝量 = 基礎代謝基準値(年齢区分別・男女別) × 体重(<a href="../bmr/">基礎代謝量計算機</a>と同じ方式)</li>
+    <li>身体活動レベル(成人の代表値): <strong>Ⅰ 低い=1.50 / Ⅱ ふつう=1.75 / Ⅲ 高い=2.00</strong></li>
+    <li>計算例: 30歳男性70kg・ふつう → 基礎代謝約1,561kcal × 1.75 = <strong>約2,732kcal/日</strong></li>
+  </ul>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>厚生労働省 e-ヘルスネット「加齢とエネルギー代謝」(基礎代謝基準値表)<br>
+      <a href="https://kennet.mhlw.go.jp/information/information/food/e-07-002.html" rel="noopener" target="_blank">https://kennet.mhlw.go.jp/information/information/food/e-07-002.html</a>(2026年7月18日参照)</li>
+    <li>厚生労働省「日本人の食事摂取基準(2025年版)」策定ポイント(推定エネルギー必要量・身体活動レベル)<br>
+      <a href="https://www.mhlw.go.jp/content/10904750/001396865.pdf" rel="noopener" target="_blank">https://www.mhlw.go.jp/content/10904750/001396865.pdf</a>(2026年7月18日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>この値は「現在の体重を維持する」ためのエネルギー量の目安です。減量したい場合はこれより少なく、増量したい場合は多く摂ることになりますが、極端な制限は健康を損ないます。</li>
+    <li>身体活動レベルの代表値は成人のものです。高齢の方は同じ区分でもやや低くなる傾向があります。</li>
+    <li>18歳未満(成長期)は別の基準が用いられるため対象外です。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 痩せたい場合は何kcalにすればいいですか?</h3>
+  <p>一般に、この目安より1日200〜500kcal程度控えると緩やかな減量になるといわれますが、必要量を大きく下回る制限は筋肉量の減少やリバウンドを招きます。具体的な目標は医師・管理栄養士にご相談ください。</p>
+  <h3>Q. 基礎代謝量との違いは何ですか?</h3>
+  <p>基礎代謝量は「安静にしていても消費する最低限のエネルギー」、このツールの結果はそれに日常の活動分を掛けた「1日の消費に見合う摂取量の目安」です。</p>
+  <h3>Q. 身体活動レベルはどう選べばいいですか?</h3>
+  <p>デスクワーク中心で移動も少ないならⅠ、通勤・買い物・家事や軽いスポーツがあるならⅡ、立ち仕事や運動習慣が活発ならⅢが目安です。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../bmr/">基礎代謝量 計算機</a></li>
+    <li><a href="../bmi/">BMI・適正体重 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_age: "年齢は 18〜120歳 の整数で入力してください。",
+    invalid_sex: "性別を選択してください。",
+    invalid_weight: "体重は 20〜300kg の範囲で入力してください。",
+    invalid_pal: "身体活動レベルを選択してください。"
+  };
+  document.getElementById("tdee-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var result = TdeeCalc.calculate(
+      parseFloat(document.getElementById("age").value),
+      document.getElementById("sex").value,
+      parseFloat(document.getElementById("weight").value),
+      document.getElementById("pal").value
+    );
+    var box = document.getElementById("result");
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">約 ' + result.tdeeKcal.toLocaleString() + " kcal/日</div>" +
+        "<p>基礎代謝量: <strong>約" + result.bmrKcal.toLocaleString() + " kcal/日</strong> × 身体活動レベル " + result.palValue.toFixed(2) + "</p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
+    }
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>
