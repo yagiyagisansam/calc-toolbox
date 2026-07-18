@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BMI・適正体重 計算機(日本肥満学会基準で判定) | 計算ツールボックス</title>
+  <meta name="description" content="身長と体重を入れるだけでBMIと適正体重(BMI22基準)を無料で計算。日本肥満学会の基準(低体重・普通体重・肥満1〜4度)で判定します。計算式と出典も明記。">
+  <link rel="stylesheet" href="../../shared/style.css">
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>BMI・適正体重 計算機</h1>
+  <p>身長と体重を入力すると、<strong>BMI</strong>と<strong>適正体重(BMI22基準)</strong>を計算し、日本肥満学会の基準で判定します。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="bmi-form">
+    <label>身長(cm)
+      <span class="field-note">例: 170(対応範囲: 100〜250cm)</span>
+      <input type="number" id="height" inputmode="decimal" step="0.1" min="100" max="250" placeholder="170" required>
+    </label>
+    <label>体重(kg)
+      <span class="field-note">例: 60(対応範囲: 20〜300kg)</span>
+      <input type="number" id="weight" inputmode="decimal" step="0.1" min="20" max="300" placeholder="60" required>
+    </label>
+    <button type="submit">計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    このツールの計算結果は<strong>概算</strong>です。対象は成人で、小児・妊娠中の方には適用できません。健康状態の判断は数値だけで行わず、医師・保健師にご相談ください。
+  </div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>身長をcm単位で入力します(例: 170)。</li>
+    <li>体重をkg単位で入力します(例: 60)。</li>
+    <li>「計算する」を押すと、BMI・判定・適正体重が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <p>このツールは次の式で計算しています(BMIは小数第1位まで表示し、判定は表示値に対して行います)。</p>
+  <ul>
+    <li><strong>BMI</strong> = 体重(kg) ÷ 身長(m) ÷ 身長(m)</li>
+    <li><strong>適正体重</strong> = 22 × 身長(m) × 身長(m)<br>
+      BMI22は統計的に最も病気になりにくいとされる値で、これを基準にした体重が「適正体重(標準体重)」です。</li>
+  </ul>
+  <p>判定は日本肥満学会の基準(成人)によります。</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>BMIによる肥満度分類(日本肥満学会)</caption>
+      <thead><tr><th>BMI</th><th>判定</th></tr></thead>
+      <tbody>
+        <tr><td>18.5未満</td><td>低体重</td></tr>
+        <tr><td>18.5以上 25未満</td><td>普通体重</td></tr>
+        <tr><td>25以上 30未満</td><td>肥満(1度)</td></tr>
+        <tr><td>30以上 35未満</td><td>肥満(2度)</td></tr>
+        <tr><td>35以上 40未満</td><td>肥満(3度)</td></tr>
+        <tr><td>40以上</td><td>肥満(4度)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>厚生労働省 e-ヘルスネット「BMI」(計算式・BMI22の根拠)<br>
+      <a href="https://www.e-healthnet.mhlw.go.jp/information/dictionary/metabolic/ym-002.html" rel="noopener" target="_blank">https://www.e-healthnet.mhlw.go.jp/information/dictionary/metabolic/ym-002.html</a>(2026年7月18日参照)</li>
+    <li>日本肥満学会「肥満症診療ガイドライン2016」(肥満度分類)<br>
+      <a href="http://www.jasso.or.jp/" rel="noopener" target="_blank">日本肥満学会 公式サイト</a>(2026年7月18日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>対象は成人です。小児(学童)は成長曲線・ローレル指数など別の指標が用いられ、妊娠中の方には適用できません。</li>
+    <li>BMIは身長と体重だけから計算するため、筋肉量や体脂肪率は反映されません。筋肉量が多い方はBMIが高めに出ることがあります。</li>
+    <li>判定基準は日本の基準です。WHO(世界保健機関)の国際基準では「肥満」の境界が BMI 30 と異なります。</li>
+  </ul>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_height: "身長は " + BmiCalc.HEIGHT_MIN_CM + "〜" + BmiCalc.HEIGHT_MAX_CM + " cm の範囲で入力してください。",
+    invalid_weight: "体重は " + BmiCalc.WEIGHT_MIN_KG + "〜" + BmiCalc.WEIGHT_MAX_KG + " kg の範囲で入力してください。"
+  };
+  document.getElementById("bmi-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var height = parseFloat(document.getElementById("height").value);
+    var weight = parseFloat(document.getElementById("weight").value);
+    var result = BmiCalc.calculate(height, weight);
+    var box = document.getElementById("result");
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">BMI ' + result.bmi.toFixed(1) + "(" + result.category + ")</div>" +
+        "<p>あなたの適正体重(BMI22基準)は約 <strong>" + result.idealWeightKg.toFixed(1) + " kg</strong> です。</p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
+    }
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

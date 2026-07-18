@@ -1,0 +1,177 @@
+/* 共通スタイル(スマホファースト・ビルド不要)
+   全ページから <link rel="stylesheet" href="/shared/style.css"> で参照する */
+
+:root {
+  --color-bg: #ffffff;
+  --color-text: #1f2933;
+  --color-muted: #5b6770;
+  --color-accent: #0b6e4f;
+  --color-accent-weak: #e6f4ef;
+  --color-border: #d9e2ec;
+  --color-warn-bg: #fff8e6;
+  --color-warn-border: #e0c179;
+  --max-width: 720px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #14181c;
+    --color-text: #e4e9ee;
+    --color-muted: #9aa7b2;
+    --color-accent: #4cc39a;
+    --color-accent-weak: #1c2b26;
+    --color-border: #313b45;
+    --color-warn-bg: #2b2517;
+    --color-warn-border: #8a743d;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", sans-serif;
+  line-height: 1.8;
+  color: var(--color-text);
+  background: var(--color-bg);
+  font-size: 16px;
+}
+
+main {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 16px 48px;
+}
+
+h1 { font-size: 1.5rem; line-height: 1.4; margin: 1.2em 0 0.6em; }
+h2 {
+  font-size: 1.2rem;
+  margin: 2em 0 0.6em;
+  padding-left: 0.5em;
+  border-left: 4px solid var(--color-accent);
+}
+h3 { font-size: 1.05rem; margin: 1.5em 0 0.5em; }
+
+a { color: var(--color-accent); }
+
+/* ヘッダ */
+.site-header {
+  border-bottom: 1px solid var(--color-border);
+  padding: 12px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+.site-brand {
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-decoration: none;
+  color: var(--color-text);
+}
+.site-nav { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.85rem; }
+.site-nav a { text-decoration: none; color: var(--color-muted); }
+.site-nav a:hover { color: var(--color-accent); }
+
+/* フッタ */
+.site-footer {
+  border-top: 1px solid var(--color-border);
+  margin-top: 48px;
+  padding: 24px 16px 40px;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  max-width: var(--max-width);
+  margin-left: auto;
+  margin-right: auto;
+}
+.site-footer nav { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-bottom: 8px; }
+.site-footer a { color: var(--color-muted); }
+
+/* ツールカード(トップページ) */
+.tool-list { list-style: none; padding: 0; display: grid; gap: 12px; }
+.tool-card {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.tool-card a { font-weight: 700; text-decoration: none; font-size: 1.05rem; }
+.tool-card p { margin: 6px 0 0; font-size: 0.88rem; color: var(--color-muted); }
+
+/* ツールの入力フォーム */
+.tool-form {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 16px;
+  display: grid;
+  gap: 14px;
+  margin: 16px 0;
+}
+.tool-form label { font-weight: 600; font-size: 0.92rem; display: block; }
+.tool-form .field-note { font-weight: 400; color: var(--color-muted); font-size: 0.8rem; }
+.tool-form input[type="number"],
+.tool-form input[type="text"],
+.tool-form select {
+  width: 100%;
+  font-size: 1.1rem;
+  padding: 10px 12px;
+  margin-top: 4px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+.tool-form button {
+  font-size: 1.05rem;
+  font-weight: 700;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-accent);
+  color: #fff;
+  cursor: pointer;
+}
+.tool-form button:active { opacity: 0.85; }
+
+/* 計算結果 */
+.tool-result {
+  border-radius: 10px;
+  background: var(--color-accent-weak);
+  padding: 16px;
+  margin: 16px 0;
+}
+.tool-result[hidden] { display: none; }
+.tool-result .result-main { font-size: 1.6rem; font-weight: 700; }
+.tool-result .result-error { color: #b3261e; font-weight: 600; }
+
+/* 注意書き */
+.note-box {
+  background: var(--color-warn-bg);
+  border: 1px solid var(--color-warn-border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 0.88rem;
+  margin: 16px 0;
+}
+
+/* 表 */
+.data-table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+.data-table th, .data-table td {
+  border: 1px solid var(--color-border);
+  padding: 8px 10px;
+  text-align: left;
+}
+.data-table th { background: var(--color-accent-weak); }
+.table-scroll { overflow-x: auto; }
+
+/* 出典リスト */
+.sources { font-size: 0.88rem; }
+.sources li { margin-bottom: 4px; }
+
+@media (min-width: 600px) {
+  h1 { font-size: 1.7rem; }
+  .tool-list { grid-template-columns: 1fr 1fr; }
+}
