@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>日数計算機(日付の差・○日後の日付と曜日) | 計算ツールボックス</title>
+  <meta name="description" content="2つの日付の間の日数と、基準日から○日後(○日前)の日付・曜日を無料で計算。締切・記念日・支払期限・提出期限の確認に便利。うるう年にも対応しています。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://yagiyagisansam.github.io/calc-toolbox/tools/days/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="日数計算機(日付の差・○日後の日付と曜日) | 計算ツールボックス">
+  <meta property="og:description" content="2つの日付の間の日数と、基準日から○日後(○日前)の日付・曜日を無料で計算。締切・記念日・支払期限・提出期限の確認に便利。うるう年にも対応しています。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://yagiyagisansam.github.io/calc-toolbox/tools/days/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://yagiyagisansam.github.io/calc-toolbox/"},{"@type":"ListItem","position":2,"name":"日数計算機(日付の差・○日後の日付と曜日)","item":"https://yagiyagisansam.github.io/calc-toolbox/tools/days/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>日数計算機(日付の差・○日後)</h1>
+  <p><strong>2つの日付の間の日数</strong>と、<strong>基準日から○日後(○日前)の日付・曜日</strong>を計算します。締切までの残り日数、支払期限、記念日の日数計算に。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="between-form">
+    <label>開始日
+      <input type="date" id="from" min="1600-01-01" max="2500-12-31" required>
+    </label>
+    <label>終了日
+      <input type="date" id="to" min="1600-01-01" max="2500-12-31" required>
+    </label>
+    <button type="submit">日数を計算</button>
+  </form>
+
+  <form class="tool-form" id="add-form">
+    <label>基準日
+      <input type="date" id="base" min="1600-01-01" max="2500-12-31" required>
+    </label>
+    <label>何日後?(前はマイナス)
+      <span class="field-note">例: 100 / -30(対応範囲: ±36,500日)</span>
+      <input type="number" id="offset" inputmode="numeric" step="1" min="-36500" max="36500" placeholder="100" required>
+    </label>
+    <button type="submit">日付を計算</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    日数の数え方には「初日を含めない(経過日数)」と「初日を含める(両端を含む日数)」の2通りがあります。本ツールは<strong>両方を表示</strong>します。契約・法律上の期間計算は数え方の規定が異なる場合があるためご注意ください。
+  </div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>「日数を計算」: 開始日と終了日を選ぶと、間の日数が表示されます。</li>
+    <li>「日付を計算」: 基準日と日数(過去はマイナス)を入れると、該当する日付と曜日が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li>グレゴリオ暦(現行の暦)に基づき、日付を通し日数に変換して差・加算を計算しています。うるう年(4年に1度、ただし100で割り切れて400で割り切れない年は平年)にも対応しています。</li>
+    <li><strong>経過日数</strong>は初日を含みません(7月18日→7月19日は「1日」)。<strong>両端を含む日数</strong>はこれに1を足した値です。</li>
+    <li>計算例: 2026-07-18 → 2026-08-01 は 14日(両端を含むと15日)</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>グレゴリオ暦の暦法(うるう年の規則)に基づく算術計算です。</li>
+    <li>祝日・営業日は考慮しません(暦日ベースの計算です)。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>「営業日」で数えたい場合(土日祝を除く)は、本ツールの結果から休日分を引いてください。</li>
+    <li>法律上の期間計算(民法の初日不算入の原則など)は個別の規定によります。重要な期限は根拠規定でご確認ください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 「○日後」に当日は含まれますか?</h3>
+  <p>含みません。「7月18日の1日後」は7月19日です。当日を1日目と数えたい場合は、入力する日数から1を引いてください。</p>
+  <h3>Q. 何ヶ月後・何年後の計算はできますか?</h3>
+  <p>本ツールは日数専用です。月数は月ごとの日数(28〜31日)が異なるため、日数に直してから入力してください(目安: 1ヶ月≒30日、1年=365日または366日)。</p>
+  <h3>Q. 過去の日付にも使えますか?</h3>
+  <p>1600年から2500年まで対応しています。日数にマイナスを入れれば「○日前」の日付も計算できます。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../age/">年齢計算機</a></li>
+    <li><a href="../wareki/">西暦・和暦 変換計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  // 開始日・基準日の初期値に今日を設定
+  var now = new Date();
+  var today = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
+  document.getElementById("from").value = today;
+  document.getElementById("base").value = today;
+
+  var ERROR_MESSAGES = {
+    invalid_from: "開始日を正しく入力してください。",
+    invalid_to: "終了日を正しく入力してください。",
+    from_after_to: "開始日が終了日より後になっています。",
+    invalid_base: "基準日を正しく入力してください。",
+    invalid_offset: "日数は ±36,500 の整数で入力してください。",
+    out_of_range: "計算結果が対応範囲(1600〜2500年)を超えました。"
+  };
+  function showError(code) {
+    box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "入力値を確認してください。") + "</p>";
+    box.hidden = false;
+  }
+  document.getElementById("between-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var result = DaysCalc.between(document.getElementById("from").value, document.getElementById("to").value);
+    if (!result.ok) { showError(result.code); return; }
+    box.innerHTML =
+      '<div class="result-main">' + result.days.toLocaleString() + " 日</div>" +
+      "<p>両端(初日・最終日)を含む場合: <strong>" + result.inclusiveDays.toLocaleString() + " 日</strong></p>";
+    box.hidden = false;
+  });
+  document.getElementById("add-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var result = DaysCalc.addDays(document.getElementById("base").value, parseFloat(document.getElementById("offset").value));
+    if (!result.ok) { showError(result.code); return; }
+    box.innerHTML = '<div class="result-main">' + result.date + "(" + result.weekday + "曜日)</div>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

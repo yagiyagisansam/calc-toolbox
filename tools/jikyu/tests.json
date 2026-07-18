@@ -1,0 +1,97 @@
+{
+  "tool": "jikyu",
+  "module": "calc.js",
+  "global": "JikyuCalc",
+  "cases": [
+    {
+      "name": "時給1200円×8h×20日 → 月収19.2万円・年収230.4万円",
+      "func": "toMonthly",
+      "args": [1200, 8, 20],
+      "expect": { "ok": true, "monthlyYen": 192000, "yearlyYen": 2304000 }
+    },
+    {
+      "name": "小数の労働時間(時給1054円×7.5h×22日) → 月収173,910円",
+      "func": "toMonthly",
+      "args": [1054, 7.5, 22],
+      "expect": { "ok": true, "monthlyYen": 173910, "yearlyYen": 2086920 }
+    },
+    {
+      "name": "短時間勤務(時給2000円×8h×10日) → 月収16万円",
+      "func": "toMonthly",
+      "args": [2000, 8, 10],
+      "expect": { "ok": true, "monthlyYen": 160000, "yearlyYen": 1920000 }
+    },
+    {
+      "name": "時給1500円×6h×15日 → 月収13.5万円",
+      "func": "toMonthly",
+      "args": [1500, 6, 15],
+      "expect": { "ok": true, "monthlyYen": 135000, "yearlyYen": 1620000 }
+    },
+    {
+      "name": "逆算: 月収19.2万円(8h×20日) → 時給1200円",
+      "func": "toHourly",
+      "args": [192000, 8, 20],
+      "expect": { "ok": true, "hourlyYen": 1200 }
+    },
+    {
+      "name": "逆算: 月収25万円(8h×22日) → 時給1420円",
+      "func": "toHourly",
+      "args": [250000, 8, 22],
+      "expect": { "ok": true, "hourlyYen": 1420 }
+    },
+    {
+      "name": "逆算: 月収30万円(7h×20日) → 時給2143円",
+      "func": "toHourly",
+      "args": [300000, 7, 20],
+      "expect": { "ok": true, "hourlyYen": 2143 }
+    },
+    {
+      "name": "異常入力: 時給99円(下限未満)はエラー",
+      "func": "toMonthly",
+      "args": [99, 8, 20],
+      "expect": { "ok": false, "code": "invalid_hourly" }
+    },
+    {
+      "name": "異常入力: 労働時間0はエラー",
+      "func": "toMonthly",
+      "args": [1200, 0, 20],
+      "expect": { "ok": false, "code": "invalid_hours" }
+    },
+    {
+      "name": "異常入力: 労働時間25hはエラー",
+      "func": "toMonthly",
+      "args": [1200, 25, 20],
+      "expect": { "ok": false, "code": "invalid_hours" }
+    },
+    {
+      "name": "異常入力: 勤務日数0はエラー",
+      "func": "toMonthly",
+      "args": [1200, 8, 0],
+      "expect": { "ok": false, "code": "invalid_days" }
+    },
+    {
+      "name": "異常入力: 勤務日数32はエラー",
+      "func": "toMonthly",
+      "args": [1200, 8, 32],
+      "expect": { "ok": false, "code": "invalid_days" }
+    },
+    {
+      "name": "異常入力: 勤務日数が小数はエラー",
+      "func": "toMonthly",
+      "args": [1200, 8, 20.5],
+      "expect": { "ok": false, "code": "invalid_days" }
+    },
+    {
+      "name": "異常入力: 逆算の月収が下限未満はエラー",
+      "func": "toHourly",
+      "args": [5000, 8, 20],
+      "expect": { "ok": false, "code": "invalid_monthly" }
+    },
+    {
+      "name": "異常入力: 数値でない時給はエラー",
+      "func": "toMonthly",
+      "args": ["abc", 8, 20],
+      "expect": { "ok": false, "code": "invalid_hourly" }
+    }
+  ]
+}

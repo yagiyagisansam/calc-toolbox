@@ -1,0 +1,97 @@
+{
+  "tool": "percent",
+  "module": "calc.js",
+  "global": "PercentCalc",
+  "cases": [
+    {
+      "name": "30は200の15%",
+      "func": "whatPercent",
+      "args": [30, 200],
+      "expect": { "ok": true, "percent": 15 }
+    },
+    {
+      "name": "75は80の93.75%",
+      "func": "whatPercent",
+      "args": [75, 80],
+      "expect": { "ok": true, "percent": 93.75 }
+    },
+    {
+      "name": "割り切れない場合は小数第2位まで(1は3の33.33%)",
+      "func": "whatPercent",
+      "args": [1, 3],
+      "expect": { "ok": true, "percent": 33.33 }
+    },
+    {
+      "name": "0は何かの0%(部分が0は許容)",
+      "func": "whatPercent",
+      "args": [0, 100],
+      "expect": { "ok": true, "percent": 0 }
+    },
+    {
+      "name": "4980の20%は996",
+      "func": "percentOf",
+      "args": [4980, 20],
+      "expect": { "ok": true, "value": 996 }
+    },
+    {
+      "name": "小数の率(158000の7.5%は11850)",
+      "func": "percentOf",
+      "args": [158000, 7.5],
+      "expect": { "ok": true, "value": 11850 }
+    },
+    {
+      "name": "100%超(200の150%は300)",
+      "func": "percentOf",
+      "args": [200, 150],
+      "expect": { "ok": true, "value": 300 }
+    },
+    {
+      "name": "増加率: 500→650 は +30%",
+      "func": "changeRate",
+      "args": [500, 650],
+      "expect": { "ok": true, "rate": 30 }
+    },
+    {
+      "name": "減少率: 1280→980 は -23.44%",
+      "func": "changeRate",
+      "args": [1280, 980],
+      "expect": { "ok": true, "rate": -23.44 }
+    },
+    {
+      "name": "変化なし: 80→80 は 0%",
+      "func": "changeRate",
+      "args": [80, 80],
+      "expect": { "ok": true, "rate": 0 }
+    },
+    {
+      "name": "異常入力: 全体が0はエラー(0除算防止)",
+      "func": "whatPercent",
+      "args": [30, 0],
+      "expect": { "ok": false, "code": "invalid_whole" }
+    },
+    {
+      "name": "異常入力: 負の部分はエラー",
+      "func": "whatPercent",
+      "args": [-5, 100],
+      "expect": { "ok": false, "code": "invalid_part" }
+    },
+    {
+      "name": "異常入力: 率が負はエラー",
+      "func": "percentOf",
+      "args": [100, -10],
+      "expect": { "ok": false, "code": "invalid_percent" }
+    },
+    {
+      "name": "異常入力: 増減率の元の値が0はエラー",
+      "func": "changeRate",
+      "args": [0, 100],
+      "expect": { "ok": false, "code": "invalid_from" }
+    },
+    {
+      "name": "異常入力: 数値でない値はエラー",
+      "func": "percentOf",
+      "args": ["abc", 10],
+      "expect": { "ok": false, "code": "invalid_value" }
+    }
+  ]
+}

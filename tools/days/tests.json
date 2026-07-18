@@ -1,0 +1,97 @@
+{
+  "tool": "days",
+  "module": "calc.js",
+  "global": "DaysCalc",
+  "cases": [
+    {
+      "name": "2026-07-18 → 2026-08-01 は14日後(両端含み15日)",
+      "func": "between",
+      "args": ["2026-07-18", "2026-08-01"],
+      "expect": { "ok": true, "days": 14, "inclusiveDays": 15 }
+    },
+    {
+      "name": "年初から大晦日まで364日(2026年・平年)",
+      "func": "between",
+      "args": ["2026-01-01", "2026-12-31"],
+      "expect": { "ok": true, "days": 364, "inclusiveDays": 365 }
+    },
+    {
+      "name": "うるう年をまたぐ(2024-02-28 → 2024-03-01 は2日)",
+      "func": "between",
+      "args": ["2024-02-28", "2024-03-01"],
+      "expect": { "ok": true, "days": 2, "inclusiveDays": 3 }
+    },
+    {
+      "name": "同じ日は0日(両端含み1日)",
+      "func": "between",
+      "args": ["2026-07-18", "2026-07-18"],
+      "expect": { "ok": true, "days": 0, "inclusiveDays": 1 }
+    },
+    {
+      "name": "長期間(2000-01-01 → 2026-07-18 は9695日)",
+      "func": "between",
+      "args": ["2000-01-01", "2026-07-18"],
+      "expect": { "ok": true, "days": 9695 }
+    },
+    {
+      "name": "100日後(2026-07-18 → 2026-10-26 月曜日)",
+      "func": "addDays",
+      "args": ["2026-07-18", 100],
+      "expect": { "ok": true, "date": "2026-10-26", "weekday": "月" }
+    },
+    {
+      "name": "30日前(2026-07-18 → 2026-06-18 木曜日)",
+      "func": "addDays",
+      "args": ["2026-07-18", -30],
+      "expect": { "ok": true, "date": "2026-06-18", "weekday": "木" }
+    },
+    {
+      "name": "うるう日をまたぐ加算(2024-02-28の2日後は2024-03-01 金曜日)",
+      "func": "addDays",
+      "args": ["2024-02-28", 2],
+      "expect": { "ok": true, "date": "2024-03-01", "weekday": "金" }
+    },
+    {
+      "name": "年またぎ(2026-12-25の14日後は2027-01-08 金曜日)",
+      "func": "addDays",
+      "args": ["2026-12-25", 14],
+      "expect": { "ok": true, "date": "2027-01-08", "weekday": "金" }
+    },
+    {
+      "name": "0日後は同じ日(2026-07-18は土曜日)",
+      "func": "addDays",
+      "args": ["2026-07-18", 0],
+      "expect": { "ok": true, "date": "2026-07-18", "weekday": "土" }
+    },
+    {
+      "name": "異常入力: 開始日が終了日より後はエラー",
+      "func": "between",
+      "args": ["2026-08-01", "2026-07-18"],
+      "expect": { "ok": false, "code": "from_after_to" }
+    },
+    {
+      "name": "異常入力: 存在しない日付(2026-02-30)はエラー",
+      "func": "between",
+      "args": ["2026-02-30", "2026-07-18"],
+      "expect": { "ok": false, "code": "invalid_from" }
+    },
+    {
+      "name": "異常入力: 形式不正はエラー",
+      "func": "between",
+      "args": ["2026-07-18", "8/1"],
+      "expect": { "ok": false, "code": "invalid_to" }
+    },
+    {
+      "name": "異常入力: 加算日数が小数はエラー",
+      "func": "addDays",
+      "args": ["2026-07-18", 1.5],
+      "expect": { "ok": false, "code": "invalid_offset" }
+    },
+    {
+      "name": "異常入力: 加算日数が範囲超過はエラー",
+      "func": "addDays",
+      "args": ["2026-07-18", 40000],
+      "expect": { "ok": false, "code": "invalid_offset" }
+    }
+  ]
+}
