@@ -1,0 +1,106 @@
+{
+  "tool": "mile",
+  "module": "calc.js",
+  "global": "MileCalc",
+  "cases": [
+    {
+      "name": "10km = 6.2137マイル = 5.3996海里",
+      "func": "convert",
+      "args": [
+        10,
+        "km"
+      ],
+      "expect": {
+        "ok": true,
+        "mile": 6.2137,
+        "nm": 5.3996
+      }
+    },
+    {
+      "name": "マラソンの26.2マイル = 42.1648km",
+      "func": "convert",
+      "args": [
+        26.2,
+        "mile"
+      ],
+      "expect": {
+        "ok": true,
+        "km": 42.1648
+      }
+    },
+    {
+      "name": "1海里 = 1.852km = 1.1508マイル",
+      "func": "convert",
+      "args": [
+        1,
+        "nm"
+      ],
+      "expect": {
+        "ok": true,
+        "km": 1.852,
+        "mile": 1.1508
+      }
+    },
+    {
+      "name": "100km = 62.1371マイル",
+      "func": "convert",
+      "args": [
+        100,
+        "km"
+      ],
+      "expect": {
+        "ok": true,
+        "mile": 62.1371,
+        "nm": 53.9957
+      }
+    },
+    {
+      "name": "1マイル = 1.6093km(定義値1.609344の丸め)",
+      "func": "convert",
+      "args": [
+        1,
+        "mile"
+      ],
+      "expect": {
+        "ok": true,
+        "km": 1.6093
+      }
+    },
+    {
+      "name": "異常入力: 0はエラー",
+      "func": "convert",
+      "args": [
+        0,
+        "km"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
+    },
+    {
+      "name": "異常入力: 負の値はエラー",
+      "func": "convert",
+      "args": [
+        -10,
+        "mile"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
+    },
+    {
+      "name": "異常入力: 不正な単位はエラー",
+      "func": "convert",
+      "args": [
+        10,
+        "yd"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_unit"
+      }
+    }
+  ]
+}

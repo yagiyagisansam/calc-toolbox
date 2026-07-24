@@ -1,0 +1,132 @@
+{
+  "tool": "petage",
+  "module": "calc.js",
+  "global": "PetageCalc",
+  "cases": [
+    {
+      "name": "猫1歳 = 人間の15歳",
+      "func": "humanAge",
+      "args": [
+        "cat",
+        1
+      ],
+      "expect": {
+        "ok": true,
+        "humanAge": 15,
+        "stage": "成年期"
+      }
+    },
+    {
+      "name": "猫2歳 = 24歳",
+      "func": "humanAge",
+      "args": [
+        "cat",
+        2
+      ],
+      "expect": {
+        "ok": true,
+        "humanAge": 24
+      }
+    },
+    {
+      "name": "猫5歳 = 36歳(24+4×3)",
+      "func": "humanAge",
+      "args": [
+        "cat",
+        5
+      ],
+      "expect": {
+        "ok": true,
+        "humanAge": 36,
+        "stage": "成年期"
+      }
+    },
+    {
+      "name": "犬10歳 = 56歳・シニア期",
+      "func": "humanAge",
+      "args": [
+        "dog",
+        10
+      ],
+      "expect": {
+        "ok": true,
+        "humanAge": 56,
+        "stage": "シニア期"
+      }
+    },
+    {
+      "name": "生後6ヶ月(0.5歳)= 7.5歳・子ども",
+      "func": "humanAge",
+      "args": [
+        "cat",
+        0.5
+      ],
+      "expect": {
+        "ok": true,
+        "humanAge": 7.5,
+        "stage": "子ども"
+      }
+    },
+    {
+      "name": "猫20歳 = 96歳(長寿猫)",
+      "func": "humanAge",
+      "args": [
+        "cat",
+        20
+      ],
+      "expect": {
+        "ok": true,
+        "humanAge": 96
+      }
+    },
+    {
+      "name": "1歳半 = 19.5歳(補間)",
+      "func": "humanAge",
+      "args": [
+        "dog",
+        1.5
+      ],
+      "expect": {
+        "ok": true,
+        "humanAge": 19.5
+      }
+    },
+    {
+      "name": "7歳からシニア期",
+      "func": "humanAge",
+      "args": [
+        "dog",
+        7
+      ],
+      "expect": {
+        "ok": true,
+        "humanAge": 44,
+        "stage": "シニア期"
+      }
+    },
+    {
+      "name": "異常入力: 不正な種別はエラー",
+      "func": "humanAge",
+      "args": [
+        "bird",
+        3
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_type"
+      }
+    },
+    {
+      "name": "異常入力: 31歳以上はエラー",
+      "func": "humanAge",
+      "args": [
+        "cat",
+        31
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_age"
+      }
+    }
+  ]
+}

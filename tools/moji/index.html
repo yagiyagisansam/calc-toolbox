@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>文字数カウント(スペース除く・原稿用紙換算) | 計算ツールボックス</title>
+  <meta name="description" content="テキストを貼るだけで文字数を瞬時にカウント。スペース込み/除く、行数、400字詰め原稿用紙換算を同時表示。エントリーシート・レポート・SNS投稿の字数チェックに。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/moji/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="文字数カウント(スペース除く・原稿用紙換算) | 計算ツールボックス">
+  <meta property="og:description" content="テキストを貼るだけで文字数を瞬時にカウント。スペース込み/除く、行数、400字詰め原稿用紙換算を同時表示。エントリーシート・レポート・SNS投稿の字数チェックに。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/moji/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"文字数カウント(スペース除く・原稿用紙換算)","item":"https://quick-calc.site/tools/moji/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>文字数カウント</h1>
+  <form class="tool-form" id="moji-form">
+    <label>テキスト
+      <span class="field-note">貼り付けるだけで自動カウントされます</span>
+      <textarea id="text" rows="6" placeholder="ここに文章を入力・貼り付け"></textarea>
+    </label>
+    <button type="submit">文字数を数える</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>エントリーシートの「400字以内」、レポートの字数指定、SNSの文字数制限……。テキストを貼り付けるだけで<strong>文字数(スペース込み/除く)・行数・原稿用紙換算</strong>を瞬時にカウントします。入力中も自動で更新されます。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>テキストボックスに文章を入力するか、コピーした文章を貼り付けます。</li>
+    <li>入力と同時に文字数が自動でカウントされます(ボタンを押してもOK)。</li>
+    <li>「スペース除く」は指定字数が厳しいときのチェックに使ってください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li>文字数は<strong>改行を除いた文字数</strong>です。「スペース除く」はさらに半角・全角スペースとタブを除きます。</li>
+    <li>絵文字などの特殊な文字も1文字として数えます(Unicodeコードポイント単位)。</li>
+    <li>原稿用紙換算は 文字数 ÷ 400 の切り上げです。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>文字の数え方(コードポイント単位)に基づく機械的なカウントです。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>応募先やサービスによっては改行やスペースも1文字と数える場合があります。提出先のルールをご確認ください。</li>
+    <li>「👨‍👩‍👧」のような結合絵文字は見た目1文字でも複数文字と数えられることがあります。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. Wordの文字数と数が違うのはなぜですか?</h3>
+  <p>Wordの「文字カウント」も既定ではスペースを含む文字数を表示しますが、改行の扱いや「単語数」との混同で差が出ることがあります。本ツールは改行を除き、スペース込み/除くの両方を表示しているので、指定に合う方をお使いください。</p>
+  <h3>Q. X(旧Twitter)の140字にも使えますか?</h3>
+  <p>目安になります。ただしXは半角英数を0.5字と数えるなど独自ルールがあるため、正確には投稿画面のカウンターをご確認ください。</p>
+  <h3>Q. 入力した文章が外部に送られることはありませんか?</h3>
+  <p>ありません。カウントはすべてお使いの端末内(ブラウザ)で行われ、テキストはどこにも送信されません。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../heikin/">平均値・中央値 計算機</a></li>
+    <li><a href="../percent/">パーセント計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var input = document.getElementById("text");
+  function run() {
+    var r = MojiCalc.count(input.value);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">テキストが長すぎます(100万文字まで)。</p>';
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">' + r.chars.toLocaleString() + " 文字</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>スペース除く</td><td>" + r.charsNoSpace.toLocaleString() + " 文字</td></tr>" +
+      "<tr><td>行数</td><td>" + r.lines.toLocaleString() + " 行</td></tr>" +
+      "<tr><td>原稿用紙(400字)</td><td>約 " + r.genkoyoshi.toLocaleString() + " 枚</td></tr>" +
+      "</tbody></table></div>";
+    box.hidden = false;
+  }
+  input.addEventListener("input", run);
+  document.getElementById("moji-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

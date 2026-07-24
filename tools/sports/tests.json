@@ -1,0 +1,130 @@
+{
+  "tool": "sports",
+  "module": "calc.js",
+  "global": "SportsCalc",
+  "cases": [
+    {
+      "name": "60kg・ジョギング30分(7.0METs): 221kcal・脂肪31g",
+      "func": "calories",
+      "args": [
+        60,
+        30,
+        "jogging"
+      ],
+      "expect": {
+        "ok": true,
+        "kcal": 221,
+        "fatG": 31,
+        "mets": 7
+      }
+    },
+    {
+      "name": "70kg・テニス60分(7.3METs): 537kcal",
+      "func": "calories",
+      "args": [
+        70,
+        60,
+        "tennis"
+      ],
+      "expect": {
+        "ok": true,
+        "kcal": 537,
+        "fatG": 75
+      }
+    },
+    {
+      "name": "50kg・ヨガ20分(2.5METs): 44kcal",
+      "func": "calories",
+      "args": [
+        50,
+        20,
+        "yoga"
+      ],
+      "expect": {
+        "ok": true,
+        "kcal": 44,
+        "mets": 2.5
+      }
+    },
+    {
+      "name": "80kg・サイクリング45分(6.8METs): 428kcal(脂肪換算は丸め境界のためkcalのみ検証)",
+      "func": "calories",
+      "args": [
+        80,
+        45,
+        "cycling"
+      ],
+      "expect": {
+        "ok": true,
+        "kcal": 428
+      }
+    },
+    {
+      "name": "60kg・なわとび10分(8.8METs): 92kcal(短時間でも高強度)",
+      "func": "calories",
+      "args": [
+        60,
+        10,
+        "jumprope"
+      ],
+      "expect": {
+        "ok": true,
+        "kcal": 92,
+        "mets": 8.8
+      }
+    },
+    {
+      "name": "ラベルも返す(水泳クロール)",
+      "func": "calories",
+      "args": [
+        60,
+        30,
+        "swim_crawl"
+      ],
+      "expect": {
+        "ok": true,
+        "mets": 5.8,
+        "label": "水泳(クロール・ゆっくり)"
+      }
+    },
+    {
+      "name": "異常入力: 体重20kg未満はエラー",
+      "func": "calories",
+      "args": [
+        10,
+        30,
+        "jogging"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_weight"
+      }
+    },
+    {
+      "name": "異常入力: 時間0分はエラー",
+      "func": "calories",
+      "args": [
+        60,
+        0,
+        "jogging"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_minutes"
+      }
+    },
+    {
+      "name": "異常入力: 不正な運動種目はエラー",
+      "func": "calories",
+      "args": [
+        60,
+        30,
+        "esports"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_activity"
+      }
+    }
+  ]
+}

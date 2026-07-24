@@ -1,0 +1,134 @@
+{
+  "tool": "tsukisu",
+  "module": "calc.js",
+  "global": "TsukisuCalc",
+  "cases": [
+    {
+      "name": "2026-07-24の3ヶ月後 → 2026-10-24",
+      "func": "addMonths",
+      "args": [
+        "2026-07-24",
+        3
+      ],
+      "expect": {
+        "ok": true,
+        "date": "2026-10-24",
+        "clamped": false
+      }
+    },
+    {
+      "name": "月末調整: 1/31の1ヶ月後 → 2/28",
+      "func": "addMonths",
+      "args": [
+        "2026-01-31",
+        1
+      ],
+      "expect": {
+        "ok": true,
+        "date": "2026-02-28",
+        "clamped": true
+      }
+    },
+    {
+      "name": "うるう年: 2024-01-31の1ヶ月後 → 2/29",
+      "func": "addMonths",
+      "args": [
+        "2024-01-31",
+        1
+      ],
+      "expect": {
+        "ok": true,
+        "date": "2024-02-29",
+        "clamped": true
+      }
+    },
+    {
+      "name": "年またぎ: 2026-11-15の3ヶ月後 → 2027-02-15",
+      "func": "addMonths",
+      "args": [
+        "2026-11-15",
+        3
+      ],
+      "expect": {
+        "ok": true,
+        "date": "2027-02-15"
+      }
+    },
+    {
+      "name": "○ヶ月前(負の月数): 2026-03-31の1ヶ月前 → 2/28",
+      "func": "addMonths",
+      "args": [
+        "2026-03-31",
+        -1
+      ],
+      "expect": {
+        "ok": true,
+        "date": "2026-02-28",
+        "clamped": true
+      }
+    },
+    {
+      "name": "月数差: 1/15〜7/24は満6ヶ月と9日",
+      "func": "monthsBetween",
+      "args": [
+        "2026-01-15",
+        "2026-07-24"
+      ],
+      "expect": {
+        "ok": true,
+        "months": 6,
+        "extraDays": 9
+      }
+    },
+    {
+      "name": "月数差: 日が足りなければ満5ヶ月(1/25〜7/24)",
+      "func": "monthsBetween",
+      "args": [
+        "2026-01-25",
+        "2026-07-24"
+      ],
+      "expect": {
+        "ok": true,
+        "months": 5,
+        "extraDays": 29
+      }
+    },
+    {
+      "name": "同日なら0ヶ月0日",
+      "func": "monthsBetween",
+      "args": [
+        "2026-07-24",
+        "2026-07-24"
+      ],
+      "expect": {
+        "ok": true,
+        "months": 0,
+        "extraDays": 0
+      }
+    },
+    {
+      "name": "異常入力: 逆順の日付はエラー",
+      "func": "monthsBetween",
+      "args": [
+        "2026-07-24",
+        "2026-01-15"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "date_order"
+      }
+    },
+    {
+      "name": "異常入力: 存在しない日付はエラー",
+      "func": "addMonths",
+      "args": [
+        "2026-02-30",
+        1
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_date"
+      }
+    }
+  ]
+}

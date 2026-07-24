@@ -1,0 +1,114 @@
+{
+  "tool": "shinpaku",
+  "module": "calc.js",
+  "global": "ShinpakuCalc",
+  "cases": [
+    {
+      "name": "40歳・安静時70: 最大180・50%=125・70%=147",
+      "func": "zones",
+      "args": [
+        40,
+        70
+      ],
+      "expect": {
+        "ok": true,
+        "maxHr": 180,
+        "reserve": 110,
+        "z40": 114,
+        "z50": 125,
+        "z60": 136,
+        "z70": 147
+      }
+    },
+    {
+      "name": "60歳・安静時60: 最大160・50%=110・70%=130",
+      "func": "zones",
+      "args": [
+        60,
+        60
+      ],
+      "expect": {
+        "ok": true,
+        "maxHr": 160,
+        "z40": 100,
+        "z50": 110,
+        "z60": 120,
+        "z70": 130
+      }
+    },
+    {
+      "name": "20歳・安静時65",
+      "func": "zones",
+      "args": [
+        20,
+        65
+      ],
+      "expect": {
+        "ok": true,
+        "maxHr": 200,
+        "reserve": 135,
+        "z50": 133
+      }
+    },
+    {
+      "name": "安静時心拍が高い人はゾーンも上がる",
+      "func": "zones",
+      "args": [
+        40,
+        80
+      ],
+      "expect": {
+        "ok": true,
+        "z50": 130
+      }
+    },
+    {
+      "name": "異常入力: 14歳以下はエラー",
+      "func": "zones",
+      "args": [
+        14,
+        70
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_age"
+      }
+    },
+    {
+      "name": "異常入力: 101歳以上はエラー",
+      "func": "zones",
+      "args": [
+        101,
+        70
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_age"
+      }
+    },
+    {
+      "name": "異常入力: 安静時心拍29以下はエラー",
+      "func": "zones",
+      "args": [
+        40,
+        29
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_rest"
+      }
+    },
+    {
+      "name": "異常入力: 安静時心拍121以上はエラー",
+      "func": "zones",
+      "args": [
+        40,
+        121
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_rest"
+      }
+    }
+  ]
+}

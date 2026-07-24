@@ -1,0 +1,123 @@
+{
+  "tool": "spoon",
+  "module": "calc.js",
+  "global": "SpoonCalc",
+  "cases": [
+    {
+      "name": "大さじ3 = 45ml = 小さじ9",
+      "func": "convert",
+      "args": [
+        3,
+        "tbsp"
+      ],
+      "expect": {
+        "ok": true,
+        "ml": 45,
+        "tsp": 9,
+        "cup": 0.23
+      }
+    },
+    {
+      "name": "100ml = 大さじ6.67 = 小さじ20 = 0.5カップ",
+      "func": "convert",
+      "args": [
+        100,
+        "ml"
+      ],
+      "expect": {
+        "ok": true,
+        "tbsp": 6.67,
+        "tsp": 20,
+        "cup": 0.5
+      }
+    },
+    {
+      "name": "1カップ = 200ml = 大さじ13.33",
+      "func": "convert",
+      "args": [
+        1,
+        "cup"
+      ],
+      "expect": {
+        "ok": true,
+        "ml": 200,
+        "tbsp": 13.33,
+        "tsp": 40
+      }
+    },
+    {
+      "name": "小さじ1 = 5ml = 大さじ1/3",
+      "func": "convert",
+      "args": [
+        1,
+        "tsp"
+      ],
+      "expect": {
+        "ok": true,
+        "ml": 5,
+        "tbsp": 0.33
+      }
+    },
+    {
+      "name": "大さじ1 = 小さじ3",
+      "func": "convert",
+      "args": [
+        1,
+        "tbsp"
+      ],
+      "expect": {
+        "ok": true,
+        "ml": 15,
+        "tsp": 3
+      }
+    },
+    {
+      "name": "0.5カップ = 100ml",
+      "func": "convert",
+      "args": [
+        0.5,
+        "cup"
+      ],
+      "expect": {
+        "ok": true,
+        "ml": 100
+      }
+    },
+    {
+      "name": "異常入力: 0はエラー",
+      "func": "convert",
+      "args": [
+        0,
+        "tbsp"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
+    },
+    {
+      "name": "異常入力: 負の値はエラー",
+      "func": "convert",
+      "args": [
+        -1,
+        "ml"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
+    },
+    {
+      "name": "異常入力: 不正な単位はエラー",
+      "func": "convert",
+      "args": [
+        1,
+        "oz"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_unit"
+      }
+    }
+  ]
+}

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>○ヶ月後・月数 計算機(日付の月単位の計算) | 計算ツールボックス</title>
+  <meta name="description" content="「3ヶ月後は何日?」「この2つの日付は何ヶ月差?」を月末調整つきで正確に計算。契約期間・支払いサイクル・記念日・赤ちゃんの月齢の確認に。○ヶ月前もOK。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/tsukisu/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="○ヶ月後・月数 計算機(日付の月単位の計算) | 計算ツールボックス">
+  <meta property="og:description" content="「3ヶ月後は何日?」「この2つの日付は何ヶ月差?」を月末調整つきで正確に計算。契約期間・支払いサイクル・記念日・赤ちゃんの月齢の確認に。○ヶ月前もOK。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/tsukisu/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"○ヶ月後・月数 計算機(日付の月単位の計算)","item":"https://quick-calc.site/tools/tsukisu/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>○ヶ月後・月数 計算機</h1>
+  <form class="tool-form" id="tsukisu-form">
+    <label>計算の種類
+      <select id="mode">
+        <option value="add" selected>○ヶ月後(前)の日付</option>
+        <option value="between">2つの日付の月数差</option>
+      </select>
+    </label>
+    <label>基準日(開始日)
+      <input type="date" id="start" min="1900-01-01" max="2200-12-31" required>
+    </label>
+    <label id="n-label">何ヶ月後?
+      <span class="field-note">マイナスで「○ヶ月前」</span>
+      <input type="number" id="n" min="-1200" max="1200" step="1" value="3">
+    </label>
+    <label id="end-label" hidden>終了日
+      <input type="date" id="end" min="1900-01-01" max="2200-12-31">
+    </label>
+    <button type="submit">計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>「契約は3ヶ月後まで」「生後何ヶ月?」——<strong>○ヶ月後の日付</strong>と<strong>2つの日付の月数差(満○ヶ月と○日)</strong>を計算します。1月31日の1ヶ月後は2月28日、といった<strong>月末の調整</strong>も正確に処理します。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>「○ヶ月後の日付」か「月数差」を選びます。</li>
+    <li>基準日と月数(または終了日)を入力します。○ヶ月前はマイナスで。</li>
+    <li>「計算する」を押すと結果が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>○ヶ月後</strong>: 月に加算し、日はそのまま。相手の月に同じ日が存在しない場合は月末に調整します(1/31の1ヶ月後→2/28、うるう年は2/29)。</li>
+    <li><strong>月数差</strong>: 「満○ヶ月」で数えます。日が基準日の日に達していなければ1ヶ月引き、残りは日数で表示します(赤ちゃんの月齢と同じ数え方)。</li>
+    <li>計算例: 1月15日〜7月24日 → <strong>満6ヶ月と9日</strong></li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>グレゴリオ暦に基づく算術計算です。月末調整の方式は民法の期間計算(応当日がない場合は月末)と同じ考え方です。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>契約書によっては月数の数え方(初日算入など)が異なる場合があります。重要な期限は契約条項をご確認ください。</li>
+    <li>「1ヶ月=30日」とみなす日割り計算とは結果が異なります。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 1月31日の1ヶ月後はいつですか?</h3>
+  <p>2月には31日がないため、月末の2月28日(うるう年は29日)になります。民法の期間計算でも同じ扱いです。</p>
+  <h3>Q. 赤ちゃんの月齢はどう数えますか?</h3>
+  <p>生まれた日を基準に「満○ヶ月」で数えます。5月10日生まれなら6月10日で生後1ヶ月です。本ツールの「月数差」で誕生日と今日を入れるとわかります。</p>
+  <h3>Q. 「3ヶ月後」と「90日後」は違いますか?</h3>
+  <p>違います。月の長さが違うため、3ヶ月後は89〜92日後になります。日数ベースの計算は<a href="../days/">日数計算機</a>をお使いください。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../days/">日数計算機(日付の差・○日後)</a></li>
+    <li><a href="../eigyobi/">営業日計算機</a></li>
+    <li><a href="../age/">年齢計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var nLabel = document.getElementById("n-label");
+  var endLabel = document.getElementById("end-label");
+  var today = new Date();
+  document.getElementById("start").value = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + String(today.getDate()).padStart(2, "0");
+  var MSG = {
+    invalid_date: "日付を正しく入力してください。",
+    invalid_n: "月数は-1200〜1200の整数で入力してください。",
+    out_of_range: "計算結果が対応範囲(1900〜2200年)を超えました。",
+    date_order: "終了日は開始日以降にしてください。"
+  };
+  mode.addEventListener("change", function () {
+    var isAdd = mode.value === "add";
+    nLabel.hidden = !isAdd;
+    endLabel.hidden = isAdd;
+  });
+  document.getElementById("tsukisu-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var start = document.getElementById("start").value;
+    if (mode.value === "add") {
+      var n = parseInt(document.getElementById("n").value, 10);
+      var r = TsukisuCalc.addMonths(start, n);
+      if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "入力値を確認してください。") + "</p>"; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">' + r.date + "</div>" +
+        "<p>" + Math.abs(n) + "ヶ月" + (n >= 0 ? "後" : "前") + (r.clamped ? "(同じ日がないため月末に調整)" : "") + "</p>";
+    } else {
+      var r2 = TsukisuCalc.monthsBetween(start, document.getElementById("end").value);
+      if (!r2.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r2.code] || "入力値を確認してください。") + "</p>"; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">満 ' + r2.months + " ヶ月と " + r2.extraDays + " 日</div>";
+    }
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>犬・猫の年齢換算 計算機(人間だと何歳?) | 計算ツールボックス</title>
+  <meta name="description" content="猫と小型・中型犬の年齢を人間の年齢に換算。1歳=人間の15歳、2歳=24歳、以降1年ごとに+4歳の目安式で計算。うちの子は人間だと何歳?シニア期の目安もわかります。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/petage/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="犬・猫の年齢換算 計算機(人間だと何歳?) | 計算ツールボックス">
+  <meta property="og:description" content="猫と小型・中型犬の年齢を人間の年齢に換算。1歳=人間の15歳、2歳=24歳、以降1年ごとに+4歳の目安式で計算。うちの子は人間だと何歳?シニア期の目安もわかります。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/petage/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"犬・猫の年齢換算 計算機(人間だと何歳?)","item":"https://quick-calc.site/tools/petage/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>犬・猫の年齢換算 計算機</h1>
+  <form class="tool-form" id="petage-form">
+    <label>ペットの種類
+      <select id="type">
+        <option value="cat" selected>猫</option>
+        <option value="dog">犬(小型・中型)</option>
+      </select>
+    </label>
+    <label>ペットの年齢(歳)
+      <span class="field-note">生後6ヶ月なら0.5と入力</span>
+      <input type="number" id="age" min="0.1" max="30" step="0.1" required placeholder="例: 3">
+    </label>
+    <button type="submit">人間の年齢に換算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>「うちの子、人間だと何歳?」——猫と小型・中型犬の年齢を、獣医療で広く使われる目安式で<strong>人間の年齢に換算</strong>します。シニア期の入り口(7歳ごろ)も一目でわかるので、健康診断の頻度を考えるきっかけに。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>猫か犬(小型・中型)かを選びます。</li>
+    <li>ペットの年齢を入力します(生後6ヶ月なら0.5)。</li>
+    <li>「換算する」を押すと、人間の年齢の目安とライフステージが表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>1歳 = 人間の約15歳 / 2歳 = 約24歳 / 以降1年ごとに約+4歳</strong></li>
+    <li>最初の2年で人間の24歳相当まで一気に成長し、その後はゆるやかに歳を重ねる——という換算で、欧米の獣医団体などが目安として紹介している方式です。</li>
+    <li>計算例: 猫5歳 → 24 + 4×3 = <strong>人間の約36歳</strong></li>
+    <li>俗説の「人間の年齢=ペットの年齢×7」は成長の速い幼少期に合わないため、現在はこの方式が主流です。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>換算式は欧米の獣医師団体等で広く使われる目安(例: <a href="https://www.aaha.org/" target="_blank" rel="noopener">米国動物病院協会(AAHA)</a>のライフステージガイドライン等)に基づきます。科学的に確立した「正確な換算」ではなく目安です。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li><strong>大型犬(目安25kg以上)は加齢がより速く</strong>、この式は当てはまりません(大型犬は7〜8歳でシニア期とされます)。</li>
+    <li>品種・飼育環境・個体差で実際の老化速度は大きく変わります。健康管理はかかりつけの獣医師にご相談ください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 「犬の1年=人間の7年」は間違いですか?</h3>
+  <p>単純化しすぎです。犬猫は最初の1〜2年で人間の20歳過ぎまで一気に成長するため、×7では幼少期が合いません。幼少期は速く・その後はゆるやか、という本ツールの方式のほうが実態に近い目安とされています。</p>
+  <h3>Q. 何歳からシニア(高齢期)ですか?</h3>
+  <p>猫と小型・中型犬はおおむね7歳ごろから、人間でいう40代半ばに入ります。7歳を過ぎたら年1回だった健康診断を年2回にすることが推奨されることが多いです。</p>
+  <h3>Q. 猫は何歳まで生きますか?</h3>
+  <p>完全室内飼いの猫の平均寿命は16歳前後と報告されています。20歳(人間の約96歳)を超える長寿猫も珍しくなくなりました。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../age/">年齢計算機(満年齢・早生まれ・干支)</a></li>
+    <li><a href="../kinenbi/">記念日カウント計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  document.getElementById("petage-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var type = document.getElementById("type").value;
+    var r = PetageCalc.humanAge(type, parseFloat(document.getElementById("age").value));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">年齢は0.1〜30歳の範囲で入力してください。</p>';
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">人間だと 約' + r.humanAge.toLocaleString() + " 歳</div>" +
+      "<p>ライフステージの目安: <strong>" + r.stage + "</strong>" + (r.stage === "シニア期" ? "(健康診断は年2回が目安)" : "") + "</p>" +
+      "<p>※小型・中型犬と猫の目安です。大型犬には当てはまりません。</p>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

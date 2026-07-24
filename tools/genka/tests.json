@@ -1,0 +1,132 @@
+{
+  "tool": "genka",
+  "module": "calc.js",
+  "global": "GenkaCalc",
+  "cases": [
+    {
+      "name": "売価1,000円・原価600円: 粗利400円・利益率40%・原価率60%",
+      "func": "analyze",
+      "args": [
+        1000,
+        600
+      ],
+      "expect": {
+        "ok": true,
+        "profit": 400,
+        "marginPct": 40,
+        "costPct": 60
+      }
+    },
+    {
+      "name": "飲食の例: 売価800円・原価240円 → 原価率30%",
+      "func": "analyze",
+      "args": [
+        800,
+        240
+      ],
+      "expect": {
+        "ok": true,
+        "costPct": 30,
+        "marginPct": 70
+      }
+    },
+    {
+      "name": "赤字も計算できる(売価500円・原価650円 → 利益率-30%)",
+      "func": "analyze",
+      "args": [
+        500,
+        650
+      ],
+      "expect": {
+        "ok": true,
+        "profit": -150,
+        "marginPct": -30
+      }
+    },
+    {
+      "name": "原価0円なら利益率100%",
+      "func": "analyze",
+      "args": [
+        1000,
+        0
+      ],
+      "expect": {
+        "ok": true,
+        "marginPct": 100,
+        "costPct": 0
+      }
+    },
+    {
+      "name": "逆算: 原価600円で利益率40%にしたい → 売価1,000円",
+      "func": "priceFor",
+      "args": [
+        600,
+        40
+      ],
+      "expect": {
+        "ok": true,
+        "price": 1000
+      }
+    },
+    {
+      "name": "逆算: 原価700円・利益率30% → 売価1,000円",
+      "func": "priceFor",
+      "args": [
+        700,
+        30
+      ],
+      "expect": {
+        "ok": true,
+        "price": 1000
+      }
+    },
+    {
+      "name": "逆算: 利益率0%なら売価=原価",
+      "func": "priceFor",
+      "args": [
+        500,
+        0
+      ],
+      "expect": {
+        "ok": true,
+        "price": 500
+      }
+    },
+    {
+      "name": "異常入力: 売価0はエラー",
+      "func": "analyze",
+      "args": [
+        0,
+        100
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_price"
+      }
+    },
+    {
+      "name": "異常入力: 原価が負はエラー",
+      "func": "analyze",
+      "args": [
+        1000,
+        -1
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_cost"
+      }
+    },
+    {
+      "name": "異常入力: 目標利益率100%はエラー",
+      "func": "priceFor",
+      "args": [
+        600,
+        100
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_margin"
+      }
+    }
+  ]
+}

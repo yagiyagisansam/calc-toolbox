@@ -1,0 +1,171 @@
+{
+  "tool": "password",
+  "module": "calc.js",
+  "global": "PasswordCalc",
+  "cases": [
+    {
+      "name": "16文字・全文字種: 各種を必ず含み、強度105ビット",
+      "func": "generate",
+      "args": [
+        16,
+        {
+          "lower": true,
+          "upper": true,
+          "digits": true,
+          "symbols": true
+        },
+        12345
+      ],
+      "expect": {
+        "ok": true,
+        "length": 16,
+        "poolSize": 94,
+        "entropyBits": 105,
+        "hasLower": true,
+        "hasUpper": true,
+        "hasDigit": true,
+        "hasSymbol": true
+      }
+    },
+    {
+      "name": "12文字・英小文字+数字: プール36文字・62ビット",
+      "func": "generate",
+      "args": [
+        12,
+        {
+          "lower": true,
+          "digits": true
+        },
+        999
+      ],
+      "expect": {
+        "ok": true,
+        "length": 12,
+        "poolSize": 36,
+        "entropyBits": 62,
+        "hasLower": true,
+        "hasDigit": true,
+        "hasSymbol": false
+      }
+    },
+    {
+      "name": "別シードでも保証は同じ(数字のみ・8文字)",
+      "func": "generate",
+      "args": [
+        8,
+        {
+          "digits": true
+        },
+        42
+      ],
+      "expect": {
+        "ok": true,
+        "length": 8,
+        "poolSize": 10,
+        "hasDigit": true,
+        "hasLower": false,
+        "hasUpper": false
+      }
+    },
+    {
+      "name": "4文字・全種でも各1文字ずつ入る",
+      "func": "generate",
+      "args": [
+        4,
+        {
+          "lower": true,
+          "upper": true,
+          "digits": true,
+          "symbols": true
+        },
+        7
+      ],
+      "expect": {
+        "ok": true,
+        "length": 4,
+        "hasLower": true,
+        "hasUpper": true,
+        "hasDigit": true,
+        "hasSymbol": true
+      }
+    },
+    {
+      "name": "シード1でも保証成立(境界確認)",
+      "func": "generate",
+      "args": [
+        10,
+        {
+          "lower": true,
+          "upper": true,
+          "digits": true
+        },
+        1
+      ],
+      "expect": {
+        "ok": true,
+        "length": 10,
+        "hasLower": true,
+        "hasUpper": true,
+        "hasDigit": true
+      }
+    },
+    {
+      "name": "異常入力: 3文字以下はエラー",
+      "func": "generate",
+      "args": [
+        3,
+        {
+          "lower": true
+        },
+        1
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_length"
+      }
+    },
+    {
+      "name": "異常入力: 65文字以上はエラー",
+      "func": "generate",
+      "args": [
+        65,
+        {
+          "lower": true
+        },
+        1
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_length"
+      }
+    },
+    {
+      "name": "異常入力: 文字種未選択はエラー",
+      "func": "generate",
+      "args": [
+        12,
+        {},
+        1
+      ],
+      "expect": {
+        "ok": false,
+        "code": "no_charset"
+      }
+    },
+    {
+      "name": "異常入力: 小数の長さはエラー",
+      "func": "generate",
+      "args": [
+        12.5,
+        {
+          "lower": true
+        },
+        1
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_length"
+      }
+    }
+  ]
+}

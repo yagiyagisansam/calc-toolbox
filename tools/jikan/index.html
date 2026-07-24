@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>時間計算機(時間の合計・時刻の差・10進数換算) | 計算ツールボックス</title>
+  <meta name="description" content="「1:30+0:45+8:00」のような時間の合計と、開始〜終了時刻の経過時間を計算。給与計算に便利な10進数(1.75時間)換算つき。勤務時間・残業時間の集計に。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/jikan/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="時間計算機(時間の合計・時刻の差・10進数換算) | 計算ツールボックス">
+  <meta property="og:description" content="「1:30+0:45+8:00」のような時間の合計と、開始〜終了時刻の経過時間を計算。給与計算に便利な10進数(1.75時間)換算つき。勤務時間・残業時間の集計に。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/jikan/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"時間計算機(時間の合計・時刻の差・10進数換算)","item":"https://quick-calc.site/tools/jikan/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>時間計算機(合計・時刻の差)</h1>
+  <form class="tool-form" id="jikan-form">
+    <label>計算の種類
+      <select id="mode">
+        <option value="total" selected>時間の合計(1:30 + 0:45 + …)</option>
+        <option value="span">時刻の差(開始〜終了)</option>
+      </select>
+    </label>
+    <div id="total-fields">
+      <label>時間のリスト(「時:分」を改行・カンマ区切りで)
+        <textarea id="list" rows="4" placeholder="例:&#10;8:00&#10;7:30&#10;8:15"></textarea>
+      </label>
+    </div>
+    <div id="span-fields" hidden>
+      <label>開始時刻
+        <input type="time" id="start" value="09:00">
+      </label>
+      <label>終了時刻
+        <span class="field-note">開始より前の時刻は「翌日」とみなします</span>
+        <input type="time" id="end" value="17:30">
+      </label>
+    </div>
+    <button type="submit">時間を計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>「8:00 + 7:30 + 8:15 は合計何時間?」「9時から17時半までは何時間?」といった<strong>時間の足し算と時刻の差</strong>を計算します。給与計算やタイムシートで使う<strong>10進数表記(8時間30分=8.5時間)</strong>も同時に表示します。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>「時間の合計」か「時刻の差」を選びます。</li>
+    <li>合計なら「時:分」を1行ずつ(またはカンマ区切りで)入力、差なら開始・終了時刻を選びます。</li>
+    <li>「計算する」を押すと、合計時間と10進数換算が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li>すべて分に変換してから計算しています(1:30 → 90分)。</li>
+    <li><strong>10進数換算 = 合計分 ÷ 60</strong>(例: 8時間30分 = 510分 ÷ 60 = 8.5時間)</li>
+    <li>時刻の差で終了が開始より前の場合は、日をまたいだ勤務(夜勤など)として+24時間で計算します。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>時間の単位換算(1時間=60分)に基づく算術計算です。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>時刻の差は休憩時間を差し引きません。労働時間の計算では休憩分を別途引いてください。</li>
+    <li>給与計算の丸め(15分単位切り捨てなど)は勤務先のルールによります。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 8時間30分は「8.3時間」ではないのですか?</h3>
+  <p>違います。30分は0.5時間なので8.5時間です。「時:分」表記と10進数表記の混同は給与計算でよくある間違いで、本ツールは両方を並べて表示します。</p>
+  <h3>Q. 休憩1時間を引いた実働時間を出すには?</h3>
+  <p>時刻の差で総拘束時間を出したあと、「時間の合計」モードで拘束時間と「-1:00」…は入力できないため、表示された合計から1時間引いてください。例: 9:00〜18:00=9時間 → 実働8時間。</p>
+  <h3>Q. 1ヶ月分の残業時間の合計にも使えますか?</h3>
+  <p>使えます。日々の残業時間(0:45 など)を改行区切りで貼り付ければ、月合計と10進数換算(給与明細でよく使われる形式)が一度に出ます。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../zangyo/">残業代 計算機</a></li>
+    <li><a href="../sleep/">睡眠時間 計算機</a></li>
+    <li><a href="../jikyu/">時給⇔月収・年収 換算計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var totalFields = document.getElementById("total-fields");
+  var spanFields = document.getElementById("span-fields");
+  var MSG = {
+    invalid_list: "時間を1件以上入力してください(最大100件)。",
+    invalid_time: "「時:分」の形式で入力してください(例: 1:30。分は00〜59)。",
+    invalid_start: "開始時刻を正しく入力してください。",
+    invalid_end: "終了時刻を正しく入力してください。"
+  };
+  mode.addEventListener("change", function () {
+    var isTotal = mode.value === "total";
+    totalFields.hidden = !isTotal;
+    spanFields.hidden = isTotal;
+  });
+  function show(r, label) {
+    if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "入力値を確認してください。") + "</p>"; box.hidden = false; return; }
+    box.innerHTML =
+      '<div class="result-main">' + r.hours + " 時間 " + r.minutes + " 分</div>" +
+      "<p>" + label + " / 10進数換算: <strong>" + r.decimal.toLocaleString() + "時間</strong>(" + r.totalMinutes.toLocaleString() + "分)</p>";
+    box.hidden = false;
+  }
+  document.getElementById("jikan-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (mode.value === "total") {
+      var parts = document.getElementById("list").value.split(/[\n,、\s]+/).filter(function (s) { return s !== ""; });
+      show(JikanCalc.total(parts), parts.length + "件の合計");
+    } else {
+      show(JikanCalc.span(document.getElementById("start").value, document.getElementById("end").value), "時刻の差");
+    }
+  });
+})();
+</script>
+</body>
+</html>

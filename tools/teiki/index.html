@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>定期券は元が取れる? 計算機(何日乗ればお得か) | 計算ツールボックス</title>
+  <meta name="description" content="定期券の価格と片道運賃から「月に何日乗れば元が取れるか」を計算。都度払い(交通系ICの往復)との差額もわかる。週何日出社なら定期が得か、通勤・通学の見直しに。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/teiki/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="定期券は元が取れる? 計算機(何日乗ればお得か) | 計算ツールボックス">
+  <meta property="og:description" content="定期券の価格と片道運賃から「月に何日乗れば元が取れるか」を計算。都度払い(交通系ICの往復)との差額もわかる。週何日出社なら定期が得か、通勤・通学の見直しに。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/teiki/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"定期券は元が取れる? 計算機(何日乗ればお得か)","item":"https://quick-calc.site/tools/teiki/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>定期券は元が取れる? 計算機</h1>
+  <form class="tool-form" id="teiki-form">
+    <label>定期券の価格(1ヶ月・円)
+      <input type="number" id="pass" min="1" step="any" required placeholder="例: 10000">
+    </label>
+    <label>片道運賃(円)
+      <span class="field-note">交通系ICの運賃で入力</span>
+      <input type="number" id="fare" min="1" step="1" required placeholder="例: 200">
+    </label>
+    <label>月に乗る日数(往復)
+      <span class="field-note">週5出社なら20〜22日、週3なら12〜13日</span>
+      <input type="number" id="days" min="1" max="31" step="1" value="20" required>
+    </label>
+    <button type="submit">元が取れるか計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>在宅勤務が増えて「定期券、本当に得?」と思ったら——定期券の価格と片道運賃から、<strong>月に何日乗れば元が取れるか(損益分岐日数)</strong>と、都度払いとの差額を計算します。3ヶ月・6ヶ月定期の比較にも使えます(価格を月割りで入力)。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>定期券の1ヶ月の価格を入力します(6ヶ月定期なら6で割った額)。</li>
+    <li>片道の運賃(交通系ICでの支払額)を入力します。</li>
+    <li>月に乗る日数を入れて「計算する」を押すと、どちらが得かと差額が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>都度払いの月額 = 片道運賃 × 2(往復)× 利用日数</strong></li>
+    <li><strong>損益分岐日数 = 定期券価格 ÷(片道運賃 × 2)</strong>の切り上げ。この日数以上乗るなら定期が得です。</li>
+    <li>計算例: 定期1万円・片道200円 → 分岐は25日。週5出社(月20〜22日)でも都度払いのほうが安い、ということが起こりえます。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>運賃と日数に基づく算術計算です。運賃・定期代は各鉄道・バス会社の公表額をご確認ください。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>定期券には「区間内なら何度でも乗れる」「途中下車できる」という金額以外のメリットがあります。区間内で買い物や寄り道が多い人は差額以上の価値があることも。</li>
+    <li>会社の通勤手当の支給ルール(定期代支給か実費精算か)によって、個人の損得は変わります。</li>
+    <li>オフピーク定期券や回数券的な割引(バスの得トク回数券など)がある路線では、それらも比較対象になります。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 週何日出社なら定期が得ですか?</h3>
+  <p>多くの鉄道の1ヶ月定期は「月15〜18日」あたりが分岐点になるよう設定されています。週4出社(月16〜18日)なら定期、週3以下(月13日以下)なら都度払いが得になるケースが多いですが、路線によるので本ツールでご確認ください。</p>
+  <h3>Q. 6ヶ月定期とどちらが得か比べられますか?</h3>
+  <p>6ヶ月定期の価格を6で割った額を「定期券の価格」に入れてください。6ヶ月定期は1ヶ月定期より1〜2割安く設定されていることが多いです。</p>
+  <h3>Q. 土日も使う場合はどう入力しますか?</h3>
+  <p>通勤以外で乗る日も「月に乗る日数」に足してください。定期区間内の休日利用が多いほど定期が有利になります。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../tanka/">単価比較 計算機</a></li>
+    <li><a href="../point/">割引とポイント還元 どっちが得? 計算機</a></li>
+    <li><a href="../jikyu/">時給⇔月収・年収 換算計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var MSG = {
+    invalid_pass: "定期券の価格を1円以上で入力してください。",
+    invalid_fare: "片道運賃を1円以上で入力してください。",
+    invalid_days: "日数は1〜31の整数で入力してください。"
+  };
+  document.getElementById("teiki-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var r = TeikiCalc.compare(
+      parseFloat(document.getElementById("pass").value),
+      parseFloat(document.getElementById("fare").value),
+      parseInt(document.getElementById("days").value, 10)
+    );
+    if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "入力値を確認してください。") + "</p>"; box.hidden = false; return; }
+    var verdict = r.better === "pass" ? "定期券のほうが得" : r.better === "payg" ? "都度払いのほうが得" : "ほぼ同額";
+    box.innerHTML =
+      '<div class="result-main">' + verdict + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>都度払いの月額</td><td>" + r.payg.toLocaleString() + " 円</td></tr>" +
+      "<tr><td>差額</td><td>" + (r.diff >= 0 ? "定期が " + r.diff.toLocaleString() + "円 お得" : "都度払いが " + Math.abs(r.diff).toLocaleString() + "円 お得") + "</td></tr>" +
+      "<tr><td>元が取れる日数</td><td>月 <strong>" + r.breakEvenDays + "日</strong> 以上</td></tr>" +
+      "</tbody></table></div>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

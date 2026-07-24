@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>歩数→距離・カロリー換算 計算機(1万歩は何km?) | 計算ツールボックス</title>
+  <meta name="description" content="歩数と身長から歩いた距離(km)・時間・消費カロリーの目安を計算。歩幅は身長×0.45の目安式。「今日の8,000歩は何キロ?」がすぐわかる。歩活・ダイエットの記録に。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/hosu/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="歩数→距離・カロリー換算 計算機(1万歩は何km?) | 計算ツールボックス">
+  <meta property="og:description" content="歩数と身長から歩いた距離(km)・時間・消費カロリーの目安を計算。歩幅は身長×0.45の目安式。「今日の8,000歩は何キロ?」がすぐわかる。歩活・ダイエットの記録に。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/hosu/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"歩数→距離・カロリー換算 計算機(1万歩は何km?)","item":"https://quick-calc.site/tools/hosu/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>歩数→距離・カロリー換算 計算機</h1>
+  <form class="tool-form" id="hosu-form">
+    <label>歩数
+      <input type="number" id="steps" min="1" max="200000" step="1" required placeholder="例: 10000">
+    </label>
+    <label>身長(cm)
+      <span class="field-note">歩幅の推定に使います</span>
+      <input type="number" id="height" min="100" max="250" step="0.1" required placeholder="例: 170">
+    </label>
+    <label>体重(kg・任意)
+      <span class="field-note">入れると消費カロリーも計算</span>
+      <input type="number" id="weight" min="20" max="300" step="0.1" placeholder="例: 60">
+    </label>
+    <button type="submit">距離・カロリーを計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>スマホの歩数計に出た「8,432歩」——それって何キロ歩いたの?歩数と身長を入れるだけで、<strong>歩いた距離・時間・消費カロリーの目安</strong>を計算します。1日8,000歩の目標達成チェックや歩活の記録に。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>スマホや歩数計の歩数を入力します。</li>
+    <li>身長を入力します(歩幅=身長×0.45の目安で距離を推定します)。</li>
+    <li>体重も入れると消費カロリーの目安が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>歩幅の目安 = 身長 × 0.45</strong>(ふつうの速さで歩くときの一般的な目安。170cmなら約77cm)</li>
+    <li><strong>距離 = 歩数 × 歩幅</strong> / 時間の目安 = 距離 ÷ 4km/h(ふつうの歩行速度)</li>
+    <li><strong>消費カロリー = 1.05 × 3.0METs × 時間 × 体重</strong>(歩行のMETs値と厚生労働省の運動指針の式)</li>
+    <li>計算例: 1万歩・170cm・60kg → 約7.7km・約115分・<strong>約360kcal</strong></li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>歩行(4km/h)=3.0METsは<a href="https://www.nibiohn.go.jp/eiken/programs/2011mets.pdf" target="_blank" rel="noopener">国立健康・栄養研究所「身体活動のメッツ(METs)表」</a>、消費カロリーの式は厚生労働省の運動指針によります。歩幅×0.45は一般的な目安です。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>歩幅は歩く速さや脚の長さで変わります(速歩では身長×0.5程度)。正確に知りたい場合は10歩歩いた距離を10で割って実測してください。</li>
+    <li>スマホの歩数計自体にも誤差があります(ポケットの位置などで±10%程度)。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 1日1万歩歩くべきですか?</h3>
+  <p>健康日本21(第三次)では成人は1日8,000歩が目安とされています。歩数を今より+1,000歩(約10分)増やすだけでも健康効果があるとされるので、続けられる目標から始めるのがおすすめです。</p>
+  <h3>Q. 1万歩でどれくらい痩せますか?</h3>
+  <p>60kgの人で約360kcal、脂肪に換算すると約50gです。毎日続ければ1ヶ月で約1.5kg分のカロリーに相当しますが、実際の体重変化は食事に大きく左右されます。</p>
+  <h3>Q. 距離がスマホの表示と違います。</h3>
+  <p>スマホはGPSや加速度センサーから独自に距離を推定しています。本ツールは「歩数×推定歩幅」の単純計算なので、歩幅の個人差の分だけずれます。実測歩幅がわかればより正確です。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../walking/">ウォーキング消費カロリー 計算機</a></li>
+    <li><a href="../sports/">運動別 消費カロリー計算機</a></li>
+    <li><a href="../bmi/">BMI・適正体重 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var MSG = {
+    invalid_steps: "歩数は1〜200,000の範囲で入力してください。",
+    invalid_height: "身長は100〜250cmの範囲で入力してください。",
+    invalid_weight: "体重は20〜300kgの範囲で入力してください。"
+  };
+  document.getElementById("hosu-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var w = document.getElementById("weight").value;
+    var r = HosuCalc.calc(
+      parseFloat(document.getElementById("steps").value),
+      parseFloat(document.getElementById("height").value),
+      w === "" ? undefined : parseFloat(w)
+    );
+    if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "入力値を確認してください。") + "</p>"; box.hidden = false; return; }
+    box.innerHTML =
+      '<div class="result-main">約 ' + r.distanceKm.toLocaleString() + " km</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>推定歩幅</td><td>" + r.strideCm.toLocaleString() + " cm(身長×0.45)</td></tr>" +
+      "<tr><td>歩いた時間の目安</td><td>約 " + r.timeMin.toLocaleString() + " 分</td></tr>" +
+      (r.kcal !== undefined ? "<tr><td>消費カロリーの目安</td><td>約 " + r.kcal.toLocaleString() + " kcal</td></tr>" : "") +
+      "</tbody></table></div>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

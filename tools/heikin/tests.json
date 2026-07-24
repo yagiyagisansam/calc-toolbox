@@ -1,0 +1,150 @@
+{
+  "tool": "heikin",
+  "module": "calc.js",
+  "global": "HeikinCalc",
+  "cases": [
+    {
+      "name": "80・90・70: 平均80・中央値80",
+      "func": "stats",
+      "args": [
+        [
+          80,
+          90,
+          70
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "n": 3,
+        "sum": 240,
+        "mean": 80,
+        "median": 80,
+        "min": 70,
+        "max": 90
+      }
+    },
+    {
+      "name": "偶数個: 1〜4の中央値は2.5",
+      "func": "stats",
+      "args": [
+        [
+          1,
+          2,
+          3,
+          4
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "mean": 2.5,
+        "median": 2.5
+      }
+    },
+    {
+      "name": "1個でも計算できる",
+      "func": "stats",
+      "args": [
+        [
+          5
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "n": 1,
+        "mean": 5,
+        "median": 5,
+        "min": 5,
+        "max": 5
+      }
+    },
+    {
+      "name": "10・10・20: 平均13.33(外れ値で平均と中央値がずれる例)",
+      "func": "stats",
+      "args": [
+        [
+          10,
+          10,
+          20
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "mean": 13.33,
+        "median": 10
+      }
+    },
+    {
+      "name": "小数もOK: 0.1+0.2の誤差を丸めて処理",
+      "func": "stats",
+      "args": [
+        [
+          0.1,
+          0.2
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "sum": 0.3,
+        "mean": 0.15
+      }
+    },
+    {
+      "name": "負の数もOK",
+      "func": "stats",
+      "args": [
+        [
+          -10,
+          10
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "mean": 0,
+        "median": 0,
+        "min": -10,
+        "max": 10
+      }
+    },
+    {
+      "name": "並び順に関係なく中央値を計算",
+      "func": "stats",
+      "args": [
+        [
+          90,
+          10,
+          50
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "median": 50
+      }
+    },
+    {
+      "name": "異常入力: 空リストはエラー",
+      "func": "stats",
+      "args": [
+        []
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_list"
+      }
+    },
+    {
+      "name": "異常入力: 数値以外を含むとエラー",
+      "func": "stats",
+      "args": [
+        [
+          1,
+          "a",
+          3
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
+    }
+  ]
+}

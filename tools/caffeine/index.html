@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>カフェイン摂取量 計算機(コーヒー何杯まで?) | 計算ツールボックス</title>
+  <meta name="description" content="コーヒー・紅茶・緑茶・エナジードリンクなどのカフェイン量を合計し、1日の目安(健康な成人400mg・妊娠中の方はより少なく)と比較。飲みすぎチェックに。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/caffeine/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="カフェイン摂取量 計算機(コーヒー何杯まで?) | 計算ツールボックス">
+  <meta property="og:description" content="コーヒー・紅茶・緑茶・エナジードリンクなどのカフェイン量を合計し、1日の目安(健康な成人400mg・妊娠中の方はより少なく)と比較。飲みすぎチェックに。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/caffeine/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"カフェイン摂取量 計算機(コーヒー何杯まで?)","item":"https://quick-calc.site/tools/caffeine/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>カフェイン摂取量 計算機</h1>
+  <form class="tool-form" id="caffeine-form">
+    <div id="rows"></div>
+    <button type="button" id="add-row" style="font-size:0.95rem;padding:8px;border:1px dashed var(--color-border);border-radius:8px;background:transparent;color:var(--color-accent);cursor:pointer;">+ 飲み物を追加</button>
+    <button type="submit">カフェイン量を計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>コーヒー、緑茶、エナジードリンク……今日どれだけカフェインを摂った?飲んだものと量を入れるだけで<strong>カフェインの合計量</strong>を計算し、<strong>健康な成人の1日の目安(400mg)</strong>と比べます。眠れない夜が続く方、妊娠中の方の飲みすぎチェックに。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>飲んだもの(コーヒー・お茶・エナジードリンクなど)と量(ml)を入力します。</li>
+    <li>「+ 飲み物を追加」で1日分をまとめて入れられます。</li>
+    <li>「計算する」を押すと、合計mgと目安に対する割合が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>カフェイン量 = 濃度(mg/100ml)× 量(ml)÷ 100</strong> の合計</li>
+    <li>濃度は日本食品標準成分表(浸出液)の値など: コーヒー60 / インスタント57 / 紅茶30 / せん茶・ほうじ茶・ウーロン茶20 / 玉露160 / コーラ約10 mg/100ml</li>
+    <li>計算例: コーヒー2杯(400ml)+緑茶ペットボトル(500ml)= 240+100 = <strong>340mg</strong>(成人目安の85%)</li>
+    <li>目安: 健康な成人は1日400mgまで(欧州食品安全機関等の評価)。妊娠中・授乳中はより少なく(WHOは300mg、多くの機関は200mgを推奨)。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>飲料中のカフェイン濃度と摂取目安: <a href="https://www.maff.go.jp/j/syouan/seisaku/risk_analysis/priority/hazard_chem/caffeine.html" target="_blank" rel="noopener">農林水産省「カフェインの過剰摂取について」</a>(食品安全委員会・海外機関の評価を含む)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>エナジードリンクは製品によりカフェイン量が大きく異なります(1本30〜300mg)。正確な量は製品表示をご確認ください。</li>
+    <li>カフェインの感受性には個人差が大きく、少量でも眠れなくなる人もいます。</li>
+    <li>錠剤・眠気覚まし飲料の常用や、体調に不安がある場合は医師・薬剤師にご相談ください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. コーヒーは1日何杯まで大丈夫ですか?</h3>
+  <p>ドリップコーヒー1杯(150ml)は約90mgなので、健康な成人の目安400mgは<strong>4〜5杯程度</strong>に相当します。ただし個人差があり、夕方以降は睡眠に影響しやすいので量とタイミングの両方に気をつけてください。</p>
+  <h3>Q. 寝る何時間前までならコーヒーを飲んでいいですか?</h3>
+  <p>カフェインの血中濃度が半分になるまで約4時間(2〜8時間の個人差)かかります。眠りに影響を感じる人は就寝の5〜6時間前までにするのが無難です。</p>
+  <h3>Q. 妊娠中はどのくらいまでにすべきですか?</h3>
+  <p>WHOは1日300mg、英国など多くの機関は200mgまでを推奨しています。本ツールは200mg基準の割合も表示します。かかりつけ医の指示があればそちらを優先してください。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../alcohol/">純アルコール量 計算機</a></li>
+    <li><a href="../cycle/">睡眠サイクル計算機</a></li>
+    <li><a href="../sleep/">睡眠時間 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var rows = document.getElementById("rows");
+  function addRow(drink, ml) {
+    var div = document.createElement("div");
+    div.className = "caffeine-row";
+    div.style.cssText = "display:flex;gap:.5em;margin-bottom:8px;";
+    var sel = document.createElement("select");
+    Object.keys(CaffeineCalc.DRINKS).forEach(function (key) {
+      sel.add(new Option(CaffeineCalc.DRINKS[key].label, key));
+    });
+    sel.value = drink || "coffee";
+    var input = document.createElement("input");
+    input.type = "number";
+    input.min = "1"; input.max = "5000"; input.step = "any";
+    input.placeholder = "量(ml)";
+    input.value = ml || "";
+    input.setAttribute("aria-label", "量(ml)");
+    input.style.width = "7em";
+    div.appendChild(sel);
+    div.appendChild(input);
+    rows.appendChild(div);
+  }
+  addRow("coffee", 200);
+  document.getElementById("add-row").addEventListener("click", function () { addRow(); });
+  document.getElementById("caffeine-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var items = [];
+    var rowEls = rows.querySelectorAll(".caffeine-row");
+    for (var i = 0; i < rowEls.length; i++) {
+      var ml = parseFloat(rowEls[i].querySelector("input").value);
+      if (!isFinite(ml) || ml <= 0) continue;
+      items.push({ drink: rowEls[i].querySelector("select").value, ml: ml });
+    }
+    var r = CaffeineCalc.total(items);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">飲み物と量(ml)を1件以上入力してください。</p>';
+      box.hidden = false;
+      return;
+    }
+    var status = r.pctAdult >= 100 ? "⚠️ 成人の1日の目安を超えています" : r.pctAdult >= 75 ? "目安に近づいています" : "目安の範囲内です";
+    box.innerHTML =
+      '<div class="result-main">合計 約' + r.totalMg.toLocaleString() + " mg</div>" +
+      "<p>" + status + "</p>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>健康な成人の目安(400mg)</td><td><strong>" + r.pctAdult + "%</strong></td></tr>" +
+      "<tr><td>妊娠中の目安(200mg)</td><td>" + r.pctPregnant + "%</td></tr>" +
+      "</tbody></table></div>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

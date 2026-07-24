@@ -1,0 +1,134 @@
+{
+  "tool": "seiza",
+  "module": "calc.js",
+  "global": "SeizaCalc",
+  "cases": [
+    {
+      "name": "3/21 → おひつじ座(境界の初日)",
+      "func": "lookup",
+      "args": [
+        3,
+        21
+      ],
+      "expect": {
+        "ok": true,
+        "sign": "おひつじ座",
+        "signEn": "Aries",
+        "stone": "アクアマリン"
+      }
+    },
+    {
+      "name": "4/19 → おひつじ座(境界の最終日)",
+      "func": "lookup",
+      "args": [
+        4,
+        19
+      ],
+      "expect": {
+        "ok": true,
+        "sign": "おひつじ座"
+      }
+    },
+    {
+      "name": "4/20 → おうし座(境界の切り替わり)",
+      "func": "lookup",
+      "args": [
+        4,
+        20
+      ],
+      "expect": {
+        "ok": true,
+        "sign": "おうし座",
+        "stone": "ダイヤモンド"
+      }
+    },
+    {
+      "name": "1/10 → やぎ座(年またぎの星座)",
+      "func": "lookup",
+      "args": [
+        1,
+        10
+      ],
+      "expect": {
+        "ok": true,
+        "sign": "やぎ座",
+        "stone": "ガーネット"
+      }
+    },
+    {
+      "name": "12/25 → やぎ座",
+      "func": "lookup",
+      "args": [
+        12,
+        25
+      ],
+      "expect": {
+        "ok": true,
+        "sign": "やぎ座",
+        "stone": "ターコイズ(トルコ石)"
+      }
+    },
+    {
+      "name": "7/24 → しし座",
+      "func": "lookup",
+      "args": [
+        7,
+        24
+      ],
+      "expect": {
+        "ok": true,
+        "sign": "しし座",
+        "stone": "ルビー"
+      }
+    },
+    {
+      "name": "2/29(うるう日)→ うお座",
+      "func": "lookup",
+      "args": [
+        2,
+        29
+      ],
+      "expect": {
+        "ok": true,
+        "sign": "うお座",
+        "stone": "アメシスト"
+      }
+    },
+    {
+      "name": "9/22 → おとめ座 / 9/23 → てんびん座",
+      "func": "lookup",
+      "args": [
+        9,
+        23
+      ],
+      "expect": {
+        "ok": true,
+        "sign": "てんびん座"
+      }
+    },
+    {
+      "name": "異常入力: 2/30はエラー",
+      "func": "lookup",
+      "args": [
+        2,
+        30
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_date"
+      }
+    },
+    {
+      "name": "異常入力: 13月はエラー",
+      "func": "lookup",
+      "args": [
+        13,
+        1
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_date"
+      }
+    }
+  ]
+}

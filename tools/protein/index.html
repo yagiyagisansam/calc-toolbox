@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>タンパク質摂取量 計算機(1日に必要な量の目安) | 計算ツールボックス</title>
+  <meta name="description" content="体重と運動量から1日のタンパク質摂取量の目安を計算。食品換算(鶏むね肉・卵・牛乳・納豆で何グラム分?)も表示。筋トレ・ダイエット・食事管理に。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/protein/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="タンパク質摂取量 計算機(1日に必要な量の目安) | 計算ツールボックス">
+  <meta property="og:description" content="体重と運動量から1日のタンパク質摂取量の目安を計算。食品換算(鶏むね肉・卵・牛乳・納豆で何グラム分?)も表示。筋トレ・ダイエット・食事管理に。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/protein/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"タンパク質摂取量 計算機(1日に必要な量の目安)","item":"https://quick-calc.site/tools/protein/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>タンパク質摂取量 計算機</h1>
+  <form class="tool-form" id="protein-form">
+    <label>体重(kg)
+      <input type="number" id="weight" min="20" max="300" step="0.1" required placeholder="例: 60">
+    </label>
+    <label>運動量
+      <select id="level">
+        <option value="normal" selected>ふつうの生活(デスクワーク中心)</option>
+        <option value="active">運動習慣あり(週2〜3回)</option>
+        <option value="training">筋トレ・スポーツ選手</option>
+      </select>
+    </label>
+    <button type="submit">必要量を計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>筋トレやダイエットで気になる「タンパク質、1日何グラム摂ればいい?」——体重と運動量を入れるだけで<strong>1日の摂取量の目安</strong>を計算し、<strong>鶏むね肉・卵・牛乳・納豆に換算</strong>して表示します。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>体重を入力します。</li>
+    <li>運動量(ふつう/運動習慣あり/筋トレ)を選びます。</li>
+    <li>「計算する」を押すと、1日の目安と食品換算が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>ふつうの生活: 体重 × 0.9g/日</strong>(日本人の食事摂取基準でタンパク質の推奨量算定に使われる考え方に基づく概数。成人の推奨量は男性65g・女性50g/日)</li>
+    <li><strong>運動習慣あり: 体重 × 1.2g / 筋トレ・スポーツ選手: 体重 × 1.6g</strong>(スポーツ栄養で一般的に推奨される1.2〜2.0g/kgの範囲の代表値)</li>
+    <li>計算例: 60kg・ふつうの生活 → <strong>約54g/日</strong>。これは鶏むね肉(皮なし)約230g、または卵9個分に相当します。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>推奨量の基準: <a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/kenkou/eiyou/syokuji_kijyun.html" target="_blank" rel="noopener">厚生労働省「日本人の食事摂取基準」</a> / 食品のタンパク質量: <a href="https://fooddb.mext.go.jp/" target="_blank" rel="noopener">文部科学省 食品成分データベース</a>(鶏むね皮なし約23g/100g、卵1個約6g、牛乳200ml約7g、納豆1パック約8g)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>腎臓の病気などでタンパク質制限を受けている方は、医師・管理栄養士の指示を優先してください。</li>
+    <li>一度に大量に摂るより、3食に分けて摂るほうが利用効率がよいとされています。</li>
+    <li>過剰摂取(体重×2gを大きく超える継続摂取)のメリットは確認されていません。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. プロテイン(サプリ)は必要ですか?</h3>
+  <p>食事で目安量を摂れていれば必須ではありません。1日の食事を振り返って足りない分(例: 20g)を補う使い方が合理的です。プロテイン1杯はおよそ15〜25gです。</p>
+  <h3>Q. 手軽にタンパク質を摂れる食品は?</h3>
+  <p>目安として、鶏むね肉100g=約23g、卵1個=約6g、牛乳コップ1杯=約7g、納豆1パック=約8g、木綿豆腐半丁=約10g、サバ缶1缶=約26gです。組み合わせて1日の目安に近づけてください。</p>
+  <h3>Q. ダイエット中もタンパク質は必要ですか?</h3>
+  <p>むしろ重要です。摂取カロリーを減らすと筋肉も落ちやすくなるため、タンパク質は体重×1.2g程度を確保しつつカロリーを調整するのが定石です。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../tdee/">1日の摂取カロリー目安 計算機</a></li>
+    <li><a href="../bmr/">基礎代謝量 計算機</a></li>
+    <li><a href="../bmi/">BMI・適正体重 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var FOODS = [
+    ["鶏むね肉(皮なし)", 23, "g", 100],
+    ["卵", 6.1, "個", 1],
+    ["牛乳(200ml)", 6.8, "杯", 1],
+    ["納豆(1パック)", 8.3, "パック", 1]
+  ];
+  document.getElementById("protein-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var r = ProteinCalc.needs(parseFloat(document.getElementById("weight").value), document.getElementById("level").value);
+    if (!r.ok) { box.innerHTML = '<p class="result-error">体重は20〜300kgの範囲で入力してください。</p>'; box.hidden = false; return; }
+    var rows = FOODS.map(function (f) {
+      var amount = f[0] === "鶏むね肉(皮なし)" ? Math.round(r.grams / f[1] * f[3] / 10) * 10 + "g" : Math.round(r.grams / f[1] * 10) / 10 + f[2];
+      return "<tr><td>" + f[0] + "だけなら</td><td>約 " + amount + "</td></tr>";
+    }).join("");
+    box.innerHTML =
+      '<div class="result-main">1日 約' + r.grams.toLocaleString() + " g</div>" +
+      "<p>" + r.label + "(体重×" + r.rate + "g)の目安です。</p>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>食品換算</th><th>量</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div><p>実際は複数の食品を組み合わせて摂ります。</p>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

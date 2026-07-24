@@ -1,0 +1,139 @@
+{
+  "tool": "speed",
+  "module": "calc.js",
+  "global": "SpeedCalc",
+  "cases": [
+    {
+      "name": "80km/h・150km → 112.5分(1時間53分)",
+      "func": "solve",
+      "args": [
+        {
+          "speedKmh": 80,
+          "distanceKm": 150
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "timeMin": 112.5,
+        "timeH": 1,
+        "timeM": 53
+      }
+    },
+    {
+      "name": "フルマラソン42.195kmを4時間 → 平均10.55km/h",
+      "func": "solve",
+      "args": [
+        {
+          "distanceKm": 42.195,
+          "timeMin": 240
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "speedKmh": 10.55
+      }
+    },
+    {
+      "name": "60km/hで4.5時間(270分)→ 270km",
+      "func": "solve",
+      "args": [
+        {
+          "speedKmh": 60,
+          "timeMin": 270
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "distanceKm": 270
+      }
+    },
+    {
+      "name": "徒歩4km/hで2km → 30分",
+      "func": "solve",
+      "args": [
+        {
+          "speedKmh": 4,
+          "distanceKm": 2
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "timeMin": 30,
+        "timeH": 0,
+        "timeM": 30
+      }
+    },
+    {
+      "name": "新幹線285km/hで515km → 約108.42分",
+      "func": "solve",
+      "args": [
+        {
+          "speedKmh": 285,
+          "distanceKm": 515
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "timeMin": 108.42,
+        "timeH": 1,
+        "timeM": 48
+      }
+    },
+    {
+      "name": "異常入力: 1つだけの指定はエラー",
+      "func": "solve",
+      "args": [
+        {
+          "speedKmh": 80
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_input"
+      }
+    },
+    {
+      "name": "異常入力: 3つ全部の指定はエラー",
+      "func": "solve",
+      "args": [
+        {
+          "speedKmh": 80,
+          "distanceKm": 100,
+          "timeMin": 60
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_input"
+      }
+    },
+    {
+      "name": "異常入力: 速さ0はエラー",
+      "func": "solve",
+      "args": [
+        {
+          "speedKmh": 0,
+          "distanceKm": 100
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
+    },
+    {
+      "name": "異常入力: 負の距離はエラー",
+      "func": "solve",
+      "args": [
+        {
+          "speedKmh": 80,
+          "distanceKm": -5
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
+    }
+  ]
+}

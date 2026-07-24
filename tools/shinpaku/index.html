@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>目標心拍数 計算機(カルボーネン法・有酸素運動の強度) | 計算ツールボックス</title>
+  <meta name="description" content="年齢と安静時心拍数から、脂肪燃焼や持久力アップに適した目標心拍数ゾーンをカルボーネン法で計算。ウォーキング・ジョギング・エアロバイクの強度設定に。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/shinpaku/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="目標心拍数 計算機(カルボーネン法・有酸素運動の強度) | 計算ツールボックス">
+  <meta property="og:description" content="年齢と安静時心拍数から、脂肪燃焼や持久力アップに適した目標心拍数ゾーンをカルボーネン法で計算。ウォーキング・ジョギング・エアロバイクの強度設定に。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/shinpaku/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"目標心拍数 計算機(カルボーネン法・有酸素運動の強度)","item":"https://quick-calc.site/tools/shinpaku/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>目標心拍数 計算機(カルボーネン法)</h1>
+  <form class="tool-form" id="shinpaku-form">
+    <label>年齢
+      <input type="number" id="age" min="15" max="100" step="1" required placeholder="例: 40">
+    </label>
+    <label>安静時心拍数(拍/分)
+      <span class="field-note">朝、起き上がる前に測った1分間の脈拍。不明なら70前後</span>
+      <input type="number" id="rest" min="30" max="120" step="1" value="70" required>
+    </label>
+    <button type="submit">目標心拍数を計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>「脂肪燃焼にちょうどいい運動のキツさ」は心拍数でわかります。年齢と安静時心拍数から、<strong>運動強度別の目標心拍数ゾーン</strong>をカルボーネン法で計算。スマートウォッチでの心拍トレーニングやエアロバイクの強度設定にどうぞ。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>年齢を入力します。</li>
+    <li>安静時心拍数を入力します(朝目覚めた直後、起き上がる前に手首の脈を1分数えるのが正確)。</li>
+    <li>「計算する」を押すと、強度40〜70%の目標心拍数ゾーンが表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>最大心拍数の推定 = 220 − 年齢</strong>(広く使われる推定式)</li>
+    <li><strong>目標心拍数 = (最大心拍数 − 安静時心拍数) × 強度% + 安静時心拍数</strong>(カルボーネン法)</li>
+    <li>計算例: 40歳・安静時70の人の50%強度 → (180−70)×0.5+70 = <strong>125拍/分</strong></li>
+    <li>強度の目安: 40〜60%=健康づくり・脂肪燃焼(楽〜ややきつい) / 60〜70%=持久力向上(ややきつい)</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>カルボーネン法と運動強度の考え方: <a href="https://www.e-healthnet.mhlw.go.jp/information/exercise" target="_blank" rel="noopener">厚生労働省 e-ヘルスネット(身体活動・運動)</a></li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>「220−年齢」は推定式であり、実際の最大心拍数には個人差(±10拍以上)があります。</li>
+    <li>心疾患・高血圧などで治療中の方、服薬中(β遮断薬など心拍に影響する薬)の方は、必ず医師に相談してから運動強度を決めてください。</li>
+    <li>運動中に胸の痛み・強い息切れ・めまいを感じたらすぐに中止してください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 脂肪燃焼には「ゆるい運動」がいいと聞きましたが?</h3>
+  <p>強度40〜60%の運動は脂肪がエネルギーとして使われる割合が高く、長く続けやすいのが利点です。ただし消費カロリー総量は強度が高いほど増えるので、「続けられる強度で長く」が基本です。</p>
+  <h3>Q. 安静時心拍数がわかりません。</h3>
+  <p>朝、目が覚めて起き上がる前に、手首の親指側に反対の指を当てて1分間数えてください。スマートウォッチの睡眠時心拍でも代用できます。成人の目安は60〜80拍/分です。</p>
+  <h3>Q. 運動中の心拍数はどう測ればいいですか?</h3>
+  <p>スマートウォッチや胸バンド式心拍計が便利です。機器がない場合は、運動を一時中断して10秒間脈を数えて6倍する方法もあります。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../walking/">ウォーキング消費カロリー 計算機</a></li>
+    <li><a href="../sports/">運動別 消費カロリー計算機</a></li>
+    <li><a href="../pace/">ランニングペース 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var MSG = {
+    invalid_age: "年齢は15〜100歳の範囲で入力してください。",
+    invalid_rest: "安静時心拍数は30〜120の範囲で入力してください。"
+  };
+  document.getElementById("shinpaku-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var r = ShinpakuCalc.zones(parseFloat(document.getElementById("age").value), parseFloat(document.getElementById("rest").value));
+    if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "入力値を確認してください。") + "</p>"; box.hidden = false; return; }
+    box.innerHTML =
+      '<div class="result-main">脂肪燃焼ゾーン ' + r.z40 + "〜" + r.z60 + " 拍/分</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>強度</th><th>心拍数</th><th>目安</th></tr></thead><tbody>' +
+      "<tr><td>40%</td><td>" + r.z40 + "</td><td>楽(運動を始めたばかりの方)</td></tr>" +
+      "<tr><td>50%</td><td>" + r.z50 + "</td><td>健康づくり・脂肪燃焼</td></tr>" +
+      "<tr><td>60%</td><td>" + r.z60 + "</td><td>脂肪燃焼〜持久力向上</td></tr>" +
+      "<tr><td>70%</td><td>" + r.z70 + "</td><td>持久力向上(ややきつい)</td></tr>" +
+      "</tbody></table></div>" +
+      "<p>推定最大心拍数: " + r.maxHr + "拍/分(220−年齢)</p>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+{
+  "tool": "hosu",
+  "module": "calc.js",
+  "global": "HosuCalc",
+  "cases": [
+    {
+      "name": "1万歩・身長170cm・60kg: 歩幅76.5cm・7.65km・約115分・361kcal",
+      "func": "calc",
+      "args": [
+        10000,
+        170,
+        60
+      ],
+      "expect": {
+        "ok": true,
+        "strideCm": 76.5,
+        "distanceKm": 7.65,
+        "timeMin": 115,
+        "kcal": 361
+      }
+    },
+    {
+      "name": "体重なしでも距離と時間は計算できる",
+      "func": "calc",
+      "args": [
+        8000,
+        155
+      ],
+      "expect": {
+        "ok": true,
+        "strideCm": 69.8,
+        "distanceKm": 5.58,
+        "timeMin": 84
+      }
+    },
+    {
+      "name": "3,000歩・180cm・80kg: 2.43km・153kcal",
+      "func": "calc",
+      "args": [
+        3000,
+        180,
+        80
+      ],
+      "expect": {
+        "ok": true,
+        "distanceKm": 2.43,
+        "timeMin": 36,
+        "kcal": 153
+      }
+    },
+    {
+      "name": "歩幅は身長×0.45(160cm→72cm)",
+      "func": "calc",
+      "args": [
+        1000,
+        160
+      ],
+      "expect": {
+        "ok": true,
+        "strideCm": 72,
+        "distanceKm": 0.72
+      }
+    },
+    {
+      "name": "異常入力: 歩数0はエラー",
+      "func": "calc",
+      "args": [
+        0,
+        170
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_steps"
+      }
+    },
+    {
+      "name": "異常入力: 歩数20万超はエラー",
+      "func": "calc",
+      "args": [
+        250000,
+        170
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_steps"
+      }
+    },
+    {
+      "name": "異常入力: 身長100cm未満はエラー",
+      "func": "calc",
+      "args": [
+        10000,
+        90
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_height"
+      }
+    },
+    {
+      "name": "異常入力: 体重20kg未満はエラー",
+      "func": "calc",
+      "args": [
+        10000,
+        170,
+        10
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_weight"
+      }
+    }
+  ]
+}

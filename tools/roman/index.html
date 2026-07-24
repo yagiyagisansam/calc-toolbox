@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ローマ数字 変換(1〜3999⇔Ⅰ Ⅴ Ⅹ表記) | 計算ツールボックス</title>
+  <meta name="description" content="アラビア数字とローマ数字(I・V・X・L・C・D・M)を相互変換。時計の文字盤、映画のタイトル、年号表記の読み方に。2026はMMXXVI。減算則にも対応した正確な変換。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/roman/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="ローマ数字 変換(1〜3999⇔Ⅰ Ⅴ Ⅹ表記) | 計算ツールボックス">
+  <meta property="og:description" content="アラビア数字とローマ数字(I・V・X・L・C・D・M)を相互変換。時計の文字盤、映画のタイトル、年号表記の読み方に。2026はMMXXVI。減算則にも対応した正確な変換。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/roman/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"ローマ数字 変換(1〜3999⇔Ⅰ Ⅴ Ⅹ表記)","item":"https://quick-calc.site/tools/roman/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>ローマ数字 変換</h1>
+  <form class="tool-form" id="roman-form">
+    <label>変換の方向
+      <select id="mode">
+        <option value="toRoman" selected>数字 → ローマ数字</option>
+        <option value="fromRoman">ローマ数字 → 数字</option>
+      </select>
+    </label>
+    <label id="input-label">数字(1〜3999)
+      <input type="text" id="value" required placeholder="例: 2026" inputmode="numeric">
+    </label>
+    <button type="submit">変換する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>時計の文字盤、映画・ゲームのタイトル(「ファイナルファンタジーⅦ」)、建物の定礎に刻まれた年号……。<strong>アラビア数字とローマ数字を相互変換</strong>します。IV(4)やIX(9)のような減算則にも正確に対応しています。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>変換の方向を選びます。</li>
+    <li>数字(1〜3999)またはローマ数字(例: MMXXVI)を入力します。</li>
+    <li>「変換する」を押すと結果が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li>基本記号は I=1, V=5, X=10, L=50, C=100, D=500, M=1000 の7つです。</li>
+    <li>大きい順に並べて足しますが、<strong>小さい記号が大きい記号の直前に来たら引き算</strong>します(IV=4, IX=9, XL=40, XC=90, CD=400, CM=900)。</li>
+    <li>計算例: 1994 = 1000(M) + 900(CM) + 90(XC) + 4(IV) = <strong>MCMXCIV</strong></li>
+    <li>ローマ数字→数字の変換では、標準表記かどうかを検証します(IIIIはエラー)。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>ローマ数字の標準的な表記法(減算則)に基づく変換です。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>ローマ数字に0と負の数はなく、標準表記で表せるのは1〜3999です。</li>
+    <li>時計の文字盤では伝統的に4をIIIIと書くことがありますが、本ツールは標準表記(IV)を使います。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 時計の文字盤はなぜ「IIII」なのですか?</h3>
+  <p>諸説ありますが、文字盤の見た目のバランス(VIIIとの釣り合い)や伝統によるものとされています。数学的な標準表記ではIVです。</p>
+  <h3>Q. 2026年はローマ数字でどう書きますか?</h3>
+  <p>MMXXVI です(M=1000が2つ、X=10が2つ、VI=6)。映画のエンドロールの製作年表記などで見かけます。</p>
+  <h3>Q. 4000以上は表せないのですか?</h3>
+  <p>標準的な表記では3999(MMMCMXCIX)までです。それ以上は上線を引いて1000倍を表す方法(V̄=5000)がありますが、一般的な用途ではほぼ使われないため本ツールは対応していません。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../wareki/">西暦・和暦 変換計算機</a></li>
+    <li><a href="../moji/">文字数カウント</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var label = document.getElementById("input-label");
+  var input = document.getElementById("value");
+  mode.addEventListener("change", function () {
+    var isTo = mode.value === "toRoman";
+    label.childNodes[0].textContent = isTo ? "数字(1〜3999)" : "ローマ数字";
+    input.placeholder = isTo ? "例: 2026" : "例: MMXXVI";
+    input.inputMode = isTo ? "numeric" : "text";
+  });
+  document.getElementById("roman-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (mode.value === "toRoman") {
+      var r = RomanCalc.toRoman(parseInt(input.value, 10));
+      if (!r.ok) { box.innerHTML = '<p class="result-error">1〜3999の整数を入力してください。</p>'; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">' + r.roman + "</div>";
+    } else {
+      var r2 = RomanCalc.fromRoman(input.value);
+      if (!r2.ok) { box.innerHTML = '<p class="result-error">正しいローマ数字を入力してください(例: MMXXVI。使える文字は I V X L C D M)。</p>'; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">' + r2.value.toLocaleString() + "</div>";
+    }
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

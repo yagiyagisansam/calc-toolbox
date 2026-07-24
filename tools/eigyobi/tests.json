@@ -1,0 +1,133 @@
+{
+  "tool": "eigyobi",
+  "module": "calc.js",
+  "global": "EigyobiCalc",
+  "cases": [
+    {
+      "name": "金曜(2026-07-24)の3営業日後 → 翌週水曜7/29",
+      "func": "addBusinessDays",
+      "args": [
+        "2026-07-24",
+        3
+      ],
+      "expect": {
+        "ok": true,
+        "date": "2026-07-29",
+        "weekday": "水"
+      }
+    },
+    {
+      "name": "海の日をまたぐ: 7/17(金)の2営業日後 → 7/22(祝月曜を飛ばす)",
+      "func": "addBusinessDays",
+      "args": [
+        "2026-07-17",
+        2
+      ],
+      "expect": {
+        "ok": true,
+        "date": "2026-07-22",
+        "weekday": "水"
+      }
+    },
+    {
+      "name": "GWをまたぐ: 4/30(木)の2営業日後 → 5/7(5/2〜6は土日祝・振替)",
+      "func": "addBusinessDays",
+      "args": [
+        "2026-04-30",
+        2
+      ],
+      "expect": {
+        "ok": true,
+        "date": "2026-05-07",
+        "weekday": "木"
+      }
+    },
+    {
+      "name": "シルバーウィーク2026: 9/18(金)〜9/25(金)の営業日は3日",
+      "func": "countBusinessDays",
+      "args": [
+        "2026-09-18",
+        "2026-09-25"
+      ],
+      "expect": {
+        "ok": true,
+        "businessDays": 3,
+        "totalDays": 8
+      }
+    },
+    {
+      "name": "1営業日後(平日連続)",
+      "func": "addBusinessDays",
+      "args": [
+        "2026-07-27",
+        1
+      ],
+      "expect": {
+        "ok": true,
+        "date": "2026-07-28",
+        "weekday": "火"
+      }
+    },
+    {
+      "name": "2027年の振替休日: 3/19(金)の1営業日後は3/23(3/21春分が日曜→3/22振替)",
+      "func": "addBusinessDays",
+      "args": [
+        "2027-03-19",
+        1
+      ],
+      "expect": {
+        "ok": true,
+        "date": "2027-03-23"
+      }
+    },
+    {
+      "name": "期間カウント: 2026-07-20(祝)〜07-24 → 4営業日",
+      "func": "countBusinessDays",
+      "args": [
+        "2026-07-20",
+        "2026-07-24"
+      ],
+      "expect": {
+        "ok": true,
+        "businessDays": 4,
+        "totalDays": 5
+      }
+    },
+    {
+      "name": "異常入力: 対応範囲外(2025年)はエラー",
+      "func": "addBusinessDays",
+      "args": [
+        "2025-12-01",
+        3
+      ],
+      "expect": {
+        "ok": false,
+        "code": "out_of_range"
+      }
+    },
+    {
+      "name": "異常入力: 営業日数0はエラー",
+      "func": "addBusinessDays",
+      "args": [
+        "2026-07-24",
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_n"
+      }
+    },
+    {
+      "name": "異常入力: 終了日が開始日より前はエラー",
+      "func": "countBusinessDays",
+      "args": [
+        "2026-07-24",
+        "2026-07-20"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "date_order"
+      }
+    }
+  ]
+}

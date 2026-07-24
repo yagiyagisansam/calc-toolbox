@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>住宅ローン 借入可能額 計算機(年収からいくら借りれる?) | 計算ツールボックス</title>
+  <meta name="description" content="年収・返済負担率・金利・期間から住宅ローンの借入可能額の目安を逆算。毎月の返済額も表示。「年収500万でいくらの家が買える?」の最初の目安に。元利均等方式。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/kariire/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="住宅ローン 借入可能額 計算機(年収からいくら借りれる?) | 計算ツールボックス">
+  <meta property="og:description" content="年収・返済負担率・金利・期間から住宅ローンの借入可能額の目安を逆算。毎月の返済額も表示。「年収500万でいくらの家が買える?」の最初の目安に。元利均等方式。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/kariire/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"住宅ローン 借入可能額 計算機(年収からいくら借りれる?)","item":"https://quick-calc.site/tools/kariire/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>住宅ローン 借入可能額 計算機</h1>
+  <form class="tool-form" id="kariire-form">
+    <label>年収(万円・額面)
+      <input type="number" id="income" min="100" max="10000" step="any" required placeholder="例: 500">
+    </label>
+    <label>返済負担率(%)
+      <span class="field-note">無理のない目安20〜25%・金融機関の審査上限目安30〜35%</span>
+      <input type="number" id="burden" min="5" max="50" step="1" value="25" required>
+    </label>
+    <label>金利(年利%)
+      <input type="number" id="rate" min="0" max="20" step="0.01" value="1.5" required>
+    </label>
+    <label>返済期間(年)
+      <input type="number" id="years" min="1" max="50" step="1" value="35" required>
+    </label>
+    <button type="submit">借入可能額を計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>「年収500万円だと、いくらの家が買える?」——年収と返済負担率から<strong>住宅ローンの借入可能額の目安</strong>を逆算します。毎月の返済額も同時に表示。無理のない予算感をつかむ最初の一歩に。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>年収(額面)を万円で入力します。</li>
+    <li>返済負担率を選びます(家計に無理のない目安は20〜25%)。</li>
+    <li>想定金利と返済期間を入れて「計算する」を押すと、借入可能額が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>毎月の返済額 = 年収 × 返済負担率 ÷ 12</strong></li>
+    <li><strong>借入可能額 = 毎月返済額 × {1 −(1+月利)<sup>−返済月数</sup>} ÷ 月利</strong>(元利均等返済の逆算・年金現価の式)</li>
+    <li>計算例: 年収500万円・負担率25%・金利1.5%・35年 → 月約10.4万円で<strong>約3,400万円</strong></li>
+    <li>返済負担率は「年収に占める年間返済額の割合」です。審査ではおおむね30〜35%が上限とされますが、手取りベースで考えると20〜25%が無理のない水準とされます。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>元利均等返済の標準的な計算式(年金現価係数)による算術計算です。返済負担率の水準は<a href="https://www.flat35.com/" target="_blank" rel="noopener">住宅金融支援機構(フラット35)</a>の基準(年収400万円以上は35%以下等)が参考になります。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>これは<strong>目安の概算</strong>です。実際の審査額は勤続年数・他の借入・物件・団信・審査金利(実行金利より高い金利で審査されます)で変わります。</li>
+    <li>「借りられる額」と「無理なく返せる額」は別物です。教育費・老後資金も含めた家計全体で判断してください。</li>
+    <li>変動金利は将来上がる可能性があります。金利を+1〜2%した場合の額も確認しておくのがおすすめです。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 年収の何倍まで借りられますか?</h3>
+  <p>「年収の7〜8倍」までという水準が近年の目安ですが、本質は毎月の返済額です。金利1.5%・35年・負担率25%なら年収の約6.8倍に相当します。倍率より負担率で考えるほうが安全です。</p>
+  <h3>Q. 頭金はどう考えればいいですか?</h3>
+  <p>物件価格 = 借入可能額 + 頭金 − 諸費用(物件価格の5〜10%)です。本ツールの結果に用意できる頭金を足し、諸費用を引いた額が物件予算の目安になります。</p>
+  <h3>Q. ペアローンや収入合算はどうなりますか?</h3>
+  <p>夫婦の年収を合算した額で概算できます(合算年収を入力)。ただしどちらかの収入が減った場合のリスクも大きくなるため、片方の収入だけでも返せる範囲が理想とされます。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../loan/">ローン返済 計算機(毎月の返済額)</a></li>
+    <li><a href="../hiwari/">家賃日割り計算機</a></li>
+    <li><a href="../compound/">複利・積立シミュレーション</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var MSG = {
+    invalid_income: "年収は100〜10,000万円の範囲で入力してください。",
+    invalid_burden: "返済負担率は5〜50%の範囲で入力してください。",
+    invalid_rate: "金利は0〜20%の範囲で入力してください。",
+    invalid_years: "返済期間は1〜50年の整数で入力してください。"
+  };
+  document.getElementById("kariire-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var r = KariireCalc.borrowable(
+      parseFloat(document.getElementById("income").value) * 10000,
+      parseFloat(document.getElementById("burden").value),
+      parseFloat(document.getElementById("rate").value),
+      parseInt(document.getElementById("years").value, 10)
+    );
+    if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "入力値を確認してください。") + "</p>"; box.hidden = false; return; }
+    var man = Math.round(r.loan / 10000);
+    box.innerHTML =
+      '<div class="result-main">約 ' + man.toLocaleString() + " 万円</div>" +
+      "<p>毎月の返済額: 約<strong>" + r.monthly.toLocaleString() + "円</strong></p>" +
+      "<p>※目安の概算です。実際の審査額は審査金利・他の借入等で変わります。</p>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

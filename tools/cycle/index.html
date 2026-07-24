@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>睡眠サイクル計算機(何時に寝ればスッキリ起きられる?) | 計算ツールボックス</title>
+  <meta name="description" content="起床時刻から逆算して、眠りの周期(約90分)の区切りに合う就寝時刻の候補を表示。入眠までの時間も考慮。「明日6時半起きなら何時に寝る?」に一発回答。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/cycle/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="睡眠サイクル計算機(何時に寝ればスッキリ起きられる?) | 計算ツールボックス">
+  <meta property="og:description" content="起床時刻から逆算して、眠りの周期(約90分)の区切りに合う就寝時刻の候補を表示。入眠までの時間も考慮。「明日6時半起きなら何時に寝る?」に一発回答。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/cycle/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"睡眠サイクル計算機(何時に寝ればスッキリ起きられる?)","item":"https://quick-calc.site/tools/cycle/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>睡眠サイクル計算機</h1>
+  <form class="tool-form" id="cycle-form">
+    <label>計算の種類
+      <select id="mode">
+        <option value="bed" selected>起床時刻から「何時に寝るか」を逆算</option>
+        <option value="wake">就寝時刻から「何時に起きるか」を計算</option>
+      </select>
+    </label>
+    <label id="time-label">起床時刻
+      <input type="time" id="time" value="06:30" required>
+    </label>
+    <label>寝つくまでの時間(分)
+      <span class="field-note">目安は15分。すぐ眠れる人は5分</span>
+      <input type="number" id="fall" min="0" max="60" step="5" value="15">
+    </label>
+    <button type="submit">時刻の候補を計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>眠りは約90分の周期(ノンレム睡眠→レム睡眠)をくり返していて、<strong>周期の区切りに近いタイミングで起きると目覚めやすい</strong>といわれます。起床時刻を入れると、周期の区切りに合う<strong>就寝時刻の候補3つ</strong>を逆算します(就寝→起床の計算も可能)。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>起きたい時刻(または寝る時刻)を入力します。</li>
+    <li>寝つくまでのおおよその時間を入力します(目安15分)。</li>
+    <li>「計算する」を押すと、6時間・7.5時間・9時間睡眠に相当する時刻の候補が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>就寝時刻の候補 = 起床時刻 −(90分 × サイクル数)− 入眠までの時間</strong></li>
+    <li>サイクル数は4回(6時間)・5回(7.5時間)・6回(9時間)の3パターンを表示します。成人の推奨睡眠時間は6時間以上です。</li>
+    <li>計算例: 6:30起床・入眠15分なら、5サイクル(7.5時間)の就寝候補は <strong>22:45</strong>。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>睡眠周期(ノンレム・レム睡眠を約90分周期でくり返す)の解説: <a href="https://www.e-healthnet.mhlw.go.jp/information/heart" target="_blank" rel="noopener">厚生労働省 e-ヘルスネット(休養・こころの健康)</a>。90分は平均値で、個人差は70〜110分程度あります。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>周期の長さには大きな個人差があり、「90分の倍数で必ずスッキリ起きられる」という保証はありません。目安としてお使いください。</li>
+    <li>もっとも大切なのは<strong>睡眠時間を十分確保し、就寝・起床時刻を毎日そろえる</strong>ことです。</li>
+    <li>強い眠気・不眠が続く場合は医療機関にご相談ください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 90分サイクルは本当ですか?</h3>
+  <p>ノンレム睡眠とレム睡眠が約90分周期でくり返されること自体はよく知られた生理現象です。ただし周期は人により70〜110分程度の幅があり、同じ人でも一晩の中で変化します。本ツールの候補は「平均90分ならこの時刻」という目安です。</p>
+  <h3>Q. 6時間睡眠でも足りますか?</h3>
+  <p>成人の多くは6〜8時間程度が適正とされ、必要量には個人差があります。日中に強い眠気があるなら不足のサインです。できれば5サイクル(7.5時間)以上の候補を選ぶのがおすすめです。</p>
+  <h3>Q. 候補の時刻に寝ても眠れません。</h3>
+  <p>就寝直前のスマホ・カフェイン・熱すぎるお風呂は寝つきを悪くします。また「眠くないのに布団に入る」のは逆効果のことも。眠気が来てから布団に入り、起床時刻のほうを一定に保つのが定石です。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../sleep/">睡眠時間 計算機</a></li>
+    <li><a href="../jikan/">時間計算機</a></li>
+    <li><a href="../bmr/">基礎代謝量 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var timeLabel = document.getElementById("time-label");
+  mode.addEventListener("change", function () {
+    timeLabel.childNodes[0].textContent = mode.value === "bed" ? "起床時刻" : "就寝時刻";
+    document.getElementById("time").value = mode.value === "bed" ? "06:30" : "23:00";
+  });
+  document.getElementById("cycle-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var t = document.getElementById("time").value;
+    var fall = parseFloat(document.getElementById("fall").value || "15");
+    var isBed = mode.value === "bed";
+    var r = isBed ? CycleCalc.bedTimes(t, fall) : CycleCalc.wakeTimes(t, fall);
+    if (!r.ok) { box.innerHTML = '<p class="result-error">時刻と入眠時間(0〜60分)を正しく入力してください。</p>'; box.hidden = false; return; }
+    var rows = r.options.map(function (o) {
+      var time = isBed ? o.bedTime : o.wakeTime;
+      var star = o.cycles === 5 ? " ⭐" : "";
+      return "<tr><td><strong>" + time + "</strong>" + star + "</td><td>" + o.sleepHours + "時間(" + o.cycles + "サイクル)</td></tr>";
+    }).join("");
+    box.innerHTML =
+      '<div class="result-main">' + (isBed ? "就寝" : "起床") + "候補 " + (isBed ? r.options[1].bedTime : r.options[1].wakeTime) + " など</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>' + (isBed ? "寝る時刻" : "起きる時刻") + "</th><th>睡眠時間</th></tr></thead><tbody>" +
+      rows + "</tbody></table></div><p>⭐=7.5時間(推奨)。周期には個人差があります。</p>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+{
+  "tool": "kariire",
+  "module": "calc.js",
+  "global": "KariireCalc",
+  "cases": [
+    {
+      "name": "年収500万・負担率25%・金利1.5%・35年: 月10.4万円・約3,402万円",
+      "func": "borrowable",
+      "args": [
+        5000000,
+        25,
+        1.5,
+        35
+      ],
+      "expect": {
+        "ok": true,
+        "monthly": 104167,
+        "loan": 34020888
+      }
+    },
+    {
+      "name": "年収400万・負担率30%・金利0.5%・30年: 月10万円・約3,342万円",
+      "func": "borrowable",
+      "args": [
+        4000000,
+        30,
+        0.5,
+        30
+      ],
+      "expect": {
+        "ok": true,
+        "monthly": 100000,
+        "loan": 33423632
+      }
+    },
+    {
+      "name": "金利0%なら単純に月額×月数(年収600万・20%・10年)",
+      "func": "borrowable",
+      "args": [
+        6000000,
+        20,
+        0,
+        10
+      ],
+      "expect": {
+        "ok": true,
+        "monthly": 100000,
+        "loan": 12000000
+      }
+    },
+    {
+      "name": "負担率が高いほど借入額も大きい",
+      "func": "borrowable",
+      "args": [
+        5000000,
+        35,
+        1.5,
+        35
+      ],
+      "expect": {
+        "ok": true,
+        "monthly": 145833
+      }
+    },
+    {
+      "name": "異常入力: 年収100万円未満はエラー",
+      "func": "borrowable",
+      "args": [
+        500000,
+        25,
+        1.5,
+        35
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_income"
+      }
+    },
+    {
+      "name": "異常入力: 負担率4%以下はエラー",
+      "func": "borrowable",
+      "args": [
+        5000000,
+        4,
+        1.5,
+        35
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_burden"
+      }
+    },
+    {
+      "name": "異常入力: 金利が負はエラー",
+      "func": "borrowable",
+      "args": [
+        5000000,
+        25,
+        -1,
+        35
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_rate"
+      }
+    },
+    {
+      "name": "異常入力: 期間51年はエラー",
+      "func": "borrowable",
+      "args": [
+        5000000,
+        25,
+        1.5,
+        51
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_years"
+      }
+    }
+  ]
+}

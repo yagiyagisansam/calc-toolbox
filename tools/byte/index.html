@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>データ容量 換算(KB・MB・GB・TB|1024と1000両対応) | 計算ツールボックス</title>
+  <meta name="description" content="KB・MB・GB・TBを一発換算。パソコンの1024換算とストレージ表記の1000換算を切り替えられるので「500GBのはずが465GB」の疑問も解決。スマホ容量・ファイルサイズの計算に。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/byte/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="データ容量 換算(KB・MB・GB・TB|1024と1000両対応) | 計算ツールボックス">
+  <meta property="og:description" content="KB・MB・GB・TBを一発換算。パソコンの1024換算とストレージ表記の1000換算を切り替えられるので「500GBのはずが465GB」の疑問も解決。スマホ容量・ファイルサイズの計算に。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/byte/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"データ容量 換算(KB・MB・GB・TB|1024と1000両対応)","item":"https://quick-calc.site/tools/byte/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>データ容量 換算(KB・MB・GB・TB)</h1>
+  <form class="tool-form" id="byte-form">
+    <label>容量
+      <input type="number" id="value" min="0" step="any" required placeholder="例: 500">
+    </label>
+    <label>単位
+      <select id="unit">
+        <option value="b">B(バイト)</option>
+        <option value="kb">KB</option>
+        <option value="mb">MB</option>
+        <option value="gb" selected>GB</option>
+        <option value="tb">TB</option>
+      </select>
+    </label>
+    <label>換算方式
+      <select id="base">
+        <option value="1024" selected>1024換算(OSのファイル表示など)</option>
+        <option value="1000">1000換算(ストレージ製品の表記)</option>
+      </select>
+    </label>
+    <button type="submit">換算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>「1GBは何MB?」「512GBのスマホの実容量は?」——<strong>B・KB・MB・GB・TBを一発で相互換算</strong>します。パソコンの表示で使われる<strong>1024換算</strong>と、ストレージ製品の表記で使われる<strong>1000換算</strong>を切り替えられます。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>容量の数値と単位を入力します。</li>
+    <li>換算方式を選びます(迷ったら1024換算)。</li>
+    <li>「換算する」を押すと、全単位での値が一覧表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>1024換算</strong>: 1KB=1024B、1MB=1024KB…。WindowsやスマホのOSがファイルサイズ表示に使う方式です(正確には KiB・MiB という単位名)。</li>
+    <li><strong>1000換算</strong>: 1KB=1000B、1GB=10億B…。SI接頭辞に基づく方式で、HDD・SSD・USBメモリなどの製品容量表記に使われます。</li>
+    <li>計算例: 「500GB」の製品(1000換算)= 500,000,000,000B。これをOSが1024換算で表示すると約465.7GB——容量が「減った」ように見えるのはこの方式の違いが主な理由です。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>SI接頭辞(1000倍)と2進接頭辞(1024倍)の定義に基づく算術計算です。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>実際のストレージはシステム領域も使うため、方式の違い以上に使える容量が少なくなることがあります。</li>
+    <li>通信量(ギガ)の「1GB」は通常1000換算です。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 買った500GBのSSDがパソコンでは465GBと表示されます。不良品ですか?</h3>
+  <p>不良品ではありません。製品表記は1000換算(500,000,000,000バイト)、パソコンの表示は1024換算のため、同じ容量でも約465.7GBと表示されます。本ツールで両方式を切り替えて確認できます。</p>
+  <h3>Q. 1GBは何MBですか?</h3>
+  <p>1024換算なら1,024MB、1000換算なら1,000MBです。文脈によって使い分けられているのが実情です。</p>
+  <h3>Q. スマホの「ギガが減る」の1GBはどちらですか?</h3>
+  <p>携帯各社のデータ通信量は通常1000換算(1GB=1,000MB)で数えられています。動画1時間でおよそ0.5〜2GB(画質による)が目安です。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../inch/">インチ⇔cm・ポンド⇔kg 変換計算機</a></li>
+    <li><a href="../percent/">パーセント計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var LABELS = { b: "B(バイト)", kb: "KB", mb: "MB", gb: "GB", tb: "TB" };
+  document.getElementById("byte-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var unit = document.getElementById("unit").value;
+    var r = ByteCalc.convert(parseFloat(document.getElementById("value").value), unit, parseInt(document.getElementById("base").value, 10));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">容量を0より大きい数値で入力してください。</p>';
+      box.hidden = false;
+      return;
+    }
+    var rows = ByteCalc.UNITS.map(function (u) {
+      return "<tr><td>" + LABELS[u] + "</td><td>" + r[u].toLocaleString(undefined, { maximumFractionDigits: 4 }) + "</td></tr>";
+    }).join("");
+    box.innerHTML =
+      '<div class="result-main">' + r.gb.toLocaleString(undefined, { maximumFractionDigits: 4 }) + " GB</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>単位</th><th>値</th></tr></thead><tbody>' + rows + "</tbody></table></div>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>
