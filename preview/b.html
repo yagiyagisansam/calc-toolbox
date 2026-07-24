@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>案B: ランキング・ポータル型 | トップページデザイン案</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    .proto-badge { position: fixed; top: 0; right: 0; background: #b3261e; color: #fff; font-size: 11px; padding: 2px 10px; border-bottom-left-radius: 8px; z-index: 10; }
+    .recent-row { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 8px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .recent-row::-webkit-scrollbar { display: none; }
+    .recent-chip {
+      flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 2px;
+      border: 1px solid var(--color-border); border-radius: 12px; padding: 8px 10px; min-width: 72px;
+      text-decoration: none; color: var(--color-text); font-size: 0.7rem; background: var(--color-surface);
+    }
+    .recent-chip .e { font-size: 1.5rem; }
+    .rank-list { list-style: none; padding: 0; margin: 0; }
+    .rank-list li { border-bottom: 1px solid var(--color-border); }
+    .rank-list a { display: flex; align-items: center; gap: 10px; padding: 11px 4px; text-decoration: none; color: inherit; }
+    .medal { width: 26px; text-align: center; font-size: 1.1rem; font-weight: 800; color: var(--color-muted); flex: 0 0 auto; }
+    .rank-list .nm { font-weight: 700; color: var(--color-accent); font-size: 0.98rem; }
+    .rank-list p { margin: 1px 0 0; font-size: 0.8rem; color: var(--color-muted); }
+    details.genre { border: 1px solid var(--color-border); border-radius: 12px; margin: 10px 0; overflow: hidden; }
+    details.genre summary {
+      list-style: none; display: flex; align-items: center; justify-content: space-between;
+      padding: 13px 16px; cursor: pointer; font-weight: 700; background: var(--color-surface);
+    }
+    details.genre summary::-webkit-details-marker { display: none; }
+    details.genre summary .cnt { font-size: 0.78rem; color: var(--color-muted); font-weight: 400; }
+    details.genre[open] summary { border-bottom: 1px solid var(--color-border); }
+    details.genre .tool-list { padding: 10px; }
+    .sec-h { font-size: 0.85rem; color: var(--color-muted); letter-spacing: 0.06em; margin: 20px 0 6px; font-weight: 700; }
+  </style>
+</head>
+<body>
+<div class="proto-badge">デザイン案B(モックアップ)</div>
+<header class="site-header">
+  <a class="site-brand" href="#">🧮 計算ツールボックス</a>
+</header>
+<main>
+  <div class="tool-search" style="margin-top:10px;">
+    <input type="search" placeholder="61個のツールを検索(例: 家賃、文字数)" aria-label="検索">
+  </div>
+
+  <p class="sec-h">🕐 よく使う(この端末の履歴から自動表示)</p>
+  <div class="recent-row" id="recent"></div>
+
+  <p class="sec-h">🔥 人気ランキング(利用状況で毎週自動更新)</p>
+  <ul class="rank-list" id="rank"></ul>
+
+  <p class="sec-h">📂 ジャンルから探す</p>
+  <div id="genres"></div>
+</main>
+<script src="./data.js"></script>
+<script>
+(function () {
+  "use strict";
+  var RECENT = ["eigyobi", "warikan", "moji", "fudosan", "days"];
+  var recentEl = document.getElementById("recent");
+  RECENT.forEach(function (s) {
+    var t = TOOLS.find(function (x) { return x.slug === s; });
+    recentEl.innerHTML += '<a class="recent-chip" href="#"><span class="e">' + t.emoji + "</span>" + t.short + "</a>";
+  });
+  var MEDALS = ["🥇", "🥈", "🥉"];
+  var rankEl = document.getElementById("rank");
+  TOOLS.filter(function (t) { return t.rank && t.rank <= 5; }).sort(function (a, b) { return a.rank - b.rank; })
+    .forEach(function (t, i) {
+      rankEl.innerHTML += '<li><a href="#"><span class="medal">' + (MEDALS[i] || (i + 1) + "位") + "</span>" +
+        '<span>' + t.emoji + '</span><span><span class="nm">' + t.name + "</span><p>" + t.desc + "</p></span></a></li>";
+    });
+  var CATS = [["健康", "💪 健康", 15], ["お金", "💴 お金", 19], ["日付", "📅 日付・時間", 8], ["変換", "🔄 暮らし・変換", 19]];
+  var gEl = document.getElementById("genres");
+  CATS.forEach(function (c, ci) {
+    var items = TOOLS.filter(function (t) { return t.cat === c[0]; });
+    var cards = items.map(function (t) {
+      return '<li class="tool-card"><a href="#"><span style="font-size:1.2rem;margin-right:6px;">' + t.emoji + '</span><span><span class="tool-name">' + t.name + '</span><p>' + t.desc + "</p></span></a></li>";
+    }).join("");
+    gEl.innerHTML += '<details class="genre"' + (ci === 0 ? " open" : "") + "><summary>" + c[1] +
+      '<span class="cnt">' + items.length + "個 ▾</span></summary>" +
+      '<ul class="tool-list">' + cards + "</ul></details>";
+  });
+  document.querySelectorAll(".tool-card > a").forEach(function (a) { a.style.display = "flex"; a.style.alignItems = "center"; });
+})();
+</script>
+</body>
+</html>
