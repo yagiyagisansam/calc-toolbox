@@ -1,0 +1,61 @@
+{
+  "tool": "kinenbi",
+  "module": "calc.js",
+  "global": "KinenbiCalc",
+  "cases": [
+    {
+      "name": "2024-01-01開始・2026-07-18時点: 929日経過・930日目",
+      "func": "milestones",
+      "args": ["2024-01-01", "2026-07-18"],
+      "expect": { "ok": true, "elapsedDays": 929, "dayNumber": 930 }
+    },
+    {
+      "name": "100日目の日付(2024-01-01開始 → 2024-04-09・過去なのでdaysUntil=-830)",
+      "func": "milestones",
+      "args": ["2024-01-01", "2026-07-18"],
+      "expect": { "ok": true, "milestones": [{ "n": 100, "date": "2024-04-09", "daysUntil": -830 }] }
+    },
+    {
+      "name": "当日は1日目(経過0日)・100日目は99日後",
+      "func": "milestones",
+      "args": ["2026-07-18", "2026-07-18"],
+      "expect": { "ok": true, "elapsedDays": 0, "dayNumber": 1, "milestones": [{ "n": 100, "date": "2026-10-25", "daysUntil": 99 }] }
+    },
+    {
+      "name": "誕生日1990-07-18: 2026-07-18で13,150日目",
+      "func": "milestones",
+      "args": ["1990-07-18", "2026-07-18"],
+      "expect": { "ok": true, "elapsedDays": 13149, "dayNumber": 13150 }
+    },
+    {
+      "name": "異常入力: 記念日が基準日より未来はエラー",
+      "func": "milestones",
+      "args": ["2027-01-01", "2026-07-18"],
+      "expect": { "ok": false, "code": "base_after_asof" }
+    },
+    {
+      "name": "異常入力: 存在しない日付はエラー",
+      "func": "milestones",
+      "args": ["2026-02-30", "2026-07-18"],
+      "expect": { "ok": false, "code": "invalid_base" }
+    },
+    {
+      "name": "異常入力: 形式不正はエラー",
+      "func": "milestones",
+      "args": ["2024/01/01", "2026-07-18"],
+      "expect": { "ok": false, "code": "invalid_base" }
+    },
+    {
+      "name": "異常入力: 基準日が不正はエラー",
+      "func": "milestones",
+      "args": ["2024-01-01", "bad"],
+      "expect": { "ok": false, "code": "invalid_asof" }
+    },
+    {
+      "name": "異常入力: 1900年より前はエラー",
+      "func": "milestones",
+      "args": ["1899-12-31", "2026-07-18"],
+      "expect": { "ok": false, "code": "invalid_base" }
+    }
+  ]
+}

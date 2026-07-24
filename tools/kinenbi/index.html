@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>記念日カウント計算機(付き合って何日?生まれて何日?1万日記念日) | 計算ツールボックス</title>
+  <meta name="description" content="誕生日や記念日から「今日で何日目か」と、100日目・1000日目・1万日目などの節目の日付を無料で一括計算。カップルの記念日、推し活、生後1万日のお祝いに。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/kinenbi/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="記念日カウント計算機(付き合って何日?生まれて何日?1万日記念日) | 計算ツールボックス">
+  <meta property="og:description" content="誕生日や記念日から「今日で何日目か」と、100日目・1000日目・1万日目などの節目の日付を無料で一括計算。カップルの記念日、推し活、生後1万日のお祝いに。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/kinenbi/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"記念日カウント計算機(付き合って何日?生まれて何日?1万日記念日)","item":"https://quick-calc.site/tools/kinenbi/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>記念日カウント計算機</h1>
+  <p>誕生日・交際開始日・推しの記念日などを入れると、<strong>今日で何日目か</strong>と、<strong>100日目・1000日目・7777日目・1万日目…といった節目の日付</strong>を一括計算します。次のお祝いの計画に。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="kinenbi-form">
+    <label>記念日(誕生日・付き合った日など)
+      <input type="date" id="base" min="1900-01-01" max="2200-12-31" required>
+    </label>
+    <label>基準日(この日時点で計算)
+      <span class="field-note">初期値は今日</span>
+      <input type="date" id="asof" min="1900-01-01" max="2200-12-31" required>
+    </label>
+    <button type="submit">節目を計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    「N日目」は<strong>記念日当日を1日目</strong>として数えています(お食い初めの「100日目」や交際記念日の一般的な数え方)。「N日経過」で数えたい場合は1日ずれるのでご注意ください。
+  </div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>記念日(誕生日・付き合った日・推しのデビュー日など)を選びます。</li>
+    <li>「節目を計算する」を押すと、今日が何日目かと、節目の日付・曜日・あと何日かが一覧表示されます。</li>
+    <li>未来の節目はカレンダーに登録してお祝いの計画に使ってください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li>グレゴリオ暦(現行の暦)で日数を数えています(うるう年対応)。</li>
+    <li><strong>N日目の日付 = 記念日 + (N−1)日</strong>(記念日当日=1日目)</li>
+    <li>節目は 100・200・300・365・500・777・1000・2000・3000・5000・7777・10000・15000・20000・25000・30000日目を表示します。</li>
+    <li>計算例: 1990年7月18日生まれの人は2026年7月18日で<strong>13,150日目</strong>。生後2万日目は2045年4月19日です。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>暦法(グレゴリオ暦)に基づく算術計算です。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>「1周年」などの年単位の記念日は同じ月日(365日目/366日目)とずれることがあります。年単位は<a href="../age/">年齢計算機</a>・<a href="../days/">日数計算機</a>もご利用ください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 「付き合って100日」は付き合った日を含めますか?</h3>
+  <p>数え方は2通りありますが、本ツールは記念日当日を1日目とする数え方(100日目=99日後)です。相手と数え方を合わせておくとすれ違いを防げます。</p>
+  <h3>Q. 生後1万日は何歳ごろですか?</h3>
+  <p>約27.4歳です(10000÷365.25≒27.4年)。2万日は約54.8歳、3万日は約82.1歳にあたります。人生の大きな節目としてお祝いする人が増えています。</p>
+  <h3>Q. 結婚記念日など「これから先」の記念日にも使えますか?</h3>
+  <p>使えます。過去の日付なら「何日目か」、これからの節目は「あと何日」が表示されるので、銀婚式などの長期の記念日計画にも便利です。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../days/">日数計算機(日付の差・○日後)</a></li>
+    <li><a href="../age/">年齢計算機(満年齢・早生まれ・干支)</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var asofInput = document.getElementById("asof");
+  var now = new Date();
+  asofInput.value = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
+
+  var ERROR_MESSAGES = {
+    invalid_base: "記念日を正しく入力してください(1900年以降)。",
+    invalid_asof: "基準日を正しく入力してください。",
+    base_after_asof: "記念日が基準日より後になっています。"
+  };
+  document.getElementById("kinenbi-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var r = KinenbiCalc.milestones(document.getElementById("base").value, asofInput.value);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var rows = r.milestones.map(function (m) {
+      var status = m.daysUntil === 0 ? "<strong>今日!🎉</strong>" :
+        m.daysUntil > 0 ? "あと <strong>" + m.daysUntil.toLocaleString() + "日</strong>" :
+        Math.abs(m.daysUntil).toLocaleString() + "日前";
+      return "<tr><td>" + m.n.toLocaleString() + "日目</td><td>" + m.date + "(" + m.weekday + ")</td><td>" + status + "</td></tr>";
+    }).join("");
+    box.innerHTML =
+      '<div class="result-main">今日で ' + r.dayNumber.toLocaleString() + " 日目</div>" +
+      "<p>(経過日数: " + r.elapsedDays.toLocaleString() + "日)</p>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>節目</th><th>日付</th><th>カウント</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>
