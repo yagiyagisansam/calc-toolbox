@@ -2,5 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /tools/*/test.html
 
-# 独自ドメイン導入時はURLを差し替える
-Sitemap: https://yagiyagisansam.github.io/calc-toolbox/sitemap.xml
+Sitemap: https://quick-calc.site/sitemap.xml
