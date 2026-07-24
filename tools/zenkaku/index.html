@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>全角⇔半角 変換ツール(英数字・記号・スペース) | 計算ツールボックス</title>
+  <meta name="description" content="全角の英数字・記号・スペースを半角に一括変換(逆方向も対応)。フォーム入力で「半角で入力してください」と言われたときや、データ整形に。貼り付けるだけで変換できます。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/zenkaku/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="全角⇔半角 変換ツール(英数字・記号・スペース) | 計算ツールボックス">
+  <meta property="og:description" content="全角の英数字・記号・スペースを半角に一括変換(逆方向も対応)。フォーム入力で「半角で入力してください」と言われたときや、データ整形に。貼り付けるだけで変換できます。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/zenkaku/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"全角⇔半角 変換ツール(英数字・記号・スペース)","item":"https://quick-calc.site/tools/zenkaku/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>全角⇔半角 変換ツール</h1>
+  <form class="tool-form" id="zenkaku-form">
+    <label>変換の方向
+      <select id="mode">
+        <option value="toHankaku" selected>全角 → 半角(英数字・記号・スペース)</option>
+        <option value="toZenkaku">半角 → 全角</option>
+      </select>
+    </label>
+    <label>テキスト
+      <textarea id="text" rows="5" placeholder="例: TEL:03-1234-5678"></textarea>
+    </label>
+    <button type="submit">変換する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>「電話番号は半角で入力してください」「全角英数字は使えません」——そんなとき、テキストを貼り付けるだけで<strong>全角の英数字・記号・スペースを半角に一括変換</strong>できます(逆方向も対応)。ひらがな・カタカナ・漢字はそのまま残ります。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>変換の方向(全角→半角 / 半角→全角)を選びます。</li>
+    <li>テキストを貼り付けて「変換する」を押します。</li>
+    <li>変換結果の「コピー」ボタンでコピーして貼り付け直してください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li>全角の英数字・記号(A〜/、!〜~)と半角は、Unicodeで規則的に対応しています(差分0xFEE0)。この対応関係に基づいて1文字ずつ変換します。</li>
+    <li>全角スペース(U+3000)⇔半角スペース(U+0020)も変換します。</li>
+    <li>ひらがな・カタカナ・漢字には手を加えません(いわゆる半角カナへの変換は行いません)。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>Unicodeの全角形・半角形(Halfwidth and Fullwidth Forms)の対応関係に基づく機械的な変換です。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>半角カナ(ｱｲｳ)→全角カナの変換には対応していません。</li>
+    <li>住所や氏名など、提出先が全角を要求する項目もあります。フォームの指定に合わせてお使いください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. なぜフォームで「半角で入力」と言われるのですか?</h3>
+  <p>システム内部で数値や英字として処理するためです。全角の「123」は見た目が似ていても別の文字なので、そのままでは数値として扱えないことがあります。</p>
+  <h3>Q. カタカナも半角(ｶﾀｶﾅ)にできますか?</h3>
+  <p>本ツールは対応していません。半角カナは文字化けの原因になりやすく、現在は使用を避けるのが一般的なためです(銀行系フォームなど特殊な場合を除く)。</p>
+  <h3>Q. 貼り付けた内容が送信されることはありませんか?</h3>
+  <p>ありません。変換はすべてお使いの端末内で行われます。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../moji/">文字数カウント</a></li>
+    <li><a href="../wareki/">西暦・和暦 変換計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  document.getElementById("zenkaku-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var mode = document.getElementById("mode").value;
+    var r = ZenkakuCalc[mode](document.getElementById("text").value);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">テキストが長すぎます(10万文字まで)。</p>';
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<p>変換結果(' + r.changed.toLocaleString() + '文字を変換):</p>' +
+      '<textarea id="out" rows="5" style="width:100%;font-size:1rem;padding:10px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-bg);color:var(--color-text);" readonly></textarea>' +
+      '<p><button type="button" id="copy-btn" style="font-size:0.95rem;padding:8px 16px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-bg);color:var(--color-text);cursor:pointer;">📋 コピー</button> <span id="copy-done"></span></p>';
+    document.getElementById("out").value = r.text;
+    document.getElementById("copy-btn").addEventListener("click", function () {
+      navigator.clipboard.writeText(r.text).then(function () {
+        document.getElementById("copy-done").textContent = "コピーしました";
+      });
+    });
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

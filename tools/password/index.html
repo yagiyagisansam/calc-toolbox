@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>パスワード生成ツール(強力・ランダム・端末内で生成) | 計算ツールボックス</title>
+  <meta name="description" content="安全なランダムパスワードを端末内で生成。長さと文字種(英大小・数字・記号)を選べて、強度(ビット数)も表示。通信に送信されないので安心して使える無料ツール。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/password/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="パスワード生成ツール(強力・ランダム・端末内で生成) | 計算ツールボックス">
+  <meta property="og:description" content="安全なランダムパスワードを端末内で生成。長さと文字種(英大小・数字・記号)を選べて、強度(ビット数)も表示。通信に送信されないので安心して使える無料ツール。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/password/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"パスワード生成ツール(強力・ランダム・端末内で生成)","item":"https://quick-calc.site/tools/password/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>パスワード生成ツール</h1>
+  <form class="tool-form" id="password-form">
+    <label>長さ: <span id="len-view">16</span>文字
+      <input type="range" id="length" min="4" max="64" value="16">
+    </label>
+    <label><input type="checkbox" id="lower" checked> 英小文字(abc)</label>
+    <label><input type="checkbox" id="upper" checked> 英大文字(ABC)</label>
+    <label><input type="checkbox" id="digits" checked> 数字(123)</label>
+    <label><input type="checkbox" id="symbols" checked> 記号(!#$…)</label>
+    <button type="submit">パスワードを生成する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>ブラウザの暗号乱数(crypto.getRandomValues)を使った<strong>強力なランダムパスワード</strong>をその場で生成します。生成はすべて端末内で行われ、<strong>ネットワークには一切送信されません</strong>。選んだ文字種は必ず1文字以上含まれます。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>スライダーで長さを選びます(推奨: 12文字以上、重要なアカウントは16文字以上)。</li>
+    <li>使う文字種にチェックを入れます(サイトの制限に合わせて調整)。</li>
+    <li>「生成する」を押し、表示されたパスワードをコピーして使います。何度でも作り直せます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li>乱数はブラウザ標準の暗号論的乱数生成器(crypto.getRandomValues)を使用しています。</li>
+    <li>選択した文字種それぞれから必ず1文字以上を含めたうえで、全体をランダムに並べ替えています。</li>
+    <li><strong>強度の目安(ビット) = 長さ × log₂(使える文字数)</strong>。80ビット以上が当面安全の目安とされ、16文字・全文字種なら105ビットです。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>強度(情報エントロピー)の考え方は<a href="https://www.ipa.go.jp/security/anshin/measures/password.html" target="_blank" rel="noopener">IPA(情報処理推進機構)のパスワードに関する解説</a>等で用いられる一般的な指標です。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>生成したパスワードは同じものを複数のサービスで使い回さないでください。</li>
+    <li>保存にはパスワード管理アプリ(またはブラウザの保存機能)の利用をおすすめします。</li>
+    <li>サービス側で使えない記号がある場合は、記号のチェックを外すか生成し直してください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 生成したパスワードはどこかに保存・送信されますか?</h3>
+  <p>いいえ。生成はお使いの端末のブラウザ内だけで完結し、当サイトのサーバーにもどこにも送信・保存されません。ページを閉じれば消えるので、必要ならコピーして安全な場所に保存してください。</p>
+  <h3>Q. 何文字あれば安全ですか?</h3>
+  <p>一般には英大小+数字+記号で12文字以上が目安、重要なアカウント(メール・金融)は16文字以上をおすすめします。長さを増やすことが最も効果的です。</p>
+  <h3>Q. 覚えやすいパスワードのほうがよくないですか?</h3>
+  <p>人が考えたパスワードは推測されやすい傾向があります。ランダム生成+パスワード管理アプリでの保存が現在の定石です。どうしても覚える必要がある場合は、無関係な単語を4つ以上つなげる方式(パスフレーズ)も有効です。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../moji/">文字数カウント</a></li>
+    <li><a href="../roman/">ローマ数字変換</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var lenInput = document.getElementById("length");
+  var lenView = document.getElementById("len-view");
+  lenInput.addEventListener("input", function () { lenView.textContent = lenInput.value; });
+  document.getElementById("password-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var r = PasswordCalc.generate(parseInt(lenInput.value, 10), {
+      lower: document.getElementById("lower").checked,
+      upper: document.getElementById("upper").checked,
+      digits: document.getElementById("digits").checked,
+      symbols: document.getElementById("symbols").checked
+    });
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (r.code === "no_charset" ? "文字種を1つ以上選んでください。" : "長さは4〜64文字で指定してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var strength = r.entropyBits >= 100 ? "非常に強い" : r.entropyBits >= 80 ? "強い" : r.entropyBits >= 60 ? "ふつう" : "弱い";
+    box.innerHTML =
+      '<div class="result-main" style="word-break:break-all;font-family:ui-monospace,monospace;font-size:1.25rem;" id="pw-out"></div>' +
+      '<p><button type="button" id="copy-btn" style="font-size:0.95rem;padding:8px 16px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-bg);color:var(--color-text);cursor:pointer;">📋 コピー</button> <span id="copy-done"></span></p>' +
+      "<p>強度の目安: <strong>" + r.entropyBits + "ビット(" + strength + ")</strong> / 文字種" + r.poolSize + "種 × " + r.length + "文字</p>";
+    document.getElementById("pw-out").textContent = r.password;
+    document.getElementById("copy-btn").addEventListener("click", function () {
+      navigator.clipboard.writeText(r.password).then(function () {
+        document.getElementById("copy-done").textContent = "コピーしました";
+      });
+    });
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

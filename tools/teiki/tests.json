@@ -1,0 +1,120 @@
+{
+  "tool": "teiki",
+  "module": "calc.js",
+  "global": "TeikiCalc",
+  "cases": [
+    {
+      "name": "定期1万円・片道200円・22日: 都度8,800円で都度払いが得(分岐25日)",
+      "func": "compare",
+      "args": [
+        10000,
+        200,
+        22
+      ],
+      "expect": {
+        "ok": true,
+        "payg": 8800,
+        "diff": -1200,
+        "breakEvenDays": 25,
+        "better": "payg"
+      }
+    },
+    {
+      "name": "定期8,000円・片道200円・22日: 定期が800円得(分岐20日)",
+      "func": "compare",
+      "args": [
+        8000,
+        200,
+        22
+      ],
+      "expect": {
+        "ok": true,
+        "payg": 8800,
+        "diff": 800,
+        "breakEvenDays": 20,
+        "better": "pass"
+      }
+    },
+    {
+      "name": "ちょうど同額なら互角",
+      "func": "compare",
+      "args": [
+        8800,
+        200,
+        22
+      ],
+      "expect": {
+        "ok": true,
+        "diff": 0,
+        "better": "even"
+      }
+    },
+    {
+      "name": "週3出社(月13日)では定期は元が取れない例",
+      "func": "compare",
+      "args": [
+        10000,
+        250,
+        13
+      ],
+      "expect": {
+        "ok": true,
+        "payg": 6500,
+        "better": "payg",
+        "breakEvenDays": 20
+      }
+    },
+    {
+      "name": "分岐日数は切り上げ(定期9,900円・片道200円→25日)",
+      "func": "compare",
+      "args": [
+        9900,
+        200,
+        20
+      ],
+      "expect": {
+        "ok": true,
+        "breakEvenDays": 25
+      }
+    },
+    {
+      "name": "異常入力: 定期価格0はエラー",
+      "func": "compare",
+      "args": [
+        0,
+        200,
+        22
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_pass"
+      }
+    },
+    {
+      "name": "異常入力: 運賃0はエラー",
+      "func": "compare",
+      "args": [
+        10000,
+        0,
+        22
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_fare"
+      }
+    },
+    {
+      "name": "異常入力: 32日はエラー",
+      "func": "compare",
+      "args": [
+        10000,
+        200,
+        32
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_days"
+      }
+    }
+  ]
+}

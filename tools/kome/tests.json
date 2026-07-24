@@ -1,0 +1,118 @@
+{
+  "tool": "kome",
+  "module": "calc.js",
+  "global": "KomeCalc",
+  "cases": [
+    {
+      "name": "2合: 米300g・水400ml・炊き上がり660g・お茶碗4.4杯",
+      "func": "fromGo",
+      "args": [
+        2
+      ],
+      "expect": {
+        "ok": true,
+        "riceG": 300,
+        "waterMl": 400,
+        "cookedG": 660,
+        "bowls": 4.4
+      }
+    },
+    {
+      "name": "1合: 米150g・水200ml・約330g",
+      "func": "fromGo",
+      "args": [
+        1
+      ],
+      "expect": {
+        "ok": true,
+        "riceG": 150,
+        "waterMl": 200,
+        "cookedG": 330,
+        "bowls": 2.2
+      }
+    },
+    {
+      "name": "0.5合でも計算できる",
+      "func": "fromGo",
+      "args": [
+        0.5
+      ],
+      "expect": {
+        "ok": true,
+        "riceG": 75,
+        "waterMl": 100,
+        "cookedG": 165,
+        "bowls": 1.1
+      }
+    },
+    {
+      "name": "3合: 450g・600ml・990g",
+      "func": "fromGo",
+      "args": [
+        3
+      ],
+      "expect": {
+        "ok": true,
+        "riceG": 450,
+        "waterMl": 600,
+        "cookedG": 990,
+        "bowls": 6.6
+      }
+    },
+    {
+      "name": "逆算: 450g → 3合",
+      "func": "fromGram",
+      "args": [
+        450
+      ],
+      "expect": {
+        "ok": true,
+        "go": 3
+      }
+    },
+    {
+      "name": "逆算: 200g → 1.33合",
+      "func": "fromGram",
+      "args": [
+        200
+      ],
+      "expect": {
+        "ok": true,
+        "go": 1.33
+      }
+    },
+    {
+      "name": "異常入力: 0合はエラー",
+      "func": "fromGo",
+      "args": [
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_go"
+      }
+    },
+    {
+      "name": "異常入力: 21合以上はエラー",
+      "func": "fromGo",
+      "args": [
+        21
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_go"
+      }
+    },
+    {
+      "name": "異常入力: グラム0はエラー",
+      "func": "fromGram",
+      "args": [
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_gram"
+      }
+    }
+  ]
+}

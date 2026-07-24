@@ -1,0 +1,114 @@
+{
+  "tool": "zenkaku",
+  "module": "calc.js",
+  "global": "ZenkakuCalc",
+  "cases": [
+    {
+      "name": "全角英数→半角: ＡＢＣ１２３ → ABC123",
+      "func": "toHankaku",
+      "args": [
+        "ＡＢＣ１２３"
+      ],
+      "expect": {
+        "ok": true,
+        "text": "ABC123",
+        "changed": 6
+      }
+    },
+    {
+      "name": "全角記号とハイフンも変換: ＴＥＬ：０３−…→TEL:03-",
+      "func": "toHankaku",
+      "args": [
+        "ＴＥＬ：０３"
+      ],
+      "expect": {
+        "ok": true,
+        "text": "TEL:03",
+        "changed": 6
+      }
+    },
+    {
+      "name": "全角スペース→半角スペース",
+      "func": "toHankaku",
+      "args": [
+        "あ　い"
+      ],
+      "expect": {
+        "ok": true,
+        "text": "あ い",
+        "changed": 1
+      }
+    },
+    {
+      "name": "かな・漢字は変換しない",
+      "func": "toHankaku",
+      "args": [
+        "東京都ＡＢＣアイウ"
+      ],
+      "expect": {
+        "ok": true,
+        "text": "東京都ABCアイウ",
+        "changed": 3
+      }
+    },
+    {
+      "name": "変換対象がなければそのまま(changed=0)",
+      "func": "toHankaku",
+      "args": [
+        "hello 123"
+      ],
+      "expect": {
+        "ok": true,
+        "text": "hello 123",
+        "changed": 0
+      }
+    },
+    {
+      "name": "半角→全角: abc 12 → ａｂｃ　１２",
+      "func": "toZenkaku",
+      "args": [
+        "abc 12"
+      ],
+      "expect": {
+        "ok": true,
+        "text": "ａｂｃ　１２",
+        "changed": 6
+      }
+    },
+    {
+      "name": "全角化: A1! → Ａ１！",
+      "func": "toZenkaku",
+      "args": [
+        "A1!"
+      ],
+      "expect": {
+        "ok": true,
+        "text": "Ａ１！",
+        "changed": 3
+      }
+    },
+    {
+      "name": "空文字はそのまま",
+      "func": "toHankaku",
+      "args": [
+        ""
+      ],
+      "expect": {
+        "ok": true,
+        "text": "",
+        "changed": 0
+      }
+    },
+    {
+      "name": "異常入力: 文字列以外はエラー",
+      "func": "toHankaku",
+      "args": [
+        123
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_text"
+      }
+    }
+  ]
+}

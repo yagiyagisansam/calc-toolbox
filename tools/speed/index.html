@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>速さ・時間・距離 計算機(2つ入れて残りを計算) | 計算ツールボックス</title>
+  <meta name="description" content="速さ(km/h)・距離(km)・時間のうち2つを入れると残りを自動計算。「80km/hで150kmは何時間?」「マラソンの平均時速は?」に一発回答。ドライブ・ランニング・宿題に。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/speed/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="速さ・時間・距離 計算機(2つ入れて残りを計算) | 計算ツールボックス">
+  <meta property="og:description" content="速さ(km/h)・距離(km)・時間のうち2つを入れると残りを自動計算。「80km/hで150kmは何時間?」「マラソンの平均時速は?」に一発回答。ドライブ・ランニング・宿題に。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/speed/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"速さ・時間・距離 計算機(2つ入れて残りを計算)","item":"https://quick-calc.site/tools/speed/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>速さ・時間・距離 計算機</h1>
+  <form class="tool-form" id="speed-form">
+    <p style="margin:0;font-size:0.88rem;color:var(--color-muted);">3つのうち<strong>2つ</strong>を入力してください(残りを計算します)</p>
+    <label>速さ(km/h)
+      <input type="number" id="speed" min="0" step="any" placeholder="例: 80">
+    </label>
+    <label>距離(km)
+      <input type="number" id="distance" min="0" step="any" placeholder="例: 150">
+    </label>
+    <label>時間(分)
+      <span class="field-note">1時間30分なら90と入力</span>
+      <input type="number" id="time" min="0" step="any" placeholder="例: 112">
+    </label>
+    <button type="submit">残りを計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>「時速80kmで150km先までは何時間?」「10kmを50分で走ったら時速いくつ?」——<strong>速さ・距離・時間のうち2つを入れるだけ</strong>で残りを計算します。小学校で習う「はじき(みはじ)」の計算をそのままツールにしました。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>わかっている2つ(速さ・距離・時間のどれか)を入力します。</li>
+    <li>残り1つは空欄のままにします。</li>
+    <li>「計算する」を押すと、3つすべての値が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>距離 = 速さ × 時間</strong> / <strong>速さ = 距離 ÷ 時間</strong> / <strong>時間 = 距離 ÷ 速さ</strong></li>
+    <li>計算例: 時速80kmで150km → 150 ÷ 80 = 1.875時間 = <strong>約1時間53分</strong></li>
+    <li>時間の入力は「分」で統一しています(1時間30分=90分)。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>速さの定義(距離÷時間)に基づく算術計算です。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>実際の移動では信号・休憩・渋滞があるため、計算どおりの時間では着きません。車の旅行計画では平均時速を控えめに(高速80km/h・一般道30km/h程度)見積もるのが現実的です。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 「はじき」ってなんですか?</h3>
+  <p>速さ(は)・時間(じ)・距離(き)の関係を円の図で覚える方法です。距離=速さ×時間という1つの式さえ覚えれば、あとは割り算で残りが出ます。</p>
+  <h3>Q. 分速・秒速に直すには?</h3>
+  <p>時速を60で割ると分速、3600で割ると秒速です(km単位)。時速60km=分速1km=秒速約16.7mです。</p>
+  <h3>Q. ランニングのペース(1kmあたり○分)も計算できますか?</h3>
+  <p>ペース表示は<a href="../pace/">ランニングペース計算機</a>が便利です。本ツールは時速ベースの計算に向いています。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../pace/">ランニングペース 計算機</a></li>
+    <li><a href="../nenpi/">燃費計算機</a></li>
+    <li><a href="../mile/">マイル⇔km 換算計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var MSG = {
+    invalid_input: "3つのうち、ちょうど2つを入力してください(残り1つは空欄)。",
+    invalid_value: "0より大きい数値で入力してください。"
+  };
+  document.getElementById("speed-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var g = {};
+    var s = document.getElementById("speed").value;
+    var d = document.getElementById("distance").value;
+    var t = document.getElementById("time").value;
+    if (s !== "") g.speedKmh = parseFloat(s);
+    if (d !== "") g.distanceKm = parseFloat(d);
+    if (t !== "") g.timeMin = parseFloat(t);
+    var r = SpeedCalc.solve(g);
+    if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "入力値を確認してください。") + "</p>"; box.hidden = false; return; }
+    box.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>速さ</td><td><strong>" + r.speedKmh.toLocaleString() + " km/h</strong></td></tr>" +
+      "<tr><td>距離</td><td><strong>" + r.distanceKm.toLocaleString() + " km</strong></td></tr>" +
+      "<tr><td>時間</td><td><strong>" + r.timeH + "時間" + r.timeM + "分</strong>(" + r.timeMin.toLocaleString() + "分)</td></tr>" +
+      "</tbody></table></div>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

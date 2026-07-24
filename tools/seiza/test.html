@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>テスト実行: seiza | 計算ツールボックス(内部ページ)</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="../../shared/style.css">
+</head>
+<body>
+<main>
+  <h1>ブラウザテスト実行: seiza</h1>
+  <p>tests.json のテストケースをこのブラウザ上で実行します(内部検証用ページ。HTTPサーバー経由で開くこと)。</p>
+  <p id="summary">実行中…</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead><tr><th>結果</th><th>ケース</th><th>詳細</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+</main>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  // Node用ランナー(scripts/run_tests.mjs)と同じ「期待値の部分一致」判定
+  function matches(expect, actual) {
+    if (expect !== null && typeof expect === "object") {
+      if (actual === null || typeof actual !== "object") return false;
+      return Object.keys(expect).every(function (k) { return matches(expect[k], actual[k]); });
+    }
+    return expect === actual;
+  }
+  fetch("./tests.json").then(function (r) { return r.json(); }).then(function (spec) {
+    var api = window[spec.global];
+    var rows = document.getElementById("rows");
+    var pass = 0;
+    spec.cases.forEach(function (c) {
+      var actual, ok;
+      try {
+        actual = api[c.func].apply(null, c.args);
+        ok = matches(c.expect, actual);
+      } catch (err) {
+        actual = String(err);
+        ok = false;
+      }
+      if (ok) pass++;
+      var tr = document.createElement("tr");
+      tr.innerHTML = "<td>" + (ok ? "✅" : "❌") + "</td><td></td><td></td>";
+      tr.children[1].textContent = c.name;
+      tr.children[2].textContent = ok ? "" : "期待: " + JSON.stringify(c.expect) + " / 実際: " + JSON.stringify(actual);
+      rows.appendChild(tr);
+    });
+    document.getElementById("summary").textContent =
+      pass + " / " + spec.cases.length + " 件通過" + (pass === spec.cases.length ? "(全通過)" : "(失敗あり)");
+  }).catch(function (err) {
+    document.getElementById("summary").textContent = "tests.json を読み込めませんでした: " + err;
+  });
+})();
+</script>
+</body>
+</html>

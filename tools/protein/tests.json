@@ -1,0 +1,106 @@
+{
+  "tool": "protein",
+  "module": "calc.js",
+  "global": "ProteinCalc",
+  "cases": [
+    {
+      "name": "60kg・ふつうの生活: 54g/日",
+      "func": "needs",
+      "args": [
+        60,
+        "normal"
+      ],
+      "expect": {
+        "ok": true,
+        "grams": 54,
+        "rate": 0.9
+      }
+    },
+    {
+      "name": "70kg・筋トレ: 112g/日",
+      "func": "needs",
+      "args": [
+        70,
+        "training"
+      ],
+      "expect": {
+        "ok": true,
+        "grams": 112,
+        "rate": 1.6
+      }
+    },
+    {
+      "name": "50kg・運動習慣あり: 60g/日",
+      "func": "needs",
+      "args": [
+        50,
+        "active"
+      ],
+      "expect": {
+        "ok": true,
+        "grams": 60,
+        "rate": 1.2
+      }
+    },
+    {
+      "name": "80kg・ふつう: 72g/日",
+      "func": "needs",
+      "args": [
+        80,
+        "normal"
+      ],
+      "expect": {
+        "ok": true,
+        "grams": 72
+      }
+    },
+    {
+      "name": "ラベルも返す",
+      "func": "needs",
+      "args": [
+        60,
+        "active"
+      ],
+      "expect": {
+        "ok": true,
+        "label": "運動習慣あり(週2〜3回)"
+      }
+    },
+    {
+      "name": "異常入力: 体重20kg未満はエラー",
+      "func": "needs",
+      "args": [
+        10,
+        "normal"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_weight"
+      }
+    },
+    {
+      "name": "異常入力: 体重301kg以上はエラー",
+      "func": "needs",
+      "args": [
+        301,
+        "normal"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_weight"
+      }
+    },
+    {
+      "name": "異常入力: 不正なレベルはエラー",
+      "func": "needs",
+      "args": [
+        60,
+        "athlete2"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_level"
+      }
+    }
+  ]
+}

@@ -1,0 +1,144 @@
+{
+  "tool": "jikan",
+  "module": "calc.js",
+  "global": "JikanCalc",
+  "cases": [
+    {
+      "name": "合計: 1:30+0:45 = 2時間15分(2.25h)",
+      "func": "total",
+      "args": [
+        [
+          "1:30",
+          "0:45"
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "totalMinutes": 135,
+        "hours": 2,
+        "minutes": 15,
+        "decimal": 2.25
+      }
+    },
+    {
+      "name": "合計: 1週間分の勤務時間(8:00×5)= 40時間",
+      "func": "total",
+      "args": [
+        [
+          "8:00",
+          "8:00",
+          "8:00",
+          "8:00",
+          "8:00"
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "hours": 40,
+        "minutes": 0,
+        "decimal": 40
+      }
+    },
+    {
+      "name": "時刻の差: 9:00〜17:30 = 8時間30分(8.5h)",
+      "func": "span",
+      "args": [
+        "9:00",
+        "17:30"
+      ],
+      "expect": {
+        "ok": true,
+        "totalMinutes": 510,
+        "hours": 8,
+        "minutes": 30,
+        "decimal": 8.5
+      }
+    },
+    {
+      "name": "日またぎ: 22:00〜6:30 = 8時間30分",
+      "func": "span",
+      "args": [
+        "22:00",
+        "6:30"
+      ],
+      "expect": {
+        "ok": true,
+        "totalMinutes": 510
+      }
+    },
+    {
+      "name": "同時刻は0分",
+      "func": "span",
+      "args": [
+        "9:00",
+        "9:00"
+      ],
+      "expect": {
+        "ok": true,
+        "totalMinutes": 0
+      }
+    },
+    {
+      "name": "10進換算: 1:45 = 1.75時間",
+      "func": "total",
+      "args": [
+        [
+          "1:45"
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "decimal": 1.75
+      }
+    },
+    {
+      "name": "異常入力: 分が60以上はエラー",
+      "func": "total",
+      "args": [
+        [
+          "1:75"
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_time"
+      }
+    },
+    {
+      "name": "異常入力: 形式不正はエラー",
+      "func": "total",
+      "args": [
+        [
+          "90分"
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_time"
+      }
+    },
+    {
+      "name": "異常入力: 時刻の差で25時はエラー",
+      "func": "span",
+      "args": [
+        "25:00",
+        "9:00"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_start"
+      }
+    },
+    {
+      "name": "異常入力: 空リストはエラー",
+      "func": "total",
+      "args": [
+        []
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_list"
+      }
+    }
+  ]
+}

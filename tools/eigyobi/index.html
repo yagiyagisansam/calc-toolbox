@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>営業日計算機(○営業日後はいつ?土日祝を除く) | 計算ツールボックス</title>
+  <meta name="description" content="「3営業日後はいつ?」を土日と日本の祝日(振替休日込み)を除いて計算。期間内の営業日数のカウントもできる。納期・支払期限・書類の到着日の確認に(2026〜2027年対応)。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/eigyobi/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="営業日計算機(○営業日後はいつ?土日祝を除く) | 計算ツールボックス">
+  <meta property="og:description" content="「3営業日後はいつ?」を土日と日本の祝日(振替休日込み)を除いて計算。期間内の営業日数のカウントもできる。納期・支払期限・書類の到着日の確認に(2026〜2027年対応)。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/eigyobi/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"営業日計算機(○営業日後はいつ?土日祝を除く)","item":"https://quick-calc.site/tools/eigyobi/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>営業日計算機(土日祝を除く)</h1>
+  <form class="tool-form" id="eigyobi-form">
+    <label>計算の種類
+      <select id="mode">
+        <option value="add" selected>○営業日後の日付</option>
+        <option value="count">期間内の営業日数</option>
+      </select>
+    </label>
+    <label>起算日(開始日)
+      <input type="date" id="start" min="2026-01-01" max="2027-12-31" required>
+    </label>
+    <label id="n-label">何営業日後?
+      <input type="number" id="n" min="1" max="200" step="1" value="3">
+    </label>
+    <label id="end-label" hidden>終了日
+      <input type="date" id="end" min="2026-01-01" max="2027-12-31">
+    </label>
+    <button type="submit">営業日を計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    土日と<strong>日本の祝日(振替休日・国民の休日を含む)</strong>を除いて計算します。年末年始・お盆などの会社独自の休業日は含みません。対応範囲は2026年1月〜2027年12月です。
+  </div>
+
+  <p>「3営業日以内に振り込まれます」「5営業日後に発送」——それ、結局いつ?<strong>土日と日本の祝日を除いた「○営業日後」の日付</strong>を一発計算します。振替休日や国民の休日、ゴールデンウィークの飛び石にも対応。期間内の営業日数のカウントもできます。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>「○営業日後の日付」か「期間内の営業日数」を選びます。</li>
+    <li>起算日と営業日数(または終了日)を入力します。</li>
+    <li>「計算する」を押すと結果が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>営業日 = 土曜・日曜・祝日以外の日</strong>として計算します。</li>
+    <li>「○営業日後」は起算日の翌日から数えます(金曜の3営業日後=翌週水曜)。</li>
+    <li>祝日には振替休日(祝日が日曜のとき翌平日が休み)と国民の休日(祝日に挟まれた平日)を含みます。2026年は9/21敬老の日と9/23秋分の日に挟まれた9/22が国民の休日です。</li>
+    <li>期間の営業日数は開始日・終了日の両方を含めて数えます。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>祝日は「国民の祝日に関する法律」に基づく<a href="https://www8.cao.go.jp/chosei/shukujitsu/gaiyou.html" target="_blank" rel="noopener">内閣府「国民の祝日について」</a>の2026年・2027年の一覧に基づいています。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>銀行の振込・証券の受渡しなどは、これに加えて年末年始(12/31〜1/3)等の独自休業日があります。正確な期日は各機関にご確認ください。</li>
+    <li>企業によっては土曜営業・平日休業など営業日の定義が異なります。</li>
+    <li>祝日は法改正等で変わる可能性があります(対応範囲: 2026〜2027年)。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 「3営業日以内」は当日を含みますか?</h3>
+  <p>慣習的には起算日(依頼した日)の翌営業日から数えることが多いですが、契約や規約で定義が異なる場合があります。本ツールは翌日起算で計算しています。重要な期限は相手方に確認するのが確実です。</p>
+  <h3>Q. 銀行の「翌営業日扱い」とは?</h3>
+  <p>土日祝や15時以降に振込操作をすると、実際の処理が次の営業日になることを指します。金曜15時以降の振込は月曜(祝日なら火曜)扱いになります。</p>
+  <h3>Q. 祝日データはいつのものですか?</h3>
+  <p>内閣府が公表している2026年・2027年の祝日(振替休日を含む)を使用しています。範囲外の日付はエラーになります。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../days/">日数計算機(日付の差・○日後)</a></li>
+    <li><a href="../tsukisu/">○ヶ月後・月数 計算機</a></li>
+    <li><a href="../hiwari/">家賃日割り計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var nLabel = document.getElementById("n-label");
+  var endLabel = document.getElementById("end-label");
+  var today = new Date();
+  document.getElementById("start").value = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + String(today.getDate()).padStart(2, "0");
+  var MSG = {
+    invalid_date: "日付を正しく入力してください。",
+    invalid_n: "営業日数は1〜200の整数で入力してください。",
+    out_of_range: "対応範囲は2026年1月1日〜2027年12月31日です。",
+    date_order: "終了日は開始日以降にしてください。"
+  };
+  mode.addEventListener("change", function () {
+    var isAdd = mode.value === "add";
+    nLabel.hidden = !isAdd;
+    endLabel.hidden = isAdd;
+  });
+  document.getElementById("eigyobi-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var start = document.getElementById("start").value;
+    if (mode.value === "add") {
+      var r = EigyobiCalc.addBusinessDays(start, parseInt(document.getElementById("n").value, 10));
+      if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "入力値を確認してください。") + "</p>"; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">' + r.date + "(" + r.weekday + ")</div>" +
+        "<p>土日祝を除いて数えた日付です。</p>";
+    } else {
+      var r2 = EigyobiCalc.countBusinessDays(start, document.getElementById("end").value);
+      if (!r2.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r2.code] || "入力値を確認してください。") + "</p>"; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">' + r2.businessDays + " 営業日</div>" +
+        "<p>暦日では" + r2.totalDays + "日間(両端を含む)です。</p>";
+    }
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

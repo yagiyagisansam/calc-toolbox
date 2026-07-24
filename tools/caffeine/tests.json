@@ -1,0 +1,159 @@
+{
+  "tool": "caffeine",
+  "module": "calc.js",
+  "global": "CaffeineCalc",
+  "cases": [
+    {
+      "name": "コーヒー1杯(200ml): 120mg・成人目安の30%",
+      "func": "total",
+      "args": [
+        [
+          {
+            "drink": "coffee",
+            "ml": 200
+          }
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "totalMg": 120,
+        "pctAdult": 30,
+        "pctPregnant": 60
+      }
+    },
+    {
+      "name": "コーヒー200ml+紅茶300ml: 210mg・53%",
+      "func": "total",
+      "args": [
+        [
+          {
+            "drink": "coffee",
+            "ml": 200
+          },
+          {
+            "drink": "blacktea",
+            "ml": 300
+          }
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "totalMg": 210,
+        "pctAdult": 53
+      }
+    },
+    {
+      "name": "コーヒー3杯+エナドリ1本: 500mg超で100%超え",
+      "func": "total",
+      "args": [
+        [
+          {
+            "drink": "coffee",
+            "ml": 600
+          },
+          {
+            "drink": "energy",
+            "ml": 500
+          }
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "totalMg": 520,
+        "pctAdult": 130
+      }
+    },
+    {
+      "name": "玉露は高濃度(100mlで160mg)",
+      "func": "total",
+      "args": [
+        [
+          {
+            "drink": "gyokuro",
+            "ml": 100
+          }
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "totalMg": 160
+      }
+    },
+    {
+      "name": "緑茶500mlペットボトル: 100mg",
+      "func": "total",
+      "args": [
+        [
+          {
+            "drink": "sencha",
+            "ml": 500
+          }
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "totalMg": 100,
+        "pctAdult": 25
+      }
+    },
+    {
+      "name": "カフェインレスはごく少量",
+      "func": "total",
+      "args": [
+        [
+          {
+            "drink": "decaf",
+            "ml": 200
+          }
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "totalMg": 2
+      }
+    },
+    {
+      "name": "異常入力: 空リストはエラー",
+      "func": "total",
+      "args": [
+        []
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_items"
+      }
+    },
+    {
+      "name": "異常入力: 不正な飲み物はエラー",
+      "func": "total",
+      "args": [
+        [
+          {
+            "drink": "beer",
+            "ml": 350
+          }
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_drink"
+      }
+    },
+    {
+      "name": "異常入力: 量0はエラー",
+      "func": "total",
+      "args": [
+        [
+          {
+            "drink": "coffee",
+            "ml": 0
+          }
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_ml"
+      }
+    }
+  ]
+}

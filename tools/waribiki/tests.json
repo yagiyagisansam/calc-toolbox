@@ -1,0 +1,132 @@
+{
+  "tool": "waribiki",
+  "module": "calc.js",
+  "global": "WaribikiCalc",
+  "cases": [
+    {
+      "name": "2,980円の30%オフ → 2,086円(894円引き)",
+      "func": "off",
+      "args": [
+        2980,
+        30
+      ],
+      "expect": {
+        "ok": true,
+        "sale": 2086,
+        "saved": 894
+      }
+    },
+    {
+      "name": "1,980円の25%オフ → 1,485円",
+      "func": "off",
+      "args": [
+        1980,
+        25
+      ],
+      "expect": {
+        "ok": true,
+        "sale": 1485,
+        "saved": 495
+      }
+    },
+    {
+      "name": "999円の10%オフ → 899円(四捨五入)",
+      "func": "off",
+      "args": [
+        999,
+        10
+      ],
+      "expect": {
+        "ok": true,
+        "sale": 899,
+        "saved": 100
+      }
+    },
+    {
+      "name": "0%オフは定価のまま",
+      "func": "off",
+      "args": [
+        500,
+        0
+      ],
+      "expect": {
+        "ok": true,
+        "sale": 500,
+        "saved": 0
+      }
+    },
+    {
+      "name": "100%オフは0円",
+      "func": "off",
+      "args": [
+        500,
+        100
+      ],
+      "expect": {
+        "ok": true,
+        "sale": 0,
+        "saved": 500
+      }
+    },
+    {
+      "name": "逆算: 1,980円→1,480円は25.3%オフ",
+      "func": "rate",
+      "args": [
+        1980,
+        1480
+      ],
+      "expect": {
+        "ok": true,
+        "pct": 25.3
+      }
+    },
+    {
+      "name": "逆算: 半額は50%",
+      "func": "rate",
+      "args": [
+        1000,
+        500
+      ],
+      "expect": {
+        "ok": true,
+        "pct": 50
+      }
+    },
+    {
+      "name": "異常入力: 定価0はエラー",
+      "func": "off",
+      "args": [
+        0,
+        30
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_price"
+      }
+    },
+    {
+      "name": "異常入力: 割引率101%はエラー",
+      "func": "off",
+      "args": [
+        1000,
+        101
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_pct"
+      }
+    },
+    {
+      "name": "異常入力: 売価が定価超はエラー",
+      "func": "rate",
+      "args": [
+        1000,
+        1200
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_sale"
+      }
+    }
+  ]
+}

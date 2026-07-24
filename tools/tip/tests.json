@@ -1,0 +1,130 @@
+{
+  "tool": "tip",
+  "module": "calc.js",
+  "global": "TipCalc",
+  "cases": [
+    {
+      "name": "$80・20%・2人: チップ$16・合計$96・1人$48",
+      "func": "calc",
+      "args": [
+        80,
+        20,
+        2
+      ],
+      "expect": {
+        "ok": true,
+        "tip": 16,
+        "total": 96,
+        "perPerson": 48
+      }
+    },
+    {
+      "name": "$85.5・18%: チップ$15.39・合計$100.89",
+      "func": "calc",
+      "args": [
+        85.5,
+        18,
+        1
+      ],
+      "expect": {
+        "ok": true,
+        "tip": 15.39,
+        "total": 100.89
+      }
+    },
+    {
+      "name": "$120・15%・4人: 1人$34.5",
+      "func": "calc",
+      "args": [
+        120,
+        15,
+        4
+      ],
+      "expect": {
+        "ok": true,
+        "tip": 18,
+        "total": 138,
+        "perPerson": 34.5
+      }
+    },
+    {
+      "name": "人数省略は1人扱い",
+      "func": "calc",
+      "args": [
+        100,
+        20
+      ],
+      "expect": {
+        "ok": true,
+        "tip": 20,
+        "total": 120,
+        "perPerson": 120
+      }
+    },
+    {
+      "name": "チップ0%も計算できる(サービス料込みの店)",
+      "func": "calc",
+      "args": [
+        100,
+        0,
+        2
+      ],
+      "expect": {
+        "ok": true,
+        "tip": 0,
+        "total": 100,
+        "perPerson": 50
+      }
+    },
+    {
+      "name": "異常入力: 金額0はエラー",
+      "func": "calc",
+      "args": [
+        0,
+        20
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_amount"
+      }
+    },
+    {
+      "name": "異常入力: チップ率51%はエラー",
+      "func": "calc",
+      "args": [
+        100,
+        51
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_pct"
+      }
+    },
+    {
+      "name": "異常入力: 人数0はエラー",
+      "func": "calc",
+      "args": [
+        100,
+        20,
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_people"
+      }
+    },
+    {
+      "name": "異常入力: 人数が小数はエラー",
+      "func": "calc",
+      "args": [
+        100,
+        20,
+        2.5
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_people"
+      }
+    }
+  ]
+}

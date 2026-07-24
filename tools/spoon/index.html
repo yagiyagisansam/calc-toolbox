@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>大さじ・小さじ・カップ 換算計算機(ml一発変換) | 計算ツールボックス</title>
+  <meta name="description" content="大さじ1=15ml、小さじ1=5ml、1カップ=200mlの定義で相互換算。「大さじ3は何ml?」「50mlは大さじ何杯?」に一発回答。レシピの分量調整・計量スプーンがないときに。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/spoon/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="大さじ・小さじ・カップ 換算計算機(ml一発変換) | 計算ツールボックス">
+  <meta property="og:description" content="大さじ1=15ml、小さじ1=5ml、1カップ=200mlの定義で相互換算。「大さじ3は何ml?」「50mlは大さじ何杯?」に一発回答。レシピの分量調整・計量スプーンがないときに。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/spoon/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"大さじ・小さじ・カップ 換算計算機(ml一発変換)","item":"https://quick-calc.site/tools/spoon/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>大さじ・小さじ・カップ 換算計算機</h1>
+  <form class="tool-form" id="spoon-form">
+    <label>分量
+      <input type="number" id="value" min="0" step="any" required placeholder="例: 3">
+    </label>
+    <label>単位
+      <select id="unit">
+        <option value="tbsp" selected>大さじ</option>
+        <option value="tsp">小さじ</option>
+        <option value="cup">カップ(200ml)</option>
+        <option value="ml">ml(cc)</option>
+      </select>
+    </label>
+    <button type="submit">換算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>「大さじ3って何ml?」「ドレッシング50mlは大さじ何杯?」——レシピでよく迷う<strong>大さじ・小さじ・カップ・mlの換算</strong>を一発で行います。計量スプーンが手元にないとき、分量を倍にしたいときに。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>レシピの分量(数値)を入力します。</li>
+    <li>その単位(大さじ・小さじ・カップ・ml)を選びます。</li>
+    <li>「換算する」を押すと、すべての単位での量が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>小さじ1 = 5ml / 大さじ1 = 15ml / 1カップ = 200ml</strong>(日本の計量スプーン・計量カップの規格)</li>
+    <li>大さじ1 = 小さじ3杯、1カップ = 大さじ13杯+小さじ1杯です。</li>
+    <li>mlとcc(シーシー)は同じ量です(1ml = 1cc)。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>日本で標準的な計量器具の容量(小さじ5ml・大さじ15ml・カップ200ml)に基づく換算です。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>これは<strong>容量(かさ)の換算</strong>です。重さ(g)は食材の密度で変わります(大さじ1は水なら15gですが、油は約12g、砂糖(上白糖)は約9g、塩は約18g)。</li>
+    <li>海外レシピの1カップは異なります(アメリカ約240ml、オーストラリア250ml)。炊飯器の米カップも180mlで別物です。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 大さじ1は何グラムですか?</h3>
+  <p>食材によって違います。水・酢・酒なら15g、しょうゆ・みりんは約18g、油・バターは約12g、砂糖(上白糖)は約9g、塩は約18gが目安です。本ツールの換算は容量(ml)ベースです。</p>
+  <h3>Q. 計量スプーンがないときの代用は?</h3>
+  <p>ペットボトルのキャップが約7.5ml(大さじ1/2)、カレースプーンが大さじ1弱の目安として使えます。正確さが必要なお菓子作りでは計量器具をおすすめします。</p>
+  <h3>Q. 「ひとつまみ」「少々」はどれくらいですか?</h3>
+  <p>目安として、少々=親指と人差し指でつまんだ量(約小さじ1/8)、ひとつまみ=指3本でつまんだ量(約小さじ1/5〜1/4)とされます。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../kome/">お米の合・グラム換算 計算機</a></li>
+    <li><a href="../renji/">電子レンジ加熱時間 換算計算機</a></li>
+    <li><a href="../shio/">塩分量 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  document.getElementById("spoon-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var r = SpoonCalc.convert(parseFloat(document.getElementById("value").value), document.getElementById("unit").value);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">分量を0より大きい数値で入力してください。</p>';
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">' + r.ml.toLocaleString() + " ml</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>大さじ</td><td>" + r.tbsp.toLocaleString() + " 杯</td></tr>" +
+      "<tr><td>小さじ</td><td>" + r.tsp.toLocaleString() + " 杯</td></tr>" +
+      "<tr><td>カップ(200ml)</td><td>" + r.cup.toLocaleString() + " 杯</td></tr>" +
+      "</tbody></table></div>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

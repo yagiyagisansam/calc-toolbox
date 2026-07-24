@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>お米の合・グラム換算 計算機(1合は何g?水の量は?) | 計算ツールボックス</title>
+  <meta name="description" content="お米1合=約150g、水は1合あたり約200mlの目安で、合数からお米の重さ・水加減・炊き上がりの量・お茶碗何杯分かを一括計算。グラムから合数への逆算にも対応。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/kome/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="お米の合・グラム換算 計算機(1合は何g?水の量は?) | 計算ツールボックス">
+  <meta property="og:description" content="お米1合=約150g、水は1合あたり約200mlの目安で、合数からお米の重さ・水加減・炊き上がりの量・お茶碗何杯分かを一括計算。グラムから合数への逆算にも対応。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/kome/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"お米の合・グラム換算 計算機(1合は何g?水の量は?)","item":"https://quick-calc.site/tools/kome/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>お米の合・グラム換算 計算機</h1>
+  <form class="tool-form" id="kome-form">
+    <label>計算の種類
+      <select id="mode">
+        <option value="fromGo" selected>合数から計算(水加減・炊き上がり)</option>
+        <option value="fromGram">グラムから合数を逆算</option>
+      </select>
+    </label>
+    <label id="value-label">お米の量(合)
+      <input type="number" id="value" min="0" step="any" required placeholder="例: 2">
+    </label>
+    <button type="submit">計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>「お米1合って何グラム?」「2合炊くときの水は?」——合数を入れるだけで、<strong>お米の重さ・水加減の目安・炊き上がりの量・お茶碗何杯分か</strong>をまとめて計算します。無洗米を袋からグラムで量るときの逆算にも対応。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>炊きたい合数を入力します(0.5合単位でもOK)。</li>
+    <li>「計算する」を押すと、米の重さ・水の量・炊き上がり量が表示されます。</li>
+    <li>袋の残りをグラムで量ったときは「グラムから合数」で逆算できます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>1合 = 180ml</strong>(米用計量カップ1杯。尺貫法の1升=約1.8Lの1/10)≒ <strong>精白米 約150g</strong></li>
+    <li><strong>水加減の目安 = 1合あたり約200ml</strong>(米の容積の1.1〜1.2倍)。炊飯器なら内釜の目盛りが優先です。</li>
+    <li><strong>炊き上がりは米の約2.2倍の重さ</strong>(1合→約330gのごはん)。お茶碗1杯150gとして約2.2杯分です。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>1合=180mlは計量法の尺貫法単位(升)に由来する容量です。重さ・水加減・炊き上がりは一般的な目安(米の銘柄・新米か古米か・研ぎ方で変わります)。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>無洗米は同じ容積でも米が多めに入るため、水をやや多め(1合あたり+10〜20ml)にするのが目安です。</li>
+    <li>新米は水分が多いので水をやや控えめに、古米はやや多めにすると好みに近づきます。</li>
+    <li>炊飯器で炊く場合は内釜の水位線に合わせるのが確実です。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 1合で何人分ですか?</h3>
+  <p>お茶碗約2.2杯分なので、大人2人の1食分が目安です。お弁当や食べ盛りがいる場合は1人1合見当で炊く家庭も多いです。</p>
+  <h3>Q. 計量カップがないとき1合を量るには?</h3>
+  <p>キッチンスケールで150gを量るのが正確です。紙コップ(200ml)なら9分目弱が約180mlの目安になります。</p>
+  <h3>Q. 5kgのお米は何合で、何日もちますか?</h3>
+  <p>5,000g ÷ 150g = 約33合です。毎日2合炊く家庭なら約16日分になります。本ツールの逆算モードで確認できます。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../spoon/">大さじ・小さじ・カップ 換算計算機</a></li>
+    <li><a href="../tanka/">単価比較 計算機</a></li>
+    <li><a href="../tsubo/">坪・平米・畳 変換計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var label = document.getElementById("value-label");
+  var input = document.getElementById("value");
+  mode.addEventListener("change", function () {
+    var isGo = mode.value === "fromGo";
+    label.childNodes[0].textContent = isGo ? "お米の量(合)" : "お米の重さ(g)";
+    input.placeholder = isGo ? "例: 2" : "例: 300";
+  });
+  document.getElementById("kome-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var v = parseFloat(input.value);
+    if (mode.value === "fromGo") {
+      var r = KomeCalc.fromGo(v);
+      if (!r.ok) { box.innerHTML = '<p class="result-error">合数は0より大きく20以下で入力してください。</p>'; box.hidden = false; return; }
+      box.innerHTML =
+        '<div class="result-main">米 ' + r.riceG.toLocaleString() + "g・水 約" + r.waterMl.toLocaleString() + "ml</div>" +
+        '<div class="table-scroll"><table class="data-table"><tbody>' +
+        "<tr><td>お米の重さ</td><td>約 " + r.riceG.toLocaleString() + " g</td></tr>" +
+        "<tr><td>水加減の目安</td><td>約 " + r.waterMl.toLocaleString() + " ml</td></tr>" +
+        "<tr><td>炊き上がり</td><td>約 " + r.cookedG.toLocaleString() + " g</td></tr>" +
+        "<tr><td>お茶碗(150g)</td><td>約 " + r.bowls.toLocaleString() + " 杯分</td></tr>" +
+        "</tbody></table></div><p>炊飯器では内釜の目盛りを優先してください。</p>";
+    } else {
+      var r2 = KomeCalc.fromGram(v);
+      if (!r2.ok) { box.innerHTML = '<p class="result-error">重さは0より大きく30,000g以下で入力してください。</p>'; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">約 ' + r2.go.toLocaleString() + " 合</div><p>1合=約150gとして計算しています。</p>";
+    }
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

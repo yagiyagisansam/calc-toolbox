@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>チップ計算機(海外旅行・15%/18%/20%と割り勘) | 計算ツールボックス</title>
+  <meta name="description" content="海外旅行のレストランで慌てないチップ計算機。金額とチップ率(15%・18%・20%)からチップ額と合計、1人あたりの支払額まで一発計算。アメリカ・ハワイ旅行の必携ツール。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/tip/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="チップ計算機(海外旅行・15%/18%/20%と割り勘) | 計算ツールボックス">
+  <meta property="og:description" content="海外旅行のレストランで慌てないチップ計算機。金額とチップ率(15%・18%・20%)からチップ額と合計、1人あたりの支払額まで一発計算。アメリカ・ハワイ旅行の必携ツール。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/tip/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"チップ計算機(海外旅行・15%/18%/20%と割り勘)","item":"https://quick-calc.site/tools/tip/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>チップ計算機(海外旅行用)</h1>
+  <form class="tool-form" id="tip-form">
+    <label>金額(税抜の飲食代など)
+      <input type="number" id="amount" min="0" step="any" required placeholder="例: 85.50">
+    </label>
+    <label>チップ率(%)
+      <select id="pct">
+        <option value="15">15%(標準・カジュアルな店)</option>
+        <option value="18" selected>18%(標準〜やや良い)</option>
+        <option value="20">20%(良いサービス)</option>
+        <option value="22">22%(高級店・特別なサービス)</option>
+        <option value="10">10%(デリバリー等)</option>
+        <option value="0">0%(サービス料込み)</option>
+      </select>
+    </label>
+    <label>割り勘の人数
+      <input type="number" id="people" min="1" max="50" step="1" value="1">
+    </label>
+    <button type="submit">チップと合計を計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>アメリカやハワイのレストランで会計のたびに悩むチップ。金額を入れて率を選ぶだけで、<strong>チップ額・合計・1人あたりの支払額</strong>を一発計算します。レシートを見ながらサッと使えるシンプル設計です。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>レシートの金額を入力します(米国では税抜の飲食代に対して計算するのが一般的)。</li>
+    <li>チップ率を選びます(迷ったら18%)。</li>
+    <li>割り勘なら人数も入れて「計算する」を押します。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>チップ = 金額 × チップ率 ÷ 100</strong> / <strong>合計 = 金額 + チップ</strong> / <strong>1人あたり = 合計 ÷ 人数</strong></li>
+    <li>計算例: $85.50の18% → チップ<strong>$15.39</strong>、合計$100.89</li>
+    <li>米国のレストランの相場はおおむね15〜20%(近年は18〜20%が主流)。サービス料(Service Charge/Gratuity)が既に含まれている場合は追加不要です。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>算術計算です。チップの相場・習慣は国・都市・業態で異なります(現地の観光局・ガイドの案内をご確認ください)。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>レシートに「Gratuity Included」「Service Charge」とあれば、チップはすでに含まれています。二重払いに注意。</li>
+    <li>チップ文化は国によって大きく違います(日本・中国・韓国は基本不要、欧州は5〜10%か端数切り上げ程度が多い)。</li>
+    <li>カード払いの場合はレシートのTip欄に金額を書き込み、Totalを自分で記入します。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. チップは税込と税抜どちらの金額に対して計算しますか?</h3>
+  <p>米国では税抜の飲食代(Subtotal)に対して計算するのが本来の習慣です。ただし税込(Total)ベースで計算しても差は小さく、多めに払う分には問題ありません。</p>
+  <h3>Q. ファストフードやカフェでもチップは必要ですか?</h3>
+  <p>カウンターで注文する店では基本的に不要です(タブレットにチップ画面が出ても「No Tip」を選べます)。テーブルで給仕を受けるレストランでは必要です。</p>
+  <h3>Q. ホテルや タクシーの相場は?</h3>
+  <p>目安として、ホテルのベルボーイは荷物1個$1〜2、ハウスキーピングは1泊$2〜5、タクシーは料金の15%前後です。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../warikan/">割り勘 計算機</a></li>
+    <li><a href="../percent/">パーセント計算機</a></li>
+    <li><a href="../mile/">マイル⇔km 換算計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var MSG = {
+    invalid_amount: "金額を0より大きい値で入力してください。",
+    invalid_pct: "チップ率は0〜50%の範囲で選んでください。",
+    invalid_people: "人数は1〜50の整数で入力してください。"
+  };
+  document.getElementById("tip-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var people = parseInt(document.getElementById("people").value, 10);
+    var r = TipCalc.calc(
+      parseFloat(document.getElementById("amount").value),
+      parseFloat(document.getElementById("pct").value),
+      people
+    );
+    if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "入力値を確認してください。") + "</p>"; box.hidden = false; return; }
+    box.innerHTML =
+      '<div class="result-main">チップ ' + r.tip.toLocaleString() + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>合計(金額+チップ)</td><td><strong>" + r.total.toLocaleString() + "</strong></td></tr>" +
+      (people > 1 ? "<tr><td>1人あたり(" + people + "人)</td><td><strong>" + r.perPerson.toLocaleString() + "</strong></td></tr>" : "") +
+      "</tbody></table></div><p>通貨単位はそのまま(ドルならドル)で表示しています。</p>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

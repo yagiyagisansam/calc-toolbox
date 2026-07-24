@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>割引計算機(○%オフはいくら?値引き額と割引率) | 計算ツールボックス</title>
+  <meta name="description" content="「30%オフでいくら?」を一発計算。割引後の価格と値引き額、逆にセール価格から割引率の計算もできる無料電卓。スーパー・セール・アウトレットでの買い物に。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/waribiki/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="割引計算機(○%オフはいくら?値引き額と割引率) | 計算ツールボックス">
+  <meta property="og:description" content="「30%オフでいくら?」を一発計算。割引後の価格と値引き額、逆にセール価格から割引率の計算もできる無料電卓。スーパー・セール・アウトレットでの買い物に。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/waribiki/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"割引計算機(○%オフはいくら?値引き額と割引率)","item":"https://quick-calc.site/tools/waribiki/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>割引計算機(○%オフはいくら?)</h1>
+  <form class="tool-form" id="waribiki-form">
+    <label>計算の種類
+      <select id="mode">
+        <option value="off" selected>○%オフ後の価格を計算</option>
+        <option value="rate">割引率を逆算(定価→売価)</option>
+      </select>
+    </label>
+    <label>定価(円)
+      <input type="number" id="price" min="1" step="any" required placeholder="例: 2980">
+    </label>
+    <label id="second-label">割引率(%)
+      <input type="number" id="second" min="0" max="100000000" step="any" required placeholder="例: 30">
+    </label>
+    <button type="submit">計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>セールの「30%オフ」「2割引き」が結局いくらになるのか、その場で計算できます。逆に<strong>定価とセール価格から割引率を逆算</strong>することもできるので、「どれくらい得か」の比較にも使えます。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>「○%オフ後の価格」か「割引率の逆算」を選びます。</li>
+    <li>定価と、割引率(またはセール価格)を入力します。</li>
+    <li>「計算する」を押すと、割引後価格と値引き額(または割引率)が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>割引後価格 = 定価 × (1 − 割引率÷100)</strong>(円未満は四捨五入)</li>
+    <li><strong>割引率 = (1 − 売価÷定価) × 100</strong></li>
+    <li>計算例: 2,980円の30%オフ → 2,980 × 0.7 = <strong>2,086円</strong>(894円引き)</li>
+    <li>「2割引き」=20%オフ、「半額」=50%オフです。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>価格と割引率に基づく算術計算です。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>店舗によっては端数を切り捨て・切り上げで処理する場合があり、レジでの金額と1円単位で差が出ることがあります。</li>
+    <li>「表示価格からさらに20%オフ」のような重ね掛けは、このツールを2回に分けてお使いください(30%オフ+20%オフ=50%オフにはなりません)。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 「30%オフからさらに20%オフ」は50%オフですか?</h3>
+  <p>違います。順番に掛かるので 0.7 × 0.8 = 0.56、つまり44%オフ相当です。1,000円なら560円になります。本ツールで2回に分けて計算すると確認できます。</p>
+  <h3>Q. 税込と税抜、どちらで計算すべきですか?</h3>
+  <p>割引は通常、表示されている価格(多くは税込)に掛かります。定価に入れた金額に対して割引率がそのまま適用される計算です。</p>
+  <h3>Q. ポイント還元と割引はどちらが得ですか?</h3>
+  <p>同じ%なら割引のほうが得です。詳しくは<a href="../point/">割引とポイント還元どっちが得?計算機</a>で比較できます。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../point/">割引とポイント還元 どっちが得? 計算機</a></li>
+    <li><a href="../percent/">パーセント計算機</a></li>
+    <li><a href="../tanka/">単価比較 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var label = document.getElementById("second-label");
+  var second = document.getElementById("second");
+  var MSG = {
+    invalid_price: "定価を1円以上で入力してください。",
+    invalid_pct: "割引率は0〜100%の範囲で入力してください。",
+    invalid_sale: "売価は0円〜定価の範囲で入力してください。"
+  };
+  mode.addEventListener("change", function () {
+    var isOff = mode.value === "off";
+    label.childNodes[0].textContent = isOff ? "割引率(%)" : "セール価格(円)";
+    second.placeholder = isOff ? "例: 30" : "例: 1480";
+  });
+  document.getElementById("waribiki-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var price = parseFloat(document.getElementById("price").value);
+    var v = parseFloat(second.value);
+    if (mode.value === "off") {
+      var r = WaribikiCalc.off(price, v);
+      if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "入力値を確認してください。") + "</p>"; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">' + r.sale.toLocaleString() + " 円</div>" +
+        "<p>値引き額: <strong>" + r.saved.toLocaleString() + "円</strong>(" + v.toLocaleString() + "%オフ)</p>";
+    } else {
+      var r2 = WaribikiCalc.rate(price, v);
+      if (!r2.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r2.code] || "入力値を確認してください。") + "</p>"; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">約 ' + r2.pct.toLocaleString() + " %オフ</div>" +
+        "<p>値引き額: " + (price - v).toLocaleString() + "円</p>";
+    }
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

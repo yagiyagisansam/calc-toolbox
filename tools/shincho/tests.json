@@ -1,0 +1,127 @@
+{
+  "tool": "shincho",
+  "module": "calc.js",
+  "global": "ShinchoCalc",
+  "cases": [
+    {
+      "name": "170cm → 5フィート7インチ",
+      "func": "toFeet",
+      "args": [
+        170
+      ],
+      "expect": {
+        "ok": true,
+        "feet": 5,
+        "inches": 7
+      }
+    },
+    {
+      "name": "182.88cm → ちょうど6フィート0インチ",
+      "func": "toFeet",
+      "args": [
+        182.88
+      ],
+      "expect": {
+        "ok": true,
+        "feet": 6,
+        "inches": 0,
+        "totalInches": 72
+      }
+    },
+    {
+      "name": "繰り上げ: 182.5cm → 6'0″(11.85インチ→12→繰り上げ)",
+      "func": "toFeet",
+      "args": [
+        182.5
+      ],
+      "expect": {
+        "ok": true,
+        "feet": 6,
+        "inches": 0
+      }
+    },
+    {
+      "name": "160cm → 5'3″",
+      "func": "toFeet",
+      "args": [
+        160
+      ],
+      "expect": {
+        "ok": true,
+        "feet": 5,
+        "inches": 3
+      }
+    },
+    {
+      "name": "200cm → 6'7″",
+      "func": "toFeet",
+      "args": [
+        200
+      ],
+      "expect": {
+        "ok": true,
+        "feet": 6,
+        "inches": 7
+      }
+    },
+    {
+      "name": "逆変換: 5'10″ → 177.8cm",
+      "func": "toCm",
+      "args": [
+        5,
+        10
+      ],
+      "expect": {
+        "ok": true,
+        "cm": 177.8
+      }
+    },
+    {
+      "name": "逆変換: 6'2″ → 187.96cm",
+      "func": "toCm",
+      "args": [
+        6,
+        2
+      ],
+      "expect": {
+        "ok": true,
+        "cm": 187.96
+      }
+    },
+    {
+      "name": "異常入力: 30cm未満はエラー",
+      "func": "toFeet",
+      "args": [
+        20
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_cm"
+      }
+    },
+    {
+      "name": "異常入力: インチ12以上はエラー",
+      "func": "toCm",
+      "args": [
+        5,
+        12
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_inches"
+      }
+    },
+    {
+      "name": "異常入力: フィートが小数はエラー",
+      "func": "toCm",
+      "args": [
+        5.5,
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_feet"
+      }
+    }
+  ]
+}

@@ -1,0 +1,162 @@
+{
+  "tool": "cycle",
+  "module": "calc.js",
+  "global": "CycleCalc",
+  "cases": [
+    {
+      "name": "6:30起床・入眠15分: 21:15(9h)/22:45(7.5h)/0:15(6h)",
+      "func": "bedTimes",
+      "args": [
+        "6:30",
+        15
+      ],
+      "expect": {
+        "ok": true,
+        "options": [
+          {
+            "cycles": 6,
+            "sleepHours": 9,
+            "bedTime": "21:15"
+          },
+          {
+            "cycles": 5,
+            "sleepHours": 7.5,
+            "bedTime": "22:45"
+          },
+          {
+            "cycles": 4,
+            "sleepHours": 6,
+            "bedTime": "0:15"
+          }
+        ]
+      }
+    },
+    {
+      "name": "7:00起床・入眠0分: 22:00/23:30/1:00",
+      "func": "bedTimes",
+      "args": [
+        "7:00",
+        0
+      ],
+      "expect": {
+        "ok": true,
+        "options": [
+          {
+            "bedTime": "22:00"
+          },
+          {
+            "bedTime": "23:30"
+          },
+          {
+            "bedTime": "1:00"
+          }
+        ]
+      }
+    },
+    {
+      "name": "日またぎの候補も正しく計算(5:00起床)",
+      "func": "bedTimes",
+      "args": [
+        "5:00",
+        15
+      ],
+      "expect": {
+        "ok": true,
+        "options": [
+          {
+            "bedTime": "19:45"
+          },
+          {
+            "bedTime": "21:15"
+          },
+          {
+            "bedTime": "22:45"
+          }
+        ]
+      }
+    },
+    {
+      "name": "就寝23:00・入眠15分 → 起床候補5:15/6:45/8:15",
+      "func": "wakeTimes",
+      "args": [
+        "23:00",
+        15
+      ],
+      "expect": {
+        "ok": true,
+        "options": [
+          {
+            "cycles": 4,
+            "wakeTime": "5:15"
+          },
+          {
+            "cycles": 5,
+            "wakeTime": "6:45"
+          },
+          {
+            "cycles": 6,
+            "wakeTime": "8:15"
+          }
+        ]
+      }
+    },
+    {
+      "name": "0:00就寝でも計算できる",
+      "func": "wakeTimes",
+      "args": [
+        "0:00",
+        15
+      ],
+      "expect": {
+        "ok": true,
+        "options": [
+          {
+            "wakeTime": "6:15"
+          },
+          {
+            "wakeTime": "7:45"
+          },
+          {
+            "wakeTime": "9:15"
+          }
+        ]
+      }
+    },
+    {
+      "name": "異常入力: 25時はエラー",
+      "func": "bedTimes",
+      "args": [
+        "25:00",
+        15
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_time"
+      }
+    },
+    {
+      "name": "異常入力: 形式不正はエラー",
+      "func": "bedTimes",
+      "args": [
+        "六時半",
+        15
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_time"
+      }
+    },
+    {
+      "name": "異常入力: 入眠時間61分以上はエラー",
+      "func": "bedTimes",
+      "args": [
+        "6:30",
+        61
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_fall"
+      }
+    }
+  ]
+}

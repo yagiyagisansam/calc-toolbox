@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>平均値・中央値 計算機(数値を貼るだけ) | 計算ツールボックス</title>
+  <meta name="description" content="数値を貼り付けるだけで平均値・中央値・最大・最小・合計を一括計算。テストの点数、売上、記録の集計に。カンマ・スペース・改行区切りに対応した無料ツール。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/heikin/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="平均値・中央値 計算機(数値を貼るだけ) | 計算ツールボックス">
+  <meta property="og:description" content="数値を貼り付けるだけで平均値・中央値・最大・最小・合計を一括計算。テストの点数、売上、記録の集計に。カンマ・スペース・改行区切りに対応した無料ツール。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/heikin/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"平均値・中央値 計算機(数値を貼るだけ)","item":"https://quick-calc.site/tools/heikin/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>平均値・中央値 計算機</h1>
+  <form class="tool-form" id="heikin-form">
+    <label>数値(カンマ・スペース・改行区切り)
+      <textarea id="list" rows="4" required placeholder="例: 80, 92, 76, 88, 65"></textarea>
+    </label>
+    <button type="submit">平均・中央値を計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>テストの点数、毎月の売上、体重の記録……数値を貼り付けるだけで<strong>平均値・中央値・最大・最小・合計</strong>をまとめて計算します。外れ値に引っ張られやすい平均値と、実感に近い中央値を並べて確認できます。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>数値をカンマ・スペース・改行のどれかで区切って入力します(Excelの列を貼り付けてもOK)。</li>
+    <li>「計算する」を押すと、個数・合計・平均・中央値・最大・最小が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>平均値 = 合計 ÷ 個数</strong></li>
+    <li><strong>中央値</strong> = 小さい順に並べたときの真ん中の値(偶数個のときは中央2つの平均)</li>
+    <li>計算例: 10, 10, 20 の平均は13.3ですが中央値は10。大きな外れ値があるデータでは中央値のほうが「ふつう」の実感に近くなります。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>統計の基本的な定義(算術平均・中央値)に基づく計算です。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>数値以外の文字が混ざっているとエラーになります(単位や「点」は除いて貼り付けてください)。</li>
+    <li>一度に計算できるのは10,000個までです。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 平均値と中央値、どちらを見ればいいですか?</h3>
+  <p>データに極端な値(外れ値)がなければ平均値で十分です。年収や住宅価格のように一部の大きな値が混ざるデータでは、中央値のほうが「真ん中の実感」に合います。両方見るのがおすすめです。</p>
+  <h3>Q. Excelからコピーした縦一列のデータも使えますか?</h3>
+  <p>使えます。改行区切りとして認識されるので、列を選択してコピー→そのまま貼り付けでOKです。</p>
+  <h3>Q. 偏差値も計算できますか?</h3>
+  <p>偏差値は<a href="../hensachi/">偏差値計算機</a>をお使いください。点数リストを貼り付けて一括計算できます。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../hensachi/">偏差値 計算機(点数リスト対応)</a></li>
+    <li><a href="../percent/">パーセント計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  document.getElementById("heikin-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var raw = document.getElementById("list").value.trim();
+    var parts = raw.split(/[\s,、]+/).filter(function (s) { return s !== ""; });
+    var list = parts.map(function (s) { return parseFloat(s); });
+    var bad = list.some(function (v) { return !isFinite(v); });
+    var r = bad ? { ok: false, code: "invalid_value" } : HeikinCalc.stats(list);
+    if (!r.ok) {
+      var msg = r.code === "invalid_value" ? "数値として読めない値が混ざっています。数字だけを区切って入力してください。" : "数値を1〜10,000個入力してください。";
+      box.innerHTML = '<p class="result-error">' + msg + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">平均 ' + r.mean.toLocaleString() + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>中央値</td><td>" + r.median.toLocaleString() + "</td></tr>" +
+      "<tr><td>個数</td><td>" + r.n.toLocaleString() + "</td></tr>" +
+      "<tr><td>合計</td><td>" + r.sum.toLocaleString() + "</td></tr>" +
+      "<tr><td>最小 / 最大</td><td>" + r.min.toLocaleString() + " / " + r.max.toLocaleString() + "</td></tr>" +
+      "</tbody></table></div>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

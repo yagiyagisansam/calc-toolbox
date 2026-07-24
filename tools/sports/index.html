@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>運動別 消費カロリー計算機(ジョギング・水泳・筋トレなど13種) | 計算ツールボックス</title>
+  <meta name="description" content="ジョギング・サイクリング・水泳・テニス・筋トレ・なわとび・ヨガなど13種の運動の消費カロリーをMETs方式(公的なMETs表)で計算。体重と時間を入れるだけ。脂肪換算つき。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/sports/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="運動別 消費カロリー計算機(ジョギング・水泳・筋トレなど13種) | 計算ツールボックス">
+  <meta property="og:description" content="ジョギング・サイクリング・水泳・テニス・筋トレ・なわとび・ヨガなど13種の運動の消費カロリーをMETs方式(公的なMETs表)で計算。体重と時間を入れるだけ。脂肪換算つき。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/sports/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"運動別 消費カロリー計算機(ジョギング・水泳・筋トレなど13種)","item":"https://quick-calc.site/tools/sports/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>運動別 消費カロリー計算機</h1>
+  <form class="tool-form" id="sports-form">
+    <label>運動の種類
+      <select id="activity"></select>
+    </label>
+    <label>体重(kg)
+      <input type="number" id="weight" min="20" max="300" step="0.1" required placeholder="例: 60">
+    </label>
+    <label>運動時間(分)
+      <input type="number" id="minutes" min="1" max="600" step="1" required placeholder="例: 30">
+    </label>
+    <button type="submit">消費カロリーを計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>ジョギング、サイクリング、水泳、筋トレ、なわとび……<strong>13種類の運動の消費カロリー</strong>を、公的なMETs(メッツ)表の値で計算します。体重と時間を入れるだけ。ダイエットの計画や「ケーキ1個分動くには?」の確認に。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>運動の種類を選びます(METs値が近いものがなければ強度の近い種目で代用してください)。</li>
+    <li>体重と運動時間を入力します。</li>
+    <li>「計算する」を押すと、消費カロリーと脂肪換算の目安が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>消費エネルギー(kcal)= 1.05 × METs × 時間(h)× 体重(kg)</strong>(厚生労働省の運動指針で用いられる式)</li>
+    <li>METs(メッツ)は安静時を1とした運動強度で、本ツールは「身体活動のメッツ(METs)表」の値を使用: ジョギング7.0 / ランニング8km/h 8.3 / サイクリング6.8 / クロール(ゆっくり)5.8 / テニス7.3 / 筋トレ(自重)3.5 / なわとび8.8 など</li>
+    <li>計算例: 60kgの人がジョギング30分 → 1.05 × 7.0 × 0.5 × 60 = <strong>約221kcal</strong></li>
+    <li>脂肪換算は体脂肪1kg≒7,200kcalの目安で割り戻しています。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>METs値: <a href="https://www.nibiohn.go.jp/eiken/programs/2011mets.pdf" target="_blank" rel="noopener">国立健康・栄養研究所「身体活動のメッツ(METs)表」(2011改訂版)</a> / 計算式: <a href="https://www.e-healthnet.mhlw.go.jp/information/exercise/s-02-004.html" target="_blank" rel="noopener">厚生労働省 e-ヘルスネット「メッツ / METs」</a></li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>この式には安静時の消費(基礎代謝分)が含まれます。運動による「上乗せ分」だけならMETsから1を引いて概算してください。</li>
+    <li>同じ種目でも強度(速さ・負荷)で実際のMETsは変わります。表示は代表的な値です。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. ショートケーキ1個分を消費するには?</h3>
+  <p>ショートケーキ1個は約300〜350kcalです。60kgの人ならジョギング約45分、ふつうのウォーキングなら約1時間50分に相当します。「食べた分を運動で帳消し」はかなり大変なので、食事側の調整と組み合わせるのが現実的です。</p>
+  <h3>Q. 筋トレの消費カロリーが思ったより少ないのですが?</h3>
+  <p>筋トレ自体の消費は控えめですが、筋肉量が増えると基礎代謝が上がり、長期的に太りにくくなります。消費カロリーだけで価値を測らないのがポイントです。</p>
+  <h3>Q. ウォーキングはどこで計算できますか?</h3>
+  <p>歩く速さ別の詳しい計算は<a href="../walking/">ウォーキング消費カロリー計算機</a>をどうぞ。歩数からの計算は<a href="../hosu/">歩数→距離・カロリー換算</a>が便利です。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../walking/">ウォーキング消費カロリー 計算機</a></li>
+    <li><a href="../hosu/">歩数→距離・カロリー換算 計算機</a></li>
+    <li><a href="../tdee/">1日の摂取カロリー目安 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var sel = document.getElementById("activity");
+  Object.keys(SportsCalc.ACTIVITIES).forEach(function (key) {
+    var a = SportsCalc.ACTIVITIES[key];
+    sel.add(new Option(a.label + "(" + a.mets + "METs)", key));
+  });
+  var MSG = {
+    invalid_weight: "体重は20〜300kgの範囲で入力してください。",
+    invalid_minutes: "時間は1〜600分の範囲で入力してください。",
+    invalid_activity: "運動の種類を選んでください。"
+  };
+  document.getElementById("sports-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var r = SportsCalc.calories(
+      parseFloat(document.getElementById("weight").value),
+      parseFloat(document.getElementById("minutes").value),
+      sel.value
+    );
+    if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "入力値を確認してください。") + "</p>"; box.hidden = false; return; }
+    box.innerHTML =
+      '<div class="result-main">約 ' + r.kcal.toLocaleString() + " kcal</div>" +
+      "<p>" + r.label + " / 脂肪換算 約<strong>" + r.fatG.toLocaleString() + "g</strong>分(1kg≒7,200kcalの目安)</p>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

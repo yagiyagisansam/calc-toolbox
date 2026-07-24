@@ -1,0 +1,130 @@
+{
+  "tool": "byte",
+  "module": "calc.js",
+  "global": "ByteCalc",
+  "cases": [
+    {
+      "name": "1GB(1024換算)= 1024MB = 1,048,576KB",
+      "func": "convert",
+      "args": [
+        1,
+        "gb",
+        1024
+      ],
+      "expect": {
+        "ok": true,
+        "mb": 1024,
+        "kb": 1048576,
+        "b": 1073741824,
+        "tb": 0.001
+      }
+    },
+    {
+      "name": "500MB(1000換算)= 0.5GB = 500,000KB",
+      "func": "convert",
+      "args": [
+        500,
+        "mb",
+        1000
+      ],
+      "expect": {
+        "ok": true,
+        "gb": 0.5,
+        "kb": 500000,
+        "tb": 0.0005
+      }
+    },
+    {
+      "name": "2TB(1024換算)= 2048GB",
+      "func": "convert",
+      "args": [
+        2,
+        "tb",
+        1024
+      ],
+      "expect": {
+        "ok": true,
+        "gb": 2048
+      }
+    },
+    {
+      "name": "DVD一層 4.7GB(1000換算)= 4700MB",
+      "func": "convert",
+      "args": [
+        4700,
+        "mb",
+        1000
+      ],
+      "expect": {
+        "ok": true,
+        "gb": 4.7
+      }
+    },
+    {
+      "name": "1024B = 1KB(1024換算)",
+      "func": "convert",
+      "args": [
+        1024,
+        "b",
+        1024
+      ],
+      "expect": {
+        "ok": true,
+        "kb": 1,
+        "mb": 0.001
+      }
+    },
+    {
+      "name": "異常入力: 0はエラー",
+      "func": "convert",
+      "args": [
+        0,
+        "gb",
+        1024
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
+    },
+    {
+      "name": "異常入力: 負の値はエラー",
+      "func": "convert",
+      "args": [
+        -5,
+        "gb",
+        1024
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
+    },
+    {
+      "name": "異常入力: 不正な単位はエラー",
+      "func": "convert",
+      "args": [
+        1,
+        "pb",
+        1024
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_unit"
+      }
+    },
+    {
+      "name": "異常入力: 基数が1024/1000以外はエラー",
+      "func": "convert",
+      "args": [
+        1,
+        "gb",
+        512
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_base"
+      }
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>星座・誕生石 早見計算機(誕生日を入れるだけ) | 計算ツールボックス</title>
+  <meta name="description" content="誕生日から12星座(牡羊座〜魚座)と誕生石をすぐ表示。「4月20日生まれは何座?」の境目もわかる無料ツール。プロフィール記入やプレゼント選びに。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/seiza/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="星座・誕生石 早見計算機(誕生日を入れるだけ) | 計算ツールボックス">
+  <meta property="og:description" content="誕生日から12星座(牡羊座〜魚座)と誕生石をすぐ表示。「4月20日生まれは何座?」の境目もわかる無料ツール。プロフィール記入やプレゼント選びに。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/seiza/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"星座・誕生石 早見計算機(誕生日を入れるだけ)","item":"https://quick-calc.site/tools/seiza/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>星座・誕生石 早見計算機</h1>
+  <form class="tool-form" id="seiza-form">
+    <label>誕生日(月・日)
+      <span style="display:flex;gap:.5em;align-items:center;">
+        <select id="month" aria-label="月"></select> 月
+        <select id="day" aria-label="日"></select> 日
+      </span>
+    </label>
+    <button type="submit">星座・誕生石を調べる</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>誕生日を選ぶだけで、<strong>12星座と誕生石</strong>がすぐわかります。「4月20日は牡羊座?牡牛座?」といった境目の日もひと目で確認。プロフィール記入や、誕生日プレゼントのジュエリー選びに。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>誕生日の月と日を選びます(年は不要です)。</li>
+    <li>「調べる」を押すと、星座(日本語・英語)と誕生石が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li>12星座は<strong>一般的に使われる日付区分</strong>(おひつじ座3/21〜4/19など)で判定しています。</li>
+    <li>星座の区分は太陽の位置(黄道十二宮)に基づくため、境界日は年によって1日前後します。境目の日に生まれた方は生まれ年・時刻で変わることがあります。</li>
+    <li>誕生石は月ごとの代表的な宝石を表示しています(複数ある月は主要なもの)。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>星座の日付区分は占星術で慣用される区分、誕生石は全国宝石卸商協同組合の選定(2021年改訂)を参考にした代表石です。いずれも自然科学的な効果を示すものではありません。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>境界日(4/19と4/20の間など)生まれの場合、媒体によって星座の表記が1日ずれることがあります。</li>
+    <li>誕生石は国・団体によって一部異なります(3月は珊瑚、6月はムーンストーンを挙げる場合など)。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 星座の境目の日生まれです。どちらの星座ですか?</h3>
+  <p>星座の切り替わりは太陽が星座間を移動する瞬間で決まり、年によって日付が1日前後します。正確に知りたい場合は生まれ年と出生時刻から調べる必要があります。一般的なプロフィール記入では本ツールの区分で問題ありません。</p>
+  <h3>Q. 誕生石が本やお店で違うのはなぜですか?</h3>
+  <p>誕生石の選定は国や宝石団体ごとに少しずつ異なるためです。日本では全国宝石卸商協同組合の選定(2021年に改訂され追加あり)が広く使われています。</p>
+  <h3>Q. 干支も調べられますか?</h3>
+  <p><a href="../age/">年齢計算機</a>で生年月日から干支と満年齢をあわせて確認できます。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../age/">年齢計算機(満年齢・早生まれ・干支)</a></li>
+    <li><a href="../kinenbi/">記念日カウント計算機</a></li>
+    <li><a href="../rireki/">入学・卒業年 早見計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var monthSel = document.getElementById("month");
+  var daySel = document.getElementById("day");
+  var DAYS = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  for (var m = 1; m <= 12; m++) monthSel.add(new Option(m, m));
+  function fillDays() {
+    var cur = parseInt(daySel.value || "1", 10);
+    daySel.innerHTML = "";
+    for (var d = 1; d <= DAYS[monthSel.value - 1]; d++) daySel.add(new Option(d, d));
+    daySel.value = Math.min(cur, DAYS[monthSel.value - 1]);
+  }
+  monthSel.addEventListener("change", fillDays);
+  fillDays();
+  document.getElementById("seiza-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var r = SeizaCalc.lookup(parseInt(monthSel.value, 10), parseInt(daySel.value, 10));
+    if (!r.ok) { box.innerHTML = '<p class="result-error">日付を正しく選んでください。</p>'; box.hidden = false; return; }
+    box.innerHTML =
+      '<div class="result-main">' + r.sign + "</div>" +
+      "<p>英語表記: <strong>" + r.signEn + "</strong> / 誕生石: <strong>" + r.stone + "</strong></p>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

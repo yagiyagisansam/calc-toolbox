@@ -1,0 +1,121 @@
+{
+  "tool": "rireki",
+  "module": "calc.js",
+  "global": "RirekiCalc",
+  "cases": [
+    {
+      "name": "1990-07-18生まれ: 小学校1997年入学・高校2009年卒・大学2013年卒",
+      "func": "schoolYears",
+      "args": [
+        "1990-07-18"
+      ],
+      "expect": {
+        "ok": true,
+        "hayaumare": false,
+        "elemIn": 1997,
+        "elemOut": 2003,
+        "jhsOut": 2006,
+        "hsOut": 2009,
+        "uniIn": 2009,
+        "uniOut": 2013
+      }
+    },
+    {
+      "name": "早生まれ1991-02-15: 1990年生まれの遅生まれと同学年(1997年入学)",
+      "func": "schoolYears",
+      "args": [
+        "1991-02-15"
+      ],
+      "expect": {
+        "ok": true,
+        "hayaumare": true,
+        "elemIn": 1997
+      }
+    },
+    {
+      "name": "4月1日生まれは早生まれ(2000-04-01 → 2006年入学)",
+      "func": "schoolYears",
+      "args": [
+        "2000-04-01"
+      ],
+      "expect": {
+        "ok": true,
+        "hayaumare": true,
+        "elemIn": 2006
+      }
+    },
+    {
+      "name": "4月2日生まれは遅生まれ(2000-04-02 → 2007年入学)",
+      "func": "schoolYears",
+      "args": [
+        "2000-04-02"
+      ],
+      "expect": {
+        "ok": true,
+        "hayaumare": false,
+        "elemIn": 2007
+      }
+    },
+    {
+      "name": "中学・高校の入卒が連続する(2007入学→中2013-2016→高2016-2019)",
+      "func": "schoolYears",
+      "args": [
+        "2000-04-02"
+      ],
+      "expect": {
+        "ok": true,
+        "jhsIn": 2013,
+        "jhsOut": 2016,
+        "hsIn": 2016,
+        "hsOut": 2019,
+        "uniOut": 2023
+      }
+    },
+    {
+      "name": "和暦変換: 2019年 → 令和元年",
+      "func": "wareki",
+      "args": [
+        2019
+      ],
+      "expect": "令和元年"
+    },
+    {
+      "name": "和暦変換: 1997年 → 平成9年",
+      "func": "wareki",
+      "args": [
+        1997
+      ],
+      "expect": "平成9年"
+    },
+    {
+      "name": "和暦変換: 1985年 → 昭和60年",
+      "func": "wareki",
+      "args": [
+        1985
+      ],
+      "expect": "昭和60年"
+    },
+    {
+      "name": "異常入力: 存在しない日付はエラー",
+      "func": "schoolYears",
+      "args": [
+        "2000-02-30"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_date"
+      }
+    },
+    {
+      "name": "異常入力: 形式不正はエラー",
+      "func": "schoolYears",
+      "args": [
+        "2000/04/01"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_date"
+      }
+    }
+  ]
+}

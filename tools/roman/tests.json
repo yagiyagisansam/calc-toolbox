@@ -1,0 +1,128 @@
+{
+  "tool": "roman",
+  "module": "calc.js",
+  "global": "RomanCalc",
+  "cases": [
+    {
+      "name": "2026 → MMXXVI",
+      "func": "toRoman",
+      "args": [
+        2026
+      ],
+      "expect": {
+        "ok": true,
+        "roman": "MMXXVI"
+      }
+    },
+    {
+      "name": "4 → IV(減算則)",
+      "func": "toRoman",
+      "args": [
+        4
+      ],
+      "expect": {
+        "ok": true,
+        "roman": "IV"
+      }
+    },
+    {
+      "name": "9 → IX / 40 → XL の減算則",
+      "func": "toRoman",
+      "args": [
+        1994
+      ],
+      "expect": {
+        "ok": true,
+        "roman": "MCMXCIV"
+      }
+    },
+    {
+      "name": "3999 → MMMCMXCIX(上限)",
+      "func": "toRoman",
+      "args": [
+        3999
+      ],
+      "expect": {
+        "ok": true,
+        "roman": "MMMCMXCIX"
+      }
+    },
+    {
+      "name": "1 → I(下限)",
+      "func": "toRoman",
+      "args": [
+        1
+      ],
+      "expect": {
+        "ok": true,
+        "roman": "I"
+      }
+    },
+    {
+      "name": "逆変換: MMXXVI → 2026",
+      "func": "fromRoman",
+      "args": [
+        "MMXXVI"
+      ],
+      "expect": {
+        "ok": true,
+        "value": 2026
+      }
+    },
+    {
+      "name": "逆変換: 小文字でもOK(mcmxciv → 1994)",
+      "func": "fromRoman",
+      "args": [
+        "mcmxciv"
+      ],
+      "expect": {
+        "ok": true,
+        "value": 1994
+      }
+    },
+    {
+      "name": "異常入力: 0はエラー(ローマ数字に0はない)",
+      "func": "toRoman",
+      "args": [
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "out_of_range"
+      }
+    },
+    {
+      "name": "異常入力: 4000以上はエラー",
+      "func": "toRoman",
+      "args": [
+        4000
+      ],
+      "expect": {
+        "ok": false,
+        "code": "out_of_range"
+      }
+    },
+    {
+      "name": "異常入力: IIII など非標準表記はエラー",
+      "func": "fromRoman",
+      "args": [
+        "IIII"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_roman"
+      }
+    },
+    {
+      "name": "異常入力: ローマ数字以外の文字はエラー",
+      "func": "fromRoman",
+      "args": [
+        "AB12"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_roman"
+      }
+    }
+  ]
+}

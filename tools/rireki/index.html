@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>入学・卒業年 早見計算機(履歴書用・早生まれ対応) | 計算ツールボックス</title>
+  <meta name="description" content="生年月日から小学校〜大学の入学・卒業年を自動計算。履歴書・職務経歴書の学歴欄に。早生まれ(1/1〜4/1)や浪人・留年の調整にも対応した無料ツール。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/rireki/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="入学・卒業年 早見計算機(履歴書用・早生まれ対応) | 計算ツールボックス">
+  <meta property="og:description" content="生年月日から小学校〜大学の入学・卒業年を自動計算。履歴書・職務経歴書の学歴欄に。早生まれ(1/1〜4/1)や浪人・留年の調整にも対応した無料ツール。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/rireki/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"入学・卒業年 早見計算機(履歴書用・早生まれ対応)","item":"https://quick-calc.site/tools/rireki/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>入学・卒業年 早見計算機(履歴書用)</h1>
+  <form class="tool-form" id="rireki-form">
+    <label>生年月日
+      <input type="date" id="birth" min="1900-01-01" max="2100-12-31" required>
+    </label>
+    <label>浪人・留年などの年数(任意)
+      <span class="field-note">高校卒業後に1浪なら「1」</span>
+      <input type="number" id="gap" min="0" max="10" step="1" value="0">
+    </label>
+    <button type="submit">入学・卒業年を計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>履歴書の学歴欄に書く<strong>「○年○月 △△高等学校 卒業」の年</strong>、すぐ出てきますか?生年月日を入れるだけで小学校から大学までの入学・卒業年を<strong>西暦・和暦の両方</strong>で表示します。早生まれ(1月1日〜4月1日)も正しく判定します。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>生年月日を入力します。</li>
+    <li>浪人・留年した年数があれば入力します(大学の入学・卒業に加算されます)。</li>
+    <li>「計算する」を押すと、学歴早見表が西暦・和暦で表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li>学年の区切りは<strong>4月2日生まれ〜翌年4月1日生まれ</strong>です。4月1日生まれの人は誕生日の前日(3月31日)に満6歳に達するため、上の学年になります。</li>
+    <li><strong>小学校入学年</strong>: 4/2〜12/31生まれ→生まれ年+7年の4月 / 1/1〜4/1生まれ(早生まれ)→生まれ年+6年の4月</li>
+    <li>以降は小学校6年・中学校3年・高校3年・大学4年で計算します(入学=4月・卒業=3月)。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>就学時期の考え方は<a href="https://elaws.e-gov.go.jp/document?lawid=322AC0000000026" target="_blank" rel="noopener">学校教育法(昭和22年法律第26号)</a>第17条(満6歳に達した日の翌日以後の最初の学年から)と年齢計算に関する法律の運用に基づきます。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>大学は4年制で計算しています。短大・専門学校(2年)、6年制学部(医・歯・薬など)は卒業年を読み替えてください。</li>
+    <li>浪人・留年・休学がある場合は「調整年数」に合計を入れてください(大学の入学・卒業に加算されます)。</li>
+    <li>9月入学など特殊なケースには対応していません。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 4月1日生まれはなぜ「早生まれ」なのですか?</h3>
+  <p>法律上、年齢は誕生日の前日が終わる瞬間に1つ増えます。4月1日生まれの人は3月31日に満6歳となるため、「4月1日までに満6歳」の条件を満たし、上の学年に入ることになります。</p>
+  <h3>Q. 履歴書は西暦と和暦どちらで書くべきですか?</h3>
+  <p>どちらでも構いませんが、書類全体で統一するのがマナーです。本ツールは両方を表示するので、提出先の書式に合わせてください。</p>
+  <h3>Q. 中退の場合はどう書きますか?</h3>
+  <p>「○年○月 △△大学□□学部 中途退学」と、在籍していた最後の時期を書くのが一般的です。入学年は本ツールの表示が使えます。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../age/">年齢計算機(満年齢・早生まれ・干支)</a></li>
+    <li><a href="../wareki/">西暦・和暦 変換計算機</a></li>
+    <li><a href="../seiza/">星座・誕生石 早見計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  document.getElementById("rireki-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var r = RirekiCalc.schoolYears(document.getElementById("birth").value);
+    if (!r.ok) { box.innerHTML = '<p class="result-error">生年月日を正しく入力してください。</p>'; box.hidden = false; return; }
+    var gap = parseInt(document.getElementById("gap").value || "0", 10);
+    if (!(gap >= 0 && gap <= 10)) gap = 0;
+    var w = RirekiCalc.wareki;
+    function row(label, inY, outY) {
+      return "<tr><td>" + label + "</td><td>" + inY + "年4月<br><span style=\"color:var(--color-muted);font-size:0.85em;\">" + w(inY) + "</span></td><td>" + outY + "年3月<br><span style=\"color:var(--color-muted);font-size:0.85em;\">" + w(outY) + "</span></td></tr>";
+    }
+    box.innerHTML =
+      '<div class="result-main">' + (r.hayaumare ? "早生まれ(上の学年)" : "遅生まれ") + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>学校</th><th>入学</th><th>卒業</th></tr></thead><tbody>' +
+      row("小学校", r.elemIn, r.elemOut) +
+      row("中学校", r.jhsIn, r.jhsOut) +
+      row("高校", r.hsIn, r.hsOut) +
+      row("大学(4年制)", r.uniIn + gap, r.uniOut + gap) +
+      "</tbody></table></div>" +
+      (gap > 0 ? "<p>大学は調整" + gap + "年を加算しています。</p>" : "");
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>
