@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>不動産投資 収支・損益分岐計算機(税金・還付金・キャッシュフロー) | 計算ツールボックス</title>
+  <meta name="description" content="家賃収入・管理費・ローン・本業の年収を入れるだけで、不動産所得と損益通算による所得税・住民税の還付額、年間キャッシュフロー、損益分岐家賃まで一括計算。不動産オーナー・ワンルーム投資の収支確認に。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/fudosan/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="不動産投資 収支・損益分岐計算機(税金・還付金・キャッシュフロー) | 計算ツールボックス">
+  <meta property="og:description" content="家賃収入・管理費・ローン・本業の年収を入れるだけで、不動産所得と損益通算による所得税・住民税の還付額、年間キャッシュフロー、損益分岐家賃まで一括計算。不動産オーナー・ワンルーム投資の収支確認に。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/fudosan/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"不動産投資 収支・損益分岐計算機(税金・還付金・キャッシュフロー)","item":"https://quick-calc.site/tools/fudosan/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>不動産投資 収支・損益分岐計算機</h1>
+  <form class="tool-form" id="fudosan-form">
+    <label>年間の家賃収入(万円)
+      <span class="field-note">月10万円なら120。空室を見込むなら減らして入力</span>
+      <input type="number" id="rent" min="1" max="10000" step="any" required placeholder="例: 120">
+    </label>
+    <label>管理費・修繕積立金など(円/月)
+      <input type="number" id="mgmt" min="0" max="1000000" step="any" required placeholder="例: 10000">
+    </label>
+    <label>固定資産税・都市計画税(円/年)
+      <input type="number" id="proptax" min="0" max="10000000" step="any" required placeholder="例: 100000">
+    </label>
+    <label>雑費・修繕費など(円/年)
+      <span class="field-note">賃貸管理手数料・保険料・交通費・通信費など</span>
+      <input type="number" id="misc" min="0" max="10000000" step="any" required placeholder="例: 100000">
+    </label>
+    <label>減価償却費(円/年)
+      <span class="field-note">建物価格÷耐用年数の目安。不明なら0でも計算可(税効果が小さく出ます)</span>
+      <input type="number" id="dep" min="0" max="10000000" step="any" value="0">
+    </label>
+    <label>借入額(万円)
+      <input type="number" id="principal" min="1" max="100000" step="any" required placeholder="例: 2000">
+    </label>
+    <label>金利(年%)
+      <input type="number" id="rate" min="0" max="20" step="0.01" value="2" required>
+    </label>
+    <label>返済期間(年)
+      <input type="number" id="years" min="1" max="50" step="1" value="25" required>
+    </label>
+    <label>借入のうち土地取得分の割合(%・任意)
+      <span class="field-note">区分マンションの目安2〜4割。赤字の損益通算制限の計算に使用(不明なら0)</span>
+      <input type="number" id="landratio" min="0" max="100" step="1" value="0">
+    </label>
+    <label>本業の給与年収(万円・額面)
+      <input type="number" id="salary" min="0" max="100000" step="any" required placeholder="例: 600">
+    </label>
+    <label>社会保険料(円/年・任意)
+      <span class="field-note">源泉徴収票の社会保険料等の金額。空欄なら年収の15%で概算</span>
+      <input type="number" id="socialins" min="0" max="100000000" step="any" placeholder="空欄=年収の15%">
+    </label>
+    <label>その他の所得控除(円/年・任意)
+      <span class="field-note">iDeCo・生命保険料控除・配偶者控除など(基礎控除は自動)</span>
+      <input type="number" id="otherded" min="0" max="100000000" step="any" value="0">
+    </label>
+    <button type="submit">収支と損益分岐を計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    本ツールは<strong>概算シミュレーション</strong>です。税額は速算表による簡易計算で、個別の控除・青色申告特別控除・住民税の調整控除などは反映していません。実際の申告・投資判断は<strong>税理士等の専門家</strong>にご確認ください。
+  </div>
+
+  <p>ワンルーム投資や賃貸経営で本当に知りたいのは「結局、手元にいくら残るのか」。家賃収入・経費・ローン・本業の年収を入れると、<strong>不動産所得 → 損益通算による所得税・住民税の還付(または増税)→ 年間キャッシュフロー → 損益分岐家賃</strong>まで一気通貫で計算します。<a href="../loan/">ローン返済計算機</a>の不動産オーナー向け拡張版です。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>物件の家賃収入と経費(管理費・固定資産税・雑費・減価償却費)を入力します。</li>
+    <li>ローンの条件(借入額・金利・期間)を入力します。</li>
+    <li>本業の給与年収を入力します(還付額の計算に使います)。</li>
+    <li>「計算する」を押すと、税金・還付金・キャッシュフロー・損益分岐がまとめて表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>ローン返済</strong>: 元利均等返済で毎月の返済額を計算し、初年度の支払利息を月ごとの残高から積算します。</li>
+    <li><strong>不動産所得 = 家賃収入 −(管理費+固定資産税+雑費+減価償却費+支払利息)</strong>。ローンの元金返済分は経費になりません。</li>
+    <li><strong>損益通算</strong>: 不動産所得が赤字の場合、給与所得から差し引いて所得税・住民税が軽減されます(確定申告による還付)。ただし<strong>土地取得に係る借入利息分の赤字は通算できません</strong>(租税特別措置法)。</li>
+    <li><strong>税額の概算</strong>: 給与所得控除(令和7年改正後)・基礎控除(所得税58万円/住民税43万円)・社会保険料控除を適用し、所得税の速算表+復興特別所得税2.1%と住民税所得割10%で、通算前後の差額=還付額を計算します。</li>
+    <li><strong>年間キャッシュフロー = 家賃収入 − 現金経費 − 年間返済額 + 税効果</strong>。減価償却費は現金支出ではないため含めません(帳簿は赤字でも手残りが黒字、の逆転が起きる理由です)。</li>
+    <li><strong>損益分岐家賃</strong>: キャッシュフローが0になる年間家賃を逆算します。入力家賃に対する割合が低いほど、空室や家賃下落への耐性が高い物件です。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>所得税の速算表・給与所得控除・基礎控除: <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2260.htm" target="_blank" rel="noopener">国税庁タックスアンサー No.2260(所得税の税率)</a>ほか国税庁の解説</li>
+    <li>不動産所得と損益通算・土地利息の制限: <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1391.htm" target="_blank" rel="noopener">国税庁タックスアンサー No.1391(不動産所得が赤字のときの他の所得との通算)</a></li>
+    <li>住民税所得割10%は標準税率(均等割・調整控除・自治体差は未反映)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>初年度ベースの概算です。2年目以降は利息の減少・家賃下落・修繕の発生で収支が変わります。また購入初年度は登記費用・不動産取得税などでさらに経費が出ます。</li>
+    <li>減価償却費は建物の構造・築年数で大きく変わります(RC47年・木造22年など)。売買契約書の建物価格÷耐用年数が目安です。</li>
+    <li>青色申告特別控除(最大65万円)・専従者給与などの節税策は含めていません。</li>
+    <li>「節税になるから」という営業トークの物件は、税還付を含めてもキャッシュフローが赤字のことがあります。本ツールの「年間キャッシュフロー」でご確認ください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 帳簿は赤字なのにキャッシュフローが黒字(またはその逆)なのはなぜですか?</h3>
+  <p>減価償却費(現金が出ていかない経費)とローン元金返済(経費にならない現金支出)のずれが原因です。帳簿の赤字は税還付を生み、元金返済は帳簿に現れず現金を減らします。両方を見るのが不動産投資の基本です。</p>
+  <h3>Q. 還付金はいつ・どうやって受け取れますか?</h3>
+  <p>翌年2〜3月の確定申告で不動産所得の赤字を申告すると、給与から源泉徴収された所得税の一部が1〜2ヶ月後に振り込まれます。住民税は翌年度の税額が軽くなる形で反映されます。</p>
+  <h3>Q. 土地分の利息が損益通算できないとはどういうことですか?</h3>
+  <p>不動産所得が赤字のとき、その赤字のうち「土地を買うための借入利息」に相当する部分は給与と通算できない決まりです(建物分は通算可)。土地割合の高い物件ほど節税効果は小さくなります。本ツールでは土地割合を入力すると自動で制限を反映します。</p>
+  <h3>Q. 損益分岐家賃が入力家賃より高いのですが?</h3>
+  <p>現状の家賃では毎年持ち出し(赤字)という意味です。繰上返済・金利交渉・経費削減・家賃アップのいずれかで分岐点を下回らせるか、売却も含めて検討する状況です。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../loan/">ローン返済 計算機(毎月の返済額)</a></li>
+    <li><a href="../kariire/">住宅ローン 借入可能額 計算機</a></li>
+    <li><a href="../hiwari/">家賃日割り計算機</a></li>
+    <li><a href="../genka/">利益率・原価率 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var MSG = {
+    invalid_rent: "家賃収入を1万円以上で入力してください。",
+    invalid_mgmt: "管理費を0以上で入力してください。",
+    invalid_proptax: "固定資産税を0以上で入力してください。",
+    invalid_misc: "雑費を0以上で入力してください。",
+    invalid_dep: "減価償却費を0以上で入力してください。",
+    invalid_principal: "借入額を1万円以上で入力してください。",
+    invalid_rate: "金利は0〜20%で入力してください。",
+    invalid_years: "返済期間は1〜50年の整数で入力してください。",
+    invalid_landratio: "土地割合は0〜100%で入力してください。",
+    invalid_salary: "給与年収を0以上で入力してください。",
+    invalid_socialins: "社会保険料を0以上で入力してください。",
+    invalid_deduction: "その他の控除を0以上で入力してください。"
+  };
+  function yen(v) { return v.toLocaleString() + "円"; }
+  document.getElementById("fudosan-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var si = document.getElementById("socialins").value;
+    var r = FudosanCalc.simulate({
+      rent: parseFloat(document.getElementById("rent").value) * 10000,
+      mgmtMonthly: parseFloat(document.getElementById("mgmt").value),
+      propTax: parseFloat(document.getElementById("proptax").value),
+      misc: parseFloat(document.getElementById("misc").value),
+      depreciation: parseFloat(document.getElementById("dep").value || "0"),
+      principal: parseFloat(document.getElementById("principal").value) * 10000,
+      ratePct: parseFloat(document.getElementById("rate").value),
+      years: parseInt(document.getElementById("years").value, 10),
+      landRatioPct: parseFloat(document.getElementById("landratio").value || "0"),
+      salary: parseFloat(document.getElementById("salary").value) * 10000,
+      socialIns: si === "" ? null : parseFloat(si),
+      otherDeduction: parseFloat(document.getElementById("otherded").value || "0")
+    });
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var cfClass = r.annualCF >= 0 ? "" : ' style="color:#b3261e;"';
+    var taxLine = r.taxEffect > 0
+      ? "還付・軽減 <strong>約" + yen(r.taxEffect) + "</strong>(所得税+住民税)"
+      : r.taxEffect < 0
+        ? "税負担増 <strong>約" + yen(-r.taxEffect) + "</strong>(不動産所得が黒字のため)"
+        : "税額への影響なし" + (r.disallowedLoss > 0 ? "(赤字が土地利息分のため損益通算不可)" : "");
+    box.innerHTML =
+      '<div class="result-main"' + cfClass + ">年間キャッシュフロー " + (r.annualCF >= 0 ? "+" : "") + yen(r.annualCF) + "</div>" +
+      "<p>月あたり " + (r.monthlyCF >= 0 ? "+" : "") + yen(r.monthlyCF) + "</p>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>毎月のローン返済</td><td>" + yen(r.monthly) + "(年" + yen(r.annualPay) + ")</td></tr>" +
+      "<tr><td>初年度の支払利息(概算)</td><td>" + yen(r.interestY1) + "</td></tr>" +
+      "<tr><td>不動産所得(帳簿)</td><td>" + (r.realEstateIncome >= 0 ? "+" : "") + yen(r.realEstateIncome) + "</td></tr>" +
+      (r.disallowedLoss > 0 ? "<tr><td>うち損益通算できない赤字(土地利息分)</td><td>" + yen(r.disallowedLoss) + "</td></tr>" : "") +
+      "<tr><td>税効果</td><td>" + taxLine + "</td></tr>" +
+      "<tr><td>税額(通算前→通算後)</td><td>" + yen(r.taxBefore) + " → " + yen(r.taxAfter) + "</td></tr>" +
+      "<tr><td>損益分岐の年間家賃</td><td><strong>約" + yen(r.breakEvenRent) + "</strong>(入力家賃の" + r.breakEvenPct.toLocaleString() + "%)</td></tr>" +
+      "</tbody></table></div>" +
+      "<p>" + (r.breakEvenPct <= 100
+        ? "入力家賃が損益分岐を上回っており、この条件では手残りがプラスです。空室・家賃下落が" + Math.round(100 - r.breakEvenPct) + "%以内なら耐えられる計算です。"
+        : "この条件では毎年持ち出しです。損益分岐に届くには家賃ベースであと約" + (r.breakEvenPct - 100).toLocaleString() + "%必要です。") + "</p>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>
