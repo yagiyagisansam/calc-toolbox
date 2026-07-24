@@ -1,0 +1,79 @@
+{
+  "tool": "hensachi",
+  "module": "calc.js",
+  "global": "HensachiCalc",
+  "cases": [
+    {
+      "name": "80点(平均60・標準偏差15) → 偏差値63.3",
+      "func": "fromStats",
+      "args": [80, 60, 15],
+      "expect": { "ok": true, "t": 63.3 }
+    },
+    {
+      "name": "45点(平均60・標準偏差15) → 偏差値40.0",
+      "func": "fromStats",
+      "args": [45, 60, 15],
+      "expect": { "ok": true, "t": 40 }
+    },
+    {
+      "name": "平均点ちょうどは偏差値50",
+      "func": "fromStats",
+      "args": [60, 60, 15],
+      "expect": { "ok": true, "t": 50 }
+    },
+    {
+      "name": "ばらつきが小さい集団では高偏差値(95点・平均70・SD8 → 81.3)",
+      "func": "fromStats",
+      "args": [95, 70, 8],
+      "expect": { "ok": true, "t": 81.3 }
+    },
+    {
+      "name": "点数リスト分析([80,65,70,90,55]): 平均72・SD12.08",
+      "func": "analyze",
+      "args": [[80, 65, 70, 90, 55]],
+      "expect": { "ok": true, "mean": 72, "sd": 12.08, "results": [{ "score": 80, "t": 56.6 }, { "score": 65, "t": 44.2 }, { "score": 70, "t": 48.3 }, { "score": 90, "t": 64.9 }, { "score": 55, "t": 35.9 }] }
+    },
+    {
+      "name": "点数リスト分析([50,50,60]): 平均53.33・SD4.71・60点は偏差値64.1",
+      "func": "analyze",
+      "args": [[50, 50, 60]],
+      "expect": { "ok": true, "mean": 53.33, "sd": 4.71 }
+    },
+    {
+      "name": "異常入力: 全員同じ点数は標準偏差0でエラー",
+      "func": "analyze",
+      "args": [[70, 70, 70]],
+      "expect": { "ok": false, "code": "zero_sd" }
+    },
+    {
+      "name": "異常入力: 1件だけのリストはエラー",
+      "func": "analyze",
+      "args": [[70]],
+      "expect": { "ok": false, "code": "invalid_list" }
+    },
+    {
+      "name": "異常入力: 標準偏差0はエラー",
+      "func": "fromStats",
+      "args": [80, 60, 0],
+      "expect": { "ok": false, "code": "invalid_sd" }
+    },
+    {
+      "name": "異常入力: 負の得点はエラー",
+      "func": "fromStats",
+      "args": [-10, 60, 15],
+      "expect": { "ok": false, "code": "invalid_score" }
+    },
+    {
+      "name": "異常入力: 得点が範囲超過(1001)はエラー",
+      "func": "fromStats",
+      "args": [1001, 60, 15],
+      "expect": { "ok": false, "code": "invalid_score" }
+    },
+    {
+      "name": "異常入力: リスト内に数値でない値はエラー",
+      "func": "analyze",
+      "args": [[80, "abc", 70]],
+      "expect": { "ok": false, "code": "invalid_score" }
+    }
+  ]
+}

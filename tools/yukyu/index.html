@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>有給休暇の付与日数 計算機(パート・アルバイト対応) | 計算ツールボックス</title>
+  <meta name="description" content="勤続年数と働き方(週の勤務日数)から年次有給休暇の付与日数を無料で計算。パート・アルバイトの比例付与にも対応。労働基準法に基づく日数と年5日取得義務も表示します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/yukyu/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="有給休暇の付与日数 計算機(パート・アルバイト対応) | 計算ツールボックス">
+  <meta property="og:description" content="勤続年数と働き方(週の勤務日数)から年次有給休暇の付与日数を無料で計算。パート・アルバイトの比例付与にも対応。労働基準法に基づく日数と年5日取得義務も表示します。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/yukyu/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"有給休暇の付与日数 計算機(パート・アルバイト対応)","item":"https://quick-calc.site/tools/yukyu/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>有給休暇の付与日数 計算機</h1>
+  <p>勤続年数と働き方を選ぶと、労働基準法に基づく<strong>年次有給休暇の付与日数</strong>を表示します。パート・アルバイト(週4日以下)の比例付与にも対応。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="yukyu-form">
+    <label>働き方
+      <select id="worker-type">
+        <option value="full">週5日以上 または 週30時間以上(正社員・フルタイム等)</option>
+        <option value="d4">週4日(かつ週30時間未満)</option>
+        <option value="d3">週3日(かつ週30時間未満)</option>
+        <option value="d2">週2日(かつ週30時間未満)</option>
+        <option value="d1">週1日(かつ週30時間未満)</option>
+      </select>
+    </label>
+    <label>勤続年数
+      <select id="service">
+        <option value="0">6ヶ月</option>
+        <option value="1">1年6ヶ月</option>
+        <option value="2">2年6ヶ月</option>
+        <option value="3">3年6ヶ月</option>
+        <option value="4">4年6ヶ月</option>
+        <option value="5">5年6ヶ月</option>
+        <option value="6">6年6ヶ月以上</option>
+      </select>
+    </label>
+    <button type="submit">付与日数を調べる</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    付与には「雇入れから6ヶ月継続勤務」かつ「全労働日の<strong>8割以上出勤</strong>」が必要です。表示は法律上の最低日数で、会社がこれより多く付与している場合もあります。
+  </div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>働き方(週の所定労働日数)を選びます。週30時間以上働いている場合は日数にかかわらず「週5日以上または週30時間以上」を選んでください。</li>
+    <li>勤続年数を選んで「付与日数を調べる」を押します。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <p>労働基準法第39条と同施行規則の付与日数表によります。</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>年次有給休暇の付与日数(法定)</caption>
+      <thead><tr><th>働き方\勤続</th><th>0.5年</th><th>1.5年</th><th>2.5年</th><th>3.5年</th><th>4.5年</th><th>5.5年</th><th>6.5年〜</th></tr></thead>
+      <tbody>
+        <tr><td>週5日〜/30h〜</td><td>10</td><td>11</td><td>12</td><td>14</td><td>16</td><td>18</td><td>20</td></tr>
+        <tr><td>週4日</td><td>7</td><td>8</td><td>9</td><td>10</td><td>12</td><td>13</td><td>15</td></tr>
+        <tr><td>週3日</td><td>5</td><td>6</td><td>6</td><td>8</td><td>9</td><td>10</td><td>11</td></tr>
+        <tr><td>週2日</td><td>3</td><td>4</td><td>4</td><td>5</td><td>6</td><td>6</td><td>7</td></tr>
+        <tr><td>週1日</td><td>1</td><td>2</td><td>2</td><td>2</td><td>3</td><td>3</td><td>3</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>労働基準法 第39条(年次有給休暇)<br>
+      <a href="https://laws.e-gov.go.jp/law/322AC0000000049" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/322AC0000000049</a>(2026年7月18日参照)</li>
+    <li>労働基準法施行規則 第24条の3(比例付与の日数)<br>
+      <a href="https://laws.e-gov.go.jp/law/322M40000100023" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/322M40000100023</a>(2026年7月18日参照)</li>
+    <li>厚生労働省 愛媛労働局「年次有給休暇に関するQ&A」(付与日数表)<br>
+      <a href="https://jsite.mhlw.go.jp/ehime-roudoukyoku/yokuaru_goshitsumon/shurouchu/2040202.html" rel="noopener" target="_blank">https://jsite.mhlw.go.jp/ehime-roudoukyoku/yokuaru_goshitsumon/shurouchu/2040202.html</a>(2026年7月18日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>有給休暇の時効は2年です(前年の残りと合わせて最大40日まで保有できます)。</li>
+    <li>付与日数が10日以上の年は、会社に「年5日を取得させる義務」があります(パートでも勤続が長く10日以上付与されれば対象)。</li>
+    <li>「継続勤務」は在籍期間で数えます。契約更新を繰り返しているパート・アルバイトも通算されます。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. パートでも有給はもらえますか?</h3>
+  <p>もらえます。週1日勤務でも、6ヶ月継続勤務と8割出勤の条件を満たせば法律上必ず付与されます(上の表の比例付与)。</p>
+  <h3>Q. 有給を使ったときの給料はいくらですか?</h3>
+  <p>①通常の賃金 ②平均賃金 ③標準報酬日額(労使協定が必要)のいずれかで、会社の就業規則で決まっています。多くの会社は①通常の賃金です。</p>
+  <h3>Q. 会社が有給をくれない場合は?</h3>
+  <p>年次有給休暇は法律上の権利で、会社の承認は不要です(会社ができるのは時季変更のみ)。付与されない・取らせてもらえない場合は労働基準監督署に相談できます。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../zangyo/">残業代 計算機</a></li>
+    <li><a href="../jikyu/">時給⇔月収・年収 換算計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  document.getElementById("yukyu-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var r = YukyuCalc.grantedDays(
+      document.getElementById("worker-type").value,
+      parseInt(document.getElementById("service").value, 10));
+    var box = document.getElementById("result");
+    if (r.ok) {
+      box.innerHTML =
+        '<div class="result-main">' + r.days + " 日</div>" +
+        "<p>勤続" + r.serviceLabel + "で付与される法定日数です。" +
+        (r.obligation5days ? "<br><strong>年5日の取得義務の対象</strong>(会社は年5日取得させる義務があります)。" : "") + "</p>";
+    } else {
+      box.innerHTML = '<p class="result-error">入力値を確認してください。</p>';
+    }
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

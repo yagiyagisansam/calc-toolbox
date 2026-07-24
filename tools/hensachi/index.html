@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>偏差値 計算機(点数と平均点から・点数リストからも) | 計算ツールボックス</title>
+  <meta name="description" content="得点・平均点・標準偏差から偏差値を無料で計算。点数のリストを貼り付けて平均・標準偏差・全員分の偏差値を一括計算することもできます。計算式も明記。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/hensachi/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="偏差値 計算機(点数と平均点から・点数リストからも) | 計算ツールボックス">
+  <meta property="og:description" content="得点・平均点・標準偏差から偏差値を無料で計算。点数のリストを貼り付けて平均・標準偏差・全員分の偏差値を一括計算することもできます。計算式も明記。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/hensachi/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"偏差値 計算機(点数と平均点から・点数リストからも)","item":"https://quick-calc.site/tools/hensachi/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>偏差値 計算機</h1>
+  <p><strong>得点・平均点・標準偏差</strong>から偏差値を計算します。標準偏差がわからなくても、<strong>点数のリスト</strong>(クラス全員の点数など)を入力すれば平均・標準偏差・全員分の偏差値を一括計算できます。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="stats-form">
+    <label>① 得点・平均点・標準偏差から</label>
+    <label>あなたの得点
+      <input type="number" id="s-score" inputmode="decimal" step="any" min="0" max="1000" placeholder="80" required>
+    </label>
+    <label>平均点
+      <input type="number" id="s-mean" inputmode="decimal" step="any" min="0" max="1000" placeholder="60" required>
+    </label>
+    <label>標準偏差
+      <span class="field-note">模試の成績表に記載されています(例: 15)</span>
+      <input type="number" id="s-sd" inputmode="decimal" step="any" min="0.01" max="500" placeholder="15" required>
+    </label>
+    <button type="submit">偏差値を計算</button>
+  </form>
+
+  <form class="tool-form" id="list-form">
+    <label>② 点数リストから一括計算
+      <span class="field-note">カンマ・スペース・改行区切りで2〜1000件(例: 80, 65, 70, 90, 55)</span>
+      <input type="text" id="scores" placeholder="80, 65, 70, 90, 55">
+    </label>
+    <button type="submit">平均・標準偏差・偏差値を計算</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    偏差値は<strong>受験した集団の中での相対的な位置</strong>を表す値です。集団(模試の受験者層)が変われば、同じ実力でも偏差値は変わります。異なる模試の偏差値を直接比べることはできません。
+  </div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>模試の成績表に「平均点」「標準偏差」があれば①に入力してください。</li>
+    <li>クラスの小テストなど全員の点数がわかる場合は、②に点数を並べて入力すると全員分を一括計算できます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>偏差値 = 50 + 10 × (得点 − 平均点) ÷ 標準偏差</strong></li>
+    <li>点数リストからの計算では、平均 = 合計÷人数、標準偏差 = 平均からの差の2乗平均の平方根(母標準偏差)を使います。</li>
+    <li>計算例: 平均60点・標準偏差15のテストで80点 → 50 + 10×(80−60)÷15 = <strong>偏差値63.3</strong></li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>統計学の標準的な定義(偏差値=平均50・標準偏差10に規格化した得点)による計算です。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>点数リストからの計算は「入力した点数の集団=全体」とみなす母標準偏差です。標本標準偏差(n−1で割る方式)を使う場合とは値がわずかに異なります。</li>
+    <li>受験者が少ない集団(クラス単位など)の偏差値は振れ幅が大きく、参考程度にとどめてください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 偏差値はどこまで上がる(下がる)のですか?</h3>
+  <p>理論上の上限・下限はありません。集団の中で極端に高い(低い)点を取ると偏差値80超や20未満もあり得ます(満点者が多いテストなどで起こります)。</p>
+  <h3>Q. 標準偏差が成績表に載っていません。</h3>
+  <p>平均点だけでは偏差値は計算できません。全員の点数がわかる場合は②のリスト計算を、模試であれば主催者の成績資料をご確認ください。</p>
+  <h3>Q. 5教科の合計の偏差値は各教科の平均ですか?</h3>
+  <p>違います。合計点の偏差値は「合計点の分布」から計算するもので、各教科の偏差値の平均とは一般に一致しません(近い値になることは多いです)。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../percent/">パーセント計算機</a></li>
+    <li><a href="../age/">年齢計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var ERROR_MESSAGES = {
+    invalid_score: "得点は 0〜1000 の範囲で入力してください。",
+    invalid_mean: "平均点は 0〜1000 の範囲で入力してください。",
+    invalid_sd: "標準偏差は 0.01〜500 の範囲で入力してください。",
+    invalid_list: "点数は 2〜1000件 入力してください。",
+    zero_sd: "全員が同じ点数のため偏差値を計算できません(ばらつきが0)。"
+  };
+  function showError(code) {
+    box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "入力値を確認してください。") + "</p>";
+    box.hidden = false;
+  }
+  document.getElementById("stats-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var r = HensachiCalc.fromStats(
+      parseFloat(document.getElementById("s-score").value),
+      parseFloat(document.getElementById("s-mean").value),
+      parseFloat(document.getElementById("s-sd").value));
+    if (!r.ok) { showError(r.code); return; }
+    box.innerHTML = '<div class="result-main">偏差値 ' + r.t.toFixed(1) + "</div>";
+    box.hidden = false;
+  });
+  document.getElementById("list-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var scores = document.getElementById("scores").value
+      .split(/[\s,、]+/).filter(function (s) { return s !== ""; })
+      .map(function (s) { return parseFloat(s); });
+    var r = HensachiCalc.analyze(scores);
+    if (!r.ok) { showError(r.code); return; }
+    var rows = r.results.map(function (x) {
+      return "<tr><td>" + x.score + "</td><td>" + x.t.toFixed(1) + "</td></tr>";
+    }).join("");
+    box.innerHTML =
+      '<div class="result-main">平均 ' + r.mean.toLocaleString() + " 点 / 標準偏差 " + r.sd.toLocaleString() + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>点数</th><th>偏差値</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

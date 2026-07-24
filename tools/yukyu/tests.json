@@ -1,0 +1,91 @@
+{
+  "tool": "yukyu",
+  "module": "calc.js",
+  "global": "YukyuCalc",
+  "cases": [
+    {
+      "name": "通常の労働者・6ヶ月 → 10日(年5日義務の対象)",
+      "func": "grantedDays",
+      "args": ["full", 0],
+      "expect": { "ok": true, "days": 10, "serviceLabel": "6ヶ月", "obligation5days": true }
+    },
+    {
+      "name": "通常の労働者・6年6ヶ月以上 → 上限20日",
+      "func": "grantedDays",
+      "args": ["full", 6],
+      "expect": { "ok": true, "days": 20, "obligation5days": true }
+    },
+    {
+      "name": "通常の労働者・3年6ヶ月 → 14日(加算が2日刻みに変わる境界)",
+      "func": "grantedDays",
+      "args": ["full", 3],
+      "expect": { "ok": true, "days": 14 }
+    },
+    {
+      "name": "週4日・6ヶ月 → 7日(義務対象外)",
+      "func": "grantedDays",
+      "args": ["d4", 0],
+      "expect": { "ok": true, "days": 7, "obligation5days": false }
+    },
+    {
+      "name": "週4日・3年6ヶ月 → 10日(比例付与でも10日に達すると義務対象)",
+      "func": "grantedDays",
+      "args": ["d4", 3],
+      "expect": { "ok": true, "days": 10, "obligation5days": true }
+    },
+    {
+      "name": "週4日・6年6ヶ月以上 → 15日",
+      "func": "grantedDays",
+      "args": ["d4", 6],
+      "expect": { "ok": true, "days": 15 }
+    },
+    {
+      "name": "週3日・2年6ヶ月 → 6日",
+      "func": "grantedDays",
+      "args": ["d3", 2],
+      "expect": { "ok": true, "days": 6 }
+    },
+    {
+      "name": "週3日・6年6ヶ月以上 → 11日",
+      "func": "grantedDays",
+      "args": ["d3", 6],
+      "expect": { "ok": true, "days": 11 }
+    },
+    {
+      "name": "週2日・4年6ヶ月 → 6日",
+      "func": "grantedDays",
+      "args": ["d2", 4],
+      "expect": { "ok": true, "days": 6 }
+    },
+    {
+      "name": "週1日・6ヶ月 → 1日",
+      "func": "grantedDays",
+      "args": ["d1", 0],
+      "expect": { "ok": true, "days": 1 }
+    },
+    {
+      "name": "週1日・6年6ヶ月以上 → 3日(4年6ヶ月以降は3日で頭打ち)",
+      "func": "grantedDays",
+      "args": ["d1", 6],
+      "expect": { "ok": true, "days": 3, "obligation5days": false }
+    },
+    {
+      "name": "異常入力: 不明な働き方区分はエラー",
+      "func": "grantedDays",
+      "args": ["d5", 0],
+      "expect": { "ok": false, "code": "invalid_worker_type" }
+    },
+    {
+      "name": "異常入力: 勤続区分が範囲外はエラー",
+      "func": "grantedDays",
+      "args": ["full", 7],
+      "expect": { "ok": false, "code": "invalid_service" }
+    },
+    {
+      "name": "異常入力: 勤続区分が小数はエラー",
+      "func": "grantedDays",
+      "args": ["full", 1.5],
+      "expect": { "ok": false, "code": "invalid_service" }
+    }
+  ]
+}

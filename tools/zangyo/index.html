@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>残業代 計算機(割増賃金・法定の割増率で計算) | 計算ツールボックス</title>
+  <meta name="description" content="基礎時給と残業時間から残業代(割増賃金)を無料で計算。時間外25%・月60時間超50%・法定休日35%・深夜+25%の法定割増率に対応。月給からの時給換算もできます。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/zangyo/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="残業代 計算機(割増賃金・法定の割増率で計算) | 計算ツールボックス">
+  <meta property="og:description" content="基礎時給と残業時間から残業代(割増賃金)を無料で計算。時間外25%・月60時間超50%・法定休日35%・深夜+25%の法定割増率に対応。月給からの時給換算もできます。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/zangyo/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"残業代 計算機(割増賃金・法定の割増率で計算)","item":"https://quick-calc.site/tools/zangyo/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>残業代 計算機(割増賃金)</h1>
+  <p>基礎時給と残業時間を入力すると、<strong>法定の最低割増率</strong>に基づく残業代(割増賃金)を計算します。「自分の残業代はいくらのはず?」の目安に。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="hourly-form">
+    <label>月給から基礎時給を出す(時給がわかる方は下へ)
+      <span class="field-note">月給は割増の基礎となる額(基本給+役職手当等。家族手当・通勤手当・住宅手当等は除く)</span>
+    </label>
+    <label>月給(円)
+      <input type="number" id="monthly" inputmode="numeric" step="1" min="50000" max="10000000" placeholder="300000">
+    </label>
+    <label>月平均所定労働時間
+      <span class="field-note">例: 160。(365日−年間休日)×1日の所定労働時間÷12 で計算できます</span>
+      <input type="number" id="avg-hours" inputmode="decimal" step="any" min="100" max="200" placeholder="160">
+    </label>
+    <button type="submit">時給に換算</button>
+  </form>
+
+  <form class="tool-form" id="zangyo-form">
+    <label>基礎時給(円)
+      <input type="number" id="hourly" inputmode="decimal" step="any" min="500" max="50000" placeholder="1875" required>
+    </label>
+    <label>時間外労働(月60時間以内の分・時間)
+      <input type="number" id="ot" inputmode="decimal" step="any" min="0" max="200" value="0">
+    </label>
+    <label>時間外労働のうち月60時間を超える分(時間)
+      <input type="number" id="ot60" inputmode="decimal" step="any" min="0" max="200" value="0">
+    </label>
+    <label>法定休日労働(時間)
+      <span class="field-note">週1日の法定休日に働いた時間</span>
+      <input type="number" id="holiday" inputmode="decimal" step="any" min="0" max="200" value="0">
+    </label>
+    <label>深夜労働(22時〜5時・時間)
+      <span class="field-note">加算分(+25%)を計算します。時間外や休日と重なる時間も入力してOK</span>
+      <input type="number" id="night" inputmode="decimal" step="any" min="0" max="200" value="0">
+    </label>
+    <button type="submit">残業代を計算</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    このツールは<strong>法定の最低割増率</strong>による概算です。会社の就業規則がこれより高い割増率を定めている場合や、変形労働時間制・固定残業代(みなし残業)・管理監督者の扱いなどにより、実際の金額は異なります。未払いが疑われる場合は労働基準監督署・専門家にご相談ください。
+  </div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>時給がわからない場合は、月給と月平均所定労働時間を入れて「時給に換算」を押します(結果が下の欄に自動で入ります)。</li>
+    <li>残業の内訳(時間外・60時間超・法定休日・深夜)を時間で入力します。</li>
+    <li>「残業代を計算」で内訳つきの金額が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <p>労働基準法が定める最低割増率で計算しています。</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>法定の割増賃金率</caption>
+      <thead><tr><th>種類</th><th>割増率</th><th>計算</th></tr></thead>
+      <tbody>
+        <tr><td>時間外労働(法定8時間/週40時間超)</td><td>25%以上</td><td>時給×1.25×時間</td></tr>
+        <tr><td>時間外労働(月60時間を超える分)</td><td>50%以上</td><td>時給×1.5×時間</td></tr>
+        <tr><td>法定休日労働</td><td>35%以上</td><td>時給×1.35×時間</td></tr>
+        <tr><td>深夜労働(22時〜5時)</td><td>25%以上を加算</td><td>時給×0.25×時間(加算分)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>計算例: 時給1,500円で時間外20時間 → 1,500×1.25×20 = <strong>37,500円</strong></p>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>労働基準法 第37条(時間外25%・月60時間超50%・深夜の割増)<br>
+      <a href="https://laws.e-gov.go.jp/law/322AC0000000049" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/322AC0000000049</a>(2026年7月18日参照)</li>
+    <li>労働基準法第37条第1項の割増賃金に係る率の最低限度を定める政令(法定休日35%)<br>
+      <a href="https://laws.e-gov.go.jp/law/406CO0000000005" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/406CO0000000005</a>(2026年7月18日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>「基礎時給」は割増賃金の算定基礎です。家族手当・通勤手当・別居手当・子女教育手当・住宅手当・臨時の賃金・賞与は基礎から除外されます。</li>
+    <li>深夜分は「+25%の加算分のみ」を表示しています(深夜労働の基本部分の賃金は通常の給与に含まれるため)。時間外かつ深夜の場合、時間外欄と深夜欄の両方に同じ時間を入れると合計で1.5倍相当になります。</li>
+    <li>所定労働時間が法定(8時間)より短い場合の「法定内残業」は割増不要のため、この計算とは異なります。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 固定残業代(みなし残業)がある場合は?</h3>
+  <p>固定残業代が「何時間分」かを確認し、実際の残業がそれを超えた分には追加の支払いが必要です。本ツールで実残業の金額を計算し、固定残業代と比べてみてください。</p>
+  <h3>Q. 土曜出勤は35%の休日労働ですか?</h3>
+  <p>35%になるのは週1日の「法定休日」の労働だけです。週休2日制の場合、多くは片方が法定休日でもう片方は所定休日(この場合は時間外の25%扱いが一般的)です。会社の就業規則でどちらが法定休日かご確認ください。</p>
+  <h3>Q. アルバイトにも残業代は付きますか?</h3>
+  <p>付きます。雇用形態にかかわらず、法定労働時間(1日8時間・週40時間)を超えれば割増賃金の対象です。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../jikyu/">時給⇔月収・年収 換算計算機</a></li>
+    <li><a href="../yukyu/">有給休暇の付与日数 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var ERROR_MESSAGES = {
+    invalid_hourly: "基礎時給は 500〜50,000円 の範囲で入力してください。",
+    invalid_hours: "時間は 0〜200時間 の範囲で入力してください。",
+    invalid_monthly: "月給は 50,000〜10,000,000円 の範囲で入力してください。",
+    invalid_avg_hours: "月平均所定労働時間は 100〜200 の範囲で入力してください。"
+  };
+  function showError(code) {
+    box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "入力値を確認してください。") + "</p>";
+    box.hidden = false;
+  }
+  document.getElementById("hourly-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var r = ZangyoCalc.hourlyFromMonthly(
+      parseFloat(document.getElementById("monthly").value),
+      parseFloat(document.getElementById("avg-hours").value));
+    if (!r.ok) { showError(r.code); return; }
+    document.getElementById("hourly").value = r.hourlyYen;
+    box.innerHTML = '<div class="result-main">基礎時給 約' + r.hourlyYen.toLocaleString() + " 円</div><p>下の残業代計算の欄に自動入力しました。</p>";
+    box.hidden = false;
+  });
+  document.getElementById("zangyo-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var num = function (id) { return parseFloat(document.getElementById(id).value || "0"); };
+    var r = ZangyoCalc.calculate(num("hourly"), num("ot"), num("ot60"), num("holiday"), num("night"));
+    if (!r.ok) { showError(r.code); return; }
+    box.innerHTML =
+      '<div class="result-main">残業代 約' + r.totalPay.toLocaleString() + " 円/月</div>" +
+      "<p>内訳 — 時間外(×1.25): <strong>" + r.overtimePay.toLocaleString() + "円</strong>" +
+      (r.overtime60Pay ? " / 60時間超(×1.5): <strong>" + r.overtime60Pay.toLocaleString() + "円</strong>" : "") +
+      (r.holidayPay ? " / 法定休日(×1.35): <strong>" + r.holidayPay.toLocaleString() + "円</strong>" : "") +
+      (r.lateNightExtra ? " / 深夜加算(+0.25): <strong>" + r.lateNightExtra.toLocaleString() + "円</strong>" : "") + "</p>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

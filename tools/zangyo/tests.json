@@ -1,0 +1,91 @@
+{
+  "tool": "zangyo",
+  "module": "calc.js",
+  "global": "ZangyoCalc",
+  "cases": [
+    {
+      "name": "時間外20h(時給1500円): 1500×1.25×20=37,500円",
+      "func": "calculate",
+      "args": [1500, 20, 0, 0, 0],
+      "expect": { "ok": true, "overtimePay": 37500, "totalPay": 37500 }
+    },
+    {
+      "name": "月60h超あり(60h+10h・時給1500円): 112,500+22,500=135,000円",
+      "func": "calculate",
+      "args": [1500, 60, 10, 0, 0],
+      "expect": { "ok": true, "overtimePay": 112500, "overtime60Pay": 22500, "totalPay": 135000 }
+    },
+    {
+      "name": "法定休日労働あり(時給2000円・時間外10h+休日8h): 25,000+21,600=46,600円",
+      "func": "calculate",
+      "args": [2000, 10, 0, 8, 0],
+      "expect": { "ok": true, "overtimePay": 25000, "holidayPay": 21600, "totalPay": 46600 }
+    },
+    {
+      "name": "深夜加算(時給1200円・時間外15h+深夜5h): 22,500+1,500=24,000円",
+      "func": "calculate",
+      "args": [1200, 15, 0, 0, 5],
+      "expect": { "ok": true, "overtimePay": 22500, "lateNightExtra": 1500, "totalPay": 24000 }
+    },
+    {
+      "name": "小数の基礎時給(1875.5円×1.25×10h=23,444円・四捨五入)",
+      "func": "calculate",
+      "args": [1875.5, 10, 0, 0, 0],
+      "expect": { "ok": true, "overtimePay": 23444 }
+    },
+    {
+      "name": "残業0時間は全て0円",
+      "func": "calculate",
+      "args": [1500, 0, 0, 0, 0],
+      "expect": { "ok": true, "totalPay": 0 }
+    },
+    {
+      "name": "月給30万円・月平均160hから基礎時給1,875円",
+      "func": "hourlyFromMonthly",
+      "args": [300000, 160],
+      "expect": { "ok": true, "hourlyYen": 1875 }
+    },
+    {
+      "name": "月給25万円・月平均173hから基礎時給1,445円",
+      "func": "hourlyFromMonthly",
+      "args": [250000, 173],
+      "expect": { "ok": true, "hourlyYen": 1445 }
+    },
+    {
+      "name": "異常入力: 基礎時給が下限未満はエラー",
+      "func": "calculate",
+      "args": [100, 10, 0, 0, 0],
+      "expect": { "ok": false, "code": "invalid_hourly" }
+    },
+    {
+      "name": "異常入力: 時間が負はエラー",
+      "func": "calculate",
+      "args": [1500, -5, 0, 0, 0],
+      "expect": { "ok": false, "code": "invalid_hours" }
+    },
+    {
+      "name": "異常入力: 時間が範囲超過(201h)はエラー",
+      "func": "calculate",
+      "args": [1500, 201, 0, 0, 0],
+      "expect": { "ok": false, "code": "invalid_hours" }
+    },
+    {
+      "name": "異常入力: 月給が下限未満はエラー",
+      "func": "hourlyFromMonthly",
+      "args": [10000, 160],
+      "expect": { "ok": false, "code": "invalid_monthly" }
+    },
+    {
+      "name": "異常入力: 月平均所定労働時間が範囲外はエラー",
+      "func": "hourlyFromMonthly",
+      "args": [300000, 90],
+      "expect": { "ok": false, "code": "invalid_avg_hours" }
+    },
+    {
+      "name": "異常入力: 数値でない時給はエラー",
+      "func": "calculate",
+      "args": ["abc", 10, 0, 0, 0],
+      "expect": { "ok": false, "code": "invalid_hourly" }
+    }
+  ]
+}
