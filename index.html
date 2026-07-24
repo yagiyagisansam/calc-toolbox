@@ -87,7 +87,7 @@
   <div class="tp-tabs" id="tabs" role="tablist"></div>
 
   <div id="pop-sec">
-    <div class="tp-sec"><b>人気</b><span>この端末での利用にあわせて自動で入れ替わります</span></div>
+    <div class="tp-sec"><b>人気</b></div>
     <div class="tp-grid" id="popular"></div>
   </div>
 
@@ -394,19 +394,10 @@
   }
   var index = tiles.map(function (t) { return norm(t.dataset.kw + " " + t.textContent); });
 
-  // 人気: この端末の利用回数(localStorage)+初期ランキングを合成
-  function popularSlugs() {
-    var uses = {};
-    try { uses = JSON.parse(localStorage.getItem("qc_uses") || "{}"); } catch (e) {}
-    var personal = Object.keys(uses).filter(function (s) { return bySlug[s] && uses[s] >= 2; })
-      .sort(function (a, b) { return uses[b] - uses[a]; }).slice(0, 4);
-    var out = personal.slice();
-    RANK.forEach(function (s) { if (out.length < 8 && out.indexOf(s) === -1) out.push(s); });
-    return out.slice(0, 8);
-  }
+  // 人気: 全ユーザーの利用データに基づくランキング(RANK。週次で更新される)
   function renderPopular() {
     popEl.innerHTML = "";
-    popularSlugs().forEach(function (slug, i) {
+    RANK.slice(0, 8).forEach(function (slug, i) {
       var t = bySlug[slug];
       if (!t) return;
       var clone = t.cloneNode(true);
