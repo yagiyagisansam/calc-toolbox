@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>塩分量 計算機(ナトリウム⇔食塩相当量 換算) | 計算ツールボックス</title>
+  <meta name="description" content="食品表示のナトリウム(mg)を食塩相当量(g)に一発換算。1日の目標量(男性7.5g・女性6.5g未満)に対する割合も表示。減塩・健康管理に。換算係数は食品表示基準に準拠。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/shio/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="塩分量 計算機(ナトリウム⇔食塩相当量 換算) | 計算ツールボックス">
+  <meta property="og:description" content="食品表示のナトリウム(mg)を食塩相当量(g)に一発換算。1日の目標量(男性7.5g・女性6.5g未満)に対する割合も表示。減塩・健康管理に。換算係数は食品表示基準に準拠。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/shio/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"塩分量 計算機(ナトリウム⇔食塩相当量 換算)","item":"https://quick-calc.site/tools/shio/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>塩分量 計算機(ナトリウム⇔食塩相当量)</h1>
+  <p>食品の栄養成分表示に「ナトリウム○mg」と書かれているとき、それが<strong>食塩何gにあたるか</strong>を換算します。1日の目標量に対する割合も表示するので、減塩中の方の食品選びに。逆方向(食塩→ナトリウム)の換算もできます。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="shio-form">
+    <label>換算の方向
+      <select id="mode">
+        <option value="toSalt" selected>ナトリウム(mg)→ 食塩相当量(g)</option>
+        <option value="toSodium">食塩相当量(g)→ ナトリウム(mg)</option>
+      </select>
+    </label>
+    <label id="value-label">ナトリウム量(mg)
+      <input type="number" id="value" min="0" step="any" required placeholder="例: 1200">
+    </label>
+    <button type="submit">換算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>食品パッケージの栄養成分表示で「ナトリウム」の量(mg)を確認します。</li>
+    <li>数値を入力して「換算する」を押すと、食塩相当量(g)と1日目標量に対する割合が表示されます。</li>
+    <li>「食塩相当量→ナトリウム」の逆換算もプルダウンで選べます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>食塩相当量(g)= ナトリウム(mg)× 2.54 ÷ 1000</strong></li>
+    <li>係数2.54は、食塩(NaCl)の分子量58.5をナトリウムの原子量23で割った値で、食品表示基準で定められています。</li>
+    <li>計算例: ナトリウム1,200mg → 1,200 × 2.54 ÷ 1000 = <strong>約3.0g</strong>(食塩相当量)</li>
+    <li>1日の目標量(食塩相当量)は成人男性7.5g未満・成人女性6.5g未満です。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>換算係数(2.54): <a href="https://elaws.e-gov.go.jp/document?lawid=427M60000002010" target="_blank" rel="noopener">食品表示基準(平成27年内閣府令第10号)</a></li>
+    <li>1日の目標量: <a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/kenkou/eiyou/syokuji_kijyun.html" target="_blank" rel="noopener">厚生労働省「日本人の食事摂取基準」</a>(成人の食塩相当量の目標量: 男性7.5g/日未満・女性6.5g/日未満)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>現在の栄養成分表示は「食塩相当量」での記載が基本ですが、古い表示や海外食品では「ナトリウム」表記が残っています。</li>
+    <li>高血圧・腎臓病などで医師から塩分制限を受けている方は、指示された数値を優先してください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. ナトリウムと食塩は同じものですか?</h3>
+  <p>違います。食塩(塩化ナトリウム)はナトリウムと塩素の化合物で、重さにするとナトリウムは食塩の約4割です。そのためナトリウム表記の数値は食塩相当量より小さく見えます。「ナトリウム400mg」は食塩約1gです。</p>
+  <h3>Q. カップ麺1個で1日の塩分をどれくらい摂りますか?</h3>
+  <p>製品によりますが、スープまで飲むと食塩相当量5g前後のものが多く、成人女性の1日目標量(6.5g未満)の8割近くに達することもあります。スープを残すと2〜3割減らせます。</p>
+  <h3>Q. WHOの推奨量とは違うのですか?</h3>
+  <p>WHO(世界保健機関)は成人1日5g未満を推奨しており、日本の目標量(男性7.5g・女性6.5g未満)より厳しい値です。日本の目標量は現在の食生活からの実現可能性を考慮して設定されています。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../alcohol/">純アルコール量 計算機(お酒の適量チェック)</a></li>
+    <li><a href="../tdee/">1日の摂取カロリー目安 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var label = document.getElementById("value-label");
+  var input = document.getElementById("value");
+  mode.addEventListener("change", function () {
+    var toSalt = mode.value === "toSalt";
+    label.childNodes[0].textContent = toSalt ? "ナトリウム量(mg)" : "食塩相当量(g)";
+    input.placeholder = toSalt ? "例: 1200" : "例: 3";
+  });
+  document.getElementById("shio-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var v = parseFloat(input.value);
+    if (mode.value === "toSalt") {
+      var r = ShioCalc.toSalt(v);
+      if (!r.ok) {
+        box.innerHTML = '<p class="result-error">ナトリウム量を0より大きい値で入力してください。</p>';
+        box.hidden = false;
+        return;
+      }
+      box.innerHTML =
+        '<div class="result-main">食塩相当量 約' + r.saltG.toLocaleString() + " g</div>" +
+        "<p>1日の目標量に対して: 成人男性(7.5g未満)の <strong>" + r.pctMale + "%</strong> / 成人女性(6.5g未満)の <strong>" + r.pctFemale + "%</strong></p>";
+    } else {
+      var r2 = ShioCalc.toSodium(v);
+      if (!r2.ok) {
+        box.innerHTML = '<p class="result-error">食塩相当量を0より大きい値で入力してください(100g以下)。</p>';
+        box.hidden = false;
+        return;
+      }
+      box.innerHTML = '<div class="result-main">ナトリウム 約' + r2.sodiumMg.toLocaleString() + " mg</div>";
+    }
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

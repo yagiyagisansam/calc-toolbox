@@ -1,0 +1,67 @@
+{
+  "tool": "ninshin",
+  "module": "calc.js",
+  "global": "NinshinCalc",
+  "cases": [
+    {
+      "name": "最終月経2026-01-01・基準2026-07-24: 予定日2026-10-08・29週1日・後期",
+      "func": "dueDate",
+      "args": ["2026-01-01", "2026-07-24"],
+      "expect": { "ok": true, "due": "2026-10-08", "week": 29, "day": 1, "elapsedDays": 204, "trimester": "後期" }
+    },
+    {
+      "name": "周期35日の補正: 予定日は7日後ろへ(2026-10-15)・28週1日",
+      "func": "dueDate",
+      "args": ["2026-01-01", "2026-07-24", 35],
+      "expect": { "ok": true, "due": "2026-10-15", "week": 28, "day": 1, "trimester": "後期" }
+    },
+    {
+      "name": "当日: 0週0日・初期・予定日は280日後(2027-04-30)",
+      "func": "dueDate",
+      "args": ["2026-07-24", "2026-07-24"],
+      "expect": { "ok": true, "due": "2027-04-30", "week": 0, "day": 0, "trimester": "初期" }
+    },
+    {
+      "name": "14週0日ちょうどは中期(98日後)",
+      "func": "dueDate",
+      "args": ["2026-01-01", "2026-04-09"],
+      "expect": { "ok": true, "week": 14, "day": 0, "elapsedDays": 98, "trimester": "中期" }
+    },
+    {
+      "name": "13週6日は初期(97日後)",
+      "func": "dueDate",
+      "args": ["2026-01-01", "2026-04-08"],
+      "expect": { "ok": true, "week": 13, "day": 6, "trimester": "初期" }
+    },
+    {
+      "name": "周期25日の補正: 予定日は3日前へ(2026-10-05)",
+      "func": "dueDate",
+      "args": ["2026-01-01", "2026-07-24", 25],
+      "expect": { "ok": true, "due": "2026-10-05", "week": 29, "day": 4 }
+    },
+    {
+      "name": "異常入力: 周期範囲外(10日)はエラー",
+      "func": "dueDate",
+      "args": ["2026-01-01", "2026-07-24", 10],
+      "expect": { "ok": false, "code": "invalid_cycle" }
+    },
+    {
+      "name": "異常入力: 最終月経が基準日より未来はエラー",
+      "func": "dueDate",
+      "args": ["2026-08-01", "2026-07-24"],
+      "expect": { "ok": false, "code": "lmp_after_asof" }
+    },
+    {
+      "name": "異常入力: 存在しない日付はエラー",
+      "func": "dueDate",
+      "args": ["2026-02-30", "2026-07-24"],
+      "expect": { "ok": false, "code": "invalid_lmp" }
+    },
+    {
+      "name": "異常入力: 基準日が不正はエラー",
+      "func": "dueDate",
+      "args": ["2026-01-01", "bad"],
+      "expect": { "ok": false, "code": "invalid_asof" }
+    }
+  ]
+}

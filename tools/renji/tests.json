@@ -1,0 +1,67 @@
+{
+  "tool": "renji",
+  "module": "calc.js",
+  "global": "RenjiCalc",
+  "cases": [
+    {
+      "name": "500W 3分 → 600W: 2分30秒(150秒)",
+      "func": "convert",
+      "args": [180, 500, 600],
+      "expect": { "ok": true, "seconds": 150, "rounded10": 150 }
+    },
+    {
+      "name": "600W 1分30秒 → 500W: 108秒(目安110秒)",
+      "func": "convert",
+      "args": [90, 600, 500],
+      "expect": { "ok": true, "seconds": 108, "rounded10": 110 }
+    },
+    {
+      "name": "1500W 1分 → 500W: 3分(180秒)",
+      "func": "convert",
+      "args": [60, 1500, 500],
+      "expect": { "ok": true, "seconds": 180, "rounded10": 180 }
+    },
+    {
+      "name": "700W 2分 → 600W: 140秒",
+      "func": "convert",
+      "args": [120, 700, 600],
+      "expect": { "ok": true, "seconds": 140, "rounded10": 140 }
+    },
+    {
+      "name": "500W 10分 → 200W(解凍): 25分(1500秒)",
+      "func": "convert",
+      "args": [600, 500, 200],
+      "expect": { "ok": true, "seconds": 1500, "rounded10": 1500 }
+    },
+    {
+      "name": "同じワット数なら時間は変わらない",
+      "func": "convert",
+      "args": [90, 600, 600],
+      "expect": { "ok": true, "seconds": 90, "rounded10": 90 }
+    },
+    {
+      "name": "異常入力: 時間0はエラー",
+      "func": "convert",
+      "args": [0, 500, 600],
+      "expect": { "ok": false, "code": "invalid_time" }
+    },
+    {
+      "name": "異常入力: 時間が負はエラー",
+      "func": "convert",
+      "args": [-10, 500, 600],
+      "expect": { "ok": false, "code": "invalid_time" }
+    },
+    {
+      "name": "異常入力: ワット数0はエラー",
+      "func": "convert",
+      "args": [180, 0, 600],
+      "expect": { "ok": false, "code": "invalid_watt" }
+    },
+    {
+      "name": "異常入力: 範囲外のワット数(3000W)はエラー",
+      "func": "convert",
+      "args": [180, 500, 3000],
+      "expect": { "ok": false, "code": "invalid_watt" }
+    }
+  ]
+}
