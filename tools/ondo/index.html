@@ -23,19 +23,12 @@
 <body>
 <!-- @partial:header start -->
 <header class="site-header">
-  <a class="site-brand" href="../../">計算ツールボックス</a>
-  <nav class="site-nav">
-    <a href="../../">ツール一覧</a>
-    <a href="../../privacy.html">プライバシーポリシー</a>
-    <a href="../../disclaimer.html">免責事項</a>
-    <a href="../../contact.html">お問い合わせ</a>
-  </nav>
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
 </header>
 <!-- @partial:header end -->
 <main>
   <h1>温度換算 計算機</h1>
-  <p>摂氏(°C)・華氏(°F)・ケルビン(K)を<strong>一発で相互変換</strong>します。海外レシピのオーブン温度(°F)、アメリカの天気予報、理科・物理の課題に。入力した値はお使いの端末内だけで計算され、送信されません。</p>
-
   <form class="tool-form" id="ondo-form">
     <label>温度
       <input type="number" id="value" step="any" required placeholder="例: 350">
@@ -51,6 +44,8 @@
   </form>
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>摂氏(°C)・華氏(°F)・ケルビン(K)を<strong>一発で相互変換</strong>します。海外レシピのオーブン温度(°F)、アメリカの天気予報、理科・物理の課題に。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -96,6 +91,7 @@
 </main>
 <!-- @partial:footer start -->
 <footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
   <nav>
     <a href="../../">ツール一覧</a>
     <a href="../../privacy.html">プライバシーポリシー</a>

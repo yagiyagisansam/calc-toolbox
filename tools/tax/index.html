@@ -23,19 +23,12 @@
 <body>
 <!-- @partial:header start -->
 <header class="site-header">
-  <a class="site-brand" href="../../">計算ツールボックス</a>
-  <nav class="site-nav">
-    <a href="../../">ツール一覧</a>
-    <a href="../../privacy.html">プライバシーポリシー</a>
-    <a href="../../disclaimer.html">免責事項</a>
-    <a href="../../contact.html">お問い合わせ</a>
-  </nav>
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
 </header>
 <!-- @partial:header end -->
 <main>
   <h1>消費税 計算機(税込⇔税抜)</h1>
-  <p>金額を入力すると、<strong>税抜→税込</strong>・<strong>税込→税抜</strong>を計算します。標準税率10%と軽減税率8%(飲食料品など)の両方に対応。入力した値はお使いの端末内だけで計算され、送信されません。</p>
-
   <form class="tool-form" id="tax-form">
     <label>金額(円・整数)
       <input type="number" id="price" inputmode="numeric" step="1" min="1" max="999999999" placeholder="1000" required>
@@ -60,6 +53,8 @@
   <div class="note-box">
     このツールの計算結果は<strong>概算</strong>です。1円未満の端数は四捨五入で計算していますが、実際の端数処理(切り捨て・切り上げ・四捨五入)は事業者ごとに異なるため、店頭のレシートと1円単位で差が出ることがあります。
   </div>
+
+  <p>金額を入力すると、<strong>税抜→税込</strong>・<strong>税込→税抜</strong>を計算します。標準税率10%と軽減税率8%(飲食料品など)の両方に対応。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -105,6 +100,7 @@
 </main>
 <!-- @partial:footer start -->
 <footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
   <nav>
     <a href="../../">ツール一覧</a>
     <a href="../../privacy.html">プライバシーポリシー</a>

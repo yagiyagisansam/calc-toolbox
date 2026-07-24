@@ -23,19 +23,12 @@
 <body>
 <!-- @partial:header start -->
 <header class="site-header">
-  <a class="site-brand" href="../../">計算ツールボックス</a>
-  <nav class="site-nav">
-    <a href="../../">ツール一覧</a>
-    <a href="../../privacy.html">プライバシーポリシー</a>
-    <a href="../../disclaimer.html">免責事項</a>
-    <a href="../../contact.html">お問い合わせ</a>
-  </nav>
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
 </header>
 <!-- @partial:header end -->
 <main>
   <h1>日数計算機(日付の差・○日後)</h1>
-  <p><strong>2つの日付の間の日数</strong>と、<strong>基準日から○日後(○日前)の日付・曜日</strong>を計算します。締切までの残り日数、支払期限、記念日の日数計算に。入力した値はお使いの端末内だけで計算され、送信されません。</p>
-
   <form class="tool-form" id="between-form">
     <label>開始日
       <input type="date" id="from" min="1600-01-01" max="2500-12-31" required>
@@ -62,6 +55,8 @@
   <div class="note-box">
     日数の数え方には「初日を含めない(経過日数)」と「初日を含める(両端を含む日数)」の2通りがあります。本ツールは<strong>両方を表示</strong>します。契約・法律上の期間計算は数え方の規定が異なる場合があるためご注意ください。
   </div>
+
+  <p><strong>2つの日付の間の日数</strong>と、<strong>基準日から○日後(○日前)の日付・曜日</strong>を計算します。締切までの残り日数、支払期限、記念日の日数計算に。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -105,6 +100,7 @@
 </main>
 <!-- @partial:footer start -->
 <footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
   <nav>
     <a href="../../">ツール一覧</a>
     <a href="../../privacy.html">プライバシーポリシー</a>

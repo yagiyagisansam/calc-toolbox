@@ -1,0 +1,67 @@
+{
+  "tool": "tanka",
+  "module": "calc.js",
+  "global": "TankaCalc",
+  "cases": [
+    {
+      "name": "100gあたり: 298円/400g vs 198円/250g → 74.5円 vs 79.2円(Aが最安・Bは6.3%高い)",
+      "func": "compare",
+      "args": [[{ "price": 298, "qty": 400 }, { "price": 198, "qty": 250 }], 100],
+      "expect": { "ok": true, "cheapest": 0, "rows": [{ "unitPrice": 74.5, "diffPct": 0 }, { "unitPrice": 79.2, "diffPct": 6.3 }] }
+    },
+    {
+      "name": "1個あたり: 卵10個228円 vs 6個148円 → 22.8円 vs 24.67円",
+      "func": "compare",
+      "args": [[{ "price": 228, "qty": 10 }, { "price": 148, "qty": 6 }], 1],
+      "expect": { "ok": true, "cheapest": 0, "rows": [{ "unitPrice": 22.8, "diffPct": 0 }, { "unitPrice": 24.67, "diffPct": 8.2 }] }
+    },
+    {
+      "name": "同単価なら先に入力した方を最安とする",
+      "func": "compare",
+      "args": [[{ "price": 100, "qty": 2 }, { "price": 200, "qty": 4 }], 1],
+      "expect": { "ok": true, "cheapest": 0, "rows": [{ "unitPrice": 50, "diffPct": 0 }, { "unitPrice": 50, "diffPct": 0 }] }
+    },
+    {
+      "name": "3商品の比較(100gあたり)",
+      "func": "compare",
+      "args": [[{ "price": 398, "qty": 650 }, { "price": 198, "qty": 300 }, { "price": 158, "qty": 220 }], 100],
+      "expect": { "ok": true, "cheapest": 0, "rows": [{ "unitPrice": 61.23, "diffPct": 0 }, { "unitPrice": 66, "diffPct": 7.8 }, { "unitPrice": 71.82, "diffPct": 17.3 }] }
+    },
+    {
+      "name": "最安が後の商品でも正しく判定",
+      "func": "compare",
+      "args": [[{ "price": 500, "qty": 300 }, { "price": 400, "qty": 300 }], 100],
+      "expect": { "ok": true, "cheapest": 1, "rows": [{ "unitPrice": 166.67, "diffPct": 25 }, { "unitPrice": 133.33, "diffPct": 0 }] }
+    },
+    {
+      "name": "異常入力: 1商品だけはエラー",
+      "func": "compare",
+      "args": [[{ "price": 298, "qty": 400 }], 100],
+      "expect": { "ok": false, "code": "invalid_items" }
+    },
+    {
+      "name": "異常入力: 内容量0はエラー",
+      "func": "compare",
+      "args": [[{ "price": 298, "qty": 0 }, { "price": 198, "qty": 250 }], 100],
+      "expect": { "ok": false, "code": "invalid_item" }
+    },
+    {
+      "name": "異常入力: 価格が負はエラー",
+      "func": "compare",
+      "args": [[{ "price": -100, "qty": 400 }, { "price": 198, "qty": 250 }], 100],
+      "expect": { "ok": false, "code": "invalid_item" }
+    },
+    {
+      "name": "異常入力: 基準量0はエラー",
+      "func": "compare",
+      "args": [[{ "price": 298, "qty": 400 }, { "price": 198, "qty": 250 }], 0],
+      "expect": { "ok": false, "code": "invalid_per" }
+    },
+    {
+      "name": "異常入力: 6商品はエラー(上限5)",
+      "func": "compare",
+      "args": [[{ "price": 1, "qty": 1 }, { "price": 1, "qty": 1 }, { "price": 1, "qty": 1 }, { "price": 1, "qty": 1 }, { "price": 1, "qty": 1 }, { "price": 1, "qty": 1 }], 100],
+      "expect": { "ok": false, "code": "invalid_items" }
+    }
+  ]
+}

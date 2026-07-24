@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>割引とポイント還元 どっちが得? 計算機(実質価格を比較) | 計算ツールボックス</title>
+  <meta name="description" content="「10%オフ」と「10%ポイント還元」は同じじゃない?実質価格と割引換算率(10%還元≒9.09%オフ)を計算して、どちらが得かを一発判定。セールとキャンペーンの比較に。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/point/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="割引とポイント還元 どっちが得? 計算機(実質価格を比較) | 計算ツールボックス">
+  <meta property="og:description" content="「10%オフ」と「10%ポイント還元」は同じじゃない?実質価格と割引換算率(10%還元≒9.09%オフ)を計算して、どちらが得かを一発判定。セールとキャンペーンの比較に。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/point/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"割引とポイント還元 どっちが得? 計算機(実質価格を比較)","item":"https://quick-calc.site/tools/point/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>割引とポイント還元 どっちが得? 計算機</h1>
+  <form class="tool-form" id="point-form">
+    <label>商品の価格(円)
+      <input type="number" id="price" min="1" step="1" required placeholder="例: 10000">
+    </label>
+    <label>案① 割引率(%オフ)
+      <input type="number" id="discount" min="0" max="99.9" step="any" required placeholder="例: 10">
+    </label>
+    <label>案② ポイント還元率(%)
+      <input type="number" id="point" min="0" max="100" step="any" required placeholder="例: 10">
+    </label>
+    <button type="submit">どっちが得か計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>「10%オフ」と「10%ポイント還元」、同じに見えて<strong>実は割引のほうが得</strong>です。このツールは両方の実質価格を計算し、還元率を割引率に換算(10%還元≒9.09%オフ)して、どちらが得かを一発判定します。セール価格とキャンペーン還元の比較に。</p>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>商品の価格を入力します。</li>
+    <li>比べたい「割引率」と「ポイント還元率」を入力します(片方が0でもOK)。</li>
+    <li>「計算する」を押すと、判定と実質価格の比較表が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>割引: 支払額 = 価格 × (1 − 割引率÷100)</strong></li>
+    <li><strong>ポイント還元: 実質負担 = 価格 × (1 − 還元率÷100)</strong>(獲得ポイントを後日全額使う前提)</li>
+    <li>ただしポイント還元では「支払った金額」自体は定価のままです。100円につきr円分のポイントは、<strong>割引率に換算すると 100r ÷ (100 + r) %</strong> になります(10%還元なら 1000÷110 = 約9.09%オフ相当)。同じ数字なら割引のほうが得、というのはこのためです。</li>
+    <li>計算例: 1万円の商品で「10%オフ」は支払9,000円。「10%還元」は支払10,000円+1,000ポイント(実質9,000円相当)ですが、割引換算では9.09%なので<strong>10%オフのほうが得</strong>です。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>算術計算です。ポイントは「1ポイント=1円として後日全額利用できる」前提で計算しています。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>ポイントに有効期限がある・使い道が限られる・失効しやすい場合、実際の価値は計算より下がります。</li>
+    <li>「ポイント払い分にはポイントが付かない」制度が多いことも、還元が割引より少し不利になる理由です。</li>
+    <li>還元上限(例: 上限2,000ポイントまで)があるキャンペーンでは、高額商品ほど実質還元率が下がります。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 「10%オフ」と「10%還元」はなぜ同じではないのですか?</h3>
+  <p>10%オフは1万円の商品を9,000円で買えます。10%還元は1万円払って1,000円分のポイントをもらうので、「11,000円分の価値を1万円で買った」ことになり、割引率に直すと約9.09%です。支払うお金が先に減る割引のほうが常に少し得です。</p>
+  <h3>Q. 何%還元なら「20%オフ」と互角ですか?</h3>
+  <p>25%還元です。換算式 100r÷(100+r) にr=25を入れると 2500÷125=20%となり、ちょうど20%オフ相当になります。</p>
+  <h3>Q. ポイントをどうせ使うなら実質同じでは?</h3>
+  <p>全額確実に使い切るなら実質負担額は同じになります(1万円・10%なら双方9,000円)。ただし還元は「先にお金が出ていく」「失効・使い忘れのリスクがある」点で不利です。このツールは両方の見方(実質負担額と割引換算率)を表示しています。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../percent/">パーセント計算機(割引率など)</a></li>
+    <li><a href="../tanka/">単価比較 計算機(どっちが安い?)</a></li>
+    <li><a href="../tax/">消費税 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var ERROR_MESSAGES = {
+    invalid_price: "価格を1円以上で入力してください。",
+    invalid_discount: "割引率は0〜99.9%の範囲で入力してください。",
+    invalid_point: "還元率は0〜100%の範囲で入力してください。"
+  };
+  var VERDICT = {
+    discount: "割引(○%オフ)のほうが得",
+    point: "ポイント還元のほうが得",
+    even: "どちらもほぼ互角"
+  };
+  document.getElementById("point-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var price = parseFloat(document.getElementById("price").value);
+    var d = parseFloat(document.getElementById("discount").value);
+    var p = parseFloat(document.getElementById("point").value);
+    var r = PointCalc.compare(price, d, p);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">' + VERDICT[r.better].replace("○", d.toLocaleString()) + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>案</th><th>支払額</th><th>実質負担</th></tr></thead><tbody>' +
+      "<tr><td>" + d.toLocaleString() + "%オフ</td><td>" + r.discounted.toLocaleString() + "円</td><td>" + r.discounted.toLocaleString() + "円</td></tr>" +
+      "<tr><td>" + p.toLocaleString() + "%還元</td><td>" + price.toLocaleString() + "円</td><td>" + r.pointNet.toLocaleString() + "円(+" + r.pointValue.toLocaleString() + "pt)</td></tr>" +
+      "</tbody></table></div>" +
+      "<p>" + p.toLocaleString() + "%還元は割引に換算すると約 <strong>" + r.pointEquivPct.toLocaleString() + "%オフ相当</strong>です(ポイントを全額使う前提)。</p>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

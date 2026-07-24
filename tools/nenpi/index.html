@@ -23,19 +23,12 @@
 <body>
 <!-- @partial:header start -->
 <header class="site-header">
-  <a class="site-brand" href="../../">計算ツールボックス</a>
-  <nav class="site-nav">
-    <a href="../../">ツール一覧</a>
-    <a href="../../privacy.html">プライバシーポリシー</a>
-    <a href="../../disclaimer.html">免責事項</a>
-    <a href="../../contact.html">お問い合わせ</a>
-  </nav>
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
 </header>
 <!-- @partial:header end -->
 <main>
   <h1>燃費計算機(満タン法)</h1>
-  <p>前回の給油から走った距離と今回の給油量を入れるだけで、<strong>実燃費(km/L)</strong>を計算します。ガソリン単価を入れると給油代と1kmあたりの燃料費も表示。カタログ燃費との比較や車の調子チェックに。入力した値はお使いの端末内だけで計算され、送信されません。</p>
-
   <form class="tool-form" id="nenpi-form">
     <label>走行距離(km)
       <span class="field-note">前回満タン給油からの走行距離(トリップメーター)</span>
@@ -53,6 +46,8 @@
   </form>
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <p>前回の給油から走った距離と今回の給油量を入れるだけで、<strong>実燃費(km/L)</strong>を計算します。ガソリン単価を入れると給油代と1kmあたりの燃料費も表示。カタログ燃費との比較や車の調子チェックに。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -98,6 +93,7 @@
 </main>
 <!-- @partial:footer start -->
 <footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
   <nav>
     <a href="../../">ツール一覧</a>
     <a href="../../privacy.html">プライバシーポリシー</a>

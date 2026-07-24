@@ -23,19 +23,12 @@
 <body>
 <!-- @partial:header start -->
 <header class="site-header">
-  <a class="site-brand" href="../../">計算ツールボックス</a>
-  <nav class="site-nav">
-    <a href="../../">ツール一覧</a>
-    <a href="../../privacy.html">プライバシーポリシー</a>
-    <a href="../../disclaimer.html">免責事項</a>
-    <a href="../../contact.html">お問い合わせ</a>
-  </nav>
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
 </header>
 <!-- @partial:header end -->
 <main>
   <h1>出産予定日・妊娠週数 計算機</h1>
-  <p>最終月経の開始日を入れると、<strong>出産予定日</strong>と<strong>今日が妊娠何週何日か</strong>を計算します。月経周期が28日でない場合の補正にも対応。妊娠初期・中期・後期の区分も表示します。入力した値はお使いの端末内だけで計算され、送信されません。</p>
-
   <form class="tool-form" id="ninshin-form">
     <label>最終月経の開始日
       <input type="date" id="lmp" min="1900-01-01" max="2200-12-31" required>
@@ -56,6 +49,8 @@
   <div class="note-box">
     このツールの結果は<strong>月経周期からの概算</strong>です。実際の出産予定日は、妊娠初期の超音波検査(赤ちゃんの大きさ)をもとに<strong>医師が決定したものが優先</strong>されます。妊娠の判定・健康管理は必ず産婦人科を受診してください。
   </div>
+
+  <p>最終月経の開始日を入れると、<strong>出産予定日</strong>と<strong>今日が妊娠何週何日か</strong>を計算します。月経周期が28日でない場合の補正にも対応。妊娠初期・中期・後期の区分も表示します。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -103,6 +98,7 @@
 </main>
 <!-- @partial:footer start -->
 <footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
   <nav>
     <a href="../../">ツール一覧</a>
     <a href="../../privacy.html">プライバシーポリシー</a>
