@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>案I: カラフル&フレンドリー | トップページデザイン案</title>
+  <style>
+    :root {
+      --bg: #fdfcf8; --ink: #33322e; --muted: #9a978e; --accent: #0e7d59;
+      --shadow: 0 2px 6px rgba(80,75,60,0.08);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #17181a; --ink: #edecea; --muted: #8f8d86; --shadow: 0 2px 6px rgba(0,0,0,0.35); }
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Hiragino Maru Gothic ProN", "Hiragino Sans", sans-serif; background: var(--bg); color: var(--ink); font-size: 16px; }
+    .proto-badge { position: fixed; top: 0; right: 0; background: #b3261e; color: #fff; font-size: 11px; padding: 2px 10px; border-bottom-left-radius: 8px; z-index: 10; }
+    main { max-width: 720px; margin: 0 auto; padding: 0 18px 60px; }
+    h1 { font-size: 1.5rem; margin: 24px 0 2px; font-weight: 800; }
+    h1 em { font-style: normal; color: var(--accent); }
+    .tg { color: var(--muted); font-size: 0.8rem; margin: 0 0 14px; }
+    .search {
+      display: flex; align-items: center; gap: 9px; background: #fff; border: 2px solid var(--ink); border-radius: 999px;
+      padding: 11px 18px; color: var(--muted); box-shadow: 3px 3px 0 rgba(51,50,46,0.9);
+    }
+    @media (prefers-color-scheme: dark) { .search { background: #222327; box-shadow: 3px 3px 0 rgba(0,0,0,0.7); border-color: #4a4b50; } }
+    .search input { border: none; outline: none; background: none; font-size: 1rem; width: 100%; color: var(--ink); }
+    .tabs { display: flex; gap: 8px; overflow-x: auto; padding: 16px 0 4px; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      flex: 0 0 auto; padding: 8px 15px; border-radius: 999px; border: 1.5px solid transparent; background: rgba(130,126,110,0.1);
+      color: var(--ink); font-size: 0.88rem; cursor: pointer; white-space: nowrap; font-weight: 600;
+    }
+    .tab.on { background: var(--accent); color: #fff; }
+    .sec { display: flex; align-items: baseline; gap: 8px; margin: 20px 2px 12px; }
+    .sec b { font-size: 1.05rem; font-weight: 800; }
+    .sec span { font-size: 0.7rem; color: var(--muted); }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 12px; }
+    .tile { display: flex; flex-direction: column; align-items: center; gap: 8px; text-decoration: none; color: var(--ink); }
+    .tile .ic {
+      width: 100%; aspect-ratio: 1; max-width: 92px; display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem; border-radius: 28px; box-shadow: var(--shadow); position: relative;
+    }
+    .tile .nm { font-size: 0.82rem; font-weight: 700; text-align: center; white-space: nowrap; }
+    .tile .rk {
+      position: absolute; top: -8px; right: -6px; background: #fff; border: 2px solid var(--ink); color: var(--ink);
+      min-width: 24px; height: 24px; border-radius: 999px; font-size: 0.72rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center; padding: 0 4px;
+    }
+    /* パステル背景(健康=グリーン/お金=クリーム/日付=スカイ/変換=ラベンダー) */
+    .p0 { background: #dff1e6; } .p1 { background: #fdeedb; } .p2 { background: #e3edfb; } .p3 { background: #efe7f9; }
+    @media (prefers-color-scheme: dark) {
+      .p0 { background: #23382c; } .p1 { background: #3d3020; } .p2 { background: #242f42; } .p3 { background: #32293f; }
+      .tile .rk { background: #17181a; color: #edecea; border-color: #edecea; }
+    }
+  </style>
+</head>
+<body>
+<div class="proto-badge">案I</div>
+<main>
+  <h1>暮らしの計算、<em>ぜんぶ無料。</em></h1>
+  <p class="tg">計算ツールボックス — 61個の計算ツール・登録不要</p>
+  <div class="search">🔍 <input type="search" id="q" placeholder="なにを計算する?(例: 家賃、文字数)"></div>
+  <div class="tabs" id="tabs"></div>
+
+  <div id="pop-sec">
+    <div class="sec"><b>🔥 みんながよく使う</b><span>毎週更新</span></div>
+    <div class="grid" id="popular"></div>
+  </div>
+
+  <div class="sec" id="genre-title"><b>すべて</b><span>61個</span></div>
+  <div class="grid" id="grid"></div>
+</main>
+<script src="./data.js"></script>
+<script>
+(function () {
+  "use strict";
+  var CATS = [["all", "すべて"], ["健康", "💪 健康"], ["お金", "💴 お金"], ["日付", "📅 日付"], ["変換", "🔄 変換"]];
+  var CAT_P = { "健康": "p0", "お金": "p1", "日付": "p2", "変換": "p3" };
+  var current = "all";
+  var tabsEl = document.getElementById("tabs");
+  CATS.forEach(function (c) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "tab" + (c[0] === current ? " on" : "");
+    b.textContent = c[1];
+    b.onclick = function () {
+      current = c[0];
+      tabsEl.querySelectorAll(".tab").forEach(function (t, i) { t.classList.toggle("on", CATS[i][0] === current); });
+      render();
+    };
+    tabsEl.appendChild(b);
+  });
+  function tile(t, rk) {
+    return '<a class="tile" href="#"><span class="ic ' + CAT_P[t.cat] + '">' + t.emoji +
+      (rk ? '<span class="rk">' + rk + "</span>" : "") + '</span><span class="nm">' + t.g + "</span></a>";
+  }
+  document.getElementById("popular").innerHTML =
+    TOOLS.filter(function (t) { return t.rank && t.rank <= 6; }).sort(function (a, b) { return a.rank - b.rank; })
+      .map(function (t, i) { return tile(t, i + 1); }).join("");
+  function render() {
+    var q = document.getElementById("q").value.trim().toLowerCase();
+    var items = TOOLS.filter(function (t) {
+      if (q) return (t.name + t.desc + t.kw).toLowerCase().indexOf(q) !== -1;
+      return current === "all" || t.cat === current;
+    });
+    document.getElementById("pop-sec").style.display = (q || current !== "all") ? "none" : "";
+    var label = q ? "検索結果" : (current === "all" ? "すべて" : CATS.find(function (c) { return c[0] === current; })[1]);
+    document.getElementById("genre-title").innerHTML = "<b>" + label + "</b><span>" + items.length + "個</span>";
+    document.getElementById("grid").innerHTML = items.map(function (t) { return tile(t); }).join("");
+  }
+  document.getElementById("q").addEventListener("input", render);
+  render();
+})();
+</script>
+</body>
+</html>
