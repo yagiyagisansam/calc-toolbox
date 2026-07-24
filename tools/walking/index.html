@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ウォーキング消費カロリー 計算機(METs方式・脂肪換算つき) | 計算ツールボックス</title>
+  <meta name="description" content="体重・時間・歩く速さから、ウォーキングの消費カロリーをMETs方式(厚労省の式)で計算。脂肪何グラム分かも表示。散歩・速歩・ダイエットの目安に。無料・登録不要。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/walking/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="ウォーキング消費カロリー 計算機(METs方式・脂肪換算つき) | 計算ツールボックス">
+  <meta property="og:description" content="体重・時間・歩く速さから、ウォーキングの消費カロリーをMETs方式(厚労省の式)で計算。脂肪何グラム分かも表示。散歩・速歩・ダイエットの目安に。無料・登録不要。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/walking/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"ウォーキング消費カロリー 計算機(METs方式・脂肪換算つき)","item":"https://quick-calc.site/tools/walking/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>ウォーキング消費カロリー 計算機</h1>
+  <p>体重・歩いた時間・歩く速さを入れると、<strong>ウォーキングで消費したカロリー(kcal)</strong>を計算します。運動強度の国際的な指標<strong>METs(メッツ)</strong>を使った方式で、脂肪何グラム分にあたるかの目安も表示。毎日の散歩やダイエットの記録に。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="walking-form">
+    <label>体重(kg)
+      <input type="number" id="weight" min="20" max="300" step="0.1" required placeholder="例: 60">
+    </label>
+    <label>歩いた時間(分)
+      <input type="number" id="minutes" min="1" max="1440" step="1" required placeholder="例: 30">
+    </label>
+    <label>歩く速さ
+      <select id="speed">
+        <option value="slow">ゆっくり(約3.2km/h・散歩)</option>
+        <option value="normal" selected>ふつう(約4.0km/h)</option>
+        <option value="brisk">やや速め(約4.8km/h)</option>
+        <option value="fast">速歩(約5.6km/h・急ぎ足)</option>
+        <option value="veryfast">かなり速い(約6.4km/h)</option>
+      </select>
+    </label>
+    <button type="submit">消費カロリーを計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>体重と歩いた時間を入力します。</li>
+    <li>歩く速さを5段階から選びます(信号待ちなどの停止時間は除くとより正確)。</li>
+    <li>「計算する」を押すと、消費カロリーと脂肪換算の目安が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>消費エネルギー(kcal)= 1.05 × METs × 時間(h)× 体重(kg)</strong>(厚生労働省の運動指針で用いられる式)</li>
+    <li>METs(メッツ)は安静時を1とした運動強度の指標です。本ツールの値は「身体活動のメッツ(METs)表」より: ゆっくり=2.8 / ふつう=3.0 / やや速め=3.5 / 速歩=4.3 / かなり速い=5.0</li>
+    <li>計算例: 体重60kgの人が「ふつう」の速さで30分 → 1.05 × 3.0 × 0.5 × 60 = <strong>約95kcal</strong></li>
+    <li>脂肪換算は体脂肪1kg≒7,200kcalの目安で割り戻しています。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>計算式・METsの解説: <a href="https://www.e-healthnet.mhlw.go.jp/information/exercise/s-02-004.html" target="_blank" rel="noopener">厚生労働省 e-ヘルスネット「メッツ / METs」</a></li>
+    <li>歩行速度別のMETs値: <a href="https://www.nibiohn.go.jp/eiken/programs/2011mets.pdf" target="_blank" rel="noopener">国立健康・栄養研究所「身体活動のメッツ(METs)表」</a></li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>この式には安静にしていても消費する分(基礎代謝)が含まれています。「歩いたことによる上乗せ分」だけを知りたい場合は、METsから1を引いた値で概算します(例: ふつう歩行30分・60kgなら上乗せ分は約63kcal)。</li>
+    <li>坂道・荷物・気温などで実際の消費量は変わります。結果は目安としてご利用ください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 1万歩歩くと何キロカロリー消費しますか?</h3>
+  <p>歩幅70cmなら1万歩で約7kmです。体重60kgの人が「ふつう」の速さ(4km/h)で歩くと約105分かかり、消費カロリーは約330kcalになります。おにぎり約2個分です。</p>
+  <h3>Q. 脂肪1kg減らすにはどれくらい歩けばいいですか?</h3>
+  <p>体脂肪1kg≒7,200kcalの目安で計算すると、体重60kgの人が毎日30分「ふつう」の速さで歩いた場合(約95kcal/日)、単純計算で約2.5ヶ月かかります。食事管理と組み合わせるのが現実的です。</p>
+  <h3>Q. 速く歩くとどれくらい効果が違いますか?</h3>
+  <p>「ふつう」(3.0METs)と「速歩」(4.3METs)では同じ時間で約1.4倍の消費量になります。健康づくりの指針でも、息が少しはずむ程度の「速歩」が推奨されています。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../pace/">ランニングペース 計算機</a></li>
+    <li><a href="../tdee/">1日の摂取カロリー目安 計算機</a></li>
+    <li><a href="../bmr/">基礎代謝量 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var ERROR_MESSAGES = {
+    invalid_weight: "体重は20〜300kgの範囲で入力してください。",
+    invalid_minutes: "時間は1分〜24時間の範囲で入力してください。",
+    invalid_speed: "歩く速さを選んでください。"
+  };
+  document.getElementById("walking-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var r = WalkingCalc.calories(
+      parseFloat(document.getElementById("weight").value),
+      parseFloat(document.getElementById("minutes").value),
+      document.getElementById("speed").value
+    );
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">約 ' + r.kcal.toLocaleString() + " kcal</div>" +
+      "<p>脂肪に換算すると約 <strong>" + r.fatG.toLocaleString() + "g</strong> 分(体脂肪1kg≒7,200kcalの目安)/ 使用したMETs値: " + r.mets + "</p>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

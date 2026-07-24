@@ -1,0 +1,67 @@
+{
+  "tool": "walking",
+  "module": "calc.js",
+  "global": "WalkingCalc",
+  "cases": [
+    {
+      "name": "60kg・30分・ふつう(3.0METs): 95kcal・脂肪13g",
+      "func": "calories",
+      "args": [60, 30, "normal"],
+      "expect": { "ok": true, "kcal": 95, "fatG": 13, "mets": 3 }
+    },
+    {
+      "name": "70kg・60分・やや速め(3.5METs): 257kcal・脂肪36g",
+      "func": "calories",
+      "args": [70, 60, "brisk"],
+      "expect": { "ok": true, "kcal": 257, "fatG": 36, "mets": 3.5 }
+    },
+    {
+      "name": "50kg・45分・速歩(4.3METs): 169kcal・脂肪24g",
+      "func": "calories",
+      "args": [50, 45, "fast"],
+      "expect": { "ok": true, "kcal": 169, "fatG": 24, "mets": 4.3 }
+    },
+    {
+      "name": "80kg・20分・ゆっくり(2.8METs): 78kcal・脂肪11g",
+      "func": "calories",
+      "args": [80, 20, "slow"],
+      "expect": { "ok": true, "kcal": 78, "fatG": 11, "mets": 2.8 }
+    },
+    {
+      "name": "65kg・90分・かなり速い(5.0METs): 512kcal",
+      "func": "calories",
+      "args": [65, 90, "veryfast"],
+      "expect": { "ok": true, "kcal": 512, "mets": 5 }
+    },
+    {
+      "name": "異常入力: 体重20kg未満はエラー",
+      "func": "calories",
+      "args": [10, 30, "normal"],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 時間0分はエラー",
+      "func": "calories",
+      "args": [60, 0, "normal"],
+      "expect": { "ok": false, "code": "invalid_minutes" }
+    },
+    {
+      "name": "異常入力: 24時間超はエラー",
+      "func": "calories",
+      "args": [60, 2000, "normal"],
+      "expect": { "ok": false, "code": "invalid_minutes" }
+    },
+    {
+      "name": "異常入力: 不正な速さはエラー",
+      "func": "calories",
+      "args": [60, 30, "run"],
+      "expect": { "ok": false, "code": "invalid_speed" }
+    },
+    {
+      "name": "異常入力: 数値以外はエラー",
+      "func": "calories",
+      "args": ["60", 30, "normal"],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    }
+  ]
+}

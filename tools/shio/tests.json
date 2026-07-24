@@ -1,0 +1,67 @@
+{
+  "tool": "shio",
+  "module": "calc.js",
+  "global": "ShioCalc",
+  "cases": [
+    {
+      "name": "ナトリウム1000mg → 食塩相当量2.54g",
+      "func": "toSalt",
+      "args": [1000],
+      "expect": { "ok": true, "saltG": 2.54, "pctMale": 34, "pctFemale": 39 }
+    },
+    {
+      "name": "ナトリウム400mg → 1.02g",
+      "func": "toSalt",
+      "args": [400],
+      "expect": { "ok": true, "saltG": 1.02 }
+    },
+    {
+      "name": "ナトリウム2950mg → 7.49g(男性目標量の100%)",
+      "func": "toSalt",
+      "args": [2950],
+      "expect": { "ok": true, "saltG": 7.49, "pctMale": 100 }
+    },
+    {
+      "name": "カップ麺の例: ナトリウム2000mg → 5.08g",
+      "func": "toSalt",
+      "args": [2000],
+      "expect": { "ok": true, "saltG": 5.08, "pctMale": 68, "pctFemale": 78 }
+    },
+    {
+      "name": "食塩相当量1g → ナトリウム394mg",
+      "func": "toSodium",
+      "args": [1],
+      "expect": { "ok": true, "sodiumMg": 394 }
+    },
+    {
+      "name": "食塩相当量6.5g(女性目標量) → ナトリウム2559mg",
+      "func": "toSodium",
+      "args": [6.5],
+      "expect": { "ok": true, "sodiumMg": 2559 }
+    },
+    {
+      "name": "異常入力: ナトリウム0はエラー",
+      "func": "toSalt",
+      "args": [0],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 負の値はエラー",
+      "func": "toSalt",
+      "args": [-100],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 数値以外はエラー",
+      "func": "toSalt",
+      "args": ["1000"],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 食塩相当量100g超はエラー",
+      "func": "toSodium",
+      "args": [200],
+      "expect": { "ok": false, "code": "invalid_value" }
+    }
+  ]
+}

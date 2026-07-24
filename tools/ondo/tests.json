@@ -1,0 +1,67 @@
+{
+  "tool": "ondo",
+  "module": "calc.js",
+  "global": "OndoCalc",
+  "cases": [
+    {
+      "name": "100°C = 212°F = 373.15K(水の沸点)",
+      "func": "convert",
+      "args": [100, "c"],
+      "expect": { "ok": true, "c": 100, "f": 212, "k": 373.15 }
+    },
+    {
+      "name": "98.6°F = 37°C = 310.15K",
+      "func": "convert",
+      "args": [98.6, "f"],
+      "expect": { "ok": true, "c": 37, "f": 98.6, "k": 310.15 }
+    },
+    {
+      "name": "0K = -273.15°C = -459.67°F(絶対零度)",
+      "func": "convert",
+      "args": [0, "k"],
+      "expect": { "ok": true, "c": -273.15, "f": -459.67, "k": 0 }
+    },
+    {
+      "name": "36.5°C = 97.7°F = 309.65K(平熱の目安)",
+      "func": "convert",
+      "args": [36.5, "c"],
+      "expect": { "ok": true, "c": 36.5, "f": 97.7, "k": 309.65 }
+    },
+    {
+      "name": "-40°Cと-40°Fは同じ温度",
+      "func": "convert",
+      "args": [-40, "c"],
+      "expect": { "ok": true, "c": -40, "f": -40, "k": 233.15 }
+    },
+    {
+      "name": "0°C = 32°F(水の融点)",
+      "func": "convert",
+      "args": [0, "c"],
+      "expect": { "ok": true, "c": 0, "f": 32, "k": 273.15 }
+    },
+    {
+      "name": "異常入力: 絶対零度未満(-300°C)はエラー",
+      "func": "convert",
+      "args": [-300, "c"],
+      "expect": { "ok": false, "code": "below_absolute_zero" }
+    },
+    {
+      "name": "異常入力: 絶対零度未満(-500°F)はエラー",
+      "func": "convert",
+      "args": [-500, "f"],
+      "expect": { "ok": false, "code": "below_absolute_zero" }
+    },
+    {
+      "name": "異常入力: 不正な単位はエラー",
+      "func": "convert",
+      "args": [100, "x"],
+      "expect": { "ok": false, "code": "invalid_unit" }
+    },
+    {
+      "name": "異常入力: 数値以外はエラー",
+      "func": "convert",
+      "args": ["hot", "c"],
+      "expect": { "ok": false, "code": "invalid_value" }
+    }
+  ]
+}

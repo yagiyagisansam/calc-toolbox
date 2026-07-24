@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>家賃日割り計算機(入居日・退去日から実日数/30日方式で計算) | 計算ツールボックス</title>
+  <meta name="description" content="月の途中で入居・退去するときの日割り家賃を無料計算。実日数方式と30日固定方式の両方を同時に表示するので、契約書の方式に合わせて確認できます。引越しの初期費用チェックに。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/hiwari/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="家賃日割り計算機(入居日・退去日から実日数/30日方式で計算) | 計算ツールボックス">
+  <meta property="og:description" content="月の途中で入居・退去するときの日割り家賃を無料計算。実日数方式と30日固定方式の両方を同時に表示するので、契約書の方式に合わせて確認できます。引越しの初期費用チェックに。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/hiwari/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"家賃日割り計算機(入居日・退去日から実日数/30日方式で計算)","item":"https://quick-calc.site/tools/hiwari/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>家賃日割り計算機</h1>
+  <p>月の途中で入居・退去するときの<strong>日割り家賃</strong>を計算します。よく使われる<strong>実日数方式</strong>(その月の日数で割る)と<strong>30日固定方式</strong>の両方を同時に表示するので、賃貸借契約書に書かれた方式に合わせて確認できます。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="hiwari-form">
+    <label>月額家賃(円)
+      <span class="field-note">共益費・管理費も日割りされる場合は合算した額で</span>
+      <input type="number" id="rent" min="1" max="10000000" step="1" required placeholder="例: 80000">
+    </label>
+    <label>入居 or 退去
+      <select id="mode">
+        <option value="movein" selected>入居(入居日〜月末分を支払う)</option>
+        <option value="moveout">退去(月初〜退去日分を支払う)</option>
+      </select>
+    </label>
+    <label>入居日/退去日
+      <input type="date" id="date" min="1900-01-01" max="2200-12-31" required>
+    </label>
+    <button type="submit">日割り家賃を計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    どちらの方式を使うか(円未満の端数処理を含む)は<strong>賃貸借契約書の定めが優先</strong>されます。本ツールは円未満切り捨てで計算しています。正確な金額は管理会社・大家さんへの確認をおすすめします。
+  </div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>月額家賃を入力します(共益費も日割り対象なら合算)。</li>
+    <li>「入居」か「退去」かを選び、日付を入力します。</li>
+    <li>「計算する」を押すと、2方式の日割り額が並んで表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>実日数方式: 日割り家賃 = 月額家賃 × 対象日数 ÷ その月の日数</strong>(28〜31日)</li>
+    <li><strong>30日固定方式: 日割り家賃 = 月額家賃 × 対象日数 ÷ 30</strong>(月の長さに関わらず30日で割る)</li>
+    <li>入居の場合の対象日数は「入居日から月末まで」、退去の場合は「月初から退去日まで」です。</li>
+    <li>計算例: 家賃8万円・7月20日入居(7月は31日)→ 対象12日分。実日数方式: 80,000 × 12 ÷ 31 = <strong>30,967円</strong> / 30日方式: 80,000 × 12 ÷ 30 = <strong>32,000円</strong></li>
+    <li>30日方式で月額を超える場合は月額で頭打ちにしています。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>算術計算です。日割りの方式・端数処理は法律で統一されておらず、個々の賃貸借契約の定めによります。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>2月(28日/29日)は方式による差が大きくなります。実日数方式では1日あたりの単価が高くなり、31日の月では安くなります。</li>
+    <li>入居月の家賃とは別に「翌月分の前家賃」を初期費用として求められるのが一般的です。日割り分と合わせて資金計画を立ててください。</li>
+    <li>退去の場合、契約によっては日割りされず「月末まで満額」となる契約(解約予告1ヶ月など)もあります。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 実日数方式と30日方式、どちらが普通ですか?</h3>
+  <p>どちらも広く使われています。契約書の「賃料の日割り計算」条項に記載があるのでそちらが優先です。記載がない場合は管理会社に確認してください。</p>
+  <h3>Q. 共益費・管理費も日割りされますか?</h3>
+  <p>契約によります。家賃と同様に日割りされる契約が多いですが、満額請求の場合もあります。日割りされるなら家賃と合算した金額で計算してください。</p>
+  <h3>Q. 引越しはいつ入居にすると得ですか?</h3>
+  <p>日割りがある契約なら、入居日を月初に近づけるほど「日割り+前家賃」の初期費用は増え、月末に近づけるほど減ります。ただしフリーレント(家賃無料期間)の有無や退去側の家賃との二重払い期間も含めて比較するのが確実です。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../loan/">ローン返済 計算機(毎月の返済額)</a></li>
+    <li><a href="../days/">日数計算機(日付の差・○日後)</a></li>
+    <li><a href="../warikan/">割り勘 計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var ERROR_MESSAGES = {
+    invalid_rent: "月額家賃を1円以上で入力してください。",
+    invalid_date: "日付を正しく入力してください。",
+    invalid_mode: "入居か退去かを選んでください。"
+  };
+  document.getElementById("hiwari-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var rent = parseInt(document.getElementById("rent").value, 10);
+    var mode = document.getElementById("mode").value;
+    var r = HiwariCalc.prorate(rent, document.getElementById("date").value, mode);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">実日数方式 ' + r.actual.toLocaleString() + " 円</div>" +
+      "<p>対象日数: " + r.days + "日分(この月は" + r.daysInMonth + "日)</p>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>方式</th><th>計算</th><th>日割り家賃</th></tr></thead><tbody>' +
+      "<tr><td>実日数方式</td><td>月額 × " + r.days + " ÷ " + r.daysInMonth + "</td><td><strong>" + r.actual.toLocaleString() + "円</strong></td></tr>" +
+      "<tr><td>30日固定方式</td><td>月額 × " + r.days + " ÷ 30</td><td><strong>" + r.by30.toLocaleString() + "円</strong></td></tr>" +
+      "</tbody></table></div>" +
+      "<p>円未満は切り捨て。どちらの方式かは契約書をご確認ください。</p>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

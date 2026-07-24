@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>電子レンジ加熱時間 換算計算機(500W⇔600W⇔700W) | 計算ツールボックス</title>
+  <meta name="description" content="「600Wで1分30秒」を500Wや700Wなら何分何秒にすればいいかを一発換算。冷凍食品のパッケージ表記と家のレンジのワット数が違うときに。10秒単位の目安も表示します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/renji/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="電子レンジ加熱時間 換算計算機(500W⇔600W⇔700W) | 計算ツールボックス">
+  <meta property="og:description" content="「600Wで1分30秒」を500Wや700Wなら何分何秒にすればいいかを一発換算。冷凍食品のパッケージ表記と家のレンジのワット数が違うときに。10秒単位の目安も表示します。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/renji/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"電子レンジ加熱時間 換算計算機(500W⇔600W⇔700W)","item":"https://quick-calc.site/tools/renji/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>電子レンジ加熱時間 換算計算機</h1>
+  <p>冷凍食品やレシピの「600Wで1分30秒」を、<strong>お家のレンジのワット数なら何分何秒にすればいいか</strong>を換算します。500W・600W・700Wはもちろん、解凍用の200Wや業務用の1500Wにも対応。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="renji-form">
+    <label>表記の加熱時間
+      <span class="field-note">パッケージやレシピに書かれている時間</span>
+      <span style="display:flex;gap:.5em;align-items:center;">
+        <input type="number" id="min" min="0" max="120" step="1" value="1" style="width:5em;" aria-label="分"> 分
+        <input type="number" id="sec" min="0" max="59" step="1" value="30" style="width:5em;" aria-label="秒"> 秒
+      </span>
+    </label>
+    <label>表記のワット数
+      <select id="from-w">
+        <option value="200">200W(解凍)</option>
+        <option value="300">300W</option>
+        <option value="500">500W</option>
+        <option value="600" selected>600W</option>
+        <option value="700">700W</option>
+        <option value="800">800W</option>
+        <option value="1000">1000W</option>
+        <option value="1500">1500W</option>
+      </select>
+    </label>
+    <label>お家のレンジのワット数
+      <select id="to-w">
+        <option value="200">200W(解凍)</option>
+        <option value="300">300W</option>
+        <option value="500" selected>500W</option>
+        <option value="600">600W</option>
+        <option value="700">700W</option>
+        <option value="800">800W</option>
+        <option value="1000">1000W</option>
+        <option value="1500">1500W</option>
+      </select>
+    </label>
+    <button type="submit">換算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    換算結果は<strong>目安</strong>です。機種・食品の量・冷凍状態で仕上がりは変わるため、様子を見ながら少しずつ加熱してください。加熱しすぎは破裂や乾燥のもとです。
+  </div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>パッケージに書かれている加熱時間とワット数を入力します(例: 600Wで1分30秒)。</li>
+    <li>お家のレンジのワット数を選びます。</li>
+    <li>「換算する」を押すと、換算後の時間と10秒単位の目安が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li>電子レンジが食品に与えるエネルギーは「<strong>電力(W)×時間</strong>」で決まります。同じ仕上がりにするには、このエネルギーが同じになるよう時間を調整します。</li>
+    <li><strong>換算後の時間 = 表記の時間 × 表記のワット数 ÷ お家のワット数</strong></li>
+    <li>計算例: 600Wで1分30秒(90秒)→ 500Wでは 90 × 600 ÷ 500 = <strong>108秒(約1分50秒)</strong></li>
+    <li>レンジのタイマーは10秒刻みが多いため、10秒単位に切り上げた目安も表示します。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>エネルギー等価(電力×時間が一定)に基づく算術計算です。</li>
+    <li>実際の加熱効率は機種(インバーター式か否か・庫内形状)や食品によって変わるため、結果はあくまで目安です。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>「500W⇔600W」のような近いワット数どうしの換算は誤差が小さいですが、200W(解凍)と1000Wのように大きく離れた換算は仕上がりが変わりやすくなります。</li>
+    <li>飲み物や油分の多い食品は加熱しすぎで突沸(急な沸騰)の危険があります。短めに設定して様子を見てください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 600Wで1分は500Wだと何秒ですか?</h3>
+  <p>72秒(約1分10秒)です。60秒 × 600 ÷ 500 = 72秒。レンジのタイマーに合わせるなら1分10秒〜1分20秒を目安にしてください。</p>
+  <h3>Q. 家のレンジのワット数はどこで確認できますか?</h3>
+  <p>扉の内側や側面のラベルに「高周波出力」として記載されています。「強・弱」表示の機種は取扱説明書で対応ワット数を確認してください。多くの機種は強=500〜600W、弱=150〜200W相当です。</p>
+  <h3>Q. ワット数を変えると味や仕上がりも変わりますか?</h3>
+  <p>合計エネルギーが同じでも、低いワット数でじっくり加熱したほうがムラは出にくい傾向があります。解凍は低ワット数(150〜200W)推奨です。高ワット数で短時間にすると中心が冷たいままのことがあるので、途中で混ぜる・裏返すのが確実です。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../denki/">電気代 計算機(消費電力と使用時間から)</a></li>
+    <li><a href="../ondo/">温度換算 計算機(摂氏⇔華氏)</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var ERROR_MESSAGES = {
+    invalid_time: "加熱時間を1秒以上で入力してください。",
+    invalid_watt: "ワット数は100〜2000Wの範囲で選んでください。"
+  };
+  function fmt(sec) {
+    var m = Math.floor(sec / 60);
+    var s = sec % 60;
+    return (m > 0 ? m + "分" : "") + (s > 0 || m === 0 ? s + "秒" : "");
+  }
+  document.getElementById("renji-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var min = parseInt(document.getElementById("min").value || "0", 10);
+    var sec = parseInt(document.getElementById("sec").value || "0", 10);
+    var fromW = parseInt(document.getElementById("from-w").value, 10);
+    var toW = parseInt(document.getElementById("to-w").value, 10);
+    var r = RenjiCalc.convert(min * 60 + sec, fromW, toW);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">' + toW + "Wなら 約" + fmt(r.rounded10) + "</div>" +
+      "<p>計算値: " + fmt(r.seconds) + "(" + r.seconds + "秒)を10秒単位に切り上げた目安です。様子を見ながら加熱してください。</p>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

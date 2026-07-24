@@ -1,0 +1,67 @@
+{
+  "tool": "nenpi",
+  "module": "calc.js",
+  "global": "NenpiCalc",
+  "cases": [
+    {
+      "name": "400km・25L: 16km/L・6.25L/100km",
+      "func": "calc",
+      "args": [400, 25],
+      "expect": { "ok": true, "kmPerL": 16, "lPer100km": 6.25 }
+    },
+    {
+      "name": "単価170円/Lを追加: 給油代4,250円・1kmあたり10.63円",
+      "func": "calc",
+      "args": [400, 25, 170],
+      "expect": { "ok": true, "kmPerL": 16, "fuelCost": 4250, "costPerKm": 10.63 }
+    },
+    {
+      "name": "小数入力: 653.2km・40.11L → 16.29km/L・6.14L/100km",
+      "func": "calc",
+      "args": [653.2, 40.11],
+      "expect": { "ok": true, "kmPerL": 16.29, "lPer100km": 6.14 }
+    },
+    {
+      "name": "軽自動車の例: 350km・15L → 23.33km/L",
+      "func": "calc",
+      "args": [350, 15],
+      "expect": { "ok": true, "kmPerL": 23.33, "lPer100km": 4.29 }
+    },
+    {
+      "name": "異常入力: 距離0はエラー",
+      "func": "calc",
+      "args": [0, 25],
+      "expect": { "ok": false, "code": "invalid_distance" }
+    },
+    {
+      "name": "異常入力: 距離が負はエラー",
+      "func": "calc",
+      "args": [-100, 25],
+      "expect": { "ok": false, "code": "invalid_distance" }
+    },
+    {
+      "name": "異常入力: 給油量0はエラー",
+      "func": "calc",
+      "args": [400, 0],
+      "expect": { "ok": false, "code": "invalid_liters" }
+    },
+    {
+      "name": "異常入力: 給油量500L超はエラー",
+      "func": "calc",
+      "args": [400, 600],
+      "expect": { "ok": false, "code": "invalid_liters" }
+    },
+    {
+      "name": "異常入力: 単価0はエラー",
+      "func": "calc",
+      "args": [400, 25, 0],
+      "expect": { "ok": false, "code": "invalid_price" }
+    },
+    {
+      "name": "異常入力: 数値以外はエラー",
+      "func": "calc",
+      "args": ["400", 25],
+      "expect": { "ok": false, "code": "invalid_distance" }
+    }
+  ]
+}

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>出産予定日・妊娠週数 計算機(最終月経から・周期補正対応) | 計算ツールボックス</title>
+  <meta name="description" content="最終月経の開始日から出産予定日と現在の妊娠週数(○週△日)を無料計算。月経周期が28日でない場合の補正にも対応。妊娠初期・中期・後期の区分も表示します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/ninshin/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="出産予定日・妊娠週数 計算機(最終月経から・周期補正対応) | 計算ツールボックス">
+  <meta property="og:description" content="最終月経の開始日から出産予定日と現在の妊娠週数(○週△日)を無料計算。月経周期が28日でない場合の補正にも対応。妊娠初期・中期・後期の区分も表示します。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/ninshin/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"出産予定日・妊娠週数 計算機(最終月経から・周期補正対応)","item":"https://quick-calc.site/tools/ninshin/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>出産予定日・妊娠週数 計算機</h1>
+  <p>最終月経の開始日を入れると、<strong>出産予定日</strong>と<strong>今日が妊娠何週何日か</strong>を計算します。月経周期が28日でない場合の補正にも対応。妊娠初期・中期・後期の区分も表示します。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="ninshin-form">
+    <label>最終月経の開始日
+      <input type="date" id="lmp" min="1900-01-01" max="2200-12-31" required>
+    </label>
+    <label>月経周期(日)
+      <span class="field-note">わからなければ28のままでOK</span>
+      <input type="number" id="cycle" min="20" max="45" step="1" value="28" required>
+    </label>
+    <label>基準日(この日時点で計算)
+      <span class="field-note">初期値は今日</span>
+      <input type="date" id="asof" min="1900-01-01" max="2200-12-31" required>
+    </label>
+    <button type="submit">予定日と週数を計算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    このツールの結果は<strong>月経周期からの概算</strong>です。実際の出産予定日は、妊娠初期の超音波検査(赤ちゃんの大きさ)をもとに<strong>医師が決定したものが優先</strong>されます。妊娠の判定・健康管理は必ず産婦人科を受診してください。
+  </div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>最終月経(いちばん最近の生理)が始まった日を入力します。</li>
+    <li>月経周期がわかれば入力します(28日でない場合は予定日が補正されます)。</li>
+    <li>「計算する」を押すと、出産予定日・現在の週数・妊娠の区分が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>出産予定日 = 最終月経開始日 + 280日</strong>(妊娠40週0日)。妊娠週数を最終月経の開始日から数えるのは産科の標準的な方法(ネーゲレの概算法)です。</li>
+    <li>月経周期が28日でない場合、排卵日のずれを補正するため<strong>(周期 − 28)日</strong>を加減します(例: 周期35日なら予定日は7日後ろへ)。</li>
+    <li>妊娠週数 = 起点からの経過日数 ÷ 7(切り捨て)。余りが「日」になります。</li>
+    <li>区分: 妊娠13週まで=初期 / 14〜27週=中期 / 28週から=後期</li>
+    <li>計算例: 最終月経が1月1日(周期28日)→ 予定日は10月8日。7月24日時点では妊娠29週1日(後期)。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>妊娠期間の数え方(最終月経初日から数えて40週0日を出産予定日とする): <a href="https://www.jsog.or.jp/citizen/5713/" target="_blank" rel="noopener">日本産科婦人科学会「産科・婦人科の病気: 妊娠・出産に関する用語解説」</a></li>
+    <li>周期補正はネーゲレ概算法に基づく一般的な調整方法です。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>月経周期が不規則な方は、この計算のずれが大きくなります。最終的な予定日は超音波検査で医師が確定します。</li>
+    <li>予定日ちょうどに生まれるのは一部で、正期産(37週0日〜41週6日)の範囲での出産が一般的です。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 予定日どおりに生まれますか?</h3>
+  <p>予定日はあくまで「40週0日」の目安の日です。37週0日〜41週6日の出産は正期産と呼ばれ、この範囲での出産が大半を占めます。予定日前後2週間は幅があると考えておくと安心です。</p>
+  <h3>Q. 病院で言われた予定日とこのツールの結果が違います。なぜですか?</h3>
+  <p>産婦人科では妊娠初期の超音波検査で赤ちゃんの大きさ(頭殿長)を測り、予定日を修正することがあるためです。<strong>医師が決めた予定日が正</strong>で、このツールは受診前の目安としてお使いください。</p>
+  <h3>Q. 妊娠○ヶ月とはどう対応しますか?</h3>
+  <p>妊娠1ヶ月=0〜3週、2ヶ月=4〜7週のように、4週で1ヶ月と数えます。例えば12週は妊娠4ヶ月、20週は妊娠6ヶ月にあたります。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../days/">日数計算機(日付の差・○日後)</a></li>
+    <li><a href="../age/">年齢計算機(満年齢・早生まれ・干支)</a></li>
+    <li><a href="../kinenbi/">記念日カウント計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var asofInput = document.getElementById("asof");
+  var now = new Date();
+  asofInput.value = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
+
+  var ERROR_MESSAGES = {
+    invalid_lmp: "最終月経の開始日を正しく入力してください。",
+    invalid_asof: "基準日を正しく入力してください。",
+    invalid_cycle: "月経周期は20〜45日の整数で入力してください。",
+    lmp_after_asof: "最終月経の開始日が基準日より後になっています。"
+  };
+  document.getElementById("ninshin-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var r = NinshinCalc.dueDate(
+      document.getElementById("lmp").value,
+      asofInput.value,
+      parseInt(document.getElementById("cycle").value, 10)
+    );
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var over = r.week >= 42 ? '<p class="result-error">計算上42週を超えています。入力日をご確認ください。</p>' : "";
+    box.innerHTML =
+      '<div class="result-main">出産予定日 ' + r.due + "</div>" +
+      "<p>基準日時点で <strong>妊娠" + r.week + "週" + r.day + "日</strong>(妊娠" + r.trimester + ")</p>" + over +
+      "<p>※医師の診断による予定日が優先されます。</p>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

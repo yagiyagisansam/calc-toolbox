@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>温度換算 計算機(摂氏⇔華氏⇔ケルビン) | 計算ツールボックス</title>
+  <meta name="description" content="摂氏(°C)・華氏(°F)・ケルビン(K)を一発で相互変換。海外レシピのオーブン温度や海外の天気予報、理科の課題に。定義式による正確な換算です。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/ondo/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="温度換算 計算機(摂氏⇔華氏⇔ケルビン) | 計算ツールボックス">
+  <meta property="og:description" content="摂氏(°C)・華氏(°F)・ケルビン(K)を一発で相互変換。海外レシピのオーブン温度や海外の天気予報、理科の課題に。定義式による正確な換算です。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/ondo/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"温度換算 計算機(摂氏⇔華氏⇔ケルビン)","item":"https://quick-calc.site/tools/ondo/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">計算ツールボックス</a>
+  <nav class="site-nav">
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>温度換算 計算機</h1>
+  <p>摂氏(°C)・華氏(°F)・ケルビン(K)を<strong>一発で相互変換</strong>します。海外レシピのオーブン温度(°F)、アメリカの天気予報、理科・物理の課題に。入力した値はお使いの端末内だけで計算され、送信されません。</p>
+
+  <form class="tool-form" id="ondo-form">
+    <label>温度
+      <input type="number" id="value" step="any" required placeholder="例: 350">
+    </label>
+    <label>入力の単位
+      <select id="unit">
+        <option value="c">摂氏(°C)</option>
+        <option value="f" selected>華氏(°F)</option>
+        <option value="k">ケルビン(K)</option>
+      </select>
+    </label>
+    <button type="submit">換算する</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <h2>使い方</h2>
+  <ol>
+    <li>温度の数値を入力します(小数もOK)。</li>
+    <li>入力した数値の単位(°C・°F・K)を選びます。</li>
+    <li>「換算する」を押すと、3つの単位すべての値が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul>
+    <li><strong>華氏(°F)= 摂氏(°C)× 1.8 + 32</strong></li>
+    <li><strong>ケルビン(K)= 摂氏(°C)+ 273.15</strong></li>
+    <li>計算例: オーブンの350°F は(350 − 32)÷ 1.8 = <strong>約177°C</strong></li>
+    <li>絶対零度(−273.15°C = −459.67°F = 0K)より低い温度は存在しないため、エラーになります。</li>
+  </ul>
+
+  <h3>出典・前提の明記</h3>
+  <ul class="sources">
+    <li>摂氏とケルビンの関係(t/°C = T/K − 273.15)は国際単位系(SI)の定義によります: <a href="https://unit.aist.go.jp/nmij/info/SI_9th/" target="_blank" rel="noopener">産業技術総合研究所 計量標準総合センター「国際単位系(SI)第9版」</a></li>
+    <li>華氏との換算式(°F = °C × 9/5 + 32)は単位の定義に基づく算術計算です。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul>
+    <li>表示は小数第2位で四捨五入しています。</li>
+    <li>華氏は主にアメリカで使われる単位です。「華氏100度」は約37.8°Cで、真夏日の気温にあたります。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3>Q. 華氏350度(オーブン)は摂氏何度ですか?</h3>
+  <p>約177°Cです。海外レシピでよく見る温度は 325°F≒163°C、350°F≒177°C、375°F≒191°C、400°F≒204°C。日本のオーブンなら180°C前後に設定するレシピが多く該当します。</p>
+  <h3>Q. 華氏と摂氏が同じ数値になる温度はありますか?</h3>
+  <p>−40度です。−40°C = −40°F で一致します。これは換算式 F = 1.8C + 32 で F = C とおくと C = −40 になるためです。</p>
+  <h3>Q. ケルビンはいつ使いますか?</h3>
+  <p>物理・化学の計算(気体の状態方程式など)で使う絶対温度の単位です。0K(絶対零度)= −273.15°C が下限で、マイナスの値はありません。目盛りの幅は摂氏と同じです。</p>
+
+  <h2>関連ツール</h2>
+  <ul>
+    <li><a href="../inch/">インチ⇔cm・ポンド⇔kg 変換計算機</a></li>
+    <li><a href="../renji/">電子レンジ加熱時間 換算計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var ERROR_MESSAGES = {
+    invalid_value: "温度を数値で入力してください。",
+    invalid_unit: "単位を選んでください。",
+    below_absolute_zero: "絶対零度(−273.15°C / −459.67°F / 0K)より低い温度は存在しません。"
+  };
+  document.getElementById("ondo-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var v = parseFloat(document.getElementById("value").value);
+    var r = OndoCalc.convert(v, document.getElementById("unit").value);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">' + r.c.toLocaleString() + " °C = " + r.f.toLocaleString() + " °F</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>単位</th><th>値</th></tr></thead><tbody>' +
+      "<tr><td>摂氏(°C)</td><td>" + r.c.toLocaleString() + "</td></tr>" +
+      "<tr><td>華氏(°F)</td><td>" + r.f.toLocaleString() + "</td></tr>" +
+      "<tr><td>ケルビン(K)</td><td>" + r.k.toLocaleString() + "</td></tr>" +
+      "</tbody></table></div>";
+    box.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

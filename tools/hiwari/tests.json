@@ -1,0 +1,67 @@
+{
+  "tool": "hiwari",
+  "module": "calc.js",
+  "global": "HiwariCalc",
+  "cases": [
+    {
+      "name": "入居: 家賃8万円・7/20入居(31日の月): 12日分・実日数30,967円・30日方式32,000円",
+      "func": "prorate",
+      "args": [80000, "2026-07-20", "movein"],
+      "expect": { "ok": true, "days": 12, "daysInMonth": 31, "actual": 30967, "by30": 32000 }
+    },
+    {
+      "name": "退去: 家賃8万円・7/10退去: 10日分・実日数25,806円・30日方式26,666円",
+      "func": "prorate",
+      "args": [80000, "2026-07-10", "moveout"],
+      "expect": { "ok": true, "days": 10, "daysInMonth": 31, "actual": 25806, "by30": 26666 }
+    },
+    {
+      "name": "うるう年2月: 家賃10万円・2024/2/20入居(29日の月): 10日分・実日数34,482円",
+      "func": "prorate",
+      "args": [100000, "2024-02-20", "movein"],
+      "expect": { "ok": true, "days": 10, "daysInMonth": 29, "actual": 34482, "by30": 33333 }
+    },
+    {
+      "name": "1日入居は満額(30日方式でも月額で頭打ち)",
+      "func": "prorate",
+      "args": [80000, "2026-07-01", "movein"],
+      "expect": { "ok": true, "days": 31, "daysInMonth": 31, "actual": 80000, "by30": 80000 }
+    },
+    {
+      "name": "月末退去は実日数方式で満額",
+      "func": "prorate",
+      "args": [80000, "2026-07-31", "moveout"],
+      "expect": { "ok": true, "days": 31, "actual": 80000, "by30": 80000 }
+    },
+    {
+      "name": "平年2月: 家賃6万円・2026/2/15退去(28日の月): 15日分・実日数32,142円・30日方式30,000円",
+      "func": "prorate",
+      "args": [60000, "2026-02-15", "moveout"],
+      "expect": { "ok": true, "days": 15, "daysInMonth": 28, "actual": 32142, "by30": 30000 }
+    },
+    {
+      "name": "異常入力: 家賃0はエラー",
+      "func": "prorate",
+      "args": [0, "2026-07-20", "movein"],
+      "expect": { "ok": false, "code": "invalid_rent" }
+    },
+    {
+      "name": "異常入力: 存在しない日付はエラー",
+      "func": "prorate",
+      "args": [80000, "2026-02-30", "movein"],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 形式不正はエラー",
+      "func": "prorate",
+      "args": [80000, "2026/07/20", "movein"],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 不正なモードはエラー",
+      "func": "prorate",
+      "args": [80000, "2026-07-20", "both"],
+      "expect": { "ok": false, "code": "invalid_mode" }
+    }
+  ]
+}
