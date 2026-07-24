@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>案A: タブ切替型 | トップページデザイン案</title>
+  <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    .proto-badge { position: fixed; top: 0; right: 0; background: #b3261e; color: #fff; font-size: 11px; padding: 2px 10px; border-bottom-left-radius: 8px; z-index: 10; }
+    .sticky-top { position: sticky; top: 0; background: var(--color-bg); padding: 8px 0 4px; z-index: 5; border-bottom: 1px solid var(--color-border); }
+    .tabs { display: flex; gap: 8px; overflow-x: auto; padding: 8px 2px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      flex: 0 0 auto; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--color-border);
+      background: var(--color-bg); color: var(--color-text); font-size: 0.88rem; cursor: pointer; white-space: nowrap;
+    }
+    .tab.active { background: var(--color-accent); border-color: var(--color-accent); color: #fff; font-weight: 700; }
+    .rank-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--color-accent-weak); color: var(--color-accent); font-weight: 700; font-size: 0.8rem; margin-right: 8px; flex: 0 0 auto; }
+    .rank-num.top3 { background: var(--color-accent); color: #fff; }
+    .tool-card > a { display: flex; align-items: center; gap: 4px; }
+    .tool-card .t-emoji { font-size: 1.3rem; margin-right: 6px; }
+    .tool-card .t-body { min-width: 0; }
+    .section-note { font-size: 0.78rem; color: var(--color-muted); margin: 2px 0 8px; }
+  </style>
+</head>
+<body>
+<div class="proto-badge">デザイン案A(モックアップ)</div>
+<header class="site-header">
+  <a class="site-brand" href="#">🧮 計算ツールボックス</a>
+</header>
+<main>
+  <div class="sticky-top">
+    <div class="tool-search" style="margin:4px 0 0;">
+      <input type="search" id="q" placeholder="61個のツールを検索(例: 家賃、文字数)" aria-label="検索">
+    </div>
+    <div class="tabs" id="tabs"></div>
+  </div>
+  <p class="section-note" id="note"></p>
+  <ul class="tool-list" id="list"></ul>
+</main>
+<script src="./data.js"></script>
+<script>
+(function () {
+  "use strict";
+  var CATS = [["popular", "🔥 人気"], ["recent", "🕐 よく使う"], ["all", "すべて"], ["健康", "健康"], ["お金", "お金"], ["日付", "日付・時間"], ["変換", "暮らし・変換"]];
+  // デモ用: 「よく使う」は端末内(localStorage)の利用履歴から自動生成される想定のサンプル
+  var RECENT = ["eigyobi", "warikan", "moji", "fudosan"];
+  var current = "popular";
+  var tabsEl = document.getElementById("tabs");
+  var listEl = document.getElementById("list");
+  var noteEl = document.getElementById("note");
+  var qEl = document.getElementById("q");
+
+  CATS.forEach(function (c) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "tab" + (c[0] === current ? " active" : "");
+    b.textContent = c[1];
+    b.onclick = function () {
+      current = c[0];
+      tabsEl.querySelectorAll(".tab").forEach(function (t, i) { t.classList.toggle("active", CATS[i][0] === current); });
+      render();
+    };
+    tabsEl.appendChild(b);
+  });
+
+  function card(t, rankNo) {
+    return '<li class="tool-card"><a href="#">' +
+      (rankNo ? '<span class="rank-num' + (rankNo <= 3 ? " top3" : "") + '">' + rankNo + "</span>" : '<span class="t-emoji">' + t.emoji + "</span>") +
+      '<span class="t-body"><span class="tool-name">' + t.name + '</span><p>' + t.desc + "</p></span></a></li>";
+  }
+
+  function render() {
+    var q = qEl.value.trim().toLowerCase();
+    var items;
+    var note = "";
+    if (q) {
+      items = TOOLS.filter(function (t) { return (t.name + t.desc + t.kw).toLowerCase().indexOf(q) !== -1; });
+      note = items.length + "件が見つかりました";
+      listEl.innerHTML = items.map(function (t) { return card(t); }).join("");
+    } else if (current === "popular") {
+      items = TOOLS.filter(function (t) { return t.rank; }).sort(function (a, b) { return a.rank - b.rank; });
+      note = "よく使われている順に自動で並びます(利用状況で毎週更新)";
+      listEl.innerHTML = items.map(function (t, i) { return card(t, i + 1); }).join("");
+    } else if (current === "recent") {
+      items = RECENT.map(function (s) { return TOOLS.find(function (t) { return t.slug === s; }); });
+      note = "この端末で最近使ったツール(履歴は端末内にのみ保存)";
+      listEl.innerHTML = items.map(function (t) { return card(t); }).join("");
+    } else {
+      items = current === "all" ? TOOLS : TOOLS.filter(function (t) { return t.cat === current; });
+      note = items.length + "個のツール";
+      listEl.innerHTML = items.map(function (t) { return card(t); }).join("");
+    }
+    noteEl.textContent = note;
+  }
+  qEl.addEventListener("input", render);
+  render();
+})();
+</script>
+</body>
+</html>
