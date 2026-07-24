@@ -102,6 +102,62 @@
         "ok": false,
         "code": "invalid_text"
       }
+    },
+    {
+      "name": "HTML除去: <p>こんにちは</p> は本文5文字",
+      "func": "countHtmlStripped",
+      "args": [
+        "<p>こんにちは</p>"
+      ],
+      "expect": {
+        "ok": true,
+        "chars": 5,
+        "charsNoSpace": 5
+      }
+    },
+    {
+      "name": "HTML除去: script/styleの中身は本文に数えない",
+      "func": "countHtmlStripped",
+      "args": [
+        "<style>p{color:red}</style><p>あい</p><script>alert(1)</script>"
+      ],
+      "expect": {
+        "ok": true,
+        "chars": 2
+      }
+    },
+    {
+      "name": "HTML除去: コメントとDOCTYPEは無視",
+      "func": "countHtmlStripped",
+      "args": [
+        "<!DOCTYPE html><!-- メモ --><b>あ</b>"
+      ],
+      "expect": {
+        "ok": true,
+        "chars": 1
+      }
+    },
+    {
+      "name": "HTML除去: 実体参照(&amp;等)は1文字に戻して数える",
+      "func": "countHtmlStripped",
+      "args": [
+        "A&amp;B&lt;C&gt;&#12354;"
+      ],
+      "expect": {
+        "ok": true,
+        "chars": 7
+      }
+    },
+    {
+      "name": "HTML除去: 文字列以外はエラー",
+      "func": "countHtmlStripped",
+      "args": [
+        123
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_text"
+      }
     }
   ]
 }
