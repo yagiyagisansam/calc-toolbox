@@ -181,8 +181,198 @@
     };
   }
 
+  // ===== 長期シミュレーション(グラフ用)=====
+
+  var LEGAL_LIFE = { rc: 47, steel: 34, wood: 22 };
+  var SHORT_TERM_RATE = 0.3963;   // 短期譲渡: 所得税30%×1.021+住民税9%
+  var LONG_TERM_RATE = 0.20315;   // 長期譲渡: 所得税15%×1.021+住民税5%
+
+  /**
+   * 中古資産の簡便法による減価償却の耐用年数。
+   * (法定耐用年数 − 経過年数) + 経過年数×20%(1年未満切捨・最低2年)
+   * @param {string} structure "rc" | "steel" | "wood"
+   * @param {number} age 築年数
+   * @returns {number|null} 耐用年数(年)。不正入力は null
+   */
+  function usefulLife(structure, age) {
+    var legal = LEGAL_LIFE[structure];
+    if (!legal || typeof age !== "number" || !isFinite(age) || age < 0 || age > 100 || age !== Math.floor(age)) {
+      return null;
+    }
+    var life = age >= legal ? Math.floor(legal * 0.2) : Math.floor(legal - age + age * 0.2);
+    return life < 2 ? 2 : life;
+  }
+
+  /**
+   * 長期収支シミュレーション。年ごとの残債・売却想定額・累計CF・
+   * 「その年に売った場合の通算損益」を計算する。
+   * @param {Object} input
+   *  必須: price(物件価格円) structure("rc"|"steel"|"wood") age(築年数)
+   *        rentMonthly(月額家賃円) salary(給与年収円)
+   *  任意(省略時は既定値):
+   *        downPayment=0 costRatePct=7 ratePct=2 years=35 buildingRatioPct=50
+   *        vacancyPct=5 rentDeclinePct=1 opexRatePct=20
+   *        saleYieldPct=null(購入時利回り) saleCostPct=4
+   *        socialIns=null(給与×15%) otherDeduction=0
+   * @returns {{ok: true, monthly, initialOutlay, grossYieldPct, usefulLifeYears, horizon,
+   *            breakEvenYear, deadCrossYear, years: Array<Object>}|{ok: false, code}}
+   *  years[i]: { y, grossRent, effRent, opex, interest, principalPaid, loanBalance,
+   *              depreciation, rei, taxEffect, cf, cumCF, cumTax, valueIncome, valueCost,
+   *              saleNet, totalIfSold, longTerm }
+   */
+  function simulateLongTerm(input) {
+    if (!input || typeof input !== "object") return { ok: false, code: "invalid_input" };
+    function pick(key, def) { return input[key] == null ? def : input[key]; }
+    var price = input.price;
+    var age = input.age;
+    var rentMonthly = input.rentMonthly;
+    var salary = input.salary;
+    if (!num(price, 1000000, 1000000000)) return { ok: false, code: "invalid_price" };
+    var life = usefulLife(input.structure, age);
+    if (life === null) return { ok: false, code: "invalid_structure_age" };
+    if (!num(rentMonthly, 1000, 10000000)) return { ok: false, code: "invalid_rent" };
+    if (!num(salary, 0, 1000000000)) return { ok: false, code: "invalid_salary" };
+    var downPayment = pick("downPayment", 0);
+    var costRate = pick("costRatePct", 7);
+    var ratePct = pick("ratePct", 2);
+    var years = pick("years", 35);
+    var buildingRatio = pick("buildingRatioPct", 50);
+    var vacancy = pick("vacancyPct", 5);
+    var rentDecline = pick("rentDeclinePct", 1);
+    var opexRate = pick("opexRatePct", 20);
+    var saleYieldPct = pick("saleYieldPct", null);
+    var saleCostRate = pick("saleCostPct", 4);
+    var si = pick("socialIns", Math.round(salary * 0.15));
+    var otherDed = pick("otherDeduction", 0);
+    if (!num(downPayment, 0, price)) return { ok: false, code: "invalid_down" };
+    if (!num(costRate, 0, 20)) return { ok: false, code: "invalid_costrate" };
+    if (!num(ratePct, 0, 20)) return { ok: false, code: "invalid_rate" };
+    if (!num(years, 1, 50) || years !== Math.floor(years)) return { ok: false, code: "invalid_years" };
+    if (!num(buildingRatio, 0, 100)) return { ok: false, code: "invalid_bratio" };
+    if (!num(vacancy, 0, 90)) return { ok: false, code: "invalid_vacancy" };
+    if (typeof rentDecline !== "number" || !isFinite(rentDecline) || rentDecline < -5 || rentDecline > 10) {
+      return { ok: false, code: "invalid_decline" };
+    }
+    if (!num(opexRate, 0, 90)) return { ok: false, code: "invalid_opex" };
+    if (saleYieldPct !== null && !num(saleYieldPct, 0.1, 30)) return { ok: false, code: "invalid_saleyield" };
+    if (!num(saleCostRate, 0, 20)) return { ok: false, code: "invalid_salecost" };
+    if (!num(si, 0, 1000000000)) return { ok: false, code: "invalid_socialins" };
+    if (!num(otherDed, 0, 1000000000)) return { ok: false, code: "invalid_deduction" };
+
+    var principal = price - downPayment;
+    var initialOutlay = Math.round(downPayment + price * costRate / 100);
+    var grossRent0 = rentMonthly * 12;
+    var grossYield = grossRent0 / price;
+    var building = price * buildingRatio / 100;
+    var land = price - building;
+    var dep = life > 0 ? building / life : 0;
+    var horizon = Math.min(50, Math.max(years, 35));
+
+    // 月次ローン返済スケジュール → 年次集計
+    var r = ratePct / 1200;
+    var n = years * 12;
+    var monthly = principal <= 0 ? 0
+      : Math.round(r === 0 ? principal / n : principal * r / (1 - Math.pow(1 + r, -n)));
+    var bal = principal;
+    var yInterest = [];
+    var yPrincipal = [];
+    var yBalance = [];
+    for (var y = 1; y <= horizon; y++) {
+      var iSum = 0;
+      var pSum = 0;
+      for (var m = 0; m < 12; m++) {
+        if (bal <= 0) break;
+        var im = bal * r;
+        var pay = Math.min(monthly, bal + im);
+        iSum += im;
+        pSum += pay - im;
+        bal = bal + im - pay;
+      }
+      yInterest.push(iSum);
+      yPrincipal.push(pSum);
+      yBalance.push(Math.max(0, bal));
+    }
+
+    var salaryInc = Math.max(0, salary - salaryDeduction(salary));
+    function taxTotal(netREI) {
+      var gross = Math.max(0, salaryInc + netREI);
+      return incomeTaxOn(gross - si - otherDed - 580000) +
+             residentTaxOn(gross - si - otherDed - 430000);
+    }
+    var taxBase = taxTotal(0);
+    var landShare = 1 - buildingRatio / 100;
+    var saleYield = saleYieldPct !== null ? saleYieldPct / 100 : grossYield;
+
+    var out = [];
+    var cumCF = 0;
+    var cumDep = 0;
+    var cumTax = 0;
+    var breakEvenYear = null;
+    var deadCrossYear = null;
+    for (var yy = 1; yy <= horizon; yy++) {
+      var grossRent = grossRent0 * Math.pow(1 - rentDecline / 100, yy - 1);
+      var effRent = grossRent * (1 - vacancy / 100);
+      var opex = grossRent * opexRate / 100;
+      var depY = yy <= life ? dep : 0;
+      var interest = yInterest[yy - 1];
+      var principalPaid = yPrincipal[yy - 1];
+      var rei = effRent - opex - depY - interest;
+      var netREI = rei;
+      if (rei < 0) netREI = rei + Math.min(-rei, interest * landShare);
+      var taxEffect = taxBase - taxTotal(netREI);
+      var cf = effRent - opex - (interest + principalPaid) + taxEffect;
+      cumCF += cf;
+      cumDep += depY;
+      cumTax += taxEffect;
+      var valueIncome = saleYield > 0 ? grossRent / saleYield : 0;
+      var valueCost = land + building * Math.max(0, 1 - yy / life);
+      var saleCosts = valueIncome * saleCostRate / 100;
+      var gain = valueIncome - saleCosts - (price - cumDep);
+      var longTerm = yy >= 7;
+      var taxSale = gain > 0 ? gain * (longTerm ? LONG_TERM_RATE : SHORT_TERM_RATE) : 0;
+      var saleNet = valueIncome - saleCosts - taxSale - yBalance[yy - 1];
+      var totalIfSold = Math.round(cumCF + saleNet - initialOutlay);
+      if (breakEvenYear === null && totalIfSold >= 0) breakEvenYear = yy;
+      if (deadCrossYear === null && yy <= years && principalPaid > depY) deadCrossYear = yy;
+      out.push({
+        y: yy,
+        grossRent: Math.round(grossRent),
+        effRent: Math.round(effRent),
+        opex: Math.round(opex),
+        interest: Math.round(interest),
+        principalPaid: Math.round(principalPaid),
+        loanBalance: Math.round(yBalance[yy - 1]),
+        depreciation: Math.round(depY),
+        rei: Math.round(rei),
+        taxEffect: Math.round(taxEffect),
+        cf: Math.round(cf),
+        cumCF: Math.round(cumCF),
+        cumTax: Math.round(cumTax),
+        valueIncome: Math.round(valueIncome),
+        valueCost: Math.round(valueCost),
+        saleNet: Math.round(saleNet),
+        totalIfSold: totalIfSold,
+        longTerm: longTerm
+      });
+    }
+
+    return {
+      ok: true,
+      monthly: monthly,
+      initialOutlay: initialOutlay,
+      grossYieldPct: Math.round(grossYield * 10000) / 100,
+      usefulLifeYears: life,
+      horizon: horizon,
+      breakEvenYear: breakEvenYear,
+      deadCrossYear: deadCrossYear,
+      years: out
+    };
+  }
+
   var api = {
     simulate: simulate,
+    simulateLongTerm: simulateLongTerm,
+    usefulLife: usefulLife,
     salaryDeduction: salaryDeduction,
     incomeTaxOn: incomeTaxOn,
     residentTaxOn: residentTaxOn,

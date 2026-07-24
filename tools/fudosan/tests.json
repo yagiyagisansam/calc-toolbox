@@ -6,92 +6,431 @@
     {
       "name": "部品: 給与所得控除(年収600万→164万)",
       "func": "salaryDeduction",
-      "args": [6000000],
+      "args": [
+        6000000
+      ],
       "expect": 1640000
     },
     {
       "name": "部品: 給与所得控除の下限(年収150万→65万)",
       "func": "salaryDeduction",
-      "args": [1500000],
+      "args": [
+        1500000
+      ],
       "expect": 650000
     },
     {
       "name": "部品: 所得税(課税所得288万→194,500円・復興税込み)",
       "func": "incomeTaxOn",
-      "args": [2880000],
+      "args": [
+        2880000
+      ],
       "expect": 194500
     },
     {
       "name": "部品: 所得税(課税所得600万→788,700円)",
       "func": "incomeTaxOn",
-      "args": [6000000],
+      "args": [
+        6000000
+      ],
       "expect": 788700
     },
     {
       "name": "部品: 課税所得0以下は税額0",
       "func": "incomeTaxOn",
-      "args": [-100],
+      "args": [
+        -100
+      ],
       "expect": 0
     },
     {
       "name": "部品: 住民税所得割(288万→288,000円)",
       "func": "residentTaxOn",
-      "args": [2880000],
+      "args": [
+        2880000
+      ],
       "expect": 288000
     },
     {
       "name": "部品: ローン2,000万・2%・25年 → 月84,771円・初年度利息394,310円",
       "func": "loanCalc",
-      "args": [20000000, 2, 25],
-      "expect": { "monthly": 84771, "annualPay": 1017252, "interestY1": 394310 }
+      "args": [
+        20000000,
+        2,
+        25
+      ],
+      "expect": {
+        "monthly": 84771,
+        "annualPay": 1017252,
+        "interestY1": 394310
+      }
     },
     {
       "name": "部品: 金利0%は元金÷月数",
       "func": "loanCalc",
-      "args": [12000000, 0, 10],
-      "expect": { "monthly": 100000, "interestY1": 0 }
+      "args": [
+        12000000,
+        0,
+        10
+      ],
+      "expect": {
+        "monthly": 100000,
+        "interestY1": 0
+      }
     },
     {
       "name": "ワンルーム例: 家賃120万・経費(管理1万/月・固都税10万・雑費10万・償却50万)・借入2000万2%25年・給与600万(社保90万) → 不動産所得-14,310円・還付3,100円・年CF-134,152円",
       "func": "simulate",
-      "args": [{ "rent": 1200000, "mgmtMonthly": 10000, "propTax": 100000, "misc": 100000, "depreciation": 500000, "principal": 20000000, "ratePct": 2, "years": 25, "landRatioPct": 0, "salary": 6000000, "socialIns": 900000 }],
-      "expect": { "ok": true, "monthly": 84771, "interestY1": 394310, "realEstateIncome": -14310, "disallowedLoss": 0, "taxBefore": 497500, "taxAfter": 494400, "taxEffect": 3100, "annualCF": -134152, "monthlyCF": -11179, "breakEvenRent": 1368352 }
+      "args": [
+        {
+          "rent": 1200000,
+          "mgmtMonthly": 10000,
+          "propTax": 100000,
+          "misc": 100000,
+          "depreciation": 500000,
+          "principal": 20000000,
+          "ratePct": 2,
+          "years": 25,
+          "landRatioPct": 0,
+          "salary": 6000000,
+          "socialIns": 900000
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "monthly": 84771,
+        "interestY1": 394310,
+        "realEstateIncome": -14310,
+        "disallowedLoss": 0,
+        "taxBefore": 497500,
+        "taxAfter": 494400,
+        "taxEffect": 3100,
+        "annualCF": -134152,
+        "monthlyCF": -11179,
+        "breakEvenRent": 1368352
+      }
     },
     {
       "name": "土地割合50%: 赤字が土地利息の範囲内なので損益通算不可 → 還付0円",
       "func": "simulate",
-      "args": [{ "rent": 1200000, "mgmtMonthly": 10000, "propTax": 100000, "misc": 100000, "depreciation": 500000, "principal": 20000000, "ratePct": 2, "years": 25, "landRatioPct": 50, "salary": 6000000, "socialIns": 900000 }],
-      "expect": { "ok": true, "disallowedLoss": 14310, "taxEffect": 0 }
+      "args": [
+        {
+          "rent": 1200000,
+          "mgmtMonthly": 10000,
+          "propTax": 100000,
+          "misc": 100000,
+          "depreciation": 500000,
+          "principal": 20000000,
+          "ratePct": 2,
+          "years": 25,
+          "landRatioPct": 50,
+          "salary": 6000000,
+          "socialIns": 900000
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "disallowedLoss": 14310,
+        "taxEffect": 0
+      }
     },
     {
       "name": "黒字物件: 不動産所得+141.6万 → 税負担増387,500円でもCFは年+100.5万",
       "func": "simulate",
-      "args": [{ "rent": 3000000, "mgmtMonthly": 20000, "propTax": 200000, "misc": 150000, "depreciation": 600000, "principal": 20000000, "ratePct": 2, "years": 25, "landRatioPct": 0, "salary": 6000000, "socialIns": 900000 }],
-      "expect": { "ok": true, "realEstateIncome": 1415690, "taxEffect": -387500, "annualCF": 1005248, "breakEvenPct": 53.8 }
+      "args": [
+        {
+          "rent": 3000000,
+          "mgmtMonthly": 20000,
+          "propTax": 200000,
+          "misc": 150000,
+          "depreciation": 600000,
+          "principal": 20000000,
+          "ratePct": 2,
+          "years": 25,
+          "landRatioPct": 0,
+          "salary": 6000000,
+          "socialIns": 900000
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "realEstateIncome": 1415690,
+        "taxEffect": -387500,
+        "annualCF": 1005248,
+        "breakEvenPct": 53.8
+      }
     },
     {
       "name": "社会保険料省略時は給与の15%概算(給与500万→75万)",
       "func": "simulate",
-      "args": [{ "rent": 1000000, "mgmtMonthly": 8000, "propTax": 80000, "misc": 50000, "depreciation": 400000, "principal": 15000000, "ratePct": 1.8, "years": 30, "salary": 5000000 }],
-      "expect": { "ok": true, "monthly": 53955, "interestY1": 266870, "realEstateIncome": 107130, "taxEffect": -21600, "annualCF": 104940 }
+      "args": [
+        {
+          "rent": 1000000,
+          "mgmtMonthly": 8000,
+          "propTax": 80000,
+          "misc": 50000,
+          "depreciation": 400000,
+          "principal": 15000000,
+          "ratePct": 1.8,
+          "years": 30,
+          "salary": 5000000
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "monthly": 53955,
+        "interestY1": 266870,
+        "realEstateIncome": 107130,
+        "taxEffect": -21600,
+        "annualCF": 104940
+      }
     },
     {
       "name": "異常入力: 家賃0はエラー",
       "func": "simulate",
-      "args": [{ "rent": 0, "mgmtMonthly": 0, "propTax": 0, "misc": 0, "depreciation": 0, "principal": 10000000, "ratePct": 2, "years": 25, "salary": 5000000 }],
-      "expect": { "ok": false, "code": "invalid_rent" }
+      "args": [
+        {
+          "rent": 0,
+          "mgmtMonthly": 0,
+          "propTax": 0,
+          "misc": 0,
+          "depreciation": 0,
+          "principal": 10000000,
+          "ratePct": 2,
+          "years": 25,
+          "salary": 5000000
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_rent"
+      }
     },
     {
       "name": "異常入力: 借入額0はエラー",
       "func": "simulate",
-      "args": [{ "rent": 1000000, "mgmtMonthly": 0, "propTax": 0, "misc": 0, "depreciation": 0, "principal": 0, "ratePct": 2, "years": 25, "salary": 5000000 }],
-      "expect": { "ok": false, "code": "invalid_principal" }
+      "args": [
+        {
+          "rent": 1000000,
+          "mgmtMonthly": 0,
+          "propTax": 0,
+          "misc": 0,
+          "depreciation": 0,
+          "principal": 0,
+          "ratePct": 2,
+          "years": 25,
+          "salary": 5000000
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_principal"
+      }
     },
     {
       "name": "異常入力: 土地割合101%はエラー",
       "func": "simulate",
-      "args": [{ "rent": 1000000, "mgmtMonthly": 0, "propTax": 0, "misc": 0, "depreciation": 0, "principal": 10000000, "ratePct": 2, "years": 25, "landRatioPct": 101, "salary": 5000000 }],
-      "expect": { "ok": false, "code": "invalid_landratio" }
+      "args": [
+        {
+          "rent": 1000000,
+          "mgmtMonthly": 0,
+          "propTax": 0,
+          "misc": 0,
+          "depreciation": 0,
+          "principal": 10000000,
+          "ratePct": 2,
+          "years": 25,
+          "landRatioPct": 101,
+          "salary": 5000000
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_landratio"
+      }
+    },
+    {
+      "name": "長期: 耐用年数の簡便法(RC築15年 → (47-15)+15×0.2=35年)",
+      "func": "usefulLife",
+      "args": [
+        "rc",
+        15
+      ],
+      "expect": 35
+    },
+    {
+      "name": "長期: 耐用年数(木造築25年・法定超過 → 22×0.2=4年)",
+      "func": "usefulLife",
+      "args": [
+        "wood",
+        25
+      ],
+      "expect": 4
+    },
+    {
+      "name": "長期: 耐用年数(RC新築 → 47年)",
+      "func": "usefulLife",
+      "args": [
+        "rc",
+        0
+      ],
+      "expect": 47
+    },
+    {
+      "name": "長期シナリオ: 2000万RC築15年・家賃8.5万・年収600万(既定値) → 表面5.1%・月返済66,253円・初期費用140万・損益分岐13年目",
+      "func": "simulateLongTerm",
+      "args": [
+        {
+          "price": 20000000,
+          "structure": "rc",
+          "age": 15,
+          "rentMonthly": 85000,
+          "salary": 6000000
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "monthly": 66253,
+        "initialOutlay": 1400000,
+        "grossYieldPct": 5.1,
+        "usefulLifeYears": 35,
+        "horizon": 35,
+        "breakEvenYear": 13,
+        "deadCrossYear": 1
+      }
+    },
+    {
+      "name": "長期: 1年目の利息はローン計算(loanCalc)と一致・残債と償却も検証",
+      "func": "simulateLongTerm",
+      "args": [
+        {
+          "price": 20000000,
+          "structure": "rc",
+          "age": 15,
+          "rentMonthly": 85000,
+          "salary": 6000000
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "years": [
+          {
+            "interest": 396359,
+            "loanBalance": 19601323,
+            "depreciation": 285714,
+            "valueIncome": 20000000,
+            "totalIfSold": -1847859
+          }
+        ]
+      }
+    },
+    {
+      "name": "長期: 譲渡税の長短切替(6年目まで短期・7年目から長期。年初購入・年末売却の想定)",
+      "func": "simulateLongTerm",
+      "args": [
+        {
+          "price": 20000000,
+          "structure": "rc",
+          "age": 15,
+          "rentMonthly": 85000,
+          "salary": 6000000
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "years": {
+          "5": {
+            "longTerm": false
+          },
+          "6": {
+            "longTerm": true
+          }
+        }
+      }
+    },
+    {
+      "name": "長期: 損益分岐の前年はマイナス・当年はプラス",
+      "func": "simulateLongTerm",
+      "args": [
+        {
+          "price": 20000000,
+          "structure": "rc",
+          "age": 15,
+          "rentMonthly": 85000,
+          "salary": 6000000
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "years": {
+          "11": {
+            "totalIfSold": -46100
+          },
+          "12": {
+            "totalIfSold": 127640
+          }
+        }
+      }
+    },
+    {
+      "name": "長期: 金利0%・20年は月返済83,333円・利息0(検証範囲は35年に拡張)",
+      "func": "simulateLongTerm",
+      "args": [
+        {
+          "price": 20000000,
+          "structure": "rc",
+          "age": 15,
+          "rentMonthly": 85000,
+          "salary": 6000000,
+          "ratePct": 0,
+          "years": 20
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "monthly": 83333,
+        "horizon": 35,
+        "years": [
+          {
+            "interest": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "長期・異常入力: 構造不正はエラー",
+      "func": "simulateLongTerm",
+      "args": [
+        {
+          "price": 20000000,
+          "structure": "tower",
+          "age": 15,
+          "rentMonthly": 85000,
+          "salary": 6000000
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_structure_age"
+      }
+    },
+    {
+      "name": "長期・異常入力: 頭金が物件価格超はエラー",
+      "func": "simulateLongTerm",
+      "args": [
+        {
+          "price": 20000000,
+          "structure": "rc",
+          "age": 15,
+          "rentMonthly": 85000,
+          "salary": 6000000,
+          "downPayment": 30000000
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_down"
+      }
     }
   ]
 }
