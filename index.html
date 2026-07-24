@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>計算ツールボックス | 暮らしに役立つ無料計算ツール集</title>
-  <meta name="description" content="健康・お金・暮らしの疑問をその場で計算できる無料Webツール集。登録不要・スマホ対応。すべてのツールに計算根拠と一次情報の出典を明記しています。">
+  <meta name="description" content="健康・お金・日付・暮らしの疑問をその場で計算できる無料Webツール集(61個)。登録不要・スマホ対応。すべてのツールに計算根拠と一次情報の出典を明記しています。">
   <link rel="stylesheet" href="./shared/style.css">
   <!-- @meta start -->
   <link rel="canonical" href="https://quick-calc.site/">
@@ -12,299 +12,353 @@
   <meta name="theme-color" content="#0b6e4f">
   <meta property="og:site_name" content="計算ツールボックス">
   <meta property="og:title" content="計算ツールボックス | 暮らしに役立つ無料計算ツール集">
-  <meta property="og:description" content="健康・お金・暮らしの疑問をその場で計算できる無料Webツール集。登録不要・スマホ対応。すべてのツールに計算根拠と一次情報の出典を明記しています。">
+  <meta property="og:description" content="健康・お金・日付・暮らしの疑問をその場で計算できる無料Webツール集(61個)。登録不要・スマホ対応。すべてのツールに計算根拠と一次情報の出典を明記しています。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://quick-calc.site/">
   <meta property="og:locale" content="ja_JP">
   <meta name="twitter:card" content="summary">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"計算ツールボックス","url":"https://quick-calc.site/","inLanguage":"ja"}</script>
   <!-- @meta end -->
+  <style>
+    :root {
+      --tp-bg: #f7f5f0; --tp-tile: #ffffff; --tp-ink: #26282b; --tp-muted: #93989e; --tp-gold: #b8873a;
+      --tp-shadow: 0 1px 2px rgba(30,32,34,0.05), 0 6px 16px rgba(30,32,34,0.06);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --tp-bg: #141619; --tp-tile: #1f2326; --tp-ink: #eceff1; --tp-muted: #8b9196; --tp-shadow: 0 1px 2px rgba(0,0,0,0.4); }
+    }
+    body { background: var(--tp-bg); color: var(--tp-ink); }
+    main { padding-bottom: 40px; }
+    .brand { display: flex; align-items: center; gap: 10px; padding: 22px 0 4px; }
+    .brand .mark { width: 40px; height: 40px; border-radius: 13px; background: var(--color-accent); display: flex; align-items: center; justify-content: center; box-shadow: var(--tp-shadow); flex: 0 0 auto; }
+    .brand .mark svg { width: 24px; height: 24px; color: #fff; }
+    .brand h1 { font-size: 1.28rem; margin: 0; font-weight: 800; letter-spacing: -0.01em; line-height: 1.3; }
+    .brand .tg { font-size: 0.72rem; color: var(--tp-muted); margin: 1px 0 0; }
+    .tp-search { display: flex; align-items: center; gap: 9px; background: var(--tp-tile); border-radius: 16px; padding: 13px 16px; color: var(--tp-muted); box-shadow: var(--tp-shadow); margin: 14px 0 0; }
+    .tp-search input { border: none; outline: none; background: none; font-size: 1rem; width: 100%; color: var(--tp-ink); }
+    .tp-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 16px 0 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .tp-tabs::-webkit-scrollbar { display: none; }
+    .tp-tab { flex: 0 0 auto; padding: 8px 16px; border-radius: 999px; border: none; background: rgba(120,124,130,0.1); color: var(--tp-ink); font-size: 0.88rem; cursor: pointer; white-space: nowrap; font-weight: 500; }
+    .tp-tab.on { background: var(--tp-ink); color: var(--tp-bg); font-weight: 700; }
+    .tp-sec { display: flex; align-items: baseline; gap: 8px; margin: 20px 2px 10px; }
+    .tp-sec b { font-size: 1.02rem; font-weight: 800; }
+    .tp-sec span { font-size: 0.7rem; color: var(--tp-muted); }
+    .tp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 10px; }
+    @media (min-width: 560px) { .tp-grid { grid-template-columns: repeat(6, 1fr); } }
+    .tile { display: flex; flex-direction: column; align-items: center; gap: 7px; text-decoration: none; color: var(--tp-ink); }
+    .tile[hidden] { display: none; }
+    .tile .ic { width: 100%; aspect-ratio: 1; max-width: 76px; display: flex; align-items: center; justify-content: center; border-radius: 24px; box-shadow: var(--tp-shadow); position: relative; }
+    .tile .ic svg { width: 46%; height: 46%; }
+    .tile .nm { font-size: 0.73rem; font-weight: 600; text-align: center; white-space: nowrap; letter-spacing: -0.01em; }
+    .tile .rk { position: absolute; top: -7px; left: -3px; min-width: 20px; height: 20px; border-radius: 999px; background: var(--tp-gold); color: #fff; font-size: 0.68rem; font-weight: 800; display: flex; align-items: center; justify-content: center; padding: 0 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    .tile .rk.silver { background: #9aa2ab; }
+    .tile .rk.bronze { background: #b0795a; }
+    .tile .rk.plain { background: var(--tp-tile); color: var(--tp-muted); box-shadow: inset 0 0 0 1.5px rgba(120,124,130,0.25); }
+    .g0 { background: #e4f2ea; color: #0e7d59; }
+    .g1 { background: #f7ecd9; color: #a3690f; }
+    .g2 { background: #e5edf9; color: #3a66a8; }
+    .g3 { background: #eee8f7; color: #6f4fa8; }
+    @media (prefers-color-scheme: dark) {
+      .g0 { background: #20352b; color: #4fc596; }
+      .g1 { background: #382e1c; color: #d9a04a; }
+      .g2 { background: #222e41; color: #7ba3e0; }
+      .g3 { background: #2e2740; color: #a98ce0; }
+    }
+    .no-hit { color: var(--tp-muted); font-size: 0.88rem; margin: 8px 2px; }
+    .seo-list { margin-top: 34px; font-size: 0.85rem; }
+    .seo-list summary { cursor: pointer; color: var(--tp-muted); font-weight: 600; }
+    .seo-list h3 { font-size: 0.95rem; margin: 14px 0 4px; }
+    .seo-list ul { padding-left: 1.2em; margin: 4px 0; }
+    .seo-list li { margin: 3px 0; color: var(--tp-muted); }
+    .about { margin-top: 28px; font-size: 0.85rem; color: var(--tp-muted); }
+  </style>
 </head>
 <body>
-<!-- @partial:header start -->
-<header class="site-header">
-  <a class="site-brand" href="./">🧮 計算ツールボックス</a>
-  <a class="site-search-link" href="./#search">🔍 ツールを探す</a>
-</header>
-<!-- @partial:header end -->
 <main>
-  <h1>暮らしに役立つ無料計算ツール集</h1>
-
-  <div class="tool-search" id="search">
-    <input type="search" id="search-input" placeholder="ツールを検索(例: 家賃、カロリー、燃費)" aria-label="ツールを検索" autocomplete="off">
+  <div class="brand">
+    <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg></span>
+    <div>
+      <h1>計算ツールボックス</h1>
+      <p class="tg">暮らしの計算61ツール・登録不要・ぜんぶ無料</p>
+    </div>
   </div>
-  <p class="search-status" id="search-status" hidden></p>
 
-  <!-- @tool-list start : 新ツール公開時は builder がここへカードを1件追記する -->
-  <section class="tool-section">
-    <h3>健康</h3>
-    <ul class="tool-list">
-      <li class="tool-card" data-keywords="BMI 肥満度 適正体重 標準体重 やせ ダイエット 身長 体重 たいじゅう しんちょう ひまん">
-        <a href="./tools/bmi/"><span class="tool-name">BMI・適正体重 計算機</span>
-        <p>身長と体重からBMIと適正体重を計算し、日本肥満学会の基準で判定します。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="基礎代謝 代謝量 カロリー 消費 きそたいしゃ">
-        <a href="./tools/bmr/"><span class="tool-name">基礎代謝量 計算機</span>
-        <p>年齢・性別・体重から1日の基礎代謝量(kcal)を厚生労働省の基準値で計算します。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="アルコール 飲酒 酔い ビール 日本酒 チューハイ 適量 お酒 おさけ さけ いんしゅ">
-        <a href="./tools/alcohol/"><span class="tool-name">純アルコール量 計算機</span>
-        <p>お酒の量と度数から純アルコール量(g)を計算し、リスクを高める飲酒量かを判定します。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="カロリー 摂取 食事量 ダイエット TDEE 必要エネルギー せっしゅ しょくじ えねるぎー">
-        <a href="./tools/tdee/"><span class="tool-name">1日の摂取カロリー目安 計算機</span>
-        <p>年齢・体重・活動量から1日に必要な摂取カロリーの目安を計算します。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="睡眠 就寝 起床 何時間寝た すいみん ねる しゅうしん きしょう">
-        <a href="./tools/sleep/"><span class="tool-name">睡眠時間 計算機</span>
-        <p>就寝時刻と起床時刻から睡眠時間を計算。日をまたいでもOKです。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="睡眠サイクル 90分 スッキリ 起床 就寝 何時に寝る すいみん">
-        <a href="./tools/cycle/"><span class="tool-name">睡眠サイクル計算機</span>
-        <p>起床時刻から逆算して、眠りの周期(約90分)の区切りに合う就寝時刻の候補を表示。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="ランニング マラソン ペース ジョギング タイム 走る はしる きろく">
-        <a href="./tools/pace/"><span class="tool-name">ランニングペース 計算機</span>
-        <p>距離とタイムから1kmペースと時速を計算。ゴールタイム予測もできます。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="ウォーキング 散歩 歩く 消費カロリー 歩数 メッツ さんぽ あるく ほこう">
-        <a href="./tools/walking/"><span class="tool-name">ウォーキング消費カロリー 計算機</span>
-        <p>体重・時間・歩く速さから消費カロリーをMETs方式で計算。脂肪換算の目安つき。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="歩数 距離 1万歩 何キロ 歩幅 ほすう まんぽけい">
-        <a href="./tools/hosu/"><span class="tool-name">歩数→距離・カロリー換算 計算機</span>
-        <p>歩数と身長から歩いた距離・時間・消費カロリーの目安を計算。1万歩は何km?</p></a>
-      </li>
-      <li class="tool-card" data-keywords="運動 消費カロリー ジョギング 水泳 筋トレ なわとび メッツ うんどう">
-        <a href="./tools/sports/"><span class="tool-name">運動別 消費カロリー計算機</span>
-        <p>ジョギング・水泳・筋トレなど13種の運動の消費カロリーをMETs方式で計算します。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="心拍数 目標心拍 カルボーネン 脂肪燃焼 運動強度 しんぱくすう">
-        <a href="./tools/shinpaku/"><span class="tool-name">目標心拍数 計算機(カルボーネン法)</span>
-        <p>年齢と安静時心拍数から脂肪燃焼・持久力向上に適した心拍数ゾーンを計算します。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="塩分 ナトリウム 食塩 減塩 塩 えんぶん しお げんえん なとりうむ">
-        <a href="./tools/shio/"><span class="tool-name">塩分量 計算機(ナトリウム⇔食塩相当量)</span>
-        <p>食品表示のナトリウム(mg)を食塩相当量(g)に換算。1日目標量に対する割合も表示。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="カフェイン コーヒー 眠れない エナジードリンク 玉露 かふぇいん">
-        <a href="./tools/caffeine/"><span class="tool-name">カフェイン摂取量 計算機</span>
-        <p>コーヒー・お茶・エナジードリンクのカフェイン量を合計し、1日の目安と比較します。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="タンパク質 プロテイン 筋トレ 栄養 たんぱくしつ">
-        <a href="./tools/protein/"><span class="tool-name">タンパク質摂取量 計算機</span>
-        <p>体重と運動量から1日のタンパク質の目安を計算。鶏むね肉・卵への食品換算つき。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="妊娠 出産予定日 週数 マタニティ 産み月 予定日 にんしん しゅっさん よていび しゅうすう">
-        <a href="./tools/ninshin/"><span class="tool-name">出産予定日・妊娠週数 計算機</span>
-        <p>最終月経の開始日から出産予定日と妊娠週数(○週△日)を計算。周期補正にも対応。</p></a>
-      </li>
-    </ul>
-  </section>
-  <section class="tool-section">
-    <h3>お金</h3>
-    <ul class="tool-list">
-      <li class="tool-card" data-keywords="ローン 借入 返済 金利 住宅 車 利息 月々 かりいれ きんり へんさい じゅうたく くるま">
-        <a href="./tools/loan/"><span class="tool-name">ローン返済 計算機</span>
-        <p>借入額・金利・期間から毎月の返済額と利息総額を計算します(元利均等返済)。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="不動産投資 収支 損益分岐 家賃収入 還付金 損益通算 キャッシュフロー 大家 ワンルーム ふどうさん おおや">
-        <a href="./tools/fudosan/"><span class="tool-name">不動産投資 収支・損益分岐計算機</span>
-        <p>家賃収入・経費・ローン・本業年収から、税金の還付・キャッシュフロー・損益分岐家賃まで一括計算。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="住宅ローン 借入可能額 いくら借りれる 年収 審査 かりいれ">
-        <a href="./tools/kariire/"><span class="tool-name">住宅ローン 借入可能額 計算機</span>
-        <p>年収と返済負担率から住宅ローンの借入可能額の目安を逆算。毎月の返済額も表示。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="消費税 税込 税抜 8% 10% 軽減税率 内税 外税 しょうひぜい ぜいこみ ぜいぬき">
-        <a href="./tools/tax/"><span class="tool-name">消費税 計算機</span>
-        <p>税込⇔税抜を一発計算。標準税率10%と軽減税率8%に対応しています。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="電気代 電力 ワット 電気料金 家電 節電 でんきだい でんき かでん">
-        <a href="./tools/denki/"><span class="tool-name">電気代 計算機</span>
-        <p>家電の消費電力と使用時間から1日・1ヶ月・1年の電気代を計算します。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="ガソリン代 燃料 車 ドライブ 交通費 遠出 くるま きゅうゆ">
-        <a href="./tools/fuel/"><span class="tool-name">ガソリン代 計算機</span>
-        <p>走行距離・燃費・単価からガソリン代と使用燃料を計算します。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="燃費 リッター 満タン ガソリン km/L 実燃費 ねんぴ きゅうゆ まんたん">
-        <a href="./tools/nenpi/"><span class="tool-name">燃費計算機(満タン法)</span>
-        <p>走行距離と給油量から実燃費(km/L)を計算。給油代と1kmあたりの燃料費も。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="時給 月収 年収 給料 バイト パート 換算 手取り じきゅう げっしゅう ねんしゅう きゅうりょう">
-        <a href="./tools/jikyu/"><span class="tool-name">時給⇔月収・年収 換算計算機</span>
-        <p>時給と働き方から月収・年収(額面)を計算。月収から時給の逆算もできます。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="複利 積立 投資 利回り 資産 NISA 貯金 シミュレーション ふくり つみたて とうし ちょきん しさん">
-        <a href="./tools/compound/"><span class="tool-name">複利・積立シミュレーション</span>
-        <p>毎月の積立額と想定利回りから将来の金額を計算します(税引前の概算)。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="割り勘 飲み会 幹事 精算 会計 わりかん のみかい せいさん かんじ">
-        <a href="./tools/warikan/"><span class="tool-name">割り勘 計算機</span>
-        <p>合計と人数から1人あたりの支払額を計算。キリのいい単位に切り上げできます。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="残業代 割増 賃金 深夜 休日 給料 労働 ざんぎょう ちんぎん わりまし">
-        <a href="./tools/zangyo/"><span class="tool-name">残業代 計算機</span>
-        <p>法定の割増率(25%・50%・35%・深夜+25%)で残業代を内訳つきで計算します。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="有給 有休 年休 付与 休暇 パート ゆうきゅう きゅうか ねんきゅう">
-        <a href="./tools/yukyu/"><span class="tool-name">有給休暇の付与日数 計算機</span>
-        <p>勤続年数と働き方から法定の有給日数を表示。パートの比例付与にも対応。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="家賃 日割り 引越し 入居 退去 賃貸 初期費用 やちん ひわり ひっこし にゅうきょ たいきょ ちんたい">
-        <a href="./tools/hiwari/"><span class="tool-name">家賃日割り計算機</span>
-        <p>月の途中の入居・退去の日割り家賃を、実日数方式と30日固定方式の両方で計算。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="単価 グラム単価 比較 どっちが安い コスパ 100gあたり 底値 買い物 たんか ひかく やすい かいもの">
-        <a href="./tools/tanka/"><span class="tool-name">単価比較 計算機(どっちが安い?)</span>
-        <p>価格と内容量から「100gあたり」「1個あたり」の単価を並べて比較。最安がひと目でわかります。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="ポイント 還元 割引 どっちが得 クーポン セール キャッシュレス かんげん わりびき とく せーる">
-        <a href="./tools/point/"><span class="tool-name">割引とポイント還元 どっちが得? 計算機</span>
-        <p>「○%オフ」と「○%ポイント還元」の実質価格を比較。還元の割引換算率も表示します。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="割引 オフ セール 値引き 何割引 わりびき">
-        <a href="./tools/waribiki/"><span class="tool-name">割引計算機(○%オフはいくら?)</span>
-        <p>「30%オフでいくら?」を一発計算。セール価格から割引率の逆算もできます。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="利益率 原価率 粗利 値付け 売価 マージン りえきりつ げんかりつ">
-        <a href="./tools/genka/"><span class="tool-name">利益率・原価率 計算機</span>
-        <p>売価と原価から粗利・利益率を計算。目標利益率からの売価逆算にも対応します。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="定期券 元が取れる 通勤 通学 交通費 ていきけん">
-        <a href="./tools/teiki/"><span class="tool-name">定期券は元が取れる? 計算機</span>
-        <p>定期券の価格と片道運賃から損益分岐の日数を計算。都度払いとの差額もわかります。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="チップ 海外旅行 アメリカ ハワイ レストラン ちっぷ">
-        <a href="./tools/tip/"><span class="tool-name">チップ計算機(海外旅行用)</span>
-        <p>海外レストランのチップ額と合計、割り勘の1人あたりまで一発計算。15/18/20%対応。</p></a>
-      </li>
-    </ul>
-  </section>
-  <section class="tool-section">
-    <h3>日付・時間</h3>
-    <ul class="tool-list">
-      <li class="tool-card" data-keywords="日数 日付 何日後 何日間 期間 曜日 にっすう ひづけ きかん なんにち">
-        <a href="./tools/days/"><span class="tool-name">日数計算機(日付の差・○日後)</span>
-        <p>2つの日付の間の日数と、○日後の日付・曜日を計算します。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="営業日 何営業日後 土日祝 納期 期限 えいぎょうび">
-        <a href="./tools/eigyobi/"><span class="tool-name">営業日計算機(土日祝を除く)</span>
-        <p>「3営業日後はいつ?」を日本の祝日・振替休日込みで計算。期間の営業日数も。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="ヶ月後 月数 何ヶ月 月齢 契約期間 かげつ つきすう">
-        <a href="./tools/tsukisu/"><span class="tool-name">○ヶ月後・月数 計算機</span>
-        <p>○ヶ月後の日付と2つの日付の月数差(満○ヶ月)を月末調整つきで計算します。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="時間計算 合計 足し算 勤務時間 タイムシート 10進数 じかん">
-        <a href="./tools/jikan/"><span class="tool-name">時間計算機(合計・時刻の差)</span>
-        <p>「1:30+0:45」の時間の合計と開始〜終了の経過時間を計算。給与用の10進換算つき。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="年齢 満年齢 何歳 早生まれ 干支 生年月日 えと ねんれい なんさい えと はやうまれ">
-        <a href="./tools/age/"><span class="tool-name">年齢計算機(満年齢・早生まれ・干支)</span>
-        <p>生年月日から満年齢・干支・早生まれ判定を計算。基準日の指定もできます。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="和暦 西暦 令和 平成 昭和 元号 変換 明治 大正 われき せいれき れいわ へいせい しょうわ げんごう">
-        <a href="./tools/wareki/"><span class="tool-name">西暦・和暦 変換計算機</span>
-        <p>西暦⇔和暦(明治〜令和)を一発変換。改元年は新旧両方を表示します。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="履歴書 入学 卒業 学歴 早見表 何年卒 りれきしょ そつぎょう">
-        <a href="./tools/rireki/"><span class="tool-name">入学・卒業年 早見計算機(履歴書用)</span>
-        <p>生年月日から小学校〜大学の入学・卒業年を西暦・和暦で表示。早生まれ対応。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="記念日 付き合って 100日 1000日 1万日 カウント 誕生日 きねんび つきあって たんじょうび ふしめ">
-        <a href="./tools/kinenbi/"><span class="tool-name">記念日カウント計算機</span>
-        <p>「付き合って何日目?」「生まれて何日?」を計算。1000日目・1万日目などの節目も一覧表示。</p></a>
-      </li>
-    </ul>
-  </section>
-  <section class="tool-section">
-    <h3>暮らし・変換</h3>
-    <ul class="tool-list">
-      <li class="tool-card" data-keywords="パーセント 割合 % 増減率 割引率 何パーセント わりあい ぞうげん わりびき">
-        <a href="./tools/percent/"><span class="tool-name">パーセント計算機</span>
-        <p>「何%か」「○%の値」「増減率」の3つのパーセント計算を一発で。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="平均 中央値 合計 統計 点数 集計 へいきん">
-        <a href="./tools/heikin/"><span class="tool-name">平均値・中央値 計算機</span>
-        <p>数値を貼り付けるだけで平均・中央値・最大・最小・合計をまとめて計算します。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="偏差値 テスト 平均点 成績 受験 点数 へんさち じゅけん せいせき てんすう">
-        <a href="./tools/hensachi/"><span class="tool-name">偏差値 計算機</span>
-        <p>得点・平均点・標準偏差から偏差値を計算。点数リストの一括計算もできます。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="文字数 カウント 字数 原稿用紙 レポート ES もじすう">
-        <a href="./tools/moji/"><span class="tool-name">文字数カウント</span>
-        <p>テキストを貼るだけで文字数(スペース込み/除く)・行数・原稿用紙換算を表示。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="全角 半角 変換 英数字 フォーム ぜんかく はんかく">
-        <a href="./tools/zenkaku/"><span class="tool-name">全角⇔半角 変換ツール</span>
-        <p>全角の英数字・記号・スペースを半角に一括変換(逆方向も)。フォーム入力に。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="パスワード 生成 ランダム 強力 セキュリティ ぱすわーど">
-        <a href="./tools/password/"><span class="tool-name">パスワード生成ツール</span>
-        <p>強力なランダムパスワードを端末内で生成。長さ・文字種を選べて強度も表示します。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="速さ 時速 距離 時間 はじき みはじ そくど">
-        <a href="./tools/speed/"><span class="tool-name">速さ・時間・距離 計算機</span>
-        <p>速さ・距離・時間のうち2つを入れると残りを自動計算。「はじき」の計算に。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="坪 平米 畳 面積 不動産 広さ ㎡ つぼ へいべい たたみ じょう めんせき ひろさ">
-        <a href="./tools/tsubo/"><span class="tool-name">坪・平米・畳 変換計算機</span>
-        <p>坪⇔㎡⇔畳を同時に変換。不動産広告の表示基準に基づく換算です。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="インチ cm ポンド kg 単位 換算 テレビ 海外通販 いんち せんち たんい かんさん">
-        <a href="./tools/inch/"><span class="tool-name">インチ⇔cm・ポンド⇔kg 変換計算機</span>
-        <p>テレビのサイズや海外通販の単位を一発換算。定義値による正確な変換です。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="マイル キロ 海里 ノット 換算 まいる">
-        <a href="./tools/mile/"><span class="tool-name">マイル⇔km 換算計算機</span>
-        <p>マイルとkmを定義値で正確に相互換算。海里にも対応。海外ドライブ・マラソンに。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="身長 フィート インチ 5'7 海外 しんちょう ふぃーと">
-        <a href="./tools/shincho/"><span class="tool-name">身長 フィート・インチ換算</span>
-        <p>170cmは5'7″。身長のcmとフィート・インチ表記を相互換算します。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="温度 摂氏 華氏 ケルビン セ氏 カ氏 °C °F おんど せっし かし">
-        <a href="./tools/ondo/"><span class="tool-name">温度換算 計算機(摂氏⇔華氏⇔ケルビン)</span>
-        <p>°C・°F・Kを一発で相互変換。海外レシピのオーブン温度や天気予報に。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="電子レンジ ワット 500W 600W 700W 温め チン 解凍 れんじ わっと あたため かいとう">
-        <a href="./tools/renji/"><span class="tool-name">電子レンジ加熱時間 換算計算機</span>
-        <p>「600Wで1分30秒」を500W・700Wなら何分何秒にすればいいかを一発換算。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="大さじ 小さじ カップ ml cc レシピ 計量 おおさじ こさじ">
-        <a href="./tools/spoon/"><span class="tool-name">大さじ・小さじ・カップ 換算計算機</span>
-        <p>大さじ1=15ml・小さじ1=5ml・1カップ=200mlで相互換算。レシピの分量調整に。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="米 一合 何グラム 水加減 炊飯 ごはん こめ ごう">
-        <a href="./tools/kome/"><span class="tool-name">お米の合・グラム換算 計算機</span>
-        <p>1合=約150g。合数から米の重さ・水加減・炊き上がり・お茶碗何杯分かを計算。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="データ容量 ギガ メガ テラ KB MB GB TB ばいと">
-        <a href="./tools/byte/"><span class="tool-name">データ容量 換算(KB・MB・GB・TB)</span>
-        <p>KB〜TBを一発換算。1024換算と1000換算を切り替えて「容量が減った?」も解決。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="ローマ数字 変換 時計 IV IX ろーますうじ">
-        <a href="./tools/roman/"><span class="tool-name">ローマ数字 変換</span>
-        <p>アラビア数字とローマ数字(I・V・X・L・C・D・M)を相互変換。2026=MMXXVI。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="星座 誕生石 誕生日 何座 占い せいざ">
-        <a href="./tools/seiza/"><span class="tool-name">星座・誕生石 早見計算機</span>
-        <p>誕生日から12星座と誕生石をすぐ表示。境目の日付もわかります。</p></a>
-      </li>
-      <li class="tool-card" data-keywords="犬 猫 年齢 換算 人間 何歳 ペット いぬ ねこ">
-        <a href="./tools/petage/"><span class="tool-name">犬・猫の年齢換算 計算機</span>
-        <p>うちの子は人間だと何歳?猫と小型・中型犬の年齢を目安式で換算します。</p></a>
-      </li>
-    </ul>
-  </section>
-  <!-- @tool-list end -->
+  <div class="tp-search" id="search">🔍 <input type="search" id="search-input" placeholder="検索(例: 家賃、文字数、営業日)" aria-label="ツールを検索" autocomplete="off"></div>
+  <div class="tp-tabs" id="tabs" role="tablist"></div>
 
-  <h2>このサイトについて</h2>
-  <p>健康・お金・暮らしのちょっとした疑問を、その場で計算できる無料のWebツール集です。登録不要・スマホ対応。すべてのツールに<strong>計算方法と根拠(一次情報の出典)</strong>を明記しています。</p>
-  <p>各ツールの計算結果は入力値に基づく<strong>概算</strong>です。計算の前提条件と根拠は各ツールページに記載しています。詳しくは<a href="./disclaimer.html">免責事項</a>をご覧ください。</p>
+  <div id="pop-sec">
+    <div class="tp-sec"><b>人気</b><span>この端末での利用にあわせて自動で入れ替わります</span></div>
+    <div class="tp-grid" id="popular"></div>
+  </div>
+
+  <div class="tp-sec" id="genre-title"><b>すべて</b><span>61個</span></div>
+  <p class="no-hit" id="no-hit" hidden>該当するツールがありません。別のことばでお試しください(例: 家賃、割引、カロリー)</p>
+  <div class="tp-grid" id="grid">
+      <a class="tile" href="./tools/bmi/" data-slug="bmi" data-cat="健康" data-kw="BMI・適正体重 計算機 身長と体重からBMIと適正体重を計算し、日本肥満学会の基準で判定します。 BMI 肥満度 適正体重 標準体重 やせ ダイエット 身長 体重 たいじゅう しんちょう ひまん" title="BMI・適正体重 計算機 — 身長と体重からBMIと適正体重を計算し、日本肥満学会の基準で判定します。">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="3.5" width="15" height="17" rx="3"/><path d="M9 8.5a3 3 0 0 1 6 0"/><path d="M12 8.5l1.5-1.8"/><ellipse cx="9.6" cy="15.3" rx="1.3" ry="2.2"/><ellipse cx="14.4" cy="15.3" rx="1.3" ry="2.2"/></svg></span><span class="nm">BMI</span>
+      </a>
+      <a class="tile" href="./tools/bmr/" data-slug="bmr" data-cat="健康" data-kw="基礎代謝量 計算機 年齢・性別・体重から1日の基礎代謝量(kcal)を厚生労働省の基準値で計算します。 基礎代謝 代謝量 カロリー 消費 きそたいしゃ" title="基礎代謝量 計算機 — 年齢・性別・体重から1日の基礎代謝量(kcal)を厚生労働省の基準値で計算します。">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c1.2 3.4 4.8 5.4 4.8 9.6a4.8 4.8 0 0 1-9.6 0c0-2.2 1-3.7 2.1-5.5.3 1.7 1 2.7 2 3.2-.1-2.5.1-5 .7-7.3z"/></svg></span><span class="nm">基礎代謝</span>
+      </a>
+      <a class="tile" href="./tools/alcohol/" data-slug="alcohol" data-cat="健康" data-kw="純アルコール量 計算機 お酒の量と度数から純アルコール量(g)を計算し、リスクを高める飲酒量かを判定します。 アルコール 飲酒 酔い ビール 日本酒 チューハイ 適量 お酒 おさけ さけ いんしゅ" title="純アルコール量 計算機 — お酒の量と度数から純アルコール量(g)を計算し、リスクを高める飲酒量かを判定します。">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="6" width="9" height="13.5" rx="1.5"/><path d="M14.5 9.5h2a2.5 2.5 0 0 1 2.5 2.5v2a2.5 2.5 0 0 1-2.5 2.5h-2"/><path d="M5.5 9.5h9"/><path d="M8.5 12.5v4M11.5 12.5v4"/></svg></span><span class="nm">アルコール量</span>
+      </a>
+      <a class="tile" href="./tools/tdee/" data-slug="tdee" data-cat="健康" data-kw="1日の摂取カロリー目安 計算機 年齢・体重・活動量から1日に必要な摂取カロリーの目安を計算します。 カロリー 摂取 食事量 ダイエット TDEE 必要エネルギー せっしゅ しょくじ えねるぎー" title="1日の摂取カロリー目安 計算機 — 年齢・体重・活動量から1日に必要な摂取カロリーの目安を計算します。">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.5v6.5M5.2 3.5v3.3a1.8 1.8 0 0 0 3.6 0V3.5"/><path d="M7 10v10.5"/><path d="M17.6 3.5c-2.2 2.6-2.2 6.4.4 8V20.5"/></svg></span><span class="nm">摂取カロリー</span>
+      </a>
+      <a class="tile" href="./tools/sleep/" data-slug="sleep" data-cat="健康" data-kw="睡眠時間 計算機 就寝時刻と起床時刻から睡眠時間を計算。日をまたいでもOKです。 睡眠 就寝 起床 何時間寝た すいみん ねる しゅうしん きしょう" title="睡眠時間 計算機 — 就寝時刻と起床時刻から睡眠時間を計算。日をまたいでもOKです。">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 3.5a8.5 8.5 0 1 0 6 12.5 7.3 7.3 0 0 1-6-12.5z"/></svg></span><span class="nm">睡眠時間</span>
+      </a>
+      <a class="tile" href="./tools/cycle/" data-slug="cycle" data-cat="健康" data-kw="睡眠サイクル計算機 起床時刻から逆算して、眠りの周期(約90分)の区切りに合う就寝時刻の候補を表示。 睡眠サイクル 90分 スッキリ 起床 就寝 何時に寝る すいみん" title="睡眠サイクル計算機 — 起床時刻から逆算して、眠りの周期(約90分)の区切りに合う就寝時刻の候補を表示。">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.1 8.1a4.4 4.4 0 1 0 3.1 6.5 3.8 3.8 0 0 1-3.1-6.5z"/><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5"/><path d="M20.5 12l2.2-2.2M20.5 12l-2.5-1.9"/></svg></span><span class="nm">睡眠サイクル</span>
+      </a>
+      <a class="tile" href="./tools/pace/" data-slug="pace" data-cat="健康" data-kw="ランニングペース 計算機 距離とタイムから1kmペースと時速を計算。ゴールタイム予測もできます。 ランニング マラソン ペース ジョギング タイム 走る はしる きろく" title="ランニングペース 計算機 — 距離とタイムから1kmペースと時速を計算。ゴールタイム予測もできます。">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 6V3.5M9.5 3.5h5"/><path d="M12 13.5l3-2.8"/></svg></span><span class="nm">ペース計算</span>
+      </a>
+      <a class="tile" href="./tools/walking/" data-slug="walking" data-cat="健康" data-kw="ウォーキング消費カロリー 計算機 体重・時間・歩く速さから消費カロリーをMETs方式で計算。脂肪換算の目安つき。 ウォーキング 散歩 歩く 消費カロリー 歩数 メッツ さんぽ あるく ほこう" title="ウォーキング消費カロリー 計算機 — 体重・時間・歩く速さから消費カロリーをMETs方式で計算。脂肪換算の目安つき。">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="8.3" cy="7.3" rx="2.2" ry="3.2" transform="rotate(-12 8.3 7.3)"/><circle cx="9.3" cy="12.4" r="1.1"/><ellipse cx="15.7" cy="14.1" rx="2.2" ry="3.2" transform="rotate(-12 15.7 14.1)"/><circle cx="16.7" cy="19.2" r="1.1"/></svg></span><span class="nm">ウォーキング</span>
+      </a>
+      <a class="tile" href="./tools/hosu/" data-slug="hosu" data-cat="健康" data-kw="歩数→距離・カロリー換算 計算機 歩数と身長から歩いた距離・時間・消費カロリーの目安を計算。1万歩は何km? 歩数 距離 1万歩 何キロ 歩幅 ほすう まんぽけい" title="歩数→距離・カロリー換算 計算機 — 歩数と身長から歩いた距離・時間・消費カロリーの目安を計算。1万歩は何km?">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="7.3" cy="6.6" rx="2" ry="2.9" transform="rotate(-12 7.3 6.6)"/><circle cx="8.2" cy="11.2" r="1"/><ellipse cx="14.1" cy="12" rx="2" ry="2.9" transform="rotate(-12 14.1 12)"/><circle cx="15" cy="16.5" r="1"/><path d="M6 20.7h12m0 0l-2.4-2.2m2.4 2.2l-2.4 2.2"/></svg></span><span class="nm">歩数→距離</span>
+      </a>
+      <a class="tile" href="./tools/sports/" data-slug="sports" data-cat="健康" data-kw="運動別 消費カロリー計算機 ジョギング・水泳・筋トレなど13種の運動の消費カロリーをMETs方式で計算します。 運動 消費カロリー ジョギング 水泳 筋トレ なわとび メッツ うんどう" title="運動別 消費カロリー計算機 — ジョギング・水泳・筋トレなど13種の運動の消費カロリーをMETs方式で計算します。">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12h8"/><rect x="4.6" y="7.5" width="2.6" height="9" rx="1"/><rect x="16.8" y="7.5" width="2.6" height="9" rx="1"/><rect x="2.1" y="9.6" width="1.8" height="4.8" rx="0.9"/><rect x="20.1" y="9.6" width="1.8" height="4.8" rx="0.9"/></svg></span><span class="nm">運動カロリー</span>
+      </a>
+      <a class="tile" href="./tools/shinpaku/" data-slug="shinpaku" data-cat="健康" data-kw="目標心拍数 計算機(カルボーネン法) 年齢と安静時心拍数から脂肪燃焼・持久力向上に適した心拍数ゾーンを計算します。 心拍数 目標心拍 カルボーネン 脂肪燃焼 運動強度 しんぱくすう" title="目標心拍数 計算機(カルボーネン法) — 年齢と安静時心拍数から脂肪燃焼・持久力向上に適した心拍数ゾーンを計算します。">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20C5.5 14.5 4.3 9.6 7.6 7c2.2-1.7 4.4.2 4.4 2 0-1.8 2.2-3.7 4.4-2 3.3 2.6 2.1 7.5-4.4 13z"/><path d="M7 12h3l1.5-2.5 1.8 4 1.4-1.5H17"/></svg></span><span class="nm">目標心拍数</span>
+      </a>
+      <a class="tile" href="./tools/shio/" data-slug="shio" data-cat="健康" data-kw="塩分量 計算機(ナトリウム⇔食塩相当量) 食品表示のナトリウム(mg)を食塩相当量(g)に換算。1日目標量に対する割合も表示。 塩分 ナトリウム 食塩 減塩 塩 えんぶん しお げんえん なとりうむ" title="塩分量 計算機(ナトリウム⇔食塩相当量) — 食品表示のナトリウム(mg)を食塩相当量(g)に換算。1日目標量に対する割合も表示。">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="3.5" rx="1"/><path d="M8.5 6.5h7l1 12a2 2 0 0 1-2 2.2h-5a2 2 0 0 1-2-2.2z"/><path d="M11 10.5h.01M13 12.5h.01M11.5 14.5h.01"/></svg></span><span class="nm">塩分量</span>
+      </a>
+      <a class="tile" href="./tools/caffeine/" data-slug="caffeine" data-cat="健康" data-kw="カフェイン摂取量 計算機 コーヒー・お茶・エナジードリンクのカフェイン量を合計し、1日の目安と比較します。 カフェイン コーヒー 眠れない エナジードリンク 玉露 かふぇいん" title="カフェイン摂取量 計算機 — コーヒー・お茶・エナジードリンクのカフェイン量を合計し、1日の目安と比較します。">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 10.5h11v4.5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 11.5h1.2a2.4 2.4 0 0 1 0 4.8H16"/><path d="M8.5 4c0 1.6 1.5 1.6 1.5 3.2M12.5 4c0 1.6 1.5 1.6 1.5 3.2"/></svg></span><span class="nm">カフェイン</span>
+      </a>
+      <a class="tile" href="./tools/protein/" data-slug="protein" data-cat="健康" data-kw="タンパク質摂取量 計算機 体重と運動量から1日のタンパク質の目安を計算。鶏むね肉・卵への食品換算つき。 タンパク質 プロテイン 筋トレ 栄養 たんぱくしつ" title="タンパク質摂取量 計算機 — 体重と運動量から1日のタンパク質の目安を計算。鶏むね肉・卵への食品換算つき。">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="14.5" cy="9" r="5.5"/><path d="M10.5 12.8L6 17.3"/><circle cx="5" cy="18.3" r="1.7"/><circle cx="7.6" cy="20.4" r="1.7"/></svg></span><span class="nm">タンパク質</span>
+      </a>
+      <a class="tile" href="./tools/ninshin/" data-slug="ninshin" data-cat="健康" data-kw="出産予定日・妊娠週数 計算機 最終月経の開始日から出産予定日と妊娠週数(○週△日)を計算。周期補正にも対応。 妊娠 出産予定日 週数 マタニティ 産み月 予定日 にんしん しゅっさん よていび しゅうすう" title="出産予定日・妊娠週数 計算機 — 最終月経の開始日から出産予定日と妊娠週数(○週△日)を計算。周期補正にも対応。">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="7.5"/><path d="M12 5.5c-.2-1.6 1-2.8 2.4-2.4"/><path d="M9.3 12.5h.01M14.7 12.5h.01"/><path d="M9.5 15.5a3.3 3.3 0 0 0 5 0"/></svg></span><span class="nm">出産予定日</span>
+      </a>
+      <a class="tile" href="./tools/loan/" data-slug="loan" data-cat="お金" data-kw="ローン返済 計算機 借入額・金利・期間から毎月の返済額と利息総額を計算します(元利均等返済)。 ローン 借入 返済 金利 住宅 車 利息 月々 かりいれ きんり へんさい じゅうたく くるま" title="ローン返済 計算機 — 借入額・金利・期間から毎月の返済額と利息総額を計算します(元利均等返済)。">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9l8-5 8 5z"/><path d="M6.5 11.5v6M12 11.5v6M17.5 11.5v6"/><path d="M4 20.5h16"/></svg></span><span class="nm">ローン返済</span>
+      </a>
+      <a class="tile" href="./tools/fudosan/" data-slug="fudosan" data-cat="お金" data-kw="不動産投資 収支・損益分岐計算機 家賃収入・経費・ローン・本業年収から、税金の還付・キャッシュフロー・損益分岐家賃まで一括計算。 不動産投資 収支 損益分岐 家賃収入 還付金 損益通算 キャッシュフロー 大家 ワンルーム ふどうさん おおや" title="不動産投資 収支・損益分岐計算機 — 家賃収入・経費・ローン・本業年収から、税金の還付・キャッシュフロー・損益分岐家賃まで一括計算。">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v8.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M9.8 11.5l2.2 3 2.2-3M12 14.5v4M10.2 15.8h3.6M10.2 17.8h3.6"/></svg></span><span class="nm">不動産投資</span>
+      </a>
+      <a class="tile" href="./tools/kariire/" data-slug="kariire" data-cat="お金" data-kw="住宅ローン 借入可能額 計算機 年収と返済負担率から住宅ローンの借入可能額の目安を逆算。毎月の返済額も表示。 住宅ローン 借入可能額 いくら借りれる 年収 審査 かりいれ" title="住宅ローン 借入可能額 計算機 — 年収と返済負担率から住宅ローンの借入可能額の目安を逆算。毎月の返済額も表示。">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5L12 4l8 6.5V19.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><circle cx="11.2" cy="13" r="3.1"/><path d="M13.5 15.3l2.8 2.8"/></svg></span><span class="nm">借入可能額</span>
+      </a>
+      <a class="tile" href="./tools/tax/" data-slug="tax" data-cat="お金" data-kw="消費税 計算機 税込⇔税抜を一発計算。標準税率10%と軽減税率8%に対応しています。 消費税 税込 税抜 8% 10% 軽減税率 内税 外税 しょうひぜい ぜいこみ ぜいぬき" title="消費税 計算機 — 税込⇔税抜を一発計算。標準税率10%と軽減税率8%に対応しています。">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h10v18l-2.5-1.6L12 21l-2.5-1.6L7 21z"/><path d="M9.8 8h4.4M9.8 11.2h4.4M9.8 14.4h2.4"/></svg></span><span class="nm">消費税</span>
+      </a>
+      <a class="tile" href="./tools/denki/" data-slug="denki" data-cat="お金" data-kw="電気代 計算機 家電の消費電力と使用時間から1日・1ヶ月・1年の電気代を計算します。 電気代 電力 ワット 電気料金 家電 節電 でんきだい でんき かでん" title="電気代 計算機 — 家電の消費電力と使用時間から1日・1ヶ月・1年の電気代を計算します。">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.2 15.2a5.8 5.8 0 1 1 5.6 0c-.8.5-1 1.3-1 2.3h-3.6c0-1-.2-1.8-1-2.3z"/><path d="M10 20.5h4"/></svg></span><span class="nm">電気代</span>
+      </a>
+      <a class="tile" href="./tools/fuel/" data-slug="fuel" data-cat="お金" data-kw="ガソリン代 計算機 走行距離・燃費・単価からガソリン代と使用燃料を計算します。 ガソリン代 燃料 車 ドライブ 交通費 遠出 くるま きゅうゆ" title="ガソリン代 計算機 — 走行距離・燃費・単価からガソリン代と使用燃料を計算します。">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="4" width="9.5" height="16" rx="1.5"/><path d="M7 7h4.5v4H7z"/><path d="M14 11h2.5a1.5 1.5 0 0 1 1.5 1.5V17"/><path d="M18 12l1.5-1.5-1.5-1.5" transform="translate(0 -1.5)"/></svg></span><span class="nm">ガソリン代</span>
+      </a>
+      <a class="tile" href="./tools/nenpi/" data-slug="nenpi" data-cat="お金" data-kw="燃費計算機(満タン法) 走行距離と給油量から実燃費(km/L)を計算。給油代と1kmあたりの燃料費も。 燃費 リッター 満タン ガソリン km/L 実燃費 ねんぴ きゅうゆ まんたん" title="燃費計算機(満タン法) — 走行距離と給油量から実燃費(km/L)を計算。給油代と1kmあたりの燃料費も。">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 13.8l1.7-4.1a2 2 0 0 1 1.9-1.2h7.8a2 2 0 0 1 1.9 1.2l1.7 4.1v4.4h-2.4"/><path d="M4.5 13.8v4.4h2.4"/><path d="M4.5 13.8h15"/><circle cx="8.2" cy="18.4" r="1.6"/><circle cx="15.8" cy="18.4" r="1.6"/><path d="M9.8 18.4h4.4"/><path d="M18.9 2.8c1 1.3 1.6 2.1 1.6 3a1.9 1.9 0 1 1-3.8 0c0-.9.7-1.7 2.2-3z" transform="translate(-6.9 0)"/></svg></span><span class="nm">燃費</span>
+      </a>
+      <a class="tile" href="./tools/jikyu/" data-slug="jikyu" data-cat="お金" data-kw="時給⇔月収・年収 換算計算機 時給と働き方から月収・年収(額面)を計算。月収から時給の逆算もできます。 時給 月収 年収 給料 バイト パート 換算 手取り じきゅう げっしゅう ねんしゅう きゅうりょう" title="時給⇔月収・年収 換算計算機 — 時給と働き方から月収・年収(額面)を計算。月収から時給の逆算もできます。">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.3" cy="10.3" r="6.8"/><path d="M10.3 6.5v3.8l2.6 1.6"/><circle cx="17.7" cy="17.7" r="4.5"/><path d="M16 15.8l1.7 2.2 1.7-2.2M17.7 18v2.5M16.3 18.9h2.8"/></svg></span><span class="nm">時給⇔月収</span>
+      </a>
+      <a class="tile" href="./tools/compound/" data-slug="compound" data-cat="お金" data-kw="複利・積立シミュレーション 毎月の積立額と想定利回りから将来の金額を計算します(税引前の概算)。 複利 積立 投資 利回り 資産 NISA 貯金 シミュレーション ふくり つみたて とうし ちょきん しさん" title="複利・積立シミュレーション — 毎月の積立額と想定利回りから将来の金額を計算します(税引前の概算)。">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 15.5l3.8-4 2.8 2.8 5-5.8"/><path d="M15 8.5h3.6V12"/></svg></span><span class="nm">複利・積立</span>
+      </a>
+      <a class="tile" href="./tools/warikan/" data-slug="warikan" data-cat="お金" data-kw="割り勘 計算機 合計と人数から1人あたりの支払額を計算。キリのいい単位に切り上げできます。 割り勘 飲み会 幹事 精算 会計 わりかん のみかい せいさん かんじ" title="割り勘 計算機 — 合計と人数から1人あたりの支払額を計算。キリのいい単位に切り上げできます。">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M8 12h8"/><path d="M12 8.2h.01M12 15.8h.01"/></svg></span><span class="nm">割り勘</span>
+      </a>
+      <a class="tile" href="./tools/zangyo/" data-slug="zangyo" data-cat="お金" data-kw="残業代 計算機 法定の割増率(25%・50%・35%・深夜+25%)で残業代を内訳つきで計算します。 残業代 割増 賃金 深夜 休日 給料 労働 ざんぎょう ちんぎん わりまし" title="残業代 計算機 — 法定の割増率(25%・50%・35%・深夜+25%)で残業代を内訳つきで計算します。">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="13" r="7.5"/><path d="M11 8.5V13l3.2 2"/><path d="M18.7 3.5v4M16.7 5.5h4"/></svg></span><span class="nm">残業代</span>
+      </a>
+      <a class="tile" href="./tools/yukyu/" data-slug="yukyu" data-cat="お金" data-kw="有給休暇の付与日数 計算機 勤続年数と働き方から法定の有給日数を表示。パートの比例付与にも対応。 有給 有休 年休 付与 休暇 パート ゆうきゅう きゅうか ねんきゅう" title="有給休暇の付与日数 計算機 — 勤続年数と働き方から法定の有給日数を表示。パートの比例付与にも対応。">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.8 10.8a8.7 8.7 0 0 1 16.4-2.9z"/><path d="M12.7 9.4L8.5 21"/><path d="M4.5 21h11"/></svg></span><span class="nm">有給日数</span>
+      </a>
+      <a class="tile" href="./tools/hiwari/" data-slug="hiwari" data-cat="お金" data-kw="家賃日割り計算機 月の途中の入居・退去の日割り家賃を、実日数方式と30日固定方式の両方で計算。 家賃 日割り 引越し 入居 退去 賃貸 初期費用 やちん ひわり ひっこし にゅうきょ たいきょ ちんたい" title="家賃日割り計算機 — 月の途中の入居・退去の日割り家賃を、実日数方式と30日固定方式の両方で計算。">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5L12 4l8 6.5v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><rect x="8.3" y="11" width="7.4" height="6.3" rx="1"/><path d="M8.3 13.4h7.4M10.6 11V9.6M13.4 11V9.6"/></svg></span><span class="nm">家賃日割り</span>
+      </a>
+      <a class="tile" href="./tools/tanka/" data-slug="tanka" data-cat="お金" data-kw="単価比較 計算機(どっちが安い?) 価格と内容量から「100gあたり」「1個あたり」の単価を並べて比較。最安がひと目でわかります。 単価 グラム単価 比較 どっちが安い コスパ 100gあたり 底値 買い物 たんか ひかく やすい かいもの" title="単価比較 計算機(どっちが安い?) — 価格と内容量から「100gあたり」「1個あたり」の単価を並べて比較。最安がひと目でわかります。">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 4.5h2.3l2.2 11h9.8l2.4-8H7.2"/><circle cx="9.7" cy="19.3" r="1.5"/><circle cx="15.9" cy="19.3" r="1.5"/></svg></span><span class="nm">単価比較</span>
+      </a>
+      <a class="tile" href="./tools/point/" data-slug="point" data-cat="お金" data-kw="割引とポイント還元 どっちが得? 計算機 「○%オフ」と「○%ポイント還元」の実質価格を比較。還元の割引換算率も表示します。 ポイント 還元 割引 どっちが得 クーポン セール キャッシュレス かんげん わりびき とく せーる" title="割引とポイント還元 どっちが得? 計算機 — 「○%オフ」と「○%ポイント還元」の実質価格を比較。還元の割引換算率も表示します。">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="1.2"/><path d="M3.5 6.8h17v3.2h-17z"/><path d="M12 6.8V20"/><path d="M12 6.5C10 3 6.5 4.5 8.5 6.5M12 6.5c2-3.5 5.5-2 3.5 0"/></svg></span><span class="nm">割引vs還元</span>
+      </a>
+      <a class="tile" href="./tools/waribiki/" data-slug="waribiki" data-cat="お金" data-kw="割引計算機(○%オフはいくら?) 「30%オフでいくら?」を一発計算。セール価格から割引率の逆算もできます。 割引 オフ セール 値引き 何割引 わりびき" title="割引計算機(○%オフはいくら?) — 「30%オフでいくら?」を一発計算。セール価格から割引率の逆算もできます。">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h7.2L20 12.8 12.8 20 4 11.2z"/><circle cx="7.6" cy="7.6" r="1.3"/><path d="M11 16l4.6-4.6"/><circle cx="11.2" cy="12" r="1.2"/><circle cx="15.4" cy="15.6" r="1.2"/></svg></span><span class="nm">割引</span>
+      </a>
+      <a class="tile" href="./tools/genka/" data-slug="genka" data-cat="お金" data-kw="利益率・原価率 計算機 売価と原価から粗利・利益率を計算。目標利益率からの売価逆算にも対応します。 利益率 原価率 粗利 値付け 売価 マージン りえきりつ げんかりつ" title="利益率・原価率 計算機 — 売価と原価から粗利・利益率を計算。目標利益率からの売価逆算にも対応します。">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 12V3.5"/><path d="M12 12l6.5 5.5"/></svg></span><span class="nm">利益率</span>
+      </a>
+      <a class="tile" href="./tools/teiki/" data-slug="teiki" data-cat="お金" data-kw="定期券は元が取れる? 計算機 定期券の価格と片道運賃から損益分岐の日数を計算。都度払いとの差額もわかります。 定期券 元が取れる 通勤 通学 交通費 ていきけん" title="定期券は元が取れる? 計算機 — 定期券の価格と片道運賃から損益分岐の日数を計算。都度払いとの差額もわかります。">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3.5" width="14" height="14.5" rx="3"/><rect x="7.5" y="6.5" width="9" height="4.5" rx="0.8"/><path d="M8.5 14.5h.01M15.5 14.5h.01"/><path d="M8 18l-1.8 3M16 18l1.8 3"/></svg></span><span class="nm">定期券損得</span>
+      </a>
+      <a class="tile" href="./tools/tip/" data-slug="tip" data-cat="お金" data-kw="チップ計算機(海外旅行用) 海外レストランのチップ額と合計、割り勘の1人あたりまで一発計算。15/18/20%対応。 チップ 海外旅行 アメリカ ハワイ レストラン ちっぷ" title="チップ計算機(海外旅行用) — 海外レストランのチップ額と合計、割り勘の1人あたりまで一発計算。15/18/20%対応。">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 6.5v11"/><path d="M14.8 8.8a2.9 2.4 0 1 0-2.8 3.2 2.9 2.4 0 1 1-2.8 3.2"/></svg></span><span class="nm">チップ</span>
+      </a>
+      <a class="tile" href="./tools/days/" data-slug="days" data-cat="日付" data-kw="日数計算機(日付の差・○日後) 2つの日付の間の日数と、○日後の日付・曜日を計算します。 日数 日付 何日後 何日間 期間 曜日 にっすう ひづけ きかん なんにち" title="日数計算機(日付の差・○日後) — 2つの日付の間の日数と、○日後の日付・曜日を計算します。">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15.5" rx="2"/><path d="M4 10h16M8.5 3v4M15.5 3v4"/><path d="M8.5 14h.01M12 14h.01M15.5 14h.01M8.5 17h.01M12 17h.01"/></svg></span><span class="nm">日数</span>
+      </a>
+      <a class="tile" href="./tools/eigyobi/" data-slug="eigyobi" data-cat="日付" data-kw="営業日計算機(土日祝を除く) 「3営業日後はいつ?」を日本の祝日・振替休日込みで計算。期間の営業日数も。 営業日 何営業日後 土日祝 納期 期限 えいぎょうび" title="営業日計算機(土日祝を除く) — 「3営業日後はいつ?」を日本の祝日・振替休日込みで計算。期間の営業日数も。">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15.5" rx="2"/><path d="M4 10h16M8.5 3v4M15.5 3v4"/><path d="M9 15l2.3 2.3 4-4"/></svg></span><span class="nm">営業日</span>
+      </a>
+      <a class="tile" href="./tools/tsukisu/" data-slug="tsukisu" data-cat="日付" data-kw="○ヶ月後・月数 計算機 ○ヶ月後の日付と2つの日付の月数差(満○ヶ月)を月末調整つきで計算します。 ヶ月後 月数 何ヶ月 月齢 契約期間 かげつ つきすう" title="○ヶ月後・月数 計算機 — ○ヶ月後の日付と2つの日付の月数差(満○ヶ月)を月末調整つきで計算します。">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15.5" rx="2"/><path d="M4 10h16M8.5 3v4M15.5 3v4"/><path d="M8.5 15.5h6m0 0l-2-2m2 2l-2 2"/></svg></span><span class="nm">○ヶ月後</span>
+      </a>
+      <a class="tile" href="./tools/jikan/" data-slug="jikan" data-cat="日付" data-kw="時間計算機(合計・時刻の差) 「1:30+0:45」の時間の合計と開始〜終了の経過時間を計算。給与用の10進換算つき。 時間計算 合計 足し算 勤務時間 タイムシート 10進数 じかん" title="時間計算機(合計・時刻の差) — 「1:30+0:45」の時間の合計と開始〜終了の経過時間を計算。給与用の10進換算つき。">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 6.8V12l3.6 2.2"/></svg></span><span class="nm">時間計算</span>
+      </a>
+      <a class="tile" href="./tools/age/" data-slug="age" data-cat="日付" data-kw="年齢計算機(満年齢・早生まれ・干支) 生年月日から満年齢・干支・早生まれ判定を計算。基準日の指定もできます。 年齢 満年齢 何歳 早生まれ 干支 生年月日 えと ねんれい なんさい えと はやうまれ" title="年齢計算機(満年齢・早生まれ・干支) — 生年月日から満年齢・干支・早生まれ判定を計算。基準日の指定もできます。">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="12" width="15" height="8" rx="1.5"/><path d="M9 12V8.5M15 12V8.5"/><path d="M9 8.5c-.8-1 0-2.2.9-2.7M15 8.5c-.8-1 0-2.2.9-2.7" transform="translate(0 -1.5)"/><path d="M3 20h18" transform="translate(0 0.5)"/></svg></span><span class="nm">年齢</span>
+      </a>
+      <a class="tile" href="./tools/wareki/" data-slug="wareki" data-cat="日付" data-kw="西暦・和暦 変換計算機 西暦⇔和暦(明治〜令和)を一発変換。改元年は新旧両方を表示します。 和暦 西暦 令和 平成 昭和 元号 変換 明治 大正 われき せいれき れいわ へいせい しょうわ げんごう" title="西暦・和暦 変換計算機 — 西暦⇔和暦(明治〜令和)を一発変換。改元年は新旧両方を表示します。">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 6.5c5.7-1.7 11.3-1.7 17 0"/><path d="M7 5.8V21M17 5.8V21"/><path d="M5.5 10.5h13"/><path d="M12 6.3v4.2"/></svg></span><span class="nm">西暦⇔和暦</span>
+      </a>
+      <a class="tile" href="./tools/rireki/" data-slug="rireki" data-cat="日付" data-kw="入学・卒業年 早見計算機(履歴書用) 生年月日から小学校〜大学の入学・卒業年を西暦・和暦で表示。早生まれ対応。 履歴書 入学 卒業 学歴 早見表 何年卒 りれきしょ そつぎょう" title="入学・卒業年 早見計算機(履歴書用) — 生年月日から小学校〜大学の入学・卒業年を西暦・和暦で表示。早生まれ対応。">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 9.5L12 5l9.5 4.5L12 14z"/><path d="M6.8 11.8v4.4c0 1.6 2.3 2.9 5.2 2.9s5.2-1.3 5.2-2.9v-4.4"/><path d="M21.5 9.5v5.5"/></svg></span><span class="nm">入学卒業年</span>
+      </a>
+      <a class="tile" href="./tools/kinenbi/" data-slug="kinenbi" data-cat="日付" data-kw="記念日カウント計算機 「付き合って何日目?」「生まれて何日?」を計算。1000日目・1万日目などの節目も一覧表示。 記念日 付き合って 100日 1000日 1万日 カウント 誕生日 きねんび つきあって たんじょうび ふしめ" title="記念日カウント計算機 — 「付き合って何日目?」「生まれて何日?」を計算。1000日目・1万日目などの節目も一覧表示。">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20C5.5 14.5 4.3 9.6 7.6 7c2.2-1.7 4.4.2 4.4 2 0-1.8 2.2-3.7 4.4-2 3.3 2.6 2.1 7.5-4.4 13z"/><path d="M4 4.5v3M2.5 6h3M19.5 16.5v3M18 18h3"/></svg></span><span class="nm">記念日</span>
+      </a>
+      <a class="tile" href="./tools/percent/" data-slug="percent" data-cat="変換" data-kw="パーセント計算機 「何%か」「○%の値」「増減率」の3つのパーセント計算を一発で。 パーセント 割合 % 増減率 割引率 何パーセント わりあい ぞうげん わりびき" title="パーセント計算機 — 「何%か」「○%の値」「増減率」の3つのパーセント計算を一発で。">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18L18 6"/><circle cx="7.6" cy="7.6" r="2.6"/><circle cx="16.4" cy="16.4" r="2.6"/></svg></span><span class="nm">パーセント</span>
+      </a>
+      <a class="tile" href="./tools/heikin/" data-slug="heikin" data-cat="変換" data-kw="平均値・中央値 計算機 数値を貼り付けるだけで平均・中央値・最大・最小・合計をまとめて計算します。 平均 中央値 合計 統計 点数 集計 へいきん" title="平均値・中央値 計算機 — 数値を貼り付けるだけで平均・中央値・最大・最小・合計をまとめて計算します。">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="12" width="3.4" height="8" rx="0.8"/><rect x="10.3" y="7.5" width="3.4" height="12.5" rx="0.8"/><rect x="16.1" y="10" width="3.4" height="10" rx="0.8"/><path d="M3.5 9.2h17" stroke-dasharray="2.4 2.4"/></svg></span><span class="nm">平均・中央値</span>
+      </a>
+      <a class="tile" href="./tools/hensachi/" data-slug="hensachi" data-cat="変換" data-kw="偏差値 計算機 得点・平均点・標準偏差から偏差値を計算。点数リストの一括計算もできます。 偏差値 テスト 平均点 成績 受験 点数 へんさち じゅけん せいせき てんすう" title="偏差値 計算機 — 得点・平均点・標準偏差から偏差値を計算。点数リストの一括計算もできます。">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 19h17"/><path d="M4 19c4 0 4.4-12.5 8-12.5S16 19 20 19"/><path d="M12 10.5V19" stroke-dasharray="2.4 2.4"/></svg></span><span class="nm">偏差値</span>
+      </a>
+      <a class="tile" href="./tools/moji/" data-slug="moji" data-cat="変換" data-kw="文字数カウント テキストを貼るだけで文字数(スペース込み/除く)・行数・原稿用紙換算を表示。 文字数 カウント 字数 原稿用紙 レポート ES もじすう" title="文字数カウント — テキストを貼るだけで文字数(スペース込み/除く)・行数・原稿用紙換算を表示。">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.4 4.4l3.7 3.7L8.2 17l-4.1.8.8-4.1z"/><path d="M11.8 6l3.7 3.7"/><path d="M13.5 20.5h7M3.5 20.5h6"/></svg></span><span class="nm">文字数</span>
+      </a>
+      <a class="tile" href="./tools/zenkaku/" data-slug="zenkaku" data-cat="変換" data-kw="全角⇔半角 変換ツール 全角の英数字・記号・スペースを半角に一括変換(逆方向も)。フォーム入力に。 全角 半角 変換 英数字 フォーム ぜんかく はんかく" title="全角⇔半角 変換ツール — 全角の英数字・記号・スペースを半角に一括変換(逆方向も)。フォーム入力に。">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 16.5L8 6h.8l4 10.5"/><path d="M5.5 12.8h5.8"/><path d="M15 11.5h5.5m0 0l-2.3-2.3m2.3 2.3l-2.3 2.3" transform="translate(0 3)"/></svg></span><span class="nm">全角⇔半角</span>
+      </a>
+      <a class="tile" href="./tools/password/" data-slug="password" data-cat="変換" data-kw="パスワード生成ツール 強力なランダムパスワードを端末内で生成。長さ・文字種を選べて強度も表示します。 パスワード 生成 ランダム 強力 セキュリティ ぱすわーど" title="パスワード生成ツール — 強力なランダムパスワードを端末内で生成。長さ・文字種を選べて強度も表示します。">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="10.5" width="13" height="9.5" rx="2.2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/><circle cx="12" cy="14.5" r="1.5"/><path d="M12 16v2"/></svg></span><span class="nm">パスワード</span>
+      </a>
+      <a class="tile" href="./tools/speed/" data-slug="speed" data-cat="変換" data-kw="速さ・時間・距離 計算機 速さ・距離・時間のうち2つを入れると残りを自動計算。「はじき」の計算に。 速さ 時速 距離 時間 はじき みはじ そくど" title="速さ・時間・距離 計算機 — 速さ・距離・時間のうち2つを入れると残りを自動計算。「はじき」の計算に。">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 15.5a7.5 7.5 0 0 1 15 0"/><path d="M12 15.5l4-4.6"/><circle cx="12" cy="15.5" r="1.3"/><path d="M6 12.2l1.5.9M18 12.2l-1.5.9M12 7.8v1.8"/><path d="M4.5 18.8h15"/></svg></span><span class="nm">速さ・距離</span>
+      </a>
+      <a class="tile" href="./tools/tsubo/" data-slug="tsubo" data-cat="変換" data-kw="坪・平米・畳 変換計算機 坪⇔㎡⇔畳を同時に変換。不動産広告の表示基準に基づく換算です。 坪 平米 畳 面積 不動産 広さ ㎡ つぼ へいべい たたみ じょう めんせき ひろさ" title="坪・平米・畳 変換計算機 — 坪⇔㎡⇔畳を同時に変換。不動産広告の表示基準に基づく換算です。">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="4.5" width="15" height="15" rx="1"/><path d="M8.5 15.5l7-7m0 0h-3.4m3.4 0v3.4M8.5 15.5h3.4m-3.4 0v-3.4"/></svg></span><span class="nm">坪・平米・畳</span>
+      </a>
+      <a class="tile" href="./tools/inch/" data-slug="inch" data-cat="変換" data-kw="インチ⇔cm・ポンド⇔kg 変換計算機 テレビのサイズや海外通販の単位を一発換算。定義値による正確な変換です。 インチ cm ポンド kg 単位 換算 テレビ 海外通販 いんち せんち たんい かんさん" title="インチ⇔cm・ポンド⇔kg 変換計算機 — テレビのサイズや海外通販の単位を一発換算。定義値による正確な変換です。">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8.8" width="18" height="6.4" rx="1.2"/><path d="M6.5 8.8v2.4M9.5 8.8v3.7M12.5 8.8v2.4M15.5 8.8v3.7M18.5 8.8v2.4"/></svg></span><span class="nm">インチ⇔cm</span>
+      </a>
+      <a class="tile" href="./tools/mile/" data-slug="mile" data-cat="変換" data-kw="マイル⇔km 換算計算機 マイルとkmを定義値で正確に相互換算。海里にも対応。海外ドライブ・マラソンに。 マイル キロ 海里 ノット 換算 まいる" title="マイル⇔km 換算計算機 — マイルとkmを定義値で正確に相互換算。海里にも対応。海外ドライブ・マラソンに。">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 21L10.5 3M16.5 21L13.5 3"/><path d="M12 6.5V9M12 12v2.5M12 17.5V20"/></svg></span><span class="nm">マイル⇔km</span>
+      </a>
+      <a class="tile" href="./tools/shincho/" data-slug="shincho" data-cat="変換" data-kw="身長 フィート・インチ換算 170cmは5'7″。身長のcmとフィート・インチ表記を相互換算します。 身長 フィート インチ 5'7 海外 しんちょう ふぃーと" title="身長 フィート・インチ換算 — 170cmは5'7″。身長のcmとフィート・インチ表記を相互換算します。">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.5 3.5v17M18.5 5.5h-2.4M18.5 9h-2.4M18.5 12.5h-2.4M18.5 16h-2.4M18.5 19.5h-2.4"/><circle cx="8.5" cy="6" r="2.4"/><path d="M8.5 8.4v6M8.5 14.4l-2.6 5M8.5 14.4l2.6 5M8.5 10l-3 2M8.5 10l3 2"/></svg></span><span class="nm">身長ft換算</span>
+      </a>
+      <a class="tile" href="./tools/ondo/" data-slug="ondo" data-cat="変換" data-kw="温度換算 計算機(摂氏⇔華氏⇔ケルビン) °C・°F・Kを一発で相互変換。海外レシピのオーブン温度や天気予報に。 温度 摂氏 華氏 ケルビン セ氏 カ氏 °C °F おんど せっし かし" title="温度換算 計算機(摂氏⇔華氏⇔ケルビン) — °C・°F・Kを一発で相互変換。海外レシピのオーブン温度や天気予報に。">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 15.6V5a2 2 0 0 1 4 0v10.6a3.6 3.6 0 1 1-4 0z"/><path d="M10.5 15.5V9"/><path d="M15.8 6h2.2M15.8 9.5h2.2M15.8 13h2.2"/></svg></span><span class="nm">温度換算</span>
+      </a>
+      <a class="tile" href="./tools/renji/" data-slug="renji" data-cat="変換" data-kw="電子レンジ加熱時間 換算計算機 「600Wで1分30秒」を500W・700Wなら何分何秒にすればいいかを一発換算。 電子レンジ ワット 500W 600W 700W 温め チン 解凍 れんじ わっと あたため かいとう" title="電子レンジ加熱時間 換算計算機 — 「600Wで1分30秒」を500W・700Wなら何分何秒にすればいいかを一発換算。">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2"/><rect x="6" y="7.8" width="8.5" height="8.5" rx="1"/><circle cx="17.4" cy="9.3" r="1"/><path d="M16.4 12.8h2M16.4 15.2h2"/></svg></span><span class="nm">レンジW換算</span>
+      </a>
+      <a class="tile" href="./tools/spoon/" data-slug="spoon" data-cat="変換" data-kw="大さじ・小さじ・カップ 換算計算機 大さじ1=15ml・小さじ1=5ml・1カップ=200mlで相互換算。レシピの分量調整に。 大さじ 小さじ カップ ml cc レシピ 計量 おおさじ こさじ" title="大さじ・小さじ・カップ 換算計算機 — 大さじ1=15ml・小さじ1=5ml・1カップ=200mlで相互換算。レシピの分量調整に。">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="7.2" rx="3.4" ry="4.6"/><path d="M12 11.8V21"/></svg></span><span class="nm">大さじ換算</span>
+      </a>
+      <a class="tile" href="./tools/kome/" data-slug="kome" data-cat="変換" data-kw="お米の合・グラム換算 計算機 1合=約150g。合数から米の重さ・水加減・炊き上がり・お茶碗何杯分かを計算。 米 一合 何グラム 水加減 炊飯 ごはん こめ ごう" title="お米の合・グラム換算 計算機 — 1合=約150g。合数から米の重さ・水加減・炊き上がり・お茶碗何杯分かを計算。">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5h15c0 4.5-3.1 7.5-7.5 7.5s-7.5-3-7.5-7.5z"/><path d="M9 4.5c-1 1.2-1 2.3 0 3.5M13.5 4.5c-1 1.2-1 2.3 0 3.5"/></svg></span><span class="nm">お米の合</span>
+      </a>
+      <a class="tile" href="./tools/byte/" data-slug="byte" data-cat="変換" data-kw="データ容量 換算(KB・MB・GB・TB) KB〜TBを一発換算。1024換算と1000換算を切り替えて「容量が減った?」も解決。 データ容量 ギガ メガ テラ KB MB GB TB ばいと" title="データ容量 換算(KB・MB・GB・TB) — KB〜TBを一発換算。1024換算と1000換算を切り替えて「容量が減った?」も解決。">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5.6" rx="7" ry="2.6"/><path d="M5 5.6v12.8c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V5.6"/><path d="M5 12c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6"/></svg></span><span class="nm">データ容量</span>
+      </a>
+      <a class="tile" href="./tools/roman/" data-slug="roman" data-cat="変換" data-kw="ローマ数字 変換 アラビア数字とローマ数字(I・V・X・L・C・D・M)を相互変換。2026=MMXXVI。 ローマ数字 変換 時計 IV IX ろーますうじ" title="ローマ数字 変換 — アラビア数字とローマ数字(I・V・X・L・C・D・M)を相互変換。2026=MMXXVI。">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8l5.5 8M10.5 8L5 16"/><path d="M14.2 8v8M18.2 8v8"/><path d="M13.2 8h2M13.2 16h2M17.2 8h2M17.2 16h2"/></svg></span><span class="nm">ローマ数字</span>
+      </a>
+      <a class="tile" href="./tools/seiza/" data-slug="seiza" data-cat="変換" data-kw="星座・誕生石 早見計算機 誕生日から12星座と誕生石をすぐ表示。境目の日付もわかります。 星座 誕生石 誕生日 何座 占い せいざ" title="星座・誕生石 早見計算機 — 誕生日から12星座と誕生石をすぐ表示。境目の日付もわかります。">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.6l2.5 5.3 5.8.7-4.3 4 1.1 5.8L12 16.6l-5.1 2.8 1.1-5.8-4.3-4 5.8-.7z"/></svg></span><span class="nm">星座・誕生石</span>
+      </a>
+      <a class="tile" href="./tools/petage/" data-slug="petage" data-cat="変換" data-kw="犬・猫の年齢換算 計算機 うちの子は人間だと何歳?猫と小型・中型犬の年齢を目安式で換算します。 犬 猫 年齢 換算 人間 何歳 ペット いぬ ねこ" title="犬・猫の年齢換算 計算機 — うちの子は人間だと何歳?猫と小型・中型犬の年齢を目安式で換算します。">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">undefined</svg></span><span class="nm">犬猫の年齢</span>
+      </a>
+  </div>
+
+  <details class="seo-list">
+    <summary>61ツールの説明つき一覧を開く</summary>
+      <h3>健康</h3>
+      <ul>
+        <li><a href="./tools/bmi/">BMI・適正体重 計算機</a> — 身長と体重からBMIと適正体重を計算し、日本肥満学会の基準で判定します。</li>
+        <li><a href="./tools/bmr/">基礎代謝量 計算機</a> — 年齢・性別・体重から1日の基礎代謝量(kcal)を厚生労働省の基準値で計算します。</li>
+        <li><a href="./tools/alcohol/">純アルコール量 計算機</a> — お酒の量と度数から純アルコール量(g)を計算し、リスクを高める飲酒量かを判定します。</li>
+        <li><a href="./tools/tdee/">1日の摂取カロリー目安 計算機</a> — 年齢・体重・活動量から1日に必要な摂取カロリーの目安を計算します。</li>
+        <li><a href="./tools/sleep/">睡眠時間 計算機</a> — 就寝時刻と起床時刻から睡眠時間を計算。日をまたいでもOKです。</li>
+        <li><a href="./tools/cycle/">睡眠サイクル計算機</a> — 起床時刻から逆算して、眠りの周期(約90分)の区切りに合う就寝時刻の候補を表示。</li>
+        <li><a href="./tools/pace/">ランニングペース 計算機</a> — 距離とタイムから1kmペースと時速を計算。ゴールタイム予測もできます。</li>
+        <li><a href="./tools/walking/">ウォーキング消費カロリー 計算機</a> — 体重・時間・歩く速さから消費カロリーをMETs方式で計算。脂肪換算の目安つき。</li>
+        <li><a href="./tools/hosu/">歩数→距離・カロリー換算 計算機</a> — 歩数と身長から歩いた距離・時間・消費カロリーの目安を計算。1万歩は何km?</li>
+        <li><a href="./tools/sports/">運動別 消費カロリー計算機</a> — ジョギング・水泳・筋トレなど13種の運動の消費カロリーをMETs方式で計算します。</li>
+        <li><a href="./tools/shinpaku/">目標心拍数 計算機(カルボーネン法)</a> — 年齢と安静時心拍数から脂肪燃焼・持久力向上に適した心拍数ゾーンを計算します。</li>
+        <li><a href="./tools/shio/">塩分量 計算機(ナトリウム⇔食塩相当量)</a> — 食品表示のナトリウム(mg)を食塩相当量(g)に換算。1日目標量に対する割合も表示。</li>
+        <li><a href="./tools/caffeine/">カフェイン摂取量 計算機</a> — コーヒー・お茶・エナジードリンクのカフェイン量を合計し、1日の目安と比較します。</li>
+        <li><a href="./tools/protein/">タンパク質摂取量 計算機</a> — 体重と運動量から1日のタンパク質の目安を計算。鶏むね肉・卵への食品換算つき。</li>
+        <li><a href="./tools/ninshin/">出産予定日・妊娠週数 計算機</a> — 最終月経の開始日から出産予定日と妊娠週数(○週△日)を計算。周期補正にも対応。</li>
+      </ul>
+      <h3>お金</h3>
+      <ul>
+        <li><a href="./tools/loan/">ローン返済 計算機</a> — 借入額・金利・期間から毎月の返済額と利息総額を計算します(元利均等返済)。</li>
+        <li><a href="./tools/fudosan/">不動産投資 収支・損益分岐計算機</a> — 家賃収入・経費・ローン・本業年収から、税金の還付・キャッシュフロー・損益分岐家賃まで一括計算。</li>
+        <li><a href="./tools/kariire/">住宅ローン 借入可能額 計算機</a> — 年収と返済負担率から住宅ローンの借入可能額の目安を逆算。毎月の返済額も表示。</li>
+        <li><a href="./tools/tax/">消費税 計算機</a> — 税込⇔税抜を一発計算。標準税率10%と軽減税率8%に対応しています。</li>
+        <li><a href="./tools/denki/">電気代 計算機</a> — 家電の消費電力と使用時間から1日・1ヶ月・1年の電気代を計算します。</li>
+        <li><a href="./tools/fuel/">ガソリン代 計算機</a> — 走行距離・燃費・単価からガソリン代と使用燃料を計算します。</li>
+        <li><a href="./tools/nenpi/">燃費計算機(満タン法)</a> — 走行距離と給油量から実燃費(km/L)を計算。給油代と1kmあたりの燃料費も。</li>
+        <li><a href="./tools/jikyu/">時給⇔月収・年収 換算計算機</a> — 時給と働き方から月収・年収(額面)を計算。月収から時給の逆算もできます。</li>
+        <li><a href="./tools/compound/">複利・積立シミュレーション</a> — 毎月の積立額と想定利回りから将来の金額を計算します(税引前の概算)。</li>
+        <li><a href="./tools/warikan/">割り勘 計算機</a> — 合計と人数から1人あたりの支払額を計算。キリのいい単位に切り上げできます。</li>
+        <li><a href="./tools/zangyo/">残業代 計算機</a> — 法定の割増率(25%・50%・35%・深夜+25%)で残業代を内訳つきで計算します。</li>
+        <li><a href="./tools/yukyu/">有給休暇の付与日数 計算機</a> — 勤続年数と働き方から法定の有給日数を表示。パートの比例付与にも対応。</li>
+        <li><a href="./tools/hiwari/">家賃日割り計算機</a> — 月の途中の入居・退去の日割り家賃を、実日数方式と30日固定方式の両方で計算。</li>
+        <li><a href="./tools/tanka/">単価比較 計算機(どっちが安い?)</a> — 価格と内容量から「100gあたり」「1個あたり」の単価を並べて比較。最安がひと目でわかります。</li>
+        <li><a href="./tools/point/">割引とポイント還元 どっちが得? 計算機</a> — 「○%オフ」と「○%ポイント還元」の実質価格を比較。還元の割引換算率も表示します。</li>
+        <li><a href="./tools/waribiki/">割引計算機(○%オフはいくら?)</a> — 「30%オフでいくら?」を一発計算。セール価格から割引率の逆算もできます。</li>
+        <li><a href="./tools/genka/">利益率・原価率 計算機</a> — 売価と原価から粗利・利益率を計算。目標利益率からの売価逆算にも対応します。</li>
+        <li><a href="./tools/teiki/">定期券は元が取れる? 計算機</a> — 定期券の価格と片道運賃から損益分岐の日数を計算。都度払いとの差額もわかります。</li>
+        <li><a href="./tools/tip/">チップ計算機(海外旅行用)</a> — 海外レストランのチップ額と合計、割り勘の1人あたりまで一発計算。15/18/20%対応。</li>
+      </ul>
+      <h3>日付・時間</h3>
+      <ul>
+        <li><a href="./tools/days/">日数計算機(日付の差・○日後)</a> — 2つの日付の間の日数と、○日後の日付・曜日を計算します。</li>
+        <li><a href="./tools/eigyobi/">営業日計算機(土日祝を除く)</a> — 「3営業日後はいつ?」を日本の祝日・振替休日込みで計算。期間の営業日数も。</li>
+        <li><a href="./tools/tsukisu/">○ヶ月後・月数 計算機</a> — ○ヶ月後の日付と2つの日付の月数差(満○ヶ月)を月末調整つきで計算します。</li>
+        <li><a href="./tools/jikan/">時間計算機(合計・時刻の差)</a> — 「1:30+0:45」の時間の合計と開始〜終了の経過時間を計算。給与用の10進換算つき。</li>
+        <li><a href="./tools/age/">年齢計算機(満年齢・早生まれ・干支)</a> — 生年月日から満年齢・干支・早生まれ判定を計算。基準日の指定もできます。</li>
+        <li><a href="./tools/wareki/">西暦・和暦 変換計算機</a> — 西暦⇔和暦(明治〜令和)を一発変換。改元年は新旧両方を表示します。</li>
+        <li><a href="./tools/rireki/">入学・卒業年 早見計算機(履歴書用)</a> — 生年月日から小学校〜大学の入学・卒業年を西暦・和暦で表示。早生まれ対応。</li>
+        <li><a href="./tools/kinenbi/">記念日カウント計算機</a> — 「付き合って何日目?」「生まれて何日?」を計算。1000日目・1万日目などの節目も一覧表示。</li>
+      </ul>
+      <h3>暮らし・変換</h3>
+      <ul>
+        <li><a href="./tools/percent/">パーセント計算機</a> — 「何%か」「○%の値」「増減率」の3つのパーセント計算を一発で。</li>
+        <li><a href="./tools/heikin/">平均値・中央値 計算機</a> — 数値を貼り付けるだけで平均・中央値・最大・最小・合計をまとめて計算します。</li>
+        <li><a href="./tools/hensachi/">偏差値 計算機</a> — 得点・平均点・標準偏差から偏差値を計算。点数リストの一括計算もできます。</li>
+        <li><a href="./tools/moji/">文字数カウント</a> — テキストを貼るだけで文字数(スペース込み/除く)・行数・原稿用紙換算を表示。</li>
+        <li><a href="./tools/zenkaku/">全角⇔半角 変換ツール</a> — 全角の英数字・記号・スペースを半角に一括変換(逆方向も)。フォーム入力に。</li>
+        <li><a href="./tools/password/">パスワード生成ツール</a> — 強力なランダムパスワードを端末内で生成。長さ・文字種を選べて強度も表示します。</li>
+        <li><a href="./tools/speed/">速さ・時間・距離 計算機</a> — 速さ・距離・時間のうち2つを入れると残りを自動計算。「はじき」の計算に。</li>
+        <li><a href="./tools/tsubo/">坪・平米・畳 変換計算機</a> — 坪⇔㎡⇔畳を同時に変換。不動産広告の表示基準に基づく換算です。</li>
+        <li><a href="./tools/inch/">インチ⇔cm・ポンド⇔kg 変換計算機</a> — テレビのサイズや海外通販の単位を一発換算。定義値による正確な変換です。</li>
+        <li><a href="./tools/mile/">マイル⇔km 換算計算機</a> — マイルとkmを定義値で正確に相互換算。海里にも対応。海外ドライブ・マラソンに。</li>
+        <li><a href="./tools/shincho/">身長 フィート・インチ換算</a> — 170cmは5'7″。身長のcmとフィート・インチ表記を相互換算します。</li>
+        <li><a href="./tools/ondo/">温度換算 計算機(摂氏⇔華氏⇔ケルビン)</a> — °C・°F・Kを一発で相互変換。海外レシピのオーブン温度や天気予報に。</li>
+        <li><a href="./tools/renji/">電子レンジ加熱時間 換算計算機</a> — 「600Wで1分30秒」を500W・700Wなら何分何秒にすればいいかを一発換算。</li>
+        <li><a href="./tools/spoon/">大さじ・小さじ・カップ 換算計算機</a> — 大さじ1=15ml・小さじ1=5ml・1カップ=200mlで相互換算。レシピの分量調整に。</li>
+        <li><a href="./tools/kome/">お米の合・グラム換算 計算機</a> — 1合=約150g。合数から米の重さ・水加減・炊き上がり・お茶碗何杯分かを計算。</li>
+        <li><a href="./tools/byte/">データ容量 換算(KB・MB・GB・TB)</a> — KB〜TBを一発換算。1024換算と1000換算を切り替えて「容量が減った?」も解決。</li>
+        <li><a href="./tools/roman/">ローマ数字 変換</a> — アラビア数字とローマ数字(I・V・X・L・C・D・M)を相互変換。2026=MMXXVI。</li>
+        <li><a href="./tools/seiza/">星座・誕生石 早見計算機</a> — 誕生日から12星座と誕生石をすぐ表示。境目の日付もわかります。</li>
+        <li><a href="./tools/petage/">犬・猫の年齢換算 計算機</a> — うちの子は人間だと何歳?猫と小型・中型犬の年齢を目安式で換算します。</li>
+      </ul>
+  </details>
+
+  <div class="about">
+    <p>健康・お金・日付・暮らしのちょっとした疑問を、その場で計算できる無料のWebツール集です。すべてのツールに<strong>計算方法と根拠(一次情報の出典)</strong>を明記しています。計算結果は入力値に基づく概算です。詳しくは<a href="./disclaimer.html">免責事項</a>をご覧ください。</p>
+  </div>
 </main>
 <!-- @partial:footer start -->
 <footer class="site-footer">
@@ -322,10 +376,15 @@
 <script>
 (function () {
   "use strict";
-  var input = document.getElementById("search-input");
-  var status = document.getElementById("search-status");
-  var cards = [].slice.call(document.querySelectorAll(".tool-card"));
-  var sections = [].slice.call(document.querySelectorAll(".tool-section"));
+  var RANK = ["moji","password","waribiki","days","bmi","wareki","eigyobi","kinenbi","jikan","tax","fudosan","heikin"];
+  var CATS = [["all", "すべて"], ["健康", "健康"], ["お金", "お金"], ["日付", "日付・時間"], ["変換", "暮らし・変換"]];
+  var current = "all";
+  var tabsEl = document.getElementById("tabs");
+  var grid = document.getElementById("grid");
+  var popEl = document.getElementById("popular");
+  var tiles = [].slice.call(grid.querySelectorAll(".tile"));
+  var bySlug = {};
+  tiles.forEach(function (t) { bySlug[t.dataset.slug] = t; });
 
   // ひらがな→カタカナ+小文字化で表記ゆれを吸収
   function norm(s) {
@@ -333,34 +392,74 @@
       return String.fromCharCode(ch.charCodeAt(0) + 0x60);
     });
   }
-  var index = cards.map(function (card) {
-    return norm(card.textContent + " " + (card.getAttribute("data-keywords") || ""));
+  var index = tiles.map(function (t) { return norm(t.dataset.kw + " " + t.textContent); });
+
+  // 人気: この端末の利用回数(localStorage)+初期ランキングを合成
+  function popularSlugs() {
+    var uses = {};
+    try { uses = JSON.parse(localStorage.getItem("qc_uses") || "{}"); } catch (e) {}
+    var personal = Object.keys(uses).filter(function (s) { return bySlug[s] && uses[s] >= 2; })
+      .sort(function (a, b) { return uses[b] - uses[a]; }).slice(0, 4);
+    var out = personal.slice();
+    RANK.forEach(function (s) { if (out.length < 8 && out.indexOf(s) === -1) out.push(s); });
+    return out.slice(0, 8);
+  }
+  function renderPopular() {
+    popEl.innerHTML = "";
+    popularSlugs().forEach(function (slug, i) {
+      var t = bySlug[slug];
+      if (!t) return;
+      var clone = t.cloneNode(true);
+      clone.hidden = false;
+      var rk = document.createElement("span");
+      var n = i + 1;
+      rk.className = "rk" + (n === 1 ? "" : n === 2 ? " silver" : n === 3 ? " bronze" : " plain");
+      rk.textContent = n;
+      clone.querySelector(".ic").appendChild(rk);
+      popEl.appendChild(clone);
+    });
+  }
+
+  CATS.forEach(function (c) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "tp-tab" + (c[0] === current ? " on" : "");
+    b.textContent = c[1];
+    b.setAttribute("role", "tab");
+    b.onclick = function () {
+      current = c[0];
+      tabsEl.querySelectorAll(".tp-tab").forEach(function (t, i) { t.classList.toggle("on", CATS[i][0] === current); });
+      render();
+    };
+    tabsEl.appendChild(b);
   });
 
-  function filter() {
-    var terms = norm(input.value.trim()).split(/\s+/).filter(Boolean);
+  var input = document.getElementById("search-input");
+  function render() {
+    var q = norm(input.value.trim());
+    var terms = q.split(/\s+/).filter(Boolean);
     var shown = 0;
-    cards.forEach(function (card, i) {
-      var hit = terms.every(function (t) { return index[i].indexOf(t) !== -1; });
-      card.hidden = !hit;
+    tiles.forEach(function (t, i) {
+      var hit;
+      if (terms.length) {
+        hit = terms.every(function (w) { return index[i].indexOf(w) !== -1; });
+      } else {
+        hit = current === "all" || t.dataset.cat === current;
+      }
+      t.hidden = !hit;
       if (hit) shown++;
     });
-    sections.forEach(function (sec) {
-      sec.hidden = sec.querySelectorAll(".tool-card:not([hidden])").length === 0;
-    });
-    if (terms.length === 0) {
-      status.hidden = true;
-    } else {
-      status.hidden = false;
-      status.textContent = shown > 0 ? shown + "件のツールが見つかりました" : "該当するツールがありません。別のことばでお試しください(例: 家賃、割引、カロリー)";
-    }
+    document.getElementById("pop-sec").style.display = (terms.length || current !== "all") ? "none" : "";
+    var label = terms.length ? "検索結果" : (current === "all" ? "すべて" : CATS.filter(function (c) { return c[0] === current; })[0][1]);
+    document.getElementById("genre-title").innerHTML = "<b>" + label + "</b><span>" + shown + "個</span>";
+    document.getElementById("no-hit").hidden = shown > 0;
   }
-  input.addEventListener("input", filter);
+  input.addEventListener("input", render);
 
-  // ?q= 対応と #search アンカーでのフォーカス
-  var q = new URLSearchParams(location.search).get("q");
-  if (q) { input.value = q; filter(); }
-  if (location.hash === "#search") input.focus();
+  var q0 = new URLSearchParams(location.search).get("q");
+  if (q0) { input.value = q0; render(); }
+  if (location.hash === "#search") setTimeout(function () { input.focus(); }, 60);
+  renderPopular();
 })();
 </script>
 </body>
