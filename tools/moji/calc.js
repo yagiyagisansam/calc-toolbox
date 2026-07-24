@@ -74,7 +74,49 @@
     };
   }
 
+  /**
+   * 目標字数に対する残り/超過を判定する。
+   * @param {string} text 対象テキスト
+   * @param {number} limit 目標字数(1以上の整数)
+   * @param {string} basis "chars"(スペース込み・既定) | "noSpace"(スペース除く)
+   * @returns {{ok:true, count:number, limit:number, remaining:number, over:number, within:boolean}
+   *          |{ok:false, code:string}}
+   *   code: "invalid_text" | "too_long" | "invalid_limit"
+   */
+  function checkTarget(text, limit, basis) {
+    var r = count(text);
+    if (!r.ok) return r;
+    if (typeof limit !== "number" || !isFinite(limit) || limit < 1 || Math.floor(limit) !== limit) {
+      return { ok: false, code: "invalid_limit" };
+    }
+    var c = basis === "noSpace" ? r.charsNoSpace : r.chars;
+    return {
+      ok: true,
+      count: c,
+      limit: limit,
+      remaining: Math.max(0, limit - c),
+      over: Math.max(0, c - limit),
+      within: c <= limit
+    };
+  }
+
+  /**
+   * 英文の単語数を数える(空白区切りで、英数字を含むかたまりのみを1語と数える)。
+   * 日本語だけの文章では0になる。
+   * @param {string} text 対象テキスト
+   * @returns {{ok:true, words:number}|{ok:false, code:string}}
+   */
+  function wordCount(text) {
+    if (typeof text !== "string") return { ok: false, code: "invalid_text" };
+    if (text.length > MAX) return { ok: false, code: "too_long" };
+    var words = text.split(/[\s　]+/).filter(function (w) {
+      return /[A-Za-z0-9]/.test(w);
+    });
+    return { ok: true, words: words.length };
+  }
+
   var api = {
+    checkTarget: checkTarget, wordCount: wordCount,
     countHtmlStripped: countHtmlStripped, count: count, MAX: MAX };
   if (typeof module !== "undefined" && module.exports) { module.exports = api; }
   else { global.MojiCalc = api; }

@@ -158,6 +158,73 @@
         "ok": false,
         "code": "invalid_text"
       }
+    },
+    {
+      "name": "目標字数: 8文字の文章は400字以内に収まる(残り392)",
+      "func": "checkTarget",
+      "args": [
+        "あいう えお\nかき",
+        400,
+        "chars"
+      ],
+      "expect": {
+        "ok": true,
+        "count": 8,
+        "remaining": 392,
+        "over": 0,
+        "within": true
+      }
+    },
+    {
+      "name": "目標字数: スペース除く7文字で目標5字なら2文字オーバー",
+      "func": "checkTarget",
+      "args": [
+        "あいう えお\nかき",
+        5,
+        "noSpace"
+      ],
+      "expect": {
+        "ok": true,
+        "count": 7,
+        "remaining": 0,
+        "over": 2,
+        "within": false
+      }
+    },
+    {
+      "name": "目標字数: 0や小数はエラー",
+      "func": "checkTarget",
+      "args": [
+        "あ",
+        0,
+        "chars"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_limit"
+      }
+    },
+    {
+      "name": "単語数: 英文5語を数える",
+      "func": "wordCount",
+      "args": [
+        "This is a pen ."
+      ],
+      "expect": {
+        "ok": true,
+        "words": 4
+      }
+    },
+    {
+      "name": "単語数: 日本語のみは0語",
+      "func": "wordCount",
+      "args": [
+        "これは日本語の文章です。"
+      ],
+      "expect": {
+        "ok": true,
+        "words": 0
+      }
     }
   ]
 }
