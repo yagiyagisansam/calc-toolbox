@@ -1,0 +1,67 @@
+{
+  "tool": "point",
+  "module": "calc.js",
+  "global": "PointCalc",
+  "cases": [
+    {
+      "name": "1万円・10%オフ vs 10%還元: 同率なら割引が得(還元は9.09%オフ相当)",
+      "func": "compare",
+      "args": [10000, 10, 10],
+      "expect": { "ok": true, "discounted": 9000, "pointNet": 9000, "pointValue": 1000, "pointEquivPct": 9.09, "better": "discount" }
+    },
+    {
+      "name": "5000円・5%オフ vs 10%還元: 還元が得",
+      "func": "compare",
+      "args": [5000, 5, 10],
+      "expect": { "ok": true, "discounted": 4750, "pointNet": 4500, "pointValue": 500, "pointEquivPct": 9.09, "better": "point" }
+    },
+    {
+      "name": "20%オフ vs 25%還元はちょうど互角(25%還元=20%オフ相当)",
+      "func": "compare",
+      "args": [3000, 20, 25],
+      "expect": { "ok": true, "discounted": 2400, "pointNet": 2250, "pointValue": 750, "pointEquivPct": 20, "better": "even" }
+    },
+    {
+      "name": "割引なし vs 5%還元: 還元が得(4.76%オフ相当)",
+      "func": "compare",
+      "args": [1980, 0, 5],
+      "expect": { "ok": true, "discounted": 1980, "pointNet": 1881, "pointValue": 99, "pointEquivPct": 4.76, "better": "point" }
+    },
+    {
+      "name": "12000円・15%オフ vs 10%還元: 割引が得",
+      "func": "compare",
+      "args": [12000, 15, 10],
+      "expect": { "ok": true, "discounted": 10200, "pointNet": 10800, "pointValue": 1200, "pointEquivPct": 9.09, "better": "discount" }
+    },
+    {
+      "name": "異常入力: 価格0はエラー",
+      "func": "compare",
+      "args": [0, 10, 10],
+      "expect": { "ok": false, "code": "invalid_price" }
+    },
+    {
+      "name": "異常入力: 割引率100%はエラー",
+      "func": "compare",
+      "args": [1000, 100, 10],
+      "expect": { "ok": false, "code": "invalid_discount" }
+    },
+    {
+      "name": "異常入力: 割引率が負はエラー",
+      "func": "compare",
+      "args": [1000, -5, 10],
+      "expect": { "ok": false, "code": "invalid_discount" }
+    },
+    {
+      "name": "異常入力: 還元率100%超はエラー",
+      "func": "compare",
+      "args": [1000, 10, 150],
+      "expect": { "ok": false, "code": "invalid_point" }
+    },
+    {
+      "name": "異常入力: 数値以外はエラー",
+      "func": "compare",
+      "args": ["1000", 10, 10],
+      "expect": { "ok": false, "code": "invalid_price" }
+    }
+  ]
+}

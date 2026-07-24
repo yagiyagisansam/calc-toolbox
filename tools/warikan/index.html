@@ -23,19 +23,12 @@
 <body>
 <!-- @partial:header start -->
 <header class="site-header">
-  <a class="site-brand" href="../../">計算ツールボックス</a>
-  <nav class="site-nav">
-    <a href="../../">ツール一覧</a>
-    <a href="../../privacy.html">プライバシーポリシー</a>
-    <a href="../../disclaimer.html">免責事項</a>
-    <a href="../../contact.html">お問い合わせ</a>
-  </nav>
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
 </header>
 <!-- @partial:header end -->
 <main>
   <h1>割り勘 計算機</h1>
-  <p>合計金額と人数を入力すると、<strong>1人あたりの支払額</strong>を計算します。100円・500円などキリのいい単位に切り上げられるので、集金がラクになります。入力した値はお使いの端末内だけで計算され、送信されません。</p>
-
   <form class="tool-form" id="warikan-form">
     <label>合計金額(円)
       <input type="number" id="total" inputmode="numeric" step="1" min="1" max="10000000" placeholder="28460" required>
@@ -60,6 +53,8 @@
   <div class="note-box">
     切り上げ方式のため、集金額の合計が支払額を上回る(余りが出る)ことがあります。余りの扱い(幹事の負担軽減・次回繰越しなど)は事前に決めておくとスムーズです。
   </div>
+
+  <p>合計金額と人数を入力すると、<strong>1人あたりの支払額</strong>を計算します。100円・500円などキリのいい単位に切り上げられるので、集金がラクになります。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -102,6 +97,7 @@
 </main>
 <!-- @partial:footer start -->
 <footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
   <nav>
     <a href="../../">ツール一覧</a>
     <a href="../../privacy.html">プライバシーポリシー</a>

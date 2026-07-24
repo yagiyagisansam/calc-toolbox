@@ -23,19 +23,12 @@
 <body>
 <!-- @partial:header start -->
 <header class="site-header">
-  <a class="site-brand" href="../../">計算ツールボックス</a>
-  <nav class="site-nav">
-    <a href="../../">ツール一覧</a>
-    <a href="../../privacy.html">プライバシーポリシー</a>
-    <a href="../../disclaimer.html">免責事項</a>
-    <a href="../../contact.html">お問い合わせ</a>
-  </nav>
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
 </header>
 <!-- @partial:header end -->
 <main>
   <h1>記念日カウント計算機</h1>
-  <p>誕生日・交際開始日・推しの記念日などを入れると、<strong>今日で何日目か</strong>と、<strong>100日目・1000日目・7777日目・1万日目…といった節目の日付</strong>を一括計算します。次のお祝いの計画に。入力した値はお使いの端末内だけで計算され、送信されません。</p>
-
   <form class="tool-form" id="kinenbi-form">
     <label>記念日(誕生日・付き合った日など)
       <input type="date" id="base" min="1900-01-01" max="2200-12-31" required>
@@ -52,6 +45,8 @@
   <div class="note-box">
     「N日目」は<strong>記念日当日を1日目</strong>として数えています(お食い初めの「100日目」や交際記念日の一般的な数え方)。「N日経過」で数えたい場合は1日ずれるのでご注意ください。
   </div>
+
+  <p>誕生日・交際開始日・推しの記念日などを入れると、<strong>今日で何日目か</strong>と、<strong>100日目・1000日目・7777日目・1万日目…といった節目の日付</strong>を一括計算します。次のお祝いの計画に。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -95,6 +90,7 @@
 </main>
 <!-- @partial:footer start -->
 <footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
   <nav>
     <a href="../../">ツール一覧</a>
     <a href="../../privacy.html">プライバシーポリシー</a>
