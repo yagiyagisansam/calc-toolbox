@@ -3,22 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>不動産投資 収支・損益分岐計算機(税金・還付金・キャッシュフロー) | 計算ツールボックス</title>
-  <meta name="description" content="家賃収入・管理費・ローン・本業の年収を入れるだけで、不動産所得と損益通算による所得税・住民税の還付額、年間キャッシュフロー、損益分岐家賃まで一括計算。不動産オーナー・ワンルーム投資の収支確認に。">
+  <title>不動産投資 収支・損益分岐計算機(長期グラフ・いつ売れば黒字?) | 計算ツールボックス</title>
+  <meta name="description" content="物件価格・家賃・年収など5項目だけで、ローン残債・売却想定額・節税効果・累計収支を最長50年グラフ表示。「いつ売れば通算損益がプラスになるか」を譲渡税(短期/長期)込みで逆算。詳細設定で前提の変更も可能。">
   <link rel="stylesheet" href="../../shared/style.css">
   <!-- @meta start -->
   <link rel="canonical" href="https://quick-calc.site/tools/fudosan/">
   <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
   <meta name="theme-color" content="#0b6e4f">
   <meta property="og:site_name" content="計算ツールボックス">
-  <meta property="og:title" content="不動産投資 収支・損益分岐計算機(税金・還付金・キャッシュフロー) | 計算ツールボックス">
-  <meta property="og:description" content="家賃収入・管理費・ローン・本業の年収を入れるだけで、不動産所得と損益通算による所得税・住民税の還付額、年間キャッシュフロー、損益分岐家賃まで一括計算。不動産オーナー・ワンルーム投資の収支確認に。">
+  <meta property="og:title" content="不動産投資 収支・損益分岐計算機(長期グラフ・いつ売れば黒字?) | 計算ツールボックス">
+  <meta property="og:description" content="物件価格・家賃・年収など5項目だけで、ローン残債・売却想定額・節税効果・累計収支を最長50年グラフ表示。「いつ売れば通算損益がプラスになるか」を譲渡税(短期/長期)込みで逆算。詳細設定で前提の変更も可能。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://quick-calc.site/tools/fudosan/">
   <meta property="og:locale" content="ja_JP">
   <meta name="twitter:card" content="summary">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"不動産投資 収支・損益分岐計算機(税金・還付金・キャッシュフロー)","item":"https://quick-calc.site/tools/fudosan/"}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"不動産投資 収支・損益分岐計算機(長期グラフ・いつ売れば黒字?)","item":"https://quick-calc.site/tools/fudosan/"}]}</script>
   <!-- @meta end -->
+  <style>
+    .chart-wrap { position: relative; margin: 20px 0 4px; }
+    .chart-wrap svg { width: 100%; height: auto; display: block; }
+    .chart-title { font-weight: 700; font-size: 1rem; margin: 24px 0 0; }
+    .chart-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 0.82rem; color: var(--color-muted); margin: 4px 0 0; }
+    .chart-legend .chip { display: inline-block; width: 14px; height: 4px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+    .chart-tip {
+      position: absolute; pointer-events: none; background: var(--color-bg);
+      border: 1px solid var(--color-border); border-radius: 8px; padding: 6px 10px;
+      font-size: 0.78rem; line-height: 1.5; box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      white-space: nowrap; display: none; z-index: 2;
+    }
+    .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+    .stat { border: 1px solid var(--color-border); border-radius: 10px; padding: 8px 12px; }
+    .stat .k { font-size: 0.75rem; color: var(--color-muted); }
+    .stat .v { font-weight: 700; font-size: 1.02rem; }
+    #result .data-table th, #result .data-table td { white-space: nowrap; }
+  </style>
 </head>
 <body>
 <!-- @partial:header start -->
@@ -30,108 +48,103 @@
 <main>
   <h1>不動産投資 収支・損益分岐計算機</h1>
   <form class="tool-form" id="fudosan-form">
-    <label>年間の家賃収入(万円)
-      <span class="field-note">月10万円なら120。空室を見込むなら減らして入力</span>
-      <input type="number" id="rent" min="1" max="10000" step="any" required placeholder="例: 120">
+    <label>物件価格(万円)
+      <input type="number" id="price" min="100" max="100000" step="any" required placeholder="例: 2000">
     </label>
-    <label>管理費・修繕積立金など(円/月)
-      <input type="number" id="mgmt" min="0" max="1000000" step="any" required placeholder="例: 10000">
+    <label>建物の構造と築年数
+      <span style="display:flex;gap:.5em;align-items:center;">
+        <select id="structure" aria-label="構造">
+          <option value="rc" selected>RC(マンション)</option>
+          <option value="steel">鉄骨</option>
+          <option value="wood">木造</option>
+        </select>
+        築 <input type="number" id="age" min="0" max="80" step="1" value="10" style="width:5em;" aria-label="築年数"> 年
+      </span>
     </label>
-    <label>固定資産税・都市計画税(円/年)
-      <input type="number" id="proptax" min="0" max="10000000" step="any" required placeholder="例: 100000">
-    </label>
-    <label>雑費・修繕費など(円/年)
-      <span class="field-note">賃貸管理手数料・保険料・交通費・通信費など</span>
-      <input type="number" id="misc" min="0" max="10000000" step="any" required placeholder="例: 100000">
-    </label>
-    <label>減価償却費(円/年)
-      <span class="field-note">建物価格÷耐用年数の目安。不明なら0でも計算可(税効果が小さく出ます)</span>
-      <input type="number" id="dep" min="0" max="10000000" step="any" value="0">
-    </label>
-    <label>借入額(万円)
-      <input type="number" id="principal" min="1" max="100000" step="any" required placeholder="例: 2000">
-    </label>
-    <label>金利(年%)
-      <input type="number" id="rate" min="0" max="20" step="0.01" value="2" required>
-    </label>
-    <label>返済期間(年)
-      <input type="number" id="years" min="1" max="50" step="1" value="25" required>
-    </label>
-    <label>借入のうち土地取得分の割合(%・任意)
-      <span class="field-note">区分マンションの目安2〜4割。赤字の損益通算制限の計算に使用(不明なら0)</span>
-      <input type="number" id="landratio" min="0" max="100" step="1" value="0">
+    <label>月額家賃(円)
+      <input type="number" id="rentm" min="1000" max="10000000" step="any" required placeholder="例: 85000">
     </label>
     <label>本業の給与年収(万円・額面)
+      <span class="field-note">節税(損益通算)の計算に使います</span>
       <input type="number" id="salary" min="0" max="100000" step="any" required placeholder="例: 600">
     </label>
-    <label>社会保険料(円/年・任意)
-      <span class="field-note">源泉徴収票の社会保険料等の金額。空欄なら年収の15%で概算</span>
-      <input type="number" id="socialins" min="0" max="100000000" step="any" placeholder="空欄=年収の15%">
-    </label>
-    <label>その他の所得控除(円/年・任意)
-      <span class="field-note">iDeCo・生命保険料控除・配偶者控除など(基礎控除は自動)</span>
-      <input type="number" id="otherded" min="0" max="100000000" step="any" value="0">
-    </label>
-    <button type="submit">収支と損益分岐を計算する</button>
+    <details id="adv">
+      <summary style="cursor:pointer;font-weight:600;font-size:0.92rem;color:var(--color-accent);">⚙️ 詳細設定(自動推定値を変更したい方向け)</summary>
+      <div style="display:grid;gap:14px;margin-top:14px;">
+        <label>頭金(万円)<input type="number" id="down" min="0" step="any" value="0"></label>
+        <label>購入諸費用率(%)<span class="field-note">登記・税・手数料など。既定7%</span><input type="number" id="costrate" min="0" max="20" step="0.1" value="7"></label>
+        <label>金利(年%)<input type="number" id="rate" min="0" max="20" step="0.01" value="2"></label>
+        <label>返済期間(年)<input type="number" id="years" min="1" max="50" step="1" value="35"></label>
+        <label>物件価格に占める建物の割合(%)<span class="field-note">減価償却と土地利息制限に影響。既定50%</span><input type="number" id="bratio" min="0" max="100" step="1" value="50"></label>
+        <label>空室率(%)<input type="number" id="vacancy" min="0" max="90" step="1" value="5"></label>
+        <label>家賃下落率(%/年)<input type="number" id="decline" min="-5" max="10" step="0.1" value="1"></label>
+        <label>運営経費率(満室家賃比%)<span class="field-note">管理費・修繕積立・固都税・賃貸管理など。既定20%</span><input type="number" id="opex" min="0" max="90" step="1" value="20"></label>
+        <label>売却時の表面利回り(%)<span class="field-note">空欄=購入時と同じ利回りで売れる想定。高くすると保守的</span><input type="number" id="saleyield" min="0.1" max="30" step="0.1" placeholder="空欄=購入時と同じ"></label>
+        <label>売却費用率(%)<span class="field-note">仲介手数料など。既定4%</span><input type="number" id="salecost" min="0" max="20" step="0.1" value="4"></label>
+        <label>社会保険料(円/年)<span class="field-note">空欄=給与の15%で概算</span><input type="number" id="socialins" min="0" step="any" placeholder="空欄=年収の15%"></label>
+        <label>その他の所得控除(円/年)<input type="number" id="otherded" min="0" step="any" value="0"></label>
+      </div>
+    </details>
+    <button type="submit">長期収支をグラフで見る</button>
   </form>
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
   <div class="note-box">
-    本ツールは<strong>概算シミュレーション</strong>です。税額は速算表による簡易計算で、個別の控除・青色申告特別控除・住民税の調整控除などは反映していません。実際の申告・投資判断は<strong>税理士等の専門家</strong>にご確認ください。
+    本ツールは<strong>概算シミュレーション</strong>です。税額は速算表による簡易計算(青色申告特別控除・調整控除など未反映)、将来の家賃・売却額・金利は仮定に基づく推定です。実際の申告・売買判断は<strong>税理士・不動産の専門家</strong>にご確認ください。
   </div>
 
-  <p>ワンルーム投資や賃貸経営で本当に知りたいのは「結局、手元にいくら残るのか」。家賃収入・経費・ローン・本業の年収を入れると、<strong>不動産所得 → 損益通算による所得税・住民税の還付(または増税)→ 年間キャッシュフロー → 損益分岐家賃</strong>まで一気通貫で計算します。<a href="../loan/">ローン返済計算機</a>の不動産オーナー向け拡張版です。</p>
+  <p>不動産投資でいちばん知りたいのは「<strong>結局、いつ売れば通算でプラスになるのか</strong>」。物件価格・家賃・年収など<strong>最少5項目</strong>を入れるだけで、ローン残債の減少・家賃から逆算した売却想定額・節税(損益通算)効果・毎年のキャッシュフローを最長50年分計算し、<strong>譲渡税(短期39.63%/長期20.315%)まで含めた「その年に売った場合の通算損益」</strong>をグラフで表示します。細かい前提は詳細設定でいつでも変更できます。</p>
 
   <h2>使い方</h2>
   <ol>
-    <li>物件の家賃収入と経費(管理費・固定資産税・雑費・減価償却費)を入力します。</li>
-    <li>ローンの条件(借入額・金利・期間)を入力します。</li>
-    <li>本業の給与年収を入力します(還付額の計算に使います)。</li>
-    <li>「計算する」を押すと、税金・還付金・キャッシュフロー・損益分岐がまとめて表示されます。</li>
+    <li>物件価格・構造と築年数・月額家賃・給与年収を入力します(残りはツールが推定します)。</li>
+    <li>「グラフで見る」を押すと、損益分岐の年と2つのグラフ・年次表が表示されます。</li>
+    <li>前提を変えたいときは「詳細設定」を開いて金利・空室率・売却利回りなどを調整してください。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
   <ul>
-    <li><strong>ローン返済</strong>: 元利均等返済で毎月の返済額を計算し、初年度の支払利息を月ごとの残高から積算します。</li>
-    <li><strong>不動産所得 = 家賃収入 −(管理費+固定資産税+雑費+減価償却費+支払利息)</strong>。ローンの元金返済分は経費になりません。</li>
-    <li><strong>損益通算</strong>: 不動産所得が赤字の場合、給与所得から差し引いて所得税・住民税が軽減されます(確定申告による還付)。ただし<strong>土地取得に係る借入利息分の赤字は通算できません</strong>(租税特別措置法)。</li>
-    <li><strong>税額の概算</strong>: 給与所得控除(令和7年改正後)・基礎控除(所得税58万円/住民税43万円)・社会保険料控除を適用し、所得税の速算表+復興特別所得税2.1%と住民税所得割10%で、通算前後の差額=還付額を計算します。</li>
-    <li><strong>年間キャッシュフロー = 家賃収入 − 現金経費 − 年間返済額 + 税効果</strong>。減価償却費は現金支出ではないため含めません(帳簿は赤字でも手残りが黒字、の逆転が起きる理由です)。</li>
-    <li><strong>損益分岐家賃</strong>: キャッシュフローが0になる年間家賃を逆算します。入力家賃に対する割合が低いほど、空室や家賃下落への耐性が高い物件です。</li>
+    <li><strong>ローン</strong>: 元利均等返済。毎月の残高から年ごとの利息・元金・残債を積算します(既定: フルローン・金利2%・35年)。</li>
+    <li><strong>減価償却</strong>: 建物価格(既定は物件価格の50%)を、中古資産の簡便法による耐用年数(RC47年・鉄骨34年・木造22年を基に「(法定−経過)+経過×20%」)で定額償却。<strong>償却が終わる年からは節税が細り、税負担が増える(デッドクロス)まで再現</strong>します。</li>
+    <li><strong>家賃・空室</strong>: 家賃は年1%下落・空室率5%(既定)。運営経費は満室家賃の20%(管理費・修繕積立・固都税・賃貸管理などの合計の目安)。</li>
+    <li><strong>節税(損益通算)</strong>: 各年の不動産所得が赤字なら給与と通算し、所得税(速算表+復興税)・住民税の軽減額を計算。土地取得分の借入利息に相当する赤字は通算不可(租税特別措置法)も反映します。</li>
+    <li><strong>売却想定額</strong>: 「その年の満室家賃 ÷ 表面利回り」の収益還元で逆算(既定は購入時と同じ利回り。家賃が下がれば売値も下がる想定)。参考として簿価ベース(土地+建物残価)の線も表示します。</li>
+    <li><strong>譲渡税</strong>: 売却益 =(売却額 − 売却費用)−(取得価格 − 累計減価償却)。保有期間により<strong>短期39.63%/長期20.315%</strong>を自動適用(年初購入・年末売却の想定で7年目から長期。正確には譲渡年の1月1日時点で5年超)。</li>
+    <li><strong>通算損益(その年に売った場合)= 累計キャッシュフロー + 売却手取り(残債・費用・税を控除)− 初期自己資金(頭金+諸費用)</strong>。これが0以上になる最初の年が損益分岐です。</li>
   </ul>
 
   <h3>出典・前提の明記</h3>
   <ul class="sources">
-    <li>所得税の速算表・給与所得控除・基礎控除: <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2260.htm" target="_blank" rel="noopener">国税庁タックスアンサー No.2260(所得税の税率)</a>ほか国税庁の解説</li>
-    <li>不動産所得と損益通算・土地利息の制限: <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1391.htm" target="_blank" rel="noopener">国税庁タックスアンサー No.1391(不動産所得が赤字のときの他の所得との通算)</a></li>
-    <li>住民税所得割10%は標準税率(均等割・調整控除・自治体差は未反映)</li>
+    <li>減価償却(中古資産の簡便法・法定耐用年数): <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2108.htm" target="_blank" rel="noopener">国税庁タックスアンサー No.2108(中古資産の耐用年数)</a></li>
+    <li>譲渡所得の税率(短期・長期): <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/joto/3208.htm" target="_blank" rel="noopener">国税庁タックスアンサー No.3208(長期譲渡所得の税額の計算)</a>・No.3211(短期)</li>
+    <li>損益通算と土地利息の制限: <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1391.htm" target="_blank" rel="noopener">国税庁タックスアンサー No.1391</a> / 所得税率: No.2260</li>
   </ul>
 
   <h2>計算の前提と注意</h2>
   <ul>
-    <li>初年度ベースの概算です。2年目以降は利息の減少・家賃下落・修繕の発生で収支が変わります。また購入初年度は登記費用・不動産取得税などでさらに経費が出ます。</li>
-    <li>減価償却費は建物の構造・築年数で大きく変わります(RC47年・木造22年など)。売買契約書の建物価格÷耐用年数が目安です。</li>
-    <li>青色申告特別控除(最大65万円)・専従者給与などの節税策は含めていません。</li>
-    <li>「節税になるから」という営業トークの物件は、税還付を含めてもキャッシュフローが赤字のことがあります。本ツールの「年間キャッシュフロー」でご確認ください。</li>
+    <li>大規模修繕・設備交換・金利上昇・売却時の市況は反映していません。売却利回りを購入時+1〜2%にして「安くしか売れない場合」も確認するのがおすすめです。</li>
+    <li>取得費は概算として「物件価格−累計償却」で計算しています(購入諸費用の一部は実際には取得費に算入でき、その分税は軽くなります=本ツールはやや保守的)。</li>
+    <li>給与年収は全期間一定と仮定しています。</li>
+    <li>新築や築浅では不動産取得税・初年度の登記費用等が別途かかります(諸費用率で調整可)。</li>
   </ul>
 
   <h2 id="faq">よくある質問</h2>
-  <h3>Q. 帳簿は赤字なのにキャッシュフローが黒字(またはその逆)なのはなぜですか?</h3>
-  <p>減価償却費(現金が出ていかない経費)とローン元金返済(経費にならない現金支出)のずれが原因です。帳簿の赤字は税還付を生み、元金返済は帳簿に現れず現金を減らします。両方を見るのが不動産投資の基本です。</p>
-  <h3>Q. 還付金はいつ・どうやって受け取れますか?</h3>
-  <p>翌年2〜3月の確定申告で不動産所得の赤字を申告すると、給与から源泉徴収された所得税の一部が1〜2ヶ月後に振り込まれます。住民税は翌年度の税額が軽くなる形で反映されます。</p>
-  <h3>Q. 土地分の利息が損益通算できないとはどういうことですか?</h3>
-  <p>不動産所得が赤字のとき、その赤字のうち「土地を買うための借入利息」に相当する部分は給与と通算できない決まりです(建物分は通算可)。土地割合の高い物件ほど節税効果は小さくなります。本ツールでは土地割合を入力すると自動で制限を反映します。</p>
-  <h3>Q. 損益分岐家賃が入力家賃より高いのですが?</h3>
-  <p>現状の家賃では毎年持ち出し(赤字)という意味です。繰上返済・金利交渉・経費削減・家賃アップのいずれかで分岐点を下回らせるか、売却も含めて検討する状況です。</p>
+  <h3>Q. 「通算損益」がプラスになる年が出ません。</h3>
+  <p>家賃収入に対して価格・借入・経費が重すぎるサインです。詳細設定で「頭金を増やす」「金利を下げる(借換え)」「経費率を下げる」と分岐がどう動くか試してみてください。それでもプラスにならない条件は、投資として成立しにくい前提ということになります。</p>
+  <h3>Q. なぜ6年目と7年目で結果が大きく変わるのですか?</h3>
+  <p>譲渡税率が短期(39.63%)から長期(20.315%)に切り替わるためです。売却益が出る物件では、長期になるのを待ってから売ると手取りが大きく変わります。正確な判定日は「譲渡した年の1月1日時点で保有5年超」なので、実際の売却時期は専門家にご確認ください。</p>
+  <h3>Q. デッドクロスとは何ですか?</h3>
+  <p>経費にならないローン元金返済額が、現金の出ていかない経費である減価償却費を上回る状態です。この状態になると「帳簿は黒字で税金は増えるのに、手元の現金は減る」ことが起きやすくなります。本ツールは該当する年を表示します。</p>
+  <h3>Q. 数字は正確ですか?</h3>
+  <p>ローン・減価償却・税率表・譲渡税の計算式は公的資料どおりに実装し、テストで検証しています。ただし将来の家賃・空室・売却額は仮定に基づく推定なので、結果は「この前提ならこうなる」というシナリオとしてお使いください。</p>
 
   <h2>関連ツール</h2>
   <ul>
     <li><a href="../loan/">ローン返済 計算機(毎月の返済額)</a></li>
     <li><a href="../kariire/">住宅ローン 借入可能額 計算機</a></li>
     <li><a href="../hiwari/">家賃日割り計算機</a></li>
-    <li><a href="../genka/">利益率・原価率 計算機</a></li>
+    <li><a href="../compound/">複利・積立シミュレーション</a></li>
     <li><a href="../../">ツール一覧へ</a></li>
   </ul>
 </main>
@@ -153,65 +166,157 @@
 (function () {
   "use strict";
   var box = document.getElementById("result");
-  var MSG = {
-    invalid_rent: "家賃収入を1万円以上で入力してください。",
-    invalid_mgmt: "管理費を0以上で入力してください。",
-    invalid_proptax: "固定資産税を0以上で入力してください。",
-    invalid_misc: "雑費を0以上で入力してください。",
-    invalid_dep: "減価償却費を0以上で入力してください。",
-    invalid_principal: "借入額を1万円以上で入力してください。",
-    invalid_rate: "金利は0〜20%で入力してください。",
-    invalid_years: "返済期間は1〜50年の整数で入力してください。",
-    invalid_landratio: "土地割合は0〜100%で入力してください。",
-    invalid_salary: "給与年収を0以上で入力してください。",
-    invalid_socialins: "社会保険料を0以上で入力してください。",
-    invalid_deduction: "その他の控除を0以上で入力してください。"
-  };
-  function yen(v) { return v.toLocaleString() + "円"; }
+  var COLORS = { green: "#12915f", orange: "#c2661f", blue: "#5b7fbf" };
+
+  function man(v) { return Math.round(v / 10000).toLocaleString(); }
+  function manSigned(v) { return (v >= 0 ? "+" : "−") + Math.abs(Math.round(v / 10000)).toLocaleString(); }
+
+  function val(id) { var v = document.getElementById(id).value; return v === "" ? null : parseFloat(v); }
+
+  // ===== SVGラインチャート(依存ライブラリなし) =====
+  function drawChart(series, opts) {
+    var W = 640, H = 300, L = 60, R = 14, T = 14, B = 30;
+    var n = series[0].values.length;
+    var min = 0, max = 0;
+    series.forEach(function (s) { s.values.forEach(function (v) { if (v < min) min = v; if (v > max) max = v; }); });
+    if (max === min) max = min + 1;
+    var span = max - min;
+    max += span * 0.06; min -= span * 0.06;
+    function sx(i) { return L + (W - L - R) * (n === 1 ? 0.5 : i / (n - 1)); }
+    function sy(v) { return T + (H - T - B) * (1 - (v - min) / (max - min)); }
+    // y軸目盛り(万円): きりのいい間隔
+    var rawStep = (max - min) / 5;
+    var pow = Math.pow(10, Math.floor(Math.log(rawStep) / Math.LN10));
+    var step = [1, 2, 2.5, 5, 10].map(function (m) { return m * pow; }).filter(function (s) { return s >= rawStep; })[0] || 10 * pow;
+    var g = "";
+    for (var yv = Math.ceil(min / step) * step; yv <= max; yv += step) {
+      var yy = sy(yv);
+      g += '<line x1="' + L + '" y1="' + yy + '" x2="' + (W - R) + '" y2="' + yy + '" stroke="var(--color-border)" stroke-width="1"/>' +
+        '<text x="' + (L - 6) + '" y="' + (yy + 4) + '" text-anchor="end" font-size="11" fill="var(--color-muted)">' + man(yv) + "</text>";
+    }
+    if (min < 0 && max > 0) {
+      g += '<line x1="' + L + '" y1="' + sy(0) + '" x2="' + (W - R) + '" y2="' + sy(0) + '" stroke="var(--color-muted)" stroke-width="1.5"/>';
+    }
+    for (var xi = 0; xi < n; xi++) {
+      var year = xi + 1;
+      if (year === 1 || year % 5 === 0) {
+        g += '<text x="' + sx(xi) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="11" fill="var(--color-muted)">' + year + "年</text>";
+      }
+    }
+    series.forEach(function (s) {
+      var pts = s.values.map(function (v, i) { return sx(i).toFixed(1) + "," + sy(v).toFixed(1); }).join(" ");
+      g += '<polyline points="' + pts + '" fill="none" stroke="' + s.color + '" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"' + (s.dash ? ' stroke-dasharray="6 5"' : "") + "/>";
+    });
+    if (opts && opts.marker != null) {
+      var mi = opts.marker - 1;
+      g += '<circle cx="' + sx(mi) + '" cy="' + sy(series[0].values[mi]) + '" r="5.5" fill="' + series[0].color + '" stroke="var(--color-bg)" stroke-width="2"/>';
+    }
+    var legend = series.map(function (s) {
+      return '<span><span class="chip" style="background:' + s.color + (s.dash ? ";height:0;border-top:3px dashed " + s.color + ";background:none" : "") + '"></span>' + s.name + "</span>";
+    }).join("");
+    return '<p class="chart-title">' + opts.title + "</p>" +
+      '<div class="chart-wrap"><svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + opts.title + '">' + g + "</svg>" +
+      '<div class="chart-tip"></div></div>' +
+      '<div class="chart-legend">' + legend + "</div>";
+  }
+
+  // タップ/ホバーで年次ツールチップ
+  function attachTips(root, data) {
+    root.querySelectorAll(".chart-wrap").forEach(function (wrap, ci) {
+      var svg = wrap.querySelector("svg");
+      var tip = wrap.querySelector(".chart-tip");
+      function onMove(ev) {
+        var rect = svg.getBoundingClientRect();
+        var x = (ev.touches ? ev.touches[0].clientX : ev.clientX) - rect.left;
+        var frac = (x / rect.width * 640 - 60) / (640 - 60 - 14);
+        var i = Math.round(frac * (data.years.length - 1));
+        if (i < 0) i = 0;
+        if (i >= data.years.length) i = data.years.length - 1;
+        var d = data.years[i];
+        tip.innerHTML = ci === 0
+          ? "<strong>" + d.y + "年目</strong><br>売却想定 " + man(d.valueIncome) + "万円<br>ローン残債 " + man(d.loanBalance) + "万円<br>簿価ベース " + man(d.valueCost) + "万円"
+          : "<strong>" + d.y + "年目</strong>に売ると<br>通算損益 <strong>" + manSigned(d.totalIfSold) + "万円</strong><br>累計CF " + manSigned(d.cumCF) + "万円 / 税効果累計 " + manSigned(d.cumTax) + "万円";
+        tip.style.display = "block";
+        var tx = x + 12;
+        if (tx > rect.width - 170) tx = x - 175;
+        tip.style.left = tx + "px";
+        tip.style.top = "10px";
+      }
+      wrap.addEventListener("pointermove", onMove);
+      wrap.addEventListener("touchstart", onMove, { passive: true });
+      wrap.addEventListener("pointerleave", function () { tip.style.display = "none"; });
+    });
+  }
+
   document.getElementById("fudosan-form").addEventListener("submit", function (e) {
     e.preventDefault();
-    var si = document.getElementById("socialins").value;
-    var r = FudosanCalc.simulate({
-      rent: parseFloat(document.getElementById("rent").value) * 10000,
-      mgmtMonthly: parseFloat(document.getElementById("mgmt").value),
-      propTax: parseFloat(document.getElementById("proptax").value),
-      misc: parseFloat(document.getElementById("misc").value),
-      depreciation: parseFloat(document.getElementById("dep").value || "0"),
-      principal: parseFloat(document.getElementById("principal").value) * 10000,
-      ratePct: parseFloat(document.getElementById("rate").value),
-      years: parseInt(document.getElementById("years").value, 10),
-      landRatioPct: parseFloat(document.getElementById("landratio").value || "0"),
-      salary: parseFloat(document.getElementById("salary").value) * 10000,
-      socialIns: si === "" ? null : parseFloat(si),
-      otherDeduction: parseFloat(document.getElementById("otherded").value || "0")
-    });
+    var input = {
+      price: val("price") * 10000,
+      structure: document.getElementById("structure").value,
+      age: parseInt(document.getElementById("age").value, 10),
+      rentMonthly: val("rentm"),
+      salary: val("salary") * 10000,
+      downPayment: (val("down") || 0) * 10000,
+      costRatePct: val("costrate"),
+      ratePct: val("rate"),
+      years: val("years"),
+      buildingRatioPct: val("bratio"),
+      vacancyPct: val("vacancy"),
+      rentDeclinePct: val("decline"),
+      opexRatePct: val("opex"),
+      saleYieldPct: val("saleyield"),
+      saleCostPct: val("salecost"),
+      socialIns: val("socialins"),
+      otherDeduction: val("otherded")
+    };
+    var r = FudosanCalc.simulateLongTerm(input);
     if (!r.ok) {
-      box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "入力値を確認してください。") + "</p>";
+      box.innerHTML = '<p class="result-error">入力値を確認してください(' + r.code + ')。物件価格100万円以上・家賃1,000円以上などの範囲があります。</p>';
       box.hidden = false;
       return;
     }
-    var cfClass = r.annualCF >= 0 ? "" : ' style="color:#b3261e;"';
-    var taxLine = r.taxEffect > 0
-      ? "還付・軽減 <strong>約" + yen(r.taxEffect) + "</strong>(所得税+住民税)"
-      : r.taxEffect < 0
-        ? "税負担増 <strong>約" + yen(-r.taxEffect) + "</strong>(不動産所得が黒字のため)"
-        : "税額への影響なし" + (r.disallowedLoss > 0 ? "(赤字が土地利息分のため損益通算不可)" : "");
-    box.innerHTML =
-      '<div class="result-main"' + cfClass + ">年間キャッシュフロー " + (r.annualCF >= 0 ? "+" : "") + yen(r.annualCF) + "</div>" +
-      "<p>月あたり " + (r.monthlyCF >= 0 ? "+" : "") + yen(r.monthlyCF) + "</p>" +
-      '<div class="table-scroll"><table class="data-table"><tbody>' +
-      "<tr><td>毎月のローン返済</td><td>" + yen(r.monthly) + "(年" + yen(r.annualPay) + ")</td></tr>" +
-      "<tr><td>初年度の支払利息(概算)</td><td>" + yen(r.interestY1) + "</td></tr>" +
-      "<tr><td>不動産所得(帳簿)</td><td>" + (r.realEstateIncome >= 0 ? "+" : "") + yen(r.realEstateIncome) + "</td></tr>" +
-      (r.disallowedLoss > 0 ? "<tr><td>うち損益通算できない赤字(土地利息分)</td><td>" + yen(r.disallowedLoss) + "</td></tr>" : "") +
-      "<tr><td>税効果</td><td>" + taxLine + "</td></tr>" +
-      "<tr><td>税額(通算前→通算後)</td><td>" + yen(r.taxBefore) + " → " + yen(r.taxAfter) + "</td></tr>" +
-      "<tr><td>損益分岐の年間家賃</td><td><strong>約" + yen(r.breakEvenRent) + "</strong>(入力家賃の" + r.breakEvenPct.toLocaleString() + "%)</td></tr>" +
-      "</tbody></table></div>" +
-      "<p>" + (r.breakEvenPct <= 100
-        ? "入力家賃が損益分岐を上回っており、この条件では手残りがプラスです。空室・家賃下落が" + Math.round(100 - r.breakEvenPct) + "%以内なら耐えられる計算です。"
-        : "この条件では毎年持ち出しです。損益分岐に届くには家賃ベースであと約" + (r.breakEvenPct - 100).toLocaleString() + "%必要です。") + "</p>";
+    var thisYear = new Date().getFullYear();
+    var headline = r.breakEvenYear
+      ? '<div class="result-main">' + r.breakEvenYear + "年目(" + (thisYear + r.breakEvenYear - 1) + "年ごろ)以降に売れば通算プラス</div>"
+      : '<div class="result-main" style="color:#b3261e;">' + r.horizon + "年以内に通算プラスになりません</div>";
+    var last = r.years[r.years.length - 1];
+    var stats =
+      '<div class="stat-row">' +
+      '<div class="stat"><div class="k">表面利回り</div><div class="v">' + r.grossYieldPct.toLocaleString() + '%</div></div>' +
+      '<div class="stat"><div class="k">毎月のローン返済</div><div class="v">' + r.monthly.toLocaleString() + '円</div></div>' +
+      '<div class="stat"><div class="k">初期自己資金(頭金+諸費用)</div><div class="v">' + man(r.initialOutlay) + '万円</div></div>' +
+      '<div class="stat"><div class="k">減価償却の期間 / デッドクロス</div><div class="v">' + r.usefulLifeYears + "年 / " + (r.deadCrossYear ? r.deadCrossYear + "年目〜" : "期間内なし") + "</div></div>" +
+      "</div>";
+    var chart1 = drawChart([
+      { name: "売却想定額(収益還元)", color: COLORS.green, values: r.years.map(function (d) { return d.valueIncome; }) },
+      { name: "ローン残債", color: COLORS.orange, values: r.years.map(function (d) { return d.loanBalance; }) },
+      { name: "参考: 簿価ベース(土地+建物残価)", color: COLORS.blue, dash: true, values: r.years.map(function (d) { return d.valueCost; }) }
+    ], { title: "📉 資産価値とローン残債の推移(万円)" });
+    var chart2 = drawChart([
+      { name: "通算損益(その年に売った場合)", color: COLORS.green, values: r.years.map(function (d) { return d.totalIfSold; }) },
+      { name: "累計キャッシュフロー", color: COLORS.orange, values: r.years.map(function (d) { return d.cumCF; }) },
+      { name: "累計の税効果(節税+/増税−)", color: COLORS.blue, dash: true, values: r.years.map(function (d) { return d.cumTax; }) }
+    ], { title: "💰 いま売ったら? 通算損益の推移(万円)", marker: r.breakEvenYear });
+    var rows = "";
+    var keyYears = [1, 2, 3, 5, 7, 10, 15, 20, 25, 30, 35, 40, 45, 50];
+    if (r.breakEvenYear && keyYears.indexOf(r.breakEvenYear) === -1) {
+      keyYears.push(r.breakEvenYear);
+      keyYears.sort(function (a, b) { return a - b; });
+    }
+    keyYears.forEach(function (y) {
+      if (y > r.horizon) return;
+      var d = r.years[y - 1];
+      var hl = y === r.breakEvenYear ? ' style="background:var(--color-accent-weak);font-weight:700;"' : "";
+      rows += "<tr" + hl + "><td>" + y + "年目" + (d.longTerm ? "" : "※") + "</td><td>" + man(d.loanBalance) + "</td><td>" + man(d.valueIncome) + "</td><td>" + manSigned(d.cf) + "</td><td>" + manSigned(d.cumCF) + "</td><td><strong>" + manSigned(d.totalIfSold) + "</strong></td></tr>";
+    });
+    var assumptions = "金利" + (input.ratePct == null ? 2 : input.ratePct) + "%・" + (input.years == null ? 35 : input.years) + "年返済 / 頭金" + man(input.downPayment) + "万円+諸費用" + (input.costRatePct == null ? 7 : input.costRatePct) + "% / 建物割合" + (input.buildingRatioPct == null ? 50 : input.buildingRatioPct) + "% / 空室率" + (input.vacancyPct == null ? 5 : input.vacancyPct) + "%・家賃下落" + (input.rentDeclinePct == null ? 1 : input.rentDeclinePct) + "%/年 / 経費率" + (input.opexRatePct == null ? 20 : input.opexRatePct) + "% / 売却利回り" + (input.saleYieldPct == null ? "購入時と同じ" : input.saleYieldPct + "%") + "・売却費用" + (input.saleCostPct == null ? 4 : input.saleCostPct) + "%";
+    box.innerHTML = headline + stats + chart1 + chart2 +
+      '<div class="table-scroll" style="margin-top:20px;"><table class="data-table"><thead><tr><th>年</th><th>残債<br>(万円)</th><th>売却想定<br>(万円)</th><th>年CF<br>(万円)</th><th>累計CF<br>(万円)</th><th>売却時<br>通算損益</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>" +
+      '<p style="font-size:0.8rem;color:var(--color-muted);">※印の年は短期譲渡(税率39.63%)。7年目以降は長期(20.315%)。損益分岐の年は色付きで表示。<br>使った前提: ' + assumptions + "</p>";
     box.hidden = false;
+    attachTips(box, r);
+    box.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 })();
 </script>
