@@ -142,12 +142,151 @@
     document.getElementById("share-box").hidden = false;
   }
 
+  var VIEW_KEY = "pollView";
+  function getView() {
+    var s = store();
+    var v = s && s.getItem(VIEW_KEY);
+    return v === "donut" ? "donut" : "bar";
+  }
+  function setView(v) {
+    var s = store();
+    if (s) { try { s.setItem(VIEW_KEY, v); } catch (e) { /* 保存不可は無視 */ } }
+  }
+
+  function nameLabel(row, isWin, hasVotes, origIndex) {
+    var label = document.createElement("span");
+    label.className = "nm";
+    var dot = document.createElement("span");
+    dot.className = "pb-dot c" + (origIndex % 10);
+    label.appendChild(dot);
+    label.appendChild(document.createTextNode(row.label));
+    if (isWin && hasVotes) {
+      var chip = document.createElement("span");
+      chip.className = "pb-chip-win";
+      chip.textContent = "1位";
+      label.appendChild(chip);
+    }
+    return label;
+  }
+
+  // 棒グラフ表示(票数の多い順・順位バッジつき)
+  function renderBars(r, order) {
+    var frag = document.createDocumentFragment();
+    order.forEach(function (origIndex, pos) {
+      var row = r.rows[origIndex];
+      var isWin = r.top.indexOf(origIndex) !== -1;
+      var div = document.createElement("div");
+      div.className = "pb-row" + (isWin ? " win" : "");
+      var top = document.createElement("div");
+      top.className = "pb-rt";
+      var label = document.createElement("span");
+      label.className = "nm";
+      if (r.total > 0 && r.rows.length > 3) {
+        var rk = document.createElement("span");
+        rk.className = "pb-rank" + (pos === 0 ? " r1" : pos === 1 ? " r2" : pos === 2 ? " r3" : "");
+        rk.textContent = pos + 1;
+        label.appendChild(rk);
+      }
+      var inner = nameLabel(row, isWin, r.total > 0, origIndex);
+      while (inner.firstChild) label.appendChild(inner.firstChild);
+      var num = document.createElement("span");
+      num.className = "pc";
+      num.textContent = row.pct + "%・" + row.count.toLocaleString() + "票";
+      top.appendChild(label);
+      top.appendChild(num);
+      var bar = document.createElement("div");
+      bar.className = "pb-bar";
+      var fill = document.createElement("div");
+      fill.className = "pb-fill c" + (origIndex % 10);
+      fill.style.width = row.pct + "%";
+      bar.appendChild(fill);
+      div.appendChild(top);
+      div.appendChild(bar);
+      frag.appendChild(div);
+    });
+    return frag;
+  }
+
+  // 円グラフ(ドーナツ)表示+凡例
+  function renderDonut(r, order, counts) {
+    var wrap = document.createElement("div");
+    wrap.className = "pb-donut-wrap";
+    var donut = document.createElement("div");
+    donut.className = "pb-donut";
+    var NS = "http://www.w3.org/2000/svg";
+    var svg = document.createElementNS(NS, "svg");
+    svg.setAttribute("viewBox", "0 0 200 200");
+    var R = 76;
+    var C = 2 * Math.PI * R;
+    function circle(cls) {
+      var el = document.createElementNS(NS, "circle");
+      el.setAttribute("cx", "100");
+      el.setAttribute("cy", "100");
+      el.setAttribute("r", String(R));
+      el.setAttribute("fill", "none");
+      el.setAttribute("stroke-width", "36");
+      if (cls) el.setAttribute("class", cls);
+      return el;
+    }
+    var track = circle("");
+    track.setAttribute("stroke", "currentColor");
+    track.style.color = "var(--track)";
+    svg.appendChild(track);
+    var a = PollCalc.arcs(counts);
+    var visible = a.ok ? a.arcs.filter(function (x) { return x.to - x.from > 0; }).length : 0;
+    var gap = visible > 1 ? 2.5 : 0;
+    var COLORS = ["#2f6fed", "#ef5da8", "#eda12f", "#23a55a", "#8b5cf6", "#0ea5b7", "#d94f2f", "#6b7280", "#a16207", "#475569"];
+    if (a.ok) {
+      a.arcs.forEach(function (arc, i) {
+        var seg = (arc.to - arc.from) * C - gap;
+        if (seg <= 0) return;
+        var el = circle("");
+        el.setAttribute("stroke", COLORS[i % 10]);
+        el.setAttribute("stroke-linecap", "butt");
+        el.setAttribute("stroke-dasharray", seg + " " + (C - seg));
+        el.setAttribute("stroke-dashoffset", String(-(arc.from * C + gap / 2)));
+        el.setAttribute("transform", "rotate(-90 100 100)");
+        svg.appendChild(el);
+      });
+    }
+    donut.appendChild(svg);
+    var center = document.createElement("div");
+    center.className = "pb-donut-center";
+    var cb = document.createElement("b");
+    cb.textContent = r.total.toLocaleString();
+    var cs = document.createElement("span");
+    cs.textContent = "票";
+    center.appendChild(cb);
+    center.appendChild(cs);
+    donut.appendChild(center);
+    wrap.appendChild(donut);
+
+    var legend = document.createElement("div");
+    legend.className = "pb-legend";
+    order.forEach(function (origIndex) {
+      var row = r.rows[origIndex];
+      var isWin = r.top.indexOf(origIndex) !== -1;
+      var lg = document.createElement("div");
+      lg.className = "lg" + (isWin ? " win" : "");
+      lg.appendChild(nameLabel(row, isWin, r.total > 0, origIndex));
+      var pc = document.createElement("span");
+      pc.className = "pc";
+      pc.textContent = row.pct + "%・" + row.count.toLocaleString() + "票";
+      lg.appendChild(pc);
+      legend.appendChild(lg);
+    });
+    wrap.appendChild(legend);
+    return wrap;
+  }
+
   function renderResults(poll, note) {
     var counts = (poll.counts || []).map(Number);
     var r = PollCalc.results(poll.options, counts);
     resultEl.innerHTML = "";
     form.hidden = true;
     if (!r.ok) { showStatus("集計結果を表示できませんでした。"); return; }
+    var ord = PollCalc.displayOrder(counts);
+    var order = ord.ok ? ord.order : counts.map(function (_, i) { return i; });
 
     var total = document.createElement("div");
     total.className = "pb-total";
@@ -169,38 +308,31 @@
       p.textContent = note;
       resultEl.appendChild(p);
     }
-    r.rows.forEach(function (row, i) {
-      var div = document.createElement("div");
-      div.className = "pb-row" + (r.top.indexOf(i) !== -1 ? " win" : "");
-      var top = document.createElement("div");
-      top.className = "pb-rt";
-      var label = document.createElement("span");
-      label.className = "nm";
-      var dot = document.createElement("span");
-      dot.className = "pb-dot c" + (i % 10);
-      label.appendChild(dot);
-      label.appendChild(document.createTextNode(row.label));
-      if (r.top.indexOf(i) !== -1 && r.total > 0) {
-        var chip = document.createElement("span");
-        chip.className = "pb-chip-win";
-        chip.textContent = "1位";
-        label.appendChild(chip);
-      }
-      var num = document.createElement("span");
-      num.className = "pc";
-      num.textContent = row.pct + "%・" + row.count.toLocaleString() + "票";
-      top.appendChild(label);
-      top.appendChild(num);
-      var bar = document.createElement("div");
-      bar.className = "pb-bar";
-      var fill = document.createElement("div");
-      fill.className = "pb-fill c" + (i % 10);
-      fill.style.width = row.pct + "%";
-      bar.appendChild(fill);
-      div.appendChild(top);
-      div.appendChild(bar);
-      resultEl.appendChild(div);
+
+    // 表示切替(棒グラフ/円グラフ)
+    var seg = document.createElement("div");
+    seg.className = "pb-seg";
+    seg.setAttribute("role", "tablist");
+    var body = document.createElement("div");
+    function renderBody() {
+      body.innerHTML = "";
+      body.appendChild(getView() === "donut" ? renderDonut(r, order, counts) : renderBars(r, order));
+    }
+    [["bar", "棒グラフ"], ["donut", "円グラフ"]].forEach(function (v) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = v[1];
+      btn.className = getView() === v[0] ? "on" : "";
+      btn.addEventListener("click", function () {
+        setView(v[0]);
+        [].forEach.call(seg.children, function (el, i) { el.classList.toggle("on", ["bar", "donut"][i] === v[0]); });
+        renderBody();
+      });
+      seg.appendChild(btn);
     });
+    resultEl.appendChild(seg);
+    resultEl.appendChild(body);
+    renderBody();
 
     var refresh = document.createElement("button");
     refresh.type = "button";

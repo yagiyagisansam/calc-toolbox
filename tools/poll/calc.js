@@ -72,6 +72,46 @@
   }
 
   /**
+   * 表示用の並び順(票数の多い順・同数は元の並び)を返す。
+   * @param {number[]} counts 選択肢ごとの票数
+   * @returns {{ok:true, order:number[]}|{ok:false, code:string}}
+   */
+  function displayOrder(counts) {
+    if (!Array.isArray(counts)) return { ok: false, code: "invalid_counts" };
+    var idx = [];
+    for (var i = 0; i < counts.length; i++) {
+      var c = counts[i];
+      if (typeof c !== "number" || !isFinite(c) || c < 0) return { ok: false, code: "invalid_counts" };
+      idx.push(i);
+    }
+    idx.sort(function (a, b) { return counts[b] - counts[a] || a - b; });
+    return { ok: true, order: idx };
+  }
+
+  /**
+   * 円グラフ(ドーナツ)用に、各選択肢の割合を累積の区間(0〜1)で返す。
+   * @param {number[]} counts 選択肢ごとの票数
+   * @returns {{ok:true, arcs:{from:number,to:number}[]}|{ok:false, code:string}}
+   */
+  function arcs(counts) {
+    if (!Array.isArray(counts)) return { ok: false, code: "invalid_counts" };
+    var total = 0;
+    for (var i = 0; i < counts.length; i++) {
+      var c = counts[i];
+      if (typeof c !== "number" || !isFinite(c) || c < 0) return { ok: false, code: "invalid_counts" };
+      total += c;
+    }
+    var res = [];
+    var acc = 0;
+    for (var j = 0; j < counts.length; j++) {
+      var f = total === 0 ? 0 : counts[j] / total;
+      res.push({ from: acc, to: acc + f });
+      acc += f;
+    }
+    return { ok: true, arcs: res };
+  }
+
+  /**
    * 乱数バイト列から投票ページ用のIDを作る(英小文字+数字の10桁)。
    * @param {number[]|Uint8Array} bytes 0以上の整数を10個以上
    * @returns {{ok:true, id:string}|{ok:false, code:string}}
@@ -98,7 +138,7 @@
     return typeof s === "string" && /^[a-z0-9]{10}$/.test(s);
   }
 
-  var api = { validatePoll: validatePoll, results: results, makeId: makeId, isValidId: isValidId, MAX_OPTIONS: MAX_OPTIONS };
+  var api = { validatePoll: validatePoll, results: results, displayOrder: displayOrder, arcs: arcs, makeId: makeId, isValidId: isValidId, MAX_OPTIONS: MAX_OPTIONS };
   if (typeof module !== "undefined" && module.exports) { module.exports = api; }
   else { global.PollCalc = api; }
 })(typeof window !== "undefined" ? window : globalThis);

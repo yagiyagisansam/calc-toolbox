@@ -155,12 +155,36 @@ body {
 .c0 { background: #2f6fed; } .c1 { background: #ef5da8; } .c2 { background: #eda12f; }
 .c3 { background: #23a55a; } .c4 { background: #8b5cf6; } .c5 { background: #0ea5b7; }
 .c6 { background: #d94f2f; } .c7 { background: #6b7280; } .c8 { background: #a16207; } .c9 { background: #475569; }
-/* ダーク=案A: 単色グラデーションで統一し、1位のみ濃く */
+/* ダーク=案A: 棒は単色グラデーションで統一し、1位のみ濃く
+   (識別用のドットと円グラフは両モードとも選択肢別カラー) */
 @media (prefers-color-scheme: dark) {
   .pb-fill { background: linear-gradient(90deg, #5b8cff, #7c5bff); opacity: 0.5; }
   .pb-row.win .pb-fill { opacity: 1; }
-  .pb-dot { background: #5b8cff; }
 }
+
+/* 表示切替(棒グラフ/円グラフ) */
+.pb-seg { display: inline-flex; margin-top: 14px; background: var(--track); border-radius: 999px; padding: 3px; gap: 2px; }
+.pb-seg button { border: none; background: none; color: var(--muted); font-size: 0.8rem; font-weight: 800; padding: 7px 16px; border-radius: 999px; cursor: pointer; }
+.pb-seg button.on { background: var(--card); color: var(--ink); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15); }
+
+/* 結果行の順位バッジ */
+.pb-rank.r1 { background: #b8873a; color: #fff; }
+.pb-rank.r2 { background: #9aa2ab; color: #fff; }
+.pb-rank.r3 { background: #b0795a; color: #fff; }
+
+/* 円グラフ(ドーナツ) */
+.pb-donut-wrap { display: flex; flex-direction: column; align-items: center; margin-top: 16px; }
+.pb-donut { width: 216px; height: 216px; position: relative; }
+.pb-donut svg { width: 100%; height: 100%; display: block; }
+.pb-donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
+.pb-donut-center b { font-size: 1.7rem; font-weight: 800; line-height: 1.2; }
+.pb-donut-center span { color: var(--muted); font-size: 0.75rem; }
+.pb-legend { width: 100%; margin-top: 16px; display: grid; gap: 9px; }
+.pb-legend .lg { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+.pb-legend .lg .nm { font-weight: 700; overflow-wrap: anywhere; display: flex; align-items: center; gap: 7px; }
+.pb-legend .lg .pc { margin-left: auto; color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pb-legend .lg.win .nm { font-weight: 800; }
+.pb-legend .lg.win .pc { color: var(--ink); font-weight: 800; }
 
 /* シェア */
 .pb-share { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; }

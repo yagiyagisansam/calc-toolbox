@@ -488,6 +488,139 @@
     "abc123def45"
    ],
    "expect": false
+  },
+  {
+   "name": "並び順: 票数の多い順(3,1,2 → 0,2,1)",
+   "func": "displayOrder",
+   "args": [
+    [
+     3,
+     1,
+     2
+    ]
+   ],
+   "expect": {
+    "ok": true,
+    "order": [
+     0,
+     2,
+     1
+    ]
+   }
+  },
+  {
+   "name": "並び順: 同数は元の順(2,2,1 → 0,1,2)",
+   "func": "displayOrder",
+   "args": [
+    [
+     2,
+     2,
+     1
+    ]
+   ],
+   "expect": {
+    "ok": true,
+    "order": [
+     0,
+     1,
+     2
+    ]
+   }
+  },
+  {
+   "name": "並び順: 全て0票は元の順",
+   "func": "displayOrder",
+   "args": [
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "expect": {
+    "ok": true,
+    "order": [
+     0,
+     1,
+     2
+    ]
+   }
+  },
+  {
+   "name": "並び順: 配列以外はエラー",
+   "func": "displayOrder",
+   "args": [
+    null
+   ],
+   "expect": {
+    "ok": false,
+    "code": "invalid_counts"
+   }
+  },
+  {
+   "name": "円グラフ: 1,1,2 → 0-0.25, 0.25-0.5, 0.5-1",
+   "func": "arcs",
+   "args": [
+    [
+     1,
+     1,
+     2
+    ]
+   ],
+   "expect": {
+    "ok": true,
+    "arcs": [
+     {
+      "from": 0,
+      "to": 0.25
+     },
+     {
+      "from": 0.25,
+      "to": 0.5
+     },
+     {
+      "from": 0.5,
+      "to": 1
+     }
+    ]
+   }
+  },
+  {
+   "name": "円グラフ: 0票は全区間ゼロ幅",
+   "func": "arcs",
+   "args": [
+    [
+     0,
+     0
+    ]
+   ],
+   "expect": {
+    "ok": true,
+    "arcs": [
+     {
+      "from": 0,
+      "to": 0
+     },
+     {
+      "from": 0,
+      "to": 0
+     }
+    ]
+   }
+  },
+  {
+   "name": "円グラフ: 負の票数はエラー",
+   "func": "arcs",
+   "args": [
+    [
+     1,
+     -1
+    ]
+   ],
+   "expect": {
+    "ok": false,
+    "code": "invalid_counts"
+   }
   }
  ]
 }
