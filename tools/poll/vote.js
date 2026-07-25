@@ -547,7 +547,9 @@ if (window.top !== window.self) {
     PollNet.getResults(pollId, voterId()).then(function (r) {
       if (!r.ok) {
         qTitle.textContent = "アンケートを表示できません";
-        showStatus(r.code === "not_found"
+        showStatus(r.code === "blocked"
+          ? "このアンケートは通報を受けて公開を停止しました。"
+          : r.code === "not_found"
           ? "このアンケートは見つかりませんでした。削除されたか、URLが間違っている可能性があります。"
           : r.code === "network"
             ? "通信に失敗しました。電波の良い場所で再読み込みしてください。"

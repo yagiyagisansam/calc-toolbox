@@ -64,6 +64,7 @@
     }).then(function (r) {
       if (!r.ok) return { ok: false, code: "rejected" };
       return r.json().then(function (data) {
+        if (data && data.blocked) return { ok: false, code: "blocked" };
         if (!data || !data.question) return { ok: false, code: "not_found" };
         return { ok: true, poll: data };
       });

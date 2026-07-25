@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://ssxskriqlaiohdutxprn.supabase.co; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'; require-trusted-types-for 'script'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>不具合の報告 | 計算ツールボックス</title>
+  <meta name="description" content="計算ツールボックスの計算結果の誤りや動作の不具合を報告するページです。">
+  <link rel="stylesheet" href="./shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/report.html">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A//www.w3.org/2000/svg'%20viewBox%3D'0%200%2024%2024'%3E%3Crect%20width%3D'24'%20height%3D'24'%20rx%3D'5'%20fill%3D'%230b6e4f'/%3E%3Cg%20fill%3D'none'%20stroke%3D'%23fff'%20stroke-width%3D'1.7'%20stroke-linecap%3D'round'%3E%3Crect%20x%3D'6.6'%20y%3D'4.6'%20width%3D'10.8'%20height%3D'14.8'%20rx%3D'2.4'/%3E%3Cpath%20d%3D'M9.6%208.2h4.8'/%3E%3Cpath%20d%3D'M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta name="robots" content="noindex">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="不具合の報告 | 計算ツールボックス">
+  <meta property="og:description" content="計算ツールボックスの計算結果の誤りや動作の不具合を報告するページです。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/report.html">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="./"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="./#search"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>不具合の報告</h1>
+  <p>計算結果の誤り・動かない箇所・表示の崩れを教えてください。いただいた内容はすべて確認し、修正に使わせていただきます。</p>
+
+  <form class="tool-form" id="report-form" novalidate>
+    <label for="tool">どのツールですか?
+      <select id="tool" name="tool" required>
+        <!-- @tools start : scripts/build/build_report_tools.mjs が自動生成する -->
+        <option value="">選んでください</option>
+        <optgroup label="健康・からだ">
+          <option value="tdee">1日の摂取カロリー目安 計算機</option>
+          <option value="bmi">BMI・適正体重 計算機</option>
+          <option value="walking">ウォーキング消費カロリー 計算機</option>
+          <option value="caffeine">カフェイン摂取量 計算機</option>
+          <option value="protein">タンパク質摂取量 計算機</option>
+          <option value="pace">ランニングペース 計算機</option>
+          <option value="sports">運動別 消費カロリー計算機</option>
+          <option value="shio">塩分量 計算機(ナトリウム⇔食塩相当量)</option>
+          <option value="bmr">基礎代謝量 計算機</option>
+          <option value="ninshin">出産予定日・妊娠週数 計算機</option>
+          <option value="alcohol">純アルコール量 計算機</option>
+          <option value="cycle">睡眠サイクル計算機</option>
+          <option value="sleep">睡眠時間 計算機</option>
+          <option value="hosu">歩数→距離・カロリー換算 計算機</option>
+          <option value="shinpaku">目標心拍数 計算機(カルボーネン法)</option>
+        </optgroup>
+        <optgroup label="お金">
+          <option value="fuel">ガソリン代 計算機</option>
+          <option value="tip">チップ計算機(海外旅行用)</option>
+          <option value="loan">ローン返済 計算機</option>
+          <option value="hiwari">家賃日割り計算機</option>
+          <option value="warikan">割り勘 計算機</option>
+          <option value="point">割引とポイント還元 どっちが得? 計算機</option>
+          <option value="waribiki">割引計算機(○%オフはいくら?)</option>
+          <option value="zangyo">残業代 計算機</option>
+          <option value="jikyu">時給⇔月収・年収 換算計算機</option>
+          <option value="kariire">住宅ローン 借入可能額 計算機</option>
+          <option value="tax">消費税 計算機</option>
+          <option value="tanka">単価比較 計算機(どっちが安い?)</option>
+          <option value="teiki">定期券は元が取れる? 計算機</option>
+          <option value="denki">電気代 計算機</option>
+          <option value="nenpi">燃費計算機(満タン法)</option>
+          <option value="fudosan">不動産投資 収支・損益分岐計算機</option>
+          <option value="compound">複利・積立シミュレーション</option>
+          <option value="yukyu">有給休暇の付与日数 計算機</option>
+          <option value="genka">利益率・原価率 計算機</option>
+        </optgroup>
+        <optgroup label="日付・時間">
+          <option value="tsukisu">○ヶ月後・月数 計算機</option>
+          <option value="eigyobi">営業日計算機(土日祝を除く)</option>
+          <option value="kinenbi">記念日カウント計算機</option>
+          <option value="jikan">時間計算機(合計・時刻の差)</option>
+          <option value="wareki">西暦・和暦 変換計算機</option>
+          <option value="days">日数計算機(日付の差・○日後)</option>
+          <option value="rireki">入学・卒業年 早見計算機(履歴書用)</option>
+          <option value="age">年齢計算機(満年齢・早生まれ・干支)</option>
+        </optgroup>
+        <optgroup label="暮らし・変換">
+          <option value="inch">インチ⇔cm・ポンド⇔kg 変換計算機</option>
+          <option value="kome">お米の合・グラム換算 計算機</option>
+          <option value="byte">データ容量 換算(KB・MB・GB・TB)</option>
+          <option value="percent">パーセント計算機</option>
+          <option value="password">パスワード生成ツール</option>
+          <option value="mile">マイル⇔km 換算計算機</option>
+          <option value="poll">みんなの投票(アンケート作成・リアルタイム集計)</option>
+          <option value="roman">ローマ数字 変換</option>
+          <option value="ondo">温度換算 計算機(摂氏⇔華氏⇔ケルビン)</option>
+          <option value="petage">犬・猫の年齢換算 計算機</option>
+          <option value="shincho">身長 フィート・インチ換算</option>
+          <option value="seiza">星座・誕生石 早見計算機</option>
+          <option value="zenkaku">全角⇔半角 変換ツール</option>
+          <option value="speed">速さ・時間・距離 計算機</option>
+          <option value="spoon">大さじ・小さじ・カップ 換算計算機</option>
+          <option value="tsubo">坪・平米・畳 変換計算機</option>
+          <option value="renji">電子レンジ加熱時間 換算計算機</option>
+          <option value="moji">文字数カウント</option>
+          <option value="heikin">平均値・中央値 計算機</option>
+          <option value="hensachi">偏差値 計算機</option>
+        </optgroup>
+        <option value="other">その他・サイト全体</option>
+        <!-- @tools end -->
+      </select>
+    </label>
+    <label for="message">どんな不具合ですか?
+      <span class="field-note">入力した値・表示された結果・正しいはずの結果を書いていただけると助かります(5〜1000文字)</span>
+      <textarea id="message" name="message" rows="6" required maxlength="1000" placeholder="例: 身長170cm・体重60kgでBMIが表示されない"></textarea>
+    </label>
+    <button type="submit" id="send-btn">送信する</button>
+  </form>
+
+  <div class="tool-result" id="report-result" hidden></div>
+
+  <p class="note-box">お名前・メールアドレス・電話番号などの個人情報は書かないでください。この報告は匿名で送信され、返信はできません。</p>
+
+  <h2>アンケートについてのご連絡</h2>
+  <p>「みんなの投票」で公開されているアンケートに問題がある場合は、そのアンケートのページにある<strong>通報ボタン</strong>からお知らせください。削除のご依頼も通報ボタンで受け付けています。</p>
+  <p><a href="./tools/poll/">みんなの投票を開く</a></p>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="./">ツール一覧</a>
+    <a href="./privacy.html">プライバシーポリシー</a>
+    <a href="./disclaimer.html">免責事項</a>
+    <a href="./contact.html">お問い合わせ</a>
+    <a href="./report.html">不具合の報告</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./tools/poll/config.js"></script>
+<script src="./shared/report.js"></script>
+</body>
+</html>
