@@ -59,7 +59,57 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>スーパーやドラッグストアで「大袋と普通サイズ、どっちが安い?」と迷ったら、価格と内容量(g・ml・個数)を入れるだけで<strong>単価を並べて比較</strong>できます。最安の商品と、他が何%高いかがひと目でわかります。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 送料込みの実質単価と送料無料ラインの判定</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">送料込みで比較(ネット通販向け)</h3>
+      <p class="adv-note">通販は本体が安くても送料で逆転することがあります。送料も入れた「実質単価」で比べます(店頭受け取りなど送料なしは0のままでOK)。</p>
+      <label>単価の基準
+        <select id="adv-sper">
+          <option value="100" selected>100あたり(g・ml)</option>
+          <option value="1">1あたり(個・枚・回)</option>
+        </select>
+      </label>
+      <label>商品A
+        <span style="display:flex;gap:.5em;">
+          <input type="number" id="adv-sprice-0" min="0" step="any" placeholder="価格(円)" aria-label="商品Aの価格">
+          <input type="number" id="adv-sqty-0" min="0" step="any" placeholder="内容量" aria-label="商品Aの内容量">
+          <input type="number" id="adv-sship-0" min="0" step="any" value="0" aria-label="商品Aの送料">
+        </span>
+        <span class="field-note">左から 価格(円)・内容量・送料(円)</span>
+      </label>
+      <label>商品B
+        <span style="display:flex;gap:.5em;">
+          <input type="number" id="adv-sprice-1" min="0" step="any" placeholder="価格(円)" aria-label="商品Bの価格">
+          <input type="number" id="adv-sqty-1" min="0" step="any" placeholder="内容量" aria-label="商品Bの内容量">
+          <input type="number" id="adv-sship-1" min="0" step="any" value="0" aria-label="商品Bの送料">
+        </span>
+      </label>
+      <label>商品C(任意)
+        <span style="display:flex;gap:.5em;">
+          <input type="number" id="adv-sprice-2" min="0" step="any" placeholder="価格(円)" aria-label="商品Cの価格">
+          <input type="number" id="adv-sqty-2" min="0" step="any" placeholder="内容量" aria-label="商品Cの内容量">
+          <input type="number" id="adv-sship-2" min="0" step="any" placeholder="送料(円)" aria-label="商品Cの送料">
+        </span>
+      </label>
+      <button type="button" id="adv-ship-run">送料込みで比較</button>
+      <h3 class="adv-h">あと少しで送料無料。買い足すべき?</h3>
+      <p class="adv-note">「あと○円で送料無料」の時、買い足しと送料のどちらが持ち出しが少ないかを判定します。</p>
+      <label>カート内の合計(円)
+        <input type="number" id="adv-cart" inputmode="numeric" step="any" min="1" placeholder="4500">
+      </label>
+      <label>送料無料ライン(円)
+        <input type="number" id="adv-threshold" inputmode="numeric" step="any" min="1" placeholder="5000">
+      </label>
+      <label>送料(円)
+        <input type="number" id="adv-ship" inputmode="numeric" step="any" min="1" placeholder="600">
+      </label>
+      <button type="button" id="adv-free-run">買い足すべきか判定</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>価格と内容量(g・ml・個数)を入れるだけで、<strong>どの商品がいちばん安いか</strong>を単価で比べられるツールです。最安のものと、ほかが何%高いかもひと目でわかります。スーパーでの大袋と小袋の比較や、ネット通販の値段比べにどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -156,6 +206,79 @@
       '<div class="table-scroll"><table class="data-table"><thead><tr><th>商品</th><th>' + unitLabel + "の単価</th><th>最安との差</th></tr></thead><tbody>" +
       rows + "</tbody></table></div>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function showError(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  var ADV_NAMES = ["商品A", "商品B", "商品C"];
+  document.getElementById("adv-ship-run").addEventListener("click", function () {
+    var items = [];
+    var names = [];
+    for (var i = 0; i < 3; i++) {
+      var p = document.getElementById("adv-sprice-" + i).value;
+      var q = document.getElementById("adv-sqty-" + i).value;
+      if (p === "" && q === "") continue;
+      var s = document.getElementById("adv-sship-" + i).value;
+      items.push({
+        price: parseFloat(p),
+        qty: parseFloat(q),
+        ship: s === "" ? 0 : parseFloat(s)
+      });
+      names.push(ADV_NAMES[i]);
+    }
+    if (items.length < 2) { showError("2つ以上の商品の価格と内容量を入力してください。"); return; }
+    for (var k = 0; k < items.length; k++) {
+      if (isNaN(items[k].price) || isNaN(items[k].qty) || isNaN(items[k].ship)) {
+        showError(names[k] + " の価格・内容量・送料を確認してください。");
+        return;
+      }
+    }
+    var per = parseFloat(document.getElementById("adv-sper").value);
+    var r = TankaCalc.compareWithShipping(items, per);
+    if (!r.ok) { showError("価格と内容量は0より大きい値、送料は0円以上で入力してください。"); return; }
+    var perLabel = per === 1 ? "1あたり" : per + "あたり";
+    var html = '<div class="result-main">' + names[r.cheapest] + " がいちばん安い</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>商品</th><th>送料込み総額</th><th>' + perLabel + "</th><th>最安との差</th></tr></thead><tbody>";
+    for (var j = 0; j < r.rows.length; j++) {
+      var row = r.rows[j];
+      html += "<tr><td>" + names[j] + (j === r.cheapest ? "(最安)" : "") + "</td>" +
+        "<td>" + row.total.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " 円</td>" +
+        "<td>" + row.unitPrice.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " 円</td>" +
+        "<td>" + (j === r.cheapest ? "-" : "+" + row.diffPct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%") + "</td></tr>";
+    }
+    html += "</tbody></table></div>";
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-free-run").addEventListener("click", function () {
+    var cart = parseFloat(document.getElementById("adv-cart").value);
+    var threshold = parseFloat(document.getElementById("adv-threshold").value);
+    var ship = parseFloat(document.getElementById("adv-ship").value);
+    if (isNaN(cart) || isNaN(threshold) || isNaN(ship)) {
+      showError("カート合計・送料無料ライン・送料を入力してください。");
+      return;
+    }
+    var r = TankaCalc.freeShipCheck(cart, threshold, ship);
+    if (!r.ok) { showError("いずれも0より大きい金額で入力してください。"); return; }
+    if (r.free) {
+      advBox.innerHTML = '<div class="result-main">すでに送料無料ラインを超えています</div>';
+    } else if (r.worth) {
+      advBox.innerHTML =
+        '<div class="result-main">あと ' + r.shortfall.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " 円 買い足す方が得(かも)</div>" +
+        '<p class="adv-note">不足額 ' + r.shortfall.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " 円 ≦ 送料 " + ship.toLocaleString() + " 円 なので、その分の商品が増えて持ち出しも少なくなります。ただし不要な物を買えば損です。</p>";
+    } else {
+      advBox.innerHTML =
+        '<div class="result-main">送料 ' + ship.toLocaleString() + " 円 を払う方が安い</div>" +
+        '<p class="adv-note">送料無料まであと ' + r.shortfall.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " 円 で、送料より高くつきます。無理に買い足す必要はありません。</p>";
+    }
+    advBox.hidden = false;
   });
 })();
 </script>
