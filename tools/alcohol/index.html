@@ -49,11 +49,36 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 複数のお酒の合計・分解にかかる時間</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">飲み会の合計をまとめて計算</h3>
+      <p class="adv-note">ビールのあとにハイボール、のように複数のお酒を飲んだ時は、こちらでまとめて計算できます(最大5件)。量と度数のペアで入力してください。</p>
+      <div id="adv-drink-rows"></div>
+      <button type="button" id="adv-total-run">合計を計算する</button>
+
+      <h3 class="adv-h">分解が終わるまでどれくらい?</h3>
+      <p class="adv-note">純アルコール量(上の合計や本体の計算結果のg)と体重から、分解速度 体重×0.1g/時 の目安で「飲み終わりから約何時間か」を計算します。飲み終わりの時刻も入れると、終わるおおよその時刻を表示します。</p>
+      <label>体重(kg)
+        <input type="number" id="adv-weight" inputmode="decimal" step="any" min="20" max="300" placeholder="例: 60">
+      </label>
+      <label>純アルコール量(g)
+        <input type="number" id="adv-grams" inputmode="decimal" step="any" min="1" max="500" placeholder="空欄なら上の合計を使用">
+      </label>
+      <label>飲み終わりの時刻(任意)
+        <input type="time" id="adv-end-time">
+      </label>
+      <button type="button" id="adv-time-run">分解時間を計算する</button>
+      <p class="adv-note">分解速度は個人差・体調差が大きく、この結果はあくまで目安です。<strong>「計算上ゼロになったから運転できる」という判断には使えません。</strong>飲酒後の運転は、時間にかかわらず体にアルコールが残っていれば違法です。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
   <div class="note-box">
     このツールの計算結果は<strong>概算</strong>です。アルコールの影響には大きな個人差があり、体質的にお酒に弱い方・妊娠中の方・服薬中の方などはこの数値にかかわらず飲酒を控える必要があります。
   </div>
 
-  <p>飲んだお酒の量と度数を入力すると、<strong>純アルコール量(g)</strong>と<strong>ドリンク数</strong>を計算し、厚生労働省のガイドラインに基づいて「生活習慣病のリスクを高める量」に達していないかを判定します。</p>
+  <p>お酒の量と度数を入れるだけで、<strong>体に入る純アルコールの量</strong>がわかるツールです。国のガイドラインの「リスクを高める量」に達していないかも判定します。晩酌の量を見直したい時にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -150,6 +175,99 @@
       box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
     }
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  var lastTotalG = null;
+  var advDrinkRows = document.getElementById("adv-drink-rows");
+  (function buildRows() {
+    for (var i = 0; i < 5; i++) {
+      var div = document.createElement("div");
+      div.className = "adv-drink-row";
+      div.style.cssText = "display:flex;gap:.5em;margin-bottom:8px;";
+      var ml = document.createElement("input");
+      ml.type = "number"; ml.min = "1"; ml.max = "10000"; ml.step = "1";
+      ml.placeholder = "量(mL)";
+      ml.setAttribute("aria-label", (i + 1) + "杯目の量(mL)");
+      var abv = document.createElement("input");
+      abv.type = "number"; abv.min = "0.1"; abv.max = "96"; abv.step = "any";
+      abv.placeholder = "度数(%)";
+      abv.setAttribute("aria-label", (i + 1) + "杯目の度数(%)");
+      div.appendChild(ml);
+      div.appendChild(abv);
+      advDrinkRows.appendChild(div);
+    }
+  })();
+  document.getElementById("adv-total-run").addEventListener("click", function () {
+    var items = [];
+    var rowEls = advDrinkRows.querySelectorAll(".adv-drink-row");
+    for (var i = 0; i < rowEls.length; i++) {
+      var inputs = rowEls[i].querySelectorAll("input");
+      var ml = parseFloat(inputs[0].value);
+      var abv = parseFloat(inputs[1].value);
+      if (!isFinite(ml) && !isFinite(abv)) continue;
+      if (!isFinite(ml) || !isFinite(abv)) {
+        advErr((i + 1) + "行目は量と度数の両方を入力してください。");
+        return;
+      }
+      items.push({ ml: ml, abv: abv });
+    }
+    if (items.length === 0) { advErr("お酒の量(mL)と度数(%)を1件以上入力してください。"); return; }
+    var r = AlcoholCalc.totalDrinks(items);
+    if (!r.ok) {
+      advErr(r.code === "invalid_volume" ? "量は1〜10,000mLの範囲で入力してください。"
+        : "度数は0.1〜96%の範囲で入力してください。");
+      return;
+    }
+    lastTotalG = r.grams;
+    advBox.innerHTML =
+      '<div class="result-main">合計 純アルコール 約 ' +
+      r.grams.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " g</div>" +
+      "<p>" + items.length + "杯分の合計で、<strong>約 " +
+      r.drinks.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      " ドリンク</strong>(1ドリンク=純アルコール10g)です。生活習慣病のリスクを高める量の目安は1日あたり男性40g・女性20g以上です。</p>" +
+      '<p class="adv-note">この値は下の「分解が終わるまでどれくらい?」に自動で引き継がれます。</p>';
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-time-run").addEventListener("click", function () {
+    var wEl = document.getElementById("adv-weight");
+    if (wEl.value === "") { advErr("体重を入力してください。"); return; }
+    var gEl = document.getElementById("adv-grams");
+    var grams;
+    if (gEl.value === "") {
+      if (lastTotalG === null) { advErr("純アルコール量を入力するか、先に上で合計を計算してください。"); return; }
+      grams = lastTotalG;
+    } else {
+      grams = parseFloat(gEl.value);
+    }
+    var r = AlcoholCalc.breakdownTime(parseFloat(wEl.value), grams, document.getElementById("adv-end-time").value);
+    if (!r.ok) {
+      var msg = r.code === "invalid_weight" ? "体重は20〜300kgの範囲で入力してください。"
+        : r.code === "invalid_grams" ? "純アルコール量は1〜500gの範囲で入力してください。"
+        : "飲み終わりの時刻を確認してください。";
+      advErr(msg);
+      return;
+    }
+    var html =
+      '<div class="result-main">飲み終わりから 約 ' +
+      r.hours.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " 時間</div>" +
+      "<p>純アルコール " + grams.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      " g を、分解速度 約" + r.rateGPerHour.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      " g/時(体重×0.1g)で分解した場合の目安です。</p>";
+    if (r.finishTime !== undefined) {
+      html += "<p>分解が終わるのは <strong>" + (r.nextDay ? "翌日 " : "") + r.finishTime + " ごろ</strong>の計算です。</p>";
+    }
+    html += '<p class="adv-note">個人差・体調差が大きい概算です。運転の可否をこの結果で判断しないでください。</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
   });
 })();
 </script>

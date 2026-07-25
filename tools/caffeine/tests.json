@@ -154,6 +154,120 @@
         "ok": false,
         "code": "invalid_ml"
       }
+    },
+    {
+      "name": "残留量: 18時に2杯・23時就寝は半減期1回分で90mg(影響小)",
+      "func": "remainingAtBed",
+      "args": [
+        "18:00",
+        "23:00",
+        2
+      ],
+      "expect": {
+        "ok": true,
+        "intakeMg": 180,
+        "hoursUntilBed": 5,
+        "remainingMg": 90,
+        "affectSleep": false
+      }
+    },
+    {
+      "name": "残留量: 20時に2杯・23時就寝は119mgで影響しやすい",
+      "func": "remainingAtBed",
+      "args": [
+        "20:00",
+        "23:00",
+        2
+      ],
+      "expect": {
+        "ok": true,
+        "intakeMg": 180,
+        "hoursUntilBed": 3,
+        "remainingMg": 119,
+        "affectSleep": true
+      }
+    },
+    {
+      "name": "残留量: 日をまたぐ(22時に1杯・翌6時就寝)は8時間後で30mg",
+      "func": "remainingAtBed",
+      "args": [
+        "22:00",
+        "06:00",
+        1
+      ],
+      "expect": {
+        "ok": true,
+        "intakeMg": 90,
+        "hoursUntilBed": 8,
+        "remainingMg": 30,
+        "affectSleep": false
+      }
+    },
+    {
+      "name": "残留量: 不正な時刻(25:00)はエラー",
+      "func": "remainingAtBed",
+      "args": [
+        "25:00",
+        "23:00",
+        1
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_drink_time"
+      }
+    },
+    {
+      "name": "残留量: 杯数0はエラー",
+      "func": "remainingAtBed",
+      "args": [
+        "18:00",
+        "23:00",
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_cups"
+      }
+    },
+    {
+      "name": "最後の1杯: 23時就寝で2杯(180mg)は約4.2時間前=18:46まで",
+      "func": "lastCupTime",
+      "args": [
+        "23:00",
+        2
+      ],
+      "expect": {
+        "ok": true,
+        "anytime": false,
+        "intakeMg": 180,
+        "hoursBefore": 4.2,
+        "latestTime": "18:46"
+      }
+    },
+    {
+      "name": "最後の1杯: 1杯(90mg)は最初から100mg未満なので制限なし",
+      "func": "lastCupTime",
+      "args": [
+        "23:00",
+        1
+      ],
+      "expect": {
+        "ok": true,
+        "anytime": true,
+        "intakeMg": 90
+      }
+    },
+    {
+      "name": "最後の1杯: 杯数11はエラー",
+      "func": "lastCupTime",
+      "args": [
+        "23:00",
+        11
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_cups"
+      }
     }
   ]
 }

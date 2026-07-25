@@ -6,98 +6,303 @@
     {
       "name": "標準的な入力(170cm/60kg)",
       "func": "calculate",
-      "args": [170, 60],
-      "expect": { "ok": true, "bmi": 20.8, "category": "普通体重", "idealWeightKg": 63.6 }
+      "args": [
+        170,
+        60
+      ],
+      "expect": {
+        "ok": true,
+        "bmi": 20.8,
+        "category": "普通体重",
+        "idealWeightKg": 63.6
+      }
     },
     {
       "name": "境界値: BMIちょうど18.5は普通体重(160cm/47.36kg)",
       "func": "calculate",
-      "args": [160, 47.36],
-      "expect": { "ok": true, "bmi": 18.5, "category": "普通体重", "idealWeightKg": 56.3 }
+      "args": [
+        160,
+        47.36
+      ],
+      "expect": {
+        "ok": true,
+        "bmi": 18.5,
+        "category": "普通体重",
+        "idealWeightKg": 56.3
+      }
     },
     {
       "name": "境界値未満: BMI18.4は低体重(160cm/47.0kg)",
       "func": "calculate",
-      "args": [160, 47.0],
-      "expect": { "ok": true, "bmi": 18.4, "category": "低体重" }
+      "args": [
+        160,
+        47
+      ],
+      "expect": {
+        "ok": true,
+        "bmi": 18.4,
+        "category": "低体重"
+      }
     },
     {
       "name": "境界値: BMIちょうど25.0は肥満(1度)(160cm/64kg)",
       "func": "calculate",
-      "args": [160, 64],
-      "expect": { "ok": true, "bmi": 25.0, "category": "肥満(1度)" }
+      "args": [
+        160,
+        64
+      ],
+      "expect": {
+        "ok": true,
+        "bmi": 25,
+        "category": "肥満(1度)"
+      }
     },
     {
       "name": "境界値直下: BMI24.6は普通体重(160cm/63kg)",
       "func": "calculate",
-      "args": [160, 63],
-      "expect": { "ok": true, "bmi": 24.6, "category": "普通体重" }
+      "args": [
+        160,
+        63
+      ],
+      "expect": {
+        "ok": true,
+        "bmi": 24.6,
+        "category": "普通体重"
+      }
     },
     {
       "name": "境界値: BMI30台は肥満(2度)(160cm/78kg)",
       "func": "calculate",
-      "args": [160, 78],
-      "expect": { "ok": true, "bmi": 30.5, "category": "肥満(2度)" }
+      "args": [
+        160,
+        78
+      ],
+      "expect": {
+        "ok": true,
+        "bmi": 30.5,
+        "category": "肥満(2度)"
+      }
     },
     {
       "name": "肥満(3度)の判定(160cm/90kg)",
       "func": "calculate",
-      "args": [160, 90],
-      "expect": { "ok": true, "bmi": 35.2, "category": "肥満(3度)" }
+      "args": [
+        160,
+        90
+      ],
+      "expect": {
+        "ok": true,
+        "bmi": 35.2,
+        "category": "肥満(3度)"
+      }
     },
     {
       "name": "肥満(4度)の判定(160cm/110kg)",
       "func": "calculate",
-      "args": [160, 110],
-      "expect": { "ok": true, "bmi": 43.0, "category": "肥満(4度)" }
+      "args": [
+        160,
+        110
+      ],
+      "expect": {
+        "ok": true,
+        "bmi": 43,
+        "category": "肥満(4度)"
+      }
     },
     {
       "name": "低体重の判定(150cm/30kg)",
       "func": "calculate",
-      "args": [150, 30],
-      "expect": { "ok": true, "bmi": 13.3, "category": "低体重", "idealWeightKg": 49.5 }
+      "args": [
+        150,
+        30
+      ],
+      "expect": {
+        "ok": true,
+        "bmi": 13.3,
+        "category": "低体重",
+        "idealWeightKg": 49.5
+      }
     },
     {
       "name": "異常入力: 身長0はエラー",
       "func": "calculate",
-      "args": [0, 60],
-      "expect": { "ok": false, "code": "invalid_height" }
+      "args": [
+        0,
+        60
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_height"
+      }
     },
     {
       "name": "異常入力: 身長が範囲超過(300cm)はエラー",
       "func": "calculate",
-      "args": [300, 60],
-      "expect": { "ok": false, "code": "invalid_height" }
+      "args": [
+        300,
+        60
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_height"
+      }
     },
     {
       "name": "異常入力: 体重0はエラー",
       "func": "calculate",
-      "args": [170, 0],
-      "expect": { "ok": false, "code": "invalid_weight" }
+      "args": [
+        170,
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_weight"
+      }
     },
     {
       "name": "異常入力: 体重が負の値はエラー",
       "func": "calculate",
-      "args": [170, -5],
-      "expect": { "ok": false, "code": "invalid_weight" }
+      "args": [
+        170,
+        -5
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_weight"
+      }
     },
     {
       "name": "異常入力: 体重が範囲超過(500kg)はエラー",
       "func": "calculate",
-      "args": [170, 500],
-      "expect": { "ok": false, "code": "invalid_weight" }
+      "args": [
+        170,
+        500
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_weight"
+      }
     },
     {
       "name": "異常入力: 数値でない身長はエラー",
       "func": "calculate",
-      "args": ["abc", 60],
-      "expect": { "ok": false, "code": "invalid_height" }
+      "args": [
+        "abc",
+        60
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_height"
+      }
     },
     {
       "name": "異常入力: 引数なしはエラー",
       "func": "calculate",
       "args": [],
-      "expect": { "ok": false, "code": "invalid_height" }
+      "expect": {
+        "ok": false,
+        "code": "invalid_height"
+      }
+    },
+    {
+      "name": "目標BMI逆算: 170cm/60kg/目標22は目標63.6kg・3.6kg増量",
+      "func": "targetFromBmi",
+      "args": [
+        170,
+        60,
+        22
+      ],
+      "expect": {
+        "ok": true,
+        "targetBmi": 22,
+        "targetWeightKg": 63.6,
+        "diffKg": -3.6
+      }
+    },
+    {
+      "name": "目標BMI逆算: 省略時は既定22(170cm/70kgは6.4kg減量)",
+      "func": "targetFromBmi",
+      "args": [
+        170,
+        70
+      ],
+      "expect": {
+        "ok": true,
+        "targetBmi": 22,
+        "targetWeightKg": 63.6,
+        "diffKg": 6.4
+      }
+    },
+    {
+      "name": "目標BMI逆算: 160cm/70kg/目標20は51.2kgで18.8kg減量",
+      "func": "targetFromBmi",
+      "args": [
+        160,
+        70,
+        20
+      ],
+      "expect": {
+        "ok": true,
+        "targetWeightKg": 51.2,
+        "diffKg": 18.8
+      }
+    },
+    {
+      "name": "目標BMI逆算: 範囲外の目標BMI(50)はエラー",
+      "func": "targetFromBmi",
+      "args": [
+        170,
+        60,
+        50
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_target_bmi"
+      }
+    },
+    {
+      "name": "体重早見表: 160cmはBMI18.5=47.4kg〜BMI30=76.8kg",
+      "func": "bmiWeightTable",
+      "args": [
+        160
+      ],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "0": {
+            "bmi": 18.5,
+            "weightKg": 47.4
+          },
+          "1": {
+            "bmi": 20,
+            "weightKg": 51.2
+          },
+          "2": {
+            "bmi": 22,
+            "weightKg": 56.3
+          },
+          "3": {
+            "bmi": 25,
+            "weightKg": 64
+          },
+          "4": {
+            "bmi": 30,
+            "weightKg": 76.8
+          },
+          "length": 5
+        }
+      }
+    },
+    {
+      "name": "体重早見表: 範囲外の身長(90cm)はエラー",
+      "func": "bmiWeightTable",
+      "args": [
+        90
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_height"
+      }
     }
   ]
 }

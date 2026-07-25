@@ -44,7 +44,25 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>ジョギング、サイクリング、水泳、筋トレ、なわとび……<strong>13種類の運動の消費カロリー</strong>を、公的なMETs(メッツ)表の値で計算します。体重と時間を入れるだけ。ダイエットの計画や「ケーキ1個分動くには?」の確認に。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 複数種目の合計・目標カロリーの必要時間</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">今日やった運動をまとめて合計</h3>
+      <p class="adv-note">「筋トレ30分のあとジョギング20分」のように複数の運動をした日は、こちらでまとめて計算できます(最大5件)。体重は上のフォームの値を使います。</p>
+      <div id="adv-rows"></div>
+      <button type="button" id="adv-total-run">合計を計算する</button>
+
+      <h3 class="adv-h">目標カロリーにはどの運動を何分?</h3>
+      <p class="adv-note">消費したいカロリーを入れると、13種類の運動それぞれで必要な時間を一覧にします。短い順に並ぶので、種目選びの参考にどうぞ。</p>
+      <label>目標消費カロリー(kcal)
+        <input type="number" id="adv-target-kcal" inputmode="numeric" step="1" min="1" max="5000" placeholder="例: 300">
+      </label>
+      <button type="button" id="adv-compare-run">種目別の必要時間を見る</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>体重と運動した時間を入れるだけで、<strong>運動で使ったカロリー</strong>がわかるツールです。ジョギングや水泳、筋トレなど13種類の運動に対応しています。今日の運動がどれくらいだったか知りたい時にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -128,6 +146,92 @@
       '<div class="result-main">約 ' + r.kcal.toLocaleString() + " kcal</div>" +
       "<p>" + r.label + " / 脂肪換算 約<strong>" + r.fatG.toLocaleString() + "g</strong>分(1kg≒7,200kcalの目安)</p>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  var advRows = document.getElementById("adv-rows");
+  (function buildRows() {
+    for (var i = 0; i < 5; i++) {
+      var div = document.createElement("div");
+      div.className = "adv-sport-row";
+      div.style.cssText = "display:flex;gap:.5em;margin-bottom:8px;";
+      var sel = document.createElement("select");
+      sel.add(new Option("(選択しない)", ""));
+      Object.keys(SportsCalc.ACTIVITIES).forEach(function (key) {
+        var a = SportsCalc.ACTIVITIES[key];
+        sel.add(new Option(a.label + "(" + a.mets + "METs)", key));
+      });
+      sel.setAttribute("aria-label", "種目" + (i + 1));
+      var input = document.createElement("input");
+      input.type = "number";
+      input.min = "1"; input.max = "600"; input.step = "1";
+      input.placeholder = "時間(分)";
+      input.setAttribute("aria-label", "種目" + (i + 1) + "の時間(分)");
+      input.style.width = "8em";
+      div.appendChild(sel);
+      div.appendChild(input);
+      advRows.appendChild(div);
+    }
+  })();
+  document.getElementById("adv-total-run").addEventListener("click", function () {
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(w)) { advErr("先に上のフォームに体重を入力してください。"); return; }
+    var items = [];
+    var rowEls = advRows.querySelectorAll(".adv-sport-row");
+    for (var i = 0; i < rowEls.length; i++) {
+      var key = rowEls[i].querySelector("select").value;
+      var min = parseFloat(rowEls[i].querySelector("input").value);
+      if (key === "" || !isFinite(min)) continue;
+      items.push({ activity: key, minutes: min });
+    }
+    if (items.length === 0) { advErr("種目と時間(分)を1件以上入力してください。"); return; }
+    var r = SportsCalc.totalCalories(w, items);
+    if (!r.ok) {
+      advErr(r.code === "invalid_minutes" ? "時間は1〜600分の範囲で入力してください。"
+        : "入力値を確認してください(体重20〜300kg)。");
+      return;
+    }
+    var rows = "";
+    for (var j = 0; j < r.items.length; j++) {
+      rows += "<tr><td>" + r.items[j].label + "</td><td>" + r.items[j].minutes.toLocaleString() +
+        " 分</td><td>約 " + r.items[j].kcal.toLocaleString() + " kcal</td></tr>";
+    }
+    advBox.innerHTML =
+      '<div class="result-main">合計 約 ' + r.totalKcal.toLocaleString() + " kcal</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>種目</th><th>時間</th><th>消費</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>" +
+      "<p>脂肪換算 約<strong>" + r.fatG.toLocaleString() + "g</strong>分(1kg≒7,200kcalの目安)。</p>";
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-compare-run").addEventListener("click", function () {
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(w)) { advErr("先に上のフォームに体重を入力してください。"); return; }
+    var kEl = document.getElementById("adv-target-kcal");
+    if (kEl.value === "") { advErr("目標消費カロリーを入力してください。"); return; }
+    var r = SportsCalc.minutesForKcalAll(w, parseFloat(kEl.value));
+    if (!r.ok) {
+      advErr(r.code === "invalid_kcal" ? "目標消費カロリーは1〜5,000kcalの範囲で入力してください。"
+        : "体重は20〜300kgの範囲で入力してください。");
+      return;
+    }
+    var sorted = r.items.slice().sort(function (a, b) { return a.minutes - b.minutes; });
+    var rows = "";
+    for (var i = 0; i < sorted.length; i++) {
+      rows += "<tr><td>" + sorted[i].label + "</td><td>約 " + sorted[i].minutes.toLocaleString() + " 分</td></tr>";
+    }
+    advBox.innerHTML =
+      '<div class="result-main">' + parseFloat(kEl.value).toLocaleString() + " kcal 消費に必要な時間</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>種目</th><th>必要時間(切り上げ)</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+    advBox.hidden = false;
   });
 })();
 </script>

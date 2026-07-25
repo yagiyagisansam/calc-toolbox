@@ -37,7 +37,30 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>コーヒー、緑茶、エナジードリンク……今日どれだけカフェインを摂った?飲んだものと量を入れるだけで<strong>カフェインの合計量</strong>を計算し、<strong>健康な成人の1日の目安(400mg)</strong>と比べます。眠れない夜が続く方、妊娠中の方の飲みすぎチェックに。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 就寝時に残るカフェイン・最後の1杯の時刻</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">寝る時にどれだけ残っている?</h3>
+      <p class="adv-note">コーヒーを飲む時刻・杯数と就寝予定を入れると、半減期約5時間の目安で就寝時に体に残るカフェイン量を計算します(1杯150ml≒90mgで計算)。</p>
+      <label>コーヒーを飲む時刻
+        <input type="time" id="adv-drink-time" value="15:00">
+      </label>
+      <label>杯数
+        <input type="number" id="adv-cups" inputmode="numeric" step="1" min="1" max="10" value="1">
+      </label>
+      <label>就寝予定時刻
+        <input type="time" id="adv-bed-time" value="23:00">
+      </label>
+      <button type="button" id="adv-remain-run">残る量を計算する</button>
+
+      <h3 class="adv-h">何時までに飲み終えればいい?</h3>
+      <p class="adv-note">上の杯数と就寝予定から、就寝時の残りが100mg(眠りに影響しやすい目安)を下回る「最後の1杯の時刻」を逆算します。</p>
+      <button type="button" id="adv-last-run">最後の1杯の時刻を逆算する</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>飲んだものと量を入れるだけで、<strong>今日とったカフェインの合計</strong>がわかるツールです。1日の目安(健康な大人で400mg)と比べて多すぎないかも確認できます。コーヒーやエナジードリンクをよく飲む方の飲みすぎチェックにどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -147,6 +170,61 @@
       "<tr><td>妊娠中の目安(200mg)</td><td>" + r.pctPregnant + "%</td></tr>" +
       "</tbody></table></div>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  var NOTE = '<p class="adv-note">半減期約5時間は一般的な平均値で、実際は2.5〜10時間程度と個人差があります。妊娠中は分解が遅くなるため、より少なめが目安です。</p>';
+  document.getElementById("adv-remain-run").addEventListener("click", function () {
+    var r = CaffeineCalc.remainingAtBed(
+      document.getElementById("adv-drink-time").value,
+      document.getElementById("adv-bed-time").value,
+      parseInt(document.getElementById("adv-cups").value, 10)
+    );
+    if (!r.ok) {
+      advErr(r.code === "invalid_cups" ? "杯数は1〜10杯の整数で入力してください。" : "時刻を入力してください。");
+      return;
+    }
+    var judge = r.affectSleep
+      ? "<strong>100mg以上残っており、寝つき・眠りの質に影響しやすい目安です。</strong>"
+      : "100mg未満で、影響は比較的小さい目安です。";
+    advBox.innerHTML =
+      '<div class="result-main">就寝時に残る量 約 ' + r.remainingMg.toLocaleString() + " mg</div>" +
+      "<p>摂取 " + r.intakeMg.toLocaleString() + " mg のうち、就寝(" +
+      r.hoursUntilBed.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      " 時間後)の時点で体に残る計算です。" + judge + "</p>" + NOTE;
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-last-run").addEventListener("click", function () {
+    var r = CaffeineCalc.lastCupTime(
+      document.getElementById("adv-bed-time").value,
+      parseInt(document.getElementById("adv-cups").value, 10)
+    );
+    if (!r.ok) {
+      advErr(r.code === "invalid_cups" ? "杯数は1〜10杯の整数で入力してください。" : "就寝予定時刻を入力してください。");
+      return;
+    }
+    if (r.anytime) {
+      advBox.innerHTML =
+        '<div class="result-main">時間の制限は特にありません</div>' +
+        "<p>" + r.intakeMg.toLocaleString() + " mg(コーヒー" +
+        (r.intakeMg / 90) + "杯分)なら、就寝時の残りが最初から100mgを下回る計算です。</p>" + NOTE;
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">' + r.latestTime + " までが目安</div>" +
+      "<p>" + r.intakeMg.toLocaleString() + " mg を飲むなら、就寝の約 <strong>" +
+      r.hoursBefore.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      " 時間前</strong>までに飲み終えると、就寝時の残りが100mgを下回る計算です。</p>" + NOTE;
+    advBox.hidden = false;
   });
 })();
 </script>

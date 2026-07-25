@@ -50,7 +50,39 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>体重・歩いた時間・歩く速さを入れると、<strong>ウォーキングで消費したカロリー(kcal)</strong>を計算します。運動強度の国際的な指標<strong>METs(メッツ)</strong>を使った方式で、脂肪何グラム分にあたるかの目安も表示。毎日の散歩やダイエットの記録に。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 目標カロリーの逆算・距離や習慣で計算</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">目標カロリーを消費するには何分歩く?</h3>
+      <p class="adv-note">消費したいカロリーを入れると、必要な歩行時間を逆算します。体重と速さは上のフォームの値を使います。</p>
+      <label>目標消費カロリー(kcal)
+        <input type="number" id="adv-target-kcal" inputmode="numeric" step="1" min="1" max="5000" placeholder="例: 200">
+      </label>
+      <button type="button" id="adv-target-run">必要な時間を逆算する</button>
+
+      <h3 class="adv-h">距離で計算する(時間がわからない時)</h3>
+      <p class="adv-note">「駅まで2km」のように距離だけわかる時はこちら。速さ区分の代表速度からかかる時間と消費カロリーを計算します。</p>
+      <label>歩いた距離(km)
+        <input type="number" id="adv-km" inputmode="decimal" step="any" min="0.1" max="100" placeholder="例: 2">
+      </label>
+      <button type="button" id="adv-km-run">距離から計算する</button>
+
+      <h3 class="adv-h">毎日続けたらどうなる?</h3>
+      <p class="adv-note">上のフォームの体重・時間・速さのウォーキングを毎日続けた場合の合計を、体脂肪換算(1kg≒7,200kcal)で表示します。</p>
+      <label>続ける日数
+        <select id="adv-days">
+          <option value="7">1週間(7日)</option>
+          <option value="30" selected>1か月(30日)</option>
+          <option value="90">3か月(90日)</option>
+          <option value="365">1年(365日)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-habit-run">続けた場合の合計を計算する</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>体重と歩いた時間を入れるだけで、<strong>ウォーキングで使ったカロリー</strong>がわかるツールです。脂肪何グラム分にあたるかの目安も一緒に表示します。毎日の散歩の記録やダイエットの励みにどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -134,6 +166,75 @@
       '<div class="result-main">約 ' + r.kcal.toLocaleString() + " kcal</div>" +
       "<p>脂肪に換算すると約 <strong>" + r.fatG.toLocaleString() + "g</strong> 分(体脂肪1kg≒7,200kcalの目安)/ 使用したMETs値: " + r.mets + "</p>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var SPEED_LABEL = { slow: "ゆっくり", normal: "ふつう", brisk: "やや速め", fast: "速歩", veryfast: "かなり速い" };
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function fmtMinutes(min) {
+    if (min < 60) return min + " 分";
+    return Math.floor(min / 60) + " 時間 " + (min % 60) + " 分";
+  }
+  document.getElementById("adv-target-run").addEventListener("click", function () {
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(w)) { advErr("先に上のフォームに体重を入力してください。"); return; }
+    var kEl = document.getElementById("adv-target-kcal");
+    if (kEl.value === "") { advErr("目標消費カロリーを入力してください。"); return; }
+    var speed = document.getElementById("speed").value;
+    var r = WalkingCalc.minutesForKcal(w, parseFloat(kEl.value), speed);
+    if (!r.ok) {
+      advErr(r.code === "invalid_kcal" ? "目標消費カロリーは1〜5,000kcalの範囲で入力してください。"
+        : "体重は20〜300kgの範囲で入力してください。");
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">約 ' + fmtMinutes(r.minutes) + "</div>" +
+      "<p>" + SPEED_LABEL[speed] + "(" + r.mets + "METs)で歩いた場合、1時間あたり約 " +
+      r.kcalPerHour.toLocaleString() + " kcal 消費する計算です。分は切り上げで表示しています。</p>";
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-km-run").addEventListener("click", function () {
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(w)) { advErr("先に上のフォームに体重を入力してください。"); return; }
+    var kmEl = document.getElementById("adv-km");
+    if (kmEl.value === "") { advErr("歩いた距離を入力してください。"); return; }
+    var speed = document.getElementById("speed").value;
+    var r = WalkingCalc.caloriesByDistance(w, parseFloat(kmEl.value), speed);
+    if (!r.ok) {
+      advErr(r.code === "invalid_distance" ? "距離は0.1〜100kmの範囲で入力してください。"
+        : "体重は20〜300kgの範囲で入力してください。");
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">約 ' + r.kcal.toLocaleString() + " kcal</div>" +
+      "<p>" + SPEED_LABEL[speed] + "(約" + r.kmh + "km/h)なら約 <strong>" + fmtMinutes(r.minutes) +
+      "</strong>、脂肪換算 約" + r.fatG.toLocaleString() + "g分の計算です。</p>";
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-habit-run").addEventListener("click", function () {
+    var w = parseFloat(document.getElementById("weight").value);
+    var min = parseFloat(document.getElementById("minutes").value);
+    if (!isFinite(w) || !isFinite(min)) { advErr("先に上のフォームに体重と歩く時間を入力してください。"); return; }
+    var days = parseInt(document.getElementById("adv-days").value, 10);
+    var speed = document.getElementById("speed").value;
+    var r = WalkingCalc.habitTotal(w, min, speed, days);
+    if (!r.ok) { advErr("上のフォームの体重(20〜300kg)と時間(1〜1440分)を確認してください。"); return; }
+    var fatText = r.fatG >= 1000
+      ? (r.fatG / 1000).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " kg"
+      : r.fatG.toLocaleString() + " g";
+    advBox.innerHTML =
+      '<div class="result-main">' + days + "日で 約 " + r.totalKcal.toLocaleString() + " kcal</div>" +
+      "<p>1日約 " + r.kcalPerDay.toLocaleString() + " kcal × " + days + "日 = 体脂肪 約 <strong>" + fatText +
+      "</strong> 分(1kg≒7,200kcalの目安)。</p>" +
+      '<p class="adv-note">食事量が変わらない前提の概算です。実際の体重変化には個人差があります。</p>';
+    advBox.hidden = false;
   });
 })();
 </script>

@@ -6,62 +6,269 @@
     {
       "name": "60kg・30分・ふつう(3.0METs): 95kcal・脂肪13g",
       "func": "calories",
-      "args": [60, 30, "normal"],
-      "expect": { "ok": true, "kcal": 95, "fatG": 13, "mets": 3 }
+      "args": [
+        60,
+        30,
+        "normal"
+      ],
+      "expect": {
+        "ok": true,
+        "kcal": 95,
+        "fatG": 13,
+        "mets": 3
+      }
     },
     {
       "name": "70kg・60分・やや速め(3.5METs): 257kcal・脂肪36g",
       "func": "calories",
-      "args": [70, 60, "brisk"],
-      "expect": { "ok": true, "kcal": 257, "fatG": 36, "mets": 3.5 }
+      "args": [
+        70,
+        60,
+        "brisk"
+      ],
+      "expect": {
+        "ok": true,
+        "kcal": 257,
+        "fatG": 36,
+        "mets": 3.5
+      }
     },
     {
       "name": "50kg・45分・速歩(4.3METs): 169kcal・脂肪24g",
       "func": "calories",
-      "args": [50, 45, "fast"],
-      "expect": { "ok": true, "kcal": 169, "fatG": 24, "mets": 4.3 }
+      "args": [
+        50,
+        45,
+        "fast"
+      ],
+      "expect": {
+        "ok": true,
+        "kcal": 169,
+        "fatG": 24,
+        "mets": 4.3
+      }
     },
     {
       "name": "80kg・20分・ゆっくり(2.8METs): 78kcal・脂肪11g",
       "func": "calories",
-      "args": [80, 20, "slow"],
-      "expect": { "ok": true, "kcal": 78, "fatG": 11, "mets": 2.8 }
+      "args": [
+        80,
+        20,
+        "slow"
+      ],
+      "expect": {
+        "ok": true,
+        "kcal": 78,
+        "fatG": 11,
+        "mets": 2.8
+      }
     },
     {
       "name": "65kg・90分・かなり速い(5.0METs): 512kcal",
       "func": "calories",
-      "args": [65, 90, "veryfast"],
-      "expect": { "ok": true, "kcal": 512, "mets": 5 }
+      "args": [
+        65,
+        90,
+        "veryfast"
+      ],
+      "expect": {
+        "ok": true,
+        "kcal": 512,
+        "mets": 5
+      }
     },
     {
       "name": "異常入力: 体重20kg未満はエラー",
       "func": "calories",
-      "args": [10, 30, "normal"],
-      "expect": { "ok": false, "code": "invalid_weight" }
+      "args": [
+        10,
+        30,
+        "normal"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_weight"
+      }
     },
     {
       "name": "異常入力: 時間0分はエラー",
       "func": "calories",
-      "args": [60, 0, "normal"],
-      "expect": { "ok": false, "code": "invalid_minutes" }
+      "args": [
+        60,
+        0,
+        "normal"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_minutes"
+      }
     },
     {
       "name": "異常入力: 24時間超はエラー",
       "func": "calories",
-      "args": [60, 2000, "normal"],
-      "expect": { "ok": false, "code": "invalid_minutes" }
+      "args": [
+        60,
+        2000,
+        "normal"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_minutes"
+      }
     },
     {
       "name": "異常入力: 不正な速さはエラー",
       "func": "calories",
-      "args": [60, 30, "run"],
-      "expect": { "ok": false, "code": "invalid_speed" }
+      "args": [
+        60,
+        30,
+        "run"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_speed"
+      }
     },
     {
       "name": "異常入力: 数値以外はエラー",
       "func": "calories",
-      "args": ["60", 30, "normal"],
-      "expect": { "ok": false, "code": "invalid_weight" }
+      "args": [
+        "60",
+        30,
+        "normal"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_weight"
+      }
+    },
+    {
+      "name": "必要時間: 60kg・ふつうで200kcalは64分(切り上げ)",
+      "func": "minutesForKcal",
+      "args": [
+        60,
+        200,
+        "normal"
+      ],
+      "expect": {
+        "ok": true,
+        "minutes": 64,
+        "mets": 3,
+        "kcalPerHour": 189
+      }
+    },
+    {
+      "name": "必要時間: 70kg・速歩で300kcalは57分",
+      "func": "minutesForKcal",
+      "args": [
+        70,
+        300,
+        "fast"
+      ],
+      "expect": {
+        "ok": true,
+        "minutes": 57,
+        "mets": 4.3
+      }
+    },
+    {
+      "name": "必要時間: 60kg・ふつうで100kcalは32分",
+      "func": "minutesForKcal",
+      "args": [
+        60,
+        100,
+        "normal"
+      ],
+      "expect": {
+        "ok": true,
+        "minutes": 32
+      }
+    },
+    {
+      "name": "必要時間: 目標0kcalはエラー",
+      "func": "minutesForKcal",
+      "args": [
+        60,
+        0,
+        "normal"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_kcal"
+      }
+    },
+    {
+      "name": "距離から: 60kg・3km・ふつうは45分で142kcal",
+      "func": "caloriesByDistance",
+      "args": [
+        60,
+        3,
+        "normal"
+      ],
+      "expect": {
+        "ok": true,
+        "minutes": 45,
+        "kcal": 142,
+        "fatG": 20,
+        "kmh": 4
+      }
+    },
+    {
+      "name": "距離から: 60kg・1.6km・ゆっくりは30分で88kcal",
+      "func": "caloriesByDistance",
+      "args": [
+        60,
+        1.6,
+        "slow"
+      ],
+      "expect": {
+        "ok": true,
+        "minutes": 30,
+        "kcal": 88
+      }
+    },
+    {
+      "name": "距離から: 距離0はエラー",
+      "func": "caloriesByDistance",
+      "args": [
+        60,
+        0,
+        "normal"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_distance"
+      }
+    },
+    {
+      "name": "習慣合計: 60kg・毎日40分ふつう×30日は3780kcal(脂肪525g)",
+      "func": "habitTotal",
+      "args": [
+        60,
+        40,
+        "normal",
+        30
+      ],
+      "expect": {
+        "ok": true,
+        "kcalPerDay": 126,
+        "totalKcal": 3780,
+        "fatG": 525
+      }
+    },
+    {
+      "name": "習慣合計: 日数0はエラー",
+      "func": "habitTotal",
+      "args": [
+        60,
+        30,
+        "normal",
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_days"
+      }
     }
   ]
 }

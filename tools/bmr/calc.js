@@ -73,7 +73,75 @@
     };
   }
 
+  /**
+   * 体脂肪率を使った Katch-McArdle 式で基礎代謝量を計算する。
+   * 式: 基礎代謝量(kcal/日) = 370 + 21.6 × 除脂肪体重(kg)
+   * (Katch & McArdle による除脂肪体重ベースの推定式。体重だけの方式より
+   *  筋肉量の個人差を反映しやすい。体脂肪率の測定誤差はそのまま結果に影響する)
+   * 丸め方針: 除脂肪体重・体脂肪量は小数第1位、基礎代謝量は整数に四捨五入。
+   * @param {number} weightKg 体重(kg・5〜300)
+   * @param {number} bodyFatPct 体脂肪率(%・1〜70)
+   * @returns {{ok:true, lbmKg:number, fatKg:number, bmrKcal:number}
+   *          |{ok:false, code:string}}  code: "invalid_weight" | "invalid_body_fat"
+   */
+  function katchMcArdle(weightKg, bodyFatPct) {
+    if (!isFiniteNumber(weightKg) || weightKg < WEIGHT_MIN_KG || weightKg > WEIGHT_MAX_KG) {
+      return { ok: false, code: "invalid_weight" };
+    }
+    if (!isFiniteNumber(bodyFatPct) || bodyFatPct < 1 || bodyFatPct > 70) {
+      return { ok: false, code: "invalid_body_fat" };
+    }
+    var lbm = weightKg * (1 - bodyFatPct / 100);
+    return {
+      ok: true,
+      lbmKg: Math.round(lbm * 10) / 10,
+      fatKg: Math.round((weightKg - lbm) * 10) / 10,
+      bmrKcal: Math.round(370 + 21.6 * lbm)
+    };
+  }
+
+  /**
+   * 同じ体重・性別のまま年代だけ変えたときの基礎代謝量を一覧にする。
+   * 「年齢とともに基礎代謝がどれくらい落ちるか」の目安。
+   * 基準値は本体と同じ「日本人の食事摂取基準」の年齢区分別の値(成人のみ)。
+   * 丸め方針: 基礎代謝量は整数に四捨五入。
+   * @param {string} sex "male" | "female"
+   * @param {number} weightKg 体重(kg・5〜300)
+   * @returns {{ok:true, rows:Array<{ageLabel:string, standardValue:number, bmrKcal:number}>}
+   *          |{ok:false, code:string}}  code: "invalid_sex" | "invalid_weight"
+   */
+  function byAgeGroups(sex, weightKg) {
+    if (sex !== "male" && sex !== "female") return { ok: false, code: "invalid_sex" };
+    if (!isFiniteNumber(weightKg) || weightKg < WEIGHT_MIN_KG || weightKg > WEIGHT_MAX_KG) {
+      return { ok: false, code: "invalid_weight" };
+    }
+    var GROUPS = [
+      { age: 18, label: "18〜29歳" },
+      { age: 30, label: "30〜49歳" },
+      { age: 50, label: "50〜69歳" },
+      { age: 70, label: "70歳以上" }
+    ];
+    var rows = [];
+    for (var i = 0; i < GROUPS.length; i++) {
+      var std = null;
+      for (var j = 0; j < STANDARD_VALUES.length; j++) {
+        if (GROUPS[i].age >= STANDARD_VALUES[j][0] && GROUPS[i].age <= STANDARD_VALUES[j][1]) {
+          std = sex === "male" ? STANDARD_VALUES[j][2] : STANDARD_VALUES[j][3];
+          break;
+        }
+      }
+      rows.push({
+        ageLabel: GROUPS[i].label,
+        standardValue: std,
+        bmrKcal: Math.round(std * weightKg)
+      });
+    }
+    return { ok: true, rows: rows };
+  }
+
   var api = {
+    byAgeGroups: byAgeGroups,
+    katchMcArdle: katchMcArdle,
     calculate: calculate,
     AGE_MIN: AGE_MIN,
     AGE_MAX: AGE_MAX,

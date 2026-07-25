@@ -43,11 +43,28 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 目標BMIから逆算・体重早見表</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">目標BMIから目標体重を逆算</h3>
+      <p class="adv-note">なりたいBMIを入れると、目標体重と「あと何kgか」を逆算します。身長・体重は上のフォームの値を使います。</p>
+      <label>目標BMI
+        <input type="number" id="adv-target-bmi" inputmode="decimal" step="any" min="10" max="40" value="22">
+      </label>
+      <button type="button" id="adv-goal-run">目標体重を逆算する</button>
+
+      <h3 class="adv-h">あなたの身長の体重早見表</h3>
+      <p class="adv-note">上のフォームの身長で、BMI 18.5〜30 に当たる体重を一覧にします。「あと何kgで普通体重か」がひと目でわかります。</p>
+      <button type="button" id="adv-table-run">早見表を表示する</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
   <div class="note-box">
     このツールの計算結果は<strong>概算</strong>です。対象は成人で、小児・妊娠中の方には適用できません。健康状態の判断は数値だけで行わず、医師・保健師にご相談ください。
   </div>
 
-  <p>身長と体重を入力すると、<strong>BMI</strong>と<strong>適正体重(BMI22基準)</strong>を計算し、日本肥満学会の基準で判定します。</p>
+  <p>身長と体重を入れるだけで、<strong>肥満度の目安になるBMI</strong>と適正体重がすぐわかるツールです。日本の学会基準で「低体重〜肥満」の判定も表示します。健康診断の数字の確認や、ダイエットの目標づくりにどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -144,6 +161,57 @@
       box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
     }
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-goal-run").addEventListener("click", function () {
+    var h = parseFloat(document.getElementById("height").value);
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(h) || !isFinite(w)) { advErr("先に上のフォームに身長と体重を入力してください。"); return; }
+    var tbRaw = document.getElementById("adv-target-bmi").value;
+    var r = BmiCalc.targetFromBmi(h, w, tbRaw === "" ? undefined : parseFloat(tbRaw));
+    if (!r.ok) {
+      advErr(r.code === "invalid_target_bmi"
+        ? "目標BMIは10〜40の範囲で入力してください。"
+        : "上のフォームの身長・体重を確認してください(身長100〜250cm、体重20〜300kg)。");
+      return;
+    }
+    var msg;
+    if (r.diffKg > 0) {
+      msg = "目標まで あと <strong>" + r.diffKg.toFixed(1) + " kg の減量</strong>が必要です。";
+    } else if (r.diffKg < 0) {
+      msg = "目標まで あと <strong>" + Math.abs(r.diffKg).toFixed(1) + " kg の増量</strong>が必要です。";
+    } else {
+      msg = "<strong>目標体重をほぼ達成しています。</strong>";
+    }
+    advBox.innerHTML =
+      '<div class="result-main">目標体重 約 ' + r.targetWeightKg.toFixed(1) + " kg</div>" +
+      "<p>BMI " + r.targetBmi + " のときの体重です。" + msg + "</p>";
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-table-run").addEventListener("click", function () {
+    var h = parseFloat(document.getElementById("height").value);
+    if (!isFinite(h)) { advErr("先に上のフォームに身長を入力してください。"); return; }
+    var r = BmiCalc.bmiWeightTable(h);
+    if (!r.ok) { advErr("身長は100〜250cmの範囲で入力してください。"); return; }
+    var rows = "";
+    for (var i = 0; i < r.rows.length; i++) {
+      rows += "<tr><td>BMI " + r.rows[i].bmi + "</td><td>" + r.rows[i].weightKg.toFixed(1) +
+        " kg</td><td>" + r.rows[i].label + "</td></tr>";
+    }
+    advBox.innerHTML =
+      '<div class="result-main">身長 ' + h + " cm の体重早見表</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>BMI</th><th>体重</th><th>意味</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+    advBox.hidden = false;
   });
 })();
 </script>

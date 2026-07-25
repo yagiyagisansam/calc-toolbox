@@ -41,11 +41,37 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 1週間の睡眠記録・就寝時刻の逆算</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">この1週間、足りていた?(睡眠負債チェック)</h3>
+      <p class="adv-note">直近7日分の睡眠時間(時間単位・小数可)を入れると、平均・合計と、理想の1日7時間に対する過不足を計算します。</p>
+      <div id="adv-week" style="display:flex;flex-wrap:wrap;gap:8px;">
+        <input type="number" id="adv-d1" step="any" min="0" max="24" placeholder="1日目" aria-label="1日目の睡眠時間(時間)" style="width:6em;">
+        <input type="number" id="adv-d2" step="any" min="0" max="24" placeholder="2日目" aria-label="2日目の睡眠時間(時間)" style="width:6em;">
+        <input type="number" id="adv-d3" step="any" min="0" max="24" placeholder="3日目" aria-label="3日目の睡眠時間(時間)" style="width:6em;">
+        <input type="number" id="adv-d4" step="any" min="0" max="24" placeholder="4日目" aria-label="4日目の睡眠時間(時間)" style="width:6em;">
+        <input type="number" id="adv-d5" step="any" min="0" max="24" placeholder="5日目" aria-label="5日目の睡眠時間(時間)" style="width:6em;">
+        <input type="number" id="adv-d6" step="any" min="0" max="24" placeholder="6日目" aria-label="6日目の睡眠時間(時間)" style="width:6em;">
+        <input type="number" id="adv-d7" step="any" min="0" max="24" placeholder="7日目" aria-label="7日目の睡眠時間(時間)" style="width:6em;">
+      </div>
+      <button type="button" id="adv-week-run">1週間の集計を見る</button>
+
+      <h3 class="adv-h">明日の起床から「寝るべき時刻」を逆算</h3>
+      <p class="adv-note">目標の睡眠時間を入れると、上のフォームの起床時刻から「何時に寝ればよいか」を逆算します。</p>
+      <label>目標睡眠時間(時間)
+        <input type="number" id="adv-target-hours" inputmode="decimal" step="any" min="1" max="16" value="7">
+      </label>
+      <button type="button" id="adv-bed-run">寝るべき時刻を逆算する</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
   <div class="note-box">
     このツールは「床についてから起きるまで」の単純な時間差を計算する<strong>概算</strong>です。寝つくまでの時間や夜中に目覚めた時間は含まれないため、実際に眠っていた時間はこれより短いことがあります。
   </div>
 
-  <p>就寝時刻と起床時刻を入力すると、<strong>睡眠時間</strong>を計算します。夜をまたいでも正しく計算できます。</p>
+  <p>寝た時刻と起きた時刻を入れるだけで、<strong>眠れた時間</strong>がすぐわかるツールです。夜中の0時をまたいでも正しく計算できます。睡眠のリズムを整えたい時にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -120,6 +146,62 @@
       box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
     }
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-week-run").addEventListener("click", function () {
+    var list = [];
+    for (var i = 1; i <= 7; i++) {
+      var v = document.getElementById("adv-d" + i).value;
+      if (v === "") { advErr("7日分すべての睡眠時間を入力してください(" + i + "日目が空欄です)。"); return; }
+      list.push(parseFloat(v));
+    }
+    var r = SleepCalc.weekStats(list);
+    if (!r.ok) { advErr("睡眠時間は0〜24時間の範囲で入力してください。"); return; }
+    var fmt1 = function (v) { return v.toLocaleString(undefined, { maximumFractionDigits: 1 }); };
+    var judge;
+    if (r.diffHours < 0) {
+      judge = "理想(1日7時間×7日=49時間)より <strong>約 " + fmt1(Math.abs(r.diffHours)) +
+        " 時間不足</strong>しています。寝不足の積み重ね(睡眠負債)の目安です。";
+    } else if (r.diffHours > 0) {
+      judge = "理想(49時間)より約 " + fmt1(r.diffHours) + " 時間多く眠れています。";
+    } else {
+      judge = "<strong>理想(1日7時間)どおりのペースです。</strong>";
+    }
+    advBox.innerHTML =
+      '<div class="result-main">平均 ' + fmt1(r.avgHours) + " 時間/日</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>7日間の合計</td><td>" + fmt1(r.totalHours) + " 時間</td></tr>" +
+      "<tr><td>理想(49時間)との差</td><td>" + (r.diffHours > 0 ? "+" : "") + fmt1(r.diffHours) + " 時間</td></tr>" +
+      "</tbody></table></div>" +
+      "<p>" + judge + "</p>" +
+      '<p class="adv-note">必要な睡眠時間には個人差があります。7時間はあくまで一般的な目安です。</p>';
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-bed-run").addEventListener("click", function () {
+    var wake = document.getElementById("wake").value;
+    if (wake === "") { advErr("先に上のフォームの起床時刻を入力してください。"); return; }
+    var tEl = document.getElementById("adv-target-hours");
+    if (tEl.value === "") { advErr("目標睡眠時間を入力してください。"); return; }
+    var r = SleepCalc.bedTimeFor(wake, parseFloat(tEl.value));
+    if (!r.ok) {
+      advErr(r.code === "invalid_target" ? "目標睡眠時間は1〜16時間の範囲で入力してください。"
+        : "起床時刻を確認してください。");
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">' + r.bedTime + " までに就寝</div>" +
+      "<p>起床 " + wake + " で " + parseFloat(tEl.value).toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      " 時間眠るには、<strong>" + r.bedTime + "</strong> までに眠りにつく計算です。寝つくまでの時間は含まないため、布団には少し早めに入るのがおすすめです。</p>";
+    advBox.hidden = false;
   });
 })();
 </script>

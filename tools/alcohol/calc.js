@@ -58,7 +58,93 @@
     };
   }
 
+  /**
+   * 複数のお酒の純アルコール量を合計する。
+   * 各行: 量(mL) × 度数(%)/100 × 0.8(本体と同じ式)。
+   * 丸め方針: 各行のgは計算のまま合算し、合計gとドリンク数を小数第1位に四捨五入。
+   * @param {Array<{ml:number, abv:number}>} items お酒のリスト(1〜5件)
+   * @returns {{ok:true, grams:number, drinks:number}
+   *          |{ok:false, code:string}}
+   *   code: "invalid_items" | "invalid_volume" | "invalid_abv"
+   */
+  function totalDrinks(items) {
+    if (!Array.isArray(items) || items.length < 1 || items.length > 5) {
+      return { ok: false, code: "invalid_items" };
+    }
+    var sum = 0;
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i];
+      if (!it || !isFiniteNumber(it.ml) || it.ml < VOLUME_MIN_ML || it.ml > VOLUME_MAX_ML) {
+        return { ok: false, code: "invalid_volume" };
+      }
+      if (!isFiniteNumber(it.abv) || it.abv < ABV_MIN || it.abv > ABV_MAX) {
+        return { ok: false, code: "invalid_abv" };
+      }
+      sum += it.ml * (it.abv / 100) * 0.8;
+    }
+    return {
+      ok: true,
+      grams: round1(sum),
+      drinks: round1(sum / 10)
+    };
+  }
+
+  function parseHhmmAdv(hhmm) {
+    if (typeof hhmm !== "string" || !/^\d{1,2}:\d{2}$/.test(hhmm)) return null;
+    var h = parseInt(hhmm.split(":")[0], 10);
+    var m = parseInt(hhmm.split(":")[1], 10);
+    if (h < 0 || h > 23 || m < 0 || m > 59) return null;
+    return h * 60 + m;
+  }
+
+  function fmtHhmmAdv(totalMin) {
+    var m = ((Math.round(totalMin) % 1440) + 1440) % 1440;
+    var h = Math.floor(m / 60);
+    var mm = m % 60;
+    return (h < 10 ? "0" + h : "" + h) + ":" + (mm < 10 ? "0" + mm : "" + mm);
+  }
+
+  /**
+   * アルコールの分解にかかるおおよその時間を計算する。
+   * 分解速度は体重1kgあたり約0.1g/時(広く使われる目安。体質・体調による個人差が大きく、
+   * 同じ人でも日によって変わる)。時間 = 純アルコールg ÷ (体重kg × 0.1)。
+   * 丸め方針: 時間・分解速度は小数第1位に四捨五入。
+   * 飲み終わりの時刻(HH:MM)を渡すと、分解が終わるおおよその時刻も返す。
+   * この結果は目安であり、運転可否の判断には使えない。
+   * @param {number} weightKg 体重(kg・20〜300)
+   * @param {number} gramsAlcohol 純アルコール量(g・1〜500)
+   * @param {string} [endTime] 飲み終わりの時刻 "HH:MM"(任意)
+   * @returns {{ok:true, hours:number, rateGPerHour:number, finishTime?:string, nextDay?:boolean}
+   *          |{ok:false, code:string}}
+   *   code: "invalid_weight" | "invalid_grams" | "invalid_end_time"
+   */
+  function breakdownTime(weightKg, gramsAlcohol, endTime) {
+    if (!isFiniteNumber(weightKg) || weightKg < 20 || weightKg > 300) {
+      return { ok: false, code: "invalid_weight" };
+    }
+    if (!isFiniteNumber(gramsAlcohol) || gramsAlcohol < 1 || gramsAlcohol > 500) {
+      return { ok: false, code: "invalid_grams" };
+    }
+    var rate = weightKg * 0.1;
+    var rawHours = gramsAlcohol / rate;
+    var out = {
+      ok: true,
+      hours: round1(rawHours),
+      rateGPerHour: round1(rate)
+    };
+    if (endTime !== undefined && endTime !== null && endTime !== "") {
+      var end = parseHhmmAdv(endTime);
+      if (end === null) return { ok: false, code: "invalid_end_time" };
+      var endTotal = end + rawHours * 60;
+      out.finishTime = fmtHhmmAdv(endTotal);
+      out.nextDay = endTotal >= 1440;
+    }
+    return out;
+  }
+
   var api = {
+    breakdownTime: breakdownTime,
+    totalDrinks: totalDrinks,
     calculate: calculate,
     VOLUME_MIN_ML: VOLUME_MIN_ML,
     VOLUME_MAX_ML: VOLUME_MAX_ML,

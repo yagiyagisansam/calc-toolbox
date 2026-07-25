@@ -109,6 +109,139 @@
         "ok": false,
         "code": "invalid_weight"
       }
+    },
+    {
+      "name": "目標残り: 目標1万歩・現在6500歩・170cm/60kgは残り3500歩=2.68km/40分/127kcal",
+      "func": "remainingToGoal",
+      "args": [
+        10000,
+        6500,
+        170,
+        60
+      ],
+      "expect": {
+        "ok": true,
+        "remainingSteps": 3500,
+        "achieved": false,
+        "distanceKm": 2.68,
+        "timeMin": 40,
+        "kcal": 127
+      }
+    },
+    {
+      "name": "目標残り: 目標を超えていれば達成(残り0)",
+      "func": "remainingToGoal",
+      "args": [
+        10000,
+        12000,
+        170,
+        60
+      ],
+      "expect": {
+        "ok": true,
+        "remainingSteps": 0,
+        "achieved": true,
+        "distanceKm": 0,
+        "timeMin": 0,
+        "kcal": 0
+      }
+    },
+    {
+      "name": "目標残り: 体重なしでも距離と時間は出る(8000歩目標・3000歩・160cm)",
+      "func": "remainingToGoal",
+      "args": [
+        8000,
+        3000,
+        160
+      ],
+      "expect": {
+        "ok": true,
+        "remainingSteps": 5000,
+        "achieved": false,
+        "distanceKm": 3.6,
+        "timeMin": 54
+      }
+    },
+    {
+      "name": "目標残り: 現在の歩数0も計算できる(残り1万歩=7.65km)",
+      "func": "remainingToGoal",
+      "args": [
+        10000,
+        0,
+        170
+      ],
+      "expect": {
+        "ok": true,
+        "remainingSteps": 10000,
+        "distanceKm": 7.65,
+        "timeMin": 115
+      }
+    },
+    {
+      "name": "目標残り: 目標0歩はエラー",
+      "func": "remainingToGoal",
+      "args": [
+        0,
+        100,
+        170
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_goal"
+      }
+    },
+    {
+      "name": "目標残り: 現在の歩数が負はエラー",
+      "func": "remainingToGoal",
+      "args": [
+        10000,
+        -1,
+        170
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_steps"
+      }
+    },
+    {
+      "name": "実測歩幅: 1万歩×歩幅70cm/60kgは7km/105分/331kcal",
+      "func": "calcWithStride",
+      "args": [
+        10000,
+        70,
+        60
+      ],
+      "expect": {
+        "ok": true,
+        "distanceKm": 7,
+        "timeMin": 105,
+        "kcal": 331
+      }
+    },
+    {
+      "name": "実測歩幅: 体重なし(8000歩×65cm)は5.2km/78分",
+      "func": "calcWithStride",
+      "args": [
+        8000,
+        65
+      ],
+      "expect": {
+        "ok": true,
+        "distanceKm": 5.2,
+        "timeMin": 78
+      }
+    },
+    {
+      "name": "実測歩幅: 歩幅10cmは範囲外エラー",
+      "func": "calcWithStride",
+      "args": [
+        8000,
+        10
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_stride"
+      }
     }
   ]
 }

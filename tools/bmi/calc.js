@@ -74,7 +74,72 @@
     };
   }
 
+  /**
+   * 目標BMIから目標体重と現在との差を逆算する。
+   * 丸め方針: 目標体重は小数第1位に四捨五入し、差は「現在の体重 − 丸めた目標体重」を
+   * さらに小数第1位に四捨五入(表示値どうしで矛盾しないようにするため)。
+   * @param {number} heightCm 身長(cm・100〜250)
+   * @param {number} weightKg 現在の体重(kg・20〜300)
+   * @param {number} [targetBmi] 目標BMI(10〜40)。省略時は22(適正体重の基準)
+   * @returns {{ok:true, targetBmi:number, targetWeightKg:number, diffKg:number}
+   *          |{ok:false, code:string}}
+   *   diffKg>0: あとdiffKg減量が必要 / diffKg<0: 増量が必要
+   *   code: "invalid_height" | "invalid_weight" | "invalid_target_bmi"
+   */
+  function targetFromBmi(heightCm, weightKg, targetBmi) {
+    if (!isFiniteNumber(heightCm) || heightCm < HEIGHT_MIN_CM || heightCm > HEIGHT_MAX_CM) {
+      return { ok: false, code: "invalid_height" };
+    }
+    if (!isFiniteNumber(weightKg) || weightKg < WEIGHT_MIN_KG || weightKg > WEIGHT_MAX_KG) {
+      return { ok: false, code: "invalid_weight" };
+    }
+    if (targetBmi === undefined || targetBmi === null) targetBmi = 22;
+    if (!isFiniteNumber(targetBmi) || targetBmi < 10 || targetBmi > 40) {
+      return { ok: false, code: "invalid_target_bmi" };
+    }
+    var heightM = heightCm / 100;
+    var targetWeightKg = round1(targetBmi * heightM * heightM);
+    return {
+      ok: true,
+      targetBmi: targetBmi,
+      targetWeightKg: targetWeightKg,
+      diffKg: round1(weightKg - targetWeightKg)
+    };
+  }
+
+  /**
+   * 身長からBMI別の体重早見表を作る(BMI 18.5 / 20 / 22 / 25 / 30)。
+   * 丸め方針: 体重は小数第1位に四捨五入。
+   * @param {number} heightCm 身長(cm・100〜250)
+   * @returns {{ok:true, rows:Array<{bmi:number, weightKg:number, label:string}>}
+   *          |{ok:false, code:string}}  code: "invalid_height"
+   */
+  function bmiWeightTable(heightCm) {
+    if (!isFiniteNumber(heightCm) || heightCm < HEIGHT_MIN_CM || heightCm > HEIGHT_MAX_CM) {
+      return { ok: false, code: "invalid_height" };
+    }
+    var heightM = heightCm / 100;
+    var POINTS = [
+      { bmi: 18.5, label: "低体重との境界" },
+      { bmi: 20, label: "細めの普通体重" },
+      { bmi: 22, label: "適正体重(統計的に病気が最も少ない)" },
+      { bmi: 25, label: "肥満(1度)との境界" },
+      { bmi: 30, label: "肥満(2度)との境界" }
+    ];
+    var rows = [];
+    for (var i = 0; i < POINTS.length; i++) {
+      rows.push({
+        bmi: POINTS[i].bmi,
+        label: POINTS[i].label,
+        weightKg: round1(POINTS[i].bmi * heightM * heightM)
+      });
+    }
+    return { ok: true, rows: rows };
+  }
+
   var api = {
+    bmiWeightTable: bmiWeightTable,
+    targetFromBmi: targetFromBmi,
     calculate: calculate,
     HEIGHT_MIN_CM: HEIGHT_MIN_CM,
     HEIGHT_MAX_CM: HEIGHT_MAX_CM,
