@@ -45,7 +45,50 @@
     return { ok: true, cm: round2((feet * 12 + inches) * INCH_CM) };
   }
 
-  var api = { toFeet: toFeet, toCm: toCm, INCH_CM: INCH_CM };
+  /**
+   * 入力値を中心に±5cm(1cm刻み)のフィート・インチ早見表を作る。
+   * 換算は toFeet と同じ方式(1インチ=2.54cm、余りインチは四捨五入・12で繰り上げ)。
+   * 範囲外(30cm未満・300cm超)になる行は表から除外する。
+   * @param {number} cm 中心となる身長(cm、30〜300)
+   * @returns {{ok:true, center:number, rows:Array<{cm:number, feet:number, inches:number}>}
+   *          |{ok:false, code:string}}  code: "invalid_cm"
+   */
+  function heightTable(cm) {
+    if (typeof cm !== "number" || !isFinite(cm) || cm < 30 || cm > 300) {
+      return { ok: false, code: "invalid_cm" };
+    }
+    var rows = [];
+    for (var d = -5; d <= 5; d++) {
+      var c = Math.round((cm + d) * 100) / 100;
+      if (c < 30 || c > 300) continue;
+      var r = toFeet(c);
+      if (!r.ok) continue;
+      rows.push({ cm: c, feet: r.feet, inches: r.inches });
+    }
+    return { ok: true, center: cm, rows: rows };
+  }
+
+  /**
+   * 指定したフィートについて、0〜11インチの各表記をcmに換算した早見表を作る。
+   * 換算は toCm と同じ((フィート×12+インチ)×2.54、小数第2位で四捨五入)。
+   * @param {number} feet フィート(整数、1〜9)
+   * @returns {{ok:true, feet:number, rows:Array<{inches:number, cm:number}>}
+   *          |{ok:false, code:string}}  code: "invalid_feet"
+   */
+  function feetTable(feet) {
+    if (typeof feet !== "number" || !isFinite(feet) || feet !== Math.floor(feet) || feet < 1 || feet > 9) {
+      return { ok: false, code: "invalid_feet" };
+    }
+    var rows = [];
+    for (var i = 0; i <= 11; i++) {
+      rows.push({ inches: i, cm: round2((feet * 12 + i) * INCH_CM) });
+    }
+    return { ok: true, feet: feet, rows: rows };
+  }
+
+  var api = {
+    feetTable: feetTable,
+    heightTable: heightTable, toFeet: toFeet, toCm: toCm, INCH_CM: INCH_CM };
   if (typeof module !== "undefined" && module.exports) { module.exports = api; }
   else { global.ShinchoCalc = api; }
 })(typeof window !== "undefined" ? window : globalThis);

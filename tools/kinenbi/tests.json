@@ -6,56 +6,246 @@
     {
       "name": "2024-01-01開始・2026-07-18時点: 929日経過・930日目",
       "func": "milestones",
-      "args": ["2024-01-01", "2026-07-18"],
-      "expect": { "ok": true, "elapsedDays": 929, "dayNumber": 930 }
+      "args": [
+        "2024-01-01",
+        "2026-07-18"
+      ],
+      "expect": {
+        "ok": true,
+        "elapsedDays": 929,
+        "dayNumber": 930
+      }
     },
     {
       "name": "100日目の日付(2024-01-01開始 → 2024-04-09・過去なのでdaysUntil=-830)",
       "func": "milestones",
-      "args": ["2024-01-01", "2026-07-18"],
-      "expect": { "ok": true, "milestones": [{ "n": 100, "date": "2024-04-09", "daysUntil": -830 }] }
+      "args": [
+        "2024-01-01",
+        "2026-07-18"
+      ],
+      "expect": {
+        "ok": true,
+        "milestones": [
+          {
+            "n": 100,
+            "date": "2024-04-09",
+            "daysUntil": -830
+          }
+        ]
+      }
     },
     {
       "name": "当日は1日目(経過0日)・100日目は99日後",
       "func": "milestones",
-      "args": ["2026-07-18", "2026-07-18"],
-      "expect": { "ok": true, "elapsedDays": 0, "dayNumber": 1, "milestones": [{ "n": 100, "date": "2026-10-25", "daysUntil": 99 }] }
+      "args": [
+        "2026-07-18",
+        "2026-07-18"
+      ],
+      "expect": {
+        "ok": true,
+        "elapsedDays": 0,
+        "dayNumber": 1,
+        "milestones": [
+          {
+            "n": 100,
+            "date": "2026-10-25",
+            "daysUntil": 99
+          }
+        ]
+      }
     },
     {
       "name": "誕生日1990-07-18: 2026-07-18で13,150日目",
       "func": "milestones",
-      "args": ["1990-07-18", "2026-07-18"],
-      "expect": { "ok": true, "elapsedDays": 13149, "dayNumber": 13150 }
+      "args": [
+        "1990-07-18",
+        "2026-07-18"
+      ],
+      "expect": {
+        "ok": true,
+        "elapsedDays": 13149,
+        "dayNumber": 13150
+      }
     },
     {
       "name": "異常入力: 記念日が基準日より未来はエラー",
       "func": "milestones",
-      "args": ["2027-01-01", "2026-07-18"],
-      "expect": { "ok": false, "code": "base_after_asof" }
+      "args": [
+        "2027-01-01",
+        "2026-07-18"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "base_after_asof"
+      }
     },
     {
       "name": "異常入力: 存在しない日付はエラー",
       "func": "milestones",
-      "args": ["2026-02-30", "2026-07-18"],
-      "expect": { "ok": false, "code": "invalid_base" }
+      "args": [
+        "2026-02-30",
+        "2026-07-18"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_base"
+      }
     },
     {
       "name": "異常入力: 形式不正はエラー",
       "func": "milestones",
-      "args": ["2024/01/01", "2026-07-18"],
-      "expect": { "ok": false, "code": "invalid_base" }
+      "args": [
+        "2024/01/01",
+        "2026-07-18"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_base"
+      }
     },
     {
       "name": "異常入力: 基準日が不正はエラー",
       "func": "milestones",
-      "args": ["2024-01-01", "bad"],
-      "expect": { "ok": false, "code": "invalid_asof" }
+      "args": [
+        "2024-01-01",
+        "bad"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_asof"
+      }
     },
     {
       "name": "異常入力: 1900年より前はエラー",
       "func": "milestones",
-      "args": ["1899-12-31", "2026-07-18"],
-      "expect": { "ok": false, "code": "invalid_base" }
+      "args": [
+        "1899-12-31",
+        "2026-07-18"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_base"
+      }
+    },
+    {
+      "name": "周年: 2025-01-01開始の1周年は2026-01-01(木)、10周年は2035-01-01(月)",
+      "func": "anniversaries",
+      "args": [
+        "2025-01-01",
+        "2026-07-24"
+      ],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "0": {
+            "years": 1,
+            "date": "2026-01-01",
+            "weekday": "木",
+            "daysUntil": -204
+          },
+          "1": {
+            "years": 2,
+            "date": "2027-01-01",
+            "weekday": "金",
+            "daysUntil": 161
+          },
+          "9": {
+            "years": 10,
+            "date": "2035-01-01",
+            "weekday": "月",
+            "daysUntil": 3083
+          },
+          "length": 10
+        }
+      }
+    },
+    {
+      "name": "周年: 2月29日開始は平年3月1日・うるう年2月29日",
+      "func": "anniversaries",
+      "args": [
+        "2024-02-29",
+        "2026-07-24"
+      ],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "0": {
+            "years": 1,
+            "date": "2025-03-01"
+          },
+          "3": {
+            "years": 4,
+            "date": "2028-02-29"
+          }
+        }
+      }
+    },
+    {
+      "name": "周年: 基準日が記念日より前ならエラー",
+      "func": "anniversaries",
+      "args": [
+        "2026-12-31",
+        "2026-07-24"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "base_after_asof"
+      }
+    },
+    {
+      "name": "100日ごと: 2025-01-01開始の100日目は2025-04-10(木)、1000日目は2027-09-27(月)",
+      "func": "hundredDays",
+      "args": [
+        "2025-01-01",
+        "2026-07-24"
+      ],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "0": {
+            "n": 100,
+            "date": "2025-04-10",
+            "weekday": "木",
+            "daysUntil": -470
+          },
+          "9": {
+            "n": 1000,
+            "date": "2027-09-27",
+            "weekday": "月",
+            "daysUntil": 430
+          },
+          "length": 10
+        }
+      }
+    },
+    {
+      "name": "100日ごと: 当日はdaysUntil=0(100日目当日)",
+      "func": "hundredDays",
+      "args": [
+        "2025-01-01",
+        "2025-04-10"
+      ],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "0": {
+            "n": 100,
+            "daysUntil": 0
+          }
+        }
+      }
+    },
+    {
+      "name": "100日ごと: 不正な日付はエラー",
+      "func": "hundredDays",
+      "args": [
+        "2025-02-30",
+        "2026-07-24"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_base"
+      }
     }
   ]
 }

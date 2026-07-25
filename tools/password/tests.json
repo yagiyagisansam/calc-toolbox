@@ -166,6 +166,117 @@
         "ok": false,
         "code": "invalid_length"
       }
+    },
+    {
+      "name": "カスタム生成: 似た文字除外で英小文字+数字は32種、3個生成",
+      "func": "generateCustom",
+      "args": [
+        12,
+        {
+          "lower": true,
+          "digits": true,
+          "excludeSimilar": true
+        },
+        3,
+        42
+      ],
+      "expect": {
+        "ok": true,
+        "count": 3,
+        "poolSize": 32,
+        "entropyBits": 60
+      }
+    },
+    {
+      "name": "カスタム生成: 記号を!@#に限定すると3種",
+      "func": "generateCustom",
+      "args": [
+        8,
+        {
+          "symbols": true,
+          "symbolSet": "!@#"
+        },
+        1,
+        7
+      ],
+      "expect": {
+        "ok": true,
+        "count": 1,
+        "poolSize": 3,
+        "entropyBits": 13
+      }
+    },
+    {
+      "name": "カスタム生成: 11個はエラー",
+      "func": "generateCustom",
+      "args": [
+        12,
+        {
+          "lower": true
+        },
+        11,
+        1
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_count"
+      }
+    },
+    {
+      "name": "カスタム生成: 記号指定に全角文字はエラー",
+      "func": "generateCustom",
+      "args": [
+        12,
+        {
+          "symbols": true,
+          "symbolSet": "あ"
+        },
+        1,
+        1
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_symbols"
+      }
+    },
+    {
+      "name": "強度チェック: abcd1234 は36種41ビットで弱い",
+      "func": "checkStrength",
+      "args": [
+        "abcd1234"
+      ],
+      "expect": {
+        "ok": true,
+        "length": 8,
+        "poolSize": 36,
+        "entropyBits": 41,
+        "level": "弱い"
+      }
+    },
+    {
+      "name": "強度チェック: 全種16文字は105ビットで非常に強い",
+      "func": "checkStrength",
+      "args": [
+        "Tr0ub4dor&3xYz!Q"
+      ],
+      "expect": {
+        "ok": true,
+        "length": 16,
+        "poolSize": 94,
+        "entropyBits": 105,
+        "level": "非常に強い"
+      }
+    },
+    {
+      "name": "強度チェック: 空文字はエラー",
+      "func": "checkStrength",
+      "args": [
+        ""
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_password"
+      }
     }
   ]
 }

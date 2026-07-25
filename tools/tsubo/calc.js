@@ -57,7 +57,80 @@
     };
   }
 
+  /**
+   * 土地面積と建ぺい率・容積率から、建てられる建物の上限を計算する。
+   *
+   * - 建築面積の上限 = 土地面積 × 建ぺい率 ÷ 100
+   *   (建ぺい率: 土地を真上から見たとき、建物が占めてよい面積の割合)
+   * - 延べ床面積の上限 = 土地面積 × 容積率 ÷ 100
+   *   (容積率: 全フロアの床面積の合計が土地面積の何%まで許されるか)
+   * - 参考の階数 = 容積率 ÷ 建ぺい率(建ぺい率いっぱいに建てた場合の単純計算)
+   * 建ぺい率・容積率は都市計画で用途地域ごとに定められる(建築基準法52・53条)。
+   * 実際は斜線制限・高さ制限等でさらに制限されることがある。
+   *
+   * 丸め: 面積・階数は小数第2位で四捨五入。坪は 1坪 = 400/121㎡ で換算。
+   * @param {number} landSqm 土地面積(㎡)
+   * @param {number} kenpeiPct 建ぺい率(%)(1〜100)
+   * @param {number} yosekiPct 容積率(%)(1〜2000)
+   * @returns {{ok:true, buildingSqm:number, buildingTsubo:number,
+   *            floorSqm:number, floorTsubo:number, floorsHint:number}
+   *          |{ok:false, code:string}} code: "invalid_value"|"invalid_kenpei"|"invalid_yoseki"
+   */
+  function buildingLimits(landSqm, kenpeiPct, yosekiPct) {
+    if (!isFiniteNumber(landSqm) || landSqm < VALUE_MIN || landSqm > VALUE_MAX) {
+      return { ok: false, code: "invalid_value" };
+    }
+    if (!isFiniteNumber(kenpeiPct) || kenpeiPct < 1 || kenpeiPct > 100) {
+      return { ok: false, code: "invalid_kenpei" };
+    }
+    if (!isFiniteNumber(yosekiPct) || yosekiPct < 1 || yosekiPct > 2000) {
+      return { ok: false, code: "invalid_yoseki" };
+    }
+    var building = landSqm * kenpeiPct / 100;
+    var floor = landSqm * yosekiPct / 100;
+    return {
+      ok: true,
+      buildingSqm: round2(building),
+      buildingTsubo: round2(building / SQM_PER_TSUBO),
+      floorSqm: round2(floor),
+      floorTsubo: round2(floor / SQM_PER_TSUBO),
+      floorsHint: round2(yosekiPct / kenpeiPct)
+    };
+  }
+
+  /**
+   * 物件価格と面積から坪単価・㎡単価を計算する。
+   * 坪単価 = 価格 ÷ 坪数、㎡単価 = 価格 ÷ ㎡数(1坪 = 400/121㎡ で換算)。
+   * 丸め: 小数第2位で四捨五入。価格の単位は入力のまま(万円なら結果も万円)。
+   * @param {number} price 価格(例: 万円)(0より大きい)
+   * @param {number} value 面積の値
+   * @param {string} unit 面積の単位 "sqm" | "tsubo" | "jo"
+   * @returns {{ok:true, perTsubo:number, perSqm:number, tsubo:number, sqm:number}
+   *          |{ok:false, code:string}} code: "invalid_price"|"invalid_value"|"invalid_unit"
+   */
+  function pricePerArea(price, value, unit) {
+    if (!isFiniteNumber(price) || price <= 0 || price > 1e9) {
+      return { ok: false, code: "invalid_price" };
+    }
+    var conv = convert(value, unit);
+    if (!conv.ok) return conv;
+    var sqm =
+      unit === "sqm" ? value :
+      unit === "tsubo" ? value * SQM_PER_TSUBO :
+      value * SQM_PER_JO;
+    var tsubo = sqm / SQM_PER_TSUBO;
+    return {
+      ok: true,
+      perTsubo: round2(price / tsubo),
+      perSqm: round2(price / sqm),
+      tsubo: round2(tsubo),
+      sqm: round2(sqm)
+    };
+  }
+
   var api = {
+    pricePerArea: pricePerArea,
+    buildingLimits: buildingLimits,
     convert: convert,
     VALUE_MIN: VALUE_MIN,
     VALUE_MAX: VALUE_MAX,

@@ -48,7 +48,27 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>眠りは約90分の周期(ノンレム睡眠→レム睡眠)をくり返していて、<strong>周期の区切りに近いタイミングで起きると目覚めやすい</strong>といわれます。起床時刻を入れると、周期の区切りに合う<strong>就寝時刻の候補3つ</strong>を逆算します(就寝→起床の計算も可能)。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 自分の周期に合わせる・今すぐ寝る</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">周期の長さを自分に合わせて再計算</h3>
+      <p class="adv-note">睡眠の周期は人により70〜110分程度の幅があります。90分で合わない場合は80分・100分で計算し直せます。時刻・寝つくまでの時間・計算の種類は上のフォームの値を使います。</p>
+      <label>周期の長さ
+        <select id="adv-cycle-len">
+          <option value="80">80分(短め)</option>
+          <option value="90" selected>90分(平均)</option>
+          <option value="100">100分(長め)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-cycle-run">この周期で再計算する</button>
+      <h3 class="adv-h">今すぐ寝たら、何時に起きればいい?</h3>
+      <p class="adv-note">今の時刻を基準に、周期の区切りに合う起床時刻の候補を出します(周期・寝つくまでの時間は上の設定を使います)。</p>
+      <button type="button" id="adv-now-run">今すぐ寝る場合の起床候補を見る</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>起きたい時刻を入れるだけで、<strong>目覚めやすい就寝時刻の候補3つ</strong>がすぐわかるツールです。眠りは約90分の周期をくり返すため、その区切りに合わせて起きる作戦です。「明日は6時起き、何時に寝よう?」という夜にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -133,6 +153,53 @@
       '<div class="table-scroll"><table class="data-table"><thead><tr><th>' + (isBed ? "寝る時刻" : "起きる時刻") + "</th><th>睡眠時間</th></tr></thead><tbody>" +
       rows + "</tbody></table></div><p>⭐=7.5時間(推奨)。周期には個人差があります。</p>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advRender(r, headline, timeHead) {
+    if (!r.ok) {
+      var msg = r.code === "invalid_time" ? "上のフォームで時刻を入力してください。"
+        : r.code === "invalid_fall" ? "寝つくまでの時間は0〜60分で入力してください。"
+        : "入力値を確認してください。";
+      advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    var html = '<div class="result-main">' + headline + '</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>サイクル数</th><th>睡眠時間</th><th>' +
+      timeHead + '</th></tr></thead><tbody>';
+    for (var i = 0; i < r.options.length; i++) {
+      var o = r.options[i];
+      html += "<tr><td>" + o.cycles + "回</td><td>約" +
+        o.sleepHours.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "時間</td><td>" + o.time + "</td></tr>";
+    }
+    html += "</tbody></table></div>" +
+      '<p class="adv-note">周期の長さには個人差があります。候補はあくまで目安です。</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-cycle-run").addEventListener("click", function () {
+    var mode = document.getElementById("mode").value;
+    var time = document.getElementById("time").value;
+    var fall = parseFloat(document.getElementById("fall").value);
+    if (isNaN(fall)) fall = 15;
+    var len = parseInt(document.getElementById("adv-cycle-len").value, 10);
+    var r = CycleCalc.customOptions(mode, time, fall, len);
+    advRender(r, "周期" + len + "分での候補",
+      mode === "bed" ? "就寝時刻の候補" : "起床時刻の候補");
+  });
+  document.getElementById("adv-now-run").addEventListener("click", function () {
+    var now = new Date();
+    var hm = now.getHours() + ":" + (now.getMinutes() < 10 ? "0" : "") + now.getMinutes();
+    var fall = parseFloat(document.getElementById("fall").value);
+    if (isNaN(fall)) fall = 15;
+    var len = parseInt(document.getElementById("adv-cycle-len").value, 10);
+    var r = CycleCalc.customOptions("wake", hm, fall, len);
+    advRender(r, "今(" + hm + ")寝た場合の起床候補", "起床時刻の候補");
   });
 })();
 </script>

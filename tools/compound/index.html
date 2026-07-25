@@ -60,11 +60,35 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 目標金額から逆算する</summary>
+    <div class="adv-inner">
+      <p class="adv-note">「老後までに2,000万円」など、先にゴールを決めて逆算します。目標金額と想定利回りは2つの計算で共通です。</p>
+      <label>目標金額(万円)
+        <input type="number" id="adv-target" inputmode="numeric" step="any" min="10" max="1000000" placeholder="1000">
+      </label>
+      <label>想定利回り(年率%)
+        <input type="number" id="adv-rate" inputmode="decimal" step="any" min="0" max="30" placeholder="3">
+      </label>
+      <h3 class="adv-h">毎月いくら積み立てればいい?</h3>
+      <label>積立期間(年)
+        <input type="number" id="adv-years" inputmode="numeric" step="1" min="1" max="50" placeholder="10">
+      </label>
+      <button type="button" id="adv-monthly-run">必要な積立月額を計算</button>
+      <h3 class="adv-h">目標金額に届くのはいつ?</h3>
+      <label>毎月の積立額(円)
+        <input type="number" id="adv-monthly" inputmode="numeric" step="1" min="1000" max="10000000" placeholder="30000">
+      </label>
+      <button type="button" id="adv-when-run">目標に届くまでの年数を計算</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
   <div class="note-box">
     このツールは<strong>利回りが一定と仮定した概算</strong>です。実際の運用成績は変動し、<strong>元本割れの可能性</strong>もあります。運用益への税金・手数料は考慮していません。特定の金融商品の勧誘・推奨を行うものではありません。
   </div>
 
-  <p><strong>毎月の積立</strong>または<strong>一括投資</strong>が、想定利回りで運用できた場合に将来いくらになるかを計算します。積立投資の計画づくりの目安に。</p>
+  <p>毎月の積立額と想定利回りを入れるだけで、<strong>将来いくらになるか</strong>がわかるツールです。まとまったお金を一括で運用した場合も計算できます。つみたて投資の計画づくりにどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -158,6 +182,61 @@
       '<div class="result-main">約 ' + r.futureValue.toLocaleString() + " 円</div>" +
       "<p>運用益(税引前): <strong>" + r.profit.toLocaleString() + " 円</strong></p>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var MAN = 10000;
+  function showError(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function readCommon() {
+    var target = parseFloat(document.getElementById("adv-target").value);
+    var rate = parseFloat(document.getElementById("adv-rate").value);
+    if (isNaN(target) || isNaN(rate)) return null;
+    return { target: target * MAN, rate: rate };
+  }
+  var ADV_MSG = {
+    invalid_target: "目標金額は 10万円〜100億円 の範囲で入力してください。",
+    invalid_rate: "想定利回りは 0〜30% の範囲で入力してください。",
+    invalid_years: "積立期間は 1〜50年 の整数で入力してください。",
+    invalid_monthly: "毎月の積立額は 1,000〜10,000,000円 の範囲で入力してください。",
+    too_long: "その条件では50年を超えても目標に届きません。積立額か利回りを見直してください。"
+  };
+  document.getElementById("adv-monthly-run").addEventListener("click", function () {
+    var c = readCommon();
+    var years = parseFloat(document.getElementById("adv-years").value);
+    if (!c || isNaN(years)) { showError("目標金額・想定利回り・積立期間を入力してください。"); return; }
+    var r = CompoundCalc.requiredMonthly(c.target, c.rate, years);
+    if (!r.ok) { showError(ADV_MSG[r.code] || "入力値を確認してください。"); return; }
+    advBox.innerHTML =
+      '<div class="result-main">毎月 ' + r.monthly.toLocaleString() + " 円</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>積立元本の合計</td><td>" + r.totalDeposit.toLocaleString() + " 円</td></tr>" +
+      "<tr><td>運用益(目標額との差)</td><td>" + r.profit.toLocaleString() + " 円</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">利回りが一定で続いた場合の概算です。税金・手数料は含みません。</p>';
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-when-run").addEventListener("click", function () {
+    var c = readCommon();
+    var monthly = parseFloat(document.getElementById("adv-monthly").value);
+    if (!c || isNaN(monthly)) { showError("目標金額・想定利回り・毎月の積立額を入力してください。"); return; }
+    var r = CompoundCalc.yearsToTarget(monthly, c.rate, c.target);
+    if (!r.ok) { showError(ADV_MSG[r.code] || "入力値を確認してください。"); return; }
+    var label = r.years > 0 ? r.years + "年" + (r.remMonths > 0 ? r.remMonths + "か月" : "") : r.remMonths + "か月";
+    advBox.innerHTML =
+      '<div class="result-main">約 ' + label + " で到達</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>積立回数</td><td>" + r.months.toLocaleString() + " 回</td></tr>" +
+      "<tr><td>その時点の評価額</td><td>約 " + r.futureValue.toLocaleString() + " 円</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">利回りが一定で続いた場合の概算です。税金・手数料は含みません。</p>';
+    advBox.hidden = false;
   });
 })();
 </script>

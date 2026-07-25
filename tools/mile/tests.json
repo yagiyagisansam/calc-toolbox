@@ -101,6 +101,100 @@
         "ok": false,
         "code": "invalid_unit"
       }
+    },
+    {
+      "name": "一括換算: 1マイル = 1760ヤード = 5280フィート(定義どおり)",
+      "func": "convertAll",
+      "args": [
+        1,
+        "mile"
+      ],
+      "expect": {
+        "ok": true,
+        "km": 1.6093,
+        "mile": 1,
+        "yd": 1760,
+        "ft": 5280
+      }
+    },
+    {
+      "name": "一括換算: 1km = 0.6214マイル・1093.6133ヤード",
+      "func": "convertAll",
+      "args": [
+        1,
+        "km"
+      ],
+      "expect": {
+        "ok": true,
+        "mile": 0.6214,
+        "nm": 0.54,
+        "yd": 1093.6133,
+        "ft": 3280.8399
+      }
+    },
+    {
+      "name": "一括換算: ヤード入力(100yd = 91.44m)",
+      "func": "convertAll",
+      "args": [
+        100,
+        "yd"
+      ],
+      "expect": {
+        "ok": true,
+        "km": 0.0914,
+        "ft": 300
+      }
+    },
+    {
+      "name": "一括換算: 不正な単位はエラー",
+      "func": "convertAll",
+      "args": [
+        1,
+        "m"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_unit"
+      }
+    },
+    {
+      "name": "速度換算: 60mph = 96.5606km/h = 52.1386ノット",
+      "func": "convertSpeed",
+      "args": [
+        60,
+        "mph"
+      ],
+      "expect": {
+        "ok": true,
+        "mph": 60,
+        "kmh": 96.5606,
+        "kt": 52.1386
+      }
+    },
+    {
+      "name": "速度換算: 100km/h = 62.1371mph",
+      "func": "convertSpeed",
+      "args": [
+        100,
+        "kmh"
+      ],
+      "expect": {
+        "ok": true,
+        "mph": 62.1371,
+        "kt": 53.9957
+      }
+    },
+    {
+      "name": "速度換算: 0はエラー",
+      "func": "convertSpeed",
+      "args": [
+        0,
+        "mph"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
     }
   ]
 }

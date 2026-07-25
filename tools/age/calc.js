@@ -67,7 +67,100 @@
     };
   }
 
+  // グレゴリオ暦の通日変換(tools/days/ と同じアルゴリズム)
+  function toSerial(y, m, d) {
+    y -= m <= 2 ? 1 : 0;
+    var era = Math.floor(y / 400);
+    var yoe = y - era * 400;
+    var doy = Math.floor((153 * (m + (m > 2 ? -3 : 9)) + 2) / 5) + d - 1;
+    var doe = yoe * 365 + Math.floor(yoe / 4) - Math.floor(yoe / 100) + doy;
+    return era * 146097 + doe - 719468;
+  }
+
+  function pad(n, len) {
+    var s = String(n);
+    while (s.length < len) s = "0" + s;
+    return s;
+  }
+
+  // その年の誕生日(2月29日生まれは平年なら3月1日扱い。calculate と同じ前提)
+  function birthdayIn(y, bm, bd) {
+    if (bm === 2 && bd === 29 && !isLeapYear(y)) return { m: 3, d: 1 };
+    return { m: bm, d: bd };
+  }
+
+  /**
+   * 次の誕生日の日付・あと何日か・何歳になるかを計算する。
+   * 基準日が誕生日当日の場合は daysLeft=0、turning=その日に達した満年齢。
+   * 2月29日生まれは平年では3月1日を誕生日として扱う(calculate と同じ前提)。
+   * あわせて生まれてから基準日までの通算日数(daysOld、生まれた日=0日)も返す。
+   * @param {string} birthIso 生年月日 "YYYY-MM-DD"
+   * @param {string} asOfIso 基準日 "YYYY-MM-DD"
+   * @returns {{ok:true, date:string, daysLeft:number, turning:number, daysOld:number}
+   *          |{ok:false, code:string}}
+   *   code: "invalid_birth" | "invalid_asof" | "birth_after_asof"
+   */
+  function nextBirthday(birthIso, asOfIso) {
+    var base = calculate(birthIso, asOfIso);
+    if (!base.ok) return base;
+    var b = parseDate(birthIso);
+    var a = parseDate(asOfIso);
+    var eff = birthdayIn(a.y, b.m, b.d);
+    var y = a.y;
+    if (a.m > eff.m || (a.m === eff.m && a.d > eff.d)) {
+      y = a.y + 1;
+      eff = birthdayIn(y, b.m, b.d);
+    }
+    var daysLeft = toSerial(y, eff.m, eff.d) - toSerial(a.y, a.m, a.d);
+    return {
+      ok: true,
+      date: pad(y, 4) + "-" + pad(eff.m, 2) + "-" + pad(eff.d, 2),
+      daysLeft: daysLeft,
+      turning: daysLeft === 0 ? base.age : base.age + 1,
+      daysOld: toSerial(a.y, a.m, a.d) - toSerial(b.y, b.m, b.d)
+    };
+  }
+
+  /**
+   * 節目の年齢(成年18歳・還暦60歳・年金の目安65歳・長寿祝いなど)を迎える日付の一覧。
+   * 日付は「誕生日当日に加齢」の通俗計算(2月29日生まれは平年3月1日)。
+   * 2100年(YEAR_MAX)を超える節目は一覧から除外する。
+   * @param {string} birthIso 生年月日 "YYYY-MM-DD"
+   * @returns {{ok:true, rows:Array<{age:number, label:string, date:string}>}
+   *          |{ok:false, code:string}}  code: "invalid_birth"
+   */
+  function milestoneAges(birthIso) {
+    var b = parseDate(birthIso);
+    if (!b || b.y < YEAR_MIN || b.y > YEAR_MAX) return { ok: false, code: "invalid_birth" };
+    var defs = [
+      { age: 18, label: "成年(成人年齢)" },
+      { age: 20, label: "20歳(飲酒・喫煙が可能に)" },
+      { age: 60, label: "還暦・定年の目安" },
+      { age: 65, label: "年金受給開始の目安" },
+      { age: 70, label: "古希" },
+      { age: 77, label: "喜寿" },
+      { age: 80, label: "傘寿" },
+      { age: 88, label: "米寿" },
+      { age: 90, label: "卒寿" },
+      { age: 100, label: "百寿" }
+    ];
+    var rows = [];
+    for (var i = 0; i < defs.length; i++) {
+      var y = b.y + defs[i].age;
+      if (y > YEAR_MAX) continue;
+      var eff = birthdayIn(y, b.m, b.d);
+      rows.push({
+        age: defs[i].age,
+        label: defs[i].label,
+        date: pad(y, 4) + "-" + pad(eff.m, 2) + "-" + pad(eff.d, 2)
+      });
+    }
+    return { ok: true, rows: rows };
+  }
+
   var api = {
+    milestoneAges: milestoneAges,
+    nextBirthday: nextBirthday,
     calculate: calculate,
     YEAR_MIN: YEAR_MIN,
     YEAR_MAX: YEAR_MAX

@@ -42,7 +42,45 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>履歴書の学歴欄に書く<strong>「○年○月 △△高等学校 卒業」の年</strong>、すぐ出てきますか?生年月日を入れるだけで小学校から大学までの入学・卒業年を<strong>西暦・和暦の両方</strong>で表示します。早生まれ(1月1日〜4月1日)も正しく判定します。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 浪人・留年・休学の補正と学歴欄の文例</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">浪人・留年・休学を分けて補正する</h3>
+      <p class="adv-note">上のフォームの生年月日を使って、浪人(大学入学が遅れる)・留年・休学(大学卒業が延びる)を分けて入力した補正後の早見表を作ります。大学院に進んだ場合も表示できます。</p>
+      <label>浪人の年数
+        <input type="number" id="adv-ronin" min="0" max="10" step="1" value="0">
+      </label>
+      <label>大学での留年の年数
+        <input type="number" id="adv-ryunen" min="0" max="10" step="1" value="0">
+      </label>
+      <label>大学での休学の年数
+        <input type="number" id="adv-kyugaku" min="0" max="10" step="1" value="0">
+      </label>
+      <label>大学院への進学
+        <select id="adv-grad">
+          <option value="none" selected>なし(大学まで)</option>
+          <option value="master">修士課程まで(2年)</option>
+          <option value="doctor">博士課程まで(修士2年+博士3年)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-detail-run">補正後の早見表を作る</button>
+      <h3 class="adv-h">学歴欄の文例をつくる</h3>
+      <p class="adv-note">学校名を入れると、上の補正を反映した学歴欄の文例(コピーして使える形)を作ります。空欄の学校は「◯◯」のままになります。</p>
+      <label>中学校名
+        <input type="text" id="adv-jhs-name" placeholder="例: 品川区立◯◯中学校">
+      </label>
+      <label>高校名
+        <input type="text" id="adv-hs-name" placeholder="例: ◯◯高等学校">
+      </label>
+      <label>大学名・学部
+        <input type="text" id="adv-uni-name" placeholder="例: ◯◯大学◯◯学部">
+      </label>
+      <button type="button" id="adv-text-run">文例を作る</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>生年月日を入れるだけで、履歴書の学歴欄に書く<strong>入学・卒業の年</strong>が西暦・和暦の両方ですぐわかるツールです。早生まれ(1月1日〜4月1日)も正しく判定します。履歴書やエントリーシートを書く時にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -124,6 +162,77 @@
       "</tbody></table></div>" +
       (gap > 0 ? "<p>大学は調整" + gap + "年を加算しています。</p>" : "");
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advCalc() {
+    var birth = document.getElementById("birth").value;
+    var ronin = parseInt(document.getElementById("adv-ronin").value, 10) || 0;
+    var ryunen = parseInt(document.getElementById("adv-ryunen").value, 10) || 0;
+    var kyugaku = parseInt(document.getElementById("adv-kyugaku").value, 10) || 0;
+    var grad = document.getElementById("adv-grad").value;
+    return RirekiCalc.detailedYears(birth, ronin, ryunen, kyugaku, grad);
+  }
+  function advFail(code) {
+    var msg = code === "invalid_years" ? "浪人・留年・休学の年数は0〜10の整数で入力してください。"
+      : "上のフォームで生年月日を入力してください。";
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function advYm(y, m) {
+    return y + "年" + m + "月(" + RirekiCalc.wareki(y) + m + "月)";
+  }
+  document.getElementById("adv-detail-run").addEventListener("click", function () {
+    var r = advCalc();
+    if (!r.ok) { advFail(r.code); return; }
+    var rows = [
+      ["小学校 入学", r.elemIn], ["小学校 卒業", r.elemOut, true],
+      ["中学校 卒業", r.jhsOut, true],
+      ["高校 入学", r.hsIn], ["高校 卒業", r.hsOut, true],
+      ["大学 入学", r.uniIn], ["大学 卒業", r.uniOut, true]
+    ];
+    if (r.msIn !== null) rows.push(["大学院(修士)入学", r.msIn], ["大学院(修士)修了", r.msOut, true]);
+    if (r.drIn !== null) rows.push(["大学院(博士)入学", r.drIn], ["大学院(博士)修了", r.drOut, true]);
+    var html = '<div class="result-main">補正後の学歴早見表</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>できごと</th><th>年月</th></tr></thead><tbody>';
+    for (var i = 0; i < rows.length; i++) {
+      html += "<tr><td>" + rows[i][0] + "</td><td>" + advYm(rows[i][1], rows[i][2] ? 3 : 4) + "</td></tr>";
+    }
+    html += "</tbody></table></div>" +
+      '<p class="adv-note">卒業・修了は3月、入学は4月として表示しています。大学院は標準の年限(修士2年・博士3年)です。</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-text-run").addEventListener("click", function () {
+    var r = advCalc();
+    if (!r.ok) { advFail(r.code); return; }
+    var jhs = document.getElementById("adv-jhs-name").value || "◯◯中学校";
+    var hs = document.getElementById("adv-hs-name").value || "◯◯高等学校";
+    var uni = document.getElementById("adv-uni-name").value || "◯◯大学◯◯学部";
+    var lines = [
+      advYm(r.jhsOut, 3) + " " + jhs + " 卒業",
+      advYm(r.hsIn, 4) + " " + hs + " 入学",
+      advYm(r.hsOut, 3) + " " + hs + " 卒業",
+      advYm(r.uniIn, 4) + " " + uni + " 入学",
+      advYm(r.uniOut, 3) + " " + uni + " 卒業"
+    ];
+    if (r.msIn !== null) {
+      lines.push(advYm(r.msIn, 4) + " ◯◯大学大学院◯◯研究科(修士課程) 入学");
+      lines.push(advYm(r.msOut, 3) + " ◯◯大学大学院◯◯研究科(修士課程) 修了");
+    }
+    if (r.drIn !== null) {
+      lines.push(advYm(r.drIn, 4) + " ◯◯大学大学院◯◯研究科(博士課程) 入学");
+      lines.push(advYm(r.drOut, 3) + " ◯◯大学大学院◯◯研究科(博士課程) 修了");
+    }
+    advBox.innerHTML = '<div class="result-main">学歴欄の文例</div>' +
+      '<textarea rows="' + (lines.length + 1) + '" readonly style="width:100%;" aria-label="学歴欄の文例">' +
+      lines.join("\n").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</textarea>" +
+      '<p class="adv-note">西暦・和暦は提出先の書式に合わせてどちらかに統一してください。</p>';
+    advBox.hidden = false;
   });
 })();
 </script>

@@ -45,7 +45,44 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>アメリカの道路標識や中古車の走行距離、マラソンの「26.2マイル」、飛行機・船で使う「海里」——<strong>マイル・km・海里を定義値で正確に相互換算</strong>します。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 5単位の一覧表・速度の換算</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">km・マイル・海里・ヤード・フィートの一覧表</h3>
+      <p class="adv-note">1つの距離を5つの単位でまとめて表にします。ゴルフのヤード、身長や高度で使われるフィートもまとめて確認できます。</p>
+      <label>距離
+        <input type="number" id="adv-dist" min="0" step="any" placeholder="例: 100">
+      </label>
+      <label>入力の単位
+        <select id="adv-dist-unit">
+          <option value="km">キロメートル(km)</option>
+          <option value="mile" selected>マイル(mile)</option>
+          <option value="nm">海里(nm)</option>
+          <option value="yd">ヤード(yd)</option>
+          <option value="ft">フィート(ft)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-all-run">一覧表にする</button>
+      <div class="tool-result" id="adv-all-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">速度の換算(mph・km/h・ノット)</h3>
+      <p class="adv-note">アメリカの制限速度「65mph」や船・飛行機の「ノット」を時速kmに直せます。レンタカーや旅行の下調べに。</p>
+      <label>速度
+        <input type="number" id="adv-speed" min="0" step="any" placeholder="例: 65">
+      </label>
+      <label>入力の単位
+        <select id="adv-speed-unit">
+          <option value="mph" selected>mph(マイル毎時)</option>
+          <option value="kmh">km/h(時速キロ)</option>
+          <option value="kt">ノット(kt)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-speed-run">速度を換算する</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>数字を入れるだけで、<strong>マイルが何kmか(kmが何マイルか)</strong>がすぐわかるツールです。船や飛行機で使う「海里」にも対応しています。アメリカの道路標識やマラソンの距離、中古車の走行距離の確認にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -123,6 +160,54 @@
       "<tr><td>海里</td><td>" + r.nm.toLocaleString(undefined, { maximumFractionDigits: 4 }) + " nm</td></tr>" +
       "</tbody></table></div>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var allBox = document.getElementById("adv-all-result");
+  document.getElementById("adv-all-run").addEventListener("click", function () {
+    var r = MileCalc.convertAll(
+      parseFloat(document.getElementById("adv-dist").value),
+      document.getElementById("adv-dist-unit").value
+    );
+    if (!r.ok) {
+      allBox.innerHTML = '<p class="result-error">距離を0より大きい数値で入力してください。</p>';
+      allBox.hidden = false;
+      return;
+    }
+    var fmt = function (x) { return x.toLocaleString(undefined, { maximumFractionDigits: 4 }); };
+    allBox.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>単位</th><th>値</th></tr></thead><tbody>' +
+      '<tr><td>キロメートル(km)</td><td>' + fmt(r.km) + '</td></tr>' +
+      '<tr><td>マイル(mile)</td><td>' + fmt(r.mile) + '</td></tr>' +
+      '<tr><td>海里(nm)</td><td>' + fmt(r.nm) + '</td></tr>' +
+      '<tr><td>ヤード(yd)</td><td>' + fmt(r.yd) + '</td></tr>' +
+      '<tr><td>フィート(ft)</td><td>' + fmt(r.ft) + '</td></tr>' +
+      '</tbody></table></div>';
+    allBox.hidden = false;
+  });
+  document.getElementById("adv-speed-run").addEventListener("click", function () {
+    var r = MileCalc.convertSpeed(
+      parseFloat(document.getElementById("adv-speed").value),
+      document.getElementById("adv-speed-unit").value
+    );
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">速度を0より大きい数値で入力してください。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var fmt2 = function (x) { return x.toLocaleString(undefined, { maximumFractionDigits: 2 }); };
+    advBox.innerHTML =
+      '<div class="result-main">' + fmt2(r.kmh) + ' km/h</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>mph(マイル毎時)</td><td>' + fmt2(r.mph) + '</td></tr>' +
+      '<tr><td>km/h(時速キロ)</td><td>' + fmt2(r.kmh) + '</td></tr>' +
+      '<tr><td>ノット(kt)</td><td>' + fmt2(r.kt) + '</td></tr>' +
+      '</tbody></table></div>';
+    advBox.hidden = false;
   });
 })();
 </script>

@@ -110,7 +110,69 @@
     return { ok: true, date: toIso(c), weekday: weekdayOf(serial) };
   }
 
+  // 基準日に暦上の月数を加算する(月末を超える日は月末に丸める)
+  function shiftMonths(y, m, d, months) {
+    var total = y * 12 + (m - 1) + months;
+    var y2 = Math.floor(total / 12);
+    var m2 = (total % 12 + 12) % 12 + 1;
+    var d2 = Math.min(d, daysInMonth(y2, m2));
+    return { y: y2, m: m2, d: d2 };
+  }
+
+  /**
+   * 2つの日付の差を「週数+端数日」「月数+端数日の目安」でも表す。
+   * days は includeStart=true なら初日を含む(両端を含む日数)、false なら経過日数。
+   * 週数の内訳はその days を7で割った商と余り。
+   * 月数の目安は暦上の丸い月数(開始日と同じ「日」まで、月末超えは月末に丸め)+残り日数で、
+   * 初日を含む/含まないの設定に関わらず暦の差で計算する。
+   * @param {string} fromIso 開始日 "YYYY-MM-DD"
+   * @param {string} toIsoStr 終了日 "YYYY-MM-DD"
+   * @param {boolean} [includeStart=false] 初日を含めて数えるか
+   * @returns {{ok:true, days:number, weeks:number, weekDays:number, months:number, monthDays:number}
+   *          |{ok:false, code:string}}  code: "invalid_from"|"invalid_to"|"from_after_to"
+   */
+  function breakdown(fromIso, toIsoStr, includeStart) {
+    var base = between(fromIso, toIsoStr);
+    if (!base.ok) return base;
+    var f = parseDate(fromIso);
+    var t = parseDate(toIsoStr);
+    var days = base.days + (includeStart === true ? 1 : 0);
+    var months = (t.y - f.y) * 12 + (t.m - f.m) - (t.d < f.d ? 1 : 0);
+    var anchor = shiftMonths(f.y, f.m, f.d, months);
+    var monthDays = toSerial(t.y, t.m, t.d) - toSerial(anchor.y, anchor.m, anchor.d);
+    return {
+      ok: true,
+      days: days,
+      weeks: Math.floor(days / 7),
+      weekDays: days % 7,
+      months: months,
+      monthDays: monthDays
+    };
+  }
+
+  /**
+   * 基準日のNか月後(負なら前)の日付と曜日。
+   * 相手の月に同じ「日」がない場合は月末に丸める(1/31の1か月後→2/28など)。
+   * @param {string} baseIso 基準日 "YYYY-MM-DD"
+   * @param {number} months 加算する月数(整数、-1200〜1200)
+   * @returns {{ok:true, date:string, weekday:string}|{ok:false, code:string}}
+   *   code: "invalid_base" | "invalid_months" | "out_of_range"
+   */
+  function addMonths(baseIso, months) {
+    var b = parseDate(baseIso);
+    if (!b) return { ok: false, code: "invalid_base" };
+    if (typeof months !== "number" || !isFinite(months) ||
+        months !== Math.floor(months) || months < -1200 || months > 1200) {
+      return { ok: false, code: "invalid_months" };
+    }
+    var c = shiftMonths(b.y, b.m, b.d, months);
+    if (c.y < YEAR_MIN || c.y > YEAR_MAX) return { ok: false, code: "out_of_range" };
+    return { ok: true, date: toIso(c), weekday: weekdayOf(toSerial(c.y, c.m, c.d)) };
+  }
+
   var api = {
+    addMonths: addMonths,
+    breakdown: breakdown,
     between: between,
     addDays: addDays,
     YEAR_MIN: YEAR_MIN,

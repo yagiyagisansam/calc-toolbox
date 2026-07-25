@@ -45,7 +45,38 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>摂氏(°C)・華氏(°F)・ケルビン(K)を<strong>一発で相互変換</strong>します。海外レシピのオーブン温度(°F)、アメリカの天気予報、理科・物理の課題に。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 早見表とオーブン設定の目安</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">摂氏⇔華氏の早見表を作る</h3>
+      <p class="adv-note">開始・終了・刻みを決めると対応表を作ります。海外レシピや旅行前の気温チェックで、表をそのまま見ながら使えます。</p>
+      <label>開始温度
+        <input type="number" id="adv-start" step="any" value="300" placeholder="例: 300">
+      </label>
+      <label>終了温度
+        <input type="number" id="adv-end" step="any" value="450" placeholder="例: 450">
+      </label>
+      <label>刻み
+        <input type="number" id="adv-step" step="any" min="0.01" value="25" placeholder="例: 25">
+      </label>
+      <label>入力の単位
+        <select id="adv-unit">
+          <option value="f" selected>華氏(°F)</option>
+          <option value="c">摂氏(°C)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-run">早見表を作る</button>
+      <h3 class="adv-h">オーブンを何度に設定すればいい?</h3>
+      <p class="adv-note">レシピの華氏(°F)を入れると、日本のオーブンで設定しやすい10°C単位の目安と、英国レシピのガスマーク相当を表示します。</p>
+      <label>レシピのオーブン温度(°F)
+        <input type="number" id="adv-oven-f" min="100" max="600" step="any" value="350" placeholder="例: 350">
+      </label>
+      <button type="button" id="adv-oven-run">設定温度の目安を見る</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>温度の数字を入れるだけで、<strong>摂氏(°C)・華氏(°F)・ケルビン(K)の3つの値</strong>がすぐわかるツールです。海外レシピのオーブン温度(°F)やアメリカの天気予報を日本の温度に直したい時にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -129,6 +160,54 @@
       "<tr><td>ケルビン(K)</td><td>" + r.k.toLocaleString() + "</td></tr>" +
       "</tbody></table></div>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var ADV_ERRORS = {
+    invalid_value: "数値を入力してください。",
+    invalid_unit: "単位を選んでください。",
+    invalid_range: "終了温度は開始温度以上にしてください。",
+    invalid_step: "刻みは0より大きい数値にしてください。",
+    too_many_rows: "行数が多すぎます(101行まで)。刻みを大きくしてください。",
+    below_absolute_zero: "絶対零度(−273.15°C / −459.67°F)より低い温度は存在しません。",
+    out_of_range: "オーブン温度は100〜600°Fの範囲で入力してください。"
+  };
+  function advError(code) {
+    advBox.innerHTML = '<p class="result-error">' + (ADV_ERRORS[code] || "入力値を確認してください。") + "</p>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", function () {
+    var start = parseFloat(document.getElementById("adv-start").value);
+    var end = parseFloat(document.getElementById("adv-end").value);
+    var step = parseFloat(document.getElementById("adv-step").value);
+    var unit = document.getElementById("adv-unit").value;
+    var r = OndoCalc.makeTable(start, end, step, unit);
+    if (!r.ok) { advError(r.code); return; }
+    var html = '<div class="result-main">早見表(' + r.count.toLocaleString() + '行)</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>摂氏(°C)</th><th>華氏(°F)</th></tr></thead><tbody>';
+    for (var i = 0; i < r.rows.length; i++) {
+      html += "<tr><td>" + r.rows[i].c.toLocaleString() + "</td><td>" + r.rows[i].f.toLocaleString() + "</td></tr>";
+    }
+    html += "</tbody></table></div>";
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-oven-run").addEventListener("click", function () {
+    var f = parseFloat(document.getElementById("adv-oven-f").value);
+    var r = OndoCalc.ovenSetting(f);
+    if (!r.ok) { advError(r.code); return; }
+    var html = '<div class="result-main">' + f.toLocaleString() + '°F → 約' + r.cOven.toLocaleString() + '°Cに設定</div>' +
+      "<p>正確には " + r.cExact.toLocaleString() + " °C です。日本の家庭用オーブンは10°C刻みの機種が多いため、<strong>" +
+      r.cOven.toLocaleString() + " °C</strong> を目安にしてください。</p>";
+    if (r.gasMark !== null) {
+      html += '<p class="adv-note">英国レシピのガスマークでは Mark ' + r.gasMark + ' に相当します。</p>';
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
   });
 })();
 </script>

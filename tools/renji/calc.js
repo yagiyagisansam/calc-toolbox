@@ -43,7 +43,29 @@
     };
   }
 
+  /**
+   * 表記の加熱時間を、主なワット数(500/600/700/800/1000W)すべてに一括換算した表を返す。
+   * 換算は convert と同じ「電力(W)×時間(秒)が一定」の考え方を使う。
+   * 丸め方針: seconds は四捨五入、rounded10 は10秒単位に切り上げ(convert と同じ)。
+   * @param {number} seconds 表記の加熱時間(秒)
+   * @param {number} fromW 表記のワット数
+   * @returns {{ok:true, rows:Array<{w:number, seconds:number, rounded10:number}>}
+   *          |{ok:false, code:string}}
+   *   code: "invalid_time" | "invalid_watt"
+   */
+  function multiTable(seconds, fromW) {
+    var watts = [500, 600, 700, 800, 1000];
+    var rows = [];
+    for (var i = 0; i < watts.length; i++) {
+      var r = convert(seconds, fromW, watts[i]);
+      if (!r.ok) return r;
+      rows.push({ w: watts[i], seconds: r.seconds, rounded10: r.rounded10 });
+    }
+    return { ok: true, rows: rows };
+  }
+
   var api = {
+    multiTable: multiTable,
     convert: convert,
     W_MIN: W_MIN,
     W_MAX: W_MAX

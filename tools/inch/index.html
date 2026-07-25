@@ -59,11 +59,43 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: テレビ・モニターの実寸と視聴距離・サイズ比較</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">テレビ・モニターの実寸と視聴距離の目安</h3>
+      <p class="adv-note">「○インチ」は画面の対角線の長さです。実際の幅・高さ(cm)と、快適に見られる距離の目安(フルHD: 画面の高さ×3、4K: 高さ×1.5)を計算します。設置場所に入るかの確認に。</p>
+      <label>画面サイズ(インチ)
+        <input type="number" id="adv-inch" inputmode="decimal" step="any" min="0.001" max="1000" placeholder="例: 65">
+      </label>
+      <label>画面比(横:縦)
+        <select id="adv-ratio">
+          <option value="16:9" selected>16:9(テレビ・一般的なモニター)</option>
+          <option value="16:10">16:10(一部PCモニター)</option>
+          <option value="21:9">21:9(ウルトラワイド)</option>
+          <option value="4:3">4:3(昔のテレビ・iPad)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-screen-run">実寸と距離を計算</button>
+      <div class="tool-result" id="adv-screen-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">買い替え前後のサイズ比較</h3>
+      <p class="adv-note">「24インチから27インチにすると、どれくらい大きくなる?」を数字で確認できます。画面比は上で選んだものを使います。</p>
+      <label>今のサイズ(インチ)
+        <input type="number" id="adv-inch-a" inputmode="decimal" step="any" min="0.001" max="1000" placeholder="例: 24">
+      </label>
+      <label>検討中のサイズ(インチ)
+        <input type="number" id="adv-inch-b" inputmode="decimal" step="any" min="0.001" max="1000" placeholder="例: 27">
+      </label>
+      <button type="button" id="adv-compare-run">比較する</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
   <div class="note-box">
     テレビ・モニターの「◯インチ」は<strong>画面の対角線の長さ</strong>です。横幅ではないのでご注意ください(例: 65インチ=対角約165cm、横幅は約144cm程度)。
   </div>
 
-  <p><strong>インチ⇔センチメートル</strong>と<strong>ポンド⇔キログラム</strong>を相互に変換します。テレビ・モニターのサイズや、海外通販・海外のジムでよく出てくる単位の換算に。</p>
+  <p>数字を入れるだけで、<strong>インチをcmに(cmをインチに)</strong>すぐ直せるツールです。ポンドとkgの重さの変換もできます。テレビやモニターのサイズ確認、海外通販の服・体重表記のチェックにどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -158,6 +190,58 @@
     if (!r.ok) { showError(r.code); return; }
     box.innerHTML = '<div class="result-main">' + r.lb.toLocaleString() + " lb = " + r.kg.toLocaleString() + " kg</div>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function ratioParts() {
+    var v = document.getElementById("adv-ratio").value.split(":");
+    return [parseInt(v[0], 10), parseInt(v[1], 10)];
+  }
+  var screenBox = document.getElementById("adv-screen-result");
+  document.getElementById("adv-screen-run").addEventListener("click", function () {
+    var ratio = ratioParts();
+    var r = InchCalc.screenSize(parseFloat(document.getElementById("adv-inch").value), ratio[0], ratio[1]);
+    if (!r.ok) {
+      screenBox.innerHTML = '<p class="result-error">画面サイズを0より大きい数値(インチ)で入力してください。</p>';
+      screenBox.hidden = false;
+      return;
+    }
+    screenBox.innerHTML =
+      '<div class="result-main">幅 ' + r.widthCm.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      ' cm × 高さ ' + r.heightCm.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>対角線</td><td>' + r.diagonalCm.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td></tr>' +
+      '<tr><td>視聴距離の目安(フルHD)</td><td>約 ' + r.distFullHdCm.toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' cm(高さ×3)</td></tr>' +
+      '<tr><td>視聴距離の目安(4K)</td><td>約 ' + r.dist4kCm.toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' cm(高さ×1.5)</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">画面部分だけの寸法です。実際の製品は枠(ベゼル)や台座のぶん少し大きくなります。</p>';
+    screenBox.hidden = false;
+  });
+  document.getElementById("adv-compare-run").addEventListener("click", function () {
+    var ratio = ratioParts();
+    var r = InchCalc.compareScreens(
+      parseFloat(document.getElementById("adv-inch-a").value),
+      parseFloat(document.getElementById("adv-inch-b").value),
+      ratio[0], ratio[1]
+    );
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">2つのサイズを0より大きい数値(インチ)で入力してください。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var up = r.areaRatePct >= 0 ? "広くなります" : "狭くなります";
+    advBox.innerHTML =
+      '<div class="result-main">画面の面積が約 ' + Math.abs(r.areaRatePct).toLocaleString(undefined, { maximumFractionDigits: 1 }) + '% ' + up + '</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th></th><th>幅</th><th>高さ</th></tr></thead><tbody>' +
+      '<tr><td>今</td><td>' + r.widthA.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td><td>' + r.heightA.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td></tr>' +
+      '<tr><td>検討中</td><td>' + r.widthB.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td><td>' + r.heightB.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td></tr>' +
+      '<tr><td>差</td><td>' + r.widthDiff.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td><td>' + r.heightDiff.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td></tr>' +
+      '</tbody></table></div>';
+    advBox.hidden = false;
   });
 })();
 </script>

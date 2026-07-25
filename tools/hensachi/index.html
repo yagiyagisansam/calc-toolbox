@@ -54,11 +54,33 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 偏差値から順位、順位から偏差値</summary>
+    <div class="adv-inner">
+      <p class="adv-note">どちらも「得点の分布が正規分布に近い」とみなした<strong>近似計算</strong>です。実際の試験の分布とはずれることがあります。</p>
+      <h3 class="adv-h">偏差値は上位何%・何位くらい?</h3>
+      <label>偏差値
+        <input type="number" id="adv-t" min="0" max="100" step="any" value="60" placeholder="例: 60">
+      </label>
+      <label>受験者数(人)
+        <input type="number" id="adv-n" min="1" max="10000000" step="1" value="10000" placeholder="例: 10000">
+      </label>
+      <button type="button" id="adv-rank-run">上位%と順位を計算する</button>
+      <h3 class="adv-h">順位から偏差値を逆算する</h3>
+      <p class="adv-note">「1200人中300位」のような結果から、偏差値のめやすを出します(受験者数は上の欄の値を使います)。</p>
+      <label>あなたの順位(位)
+        <input type="number" id="adv-rank" min="1" max="10000000" step="1" placeholder="例: 300">
+      </label>
+      <button type="button" id="adv-t-run">偏差値を逆算する</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
   <div class="note-box">
     偏差値は<strong>受験した集団の中での相対的な位置</strong>を表す値です。集団(模試の受験者層)が変われば、同じ実力でも偏差値は変わります。異なる模試の偏差値を直接比べることはできません。
   </div>
 
-  <p><strong>得点・平均点・標準偏差</strong>から偏差値を計算します。標準偏差がわからなくても、<strong>点数のリスト</strong>(クラス全員の点数など)を入力すれば平均・標準偏差・全員分の偏差値を一括計算できます。</p>
+  <p>テストの得点・平均点・標準偏差を入れるだけで、<strong>自分の偏差値</strong>がすぐわかるツールです。標準偏差がわからなくても、クラス全員の点数リストを貼れば平均・標準偏差ごと一括計算できます。模試の結果確認や成績処理にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -153,6 +175,55 @@
       '<div class="table-scroll"><table class="data-table"><thead><tr><th>点数</th><th>偏差値</th></tr></thead><tbody>' +
       rows + "</tbody></table></div>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advFail(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-rank-run").addEventListener("click", function () {
+    var t = parseFloat(document.getElementById("adv-t").value);
+    var n = parseInt(document.getElementById("adv-n").value, 10);
+    var r = HensachiCalc.toRank(t, n);
+    if (!r.ok) {
+      advFail(r.code === "invalid_t" ? "偏差値は0〜100の範囲で入力してください。" : "受験者数は1人以上の整数で入力してください。");
+      return;
+    }
+    var html = '<div class="result-main">偏差値' + t.toLocaleString() + ' は上位 ' +
+      r.topPct.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '%</div>' +
+      "<p>" + n.toLocaleString() + "人中 <strong>およそ" + r.rank.toLocaleString() + "位</strong> に相当します(正規分布による近似)。</p>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>偏差値</th><th>上位%</th><th>' +
+      n.toLocaleString() + '人中の順位</th></tr></thead><tbody>';
+    var list = [70, 65, 60, 55, 50, 45, 40];
+    for (var i = 0; i < list.length; i++) {
+      var row = HensachiCalc.toRank(list[i], n);
+      html += "<tr><td>" + list[i] + "</td><td>" +
+        row.topPct.toLocaleString(undefined, { maximumFractionDigits: 2 }) + "%</td><td>約 " +
+        row.rank.toLocaleString() + " 位</td></tr>";
+    }
+    html += "</tbody></table></div>";
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-t-run").addEventListener("click", function () {
+    var rank = parseInt(document.getElementById("adv-rank").value, 10);
+    var n = parseInt(document.getElementById("adv-n").value, 10);
+    var r = HensachiCalc.fromRank(rank, n);
+    if (!r.ok) {
+      advFail(r.code === "invalid_rank" ? "順位は1〜受験者数の整数で入力してください。" : "受験者数は1人以上の整数で入力してください。");
+      return;
+    }
+    advBox.innerHTML = '<div class="result-main">偏差値のめやす: ' +
+      r.t.toLocaleString(undefined, { maximumFractionDigits: 1 }) + '</div>' +
+      "<p>" + n.toLocaleString() + "人中" + rank.toLocaleString() +
+      "位は、偏差値 <strong>約" + r.t.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      "</strong> に相当します(正規分布による近似)。</p>";
+    advBox.hidden = false;
   });
 })();
 </script>

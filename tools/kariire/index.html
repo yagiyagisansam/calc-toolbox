@@ -48,7 +48,29 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>「年収500万円だと、いくらの家が買える?」——年収と返済負担率から<strong>住宅ローンの借入可能額の目安</strong>を逆算します。毎月の返済額も同時に表示。無理のない予算感をつかむ最初の一歩に。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 金利が上がったら? と 買える物件価格</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">金利上昇シナリオ(変動金利のリスクチェック)</h3>
+      <p class="adv-note">借入額を入れると、金利が今より +0.5% / +1% / +2% 上がった場合の毎月返済額を比べられます。金利と期間は上のフォームの値を使います。空欄なら上のフォームの計算結果(借入可能額)を使います。</p>
+      <label>借入額(万円)
+        <input type="number" id="adv-loan" inputmode="numeric" step="any" min="100" max="100000" placeholder="空欄なら上の計算結果を使用">
+      </label>
+      <button type="button" id="adv-scenario-run">金利上昇シナリオを計算</button>
+      <h3 class="adv-h">買える物件価格の目安</h3>
+      <p class="adv-note">物件価格 =(借入額 + 頭金)÷(1 + 諸費用率)で概算します。諸費用は物件価格の5〜10%が目安です。借入額は上と同じ(空欄なら計算結果)を使います。</p>
+      <label>頭金(万円)
+        <input type="number" id="adv-down" inputmode="numeric" step="any" min="0" max="100000" value="0">
+      </label>
+      <label>諸費用率(%)
+        <input type="number" id="adv-fee" inputmode="decimal" step="any" min="0" max="20" value="8">
+      </label>
+      <button type="button" id="adv-budget-run">物件予算を計算</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>年収を入れるだけで、<strong>住宅ローンをいくらまで借りられそうか</strong>の目安がわかるツールです。毎月の返済額も一緒に表示します。家探しを始める前の予算決めにどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -132,6 +154,75 @@
       "<p>毎月の返済額: 約<strong>" + r.monthly.toLocaleString() + "円</strong></p>" +
       "<p>※目安の概算です。実際の審査額は審査金利・他の借入等で変わります。</p>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var MAN = 10000;
+  function showError(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function readLoanYen() {
+    var v = parseFloat(document.getElementById("adv-loan").value);
+    if (!isNaN(v)) return v * MAN;
+    var income = parseFloat(document.getElementById("income").value);
+    var burden = parseFloat(document.getElementById("burden").value);
+    var rate = parseFloat(document.getElementById("rate").value);
+    var years = parseInt(document.getElementById("years").value, 10);
+    if (isNaN(income) || isNaN(burden) || isNaN(rate) || isNaN(years)) return null;
+    var r = KariireCalc.borrowable(income * MAN, burden, rate, years);
+    return r.ok ? r.loan : null;
+  }
+  document.getElementById("adv-scenario-run").addEventListener("click", function () {
+    var loanYen = readLoanYen();
+    var rate = parseFloat(document.getElementById("rate").value);
+    var years = parseInt(document.getElementById("years").value, 10);
+    if (loanYen === null || isNaN(rate) || isNaN(years)) {
+      showError("借入額(万円)を入力するか、上のフォームを先に入力してください。");
+      return;
+    }
+    var r = KariireCalc.rateScenarios(loanYen, rate, years);
+    if (!r.ok) {
+      showError(r.code === "invalid_rate" ? "金利は0〜18%の範囲で入力してください(+2%の比較まで行うため)。" : "借入額は100万〜10億円、期間は1〜50年で入力してください。");
+      return;
+    }
+    var html = '<div class="result-main">金利+1%で毎月 +' + r.rows[2].monthlyDiff.toLocaleString() + " 円</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>金利</th><th>毎月返済額</th><th>毎月の増加</th><th>総返済額</th></tr></thead><tbody>';
+    for (var i = 0; i < r.rows.length; i++) {
+      var row = r.rows[i];
+      html += "<tr><td>" + (row.delta === 0 ? "現在 " : "+" + row.delta + "% ") + row.rate + "%</td>" +
+        "<td>" + row.monthly.toLocaleString() + " 円</td>" +
+        "<td>" + (row.monthlyDiff === 0 ? "-" : "+" + row.monthlyDiff.toLocaleString() + " 円") + "</td>" +
+        "<td>" + row.total.toLocaleString() + " 円</td></tr>";
+    }
+    html += "</tbody></table></div>" +
+      '<p class="adv-note">借入額 ' + Math.round(loanYen / MAN).toLocaleString() + " 万円・元利均等の概算です。変動金利を選ぶ場合はこの上昇に耐えられるかを確認しておくと安心です。</p>";
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-budget-run").addEventListener("click", function () {
+    var loanYen = readLoanYen();
+    if (loanYen === null) {
+      showError("借入額(万円)を入力するか、上のフォームを先に入力してください。");
+      return;
+    }
+    var down = parseFloat(document.getElementById("adv-down").value);
+    var fee = parseFloat(document.getElementById("adv-fee").value);
+    if (isNaN(down) || isNaN(fee)) { showError("頭金と諸費用率を入力してください。"); return; }
+    var r = KariireCalc.propertyBudget(loanYen, down * MAN, fee);
+    if (!r.ok) { showError("借入額は100万〜10億円、頭金は0円以上、諸費用率は0〜20%で入力してください。"); return; }
+    advBox.innerHTML =
+      '<div class="result-main">物件価格の目安 約 ' + Math.round(r.budget / MAN).toLocaleString() + " 万円</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>借入額 + 頭金</td><td>" + Math.round((loanYen + down * MAN) / MAN).toLocaleString() + " 万円</td></tr>" +
+      "<tr><td>うち諸費用(" + fee + "%)</td><td>約 " + Math.round(r.fees / MAN).toLocaleString() + " 万円</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">諸費用を物件価格に比例(' + fee + "%)と仮定した概算です。実際の諸費用は物件種別・仲介の有無で変わります。</p>";
+    advBox.hidden = false;
   });
 })();
 </script>

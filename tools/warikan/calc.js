@@ -47,7 +47,71 @@
     return { ok: true, perPerson: perPerson, collected: collected, surplus: collected - totalYen };
   }
 
+  /**
+   * 傾斜配分の割り勘: 「多めに払う人」(先輩・上司など)が普通の人の○倍払う分け方。
+   * 普通の人 = 合計 ÷ (多め人数 × 倍率 + 普通人数) を円未満切り捨て。
+   * 多めの人 = (合計 − 普通の人 × 普通人数) ÷ 多め人数 を円未満切り上げ(端数は多め側が吸収)。
+   * 集金合計 − 合計金額 = 余り(切り上げで生じた分・幹事の手元に残る)。
+   * @param {number} totalYen 合計金額(円・整数・1〜1,000万)
+   * @param {number} heavyCount 多めに払う人数(1〜99の整数)
+   * @param {number} multiplier 倍率(普通の人の何倍払うか・1〜10)
+   * @param {number} normalCount 普通に払う人数(1〜99の整数)
+   * @returns {{ok:true, heavyPay:number, normalPay:number, collected:number, surplus:number}
+   *          |{ok:false, code:string}}
+   *   code: "invalid_total" | "invalid_people" | "invalid_mult"
+   */
+  function weightedSplit(totalYen, heavyCount, multiplier, normalCount) {
+    if (!isFiniteNumber(totalYen) || totalYen !== Math.floor(totalYen) ||
+        totalYen < TOTAL_MIN_YEN || totalYen > TOTAL_MAX_YEN) {
+      return { ok: false, code: "invalid_total" };
+    }
+    if (!isFiniteNumber(heavyCount) || heavyCount !== Math.floor(heavyCount) || heavyCount < 1 || heavyCount > 99) {
+      return { ok: false, code: "invalid_people" };
+    }
+    if (!isFiniteNumber(normalCount) || normalCount !== Math.floor(normalCount) || normalCount < 1 || normalCount > 99) {
+      return { ok: false, code: "invalid_people" };
+    }
+    if (heavyCount + normalCount > PEOPLE_MAX) {
+      return { ok: false, code: "invalid_people" };
+    }
+    if (!isFiniteNumber(multiplier) || multiplier < 1 || multiplier > 10) {
+      return { ok: false, code: "invalid_mult" };
+    }
+    var normalPay = Math.floor(totalYen / (heavyCount * multiplier + normalCount));
+    var rest = totalYen - normalPay * normalCount;
+    var heavyPay = Math.ceil(rest / heavyCount);
+    var collected = heavyPay * heavyCount + normalPay * normalCount;
+    return { ok: true, heavyPay: heavyPay, normalPay: normalPay, collected: collected, surplus: collected - totalYen };
+  }
+
+  /**
+   * 集金額の過不足チェック: 「1人○円ずつ集めたら足りる?」を確認する。
+   * 差額 = 集金額 × 人数 − 合計金額(プラスなら余り・マイナスなら不足)。
+   * @param {number} totalYen 合計金額(円・整数・1〜1,000万)
+   * @param {number} people 人数(2〜100の整数)
+   * @param {number} perYen 1人から集める額(円・整数・1〜1,000万)
+   * @returns {{ok:true, collected:number, diff:number}|{ok:false, code:string}}
+   *   code: "invalid_total" | "invalid_people" | "invalid_per"
+   */
+  function collectCheck(totalYen, people, perYen) {
+    if (!isFiniteNumber(totalYen) || totalYen !== Math.floor(totalYen) ||
+        totalYen < TOTAL_MIN_YEN || totalYen > TOTAL_MAX_YEN) {
+      return { ok: false, code: "invalid_total" };
+    }
+    if (!isFiniteNumber(people) || people !== Math.floor(people) ||
+        people < PEOPLE_MIN || people > PEOPLE_MAX) {
+      return { ok: false, code: "invalid_people" };
+    }
+    if (!isFiniteNumber(perYen) || perYen !== Math.floor(perYen) || perYen < 1 || perYen > TOTAL_MAX_YEN) {
+      return { ok: false, code: "invalid_per" };
+    }
+    var collected = perYen * people;
+    return { ok: true, collected: collected, diff: collected - totalYen };
+  }
+
   var api = {
+    collectCheck: collectCheck,
+    weightedSplit: weightedSplit,
     split: split,
     TOTAL_MIN_YEN: TOTAL_MIN_YEN,
     TOTAL_MAX_YEN: TOTAL_MAX_YEN,

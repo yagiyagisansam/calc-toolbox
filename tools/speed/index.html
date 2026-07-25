@@ -46,7 +46,41 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>「時速80kmで150km先までは何時間?」「10kmを50分で走ったら時速いくつ?」——<strong>速さ・距離・時間のうち2つを入れるだけ</strong>で残りを計算します。小学校で習う「はじき(みはじ)」の計算をそのままツールにしました。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 到着時刻・出発時刻・分速/秒速</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">何時に着く? 到着時刻を計算</h3>
+      <p class="adv-note">出発時刻・距離・速さ(平均時速)を入れると到着予定時刻を計算します。途中の休憩時間(合計)も足せます。ドライブや帰省の計画に。</p>
+      <label>出発時刻
+        <input type="time" id="adv-dep-time" value="09:00">
+      </label>
+      <label>距離(km)
+        <input type="number" id="adv-dist" min="0.1" max="100000" step="any" value="150" placeholder="例: 150">
+      </label>
+      <label>速さ(平均時速 km/h)
+        <input type="number" id="adv-speed" min="0.1" max="5000" step="any" value="80" placeholder="例: 80">
+      </label>
+      <label>休憩時間の合計(分)
+        <input type="number" id="adv-break" min="0" max="100000" step="1" value="0" placeholder="例: 20">
+      </label>
+      <button type="button" id="adv-arr-run">到着時刻を計算する</button>
+      <h3 class="adv-h">何時に出発すればいい? 逆算</h3>
+      <p class="adv-note">着きたい時刻を入れると、出発すべき時刻を逆算します。距離・速さ・休憩は上の欄の値を使います。</p>
+      <label>到着したい時刻
+        <input type="time" id="adv-arr-time" value="12:00">
+      </label>
+      <button type="button" id="adv-dep-run">出発時刻を逆算する</button>
+      <h3 class="adv-h">時速を分速・秒速に直す</h3>
+      <p class="adv-note">理科の宿題でよく使う「時速→分速・秒速(m/s)」の換算です。</p>
+      <label>時速(km/h)
+        <input type="number" id="adv-kmh" min="0.1" max="5000" step="any" placeholder="例: 60">
+      </label>
+      <button type="button" id="adv-unit-run">分速・秒速に直す</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>速さ・距離・時間のうち<strong>2つを入れるだけで、残りの1つ</strong>がすぐわかるツールです。「時速80kmで150km先まで何時間?」のような計算を、学校で習う「はじき」の式そのままで行います。宿題の検算やドライブの計画にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -128,6 +162,74 @@
       "<tr><td>時間</td><td><strong>" + r.timeH + "時間" + r.timeM + "分</strong>(" + r.timeMin.toLocaleString() + "分)</td></tr>" +
       "</tbody></table></div>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advReadCommon() {
+    var d = parseFloat(document.getElementById("adv-dist").value);
+    var s = parseFloat(document.getElementById("adv-speed").value);
+    var b = parseFloat(document.getElementById("adv-break").value);
+    if (isNaN(b)) b = 0;
+    return { d: d, s: s, b: b };
+  }
+  function advParseTime(id) {
+    var v = document.getElementById(id).value;
+    var m = v.match(/^(\d{1,2}):(\d{2})$/);
+    if (!m) return null;
+    return { h: parseInt(m[1], 10), m: parseInt(m[2], 10) };
+  }
+  function advPad(n) { return (n < 10 ? "0" : "") + n; }
+  function advDur(min) {
+    var h = Math.floor(min / 60);
+    var m = min % 60;
+    return (h > 0 ? h + "時間" : "") + (m > 0 || h === 0 ? m + "分" : "");
+  }
+  function advFail(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-arr-run").addEventListener("click", function () {
+    var t = advParseTime("adv-dep-time");
+    if (!t) { advFail("出発時刻を入力してください。"); return; }
+    var c = advReadCommon();
+    var r = SpeedCalc.arrival(t.h, t.m, c.d, c.s, c.b);
+    if (!r.ok) { advFail("距離・速さ・休憩時間を正しく入力してください。"); return; }
+    advBox.innerHTML =
+      '<div class="result-main">' + (r.daysLater > 0 ? "翌日 " : "") + r.arriveH + ":" + advPad(r.arriveM) + ' 到着予定</div>' +
+      "<p>移動 " + advDur(r.travelMin) + (c.b > 0 ? " + 休憩 " + advDur(Math.round(c.b)) : "") +
+      " = 合計 <strong>" + advDur(r.totalMin) + "</strong> かかります。" +
+      (r.daysLater > 1 ? "(" + r.daysLater + "日後の到着です)" : "") + "</p>" +
+      '<p class="adv-note">信号や渋滞は含みません。車では平均時速を控えめに(高速80km/h・一般道30km/h程度)見積もると現実的です。</p>';
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-dep-run").addEventListener("click", function () {
+    var t = advParseTime("adv-arr-time");
+    if (!t) { advFail("到着したい時刻を入力してください。"); return; }
+    var c = advReadCommon();
+    var r = SpeedCalc.departure(t.h, t.m, c.d, c.s, c.b);
+    if (!r.ok) { advFail("距離・速さ・休憩時間を正しく入力してください。"); return; }
+    advBox.innerHTML =
+      '<div class="result-main">' + (r.prevDay ? "前日 " : "") + r.depH + ":" + advPad(r.depM) + ' に出発</div>' +
+      "<p>所要時間は合計 <strong>" + advDur(r.totalMin) + "</strong>(移動 " + advDur(r.travelMin) +
+      (c.b > 0 ? " + 休憩 " + advDur(Math.round(c.b)) : "") + ")です。</p>";
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-unit-run").addEventListener("click", function () {
+    var kmh = parseFloat(document.getElementById("adv-kmh").value);
+    var r = SpeedCalc.speedUnits(kmh);
+    if (!r.ok) { advFail("時速を0より大きい数値で入力してください。"); return; }
+    advBox.innerHTML =
+      '<div class="result-main">時速' + kmh.toLocaleString() + "km = 秒速" +
+      r.mPerSec.toLocaleString(undefined, { maximumFractionDigits: 2 }) + "m</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>分速</td><td>" + r.mPerMin.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " m/分</td></tr>" +
+      "<tr><td>秒速</td><td>" + r.mPerSec.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " m/s</td></tr>" +
+      "</tbody></table></div>";
+    advBox.hidden = false;
   });
 })();
 </script>

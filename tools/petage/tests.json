@@ -127,6 +127,95 @@
         "ok": false,
         "code": "invalid_age"
       }
+    },
+    {
+      "name": "逆換算: 人間24歳はペット2歳(境界)",
+      "func": "petAge",
+      "args": [
+        "dog",
+        24
+      ],
+      "expect": {
+        "ok": true,
+        "petAge": 2
+      }
+    },
+    {
+      "name": "逆換算: 人間15歳は1歳、人間40歳は6歳",
+      "func": "petAge",
+      "args": [
+        "cat",
+        40
+      ],
+      "expect": {
+        "ok": true,
+        "petAge": 6
+      }
+    },
+    {
+      "name": "逆換算: 人間35歳は約4.8歳(端数の四捨五入)",
+      "func": "petAge",
+      "args": [
+        "dog",
+        35
+      ],
+      "expect": {
+        "ok": true,
+        "petAge": 4.8
+      }
+    },
+    {
+      "name": "逆換算: 1.5歳未満はエラー",
+      "func": "petAge",
+      "args": [
+        "cat",
+        1
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_age"
+      }
+    },
+    {
+      "name": "逆換算: 対象外の種類はエラー",
+      "func": "petAge",
+      "args": [
+        "bird",
+        30
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_type"
+      }
+    },
+    {
+      "name": "早見表: 1〜20歳の20行(1歳=15歳、2歳=24歳、7歳=44歳シニア期、20歳=96歳)",
+      "func": "ageTable",
+      "args": [],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "0": {
+            "age": 1,
+            "human": 15,
+            "stage": "成年期"
+          },
+          "1": {
+            "age": 2,
+            "human": 24
+          },
+          "6": {
+            "age": 7,
+            "human": 44,
+            "stage": "シニア期"
+          },
+          "19": {
+            "age": 20,
+            "human": 96
+          },
+          "length": 20
+        }
+      }
     }
   ]
 }

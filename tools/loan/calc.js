@@ -62,7 +62,111 @@
     };
   }
 
+  /**
+   * 月次の残高スケジュールを計算する内部関数。
+   * 利息 = 残高 × 月利(内部では小数のまま、合計のみ最後に円未満四捨五入)。
+   * 契約上の最終回(nSchedule回目)には残高全額を返済して完済扱いとする(最終回調整)。
+   * @param {number} principalYen 借入額(円)
+   * @param {number} monthlyRate 月利(年利÷12÷100)
+   * @param {number} monthly 毎月返済額(円)
+   * @param {number} nSchedule 契約返済回数
+   * @param {number} prepayMonth 繰上返済を行う回(0なら繰上なし)
+   * @param {number} prepayYen 繰上返済額(円)
+   * @returns {{months:number, interest:number, tooLarge:boolean}}
+   */
+  function simulateSchedule(principalYen, monthlyRate, monthly, nSchedule, prepayMonth, prepayYen) {
+    var b = principalYen;
+    var months = 0;
+    var interest = 0;
+    var k = 0;
+    var tooLarge = false;
+    while (b > 0 && k < nSchedule) {
+      k++;
+      var i = b * monthlyRate;
+      interest += i;
+      if (b + i <= monthly || k === nSchedule) { b = 0; months = k; break; }
+      b = b + i - monthly;
+      if (k === prepayMonth) {
+        if (prepayYen >= b) { tooLarge = true; break; }
+        b -= prepayYen;
+      }
+    }
+    return { months: months, interest: Math.round(interest), tooLarge: tooLarge };
+  }
+
+  /**
+   * 繰上返済(期間短縮型)のシミュレーション。
+   * 毎月返済額は calculate() と同じ値(円未満四捨五入)を使い、月次残高スケジュールで
+   * 「繰上なし」と「○年後に繰上」を比較する。利息軽減額 = 両者の利息合計の差。
+   * 繰上返済後も毎月返済額は変えず、完済が早まる(期間短縮型)。
+   * @param {number} principalYen 借入額(円)
+   * @param {number} annualRatePercent 年利(%)
+   * @param {number} years 返済期間(年・整数)
+   * @param {number} afterYears 繰上返済の時期(○年後・1〜years-1 の整数)
+   * @param {number} prepayYen 繰上返済額(円・1万円以上・借入額以下)
+   * @returns {{ok:true, monthlyPayment:number, baseMonths:number, baseInterest:number,
+   *            newMonths:number, newInterest:number, interestSaved:number, shortenedMonths:number}
+   *          |{ok:false, code:string}}
+   *   code: calculate() の各コード | "invalid_after" | "invalid_prepay" | "prepay_too_large"
+   */
+  function prepayment(principalYen, annualRatePercent, years, afterYears, prepayYen) {
+    var base = calculate(principalYen, annualRatePercent, years);
+    if (!base.ok) return base;
+    if (!isFiniteNumber(afterYears) || afterYears !== Math.floor(afterYears) ||
+        afterYears < 1 || afterYears > years - 1) {
+      return { ok: false, code: "invalid_after" };
+    }
+    if (!isFiniteNumber(prepayYen) || prepayYen < 10000 || prepayYen > principalYen) {
+      return { ok: false, code: "invalid_prepay" };
+    }
+    var n = years * 12;
+    var r = annualRatePercent / 100 / 12;
+    var noPre = simulateSchedule(principalYen, r, base.monthlyPayment, n, 0, 0);
+    var withPre = simulateSchedule(principalYen, r, base.monthlyPayment, n, afterYears * 12, prepayYen);
+    if (withPre.tooLarge) return { ok: false, code: "prepay_too_large" };
+    return {
+      ok: true,
+      monthlyPayment: base.monthlyPayment,
+      baseMonths: noPre.months,
+      baseInterest: noPre.interest,
+      newMonths: withPre.months,
+      newInterest: withPre.interest,
+      interestSaved: noPre.interest - withPre.interest,
+      shortenedMonths: noPre.months - withPre.months
+    };
+  }
+
+  /**
+   * 元金均等返済にした場合の比較。
+   * 毎月の元金 = 借入額 ÷ 返済回数(一定)。各回の利息 = 残高 × 月利。
+   * 初回返済額 = 元金 + 借入額×月利 / 最終回返済額 = 元金 + 元金×月利(いずれも円未満四捨五入)。
+   * 利息総額 = 借入額 × 月利 × (回数+1) ÷ 2(等差数列の和・円未満四捨五入)。
+   * interestDiff = 元利均等の利息総額(calculate()と同じ) − 元金均等の利息総額。
+   * @param {number} principalYen 借入額(円)
+   * @param {number} annualRatePercent 年利(%)
+   * @param {number} years 返済期間(年・整数)
+   * @returns {{ok:true, firstPayment:number, lastPayment:number, totalInterest:number, interestDiff:number}
+   *          |{ok:false, code:string}}
+   */
+  function gankinKinto(principalYen, annualRatePercent, years) {
+    var base = calculate(principalYen, annualRatePercent, years);
+    if (!base.ok) return base;
+    var n = years * 12;
+    var r = annualRatePercent / 100 / 12;
+    var principalPart = principalYen / n;
+    var totalInterest = Math.round(principalYen * r * (n + 1) / 2);
+    return {
+      ok: true,
+      firstPayment: Math.round(principalPart + principalYen * r),
+      lastPayment: Math.round(principalPart + principalPart * r),
+      totalInterest: totalInterest,
+      interestDiff: base.totalInterest - totalInterest
+    };
+  }
+
   var api = {
+    gankinKinto: gankinKinto,
+    prepayment: prepayment,
     calculate: calculate,
     PRINCIPAL_MIN_YEN: PRINCIPAL_MIN_YEN,
     PRINCIPAL_MAX_YEN: PRINCIPAL_MAX_YEN,

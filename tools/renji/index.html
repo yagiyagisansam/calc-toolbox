@@ -66,11 +66,48 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 一括換算表と自由なワット数</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">500〜1000Wの一括換算表</h3>
+      <p class="adv-note">表記の時間とワット数から、500W・600W・700W・800W・1000Wそれぞれの加熱時間を一度に表にします。実家や職場などワット数が違うレンジを使う時の確認に。</p>
+      <label>表記の加熱時間
+        <span style="display:flex;gap:.5em;align-items:center;">
+          <input type="number" id="adv-min" min="0" max="120" step="1" value="1" style="width:5em;" aria-label="分"> 分
+          <input type="number" id="adv-sec" min="0" max="59" step="1" value="30" style="width:5em;" aria-label="秒"> 秒
+        </span>
+      </label>
+      <label>表記のワット数
+        <select id="adv-from-w">
+          <option value="200">200W(解凍)</option>
+          <option value="300">300W</option>
+          <option value="500">500W</option>
+          <option value="600" selected>600W</option>
+          <option value="700">700W</option>
+          <option value="800">800W</option>
+          <option value="1000">1000W</option>
+          <option value="1500">1500W</option>
+        </select>
+      </label>
+      <button type="button" id="adv-run">一括換算表を作る</button>
+      <h3 class="adv-h">一覧にないワット数で換算する</h3>
+      <p class="adv-note">850Wや550Wなど、上の選択肢にないワット数はこちらで。100〜2000Wの範囲で自由に入力できます(時間は上の欄の値を使います)。</p>
+      <label>表記のワット数(自由入力)
+        <input type="number" id="adv-free-from" min="100" max="2000" step="1" value="600" placeholder="例: 600">
+      </label>
+      <label>お家のレンジのワット数(自由入力)
+        <input type="number" id="adv-free-to" min="100" max="2000" step="1" placeholder="例: 850">
+      </label>
+      <button type="button" id="adv-free-run">このワット数で換算する</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
   <div class="note-box">
     換算結果は<strong>目安</strong>です。機種・食品の量・冷凍状態で仕上がりは変わるため、様子を見ながら少しずつ加熱してください。加熱しすぎは破裂や乾燥のもとです。
   </div>
 
-  <p>冷凍食品やレシピの「600Wで1分30秒」を、<strong>お家のレンジのワット数なら何分何秒にすればいいか</strong>を換算します。500W・600W・700Wはもちろん、解凍用の200Wや業務用の1500Wにも対応。</p>
+  <p>レシピや冷凍食品の「600Wで1分30秒」を、<strong>お家のレンジでは何分何秒にすればいいか</strong>がすぐわかるツールです。ワット数を選んで時間を入れるだけ。パッケージと自宅のレンジのワット数が違う時にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -157,6 +194,58 @@
       '<div class="result-main">' + toW + "Wなら 約" + fmt(r.rounded10) + "</div>" +
       "<p>計算値: " + fmt(r.seconds) + "(" + r.seconds + "秒)を10秒単位に切り上げた目安です。様子を見ながら加熱してください。</p>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advFmt(sec) {
+    var m = Math.floor(sec / 60);
+    var s = sec % 60;
+    if (m === 0) return s + "秒";
+    return m + "分" + (s > 0 ? s + "秒" : "");
+  }
+  function advReadTime() {
+    var mi = parseInt(document.getElementById("adv-min").value, 10);
+    var se = parseInt(document.getElementById("adv-sec").value, 10);
+    if (isNaN(mi)) mi = 0;
+    if (isNaN(se)) se = 0;
+    return mi * 60 + se;
+  }
+  function advShowError(code) {
+    advBox.innerHTML = '<p class="result-error">' +
+      (code === "invalid_time" ? "加熱時間を1秒以上で入力してください。" : "ワット数は100〜2000Wの範囲で入力してください。") + "</p>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", function () {
+    var total = advReadTime();
+    var fromW = parseInt(document.getElementById("adv-from-w").value, 10);
+    var r = RenjiCalc.multiTable(total, fromW);
+    if (!r.ok) { advShowError(r.code); return; }
+    var html = '<div class="result-main">' + fromW + "Wで" + advFmt(total) + "の場合</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>ワット数</th><th>換算時間</th><th>10秒単位の目安</th></tr></thead><tbody>';
+    for (var i = 0; i < r.rows.length; i++) {
+      var row = r.rows[i];
+      html += "<tr><td>" + row.w + "W</td><td>" + advFmt(row.seconds) + "</td><td>" + advFmt(row.rounded10) + "</td></tr>";
+    }
+    html += "</tbody></table></div>" +
+      '<p class="adv-note">10秒単位の目安は切り上げです。様子を見ながら加熱してください。</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-free-run").addEventListener("click", function () {
+    var total = advReadTime();
+    var fromW = parseFloat(document.getElementById("adv-free-from").value);
+    var toW = parseFloat(document.getElementById("adv-free-to").value);
+    var r = RenjiCalc.convert(total, fromW, toW);
+    if (!r.ok) { advShowError(r.code); return; }
+    advBox.innerHTML =
+      '<div class="result-main">' + toW.toLocaleString() + "Wなら " + advFmt(r.seconds) + "</div>" +
+      "<p>" + fromW.toLocaleString() + "Wで" + advFmt(total) + " → " + toW.toLocaleString() +
+      "Wでは <strong>" + advFmt(r.seconds) + "</strong>(10秒単位の目安: " + advFmt(r.rounded10) + ")です。</p>";
+    advBox.hidden = false;
   });
 })();
 </script>

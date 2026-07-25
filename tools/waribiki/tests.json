@@ -127,6 +127,111 @@
         "ok": false,
         "code": "invalid_sale"
       }
+    },
+    {
+      "name": "重ね掛け: 1万円の20%オフ+10%オフは7,200円(28%オフ、30%ではない)",
+      "func": "doubleOff",
+      "args": [
+        10000,
+        20,
+        10
+      ],
+      "expect": {
+        "ok": true,
+        "sale": 7200,
+        "saved": 2800,
+        "effectivePct": 28,
+        "naivePct": 30
+      }
+    },
+    {
+      "name": "重ね掛け: 2,980円の30%オフ+20%オフは1,669円(44%オフ)",
+      "func": "doubleOff",
+      "args": [
+        2980,
+        30,
+        20
+      ],
+      "expect": {
+        "ok": true,
+        "sale": 1669,
+        "saved": 1311,
+        "effectivePct": 44
+      }
+    },
+    {
+      "name": "重ね掛け: 2回目が100%オフなら0円",
+      "func": "doubleOff",
+      "args": [
+        10000,
+        20,
+        100
+      ],
+      "expect": {
+        "ok": true,
+        "sale": 0,
+        "effectivePct": 100
+      }
+    },
+    {
+      "name": "重ね掛け: 割引率が100%超はエラー",
+      "func": "doubleOff",
+      "args": [
+        10000,
+        120,
+        10
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_pct"
+      }
+    },
+    {
+      "name": "クーポン比較: 3,000円で500円引きvs20%オフは%オフが100円得",
+      "func": "couponCompare",
+      "args": [
+        3000,
+        500,
+        20
+      ],
+      "expect": {
+        "ok": true,
+        "byYen": 2500,
+        "byPct": 2400,
+        "better": "pct",
+        "diff": 100
+      }
+    },
+    {
+      "name": "クーポン比較: 1,000円で100円引きと10%オフは同額",
+      "func": "couponCompare",
+      "args": [
+        1000,
+        100,
+        10
+      ],
+      "expect": {
+        "ok": true,
+        "byYen": 900,
+        "byPct": 900,
+        "better": "even",
+        "diff": 0
+      }
+    },
+    {
+      "name": "クーポン比較: 値引き額が定価を超えたら0円で打ち切り",
+      "func": "couponCompare",
+      "args": [
+        500,
+        800,
+        0
+      ],
+      "expect": {
+        "ok": true,
+        "byYen": 0,
+        "byPct": 500,
+        "better": "yen"
+      }
     }
   ]
 }

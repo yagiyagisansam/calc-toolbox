@@ -45,7 +45,30 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>「うちの子、人間だと何歳?」——猫と小型・中型犬の年齢を、獣医療で広く使われる目安式で<strong>人間の年齢に換算</strong>します。シニア期の入り口(7歳ごろ)も一目でわかるので、健康診断の頻度を考えるきっかけに。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 逆換算(人間→ペット)と年齢早見表</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">逆換算: 人間の年齢はペットの何歳?</h3>
+      <p class="adv-note">「自分の年齢は、うちの子でいうと何歳くらい?」を計算します。飼い主とペットの年齢を比べてみたい時に。</p>
+      <label>種類
+        <select id="adv-type">
+          <option value="cat">猫</option>
+          <option value="dog">犬(小型・中型)</option>
+        </select>
+      </label>
+      <label>人間の年齢(歳)
+        <input type="number" id="adv-human" min="2" max="136" step="1" placeholder="例: 35">
+      </label>
+      <button type="button" id="adv-rev-run">ペットの年齢に換算する</button>
+
+      <h3 class="adv-h">1〜20歳の年齢早見表</h3>
+      <p class="adv-note">ペットの1〜20歳が人間の何歳にあたるかの一覧です(換算式は猫と小型・中型犬で共通)。</p>
+      <button type="button" id="adv-table-run">早見表を表示する</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>猫や犬の年齢を入れるだけで、<strong>人間だと何歳くらいか</strong>がすぐわかるツールです(猫と小型・中型犬が対象)。シニア期に入る時期の目安もあわせて表示します。健康診断やフードの切り替え時期を考える時にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -120,6 +143,42 @@
       "<p>ライフステージの目安: <strong>" + r.stage + "</strong>" + (r.stage === "シニア期" ? "(健康診断は年2回が目安)" : "") + "</p>" +
       "<p>※小型・中型犬と猫の目安です。大型犬には当てはまりません。</p>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-rev-run").addEventListener("click", function () {
+    var human = document.getElementById("adv-human");
+    var type = document.getElementById("adv-type").value;
+    if (human.value === "") { advErr("人間の年齢を入力してください。"); return; }
+    var r = PetageCalc.petAge(type, parseFloat(human.value));
+    if (!r.ok) { advErr("人間の年齢は2〜136歳の範囲で入力してください。"); return; }
+    var name = type === "cat" ? "猫" : "犬(小型・中型)";
+    advBox.innerHTML =
+      '<div class="result-main">' + name + "の約 " +
+      r.petAge.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " 歳に相当</div>" +
+      '<p class="adv-note">獣医療で使われる目安式による概算です。</p>';
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-table-run").addEventListener("click", function () {
+    var r = PetageCalc.ageTable();
+    var rows = "";
+    for (var i = 0; i < r.rows.length; i++) {
+      var row = r.rows[i];
+      rows += "<tr><td>" + row.age + "歳</td><td>約 " +
+        row.human.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "歳</td><td>" + row.stage + "</td></tr>";
+    }
+    advBox.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>ペットの年齢</th><th>人間の年齢の目安</th><th>区分</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+    advBox.hidden = false;
   });
 })();
 </script>

@@ -116,6 +116,108 @@
         "ok": false,
         "code": "invalid_date"
       }
+    },
+    {
+      "name": "補正: 1990-05-15生まれ・1浪・休学1年→大学2010年入学・2015年卒業",
+      "func": "detailedYears",
+      "args": [
+        "1990-05-15",
+        1,
+        0,
+        1,
+        "none"
+      ],
+      "expect": {
+        "ok": true,
+        "hayaumare": false,
+        "elemIn": 1997,
+        "hsOut": 2009,
+        "uniIn": 2010,
+        "uniOut": 2015,
+        "msIn": null,
+        "drIn": null
+      }
+    },
+    {
+      "name": "補正: 2000-02-10生まれ(早生まれ)・現役→大学2018年入学・2022年卒業",
+      "func": "detailedYears",
+      "args": [
+        "2000-02-10",
+        0,
+        0,
+        0,
+        "none"
+      ],
+      "expect": {
+        "ok": true,
+        "hayaumare": true,
+        "elemIn": 2006,
+        "uniIn": 2018,
+        "uniOut": 2022
+      }
+    },
+    {
+      "name": "補正: 博士まで進学→修士2022〜2024・博士2024〜2027",
+      "func": "detailedYears",
+      "args": [
+        "2000-02-10",
+        0,
+        0,
+        0,
+        "doctor"
+      ],
+      "expect": {
+        "ok": true,
+        "msIn": 2022,
+        "msOut": 2024,
+        "drIn": 2024,
+        "drOut": 2027
+      }
+    },
+    {
+      "name": "補正: 浪人年数が小数はエラー",
+      "func": "detailedYears",
+      "args": [
+        "1990-05-15",
+        0.5,
+        0,
+        0,
+        "none"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_years"
+      }
+    },
+    {
+      "name": "補正: 進学区分が不正はエラー",
+      "func": "detailedYears",
+      "args": [
+        "1990-05-15",
+        0,
+        0,
+        0,
+        "phd"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_grad"
+      }
+    },
+    {
+      "name": "補正: 不正な日付はエラー",
+      "func": "detailedYears",
+      "args": [
+        "1990-13-01",
+        0,
+        0,
+        0,
+        "none"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_date"
+      }
     }
   ]
 }

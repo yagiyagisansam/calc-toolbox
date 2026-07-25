@@ -134,6 +134,144 @@
         "ok": false,
         "code": "invalid_value"
       }
+    },
+    {
+      "name": "到着: 9:00発・150km・80km/h・休憩20分→11:13着(移動113分)",
+      "func": "arrival",
+      "args": [
+        9,
+        0,
+        150,
+        80,
+        20
+      ],
+      "expect": {
+        "ok": true,
+        "arriveH": 11,
+        "arriveM": 13,
+        "daysLater": 0,
+        "travelMin": 113,
+        "totalMin": 133
+      }
+    },
+    {
+      "name": "到着: 23:30発・60km・40km/h→翌日1:00着",
+      "func": "arrival",
+      "args": [
+        23,
+        30,
+        60,
+        40,
+        0
+      ],
+      "expect": {
+        "ok": true,
+        "arriveH": 1,
+        "arriveM": 0,
+        "daysLater": 1,
+        "travelMin": 90
+      }
+    },
+    {
+      "name": "到着: 時刻が範囲外(25時)はエラー",
+      "func": "arrival",
+      "args": [
+        25,
+        0,
+        100,
+        50,
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_time"
+      }
+    },
+    {
+      "name": "到着: 速さ0はエラー",
+      "func": "arrival",
+      "args": [
+        9,
+        0,
+        100,
+        0,
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
+    },
+    {
+      "name": "逆算: 12:00着・150km・80km/h・休憩20分→9:47発",
+      "func": "departure",
+      "args": [
+        12,
+        0,
+        150,
+        80,
+        20
+      ],
+      "expect": {
+        "ok": true,
+        "depH": 9,
+        "depM": 47,
+        "prevDay": false,
+        "totalMin": 133
+      }
+    },
+    {
+      "name": "逆算: 0:30着・移動90分→前日23:00発",
+      "func": "departure",
+      "args": [
+        0,
+        30,
+        60,
+        40,
+        0
+      ],
+      "expect": {
+        "ok": true,
+        "depH": 23,
+        "depM": 0,
+        "prevDay": true,
+        "travelMin": 90
+      }
+    },
+    {
+      "name": "単位: 時速60km=分速1000m・秒速16.67m",
+      "func": "speedUnits",
+      "args": [
+        60
+      ],
+      "expect": {
+        "ok": true,
+        "mPerMin": 1000,
+        "mPerSec": 16.67
+      }
+    },
+    {
+      "name": "単位: 時速36km=秒速10m",
+      "func": "speedUnits",
+      "args": [
+        36
+      ],
+      "expect": {
+        "ok": true,
+        "mPerMin": 600,
+        "mPerSec": 10
+      }
+    },
+    {
+      "name": "単位: 0以下はエラー",
+      "func": "speedUnits",
+      "args": [
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
     }
   ]
 }

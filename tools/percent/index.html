@@ -64,11 +64,46 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 連続の増減・打ち消し・元の値の逆算</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">連続の増減で結局何%変わった?</h3>
+      <p class="adv-note">「10%増えたあと10%減った」は、実は元どおりではなく1%の減少です。変化率をカンマか改行で区切って入力すると(増加はそのまま、減少はマイナス)、掛け合わせた合計の変化率を計算します。</p>
+      <label>変化率(%)を順番に(最大10件。例: 10, -10)
+        <textarea id="adv-chain" rows="2" placeholder="例: 10, -10"></textarea>
+      </label>
+      <label>元の値(任意。入れると最終的な値も表示)
+        <input type="number" id="adv-chain-start" inputmode="decimal" step="any" min="0.000001" placeholder="例: 1000">
+      </label>
+      <button type="button" id="adv-chain-run">合計の変化率を計算</button>
+      <div class="tool-result" id="adv-chain-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">○%の変化を打ち消すには?</h3>
+      <p class="adv-note">「25%値上げを元に戻すには25%引きではダメ」——増えた分と同じ%では戻りません。打ち消しに必要な逆方向の%を計算します。</p>
+      <label>適用済みの変化率(%。減少はマイナスで)
+        <input type="number" id="adv-cancel-rate" inputmode="decimal" step="any" placeholder="例: 25">
+      </label>
+      <button type="button" id="adv-cancel-run">打ち消す%を計算</button>
+      <div class="tool-result" id="adv-cancel-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">変化した後の値から元の値を逆算</h3>
+      <p class="adv-note">「5%増えて105万円になった。元は?」「20%オフで8,000円だった。定価は?」のように、変化後の値と%から元の値を求めます。</p>
+      <label>変化した後の値
+        <input type="number" id="adv-after" inputmode="decimal" step="any" min="0.000001" placeholder="例: 8000">
+      </label>
+      <label>適用された変化率(%。減少はマイナスで)
+        <input type="number" id="adv-after-rate" inputmode="decimal" step="any" placeholder="例: -20">
+      </label>
+      <button type="button" id="adv-before-run">元の値を計算</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
   <div class="note-box">
     結果は小数第2位までの<strong>概算</strong>(四捨五入)です。金額の端数処理が必要な場面(請求・値引など)では、切り捨て・切り上げの規定により1円単位で差が出ることがあります。
   </div>
 
-  <p>パーセントにまつわる3つの計算——<strong>「AはBの何%?」「Aの○%はいくつ?」「AからBへの増減率」</strong>——をそれぞれ一発で計算します。割引額・達成率・前年比などに。</p>
+  <p>「AはBの何%?」「20%引きだといくら?」——そんな<strong>パーセントの計算</strong>を、数字を入れるだけでできるツールです。買い物の値引き、テストの達成率、前年比の増減の計算にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -157,6 +192,69 @@
     if (!r.ok) { showError(r.code); return; }
     show('<div class="result-main">' + (r.rate > 0 ? "+" : "") + r.rate.toLocaleString() + " %</div>" +
       "<p>" + (r.rate > 0 ? "増加" : r.rate < 0 ? "減少" : "変化なし") + "</p>");
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var chainBox = document.getElementById("adv-chain-result");
+  var cancelBox = document.getElementById("adv-cancel-result");
+  document.getElementById("adv-chain-run").addEventListener("click", function () {
+    var parts = document.getElementById("adv-chain").value.split(/[\n,、]+/)
+      .map(function (p) { return p.trim(); })
+      .filter(function (p) { return p !== ""; });
+    var rates = parts.map(function (p) { return parseFloat(p); });
+    var startRaw = document.getElementById("adv-chain-start").value;
+    var start = startRaw === "" ? undefined : parseFloat(startRaw);
+    var r = PercentCalc.chainRates(rates, start);
+    if (!r.ok || rates.some(function (x) { return isNaN(x); })) {
+      var msg = r.code === "too_many" ? "変化率は最大10件までです。"
+        : r.code === "invalid_value" ? "元の値は0より大きい数値で入力してください。"
+        : "変化率を数値で入力してください(例: 10, -10。-100より大きい値)。";
+      chainBox.innerHTML = '<p class="result-error">' + msg + '</p>';
+      chainBox.hidden = false;
+      return;
+    }
+    var sign = r.totalRate > 0 ? "+" : "";
+    var html = '<div class="result-main">合計 ' + sign + r.totalRate.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '%</div>';
+    if (r.finalValue !== undefined) {
+      html += '<p>' + start.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' → <strong>' +
+        r.finalValue.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '</strong></p>';
+    }
+    chainBox.innerHTML = html;
+    chainBox.hidden = false;
+  });
+  document.getElementById("adv-cancel-run").addEventListener("click", function () {
+    var p = parseFloat(document.getElementById("adv-cancel-rate").value);
+    var r = PercentCalc.cancelRate(p);
+    if (!r.ok) {
+      cancelBox.innerHTML = '<p class="result-error">変化率を-100より大きい数値で入力してください。</p>';
+      cancelBox.hidden = false;
+      return;
+    }
+    var dir1 = p >= 0 ? "増(値上げ)" : "減(値下げ)";
+    var dir2 = r.cancel >= 0 ? "% の増加" : "% の減少";
+    cancelBox.innerHTML =
+      '<div class="result-main">' + Math.abs(r.cancel).toLocaleString(undefined, { maximumFractionDigits: 2 }) + dir2 + '</div>' +
+      '<p>' + Math.abs(p).toLocaleString(undefined, { maximumFractionDigits: 2 }) + '%' + dir1 + ' を打ち消して元に戻すために必要な変化です。</p>';
+    cancelBox.hidden = false;
+  });
+  document.getElementById("adv-before-run").addEventListener("click", function () {
+    var after = parseFloat(document.getElementById("adv-after").value);
+    var rate = parseFloat(document.getElementById("adv-after-rate").value);
+    var r = PercentCalc.beforeChange(after, rate);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">変化後の値は0より大きい数値、変化率は-100より大きい数値で入力してください。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">元の値: ' + r.value.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '</div>' +
+      '<p>元の値に ' + rate.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '% の変化を適用すると ' +
+      after.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' になります。</p>';
+    advBox.hidden = false;
   });
 })();
 </script>

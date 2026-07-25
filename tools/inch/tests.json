@@ -6,80 +6,251 @@
     {
       "name": "65インチ → 165.1cm(テレビサイズ)",
       "func": "convertLength",
-      "args": [65, "in"],
-      "expect": { "ok": true, "inch": 65, "cm": 165.1 }
+      "args": [
+        65,
+        "in"
+      ],
+      "expect": {
+        "ok": true,
+        "inch": 65,
+        "cm": 165.1
+      }
     },
     {
       "name": "100cm → 39.37インチ",
       "func": "convertLength",
-      "args": [100, "cm"],
-      "expect": { "ok": true, "inch": 39.37, "cm": 100 }
+      "args": [
+        100,
+        "cm"
+      ],
+      "expect": {
+        "ok": true,
+        "inch": 39.37,
+        "cm": 100
+      }
     },
     {
       "name": "27インチ → 68.58cm(モニターサイズ)",
       "func": "convertLength",
-      "args": [27, "in"],
-      "expect": { "ok": true, "inch": 27, "cm": 68.58 }
+      "args": [
+        27,
+        "in"
+      ],
+      "expect": {
+        "ok": true,
+        "inch": 27,
+        "cm": 68.58
+      }
     },
     {
       "name": "170cm → 66.93インチ",
       "func": "convertLength",
-      "args": [170, "cm"],
-      "expect": { "ok": true, "inch": 66.93, "cm": 170 }
+      "args": [
+        170,
+        "cm"
+      ],
+      "expect": {
+        "ok": true,
+        "inch": 66.93,
+        "cm": 170
+      }
     },
     {
       "name": "10ポンド → 4.54kg",
       "func": "convertWeight",
-      "args": [10, "lb"],
-      "expect": { "ok": true, "lb": 10, "kg": 4.54 }
+      "args": [
+        10,
+        "lb"
+      ],
+      "expect": {
+        "ok": true,
+        "lb": 10,
+        "kg": 4.54
+      }
     },
     {
       "name": "60kg → 132.28ポンド(体重)",
       "func": "convertWeight",
-      "args": [60, "kg"],
-      "expect": { "ok": true, "lb": 132.28, "kg": 60 }
+      "args": [
+        60,
+        "kg"
+      ],
+      "expect": {
+        "ok": true,
+        "lb": 132.28,
+        "kg": 60
+      }
     },
     {
       "name": "150ポンド → 68.04kg",
       "func": "convertWeight",
-      "args": [150, "lb"],
-      "expect": { "ok": true, "lb": 150, "kg": 68.04 }
+      "args": [
+        150,
+        "lb"
+      ],
+      "expect": {
+        "ok": true,
+        "lb": 150,
+        "kg": 68.04
+      }
     },
     {
       "name": "小数(0.5kg → 1.1ポンド)",
       "func": "convertWeight",
-      "args": [0.5, "kg"],
-      "expect": { "ok": true, "lb": 1.1, "kg": 0.5 }
+      "args": [
+        0.5,
+        "kg"
+      ],
+      "expect": {
+        "ok": true,
+        "lb": 1.1,
+        "kg": 0.5
+      }
     },
     {
       "name": "異常入力: 0はエラー",
       "func": "convertLength",
-      "args": [0, "in"],
-      "expect": { "ok": false, "code": "invalid_value" }
+      "args": [
+        0,
+        "in"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
     },
     {
       "name": "異常入力: 負の値はエラー",
       "func": "convertWeight",
-      "args": [-5, "kg"],
-      "expect": { "ok": false, "code": "invalid_value" }
+      "args": [
+        -5,
+        "kg"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
     },
     {
       "name": "異常入力: 範囲超過はエラー",
       "func": "convertLength",
-      "args": [2000000, "cm"],
-      "expect": { "ok": false, "code": "invalid_value" }
+      "args": [
+        2000000,
+        "cm"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
     },
     {
       "name": "異常入力: 不明な単位はエラー",
       "func": "convertLength",
-      "args": [100, "ft"],
-      "expect": { "ok": false, "code": "invalid_unit" }
+      "args": [
+        100,
+        "ft"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_unit"
+      }
     },
     {
       "name": "異常入力: 数値でない値はエラー",
       "func": "convertWeight",
-      "args": ["abc", "kg"],
-      "expect": { "ok": false, "code": "invalid_value" }
+      "args": [
+        "abc",
+        "kg"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
+    },
+    {
+      "name": "画面サイズ: 65インチ16:9は幅約143.9cm・高さ約80.94cm",
+      "func": "screenSize",
+      "args": [
+        65,
+        16,
+        9
+      ],
+      "expect": {
+        "ok": true,
+        "diagonalCm": 165.1,
+        "widthCm": 143.9,
+        "heightCm": 80.94,
+        "distFullHdCm": 242.83,
+        "dist4kCm": 121.41
+      }
+    },
+    {
+      "name": "画面サイズ: 27インチ16:9は幅約59.77cm・高さ約33.62cm",
+      "func": "screenSize",
+      "args": [
+        27,
+        16,
+        9
+      ],
+      "expect": {
+        "ok": true,
+        "widthCm": 59.77,
+        "heightCm": 33.62
+      }
+    },
+    {
+      "name": "画面サイズ: 画面比が0はエラー",
+      "func": "screenSize",
+      "args": [
+        27,
+        0,
+        9
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_ratio"
+      }
+    },
+    {
+      "name": "画面サイズ: インチが0はエラー",
+      "func": "screenSize",
+      "args": [
+        0,
+        16,
+        9
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
+    },
+    {
+      "name": "サイズ比較: 24→27インチは面積+26.56%",
+      "func": "compareScreens",
+      "args": [
+        24,
+        27,
+        16,
+        9
+      ],
+      "expect": {
+        "ok": true,
+        "areaRatePct": 26.56
+      }
+    },
+    {
+      "name": "サイズ比較: 大→小はマイナスの増加率",
+      "func": "compareScreens",
+      "args": [
+        32,
+        24,
+        16,
+        9
+      ],
+      "expect": {
+        "ok": true,
+        "areaRatePct": -43.75
+      }
     }
   ]
 }

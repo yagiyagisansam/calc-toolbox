@@ -53,7 +53,35 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>「1GBは何MB?」「512GBのスマホの実容量は?」——<strong>B・KB・MB・GB・TBを一発で相互換算</strong>します。パソコンの表示で使われる<strong>1024換算</strong>と、ストレージ製品の表記で使われる<strong>1000換算</strong>を切り替えられます。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: ダウンロード時間と「この容量でできること」</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">ダウンロード時間の目安</h3>
+      <p class="adv-note">ファイルの容量と回線速度(Mbps)から、ダウンロードにかかる時間の目安を計算します。実際の回線は理論値どおりには出ないため、理論値の70%の速度で計算した「現実的な目安」も表示します。</p>
+      <label>ファイル容量
+        <input type="number" id="adv-size" min="0" step="any" placeholder="例: 5">
+      </label>
+      <label>単位
+        <select id="adv-unit">
+          <option value="mb">MB</option>
+          <option value="gb" selected>GB</option>
+          <option value="tb">TB</option>
+        </select>
+      </label>
+      <label>回線速度(Mbps)
+        <input type="number" id="adv-mbps" min="0" step="any" placeholder="例: 100">
+      </label>
+      <button type="button" id="adv-dl-run">時間を計算する</button>
+      <div class="tool-result" id="adv-dl-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">この容量でできることの目安</h3>
+      <p class="adv-note">上のフォームに入れた容量で「写真何枚・音楽何曲・動画何時間ぶんか」のざっくりした目安を表示します。スマホやSDカードの容量選びの参考に。</p>
+      <button type="button" id="adv-usage-run">できることを見る</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>容量の数字を入れるだけで、<strong>KB・MB・GB・TBのすべての単位でいくつになるか</strong>が一度にわかるツールです。パソコンの表示(1024区切り)と製品パッケージの表記(1000区切り)は数え方が違うので、切り替えて見比べられます。「買った500GBがパソコンでは465GBに見える」ようなモヤモヤの確認にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -130,6 +158,64 @@
       '<div class="result-main">' + r.gb.toLocaleString(undefined, { maximumFractionDigits: 4 }) + " GB</div>" +
       '<div class="table-scroll"><table class="data-table"><thead><tr><th>単位</th><th>値</th></tr></thead><tbody>' + rows + "</tbody></table></div>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function fmtDur(sec) {
+    if (sec < 60) return sec.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " 秒";
+    if (sec < 3600) {
+      var m = Math.floor(sec / 60);
+      var s = Math.round(sec % 60);
+      return m + " 分 " + s + " 秒";
+    }
+    var h = Math.floor(sec / 3600);
+    var mm = Math.round((sec % 3600) / 60);
+    return h.toLocaleString() + " 時間 " + mm + " 分";
+  }
+  var dlBox = document.getElementById("adv-dl-result");
+  document.getElementById("adv-dl-run").addEventListener("click", function () {
+    var size = parseFloat(document.getElementById("adv-size").value);
+    var mbps = parseFloat(document.getElementById("adv-mbps").value);
+    var unit = document.getElementById("adv-unit").value;
+    var base = parseInt(document.getElementById("base").value, 10) || 1000;
+    var r = ByteCalc.downloadTime(size, unit, mbps, base);
+    if (!r.ok) {
+      dlBox.innerHTML = '<p class="result-error">容量と回線速度を0より大きい数値で入力してください。</p>';
+      dlBox.hidden = false;
+      return;
+    }
+    dlBox.innerHTML =
+      '<div class="result-main">約 ' + fmtDur(r.secondsEffective) + '</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>理論値(' + mbps.toLocaleString() + ' Mbpsフル)</td><td>' + fmtDur(r.seconds) + '</td></tr>' +
+      '<tr><td>実効速度の目安(理論の70%)</td><td>' + fmtDur(r.secondsEffective) + '</td></tr>' +
+      '<tr><td>速度の換算</td><td>' + mbps.toLocaleString() + ' Mbps = 約 ' + r.mbPerSec.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' MB/秒</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">容量の数え方は上のフォームで選んだ換算方式(1024/1000)に合わせています。</p>';
+    dlBox.hidden = false;
+  });
+  document.getElementById("adv-usage-run").addEventListener("click", function () {
+    var value = parseFloat(document.getElementById("value").value);
+    var unit = document.getElementById("unit").value;
+    var base = parseInt(document.getElementById("base").value, 10);
+    var r = ByteCalc.capacityUsage(value, unit, base);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">上のフォームに容量を0より大きい数値で入力してください。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>用途</th><th>目安</th></tr></thead><tbody>' +
+      '<tr><td>写真(1枚 約4MB)</td><td>約 ' + r.photos.toLocaleString() + ' 枚</td></tr>' +
+      '<tr><td>音楽(1曲 約8MB)</td><td>約 ' + r.songs.toLocaleString() + ' 曲</td></tr>' +
+      '<tr><td>フルHD動画(1時間 約2GB)</td><td>約 ' + r.videoHours.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' 時間</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">画質や設定によって大きく変わる、ざっくりした目安です。</p>';
+    advBox.hidden = false;
   });
 })();
 </script>

@@ -129,6 +129,98 @@
         "ok": false,
         "code": "invalid_date"
       }
+    },
+    {
+      "name": "詳細: 2000年1月1日は土曜日・やぎ座・カスプなし",
+      "func": "detail",
+      "args": [
+        2000,
+        1,
+        1
+      ],
+      "expect": {
+        "ok": true,
+        "youbi": "土曜日",
+        "dow": 6,
+        "sign": "やぎ座",
+        "cusp": null
+      }
+    },
+    {
+      "name": "詳細: 1990年4月20日は金曜日・おうし座(おひつじ座とのカスプ)",
+      "func": "detail",
+      "args": [
+        1990,
+        4,
+        20
+      ],
+      "expect": {
+        "ok": true,
+        "youbi": "金曜日",
+        "sign": "おうし座",
+        "cusp": {
+          "otherSign": "おひつじ座",
+          "boundaryM": 4,
+          "boundaryD": 20
+        }
+      }
+    },
+    {
+      "name": "詳細: 4月19日はおひつじ座だがおうし座とのカスプ注記",
+      "func": "detail",
+      "args": [
+        1990,
+        4,
+        19
+      ],
+      "expect": {
+        "ok": true,
+        "sign": "おひつじ座",
+        "cusp": {
+          "otherSign": "おうし座"
+        }
+      }
+    },
+    {
+      "name": "詳細: 2024年2月29日(うるう年)は木曜日・うお座",
+      "func": "detail",
+      "args": [
+        2024,
+        2,
+        29
+      ],
+      "expect": {
+        "ok": true,
+        "youbi": "木曜日",
+        "dow": 4,
+        "sign": "うお座"
+      }
+    },
+    {
+      "name": "詳細: 2023年2月29日は存在しないのでエラー",
+      "func": "detail",
+      "args": [
+        2023,
+        2,
+        29
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_date"
+      }
+    },
+    {
+      "name": "詳細: 範囲外の年(1500年)はエラー",
+      "func": "detail",
+      "args": [
+        1500,
+        1,
+        1
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_date"
+      }
     }
   ]
 }

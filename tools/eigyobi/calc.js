@@ -112,7 +112,92 @@
     return { ok: true, businessDays: count, totalDays: es - ss + 1 };
   }
 
-  var api = { addBusinessDays: addBusinessDays, countBusinessDays: countBusinessDays,
+  // 会社休業日リスト(カンマ・読点・空白・改行区切り、"YYYY-MM-DD"/"YYYY/M/D")を集合に変換する
+  function buildCustomHolidays(text) {
+    if (text === undefined || text === null || text === "") return { ok: true, set: {}, count: 0 };
+    if (typeof text !== "string") return { ok: false };
+    var tokens = text.split(/[\s,、]+/);
+    var set = {};
+    var count = 0;
+    for (var i = 0; i < tokens.length; i++) {
+      var t = tokens[i];
+      if (t === "") continue;
+      var parts = t.replace(/\//g, "-").split("-");
+      if (parts.length !== 3) return { ok: false };
+      var iso = parts[0] + "-" + pad(parseInt(parts[1], 10)) + "-" + pad(parseInt(parts[2], 10));
+      if (!parseDate(iso)) return { ok: false };
+      if (!set[iso]) { set[iso] = 1; count++; }
+    }
+    return { ok: true, set: set, count: count };
+  }
+
+  function isBusinessDayCustom(serial, set, satOpen) {
+    var dow = ((serial + 3) % 7 + 7) % 7; // 0=月 … 5=土 6=日
+    if (dow === 6) return false;
+    if (dow === 5 && satOpen !== true) return false;
+    var iso = toIso(serial);
+    if (HOLIDAYS[iso]) return false;
+    return !set[iso];
+  }
+
+  /**
+   * 会社独自の休業日と「土曜も営業」の設定を反映した○営業日後の日付。
+   * 数え方は addBusinessDays と同じ(起算日の翌日から数える)。日曜と祝日は常に休業扱い。
+   * @param {string} startIso 起算日 "YYYY-MM-DD"
+   * @param {number} n 営業日数(1〜200)
+   * @param {string} [holidaysText] 会社休業日のリスト(カンマ・空白・改行区切り)
+   * @param {boolean} [satOpen=false] 土曜日も営業日に数えるか
+   * @returns {{ok:true, date:string, weekday:string, customCount:number}|{ok:false, code:string}}
+   *   code: "invalid_date" | "invalid_n" | "invalid_holidays" | "out_of_range"
+   */
+  function addBusinessDaysCustom(startIso, n, holidaysText, satOpen) {
+    var p = parseDate(startIso);
+    if (!p || !inRange(startIso)) return { ok: false, code: p ? "out_of_range" : "invalid_date" };
+    if (typeof n !== "number" || n !== Math.floor(n) || n < 1 || n > 200) {
+      return { ok: false, code: "invalid_n" };
+    }
+    var custom = buildCustomHolidays(holidaysText);
+    if (!custom.ok) return { ok: false, code: "invalid_holidays" };
+    var serial = toSerial(p.y, p.m, p.d);
+    var count = 0;
+    while (count < n) {
+      serial++;
+      if (!inRange(toIso(serial))) return { ok: false, code: "out_of_range" };
+      if (isBusinessDayCustom(serial, custom.set, satOpen)) count++;
+    }
+    var WD = ["月", "火", "水", "木", "金", "土", "日"];
+    return { ok: true, date: toIso(serial), weekday: WD[((serial + 3) % 7 + 7) % 7], customCount: custom.count };
+  }
+
+  /**
+   * 会社独自の休業日と「土曜も営業」の設定を反映した期間内の営業日数。
+   * 数え方は countBusinessDays と同じ(開始日・終了日を含む)。
+   * @param {string} startIso 開始日 "YYYY-MM-DD"
+   * @param {string} endIso 終了日 "YYYY-MM-DD"
+   * @param {string} [holidaysText] 会社休業日のリスト(カンマ・空白・改行区切り)
+   * @param {boolean} [satOpen=false] 土曜日も営業日に数えるか
+   * @returns {{ok:true, businessDays:number, totalDays:number, customCount:number}
+   *          |{ok:false, code:string}}
+   *   code: "invalid_date" | "invalid_holidays" | "out_of_range" | "date_order"
+   */
+  function countBusinessDaysCustom(startIso, endIso, holidaysText, satOpen) {
+    var s = parseDate(startIso);
+    var e = parseDate(endIso);
+    if (!s || !inRange(startIso)) return { ok: false, code: s ? "out_of_range" : "invalid_date" };
+    if (!e || !inRange(endIso)) return { ok: false, code: e ? "out_of_range" : "invalid_date" };
+    var custom = buildCustomHolidays(holidaysText);
+    if (!custom.ok) return { ok: false, code: "invalid_holidays" };
+    var ss = toSerial(s.y, s.m, s.d);
+    var es = toSerial(e.y, e.m, e.d);
+    if (es < ss) return { ok: false, code: "date_order" };
+    var count = 0;
+    for (var z = ss; z <= es; z++) { if (isBusinessDayCustom(z, custom.set, satOpen)) count++; }
+    return { ok: true, businessDays: count, totalDays: es - ss + 1, customCount: custom.count };
+  }
+
+  var api = {
+    countBusinessDaysCustom: countBusinessDaysCustom,
+    addBusinessDaysCustom: addBusinessDaysCustom, addBusinessDays: addBusinessDays, countBusinessDays: countBusinessDays,
     HOLIDAYS: HOLIDAYS, RANGE_MIN: RANGE_MIN, RANGE_MAX: RANGE_MAX };
   if (typeof module !== "undefined" && module.exports) { module.exports = api; }
   else { global.EigyobiCalc = api; }
