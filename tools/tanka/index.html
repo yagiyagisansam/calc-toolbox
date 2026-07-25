@@ -199,7 +199,7 @@
     }
     var unitLabel = per === 1 ? "1あたり" : per + "あたり";
     var rows = r.rows.map(function (row, i) {
-      var mark = i === r.cheapest ? "🏆 最安" : "+" + row.diffPct.toLocaleString() + "%";
+      var mark = i === r.cheapest ? "<strong>最安</strong>" : "+" + row.diffPct.toLocaleString() + "%";
       return "<tr><td>" + labels[i] + "</td><td>" + row.unitPrice.toLocaleString() + "円</td><td>" + mark + "</td></tr>";
     }).join("");
     box.innerHTML =
