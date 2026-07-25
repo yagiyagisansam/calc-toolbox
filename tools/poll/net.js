@@ -28,13 +28,14 @@
   function base() { return conf().url.replace(/\/+$/, ""); }
 
   // アンケートを保存する。IDが既に使われていたら {ok:false, code:"conflict"}
-  function createPoll(id, question, options) {
+  // isPublic=true ならホームの公開一覧に載る
+  function createPoll(id, question, options, isPublic) {
     var h = headers();
     h["Prefer"] = "return=minimal";
     return fetch(base() + "/rest/v1/polls", {
       method: "POST",
       headers: h,
-      body: JSON.stringify({ id: id, question: question, options: options })
+      body: JSON.stringify({ id: id, question: question, options: options, is_public: !!isPublic })
     }).then(function (r) {
       if (r.ok) return { ok: true };
       if (r.status === 409) return { ok: false, code: "conflict" };
@@ -72,5 +73,34 @@
     }).catch(function () { return { ok: false, code: "network" }; });
   }
 
-  global.PollNet = { ready: ready, createPoll: createPoll, getResults: getResults, vote: vote };
+  // 公開アンケート一覧(sort: "popular" | "new")
+  function listPublic(sort, limit) {
+    return fetch(base() + "/rest/v1/rpc/public_polls", {
+      method: "POST",
+      headers: headers(),
+      body: JSON.stringify({ p_sort: sort || "new", p_limit: limit || 20 })
+    }).then(function (r) {
+      if (!r.ok) return { ok: false, code: "rejected" };
+      return r.json().then(function (data) {
+        return { ok: true, items: Array.isArray(data) ? data : [] };
+      });
+    }).catch(function () { return { ok: false, code: "network" }; });
+  }
+
+  // 問題のあるアンケートの通報(1端末につき同じアンケートへ1回)
+  function report(pollId, reporter) {
+    var h = headers();
+    h["Prefer"] = "return=minimal";
+    return fetch(base() + "/rest/v1/reports", {
+      method: "POST",
+      headers: h,
+      body: JSON.stringify({ poll_id: pollId, reporter: reporter })
+    }).then(function (r) {
+      if (r.ok) return { ok: true };
+      if (r.status === 409) return { ok: true };
+      return { ok: false, code: "rejected" };
+    }).catch(function () { return { ok: false, code: "network" }; });
+  }
+
+  global.PollNet = { ready: ready, createPoll: createPoll, getResults: getResults, vote: vote, listPublic: listPublic, report: report };
 })(window);

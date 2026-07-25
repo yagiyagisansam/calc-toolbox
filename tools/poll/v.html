@@ -5,73 +5,61 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.supabase.co; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <title>アンケートに投票する | 計算ツールボックス</title>
+  <title>アンケートに投票する | みんなの投票</title>
   <meta name="description" content="共有されたアンケートに投票して、みんなの回答のリアルタイム集計を見られるページです。登録不要・無料。">
   <meta name="robots" content="noindex">
-  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="./poll.css">
   <!-- @meta start -->
-  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
-  <meta name="theme-color" content="#0b6e4f">
-  <meta property="og:site_name" content="計算ツールボックス">
-  <meta property="og:title" content="アンケートに投票する | 計算ツールボックス">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Crect%20width='100'%20height='100'%20rx='22'%20fill='%23ff5a70'/%3E%3Cpath%20d='M28%2072V44M50%2072V28M72%2072V54'%20stroke='%23fff'%20stroke-width='10'%20stroke-linecap='round'/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#ff5a70">
+  <meta property="og:site_name" content="みんなの投票">
+  <meta property="og:title" content="アンケートに投票する | みんなの投票">
   <meta property="og:description" content="共有されたアンケートに投票して、みんなの回答のリアルタイム集計を見られるページです。登録不要・無料。">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ja_JP">
   <meta name="twitter:card" content="summary">
   <!-- @meta end -->
-  <style>
-    .tool-form[hidden] { display: none; }
-    .opt { display: flex; align-items: center; gap: 10px; border: 1.5px solid rgba(120,124,130,0.35); border-radius: 10px; padding: 12px 14px; margin: 8px 0; cursor: pointer; }
-    .opt input { width: auto; margin: 0; flex: 0 0 auto; }
-    .opt:has(input:checked) { border-color: var(--color-accent); background: rgba(11,110,79,0.06); }
-    .pr-row { margin: 12px 0; }
-    .pr-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 0.95rem; }
-    .pr-top .pr-label { word-break: break-word; }
-    .pr-top .pr-num { white-space: nowrap; color: rgba(120,124,130,0.95); font-size: 0.85rem; }
-    .pr-row.top .pr-label, .pr-row.top .pr-num { font-weight: 700; color: inherit; }
-    .pr-bar { height: 10px; border-radius: 6px; background: rgba(120,124,130,0.18); overflow: hidden; margin-top: 4px; }
-    .pr-fill { height: 100%; border-radius: 6px; background: var(--color-accent); }
-    .share-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-    .share-row a, .share-row button { display: inline-block; width: auto; padding: 8px 14px; border: 1.5px solid var(--color-accent); border-radius: 8px; color: var(--color-accent); background: none; text-decoration: none; font-size: 0.9rem; font-weight: 600; margin: 0; cursor: pointer; }
-    .sub-link { font-size: 0.9rem; }
-    #refresh-btn { width: auto; padding: 8px 14px; margin-top: 10px; background: none; color: var(--color-accent); border: 1.5px solid var(--color-accent); }
-  </style>
 </head>
 <body>
-<!-- @partial:header start -->
-<header class="site-header">
-  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
-  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+<header class="pb-header">
+  <a href="./">
+    <span class="pb-mark"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></span>
+    <span class="pb-name">みんなの投票</span>
+  </a>
+  <a class="pb-cta" href="./new.html">アンケートを作る</a>
 </header>
-<!-- @partial:header end -->
 <main>
-  <h1 id="q-title">アンケートを読み込んでいます…</h1>
-  <p id="status" hidden></p>
-  <form class="tool-form" id="vote-form" hidden>
-    <div id="opts"></div>
-    <button type="submit" id="vote-btn" disabled>投票する</button>
-    <p class="sub-link"><a href="#" id="peek-link">投票せずに結果だけ見る</a></p>
-  </form>
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
-  <div id="share-box" hidden>
-    <h2>このアンケートを広める</h2>
-    <div class="share-row" id="share-row"></div>
+  <div class="pb-card" id="main-card">
+    <h1 class="pb-q" id="q-title">アンケートを読み込んでいます…</h1>
+    <p class="pb-status" id="status" hidden></p>
+    <form id="vote-form" hidden>
+      <p class="pb-meta">1人1回・タップして投票</p>
+      <div class="pb-opts" id="opts"></div>
+      <button type="submit" class="pb-btn" id="vote-btn" disabled>この選択で投票する</button>
+      <p class="pb-center" style="margin-top:12px"><a class="pb-sub-link" href="#" id="peek-link">投票せずに結果だけ見る</a></p>
+    </form>
+    <div id="result" hidden aria-live="polite"></div>
   </div>
-  <p><a href="./">自分もアンケートを作ってみる(無料・登録不要)</a></p>
+
+  <div id="share-box" hidden>
+    <div class="pb-sec"><b>このアンケートを広める</b></div>
+    <div class="pb-share" id="share-row"></div>
+  </div>
+
+  <p class="pb-center" style="margin-top:20px"><a class="pb-link" href="./new.html">自分もアンケートを作ってみる(無料・登録不要)</a></p>
+  <button type="button" class="pb-report" id="report-btn" hidden>問題のあるアンケートを報告する</button>
 </main>
-<!-- @partial:footer start -->
-<footer class="site-footer">
+<footer class="pb-footer">
   <p>このページの投票データ(選んだ選択肢)は、集計のため外部データベースに保存されます(個人を特定する情報は収集しません)。詳しくは<a href="../../privacy.html">プライバシーポリシー</a>をご覧ください。</p>
   <nav>
-    <a href="../../">ツール一覧</a>
+    <a href="./">みんなの投票</a>
+    <a href="../../">計算ツールボックス</a>
     <a href="../../privacy.html">プライバシーポリシー</a>
     <a href="../../disclaimer.html">免責事項</a>
     <a href="../../contact.html">お問い合わせ</a>
   </nav>
-  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
-  <p>© 2026 計算ツールボックス</p>
+  <p>© 2026 みんなの投票(quick-calc.site)</p>
 </footer>
-<!-- @partial:footer end -->
 <script src="./config.js"></script>
 <script src="./calc.js"></script>
 <script src="./net.js"></script>
@@ -100,7 +88,7 @@
     if (!s) return;
     var m = votedMap();
     m[id] = choice;
-    try { s.setItem(VOTED_KEY, JSON.stringify(m)); } catch (e) { /* 保存できない環境では諦める */ }
+    try { s.setItem(VOTED_KEY, JSON.stringify(m)); } catch (e) { /* 保存不可は無視 */ }
   }
   function voterId() {
     var s = store();
@@ -161,32 +149,52 @@
     form.hidden = true;
     if (!r.ok) { showStatus("集計結果を表示できませんでした。"); return; }
 
-    var main = document.createElement("div");
-    main.className = "result-main";
-    main.textContent = "合計 " + r.total + " 票";
-    resultEl.appendChild(main);
+    var total = document.createElement("div");
+    total.className = "pb-total";
+    var b = document.createElement("b");
+    b.textContent = r.total.toLocaleString();
+    var sp = document.createElement("span");
+    sp.textContent = "票";
+    var live = document.createElement("span");
+    live.className = "pb-live";
+    live.innerHTML = "<i></i>";
+    live.appendChild(document.createTextNode("LIVE集計中"));
+    total.appendChild(b);
+    total.appendChild(sp);
+    total.appendChild(live);
+    resultEl.appendChild(total);
     if (note) {
       var p = document.createElement("p");
+      p.className = "pb-meta";
       p.textContent = note;
       resultEl.appendChild(p);
     }
     r.rows.forEach(function (row, i) {
       var div = document.createElement("div");
-      div.className = "pr-row" + (r.top.indexOf(i) !== -1 ? " top" : "");
+      div.className = "pb-row" + (r.top.indexOf(i) !== -1 ? " win" : "");
       var top = document.createElement("div");
-      top.className = "pr-top";
+      top.className = "pb-rt";
       var label = document.createElement("span");
-      label.className = "pr-label";
-      label.textContent = row.label;
+      label.className = "nm";
+      var dot = document.createElement("span");
+      dot.className = "pb-dot c" + (i % 10);
+      label.appendChild(dot);
+      label.appendChild(document.createTextNode(row.label));
+      if (r.top.indexOf(i) !== -1 && r.total > 0) {
+        var chip = document.createElement("span");
+        chip.className = "pb-chip-win";
+        chip.textContent = "1位";
+        label.appendChild(chip);
+      }
       var num = document.createElement("span");
-      num.className = "pr-num";
-      num.textContent = row.pct + "%(" + row.count + "票)";
+      num.className = "pc";
+      num.textContent = row.pct + "%・" + row.count.toLocaleString() + "票";
       top.appendChild(label);
       top.appendChild(num);
       var bar = document.createElement("div");
-      bar.className = "pr-bar";
+      bar.className = "pb-bar";
       var fill = document.createElement("div");
-      fill.className = "pr-fill";
+      fill.className = "pb-fill c" + (i % 10);
       fill.style.width = row.pct + "%";
       bar.appendChild(fill);
       div.appendChild(top);
@@ -196,7 +204,7 @@
 
     var refresh = document.createElement("button");
     refresh.type = "button";
-    refresh.id = "refresh-btn";
+    refresh.className = "pb-btn-sub";
     refresh.textContent = "最新の結果に更新";
     refresh.addEventListener("click", function () { load(true); });
     resultEl.appendChild(refresh);
@@ -207,15 +215,22 @@
     optsEl.innerHTML = "";
     poll.options.forEach(function (opt, i) {
       var label = document.createElement("label");
-      label.className = "opt";
+      label.className = "pb-opt";
       var input = document.createElement("input");
       input.type = "radio";
       input.name = "choice";
       input.value = String(i);
-      input.addEventListener("change", function () { voteBtn.disabled = false; });
+      input.addEventListener("change", function () {
+        voteBtn.disabled = false;
+        [].forEach.call(optsEl.children, function (el) { el.classList.remove("sel"); });
+        label.classList.add("sel");
+      });
+      var rd = document.createElement("span");
+      rd.className = "rd";
       var span = document.createElement("span");
       span.textContent = opt;
       label.appendChild(input);
+      label.appendChild(rd);
       label.appendChild(span);
       optsEl.appendChild(label);
     });
@@ -235,7 +250,7 @@
           load(true, r.ok ? "投票を受け付けました。" : "この端末からはすでに投票済みです。");
         } else {
           voteBtn.disabled = false;
-          voteBtn.textContent = "投票する";
+          voteBtn.textContent = "この選択で投票する";
           showStatus(r.code === "network"
             ? "通信に失敗しました。電波の良い場所でもう一度お試しください。"
             : "投票を受け付けられませんでした。もう一度お試しください。");
@@ -263,8 +278,9 @@
       }
       var poll = r.poll;
       qTitle.textContent = poll.question;
-      document.title = poll.question + " | アンケートに投票する";
+      document.title = poll.question + " | みんなの投票";
       renderShare(poll.question);
+      document.getElementById("report-btn").hidden = false;
       var voted = votedMap()[pollId] !== undefined;
       if (resultsOnly || voted) {
         renderResults(poll, note || (voted ? "この端末からは投票済みです。" : ""));
@@ -273,6 +289,16 @@
       }
     });
   }
+
+  document.getElementById("report-btn").addEventListener("click", function () {
+    var btn = this;
+    if (!window.confirm("このアンケートを不適切な内容として報告しますか?")) return;
+    btn.disabled = true;
+    PollNet.report(pollId, voterId()).then(function (r) {
+      btn.textContent = r.ok ? "報告を受け付けました。ご協力ありがとうございます。" : "報告を送信できませんでした。時間をおいてお試しください。";
+      if (!r.ok) btn.disabled = false;
+    });
+  });
 
   if (!PollNet.ready()) {
     qTitle.textContent = "アンケート機能は準備中です";

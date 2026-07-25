@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.supabase.co; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>アンケートを作る | みんなの投票</title>
+  <meta name="description" content="質問と選択肢(最大10個)を入れるだけで、SNSで共有できる投票ページのリンクを無料で発行。回答はリアルタイムで集計されます。登録不要。">
+  <link rel="stylesheet" href="./poll.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/poll/new.html">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Crect%20width='100'%20height='100'%20rx='22'%20fill='%23ff5a70'/%3E%3Cpath%20d='M28%2072V44M50%2072V28M72%2072V54'%20stroke='%23fff'%20stroke-width='10'%20stroke-linecap='round'/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#ff5a70">
+  <meta property="og:site_name" content="みんなの投票">
+  <meta property="og:title" content="アンケートを作る | みんなの投票">
+  <meta property="og:description" content="質問と選択肢(最大10個)を入れるだけで、SNSで共有できる投票ページのリンクを無料で発行。回答はリアルタイムで集計されます。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/poll/new.html">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <!-- @meta end -->
+</head>
+<body>
+<header class="pb-header">
+  <a href="./">
+    <span class="pb-mark"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></span>
+    <span class="pb-name">みんなの投票</span>
+  </a>
+  <span class="pb-tag">アンケート作成</span>
+</header>
+<main>
+  <div class="pb-status" id="setup-note" hidden>現在準備中のため、アンケートは作成できません。もうしばらくお待ちください。</div>
+
+  <div class="pb-card">
+    <h1 class="pb-q" style="font-size:1.1rem">アンケートを作る</h1>
+    <form class="pb-form" id="poll-form" style="margin-top:14px">
+      <label>質問(聞きたいこと)<span class="pb-note">120文字まで</span>
+        <input type="text" id="question" maxlength="120" required placeholder="例: きのこの山とたけのこの里、どっち派?">
+      </label>
+      <div id="options-box"></div>
+      <button type="button" class="pb-add" id="add-opt">＋ 選択肢を追加(最大10個)</button>
+      <label class="pb-toggle">
+        <input type="checkbox" id="is-public" checked>
+        <span>みんなのアンケート一覧に載せる<small>オフにすると、リンクを知っている人だけが開ける非公開アンケートになります。</small></span>
+      </label>
+      <button type="submit" class="pb-btn" id="create-btn">投票ページを作成する</button>
+      <p class="pb-error" id="form-error" hidden></p>
+    </form>
+  </div>
+
+  <div class="pb-card" id="done-card" hidden>
+    <p class="pb-q" style="font-size:1.1rem">投票ページができました</p>
+    <p class="pb-meta">このリンクをSNSやグループチャットに貼ると、開いた人が投票できます。</p>
+    <div class="pb-url">
+      <input type="text" id="done-url" readonly>
+      <button type="button" id="copy-btn">コピー</button>
+    </div>
+    <div class="pb-share" id="share-row"></div>
+    <p class="pb-center" style="margin-top:16px"><a class="pb-link" id="open-link" href="#">投票ページを開く(結果もここで見られます)</a></p>
+  </div>
+
+  <p class="pb-center"><a class="pb-sub-link" href="./">← みんなの投票トップへ</a></p>
+</main>
+<footer class="pb-footer">
+  <p>作成された質問・選択肢・投票データは、集計のため外部データベースに保存されます(個人を特定する情報は収集しません)。詳しくは<a href="../../privacy.html">プライバシーポリシー</a>をご覧ください。</p>
+  <nav>
+    <a href="./">みんなの投票</a>
+    <a href="../../">計算ツールボックス</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>© 2026 みんなの投票(quick-calc.site)</p>
+</footer>
+<script src="./config.js"></script>
+<script src="./calc.js"></script>
+<script src="./net.js"></script>
+<script>
+(function () {
+  "use strict";
+  var optsBox = document.getElementById("options-box");
+  var addBtn = document.getElementById("add-opt");
+  var errEl = document.getElementById("form-error");
+  var MINE_KEY = "pollMine";
+  var MSG = {
+    invalid_question: "質問を入力してください。",
+    question_too_long: "質問は120文字以内で入力してください。",
+    option_too_long: "選択肢は1個60文字以内で入力してください。",
+    too_few_options: "選択肢を2個以上入力してください。",
+    too_many_options: "選択肢は10個までです。",
+    duplicate_options: "同じ内容の選択肢があります。",
+    not_configured: "現在準備中のため作成できません。もうしばらくお待ちください。",
+    network: "通信に失敗しました。電波の良い場所でもう一度お試しください。",
+    rejected: "作成に失敗しました。内容を確認してもう一度お試しください。",
+    conflict: "作成に失敗しました。もう一度お試しください。"
+  };
+
+  function store() {
+    try { return window.localStorage; } catch (e) { return null; }
+  }
+  function loadMine() {
+    var s = store();
+    if (!s) return [];
+    try { return JSON.parse(s.getItem(MINE_KEY)) || []; } catch (e) { return []; }
+  }
+  function saveMine(list) {
+    var s = store();
+    if (!s) return;
+    try { s.setItem(MINE_KEY, JSON.stringify(list.slice(0, 30))); } catch (e) { /* 保存不可は無視 */ }
+  }
+
+  function addOptionField(focus) {
+    var n = optsBox.children.length;
+    if (n >= PollCalc.MAX_OPTIONS) return;
+    var label = document.createElement("label");
+    label.appendChild(document.createTextNode("選択肢" + (n + 1)));
+    var input = document.createElement("input");
+    input.type = "text";
+    input.maxLength = 60;
+    input.className = "opt-input";
+    input.placeholder = n === 0 ? "例: きのこの山" : n === 1 ? "例: たけのこの里" : "";
+    label.appendChild(input);
+    optsBox.appendChild(label);
+    addBtn.hidden = optsBox.children.length >= PollCalc.MAX_OPTIONS;
+    if (focus) input.focus();
+  }
+  addOptionField(false);
+  addOptionField(false);
+  addBtn.addEventListener("click", function () { addOptionField(true); });
+
+  function showError(code) {
+    errEl.textContent = MSG[code] || MSG.rejected;
+    errEl.hidden = false;
+  }
+
+  function voteUrl(id) {
+    return location.origin + location.pathname.replace(/new\.html$/, "") + "v.html?id=" + id;
+  }
+
+  function showCreated(id, question) {
+    var url = voteUrl(id);
+    document.getElementById("done-url").value = url;
+    document.getElementById("open-link").href = "./v.html?id=" + id;
+    var row = document.getElementById("share-row");
+    row.innerHTML = "";
+    var text = question + " | みんなに聞いてみた(投票はこちら)";
+    [
+      ["Xでシェア", "https://twitter.com/intent/tweet?text=" + encodeURIComponent(text) + "&url=" + encodeURIComponent(url)],
+      ["LINEで送る", "https://line.me/R/share?text=" + encodeURIComponent(text + " " + url)],
+      ["Facebookでシェア", "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(url)]
+    ].forEach(function (it) {
+      var a = document.createElement("a");
+      a.href = it[1];
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.textContent = it[0];
+      row.appendChild(a);
+    });
+    document.getElementById("done-card").hidden = false;
+    document.getElementById("done-card").scrollIntoView({ behavior: "smooth" });
+  }
+
+  document.getElementById("copy-btn").addEventListener("click", function () {
+    var input = document.getElementById("done-url");
+    var btn = this;
+    var done = function () { btn.textContent = "コピー済み"; setTimeout(function () { btn.textContent = "コピー"; }, 1500); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(input.value).then(done, function () { input.select(); });
+    } else {
+      input.select();
+      document.execCommand("copy");
+      done();
+    }
+  });
+
+  if (!PollNet.ready()) {
+    document.getElementById("setup-note").hidden = false;
+  }
+
+  var creating = false;
+  document.getElementById("poll-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (creating) return;
+    errEl.hidden = true;
+    var options = [].map.call(optsBox.querySelectorAll(".opt-input"), function (el) { return el.value; });
+    var v = PollCalc.validatePoll(document.getElementById("question").value, options);
+    if (!v.ok) { showError(v.code); return; }
+    if (!PollNet.ready()) { showError("not_configured"); return; }
+
+    var btn = document.getElementById("create-btn");
+    creating = true;
+    btn.disabled = true;
+    btn.textContent = "作成中…";
+    var isPublic = document.getElementById("is-public").checked;
+
+    function finish() {
+      creating = false;
+      btn.disabled = false;
+      btn.textContent = "投票ページを作成する";
+    }
+    function attempt(triesLeft) {
+      var bytes = new Uint8Array(10);
+      crypto.getRandomValues(bytes);
+      var idRes = PollCalc.makeId(bytes);
+      PollNet.createPoll(idRes.id, v.question, v.options, isPublic).then(function (r) {
+        if (r.ok) {
+          var mine = loadMine();
+          mine.unshift({ id: idRes.id, q: v.question, t: new Date().toISOString().slice(0, 10) });
+          saveMine(mine);
+          showCreated(idRes.id, v.question);
+          finish();
+        } else if (r.code === "conflict" && triesLeft > 0) {
+          attempt(triesLeft - 1);
+        } else {
+          showError(r.code);
+          finish();
+        }
+      });
+    }
+    attempt(3);
+  });
+})();
+</script>
+</body>
+</html>
