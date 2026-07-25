@@ -168,7 +168,7 @@
       box.innerHTML =
         '<div class="result-main">約 ' + result.tdeeKcal.toLocaleString() + " kcal/日</div>" +
         "<p>基礎代謝量: <strong>約" + result.bmrKcal.toLocaleString() + " kcal/日</strong> × 身体活動レベル " + result.palValue.toFixed(2) + "</p>" +
-        '<p>同じ入力で続けて計算: <a href="../bmr/">基礎代謝量</a> / <a href="../bmi/">BMI・適正体重</a></p>';
+        '<p><small>続けて計算: <a href="../bmr/">基礎代謝量</a> / <a href="../bmi/">BMI・適正体重</a></small></p>';
     } else {
       box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
     }
