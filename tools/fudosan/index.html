@@ -70,9 +70,9 @@
       <span class="field-note">節税(損益通算)の計算に使います</span>
       <input type="number" id="salary" inputmode="decimal" min="0" max="100000" step="any" required placeholder="例: 600">
     </label>
-    <details id="adv">
-      <summary style="cursor:pointer;font-weight:600;font-size:0.92rem;color:var(--color-accent);">詳細設定(自動推定値を変更したい方向け)</summary>
-      <div style="display:grid;gap:14px;margin-top:14px;">
+    <details class="adv-box" id="adv">
+      <summary><span class="plus">＋</span>詳細機能: 自動推定値を自分で設定する</summary>
+      <div class="adv-inner">
         <label>頭金(万円)<input type="number" id="down" inputmode="decimal" min="0" step="any" value="0"></label>
         <label>購入諸費用率(%)<span class="field-note">登記・税・手数料など。既定7%</span><input type="number" id="costrate" inputmode="decimal" min="0" max="20" step="0.1" value="7"></label>
         <label>金利(年%)<input type="number" id="rate" inputmode="decimal" min="0" max="20" step="0.01" value="2"></label>
