@@ -176,8 +176,8 @@ $$;
 
 grant execute on function public.poll_results(text, text) to anon;
 
--- 公開アンケート一覧(人気順/新着順)
-create or replace function public.public_polls(p_sort text default 'new', p_limit integer default 20)
+-- 公開アンケート一覧(人気順/新着順。p_days=期間内の票だけ数える。null=全期間)
+create or replace function public.public_polls(p_sort text default 'new', p_limit integer default 20, p_days integer default null)
 returns jsonb
 language sql
 stable
@@ -186,7 +186,11 @@ set search_path = public
 as $$
   with base as (
     select p.id, p.question, p.created_at,
-           (select count(*)::int from public.votes v where v.poll_id = p.id) as total
+           (select count(*)::int from public.votes v
+             where v.poll_id = p.id
+               and (p_days is null
+                    or v.created_at > now() - make_interval(days => least(greatest(p_days, 1), 366)))
+           ) as total
     from public.polls p
     where p.is_public
   ), ordered as (
@@ -205,7 +209,8 @@ as $$
   where o.rn <= least(greatest(coalesce(p_limit, 20), 1), 50);
 $$;
 
-grant execute on function public.public_polls(text, integer) to anon;
+revoke all on function public.public_polls(text, integer, integer) from public, authenticated;
+grant execute on function public.public_polls(text, integer, integer) to anon;
 
 -- ---- セキュリティ強化(権限最小化・レート制限) ----
 
@@ -223,9 +228,7 @@ grant insert (poll_id, reporter) on public.reports to anon;
 
 -- ② 関数の実行権限の最小化
 revoke all on function public.poll_results(text, text) from public, authenticated;
-revoke all on function public.public_polls(text, integer) from public, authenticated;
 grant execute on function public.poll_results(text, text) to anon;
-grant execute on function public.public_polls(text, integer) to anon;
 -- トリガー関数は外部から直接実行できないようにする(トリガー経由の実行には影響しない)
 revoke all on function public.check_vote_choices() from public, anon, authenticated;
 -- poll_options_valid はCHECK制約の評価でanonが使うため実行権限を残す

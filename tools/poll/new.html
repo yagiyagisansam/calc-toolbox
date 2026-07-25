@@ -86,6 +86,15 @@
   </div>
 
   <p class="pb-center"><a class="pb-sub-link" href="./">← みんなの投票トップへ</a></p>
+
+  <div class="pb-modal-bg" id="confirm-bg" hidden>
+    <div class="pb-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      <p class="pb-q pb-q-sm" id="confirm-title">この内容で公開しますか?</p>
+      <p class="pb-meta">アンケートは公開後に編集できません。質問・選択肢・設定をもう一度ご確認ください。</p>
+      <button type="button" class="pb-btn" id="confirm-yes">はい、公開する</button>
+      <button type="button" class="pb-btn-sub" id="confirm-no">いいえ、戻って修正する</button>
+    </div>
+  </div>
 </main>
 <footer class="pb-footer">
   <p>作成された質問・選択肢・投票データは、集計のため外部データベースに保存されます(個人を特定する情報は収集しません)。詳しくは<a href="../../privacy.html">プライバシーポリシー</a>をご覧ください。</p>

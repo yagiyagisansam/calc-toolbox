@@ -39,8 +39,14 @@
     <a class="pb-btn" href="./new.html">アンケートを作る</a>
   </div>
 
-  <div class="pb-sec"><b>人気のアンケート</b><span>投票数の多い順</span></div>
-  <div class="pb-list" id="popular"><p class="pb-empty">読み込み中…</p></div>
+  <div class="pb-sec"><b>人気のアンケート</b><span id="pop-note">投票数の多い順</span></div>
+  <div class="pb-seg" id="pop-period">
+    <button type="button" class="on" data-days="">無期限</button>
+    <button type="button" data-days="7">1週間</button>
+    <button type="button" data-days="31">1ヶ月</button>
+    <button type="button" data-days="62">2ヶ月</button>
+  </div>
+  <div class="pb-list mt12" id="popular"><p class="pb-empty">読み込み中…</p></div>
 
   <div class="pb-sec"><b>新着アンケート</b></div>
   <div class="pb-list" id="recent"><p class="pb-empty">読み込み中…</p></div>

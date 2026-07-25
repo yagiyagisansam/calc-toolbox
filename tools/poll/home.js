@@ -7,12 +7,12 @@ if (window.top !== window.self) {
 (function () {
   "use strict";
 
-  function renderList(el, items, ranked) {
+  function renderList(el, items, ranked, emptyMsg) {
     el.replaceChildren();
     if (!items.length) {
       var p = document.createElement("p");
       p.className = "pb-empty";
-      p.textContent = "まだ公開アンケートがありません。最初の1件を作ってみましょう。";
+      p.textContent = emptyMsg || "まだ公開アンケートがありません。最初の1件を作ってみましょう。";
       el.appendChild(p);
       return;
     }
@@ -48,14 +48,44 @@ if (window.top !== window.self) {
 
   var popEl = document.getElementById("popular");
   var recEl = document.getElementById("recent");
+  var popSeg = document.getElementById("pop-period");
+  var popNote = document.getElementById("pop-note");
+  var popRequest = 0;
+
+  // 人気ランキング(期間別)。days=null は全期間
+  function loadPopular(days, label) {
+    var req = ++popRequest;
+    popEl.replaceChildren();
+    var loading = document.createElement("p");
+    loading.className = "pb-empty";
+    loading.textContent = "読み込み中…";
+    popEl.appendChild(loading);
+    popNote.textContent = days === null ? "投票数の多い順" : "直近" + label + "の投票数順";
+    PollNet.listPublic("popular", 5, days).then(function (r) {
+      if (req !== popRequest) return; // 古いリクエストの結果は捨てる
+      if (r.ok) {
+        renderList(popEl, r.items.filter(function (it) { return days === null || it.total > 0; }), true,
+          days === null ? null : "この期間に投票されたアンケートはまだありません。");
+      } else {
+        fail(popEl);
+      }
+    });
+  }
+
+  [].forEach.call(popSeg.querySelectorAll("button"), function (btn) {
+    btn.addEventListener("click", function () {
+      [].forEach.call(popSeg.querySelectorAll("button"), function (b) { b.classList.toggle("on", b === btn); });
+      var d = btn.dataset.days;
+      loadPopular(d === "" ? null : parseInt(d, 10), btn.textContent);
+    });
+  });
+
   if (!PollNet.ready()) {
     document.getElementById("setup-note").hidden = false;
     popEl.replaceChildren();
     recEl.replaceChildren();
   } else {
-    PollNet.listPublic("popular", 5).then(function (r) {
-      if (r.ok) renderList(popEl, r.items, true); else fail(popEl);
-    });
+    loadPopular(null, "");
     PollNet.listPublic("new", 10).then(function (r) {
       if (r.ok) renderList(recEl, r.items, false); else fail(recEl);
     });
