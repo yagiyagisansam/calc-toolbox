@@ -355,6 +355,124 @@
         "ok": false,
         "code": "invalid_order"
       }
+    },
+    {
+      "name": "正確変換: 1989年1月7日は昭和64年",
+      "func": "toWarekiExact",
+      "args": [
+        1989,
+        1,
+        7
+      ],
+      "expect": {
+        "ok": true,
+        "era": "昭和",
+        "eraYear": 64
+      }
+    },
+    {
+      "name": "正確変換: 1989年1月8日は平成元年",
+      "func": "toWarekiExact",
+      "args": [
+        1989,
+        1,
+        8
+      ],
+      "expect": {
+        "ok": true,
+        "era": "平成",
+        "eraYear": 1,
+        "label": "平成元年"
+      }
+    },
+    {
+      "name": "正確変換: 2019年4月30日は平成31年",
+      "func": "toWarekiExact",
+      "args": [
+        2019,
+        4,
+        30
+      ],
+      "expect": {
+        "ok": true,
+        "era": "平成",
+        "eraYear": 31
+      }
+    },
+    {
+      "name": "正確変換: 2019年5月1日は令和元年",
+      "func": "toWarekiExact",
+      "args": [
+        2019,
+        5,
+        1
+      ],
+      "expect": {
+        "ok": true,
+        "era": "令和",
+        "eraYear": 1
+      }
+    },
+    {
+      "name": "正確変換: 2月30日など実在しない日付はエラー",
+      "func": "toWarekiExact",
+      "args": [
+        2026,
+        2,
+        30
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_date"
+      }
+    },
+    {
+      "name": "満年齢: 1980年6月15日生まれは2026年6月14日時点で満45歳",
+      "func": "ageOn",
+      "args": [
+        1980,
+        6,
+        15,
+        2026,
+        6,
+        14
+      ],
+      "expect": {
+        "ok": true,
+        "age": 45
+      }
+    },
+    {
+      "name": "満年齢: 誕生日当日に1歳加算(2026年6月15日で満46歳)",
+      "func": "ageOn",
+      "args": [
+        1980,
+        6,
+        15,
+        2026,
+        6,
+        15
+      ],
+      "expect": {
+        "ok": true,
+        "age": 46
+      }
+    },
+    {
+      "name": "満年齢: 基準日が誕生日より前はエラー",
+      "func": "ageOn",
+      "args": [
+        2030,
+        1,
+        1,
+        2026,
+        1,
+        1
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_order"
+      }
     }
   ]
 }
