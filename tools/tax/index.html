@@ -31,6 +31,7 @@
   <h1>消費税 計算機(税込⇔税抜)</h1>
   <form class="tool-form" id="tax-form">
     <label>金額(円・整数)
+      <span class="field-note">入力すると自動で計算されます</span>
       <input type="number" id="price" inputmode="numeric" step="1" min="1" max="999999999" placeholder="1000" required>
     </label>
     <label>計算の向き
@@ -46,15 +47,14 @@
       </select>
     </label>
     <button type="submit">計算する</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
   </form>
-
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
   <details class="adv-box">
     <summary><span class="plus">＋</span>詳細機能: 複数商品の合計と源泉徴収</summary>
     <div class="adv-inner">
       <h3 class="adv-h">複数商品の合計(税率10%と8%が混ざってもOK)</h3>
-      <p class="adv-note">税抜の金額を入れて、行ごとに税率を選んでください(最大8行・使う行だけでOK)。消費税は税率ごとの合計にまとめて1回だけ計算します(請求書・レシートの一般的な方式)。</p>
+      <p class="adv-note">税抜の金額を行ごとに入れると、税率ごとの合計にまとめて課税する方式(請求書・レシートの一般的な方式)で自動合算します。</p>
       <span style="display:flex;gap:.5em;"><input type="number" id="adv-p0" inputmode="numeric" step="1" min="1" placeholder="金額(税抜・円)" aria-label="1行目の金額"><select id="adv-r0" aria-label="1行目の税率"><option value="10">10%</option><option value="8">8%</option></select></span>
       <span style="display:flex;gap:.5em;"><input type="number" id="adv-p1" inputmode="numeric" step="1" min="1" placeholder="金額(税抜・円)" aria-label="2行目の金額"><select id="adv-r1" aria-label="2行目の税率"><option value="10">10%</option><option value="8">8%</option></select></span>
       <span style="display:flex;gap:.5em;"><input type="number" id="adv-p2" inputmode="numeric" step="1" min="1" placeholder="金額(税抜・円)" aria-label="3行目の金額"><select id="adv-r2" aria-label="3行目の税率"><option value="10">10%</option><option value="8">8%</option></select></span>
@@ -71,6 +71,7 @@
         </select>
       </label>
       <button type="button" id="adv-items-run">合計を計算</button>
+      <div class="tool-result" id="adv-items-result" hidden aria-live="polite"></div>
       <h3 class="adv-h">源泉徴収の計算(フリーランスの請求書)</h3>
       <p class="adv-note">原稿料・講演料・デザイン料など、個人への報酬から引かれる源泉徴収税(10.21%、100万円超の部分は20.42%)と手取り額を計算します。</p>
       <label>報酬額(円・税抜で記載する場合はその額)
@@ -91,7 +92,7 @@
   <ol class="steps">
     <li>金額を円単位の整数で入力します。</li>
     <li>「税抜→税込」か「税込→税抜」かを選びます。</li>
-    <li>税率(10%または8%)を選んで「計算する」を押すと、税額の内訳つきで表示されます。</li>
+    <li>税率(10%または8%)を選ぶと、その場で税額の内訳つきで表示されます(ボタンを押す必要はありません)。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -151,13 +152,13 @@
     invalid_rate: "税率を選択してください。",
     invalid_direction: "計算の向きを選択してください。"
   };
-  document.getElementById("tax-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  var box = document.getElementById("result");
+  function runMain() {
+    if (document.getElementById("price").value === "") { box.hidden = true; return; }
     var price = parseFloat(document.getElementById("price").value);
     var rate = parseInt(document.getElementById("rate").value, 10);
     var direction = document.getElementById("direction").value;
     var result = TaxCalc.calculate(price, rate, direction);
-    var box = document.getElementById("result");
     if (result.ok) {
       box.innerHTML =
         '<div class="result-main">税込 ' + result.taxIncluded.toLocaleString() + " 円</div>" +
@@ -167,18 +168,26 @@
       box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
     }
     box.hidden = false;
+  }
+  document.getElementById("tax-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
   });
+  document.getElementById("price").addEventListener("input", runMain);
+  document.getElementById("direction").addEventListener("change", runMain);
+  document.getElementById("rate").addEventListener("change", runMain);
 })();
 </script>
 <script>
 (function () {
   "use strict";
+  var itemsBox = document.getElementById("adv-items-result");
   var advBox = document.getElementById("adv-result");
-  function showError(msg) {
-    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
-    advBox.hidden = false;
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
   }
-  document.getElementById("adv-items-run").addEventListener("click", function () {
+  function runItems(fromButton) {
     var items = [];
     for (var i = 0; i < 8; i++) {
       var v = document.getElementById("adv-p" + i).value;
@@ -188,10 +197,13 @@
         rate: parseInt(document.getElementById("adv-r" + i).value, 10)
       });
     }
-    if (items.length === 0) { showError("金額を1行以上入力してください。"); return; }
+    if (items.length === 0) {
+      if (fromButton) { showError(itemsBox, "金額を1行以上入力してください。"); } else { itemsBox.hidden = true; }
+      return;
+    }
     var mode = document.getElementById("adv-round").value;
     var r = TaxCalc.itemsTotal(items, mode);
-    if (!r.ok) { showError("金額は1〜999,999,999円の整数で入力してください。"); return; }
+    if (!r.ok) { showError(itemsBox, "金額は1〜999,999,999円の整数で入力してください。"); return; }
     var html = '<div class="result-main">税込合計 ' + r.total.toLocaleString() + " 円</div>" +
       '<div class="table-scroll"><table class="data-table"><thead><tr><th>区分</th><th>税抜</th><th>消費税</th><th>税込</th></tr></thead><tbody>';
     if (r.base10 > 0) {
@@ -204,24 +216,37 @@
       "</tbody></table></div>" +
       '<p class="adv-note">消費税は税率ごとの合計に対して1回だけ計算し、1円未満は' +
       (mode === "floor" ? "切り捨て" : mode === "ceil" ? "切り上げ" : "四捨五入") +
-      "ています。お店や取引先の端数処理が違うと1円単位で差が出ることがあります。</p>";
-    advBox.innerHTML = html;
-    advBox.hidden = false;
-  });
-  document.getElementById("adv-wh-run").addEventListener("click", function () {
-    var gross = parseInt(document.getElementById("adv-gross").value, 10);
-    if (isNaN(gross)) { showError("報酬額を入力してください。"); return; }
+      "ています。</p>";
+    itemsBox.innerHTML = html;
+    itemsBox.hidden = false;
+  }
+  function runWithholding(fromButton) {
+    var raw = document.getElementById("adv-gross").value;
+    if (raw === "") {
+      if (fromButton) { showError(advBox, "報酬額を入力してください。"); } else { advBox.hidden = true; }
+      return;
+    }
+    var gross = parseInt(raw, 10);
+    if (isNaN(gross)) { showError(advBox, "報酬額を入力してください。"); return; }
     var r = TaxCalc.withholding(gross);
-    if (!r.ok) { showError("報酬額は1〜999,999,999円の整数で入力してください。"); return; }
+    if (!r.ok) { showError(advBox, "報酬額は1〜999,999,999円の整数で入力してください。"); return; }
     advBox.innerHTML =
       '<div class="result-main">手取り ' + r.net.toLocaleString() + " 円</div>" +
       '<div class="table-scroll"><table class="data-table"><tbody>' +
       "<tr><td>報酬額</td><td>" + gross.toLocaleString() + " 円</td></tr>" +
       "<tr><td>源泉徴収税額</td><td>" + r.tax.toLocaleString() + " 円</td></tr>" +
       "</tbody></table></div>" +
-      '<p class="adv-note">個人への報酬(原稿料・講演料など)の源泉徴収です。100万円以下は10.21%、100万円を超える部分は20.42%(復興特別所得税込み・1円未満切り捨て)。詳細は国税庁タックスアンサー No.2792 をご確認ください。</p>';
+      '<p class="adv-note">100万円以下は10.21%、100万円を超える部分は20.42%(復興特別所得税込み・1円未満切り捨て)の概算です。</p>';
     advBox.hidden = false;
-  });
+  }
+  document.getElementById("adv-items-run").addEventListener("click", function () { runItems(true); });
+  document.getElementById("adv-wh-run").addEventListener("click", function () { runWithholding(true); });
+  for (var i = 0; i < 8; i++) {
+    document.getElementById("adv-p" + i).addEventListener("input", function () { runItems(false); });
+    document.getElementById("adv-r" + i).addEventListener("change", function () { runItems(false); });
+  }
+  document.getElementById("adv-round").addEventListener("change", function () { runItems(false); });
+  document.getElementById("adv-gross").addEventListener("input", function () { runWithholding(false); });
 })();
 </script>
 </body>

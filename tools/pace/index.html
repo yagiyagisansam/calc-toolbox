@@ -30,6 +30,7 @@
 <main>
   <h1>ランニングペース 計算機</h1>
   <form class="tool-form" id="pace-form">
+    <span class="field-note">距離と目標タイムを入れると、すぐ下にペースが表示されます</span>
     <label>距離
       <select id="distance-preset">
         <option value="42.195">フルマラソン(42.195km)</option>
@@ -40,35 +41,40 @@
       </select>
       <input type="number" id="distance" inputmode="decimal" step="any" min="0.1" max="1000" placeholder="10" hidden>
     </label>
-    <label>目標タイム(時間・分・秒)
-      <span class="field-note">例: 50分なら「0時間50分0秒」</span>
-    </label>
-    <div style="display:flex; gap:8px;">
-      <input type="number" id="t-h" inputmode="numeric" step="1" min="0" max="99" placeholder="0" aria-label="時間">
-      <input type="number" id="t-m" inputmode="numeric" step="1" min="0" max="59" placeholder="50" aria-label="分">
-      <input type="number" id="t-s" inputmode="numeric" step="1" min="0" max="59" placeholder="0" aria-label="秒">
+    <div class="field-row">
+      <label>目標タイム(時間)
+        <input type="number" id="t-h" inputmode="numeric" step="1" min="0" max="99" placeholder="0">
+      </label>
+      <label>分
+        <input type="number" id="t-m" inputmode="numeric" step="1" min="0" max="59" placeholder="50">
+      </label>
+      <label>秒
+        <input type="number" id="t-s" inputmode="numeric" step="1" min="0" max="59" placeholder="0">
+      </label>
     </div>
-    <button type="submit">ペースを計算</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
   </form>
 
   <form class="tool-form" id="time-form">
     <label>ペースからゴールタイムを予測(分・秒/km)
       <span class="field-note">上で選んだ距離を使います</span>
     </label>
-    <div style="display:flex; gap:8px;">
-      <input type="number" id="p-m" inputmode="numeric" step="1" min="1" max="60" placeholder="5" aria-label="分">
-      <input type="number" id="p-s" inputmode="numeric" step="1" min="0" max="59" placeholder="30" aria-label="秒">
+    <div class="field-row">
+      <label>ペース(分/km)
+        <input type="number" id="p-m" inputmode="numeric" step="1" min="1" max="60" placeholder="5">
+      </label>
+      <label>秒
+        <input type="number" id="p-s" inputmode="numeric" step="1" min="0" max="59" placeholder="30">
+      </label>
     </div>
-    <button type="submit">タイムを予測</button>
+    <div class="tool-result" id="result-b" hidden aria-live="polite"></div>
   </form>
-
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
   <details class="adv-box">
     <summary><span class="plus">＋</span>詳細機能: 5kmごとの通過タイムと定番目標の早見表</summary>
     <div class="adv-inner">
       <h3 class="adv-h">目標タイムから5kmごとの通過タイムを出す</h3>
-      <p class="adv-note">種目と目標タイムを入れると、必要な1kmペースと5kmごとの通過タイム表を作ります。レース中のペース確認(腕時計との照合)に。</p>
+      <p class="adv-note">種目と目標タイムを入れると、必要な1kmペースと5kmごとの通過タイム表を作ります。</p>
       <label>種目
         <select id="adv-race">
           <option value="42.195" selected>フルマラソン(42.195km)</option>
@@ -100,8 +106,8 @@
   <h2>使い方</h2>
   <ol class="steps">
     <li>距離を選びます(プリセットにない距離は「距離を入力する」)。</li>
-    <li>目標タイムを入れて「ペースを計算」を押すと、1kmあたりのペースと時速が出ます。</li>
-    <li>逆に普段のペース(例: 5分30秒/km)を入れて「タイムを予測」も使えます。</li>
+    <li>目標タイムを入れると同時に、1kmあたりのペースと時速がすぐ下に出ます。ボタンは不要です。</li>
+    <li>逆に普段のペース(例: 5分30秒/km)を入れてゴールタイムを予測することもできます。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -154,10 +160,17 @@
 (function () {
   "use strict";
   var box = document.getElementById("result");
+  var boxB = document.getElementById("result-b");
   var preset = document.getElementById("distance-preset");
   var custom = document.getElementById("distance");
   preset.addEventListener("change", function () {
     custom.hidden = preset.value !== "custom";
+    runPace(false);
+    runTime(false);
+  });
+  custom.addEventListener("input", function () {
+    runPace(false);
+    runTime(false);
   });
   function currentDistance() {
     return preset.value === "custom" ? parseFloat(custom.value) : parseFloat(preset.value);
@@ -174,30 +187,51 @@
     invalid_time: "タイムは1分〜100時間の範囲で入力してください。",
     invalid_pace: "ペースは 1分00秒〜60分00秒/km の範囲で入力してください。"
   };
-  function showError(code) {
-    box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "入力値を確認してください。") + "</p>";
-    box.hidden = false;
+  function showError(el, code) {
+    el.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "入力値を確認してください。") + "</p>";
+    el.hidden = false;
   }
-  document.getElementById("pace-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var t = (parseInt(document.getElementById("t-h").value || "0", 10)) * 3600 +
-            (parseInt(document.getElementById("t-m").value || "0", 10)) * 60 +
-            (parseInt(document.getElementById("t-s").value || "0", 10));
+  function runPace(fromSubmit) {
+    var hRaw = document.getElementById("t-h").value;
+    var mRaw = document.getElementById("t-m").value;
+    var sRaw = document.getElementById("t-s").value;
+    if (!fromSubmit && hRaw === "" && mRaw === "") { box.hidden = true; return; }
+    if (!fromSubmit && preset.value === "custom" && custom.value === "") { box.hidden = true; return; }
+    var t = (parseInt(hRaw || "0", 10)) * 3600 +
+            (parseInt(mRaw || "0", 10)) * 60 +
+            (parseInt(sRaw || "0", 10));
     var r = PaceCalc.paceFor(currentDistance(), t);
-    if (!r.ok) { showError(r.code); return; }
+    if (!r.ok) { showError(box, r.code); return; }
     box.innerHTML = '<div class="result-main">' + fmtPace(r.paceSecPerKm) + "</div>" +
       "<p>時速: <strong>" + r.speedKmh.toLocaleString() + " km/h</strong></p>";
     box.hidden = false;
+  }
+  function runTime(fromSubmit) {
+    var mRaw = document.getElementById("p-m").value;
+    var sRaw = document.getElementById("p-s").value;
+    if (!fromSubmit && mRaw === "") { boxB.hidden = true; return; }
+    if (!fromSubmit && preset.value === "custom" && custom.value === "") { boxB.hidden = true; return; }
+    var p = (parseInt(mRaw || "0", 10)) * 60 +
+            (parseInt(sRaw || "0", 10));
+    var r = PaceCalc.timeFor(currentDistance(), p);
+    if (!r.ok) { showError(boxB, r.code); return; }
+    boxB.innerHTML = '<div class="result-main">' + fmtTime(r.totalSeconds) + "</div>" +
+      "<p>距離 " + currentDistance() + " km を " + fmtPace(p) + " で走った場合</p>";
+    boxB.hidden = false;
+  }
+  document.getElementById("pace-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runPace(true);
   });
   document.getElementById("time-form").addEventListener("submit", function (e) {
     e.preventDefault();
-    var p = (parseInt(document.getElementById("p-m").value || "0", 10)) * 60 +
-            (parseInt(document.getElementById("p-s").value || "0", 10));
-    var r = PaceCalc.timeFor(currentDistance(), p);
-    if (!r.ok) { showError(r.code); return; }
-    box.innerHTML = '<div class="result-main">' + fmtTime(r.totalSeconds) + "</div>" +
-      "<p>距離 " + currentDistance() + " km を " + fmtPace(p) + " で走った場合</p>";
-    box.hidden = false;
+    runTime(true);
+  });
+  ["t-h", "t-m", "t-s"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runPace(false); });
+  });
+  ["p-m", "p-s"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runTime(false); });
   });
 })();
 </script>
@@ -219,7 +253,10 @@
     advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
     advBox.hidden = false;
   }
-  document.getElementById("adv-split-run").addEventListener("click", function () {
+  function runSplits(fromButton) {
+    if (!fromButton &&
+        document.getElementById("adv-th").value === "" &&
+        document.getElementById("adv-tm").value === "") { return; }
     var d = parseFloat(document.getElementById("adv-race").value);
     var h = parseInt(document.getElementById("adv-th").value, 10) || 0;
     var m = parseInt(document.getElementById("adv-tm").value, 10) || 0;
@@ -236,10 +273,15 @@
         "</td><td>" + advFmtTime(row.sec) + "</td></tr>";
     }
     html += "</tbody></table></div>" +
-      '<p class="adv-note">一定ペースで走った場合の計算です。給水やトイレのロスがある分、少し速めのペースで見ておくと安心です。</p>';
+      '<p class="adv-note">一定ペースで走った場合の計算です。</p>';
     advBox.innerHTML = html;
     advBox.hidden = false;
+  }
+  document.getElementById("adv-split-run").addEventListener("click", function () { runSplits(true); });
+  ["adv-th", "adv-tm", "adv-ts"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runSplits(false); });
   });
+  document.getElementById("adv-race").addEventListener("change", function () { runSplits(false); });
   var ADV_GOALS = {
     "42.195": [["サブ3", 10800], ["サブ3.5", 12600], ["サブ4", 14400], ["サブ4.5", 16200], ["サブ5", 18000]],
     "21.0975": [["1時間30分", 5400], ["1時間45分", 6300], ["2時間", 7200], ["2時間30分", 9000]],

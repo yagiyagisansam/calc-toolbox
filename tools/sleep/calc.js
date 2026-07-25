@@ -80,6 +80,39 @@
   }
 
   /**
+   * 入力済みの日だけで1週間の平均・合計・理想との差を計算する(空欄の日は無視)。
+   * 理想は1日7時間とし、差 = 合計 − 7時間 × 入力済み日数。
+   * 丸め方針: いずれも小数第1位に四捨五入。
+   * @param {Array<number|null|undefined>} hoursList 最大7日分。null/undefined は未入力として無視
+   * @returns {{ok:true, days:number, avgHours:number, totalHours:number, diffHours:number}
+   *          |{ok:false, code:string}}  code: "invalid_days"(入力0日・配列でない・7日超) | "invalid_hours"
+   */
+  function weekStatsPartial(hoursList) {
+    if (!Array.isArray(hoursList) || hoursList.length > 7) {
+      return { ok: false, code: "invalid_days" };
+    }
+    var total = 0;
+    var days = 0;
+    for (var i = 0; i < hoursList.length; i++) {
+      var h = hoursList[i];
+      if (h === null || h === undefined) continue;
+      if (typeof h !== "number" || !isFinite(h) || h < 0 || h > 24) {
+        return { ok: false, code: "invalid_hours" };
+      }
+      total += h;
+      days++;
+    }
+    if (days === 0) return { ok: false, code: "invalid_days" };
+    return {
+      ok: true,
+      days: days,
+      avgHours: round1Adv(total / days),
+      totalHours: round1Adv(total),
+      diffHours: round1Adv(total - 7 * days)
+    };
+  }
+
+  /**
    * 起床時刻と目標睡眠時間から、就寝すべき時刻を逆算する。
    * 寝つくまでの時間は含まない(布団に入ってすぐ眠る前提の単純な引き算)。
    * 丸め方針: 分単位に四捨五入。
@@ -99,6 +132,7 @@
 
   var api = {
     bedTimeFor: bedTimeFor,
+    weekStatsPartial: weekStatsPartial,
     weekStats: weekStats, calculate: calculate };
 
   if (typeof module !== "undefined" && module.exports) {

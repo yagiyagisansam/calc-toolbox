@@ -41,6 +41,7 @@
       <input type="number" id="avg-hours" inputmode="decimal" step="any" min="100" max="200" placeholder="160">
     </label>
     <button type="submit">時給に換算</button>
+    <div class="tool-result" id="result-hourly" hidden aria-live="polite"></div>
   </form>
 
   <form class="tool-form" id="zangyo-form">
@@ -62,15 +63,14 @@
       <input type="number" id="night" inputmode="decimal" step="any" min="0" max="200" value="0">
     </label>
     <button type="submit">残業代を計算</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
   </form>
-
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
   <details class="adv-box">
     <summary><span class="plus">＋</span>詳細機能: 月合計から自動計算・未払いチェック</summary>
     <div class="adv-inner">
       <h3 class="adv-h">残業の合計時間だけで詳細計算</h3>
-      <p class="adv-note">月の時間外の合計を入れるだけで、60時間を超えた分(割増50%)を自動で振り分けて計算します。基礎時給は上のフォームの値を使います。</p>
+      <p class="adv-note">月の時間外の合計を入れるだけで、60時間を超えた分(割増50%)を自動で振り分けて計算します(基礎時給は上のフォームの値)。</p>
       <label>月の時間外労働の合計(時間)
         <span class="field-note">60時間以内は25%、超えた分は自動で50%で計算します</span>
         <input type="number" id="adv-ot-total" inputmode="decimal" step="any" min="0" max="200" placeholder="70">
@@ -99,9 +99,9 @@
 
   <h2>使い方</h2>
   <ol class="steps">
-    <li>時給がわからない場合は、月給と月平均所定労働時間を入れて「時給に換算」を押します(結果が下の欄に自動で入ります)。</li>
+    <li>時給がわからない場合は、月給と月平均所定労働時間を入れると基礎時給が自動計算され、下の欄に入ります。</li>
     <li>残業の内訳(時間外・60時間超・法定休日・深夜)を時間で入力します。</li>
-    <li>「残業代を計算」で内訳つきの金額が表示されます。</li>
+    <li>入力のたびに内訳つきの金額が自動で更新されます(ボタンでも計算できます)。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -168,31 +168,23 @@
 (function () {
   "use strict";
   var box = document.getElementById("result");
+  var hourlyBox = document.getElementById("result-hourly");
   var ERROR_MESSAGES = {
     invalid_hourly: "基礎時給は 500〜50,000円 の範囲で入力してください。",
     invalid_hours: "時間は 0〜200時間 の範囲で入力してください。",
     invalid_monthly: "月給は 50,000〜10,000,000円 の範囲で入力してください。",
     invalid_avg_hours: "月平均所定労働時間は 100〜200 の範囲で入力してください。"
   };
-  function showError(code) {
-    box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "入力値を確認してください。") + "</p>";
-    box.hidden = false;
+  function raw(id) { return document.getElementById(id).value; }
+  function showError(target, code) {
+    target.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "入力値を確認してください。") + "</p>";
+    target.hidden = false;
   }
-  document.getElementById("hourly-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var r = ZangyoCalc.hourlyFromMonthly(
-      parseFloat(document.getElementById("monthly").value),
-      parseFloat(document.getElementById("avg-hours").value));
-    if (!r.ok) { showError(r.code); return; }
-    document.getElementById("hourly").value = r.hourlyYen;
-    box.innerHTML = '<div class="result-main">基礎時給 約' + r.hourlyYen.toLocaleString() + " 円</div><p>下の残業代計算の欄に自動入力しました。</p>";
-    box.hidden = false;
-  });
-  document.getElementById("zangyo-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var num = function (id) { return parseFloat(document.getElementById(id).value || "0"); };
+  function runZangyo() {
+    if (raw("hourly") === "") { box.hidden = true; return; }
+    var num = function (id) { return parseFloat(raw(id) || "0"); };
     var r = ZangyoCalc.calculate(num("hourly"), num("ot"), num("ot60"), num("holiday"), num("night"));
-    if (!r.ok) { showError(r.code); return; }
+    if (!r.ok) { showError(box, r.code); return; }
     box.innerHTML =
       '<div class="result-main">残業代 約' + r.totalPay.toLocaleString() + " 円/月</div>" +
       "<p>内訳 — 時間外(×1.25): <strong>" + r.overtimePay.toLocaleString() + "円</strong>" +
@@ -200,6 +192,35 @@
       (r.holidayPay ? " / 法定休日(×1.35): <strong>" + r.holidayPay.toLocaleString() + "円</strong>" : "") +
       (r.lateNightExtra ? " / 深夜加算(+0.25): <strong>" + r.lateNightExtra.toLocaleString() + "円</strong>" : "") + "</p>";
     box.hidden = false;
+  }
+  function runHourlyFromMonthly() {
+    if (raw("monthly") === "" || raw("avg-hours") === "") { hourlyBox.hidden = true; return; }
+    var r = ZangyoCalc.hourlyFromMonthly(parseFloat(raw("monthly")), parseFloat(raw("avg-hours")));
+    if (!r.ok) { showError(hourlyBox, r.code); return; }
+    var hourlyInput = document.getElementById("hourly");
+    hourlyInput.value = r.hourlyYen;
+    hourlyBox.innerHTML = '<div class="result-main">基礎時給 約' + r.hourlyYen.toLocaleString() + " 円</div><p>下の残業代計算の欄に自動入力しました。</p>";
+    hourlyBox.hidden = false;
+    hourlyInput.dispatchEvent(new Event("input"));
+  }
+  ["monthly", "avg-hours"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runHourlyFromMonthly);
+  });
+  ["hourly", "ot", "ot60", "holiday", "night"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runZangyo);
+  });
+  document.getElementById("hourly-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (raw("monthly") === "" || raw("avg-hours") === "") {
+      showError(hourlyBox, raw("monthly") === "" ? "invalid_monthly" : "invalid_avg_hours");
+      return;
+    }
+    runHourlyFromMonthly();
+  });
+  document.getElementById("zangyo-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (raw("hourly") === "") { showError(box, "invalid_hourly"); return; }
+    runZangyo();
   });
 })();
 </script>
@@ -212,7 +233,7 @@
     invalid_hours: "時間は 0〜200時間 の範囲で入力してください。",
     invalid_paid: "支払われた残業代は 0〜10,000,000円 の範囲で入力してください。"
   };
-  document.getElementById("adv-run").addEventListener("click", function () {
+  function runAdv() {
     var hourly = parseFloat(document.getElementById("hourly").value);
     var otTotal = parseFloat(document.getElementById("adv-ot-total").value);
     if (isNaN(otTotal)) otTotal = 0;
@@ -246,6 +267,17 @@
     }
     advBox.innerHTML = html;
     advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", runAdv);
+  function autoAdv() {
+    if (document.getElementById("hourly").value !== "" && document.getElementById("adv-ot-total").value !== "") {
+      runAdv();
+    } else {
+      advBox.hidden = true;
+    }
+  }
+  ["adv-ot-total", "adv-holiday", "adv-night", "adv-paid", "hourly"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoAdv);
   });
 })();
 </script>

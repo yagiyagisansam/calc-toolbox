@@ -31,34 +31,35 @@
   <h1>住宅ローン 借入可能額 計算機</h1>
   <form class="tool-form" id="kariire-form">
     <label>年収(万円・額面)
-      <input type="number" id="income" min="100" max="10000" step="any" required placeholder="例: 500">
+      <span class="field-note">入力すると自動で計算されます</span>
+      <input type="number" id="income" inputmode="numeric" min="100" max="10000" step="any" required placeholder="例: 500">
     </label>
     <label>返済負担率(%)
       <span class="field-note">無理のない目安20〜25%・金融機関の審査上限目安30〜35%</span>
-      <input type="number" id="burden" min="5" max="50" step="1" value="25" required>
+      <input type="number" id="burden" inputmode="numeric" min="5" max="50" step="1" value="25" required>
     </label>
     <label>金利(年利%)
-      <input type="number" id="rate" min="0" max="20" step="0.01" value="1.5" required>
+      <input type="number" id="rate" inputmode="decimal" min="0" max="20" step="0.01" value="1.5" required>
     </label>
     <label>返済期間(年)
-      <input type="number" id="years" min="1" max="50" step="1" value="35" required>
+      <input type="number" id="years" inputmode="numeric" min="1" max="50" step="1" value="35" required>
     </label>
     <button type="submit">借入可能額を計算する</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
   </form>
-
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
   <details class="adv-box">
     <summary><span class="plus">＋</span>詳細機能: 金利が上がったら? と 買える物件価格</summary>
     <div class="adv-inner">
       <h3 class="adv-h">金利上昇シナリオ(変動金利のリスクチェック)</h3>
-      <p class="adv-note">借入額を入れると、金利が今より +0.5% / +1% / +2% 上がった場合の毎月返済額を比べられます。金利と期間は上のフォームの値を使います。空欄なら上のフォームの計算結果(借入可能額)を使います。</p>
+      <p class="adv-note">金利が今より +0.5% / +1% / +2% 上がった場合の毎月返済額を比べます(借入額が空欄なら上の計算結果を使用)。</p>
       <label>借入額(万円)
         <input type="number" id="adv-loan" inputmode="numeric" step="any" min="100" max="100000" placeholder="空欄なら上の計算結果を使用">
       </label>
       <button type="button" id="adv-scenario-run">金利上昇シナリオを計算</button>
+      <div class="tool-result" id="adv-scenario-result" hidden aria-live="polite"></div>
       <h3 class="adv-h">買える物件価格の目安</h3>
-      <p class="adv-note">物件価格 =(借入額 + 頭金)÷(1 + 諸費用率)で概算します。諸費用は物件価格の5〜10%が目安です。借入額は上と同じ(空欄なら計算結果)を使います。</p>
+      <p class="adv-note">物件価格 =(借入額 + 頭金)÷(1 + 諸費用率)で概算します(借入額は上と同じ・諸費用の目安は5〜10%)。</p>
       <label>頭金(万円)
         <input type="number" id="adv-down" inputmode="numeric" step="any" min="0" max="100000" value="0">
       </label>
@@ -76,7 +77,7 @@
   <ol class="steps">
     <li>年収(額面)を万円で入力します。</li>
     <li>返済負担率を選びます(家計に無理のない目安は20〜25%)。</li>
-    <li>想定金利と返済期間を入れて「計算する」を押すと、借入可能額が表示されます。</li>
+    <li>想定金利と返済期間を入れると、その場で借入可能額が表示されます(ボタンを押す必要はありません)。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -139,8 +140,11 @@
     invalid_rate: "金利は0〜20%の範囲で入力してください。",
     invalid_years: "返済期間は1〜50年の整数で入力してください。"
   };
-  document.getElementById("kariire-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  function runMain() {
+    if (document.getElementById("income").value === "" ||
+        document.getElementById("burden").value === "" ||
+        document.getElementById("rate").value === "" ||
+        document.getElementById("years").value === "") { box.hidden = true; return; }
     var r = KariireCalc.borrowable(
       parseFloat(document.getElementById("income").value) * 10000,
       parseFloat(document.getElementById("burden").value),
@@ -154,17 +158,26 @@
       "<p>毎月の返済額: 約<strong>" + r.monthly.toLocaleString() + "円</strong></p>" +
       "<p>※目安の概算です。実際の審査額は審査金利・他の借入等で変わります。</p>";
     box.hidden = false;
+  }
+  document.getElementById("kariire-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
   });
+  ["income", "burden", "rate", "years"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runMain);
+  });
+  runMain();
 })();
 </script>
 <script>
 (function () {
   "use strict";
+  var scenarioBox = document.getElementById("adv-scenario-result");
   var advBox = document.getElementById("adv-result");
   var MAN = 10000;
-  function showError(msg) {
-    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
-    advBox.hidden = false;
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
   }
   function readLoanYen() {
     var v = parseFloat(document.getElementById("adv-loan").value);
@@ -177,17 +190,17 @@
     var r = KariireCalc.borrowable(income * MAN, burden, rate, years);
     return r.ok ? r.loan : null;
   }
-  document.getElementById("adv-scenario-run").addEventListener("click", function () {
+  function runScenario() {
     var loanYen = readLoanYen();
     var rate = parseFloat(document.getElementById("rate").value);
     var years = parseInt(document.getElementById("years").value, 10);
     if (loanYen === null || isNaN(rate) || isNaN(years)) {
-      showError("借入額(万円)を入力するか、上のフォームを先に入力してください。");
+      showError(scenarioBox, "借入額(万円)を入力するか、上のフォームを先に入力してください。");
       return;
     }
     var r = KariireCalc.rateScenarios(loanYen, rate, years);
     if (!r.ok) {
-      showError(r.code === "invalid_rate" ? "金利は0〜18%の範囲で入力してください(+2%の比較まで行うため)。" : "借入額は100万〜10億円、期間は1〜50年で入力してください。");
+      showError(scenarioBox, r.code === "invalid_rate" ? "金利は0〜18%の範囲で入力してください(+2%の比較まで行うため)。" : "借入額は100万〜10億円、期間は1〜50年で入力してください。");
       return;
     }
     var html = '<div class="result-main">金利+1%で毎月 +' + r.rows[2].monthlyDiff.toLocaleString() + " 円</div>" +
@@ -200,29 +213,43 @@
         "<td>" + row.total.toLocaleString() + " 円</td></tr>";
     }
     html += "</tbody></table></div>" +
-      '<p class="adv-note">借入額 ' + Math.round(loanYen / MAN).toLocaleString() + " 万円・元利均等の概算です。変動金利を選ぶ場合はこの上昇に耐えられるかを確認しておくと安心です。</p>";
-    advBox.innerHTML = html;
-    advBox.hidden = false;
-  });
-  document.getElementById("adv-budget-run").addEventListener("click", function () {
+      '<p class="adv-note">借入額 ' + Math.round(loanYen / MAN).toLocaleString() + " 万円・元利均等の概算です。</p>";
+    scenarioBox.innerHTML = html;
+    scenarioBox.hidden = false;
+  }
+  function runBudget() {
     var loanYen = readLoanYen();
     if (loanYen === null) {
-      showError("借入額(万円)を入力するか、上のフォームを先に入力してください。");
+      showError(advBox, "借入額(万円)を入力するか、上のフォームを先に入力してください。");
       return;
     }
     var down = parseFloat(document.getElementById("adv-down").value);
     var fee = parseFloat(document.getElementById("adv-fee").value);
-    if (isNaN(down) || isNaN(fee)) { showError("頭金と諸費用率を入力してください。"); return; }
+    if (isNaN(down) || isNaN(fee)) { showError(advBox, "頭金と諸費用率を入力してください。"); return; }
     var r = KariireCalc.propertyBudget(loanYen, down * MAN, fee);
-    if (!r.ok) { showError("借入額は100万〜10億円、頭金は0円以上、諸費用率は0〜20%で入力してください。"); return; }
+    if (!r.ok) { showError(advBox, "借入額は100万〜10億円、頭金は0円以上、諸費用率は0〜20%で入力してください。"); return; }
     advBox.innerHTML =
       '<div class="result-main">物件価格の目安 約 ' + Math.round(r.budget / MAN).toLocaleString() + " 万円</div>" +
       '<div class="table-scroll"><table class="data-table"><tbody>' +
       "<tr><td>借入額 + 頭金</td><td>" + Math.round((loanYen + down * MAN) / MAN).toLocaleString() + " 万円</td></tr>" +
       "<tr><td>うち諸費用(" + fee + "%)</td><td>約 " + Math.round(r.fees / MAN).toLocaleString() + " 万円</td></tr>" +
       "</tbody></table></div>" +
-      '<p class="adv-note">諸費用を物件価格に比例(' + fee + "%)と仮定した概算です。実際の諸費用は物件種別・仲介の有無で変わります。</p>";
+      '<p class="adv-note">諸費用を物件価格に比例(' + fee + "%)と仮定した概算です。</p>";
     advBox.hidden = false;
+  }
+  var scenarioShown = false;
+  var budgetShown = false;
+  document.getElementById("adv-scenario-run").addEventListener("click", function () { scenarioShown = true; runScenario(); });
+  document.getElementById("adv-budget-run").addEventListener("click", function () { budgetShown = true; runBudget(); });
+  document.getElementById("adv-loan").addEventListener("input", function () { scenarioShown = true; runScenario(); if (budgetShown) runBudget(); });
+  ["adv-down", "adv-fee"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { budgetShown = true; runBudget(); });
+  });
+  ["income", "burden", "rate", "years"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (scenarioShown) runScenario();
+      if (budgetShown) runBudget();
+    });
   });
 })();
 </script>

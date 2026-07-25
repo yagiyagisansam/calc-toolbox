@@ -30,6 +30,7 @@
 <main>
   <h1>睡眠サイクル計算機</h1>
   <form class="tool-form" id="cycle-form">
+    <span class="field-note">時刻を変えると、すぐ下の候補が自動で更新されます</span>
     <label>計算の種類
       <select id="mode">
         <option value="bed" selected>起床時刻から「何時に寝るか」を逆算</option>
@@ -41,7 +42,7 @@
     </label>
     <label>寝つくまでの時間(分)
       <span class="field-note">目安は15分。すぐ眠れる人は5分</span>
-      <input type="number" id="fall" min="0" max="60" step="5" value="15">
+      <input type="number" id="fall" inputmode="numeric" min="0" max="60" step="5" value="15">
     </label>
     <button type="submit">時刻の候補を計算する</button>
   </form>
@@ -52,7 +53,7 @@
     <summary><span class="plus">＋</span>詳細機能: 自分の周期に合わせる・今すぐ寝る</summary>
     <div class="adv-inner">
       <h3 class="adv-h">周期の長さを自分に合わせて再計算</h3>
-      <p class="adv-note">睡眠の周期は人により70〜110分程度の幅があります。90分で合わない場合は80分・100分で計算し直せます。時刻・寝つくまでの時間・計算の種類は上のフォームの値を使います。</p>
+      <p class="adv-note">周期には70〜110分程度の個人差があるため、90分で合わない場合は80分・100分で計算し直せます(時刻などは上のフォームの値を使います)。</p>
       <label>周期の長さ
         <select id="adv-cycle-len">
           <option value="80">80分(短め)</option>
@@ -74,7 +75,7 @@
   <ol class="steps">
     <li>起きたい時刻(または寝る時刻)を入力します。</li>
     <li>寝つくまでのおおよその時間を入力します(目安15分)。</li>
-    <li>「計算する」を押すと、6時間・7.5時間・9時間睡眠に相当する時刻の候補が表示されます。</li>
+    <li>入力と同時に、6時間・7.5時間・9時間睡眠に相当する時刻の候補が下に表示されます。ボタンは不要です。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -135,10 +136,11 @@
   mode.addEventListener("change", function () {
     timeLabel.childNodes[0].textContent = mode.value === "bed" ? "起床時刻" : "就寝時刻";
     document.getElementById("time").value = mode.value === "bed" ? "06:30" : "23:00";
+    run(false);
   });
-  document.getElementById("cycle-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  function run(fromSubmit) {
     var t = document.getElementById("time").value;
+    if (!fromSubmit && t === "") { box.hidden = true; return; }
     var fall = parseFloat(document.getElementById("fall").value || "15");
     var isBed = mode.value === "bed";
     var r = isBed ? CycleCalc.bedTimes(t, fall) : CycleCalc.wakeTimes(t, fall);
@@ -153,7 +155,16 @@
       '<div class="table-scroll"><table class="data-table"><thead><tr><th>' + (isBed ? "寝る時刻" : "起きる時刻") + "</th><th>睡眠時間</th></tr></thead><tbody>" +
       rows + "</tbody></table></div><p>⭐=7.5時間(推奨)。周期には個人差があります。</p>";
     box.hidden = false;
+    if (window.__cycleAdvRefresh) { window.__cycleAdvRefresh(); }
+  }
+  document.getElementById("cycle-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
   });
+  document.getElementById("time").addEventListener("change", function () { run(false); });
+  document.getElementById("time").addEventListener("input", function () { run(false); });
+  document.getElementById("fall").addEventListener("input", function () { run(false); });
+  run(false);
 })();
 </script>
 <script>
@@ -178,11 +189,11 @@
         o.sleepHours.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "時間</td><td>" + o.time + "</td></tr>";
     }
     html += "</tbody></table></div>" +
-      '<p class="adv-note">周期の長さには個人差があります。候補はあくまで目安です。</p>';
+      '<p class="adv-note">周期の長さには個人差があるため、候補はあくまで目安です。</p>';
     advBox.innerHTML = html;
     advBox.hidden = false;
   }
-  document.getElementById("adv-cycle-run").addEventListener("click", function () {
+  function runCustom() {
     var mode = document.getElementById("mode").value;
     var time = document.getElementById("time").value;
     var fall = parseFloat(document.getElementById("fall").value);
@@ -191,7 +202,12 @@
     var r = CycleCalc.customOptions(mode, time, fall, len);
     advRender(r, "周期" + len + "分での候補",
       mode === "bed" ? "就寝時刻の候補" : "起床時刻の候補");
-  });
+  }
+  document.getElementById("adv-cycle-run").addEventListener("click", runCustom);
+  document.getElementById("adv-cycle-len").addEventListener("change", runCustom);
+  window.__cycleAdvRefresh = function () {
+    if (!advBox.hidden) { runCustom(); }
+  };
   document.getElementById("adv-now-run").addEventListener("click", function () {
     var now = new Date();
     var hm = now.getHours() + ":" + (now.getMinutes() < 10 ? "0" : "") + now.getMinutes();

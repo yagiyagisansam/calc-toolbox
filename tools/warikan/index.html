@@ -45,16 +45,16 @@
         <option value="1000">1000円単位</option>
       </select>
     </label>
+    <span class="field-note">金額と人数を入れると自動で計算されます</span>
     <button type="submit">計算する</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
   </form>
-
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
   <details class="adv-box">
     <summary><span class="plus">＋</span>詳細機能: 傾斜をつけた割り勘と集金チェック</summary>
     <div class="adv-inner">
       <h3 class="adv-h">多めに払う人がいる割り勘(傾斜配分)</h3>
-      <p class="adv-note">「上司は多めに、後輩は少なめに」の分け方です。合計金額は上のフォームの値を使います(下に入れれば上書き)。端数は多めに払う側が吸収します。</p>
+      <p class="adv-note">「上司は多めに」の傾斜割り勘で、端数は多めに払う側が吸収します(合計金額が空欄なら上のフォームの値を使用)。</p>
       <label>合計金額(円・空欄なら上のフォームの値)
         <input type="number" id="adv-wtotal" inputmode="numeric" step="1" min="1" max="10000000" placeholder="空欄なら上の値を使用">
       </label>
@@ -68,8 +68,9 @@
         <input type="number" id="adv-normal" inputmode="numeric" step="1" min="1" max="99" placeholder="3">
       </label>
       <button type="button" id="adv-weight-run">傾斜割り勘を計算</button>
+      <div class="tool-result" id="adv-weight-result" hidden aria-live="polite"></div>
       <h3 class="adv-h">「1人○円」で集めたら足りる?</h3>
-      <p class="adv-note">キリのいい金額で集めた時の余り・不足を確認します。合計金額と人数は上のフォームの値を使います。</p>
+      <p class="adv-note">キリのいい金額で集めた時の余り・不足を確認します(合計金額と人数は上のフォームの値を使用)。</p>
       <label>1人から集める額(円)
         <input type="number" id="adv-per" inputmode="numeric" step="1" min="1" placeholder="4000">
       </label>
@@ -88,7 +89,7 @@
   <ol class="steps">
     <li>レシートの合計金額と参加人数を入力します。</li>
     <li>集金しやすい単位(100円・500円など)を選びます。小銭を出し合えるなら「1円単位」でぴったり割れます。</li>
-    <li>「計算する」を押すと、1人あたりの金額・集金合計・余りが表示されます。</li>
+    <li>入力と同時に、1人あたりの金額・集金合計・余りが表示されます(ボタンを押す必要はありません)。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -145,13 +146,14 @@
     invalid_people: "人数は 2〜100人 の整数で入力してください。",
     invalid_unit: "切り上げの単位を選択してください。"
   };
-  document.getElementById("warikan-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  var box = document.getElementById("result");
+  function runMain() {
+    if (document.getElementById("total").value === "" ||
+        document.getElementById("people").value === "") { box.hidden = true; return; }
     var result = WarikanCalc.split(
       parseFloat(document.getElementById("total").value),
       parseFloat(document.getElementById("people").value),
       parseInt(document.getElementById("unit").value, 10));
-    var box = document.getElementById("result");
     if (result.ok) {
       box.innerHTML =
         '<div class="result-main">1人 ' + result.perPerson.toLocaleString() + " 円</div>" +
@@ -161,16 +163,25 @@
       box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
     }
     box.hidden = false;
+  }
+  document.getElementById("warikan-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
   });
+  ["total", "people"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runMain);
+  });
+  document.getElementById("unit").addEventListener("change", runMain);
 })();
 </script>
 <script>
 (function () {
   "use strict";
+  var weightBox = document.getElementById("adv-weight-result");
   var advBox = document.getElementById("adv-result");
-  function showError(msg) {
-    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
-    advBox.hidden = false;
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
   }
   function readTotal(advId) {
     var v = parseInt(document.getElementById(advId).value, 10);
@@ -178,38 +189,38 @@
     var main = parseInt(document.getElementById("total").value, 10);
     return isNaN(main) ? null : main;
   }
-  document.getElementById("adv-weight-run").addEventListener("click", function () {
+  function runWeighted() {
     var total = readTotal("adv-wtotal");
     var heavy = parseInt(document.getElementById("adv-heavy").value, 10);
     var mult = parseFloat(document.getElementById("adv-mult").value);
     var normal = parseInt(document.getElementById("adv-normal").value, 10);
-    if (total === null) { showError("合計金額を入力してください(上のフォームでも可)。"); return; }
-    if (isNaN(heavy) || isNaN(mult) || isNaN(normal)) { showError("人数と倍率を入力してください。"); return; }
+    if (total === null) { showError(weightBox, "合計金額を入力してください(上のフォームでも可)。"); return; }
+    if (isNaN(heavy) || isNaN(mult) || isNaN(normal)) { showError(weightBox, "人数と倍率を入力してください。"); return; }
     var r = WarikanCalc.weightedSplit(total, heavy, mult, normal);
     if (!r.ok) {
-      showError(r.code === "invalid_mult" ? "倍率は1〜10倍で入力してください。" :
+      showError(weightBox, r.code === "invalid_mult" ? "倍率は1〜10倍で入力してください。" :
         r.code === "invalid_people" ? "人数はそれぞれ1〜99人・合計100人以内で入力してください。" :
         "合計金額は1〜10,000,000円の整数で入力してください。");
       return;
     }
-    advBox.innerHTML =
+    weightBox.innerHTML =
       '<div class="result-main">多めの人 ' + r.heavyPay.toLocaleString() + " 円 / 普通の人 " + r.normalPay.toLocaleString() + " 円</div>" +
       '<div class="table-scroll"><table class="data-table"><tbody>' +
       "<tr><td>多めに払う人(" + heavy + "人)</td><td>" + r.heavyPay.toLocaleString() + " 円 ずつ</td></tr>" +
       "<tr><td>普通に払う人(" + normal + "人)</td><td>" + r.normalPay.toLocaleString() + " 円 ずつ</td></tr>" +
       "<tr><td>集金合計</td><td>" + r.collected.toLocaleString() + " 円(余り " + r.surplus.toLocaleString() + " 円)</td></tr>" +
       "</tbody></table></div>" +
-      '<p class="adv-note">端数は多めに払う側が吸収する計算です。余りは切り上げで生じた分です。</p>';
-    advBox.hidden = false;
-  });
-  document.getElementById("adv-collect-run").addEventListener("click", function () {
+      '<p class="adv-note">端数は多めに払う側が吸収する計算です。</p>';
+    weightBox.hidden = false;
+  }
+  function runCollect() {
     var total = parseInt(document.getElementById("total").value, 10);
     var people = parseInt(document.getElementById("people").value, 10);
     var per = parseInt(document.getElementById("adv-per").value, 10);
-    if (isNaN(total) || isNaN(people)) { showError("先に上のフォームへ合計金額と人数を入力してください。"); return; }
-    if (isNaN(per)) { showError("1人から集める額を入力してください。"); return; }
+    if (isNaN(total) || isNaN(people)) { showError(advBox, "先に上のフォームへ合計金額と人数を入力してください。"); return; }
+    if (isNaN(per)) { showError(advBox, "1人から集める額を入力してください。"); return; }
     var r = WarikanCalc.collectCheck(total, people, per);
-    if (!r.ok) { showError("入力値を確認してください(合計1〜1,000万円・2〜100人・集金額1円以上)。"); return; }
+    if (!r.ok) { showError(advBox, "入力値を確認してください(合計1〜1,000万円・2〜100人・集金額1円以上)。"); return; }
     var verdict = r.diff >= 0
       ? "足ります(余り " + r.diff.toLocaleString() + " 円)"
       : "足りません(不足 " + Math.abs(r.diff).toLocaleString() + " 円)";
@@ -217,6 +228,29 @@
       '<div class="result-main">' + verdict + "</div>" +
       "<p>1人 " + per.toLocaleString() + " 円 × " + people + " 人 = 集金合計 <strong>" + r.collected.toLocaleString() + " 円</strong>(支払い " + total.toLocaleString() + " 円)</p>";
     advBox.hidden = false;
+  }
+  document.getElementById("adv-weight-run").addEventListener("click", runWeighted);
+  document.getElementById("adv-collect-run").addEventListener("click", runCollect);
+  function maybeRunWeighted() {
+    if (readTotal("adv-wtotal") !== null &&
+        document.getElementById("adv-heavy").value !== "" &&
+        document.getElementById("adv-mult").value !== "" &&
+        document.getElementById("adv-normal").value !== "") runWeighted();
+  }
+  function maybeRunCollect() {
+    if (document.getElementById("adv-per").value !== "" &&
+        document.getElementById("total").value !== "" &&
+        document.getElementById("people").value !== "") runCollect();
+  }
+  ["adv-wtotal", "adv-heavy", "adv-mult", "adv-normal"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", maybeRunWeighted);
+  });
+  document.getElementById("adv-per").addEventListener("input", maybeRunCollect);
+  ["total", "people"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (!weightBox.hidden) maybeRunWeighted();
+      if (!advBox.hidden) maybeRunCollect();
+    });
   });
 })();
 </script>

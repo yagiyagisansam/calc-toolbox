@@ -31,26 +31,25 @@
   <h1>定期券は元が取れる? 計算機</h1>
   <form class="tool-form" id="teiki-form">
     <label>定期券の価格(1ヶ月・円)
-      <input type="number" id="pass" min="1" step="any" required placeholder="例: 10000">
+      <input type="number" id="pass" inputmode="numeric" min="1" step="any" required placeholder="例: 10000">
     </label>
     <label>片道運賃(円)
       <span class="field-note">交通系ICの運賃で入力</span>
-      <input type="number" id="fare" min="1" step="1" required placeholder="例: 200">
+      <input type="number" id="fare" inputmode="numeric" min="1" step="1" required placeholder="例: 200">
     </label>
     <label>月に乗る日数(往復)
       <span class="field-note">週5出社なら20〜22日、週3なら12〜13日</span>
-      <input type="number" id="days" min="1" max="31" step="1" value="20" required>
+      <input type="number" id="days" inputmode="numeric" min="1" max="31" step="1" value="20" required>
     </label>
     <button type="submit">元が取れるか計算する</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
   </form>
-
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
   <details class="adv-box">
     <summary><span class="plus">＋</span>詳細機能: 3ヶ月・6ヶ月定期もまとめて比較</summary>
     <div class="adv-inner">
       <h3 class="adv-h">3ヶ月・6ヶ月定期とくらべる</h3>
-      <p class="adv-note">1ヶ月定期の価格・片道運賃・利用日数は上のフォームの値を使います。3ヶ月・6ヶ月定期の価格を追加すると、月あたり額・元が取れる日数・年間額を表でくらべられます。</p>
+      <p class="adv-note">3ヶ月・6ヶ月定期の価格を追加すると、月あたり額・元が取れる日数・年間額を表でくらべられます(1ヶ月定期・運賃・日数は上のフォームの値)。</p>
       <label>3ヶ月定期の価格(円)
         <input type="number" id="adv-pass3" inputmode="numeric" min="1" max="3000000" step="any" placeholder="例: 28500">
       </label>
@@ -68,7 +67,7 @@
   <ol class="steps">
     <li>定期券の1ヶ月の価格を入力します(6ヶ月定期なら6で割った額)。</li>
     <li>片道の運賃(交通系ICでの支払額)を入力します。</li>
-    <li>月に乗る日数を入れて「計算する」を押すと、どちらが得かと差額が表示されます。</li>
+    <li>月に乗る日数を入れると、どちらが得かと差額がすぐ下に自動表示されます。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -129,12 +128,22 @@
     invalid_fare: "片道運賃を1円以上で入力してください。",
     invalid_days: "日数は1〜31の整数で入力してください。"
   };
-  document.getElementById("teiki-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  function raw(id) { return document.getElementById(id).value; }
+  function run(showErrors) {
+    if (raw("pass") === "" || raw("fare") === "" || raw("days") === "") {
+      if (showErrors) {
+        var code = raw("pass") === "" ? "invalid_pass" : raw("fare") === "" ? "invalid_fare" : "invalid_days";
+        box.innerHTML = '<p class="result-error">' + MSG[code] + "</p>";
+        box.hidden = false;
+      } else {
+        box.hidden = true;
+      }
+      return;
+    }
     var r = TeikiCalc.compare(
-      parseFloat(document.getElementById("pass").value),
-      parseFloat(document.getElementById("fare").value),
-      parseInt(document.getElementById("days").value, 10)
+      parseFloat(raw("pass")),
+      parseFloat(raw("fare")),
+      parseInt(raw("days"), 10)
     );
     if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "入力値を確認してください。") + "</p>"; box.hidden = false; return; }
     var verdict = r.better === "pass" ? "定期券のほうが得" : r.better === "payg" ? "都度払いのほうが得" : "ほぼ同額";
@@ -146,6 +155,13 @@
       "<tr><td>元が取れる日数</td><td>月 <strong>" + r.breakEvenDays + "日</strong> 以上</td></tr>" +
       "</tbody></table></div>";
     box.hidden = false;
+  }
+  ["pass", "fare", "days"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { run(false); });
+  });
+  document.getElementById("teiki-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
   });
 })();
 </script>
@@ -161,7 +177,7 @@
     invalid_days: "月の利用日数(上のフォーム)は 1〜31日 の整数で入力してください。"
   };
   var BEST_LABELS = { payg: "都度払い(定期なし)", m1: "1ヶ月定期", m3: "3ヶ月定期", m6: "6ヶ月定期" };
-  document.getElementById("adv-run").addEventListener("click", function () {
+  function runAdv() {
     var pass1 = parseFloat(document.getElementById("pass").value);
     var fare = parseFloat(document.getElementById("fare").value);
     var days = parseFloat(document.getElementById("days").value);
@@ -199,6 +215,18 @@
     html += '</ul><p class="adv-note">定期は途中で使わなくなると払い戻し手数料がかかります。長期の休みや異動の予定がある場合はご注意ください。</p>';
     advBox.innerHTML = html;
     advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", runAdv);
+  function autoAdv() {
+    var filled = function (id) { return document.getElementById(id).value !== ""; };
+    if (filled("adv-pass3") && filled("adv-pass6") && filled("pass") && filled("fare") && filled("days")) {
+      runAdv();
+    } else {
+      advBox.hidden = true;
+    }
+  }
+  ["adv-pass3", "adv-pass6", "pass", "fare", "days"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoAdv);
   });
 })();
 </script>

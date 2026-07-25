@@ -30,11 +30,12 @@
 <main>
   <h1>電子レンジ加熱時間 換算計算機</h1>
   <form class="tool-form" id="renji-form">
+    <span class="field-note">入力・変更と同時に、すぐ下に換算結果が表示されます</span>
     <label>表記の加熱時間
       <span class="field-note">パッケージやレシピに書かれている時間</span>
       <span style="display:flex;gap:.5em;align-items:center;">
-        <input type="number" id="min" min="0" max="120" step="1" value="1" style="width:5em;" aria-label="分"> 分
-        <input type="number" id="sec" min="0" max="59" step="1" value="30" style="width:5em;" aria-label="秒"> 秒
+        <input type="number" id="min" inputmode="numeric" min="0" max="120" step="1" value="1" style="width:5em;" aria-label="分"> 分
+        <input type="number" id="sec" inputmode="numeric" min="0" max="59" step="1" value="30" style="width:5em;" aria-label="秒"> 秒
       </span>
     </label>
     <label>表記のワット数
@@ -70,11 +71,11 @@
     <summary><span class="plus">＋</span>詳細機能: 一括換算表と自由なワット数</summary>
     <div class="adv-inner">
       <h3 class="adv-h">500〜1000Wの一括換算表</h3>
-      <p class="adv-note">表記の時間とワット数から、500W・600W・700W・800W・1000Wそれぞれの加熱時間を一度に表にします。実家や職場などワット数が違うレンジを使う時の確認に。</p>
+      <p class="adv-note">表記の時間とワット数から、500W・600W・700W・800W・1000Wそれぞれの加熱時間を一度に表にします。</p>
       <label>表記の加熱時間
         <span style="display:flex;gap:.5em;align-items:center;">
-          <input type="number" id="adv-min" min="0" max="120" step="1" value="1" style="width:5em;" aria-label="分"> 分
-          <input type="number" id="adv-sec" min="0" max="59" step="1" value="30" style="width:5em;" aria-label="秒"> 秒
+          <input type="number" id="adv-min" inputmode="numeric" min="0" max="120" step="1" value="1" style="width:5em;" aria-label="分"> 分
+          <input type="number" id="adv-sec" inputmode="numeric" min="0" max="59" step="1" value="30" style="width:5em;" aria-label="秒"> 秒
         </span>
       </label>
       <label>表記のワット数
@@ -91,12 +92,12 @@
       </label>
       <button type="button" id="adv-run">一括換算表を作る</button>
       <h3 class="adv-h">一覧にないワット数で換算する</h3>
-      <p class="adv-note">850Wや550Wなど、上の選択肢にないワット数はこちらで。100〜2000Wの範囲で自由に入力できます(時間は上の欄の値を使います)。</p>
+      <p class="adv-note">850Wなど選択肢にないワット数は、こちらに100〜2000Wの範囲で自由に入力できます(時間は上の欄の値を使います)。</p>
       <label>表記のワット数(自由入力)
-        <input type="number" id="adv-free-from" min="100" max="2000" step="1" value="600" placeholder="例: 600">
+        <input type="number" id="adv-free-from" inputmode="numeric" min="100" max="2000" step="1" value="600" placeholder="例: 600">
       </label>
       <label>お家のレンジのワット数(自由入力)
-        <input type="number" id="adv-free-to" min="100" max="2000" step="1" placeholder="例: 850">
+        <input type="number" id="adv-free-to" inputmode="numeric" min="100" max="2000" step="1" placeholder="例: 850">
       </label>
       <button type="button" id="adv-free-run">このワット数で換算する</button>
       <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
@@ -113,7 +114,7 @@
   <ol class="steps">
     <li>パッケージに書かれている加熱時間とワット数を入力します(例: 600Wで1分30秒)。</li>
     <li>お家のレンジのワット数を選びます。</li>
-    <li>「換算する」を押すと、換算後の時間と10秒単位の目安が表示されます。</li>
+    <li>選んだ瞬間に、換算後の時間と10秒単位の目安が下に表示されます。ボタンは不要です。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -178,10 +179,12 @@
     var s = sec % 60;
     return (m > 0 ? m + "分" : "") + (s > 0 || m === 0 ? s + "秒" : "");
   }
-  document.getElementById("renji-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var min = parseInt(document.getElementById("min").value || "0", 10);
-    var sec = parseInt(document.getElementById("sec").value || "0", 10);
+  function run(fromSubmit) {
+    var minRaw = document.getElementById("min").value;
+    var secRaw = document.getElementById("sec").value;
+    if (!fromSubmit && minRaw === "" && secRaw === "") { box.hidden = true; return; }
+    var min = parseInt(minRaw || "0", 10);
+    var sec = parseInt(secRaw || "0", 10);
     var fromW = parseInt(document.getElementById("from-w").value, 10);
     var toW = parseInt(document.getElementById("to-w").value, 10);
     var r = RenjiCalc.convert(min * 60 + sec, fromW, toW);
@@ -194,7 +197,18 @@
       '<div class="result-main">' + toW + "Wなら 約" + fmt(r.rounded10) + "</div>" +
       "<p>計算値: " + fmt(r.seconds) + "(" + r.seconds + "秒)を10秒単位に切り上げた目安です。様子を見ながら加熱してください。</p>";
     box.hidden = false;
+  }
+  document.getElementById("renji-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
   });
+  ["min", "sec"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { run(false); });
+  });
+  ["from-w", "to-w"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", function () { run(false); });
+  });
+  run(false);
 })();
 </script>
 <script>
@@ -219,7 +233,10 @@
       (code === "invalid_time" ? "加熱時間を1秒以上で入力してください。" : "ワット数は100〜2000Wの範囲で入力してください。") + "</p>";
     advBox.hidden = false;
   }
-  document.getElementById("adv-run").addEventListener("click", function () {
+  function runMulti(fromButton) {
+    if (!fromButton &&
+        document.getElementById("adv-min").value === "" &&
+        document.getElementById("adv-sec").value === "") { return; }
     var total = advReadTime();
     var fromW = parseInt(document.getElementById("adv-from-w").value, 10);
     var r = RenjiCalc.multiTable(total, fromW);
@@ -231,11 +248,14 @@
       html += "<tr><td>" + row.w + "W</td><td>" + advFmt(row.seconds) + "</td><td>" + advFmt(row.rounded10) + "</td></tr>";
     }
     html += "</tbody></table></div>" +
-      '<p class="adv-note">10秒単位の目安は切り上げです。様子を見ながら加熱してください。</p>';
+      '<p class="adv-note">10秒単位の目安は切り上げです。</p>';
     advBox.innerHTML = html;
     advBox.hidden = false;
-  });
-  document.getElementById("adv-free-run").addEventListener("click", function () {
+  }
+  function runFree(fromButton) {
+    if (!fromButton &&
+        (document.getElementById("adv-free-from").value === "" ||
+         document.getElementById("adv-free-to").value === "")) { return; }
     var total = advReadTime();
     var fromW = parseFloat(document.getElementById("adv-free-from").value);
     var toW = parseFloat(document.getElementById("adv-free-to").value);
@@ -246,6 +266,15 @@
       "<p>" + fromW.toLocaleString() + "Wで" + advFmt(total) + " → " + toW.toLocaleString() +
       "Wでは <strong>" + advFmt(r.seconds) + "</strong>(10秒単位の目安: " + advFmt(r.rounded10) + ")です。</p>";
     advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", function () { runMulti(true); });
+  document.getElementById("adv-free-run").addEventListener("click", function () { runFree(true); });
+  ["adv-min", "adv-sec"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runMulti(false); });
+  });
+  document.getElementById("adv-from-w").addEventListener("change", function () { runMulti(false); });
+  ["adv-free-from", "adv-free-to"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runFree(false); });
   });
 })();
 </script>

@@ -31,7 +31,8 @@
   <h1>データ容量 換算(KB・MB・GB・TB)</h1>
   <form class="tool-form" id="byte-form">
     <label>容量
-      <input type="number" id="value" min="0" step="any" required placeholder="例: 500">
+      <span class="field-note">数値を入れると、すぐ下に全単位の値が表示されます</span>
+      <input type="number" id="value" inputmode="decimal" min="0" step="any" required placeholder="例: 500">
     </label>
     <label>単位
       <select id="unit">
@@ -57,9 +58,9 @@
     <summary><span class="plus">＋</span>詳細機能: ダウンロード時間と「この容量でできること」</summary>
     <div class="adv-inner">
       <h3 class="adv-h">ダウンロード時間の目安</h3>
-      <p class="adv-note">ファイルの容量と回線速度(Mbps)から、ダウンロードにかかる時間の目安を計算します。実際の回線は理論値どおりには出ないため、理論値の70%の速度で計算した「現実的な目安」も表示します。</p>
+      <p class="adv-note">ファイルの容量と回線速度(Mbps)を入れると、理論値とあわせて実効速度(理論の70%)での現実的な目安時間も計算します。</p>
       <label>ファイル容量
-        <input type="number" id="adv-size" min="0" step="any" placeholder="例: 5">
+        <input type="number" id="adv-size" inputmode="decimal" min="0" step="any" placeholder="例: 5">
       </label>
       <label>単位
         <select id="adv-unit">
@@ -69,13 +70,13 @@
         </select>
       </label>
       <label>回線速度(Mbps)
-        <input type="number" id="adv-mbps" min="0" step="any" placeholder="例: 100">
+        <input type="number" id="adv-mbps" inputmode="decimal" min="0" step="any" placeholder="例: 100">
       </label>
       <button type="button" id="adv-dl-run">時間を計算する</button>
       <div class="tool-result" id="adv-dl-result" hidden aria-live="polite"></div>
 
       <h3 class="adv-h">この容量でできることの目安</h3>
-      <p class="adv-note">上のフォームに入れた容量で「写真何枚・音楽何曲・動画何時間ぶんか」のざっくりした目安を表示します。スマホやSDカードの容量選びの参考に。</p>
+      <p class="adv-note">上のフォームに入れた容量で「写真何枚・音楽何曲・動画何時間ぶんか」の目安を表示します。</p>
       <button type="button" id="adv-usage-run">できることを見る</button>
       <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
     </div>
@@ -87,7 +88,7 @@
   <ol class="steps">
     <li>容量の数値と単位を入力します。</li>
     <li>換算方式を選びます(迷ったら1024換算)。</li>
-    <li>「換算する」を押すと、全単位での値が一覧表示されます。</li>
+    <li>入力した瞬間に、全単位での値が一覧表示されます。ボタンは不要です。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -142,10 +143,11 @@
   "use strict";
   var box = document.getElementById("result");
   var LABELS = { b: "B(バイト)", kb: "KB", mb: "MB", gb: "GB", tb: "TB" };
-  document.getElementById("byte-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  var valueEl = document.getElementById("value");
+  function run() {
+    if (valueEl.value.trim() === "") { box.hidden = true; return; }
     var unit = document.getElementById("unit").value;
-    var r = ByteCalc.convert(parseFloat(document.getElementById("value").value), unit, parseInt(document.getElementById("base").value, 10));
+    var r = ByteCalc.convert(parseFloat(valueEl.value), unit, parseInt(document.getElementById("base").value, 10));
     if (!r.ok) {
       box.innerHTML = '<p class="result-error">容量を0より大きい数値で入力してください。</p>';
       box.hidden = false;
@@ -158,7 +160,11 @@
       '<div class="result-main">' + r.gb.toLocaleString(undefined, { maximumFractionDigits: 4 }) + " GB</div>" +
       '<div class="table-scroll"><table class="data-table"><thead><tr><th>単位</th><th>値</th></tr></thead><tbody>' + rows + "</tbody></table></div>";
     box.hidden = false;
-  });
+  }
+  valueEl.addEventListener("input", run);
+  document.getElementById("unit").addEventListener("change", run);
+  document.getElementById("base").addEventListener("change", run);
+  document.getElementById("byte-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
 })();
 </script>
 <script>
@@ -177,9 +183,12 @@
     return h.toLocaleString() + " 時間 " + mm + " 分";
   }
   var dlBox = document.getElementById("adv-dl-result");
-  document.getElementById("adv-dl-run").addEventListener("click", function () {
-    var size = parseFloat(document.getElementById("adv-size").value);
-    var mbps = parseFloat(document.getElementById("adv-mbps").value);
+  function runDl(force) {
+    var sizeRaw = document.getElementById("adv-size").value;
+    var mbpsRaw = document.getElementById("adv-mbps").value;
+    if ((sizeRaw.trim() === "" || mbpsRaw.trim() === "") && !force) { dlBox.hidden = true; return; }
+    var size = parseFloat(sizeRaw);
+    var mbps = parseFloat(mbpsRaw);
     var unit = document.getElementById("adv-unit").value;
     var base = parseInt(document.getElementById("base").value, 10) || 1000;
     var r = ByteCalc.downloadTime(size, unit, mbps, base);
@@ -197,13 +206,22 @@
       '</tbody></table></div>' +
       '<p class="adv-note">容量の数え方は上のフォームで選んだ換算方式(1024/1000)に合わせています。</p>';
     dlBox.hidden = false;
+  }
+  ["adv-size", "adv-mbps"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runDl(false); });
   });
-  document.getElementById("adv-usage-run").addEventListener("click", function () {
-    var value = parseFloat(document.getElementById("value").value);
+  document.getElementById("adv-unit").addEventListener("change", function () { runDl(false); });
+  document.getElementById("base").addEventListener("change", function () { runDl(false); });
+  document.getElementById("adv-dl-run").addEventListener("click", function () { runDl(true); });
+  function runUsage(force) {
+    var raw = document.getElementById("value").value;
+    if (raw.trim() === "" && !force) { advBox.hidden = true; return; }
+    var value = parseFloat(raw);
     var unit = document.getElementById("unit").value;
     var base = parseInt(document.getElementById("base").value, 10);
     var r = ByteCalc.capacityUsage(value, unit, base);
     if (!r.ok) {
+      if (!force) { advBox.hidden = true; return; }
       advBox.innerHTML = '<p class="result-error">上のフォームに容量を0より大きい数値で入力してください。</p>';
       advBox.hidden = false;
       return;
@@ -216,7 +234,12 @@
       '</tbody></table></div>' +
       '<p class="adv-note">画質や設定によって大きく変わる、ざっくりした目安です。</p>';
     advBox.hidden = false;
-  });
+  }
+  document.getElementById("value").addEventListener("input", function () { runUsage(false); });
+  document.getElementById("unit").addEventListener("change", function () { runUsage(false); });
+  document.getElementById("base").addEventListener("change", function () { runUsage(false); });
+  document.getElementById("adv-usage-run").addEventListener("click", function () { runUsage(true); });
+  runUsage(false);
 })();
 </script>
 </body>

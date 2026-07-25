@@ -31,9 +31,9 @@
   <h1>平均値・中央値 計算機</h1>
   <form class="tool-form" id="heikin-form">
     <label>数値(カンマ・スペース・改行区切り)
+      <span class="field-note">貼り付けると、すぐ下に平均・中央値が表示されます</span>
       <textarea id="list" rows="4" required placeholder="例: 80, 92, 76, 88, 65"></textarea>
     </label>
-    <button type="submit">平均・中央値を計算する</button>
   </form>
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
@@ -42,7 +42,7 @@
     <summary><span class="plus">＋</span>詳細機能: 加重平均・トリム平均・目標平均の逆算</summary>
     <div class="adv-inner">
       <h3 class="adv-h">加重平均(重み付き平均)</h3>
-      <p class="adv-note">「中間は2割・期末は3割」のように重みが違うときの平均です。1行に「値,重み」の組を1つずつ入力してください。</p>
+      <p class="adv-note">1行に「値,重み」の組を1つずつ入れると、「中間は2割・期末は3割」のような重み付きの平均を計算します。</p>
       <label>値と重み(1行に「値,重み」。例: 90,2)
         <textarea id="adv-pairs" rows="4" placeholder="例:&#10;90,2&#10;70,3"></textarea>
       </label>
@@ -50,7 +50,7 @@
       <div class="tool-result" id="adv-weighted-result" hidden aria-live="polite"></div>
 
       <h3 class="adv-h">最大・最小を除いた平均(トリム平均)</h3>
-      <p class="adv-note">上の入力欄の数値から、最高と最低を1つずつ除いて平均します。極端な値に引っ張られたくないときに。</p>
+      <p class="adv-note">極端な値に引っ張られないよう、上の入力欄の数値から最高と最低を1つずつ除いて平均します。</p>
       <button type="button" id="adv-trim-run">上の数値で計算する</button>
       <div class="tool-result" id="adv-trim-result" hidden aria-live="polite"></div>
 
@@ -69,7 +69,7 @@
   <h2>使い方</h2>
   <ol class="steps">
     <li>数値をカンマ・スペース・改行のどれかで区切って入力します(Excelの列を貼り付けてもOK)。</li>
-    <li>「計算する」を押すと、個数・合計・平均・中央値・最大・最小が表示されます。</li>
+    <li>貼り付けた(入力した)瞬間に、個数・合計・平均・中央値・最大・最小が表示されます。ボタンは不要です。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -123,9 +123,9 @@
 (function () {
   "use strict";
   var box = document.getElementById("result");
-  document.getElementById("heikin-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  function run() {
     var raw = document.getElementById("list").value.trim();
+    if (raw === "") { box.hidden = true; return; }
     var parts = raw.split(/[\s,、]+/).filter(function (s) { return s !== ""; });
     var list = parts.map(function (s) { return parseFloat(s); });
     var bad = list.some(function (v) { return !isFinite(v); });
@@ -145,7 +145,9 @@
       "<tr><td>最小 / 最大</td><td>" + r.min.toLocaleString() + " / " + r.max.toLocaleString() + "</td></tr>" +
       "</tbody></table></div>";
     box.hidden = false;
-  });
+  }
+  document.getElementById("list").addEventListener("input", run);
+  document.getElementById("heikin-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
 })();
 </script>
 <script>
@@ -159,7 +161,8 @@
   }
   var wBox = document.getElementById("adv-weighted-result");
   var tBox = document.getElementById("adv-trim-result");
-  document.getElementById("adv-weighted-run").addEventListener("click", function () {
+  function runWeighted() {
+    if (document.getElementById("adv-pairs").value.trim() === "") { wBox.hidden = true; return; }
     var lines = document.getElementById("adv-pairs").value.split(/\n+/)
       .map(function (l) { return l.trim(); })
       .filter(function (l) { return l !== ""; });
@@ -180,10 +183,14 @@
       '<div class="result-main">加重平均 ' + r.mean.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '</div>' +
       '<p>' + r.n.toLocaleString() + ' 組 / 重みの合計 ' + r.weightSum.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '</p>';
     wBox.hidden = false;
-  });
-  document.getElementById("adv-trim-run").addEventListener("click", function () {
+  }
+  document.getElementById("adv-pairs").addEventListener("input", runWeighted);
+  document.getElementById("adv-weighted-run").addEventListener("click", runWeighted);
+  function runTrim(force) {
+    if (document.getElementById("list").value.trim() === "" && !force) { tBox.hidden = true; return; }
     var r = HeikinCalc.trimmedMean(parseList());
     if (!r.ok) {
+      if (!force && tBox.hidden) return;
       tBox.innerHTML = '<p class="result-error">上の入力欄に数値を3個以上入れてください。</p>';
       tBox.hidden = false;
       return;
@@ -194,9 +201,16 @@
       r.removedMax.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' を除いた ' +
       r.used.toLocaleString() + ' 個の平均です。</p>';
     tBox.hidden = false;
-  });
-  document.getElementById("adv-need-run").addEventListener("click", function () {
-    var target = parseFloat(document.getElementById("adv-target").value);
+  }
+  document.getElementById("adv-trim-run").addEventListener("click", function () { runTrim(true); });
+  document.getElementById("list").addEventListener("input", function () { runTrim(false); });
+  function runNeed(force) {
+    var targetRaw = document.getElementById("adv-target").value;
+    if ((targetRaw.trim() === "" || document.getElementById("list").value.trim() === "") && !force) {
+      advBox.hidden = true;
+      return;
+    }
+    var target = parseFloat(targetRaw);
     var r = HeikinCalc.needScore(parseList(), target);
     if (!r.ok) {
       advBox.innerHTML = '<p class="result-error">上の入力欄に数値を入れて、目標の平均を数値で指定してください。</p>';
@@ -209,7 +223,10 @@
       ' 個)。次の1回で上の値を取ると、' + (r.n + 1).toLocaleString() + ' 個の平均が ' +
       target.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' になります。</p>';
     advBox.hidden = false;
-  });
+  }
+  document.getElementById("adv-target").addEventListener("input", function () { runNeed(false); });
+  document.getElementById("list").addEventListener("input", function () { runNeed(false); });
+  document.getElementById("adv-need-run").addEventListener("click", function () { runNeed(true); });
 })();
 </script>
 </body>

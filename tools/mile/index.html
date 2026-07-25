@@ -31,7 +31,8 @@
   <h1>マイル⇔km 換算計算機</h1>
   <form class="tool-form" id="mile-form">
     <label>距離
-      <input type="number" id="value" min="0" step="any" required placeholder="例: 26.2">
+      <span class="field-note">数値を入れると、すぐ下に換算結果が表示されます</span>
+      <input type="number" id="value" inputmode="decimal" min="0" step="any" required placeholder="例: 26.2">
     </label>
     <label>入力の単位
       <select id="unit">
@@ -49,9 +50,9 @@
     <summary><span class="plus">＋</span>詳細機能: 5単位の一覧表・速度の換算</summary>
     <div class="adv-inner">
       <h3 class="adv-h">km・マイル・海里・ヤード・フィートの一覧表</h3>
-      <p class="adv-note">1つの距離を5つの単位でまとめて表にします。ゴルフのヤード、身長や高度で使われるフィートもまとめて確認できます。</p>
+      <p class="adv-note">1つの距離を、ゴルフのヤードや高度のフィートも含めた5つの単位でまとめて表にします。</p>
       <label>距離
-        <input type="number" id="adv-dist" min="0" step="any" placeholder="例: 100">
+        <input type="number" id="adv-dist" inputmode="decimal" min="0" step="any" placeholder="例: 100">
       </label>
       <label>入力の単位
         <select id="adv-dist-unit">
@@ -66,9 +67,9 @@
       <div class="tool-result" id="adv-all-result" hidden aria-live="polite"></div>
 
       <h3 class="adv-h">速度の換算(mph・km/h・ノット)</h3>
-      <p class="adv-note">アメリカの制限速度「65mph」や船・飛行機の「ノット」を時速kmに直せます。レンタカーや旅行の下調べに。</p>
+      <p class="adv-note">アメリカの制限速度「65mph」や船・飛行機の「ノット」を時速kmに直せます。</p>
       <label>速度
-        <input type="number" id="adv-speed" min="0" step="any" placeholder="例: 65">
+        <input type="number" id="adv-speed" inputmode="decimal" min="0" step="any" placeholder="例: 65">
       </label>
       <label>入力の単位
         <select id="adv-speed-unit">
@@ -88,7 +89,7 @@
   <ol class="steps">
     <li>距離の数値を入力します。</li>
     <li>入力した数値の単位(マイル・km・海里)を選びます。</li>
-    <li>「換算する」を押すと、3つの単位すべての値が表示されます。</li>
+    <li>入力した瞬間に、3つの単位すべての値が表示されます。ボタンは不要です。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -144,8 +145,8 @@
 (function () {
   "use strict";
   var box = document.getElementById("result");
-  document.getElementById("mile-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  function run() {
+    if (document.getElementById("value").value.trim() === "") { box.hidden = true; return; }
     var r = MileCalc.convert(parseFloat(document.getElementById("value").value), document.getElementById("unit").value);
     if (!r.ok) {
       box.innerHTML = '<p class="result-error">距離を0より大きい数値で入力してください。</p>';
@@ -160,7 +161,10 @@
       "<tr><td>海里</td><td>" + r.nm.toLocaleString(undefined, { maximumFractionDigits: 4 }) + " nm</td></tr>" +
       "</tbody></table></div>";
     box.hidden = false;
-  });
+  }
+  document.getElementById("value").addEventListener("input", run);
+  document.getElementById("unit").addEventListener("change", run);
+  document.getElementById("mile-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
 })();
 </script>
 <script>
@@ -168,7 +172,8 @@
   "use strict";
   var advBox = document.getElementById("adv-result");
   var allBox = document.getElementById("adv-all-result");
-  document.getElementById("adv-all-run").addEventListener("click", function () {
+  function runAll(force) {
+    if (document.getElementById("adv-dist").value.trim() === "" && !force) { allBox.hidden = true; return; }
     var r = MileCalc.convertAll(
       parseFloat(document.getElementById("adv-dist").value),
       document.getElementById("adv-dist-unit").value
@@ -188,8 +193,12 @@
       '<tr><td>フィート(ft)</td><td>' + fmt(r.ft) + '</td></tr>' +
       '</tbody></table></div>';
     allBox.hidden = false;
-  });
-  document.getElementById("adv-speed-run").addEventListener("click", function () {
+  }
+  document.getElementById("adv-dist").addEventListener("input", function () { runAll(false); });
+  document.getElementById("adv-dist-unit").addEventListener("change", function () { runAll(false); });
+  document.getElementById("adv-all-run").addEventListener("click", function () { runAll(true); });
+  function runSpeed(force) {
+    if (document.getElementById("adv-speed").value.trim() === "" && !force) { advBox.hidden = true; return; }
     var r = MileCalc.convertSpeed(
       parseFloat(document.getElementById("adv-speed").value),
       document.getElementById("adv-speed-unit").value
@@ -208,7 +217,10 @@
       '<tr><td>ノット(kt)</td><td>' + fmt2(r.kt) + '</td></tr>' +
       '</tbody></table></div>';
     advBox.hidden = false;
-  });
+  }
+  document.getElementById("adv-speed").addEventListener("input", function () { runSpeed(false); });
+  document.getElementById("adv-speed-unit").addEventListener("change", function () { runSpeed(false); });
+  document.getElementById("adv-speed-run").addEventListener("click", function () { runSpeed(true); });
 })();
 </script>
 </body>

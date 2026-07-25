@@ -30,11 +30,12 @@
 <main>
   <h1>ウォーキング消費カロリー 計算機</h1>
   <form class="tool-form" id="walking-form">
+    <span class="field-note">体重と時間を入れると、すぐ下に結果が表示されます</span>
     <label>体重(kg)
-      <input type="number" id="weight" min="20" max="300" step="0.1" required placeholder="例: 60">
+      <input type="number" id="weight" inputmode="decimal" min="20" max="300" step="0.1" required placeholder="例: 60">
     </label>
     <label>歩いた時間(分)
-      <input type="number" id="minutes" min="1" max="1440" step="1" required placeholder="例: 30">
+      <input type="number" id="minutes" inputmode="numeric" min="1" max="1440" step="1" required placeholder="例: 30">
     </label>
     <label>歩く速さ
       <select id="speed">
@@ -54,21 +55,21 @@
     <summary><span class="plus">＋</span>詳細機能: 目標カロリーの逆算・距離や習慣で計算</summary>
     <div class="adv-inner">
       <h3 class="adv-h">目標カロリーを消費するには何分歩く?</h3>
-      <p class="adv-note">消費したいカロリーを入れると、必要な歩行時間を逆算します。体重と速さは上のフォームの値を使います。</p>
+      <p class="adv-note">消費したいカロリーを入れると、必要な歩行時間を逆算します(体重と速さは上の値を使用)。</p>
       <label>目標消費カロリー(kcal)
         <input type="number" id="adv-target-kcal" inputmode="numeric" step="1" min="1" max="5000" placeholder="例: 200">
       </label>
       <button type="button" id="adv-target-run">必要な時間を逆算する</button>
 
       <h3 class="adv-h">距離で計算する(時間がわからない時)</h3>
-      <p class="adv-note">「駅まで2km」のように距離だけわかる時はこちら。速さ区分の代表速度からかかる時間と消費カロリーを計算します。</p>
+      <p class="adv-note">距離だけわかる時は、速さ区分の代表速度からかかる時間と消費カロリーを計算します。</p>
       <label>歩いた距離(km)
         <input type="number" id="adv-km" inputmode="decimal" step="any" min="0.1" max="100" placeholder="例: 2">
       </label>
       <button type="button" id="adv-km-run">距離から計算する</button>
 
       <h3 class="adv-h">毎日続けたらどうなる?</h3>
-      <p class="adv-note">上のフォームの体重・時間・速さのウォーキングを毎日続けた場合の合計を、体脂肪換算(1kg≒7,200kcal)で表示します。</p>
+      <p class="adv-note">上の内容のウォーキングを毎日続けた場合の合計を、体脂肪換算(1kg≒7,200kcal)で表示します。</p>
       <label>続ける日数
         <select id="adv-days">
           <option value="7">1週間(7日)</option>
@@ -88,7 +89,7 @@
   <ol class="steps">
     <li>体重と歩いた時間を入力します。</li>
     <li>歩く速さを5段階から選びます(信号待ちなどの停止時間は除くとより正確)。</li>
-    <li>「計算する」を押すと、消費カロリーと脂肪換算の目安が表示されます。</li>
+    <li>入力すると同時に、消費カロリーと脂肪換算の目安がすぐ下に表示されます。ボタンは不要です。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -150,11 +151,13 @@
     invalid_minutes: "時間は1分〜24時間の範囲で入力してください。",
     invalid_speed: "歩く速さを選んでください。"
   };
-  document.getElementById("walking-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  var weightEl = document.getElementById("weight");
+  var minutesEl = document.getElementById("minutes");
+  function run() {
+    if (weightEl.value === "" || minutesEl.value === "") { box.hidden = true; return; }
     var r = WalkingCalc.calories(
-      parseFloat(document.getElementById("weight").value),
-      parseFloat(document.getElementById("minutes").value),
+      parseFloat(weightEl.value),
+      parseFloat(minutesEl.value),
       document.getElementById("speed").value
     );
     if (!r.ok) {
@@ -166,13 +169,18 @@
       '<div class="result-main">約 ' + r.kcal.toLocaleString() + " kcal</div>" +
       "<p>脂肪に換算すると約 <strong>" + r.fatG.toLocaleString() + "g</strong> 分(体脂肪1kg≒7,200kcalの目安)/ 使用したMETs値: " + r.mets + "</p>";
     box.hidden = false;
-  });
+  }
+  weightEl.addEventListener("input", run);
+  minutesEl.addEventListener("input", run);
+  document.getElementById("speed").addEventListener("change", run);
+  document.getElementById("walking-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
 })();
 </script>
 <script>
 (function () {
   "use strict";
   var advBox = document.getElementById("adv-result");
+  var lastAdv = null;
   var SPEED_LABEL = { slow: "ゆっくり", normal: "ふつう", brisk: "やや速め", fast: "速歩", veryfast: "かなり速い" };
   function advErr(msg) {
     advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
@@ -182,11 +190,11 @@
     if (min < 60) return min + " 分";
     return Math.floor(min / 60) + " 時間 " + (min % 60) + " 分";
   }
-  document.getElementById("adv-target-run").addEventListener("click", function () {
+  function runTarget(fromButton) {
     var w = parseFloat(document.getElementById("weight").value);
-    if (!isFinite(w)) { advErr("先に上のフォームに体重を入力してください。"); return; }
+    if (!isFinite(w)) { if (fromButton) advErr("先に上のフォームに体重を入力してください。"); return; }
     var kEl = document.getElementById("adv-target-kcal");
-    if (kEl.value === "") { advErr("目標消費カロリーを入力してください。"); return; }
+    if (kEl.value === "") { if (fromButton) advErr("目標消費カロリーを入力してください。"); return; }
     var speed = document.getElementById("speed").value;
     var r = WalkingCalc.minutesForKcal(w, parseFloat(kEl.value), speed);
     if (!r.ok) {
@@ -194,17 +202,18 @@
         : "体重は20〜300kgの範囲で入力してください。");
       return;
     }
+    lastAdv = runTarget;
     advBox.innerHTML =
       '<div class="result-main">約 ' + fmtMinutes(r.minutes) + "</div>" +
       "<p>" + SPEED_LABEL[speed] + "(" + r.mets + "METs)で歩いた場合、1時間あたり約 " +
       r.kcalPerHour.toLocaleString() + " kcal 消費する計算です。分は切り上げで表示しています。</p>";
     advBox.hidden = false;
-  });
-  document.getElementById("adv-km-run").addEventListener("click", function () {
+  }
+  function runKm(fromButton) {
     var w = parseFloat(document.getElementById("weight").value);
-    if (!isFinite(w)) { advErr("先に上のフォームに体重を入力してください。"); return; }
+    if (!isFinite(w)) { if (fromButton) advErr("先に上のフォームに体重を入力してください。"); return; }
     var kmEl = document.getElementById("adv-km");
-    if (kmEl.value === "") { advErr("歩いた距離を入力してください。"); return; }
+    if (kmEl.value === "") { if (fromButton) advErr("歩いた距離を入力してください。"); return; }
     var speed = document.getElementById("speed").value;
     var r = WalkingCalc.caloriesByDistance(w, parseFloat(kmEl.value), speed);
     if (!r.ok) {
@@ -212,16 +221,17 @@
         : "体重は20〜300kgの範囲で入力してください。");
       return;
     }
+    lastAdv = runKm;
     advBox.innerHTML =
       '<div class="result-main">約 ' + r.kcal.toLocaleString() + " kcal</div>" +
       "<p>" + SPEED_LABEL[speed] + "(約" + r.kmh + "km/h)なら約 <strong>" + fmtMinutes(r.minutes) +
       "</strong>、脂肪換算 約" + r.fatG.toLocaleString() + "g分の計算です。</p>";
     advBox.hidden = false;
-  });
-  document.getElementById("adv-habit-run").addEventListener("click", function () {
+  }
+  function runHabit(fromButton) {
     var w = parseFloat(document.getElementById("weight").value);
     var min = parseFloat(document.getElementById("minutes").value);
-    if (!isFinite(w) || !isFinite(min)) { advErr("先に上のフォームに体重と歩く時間を入力してください。"); return; }
+    if (!isFinite(w) || !isFinite(min)) { if (fromButton) advErr("先に上のフォームに体重と歩く時間を入力してください。"); return; }
     var days = parseInt(document.getElementById("adv-days").value, 10);
     var speed = document.getElementById("speed").value;
     var r = WalkingCalc.habitTotal(w, min, speed, days);
@@ -229,13 +239,24 @@
     var fatText = r.fatG >= 1000
       ? (r.fatG / 1000).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " kg"
       : r.fatG.toLocaleString() + " g";
+    lastAdv = runHabit;
     advBox.innerHTML =
       '<div class="result-main">' + days + "日で 約 " + r.totalKcal.toLocaleString() + " kcal</div>" +
       "<p>1日約 " + r.kcalPerDay.toLocaleString() + " kcal × " + days + "日 = 体脂肪 約 <strong>" + fatText +
       "</strong> 分(1kg≒7,200kcalの目安)。</p>" +
       '<p class="adv-note">食事量が変わらない前提の概算です。実際の体重変化には個人差があります。</p>';
     advBox.hidden = false;
+  }
+  document.getElementById("adv-target-run").addEventListener("click", function () { runTarget(true); });
+  document.getElementById("adv-km-run").addEventListener("click", function () { runKm(true); });
+  document.getElementById("adv-habit-run").addEventListener("click", function () { runHabit(true); });
+  document.getElementById("adv-target-kcal").addEventListener("input", function () { runTarget(false); });
+  document.getElementById("adv-km").addEventListener("input", function () { runKm(false); });
+  document.getElementById("adv-days").addEventListener("change", function () { runHabit(false); });
+  ["weight", "minutes"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { if (lastAdv) lastAdv(false); });
   });
+  document.getElementById("speed").addEventListener("change", function () { if (lastAdv) lastAdv(false); });
 })();
 </script>
 </body>

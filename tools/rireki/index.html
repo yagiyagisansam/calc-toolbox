@@ -30,31 +30,38 @@
 <main>
   <h1>入学・卒業年 早見計算機(履歴書用)</h1>
   <form class="tool-form" id="rireki-form">
-    <label>生年月日
-      <input type="date" id="birth" min="1900-01-01" max="2100-12-31" required>
-    </label>
+    <span class="field-note">生年月日を選ぶと、すぐ下に学歴早見表が表示されます</span>
+    <div class="field-row">
+      <label>生年月日(年)
+        <select id="birth-year"></select>
+      </label>
+      <label>月
+        <select id="birth-month"></select>
+      </label>
+      <label>日
+        <select id="birth-day"></select>
+      </label>
+    </div>
     <label>浪人・留年などの年数(任意)
       <span class="field-note">高校卒業後に1浪なら「1」</span>
-      <input type="number" id="gap" min="0" max="10" step="1" value="0">
+      <input type="number" id="gap" inputmode="numeric" min="0" max="10" step="1" value="0">
     </label>
-    <button type="submit">入学・卒業年を計算する</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
   </form>
-
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
   <details class="adv-box">
     <summary><span class="plus">＋</span>詳細機能: 浪人・留年・休学の補正と学歴欄の文例</summary>
     <div class="adv-inner">
       <h3 class="adv-h">浪人・留年・休学を分けて補正する</h3>
-      <p class="adv-note">上のフォームの生年月日を使って、浪人(大学入学が遅れる)・留年・休学(大学卒業が延びる)を分けて入力した補正後の早見表を作ります。大学院に進んだ場合も表示できます。</p>
+      <p class="adv-note">浪人・留年・休学・大学院進学を分けて反映した早見表を作ります(生年月日は上のフォームの値を使います)。</p>
       <label>浪人の年数
-        <input type="number" id="adv-ronin" min="0" max="10" step="1" value="0">
+        <input type="number" id="adv-ronin" inputmode="numeric" min="0" max="10" step="1" value="0">
       </label>
       <label>大学での留年の年数
-        <input type="number" id="adv-ryunen" min="0" max="10" step="1" value="0">
+        <input type="number" id="adv-ryunen" inputmode="numeric" min="0" max="10" step="1" value="0">
       </label>
       <label>大学での休学の年数
-        <input type="number" id="adv-kyugaku" min="0" max="10" step="1" value="0">
+        <input type="number" id="adv-kyugaku" inputmode="numeric" min="0" max="10" step="1" value="0">
       </label>
       <label>大学院への進学
         <select id="adv-grad">
@@ -65,7 +72,7 @@
       </label>
       <button type="button" id="adv-detail-run">補正後の早見表を作る</button>
       <h3 class="adv-h">学歴欄の文例をつくる</h3>
-      <p class="adv-note">学校名を入れると、上の補正を反映した学歴欄の文例(コピーして使える形)を作ります。空欄の学校は「◯◯」のままになります。</p>
+      <p class="adv-note">学校名を入れると、上の補正を反映した学歴欄の文例(コピーして使える形)を作ります。</p>
       <label>中学校名
         <input type="text" id="adv-jhs-name" placeholder="例: 品川区立◯◯中学校">
       </label>
@@ -84,9 +91,9 @@
 
   <h2>使い方</h2>
   <ol class="steps">
-    <li>生年月日を入力します。</li>
+    <li>生年月日を選びます。</li>
     <li>浪人・留年した年数があれば入力します(大学の入学・卒業に加算されます)。</li>
-    <li>「計算する」を押すと、学歴早見表が西暦・和暦で表示されます。</li>
+    <li>選んだ瞬間に、学歴早見表が西暦・和暦で下に表示されます。ボタンは不要です。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -142,9 +149,32 @@
 (function () {
   "use strict";
   var box = document.getElementById("result");
-  document.getElementById("rireki-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var r = RirekiCalc.schoolYears(document.getElementById("birth").value);
+
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, "日", Math.min(keep, max));
+  }
+  fillSelect(document.getElementById("birth-year"), 1900, 2100, "年", 2000);
+  fillSelect(document.getElementById("birth-month"), 1, 12, "月", 4);
+  fillSelect(document.getElementById("birth-day"), 1, daysInMonth(2000, 4), "日", 2);
+  function pad2(n) { return (n < 10 ? "0" : "") + n; }
+  window.__rirekiBirthISO = function () {
+    adjustDays("birth-year", "birth-month", "birth-day");
+    return val("birth-year") + "-" + pad2(val("birth-month")) + "-" + pad2(val("birth-day"));
+  };
+
+  function run() {
+    var r = RirekiCalc.schoolYears(window.__rirekiBirthISO());
     if (!r.ok) { box.innerHTML = '<p class="result-error">生年月日を正しく入力してください。</p>'; box.hidden = false; return; }
     var gap = parseInt(document.getElementById("gap").value || "0", 10);
     if (!(gap >= 0 && gap <= 10)) gap = 0;
@@ -162,15 +192,26 @@
       "</tbody></table></div>" +
       (gap > 0 ? "<p>大学は調整" + gap + "年を加算しています。</p>" : "");
     box.hidden = false;
+    if (window.__rirekiAdvRefresh) { window.__rirekiAdvRefresh(); }
+  }
+  document.getElementById("rireki-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run();
   });
+  ["birth-year", "birth-month", "birth-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", run);
+  });
+  document.getElementById("gap").addEventListener("input", run);
+  run();
 })();
 </script>
 <script>
 (function () {
   "use strict";
   var advBox = document.getElementById("adv-result");
+  var lastAdv = "";
   function advCalc() {
-    var birth = document.getElementById("birth").value;
+    var birth = window.__rirekiBirthISO();
     var ronin = parseInt(document.getElementById("adv-ronin").value, 10) || 0;
     var ryunen = parseInt(document.getElementById("adv-ryunen").value, 10) || 0;
     var kyugaku = parseInt(document.getElementById("adv-kyugaku").value, 10) || 0;
@@ -186,7 +227,8 @@
   function advYm(y, m) {
     return y + "年" + m + "月(" + RirekiCalc.wareki(y) + m + "月)";
   }
-  document.getElementById("adv-detail-run").addEventListener("click", function () {
+  function runDetail() {
+    lastAdv = "detail";
     var r = advCalc();
     if (!r.ok) { advFail(r.code); return; }
     var rows = [
@@ -203,11 +245,12 @@
       html += "<tr><td>" + rows[i][0] + "</td><td>" + advYm(rows[i][1], rows[i][2] ? 3 : 4) + "</td></tr>";
     }
     html += "</tbody></table></div>" +
-      '<p class="adv-note">卒業・修了は3月、入学は4月として表示しています。大学院は標準の年限(修士2年・博士3年)です。</p>';
+      '<p class="adv-note">卒業・修了は3月、入学は4月、大学院は標準の年限(修士2年・博士3年)で表示しています。</p>';
     advBox.innerHTML = html;
     advBox.hidden = false;
-  });
-  document.getElementById("adv-text-run").addEventListener("click", function () {
+  }
+  function runText() {
+    lastAdv = "text";
     var r = advCalc();
     if (!r.ok) { advFail(r.code); return; }
     var jhs = document.getElementById("adv-jhs-name").value || "◯◯中学校";
@@ -233,7 +276,25 @@
       lines.join("\n").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</textarea>" +
       '<p class="adv-note">西暦・和暦は提出先の書式に合わせてどちらかに統一してください。</p>';
     advBox.hidden = false;
+  }
+  document.getElementById("adv-detail-run").addEventListener("click", runDetail);
+  document.getElementById("adv-text-run").addEventListener("click", runText);
+  function refreshLast() {
+    if (advBox.hidden) { return; }
+    if (lastAdv === "detail") { runDetail(); }
+    else if (lastAdv === "text") { runText(); }
+  }
+  function onDetailParam() {
+    if (!advBox.hidden && lastAdv === "text") { runText(); } else { runDetail(); }
+  }
+  ["adv-ronin", "adv-ryunen", "adv-kyugaku"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", onDetailParam);
   });
+  document.getElementById("adv-grad").addEventListener("change", onDetailParam);
+  ["adv-jhs-name", "adv-hs-name", "adv-uni-name"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runText);
+  });
+  window.__rirekiAdvRefresh = refreshLast;
 })();
 </script>
 </body>

@@ -445,3 +445,8 @@ ul.related li a:hover { border-color: var(--color-accent); color: var(--color-ac
 @media (prefers-color-scheme: dark) {
   ol.steps li::before, h3.faq-q::before, .adv-box summary .plus { color: #10261e; }
 }
+
+/* 横並びの入力行(年月日セレクト等) */
+.field-row { display: flex; gap: 8px; }
+.field-row label { flex: 1 1 0; min-width: 0; margin: 0; }
+.field-row label.grow-2 { flex: 2 1 0; }

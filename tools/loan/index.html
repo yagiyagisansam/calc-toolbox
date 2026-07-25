@@ -36,23 +36,23 @@
     </label>
     <label>年利(%)
       <span class="field-note">例: 1.5(対応範囲: 0〜20%)</span>
-      <input type="number" id="rate" inputmode="decimal" step="0.01" min="0" max="20" placeholder="1.5" required>
+      <input type="number" id="rate" inputmode="decimal" step="0.01" min="0" max="20" value="1.5" required>
     </label>
     <label>返済期間(年)
       <span class="field-note">対応範囲: 1〜50年(整数)</span>
-      <input type="number" id="years" inputmode="numeric" step="1" min="1" max="50" placeholder="35" required>
+      <input type="number" id="years" inputmode="numeric" step="1" min="1" max="50" value="35" required>
     </label>
+    <span class="field-note">入力すると自動で計算されます</span>
     <button type="submit">計算する</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
   </form>
-
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
   <details class="adv-box">
     <summary><span class="plus">＋</span>詳細機能: 繰上返済と返済方式の比較</summary>
     <div class="adv-inner">
-      <p class="adv-note">どちらも、上のフォームに入力した借入条件(借入額・年利・返済期間)をそのまま使います。先に上のフォームを入力してください。</p>
+      <p class="adv-note">どちらも、上のフォームの借入条件(借入額・年利・返済期間)をそのまま使います。</p>
       <h3 class="adv-h">繰上返済シミュレーション(期間短縮型)</h3>
-      <p class="adv-note">「○年後にまとまった額を返すと、利息がいくら減って、完済がどれだけ早まるか」を計算します。毎月の返済額は変えずに期間を縮める方式です。</p>
+      <p class="adv-note">毎月の返済額は変えず、○年後にまとまった額を返して完済を早めた場合の利息軽減を計算します。</p>
       <label>繰上返済する時期(○年後)
         <input type="number" id="adv-after" inputmode="numeric" step="1" min="1" max="49" placeholder="5">
       </label>
@@ -60,8 +60,9 @@
         <input type="number" id="adv-prepay" inputmode="numeric" step="any" min="1" placeholder="100">
       </label>
       <button type="button" id="adv-prepay-run">利息の軽減額を計算</button>
+      <div class="tool-result" id="adv-prepay-result" hidden aria-live="polite"></div>
       <h3 class="adv-h">元金均等返済にした場合</h3>
-      <p class="adv-note">毎月の元金部分を一定にする方式です。最初の返済額は大きくなりますが、利息の合計は元利均等より少なくなります。</p>
+      <p class="adv-note">初回の返済額が大きい代わりに利息合計が少なくなる「元金均等返済」と比較します。</p>
       <button type="button" id="adv-gankin-run">元金均等で計算して比較</button>
       <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
     </div>
@@ -81,7 +82,7 @@
   <ol class="steps">
     <li>借入額を万円単位で入力します(3,000万円なら「3000」)。</li>
     <li>年利(%)と返済期間(年)を入力します。</li>
-    <li>「計算する」を押すと、毎月の返済額・総返済額・利息総額が表示されます。</li>
+    <li>入力と同時に、毎月の返済額・総返済額・利息総額が表示されます(ボタンを押す必要はありません)。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -144,13 +145,14 @@
     invalid_rate: "年利は " + LoanCalc.RATE_MIN + "〜" + LoanCalc.RATE_MAX + " % の範囲で入力してください。",
     invalid_years: "返済期間は " + LoanCalc.YEARS_MIN + "〜" + LoanCalc.YEARS_MAX + " 年の整数で入力してください。"
   };
-  document.getElementById("loan-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var principalMan = parseFloat(document.getElementById("principal").value);
-    var rate = parseFloat(document.getElementById("rate").value);
-    var years = parseFloat(document.getElementById("years").value);
-    var result = LoanCalc.calculate(principalMan * 10000, rate, years);
-    var box = document.getElementById("result");
+  var box = document.getElementById("result");
+  function runMain() {
+    var pv = document.getElementById("principal").value;
+    var rv = document.getElementById("rate").value;
+    var yv = document.getElementById("years").value;
+    if (pv === "" || rv === "" || yv === "") { box.hidden = true; return; }
+    var years = parseFloat(yv);
+    var result = LoanCalc.calculate(parseFloat(pv) * 10000, parseFloat(rv), years);
     if (result.ok) {
       box.innerHTML =
         '<div class="result-main">毎月 ' + result.monthlyPayment.toLocaleString() + " 円</div>" +
@@ -160,12 +162,21 @@
       box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
     }
     box.hidden = false;
+  }
+  document.getElementById("loan-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
   });
+  ["principal", "rate", "years"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runMain);
+  });
+  runMain();
 })();
 </script>
 <script>
 (function () {
   "use strict";
+  var prepayBox = document.getElementById("adv-prepay-result");
   var advBox = document.getElementById("adv-result");
   var MAN = 10000;
   function readBase() {
@@ -182,9 +193,9 @@
     if (y > 0) return y + "年";
     return mm + "か月";
   }
-  function showError(msg) {
-    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
-    advBox.hidden = false;
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
   }
   var ADV_MSG = {
     invalid_principal: "上のフォームの借入額は 10〜50,000万円 の範囲で入力してください。",
@@ -194,29 +205,40 @@
     invalid_prepay: "繰上返済額は 1万円以上・借入額以下で入力してください。",
     prepay_too_large: "その時点のローン残高より繰上返済額が大きくなっています。金額を減らしてください。"
   };
-  document.getElementById("adv-prepay-run").addEventListener("click", function () {
+  function runPrepay() {
     var base = readBase();
-    if (!base) { showError("先に上のフォームへ借入額・年利・返済期間を入力してください。"); return; }
+    if (!base) { showError(prepayBox, "先に上のフォームへ借入額・年利・返済期間を入力してください。"); return; }
     var after = parseFloat(document.getElementById("adv-after").value);
     var prepayMan = parseFloat(document.getElementById("adv-prepay").value);
-    if (isNaN(after) || isNaN(prepayMan)) { showError("繰上返済の時期(○年後)と金額(万円)を入力してください。"); return; }
+    if (isNaN(after) || isNaN(prepayMan)) { showError(prepayBox, "繰上返済の時期(○年後)と金額(万円)を入力してください。"); return; }
     var r = LoanCalc.prepayment(base.principal, base.rate, base.years, after, prepayMan * MAN);
-    if (!r.ok) { showError(ADV_MSG[r.code] || "入力値を確認してください。"); return; }
-    advBox.innerHTML =
+    if (!r.ok) { showError(prepayBox, ADV_MSG[r.code] || "入力値を確認してください。"); return; }
+    prepayBox.innerHTML =
       '<div class="result-main">利息が約 ' + r.interestSaved.toLocaleString() + " 円 減ります</div>" +
       '<div class="table-scroll"><table class="data-table"><tbody>' +
       "<tr><td>短縮される期間</td><td>" + fmtMonths(r.shortenedMonths) + "(" + r.shortenedMonths + "回分)</td></tr>" +
       "<tr><td>完済までの期間</td><td>" + fmtMonths(r.baseMonths) + " → " + fmtMonths(r.newMonths) + "</td></tr>" +
       "<tr><td>利息の合計</td><td>" + r.baseInterest.toLocaleString() + " 円 → " + r.newInterest.toLocaleString() + " 円</td></tr>" +
       "</tbody></table></div>" +
-      '<p class="adv-note">毎月 ' + r.monthlyPayment.toLocaleString() + " 円の返済は変えず、完済を早める「期間短縮型」の概算です。繰上返済の手数料は含みません。</p>";
-    advBox.hidden = false;
+      '<p class="adv-note">毎月 ' + r.monthlyPayment.toLocaleString() + " 円の返済は変えない前提の概算で、繰上返済の手数料は含みません。</p>";
+    prepayBox.hidden = false;
+  }
+  function maybeRunPrepay() {
+    if (document.getElementById("adv-after").value === "" ||
+        document.getElementById("adv-prepay").value === "") { prepayBox.hidden = true; return; }
+    runPrepay();
+  }
+  document.getElementById("adv-prepay-run").addEventListener("click", runPrepay);
+  ["adv-after", "adv-prepay"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", maybeRunPrepay);
   });
-  document.getElementById("adv-gankin-run").addEventListener("click", function () {
+  var gankinShown = false;
+  function runGankin() {
     var base = readBase();
-    if (!base) { showError("先に上のフォームへ借入額・年利・返済期間を入力してください。"); return; }
+    if (!base) { showError(advBox, "先に上のフォームへ借入額・年利・返済期間を入力してください。"); return; }
+    gankinShown = true;
     var r = LoanCalc.gankinKinto(base.principal, base.rate, base.years);
-    if (!r.ok) { showError(ADV_MSG[r.code] || "入力値を確認してください。"); return; }
+    if (!r.ok) { showError(advBox, ADV_MSG[r.code] || "入力値を確認してください。"); return; }
     var ganri = LoanCalc.calculate(base.principal, base.rate, base.years);
     advBox.innerHTML =
       '<div class="result-main">元金均等なら利息は ' + r.totalInterest.toLocaleString() + " 円</div>" +
@@ -227,6 +249,13 @@
       "<tr><td>利息の差</td><td>元金均等のほうが " + r.interestDiff.toLocaleString() + " 円 少ない</td></tr>" +
       "</tbody></table></div>";
     advBox.hidden = false;
+  }
+  document.getElementById("adv-gankin-run").addEventListener("click", runGankin);
+  ["principal", "rate", "years"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      maybeRunPrepay();
+      if (gankinShown) runGankin();
+    });
   });
 })();
 </script>

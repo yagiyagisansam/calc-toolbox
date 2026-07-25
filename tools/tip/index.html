@@ -31,7 +31,8 @@
   <h1>チップ計算機(海外旅行用)</h1>
   <form class="tool-form" id="tip-form">
     <label>金額(税抜の飲食代など)
-      <input type="number" id="amount" min="0" step="any" required placeholder="例: 85.50">
+      <span class="field-note">入力すると自動で計算されます</span>
+      <input type="number" id="amount" inputmode="decimal" min="0" step="any" required placeholder="例: 85.50">
     </label>
     <label>チップ率(%)
       <select id="pct">
@@ -44,18 +45,17 @@
       </select>
     </label>
     <label>割り勘の人数
-      <input type="number" id="people" min="1" max="50" step="1" value="1">
+      <input type="number" id="people" inputmode="numeric" min="1" max="50" step="1" value="1">
     </label>
     <button type="submit">チップと合計を計算する</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
   </form>
-
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
   <details class="adv-box">
     <summary><span class="plus">＋</span>詳細機能: チップ率の逆算とサービス料込みの判定</summary>
     <div class="adv-inner">
       <h3 class="adv-h">結局チップを何%払った?(逆算)</h3>
-      <p class="adv-note">カード明細やレシートの支払い総額から、実際に払ったチップ率を逆算します。「多く払いすぎた?」の確認に。</p>
+      <p class="adv-note">カード明細やレシートの支払い総額から、実際に払ったチップ率を逆算します。</p>
       <label>実際に支払った総額
         <input type="number" id="adv-paid" inputmode="decimal" step="any" min="0.01" placeholder="例: 118.00">
       </label>
@@ -63,6 +63,7 @@
         <input type="number" id="adv-base" inputmode="decimal" step="any" min="0.01" placeholder="例: 100.00">
       </label>
       <button type="button" id="adv-rev-run">チップ率を逆算</button>
+      <div class="tool-result" id="adv-rev-result" hidden aria-live="polite"></div>
       <h3 class="adv-h">サービス料が付いている時、チップは必要?</h3>
       <p class="adv-note">レシートに「Service Charge」「Gratuity」がすでに入っている場合の、追加チップの要否と目安額を判定します。</p>
       <label>金額(サービス料を掛ける前の飲食代)
@@ -82,7 +83,7 @@
   <ol class="steps">
     <li>レシートの金額を入力します(米国では税抜の飲食代に対して計算するのが一般的)。</li>
     <li>チップ率を選びます(迷ったら18%)。</li>
-    <li>割り勘なら人数も入れて「計算する」を押します。</li>
+    <li>割り勘なら人数も入れると、1人あたりの支払額まで自動で表示されます。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -143,8 +144,9 @@
     invalid_pct: "チップ率は0〜50%の範囲で選んでください。",
     invalid_people: "人数は1〜50の整数で入力してください。"
   };
-  document.getElementById("tip-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  function runMain() {
+    if (document.getElementById("amount").value === "" ||
+        document.getElementById("people").value === "") { box.hidden = true; return; }
     var people = parseInt(document.getElementById("people").value, 10);
     var r = TipCalc.calc(
       parseFloat(document.getElementById("amount").value),
@@ -159,27 +161,36 @@
       (people > 1 ? "<tr><td>1人あたり(" + people + "人)</td><td><strong>" + r.perPerson.toLocaleString() + "</strong></td></tr>" : "") +
       "</tbody></table></div><p>通貨単位はそのまま(ドルならドル)で表示しています。</p>";
     box.hidden = false;
+  }
+  document.getElementById("tip-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
   });
+  ["amount", "people"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runMain);
+  });
+  document.getElementById("pct").addEventListener("change", runMain);
 })();
 </script>
 <script>
 (function () {
   "use strict";
+  var revBox = document.getElementById("adv-rev-result");
   var advBox = document.getElementById("adv-result");
-  function showError(msg) {
-    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
-    advBox.hidden = false;
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
   }
   function fmt(x) {
     return x.toLocaleString(undefined, { maximumFractionDigits: 2 });
   }
-  document.getElementById("adv-rev-run").addEventListener("click", function () {
+  function runReverse() {
     var paid = parseFloat(document.getElementById("adv-paid").value);
     var base = parseFloat(document.getElementById("adv-base").value);
-    if (isNaN(paid) || isNaN(base)) { showError("支払い総額と元の金額を入力してください。"); return; }
+    if (isNaN(paid) || isNaN(base)) { showError(revBox, "支払い総額と元の金額を入力してください。"); return; }
     var r = TipCalc.reverse(paid, base);
     if (!r.ok) {
-      showError(r.code === "invalid_paid"
+      showError(revBox, r.code === "invalid_paid"
         ? "支払い総額は元の金額以上(200万まで)で入力してください。"
         : "元の金額は0より大きい値(100万まで)で入力してください。");
       return;
@@ -189,18 +200,18 @@
       : r.verdict === "low"
         ? "アメリカの標準(15〜20%)よりは少なめです。"
         : "チップは払っていません(サービス料込みの店なら問題ありません)。";
-    advBox.innerHTML =
+    revBox.innerHTML =
       '<div class="result-main">チップ率 ' + r.pct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " %</div>" +
       "<p>チップとして払った額: <strong>" + fmt(r.tip) + "</strong></p>" +
       '<p class="adv-note">' + msg + "</p>";
-    advBox.hidden = false;
-  });
-  document.getElementById("adv-svc-run").addEventListener("click", function () {
+    revBox.hidden = false;
+  }
+  function runService() {
     var base = parseFloat(document.getElementById("adv-sbase").value);
     var pct = parseFloat(document.getElementById("adv-spct").value);
-    if (isNaN(base) || isNaN(pct)) { showError("金額とサービス料率を入力してください。"); return; }
+    if (isNaN(base) || isNaN(pct)) { showError(advBox, "金額とサービス料率を入力してください。"); return; }
     var r = TipCalc.serviceAdvice(base, pct);
-    if (!r.ok) { showError("金額は0より大きい値、サービス料率は0〜50%で入力してください。"); return; }
+    if (!r.ok) { showError(advBox, "金額は0より大きい値、サービス料率は0〜50%で入力してください。"); return; }
     if (!r.need) {
       advBox.innerHTML =
         '<div class="result-main">追加のチップは不要です</div>' +
@@ -211,6 +222,20 @@
         '<p class="adv-note">サービス料 ' + pct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%だけでは標準(15〜18%)に届きません。合計で15%にするなら +" + fmt(r.add15) + "、18%にするなら +" + fmt(r.add18) + " が目安です。</p>";
     }
     advBox.hidden = false;
+  }
+  document.getElementById("adv-rev-run").addEventListener("click", runReverse);
+  document.getElementById("adv-svc-run").addEventListener("click", runService);
+  ["adv-paid", "adv-base"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-paid").value !== "" &&
+          document.getElementById("adv-base").value !== "") runReverse();
+    });
+  });
+  ["adv-sbase", "adv-spct"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-sbase").value !== "" &&
+          document.getElementById("adv-spct").value !== "") runService();
+    });
   });
 })();
 </script>

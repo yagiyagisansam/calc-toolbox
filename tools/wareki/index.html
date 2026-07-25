@@ -30,52 +30,55 @@
 <main>
   <h1>西暦・和暦 変換計算機</h1>
   <form class="tool-form" id="to-wareki-form">
-    <label>西暦 → 和暦
-      <span class="field-note">対応範囲: 1868〜2100年</span>
-      <input type="number" id="year" inputmode="numeric" step="1" min="1868" max="2100" placeholder="2026" required>
-    </label>
-    <button type="submit">和暦に変換</button>
+    <span class="field-note">日付を選ぶと、すぐ下に和暦が表示されます</span>
+    <div class="field-row">
+      <label>西暦(年)
+        <select id="sel-year"></select>
+      </label>
+      <label>月
+        <select id="sel-month"></select>
+      </label>
+      <label>日
+        <select id="sel-day"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" aria-live="polite"></div>
   </form>
 
   <form class="tool-form" id="to-seireki-form">
-    <label>和暦 → 西暦
-      <select id="era">
-        <option value="令和">令和</option>
-        <option value="平成">平成</option>
-        <option value="昭和">昭和</option>
-        <option value="大正">大正</option>
-        <option value="明治">明治</option>
-      </select>
-    </label>
-    <label>年(元年は1)
-      <input type="number" id="era-year" inputmode="numeric" step="1" min="1" max="99" placeholder="8" required>
-    </label>
-    <button type="submit">西暦に変換</button>
-  </form>
-
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
-
-  <details class="adv-box">
-    <summary><span class="plus">＋</span>詳細機能: 年度の和暦と生まれ年からの年齢</summary>
-    <div class="adv-inner">
-      <h3 class="adv-h">年度(4月1日区切り)で言うと?</h3>
-      <p class="adv-note">書類でよく使う「年度」は4月1日から翌年3月31日まで。1〜3月は前の年度になります。年は上の「西暦 → 和暦」欄の値を使います。</p>
-      <label>月
-        <select id="adv-fy-month">
-          <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
-          <option value="4">4月</option><option value="5">5月</option><option value="6">6月</option>
-          <option value="7">7月</option><option value="8">8月</option><option value="9">9月</option>
-          <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+    <span class="field-note">和暦から西暦を調べる</span>
+    <div class="field-row">
+      <label>元号
+        <select id="era">
+          <option value="令和">令和</option>
+          <option value="平成">平成</option>
+          <option value="昭和">昭和</option>
+          <option value="大正">大正</option>
+          <option value="明治">明治</option>
         </select>
       </label>
-      <button type="button" id="adv-fy-run">年度を表示する</button>
-
-      <h3 class="adv-h">この年生まれの人は今年で満何歳?</h3>
-      <p class="adv-note">生まれた年(西暦)を入れると、和暦と「今年の誕生日で満何歳になるか」を表示します。書類の年齢欄の確認に。</p>
-      <label>生まれた年(西暦)
-        <input type="number" id="adv-birth-year" inputmode="numeric" step="1" min="1868" max="2100" placeholder="例: 1980">
+      <label>年
+        <select id="era-year"></select>
       </label>
-      <button type="button" id="adv-age-run">満年齢を調べる</button>
+    </div>
+    <div class="tool-result" id="result-b" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 基準日を変えて満年齢を計算</summary>
+    <div class="adv-inner">
+      <p class="adv-note">「入社日時点」「今年4月1日時点」など、指定した日での満年齢を計算します(上で選んだ日付を誕生日として使います)。</p>
+      <div class="field-row">
+        <label>基準日(年)
+          <select id="ref-year"></select>
+        </label>
+        <label>月
+          <select id="ref-month"></select>
+        </label>
+        <label>日
+          <select id="ref-day"></select>
+        </label>
+      </div>
       <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
     </div>
   </details>
@@ -88,8 +91,9 @@
 
   <h2>使い方</h2>
   <ol class="steps">
-    <li>西暦から調べる場合は上の欄に西暦年を入力して「和暦に変換」を押します。</li>
-    <li>和暦から調べる場合は元号と年を選んで「西暦に変換」を押します。</li>
+    <li>上の3つのボックスで年・月・日を選びます(最初は今日の日付が入っています)。</li>
+    <li>選んだ瞬間に、和暦・曜日・年度・その日生まれの人の満年齢が下に表示されます。ボタンは不要です。</li>
+    <li>和暦から西暦を調べる時は、2段目で元号と年を選びます。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -153,80 +157,101 @@
 <script>
 (function () {
   "use strict";
+  var today = new Date();
+
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, "日", Math.min(keep, max));
+  }
+
+  // ---- 西暦 → 和暦(即時) ----
   var box = document.getElementById("result");
-  function showError(code) {
-    var messages = {
-      invalid_year: "西暦は " + WarekiCalc.YEAR_MIN + "〜" + WarekiCalc.YEAR_MAX + " 年の整数で入力してください。",
-      invalid_era: "元号を選択してください。",
-      invalid_era_year: "その元号に存在しない年です。年数を確認してください。"
-    };
-    box.innerHTML = '<p class="result-error">' + (messages[code] || "入力値を確認してください。") + "</p>";
+  fillSelect(document.getElementById("sel-year"), 1868, 2100, "年", today.getFullYear());
+  fillSelect(document.getElementById("sel-month"), 1, 12, "月", today.getMonth() + 1);
+  fillSelect(document.getElementById("sel-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), "日", today.getDate());
+
+  function runA() {
+    adjustDays("sel-year", "sel-month", "sel-day");
+    var y = val("sel-year"), m = val("sel-month"), d = val("sel-day");
+    var r = WarekiCalc.toWarekiExact(y, m, d);
+    if (!r.ok) { box.innerHTML = '<p class="result-error">日付を確認してください。</p>'; return; }
+    var fy = WarekiCalc.fiscalYear(y, m);
+    var age = WarekiCalc.ageOn(y, m, d, today.getFullYear(), today.getMonth() + 1, today.getDate());
+    box.innerHTML =
+      '<div class="result-main">' + r.label + m + "月" + d + "日(" + r.youbi + ")</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      (fy.ok ? "<tr><td>年度</td><td>" + fy.fiscalYear + "年度(" + fy.labels.join("・") + ")</td></tr>" : "") +
+      (age.ok ? "<tr><td>この日生まれの人</td><td>今日時点で 満" + age.age + "歳</td></tr>" : "") +
+      "</tbody></table></div>";
     box.hidden = false;
+    runRef();
   }
-  document.getElementById("to-wareki-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var year = parseFloat(document.getElementById("year").value);
-    var result = WarekiCalc.toWareki(year);
-    if (!result.ok) { showError(result.code); return; }
-    var labels = result.results.map(function (r) { return r.label; }).join(" / ");
-    box.innerHTML = '<div class="result-main">' + labels + "</div>" +
-      (result.results.length > 1 ? "<p>この年は改元年のため、月日によって元号が異なります。</p>" : "");
-    box.hidden = false;
+  ["sel-year", "sel-month", "sel-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runA);
   });
-  document.getElementById("to-seireki-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var era = document.getElementById("era").value;
-    var eraYear = parseFloat(document.getElementById("era-year").value);
-    var result = WarekiCalc.toSeireki(era, eraYear);
-    if (!result.ok) { showError(result.code); return; }
-    box.innerHTML = '<div class="result-main">西暦 ' + result.year + " 年</div>";
-    box.hidden = false;
-  });
-})();
-</script>
-<script>
-(function () {
-  "use strict";
+
+  // ---- 和暦 → 西暦(即時) ----
+  var boxB = document.getElementById("result-b");
+  var eraEl = document.getElementById("era");
+  var eraYearEl = document.getElementById("era-year");
+  var ERA_MAX = { "令和": 82, "平成": 31, "昭和": 64, "大正": 15, "明治": 45 };
+  function fillEraYears() {
+    var keep = parseInt(eraYearEl.value, 10) || 1;
+    var max = ERA_MAX[eraEl.value];
+    var html = "";
+    for (var v = 1; v <= max; v++) {
+      html += '<option value="' + v + '"' + (v === Math.min(keep, max) ? " selected" : "") + ">" +
+        (v === 1 ? "元" : v) + "年</option>";
+    }
+    eraYearEl.innerHTML = html;
+  }
+  function runB() {
+    var r = WarekiCalc.toSeireki(eraEl.value, parseInt(eraYearEl.value, 10));
+    if (!r.ok) { boxB.hidden = true; return; }
+    boxB.innerHTML = '<div class="result-main">西暦 ' + r.year + " 年</div>";
+    boxB.hidden = false;
+  }
+  fillEraYears();
+  eraEl.addEventListener("change", function () { fillEraYears(); runB(); });
+  eraYearEl.addEventListener("change", runB);
+
+  // ---- 詳細機能: 基準日時点の満年齢(即時) ----
   var advBox = document.getElementById("adv-result");
-  function advErr(msg) {
-    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+  fillSelect(document.getElementById("ref-year"), 1868, 2100, "年", today.getFullYear());
+  fillSelect(document.getElementById("ref-month"), 1, 12, "月", today.getMonth() + 1);
+  fillSelect(document.getElementById("ref-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), "日", today.getDate());
+  function runRef() {
+    adjustDays("ref-year", "ref-month", "ref-day");
+    var r = WarekiCalc.ageOn(
+      val("sel-year"), val("sel-month"), val("sel-day"),
+      val("ref-year"), val("ref-month"), val("ref-day")
+    );
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">基準日が誕生日(上で選んだ日付)より前になっています。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var w = WarekiCalc.toWarekiExact(val("ref-year"), val("ref-month"), val("ref-day"));
+    advBox.innerHTML =
+      '<div class="result-main">基準日時点で 満' + r.age + "歳</div>" +
+      (w.ok ? "<p>基準日: " + w.label + val("ref-month") + "月" + val("ref-day") + "日(" + w.youbi + ")</p>" : "");
     advBox.hidden = false;
   }
-  var advMonth = document.getElementById("adv-fy-month");
-  advMonth.value = String(new Date().getMonth() + 1);
-  document.getElementById("adv-fy-run").addEventListener("click", function () {
-    var yearEl = document.getElementById("year");
-    if (yearEl.value === "") { advErr("上の「西暦 → 和暦」欄に年を入力してください。"); return; }
-    var r = WarekiCalc.fiscalYear(parseInt(yearEl.value, 10), parseInt(advMonth.value, 10));
-    if (!r.ok) {
-      advErr(r.code === "out_of_range" ? "1868年1〜3月は対応範囲外です(1867年度になるため)。" : "西暦年は1868〜2100の範囲で入力してください。");
-      return;
-    }
-    advBox.innerHTML =
-      '<div class="result-main">' + r.fiscalYear + "年度(" + r.labels.join("・") + ")</div>" +
-      "<p>" + yearEl.value + "年" + advMonth.value + "月は、" + r.fiscalYear + "年4月1日に始まる年度に属します。</p>";
-    advBox.hidden = false;
+  ["ref-year", "ref-month", "ref-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runRef);
   });
-  document.getElementById("adv-age-run").addEventListener("click", function () {
-    var birthEl = document.getElementById("adv-birth-year");
-    if (birthEl.value === "") { advErr("生まれた年(西暦)を入力してください。"); return; }
-    var birth = parseInt(birthEl.value, 10);
-    var now = new Date().getFullYear();
-    var r = WarekiCalc.ageThisYear(birth, now);
-    if (!r.ok) {
-      advErr(r.code === "invalid_order" ? "生まれた年が今年より後になっています。" : "生まれた年は1868〜2100の範囲で入力してください。");
-      return;
-    }
-    var w = WarekiCalc.toWareki(birth);
-    var labels = [];
-    for (var i = 0; i < w.results.length; i++) labels.push(w.results[i].label);
-    advBox.innerHTML =
-      '<div class="result-main">今年(' + now + "年)の誕生日で 満" + r.age + "歳</div>" +
-      "<p>" + birth + "年(" + labels.join("・") + ")生まれ</p>" +
-      '<p class="adv-note">まだ誕生日が来ていない時点では、これより1歳下(満' +
-      (r.age > 0 ? r.age - 1 : 0) + "歳)です。</p>";
-    advBox.hidden = false;
-  });
+
+  runA();
 })();
 </script>
 </body>

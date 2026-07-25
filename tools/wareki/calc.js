@@ -39,6 +39,57 @@
    * @returns {{ok: true, results: Array<{era: string, eraYear: number, label: string}>}
    *          |{ok: false, code: "invalid_year"}}
    */
+  // 改元日(この日から新元号)。明治は慣例に合わせ1868年1月1日扱い(実際の改元布告は1868年10月23日)
+  var ERA_STARTS = [
+    ["令和", 2019, 5, 1],
+    ["平成", 1989, 1, 8],
+    ["昭和", 1926, 12, 25],
+    ["大正", 1912, 7, 30],
+    ["明治", 1868, 1, 1]
+  ];
+
+  function isRealDate(y, m, d) {
+    if (m < 1 || m > 12 || d < 1 || d > 31) return false;
+    var dt = new Date(y, m - 1, d);
+    return dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d;
+  }
+
+  /**
+   * 月日まで含めた正確な和暦変換(改元日で判定)。
+   * @param {number} y 西暦年(1868〜2100) @param {number} m 月 @param {number} d 日
+   * @returns {{ok:true, era:string, eraYear:number, label:string, youbi:string}
+   *          |{ok:false, code:"invalid_date"}}
+   */
+  function toWarekiExact(y, m, d) {
+    if (!isFiniteNumber(y) || y !== Math.floor(y) || y < YEAR_MIN || y > YEAR_MAX ||
+        !isFiniteNumber(m) || !isFiniteNumber(d) || !isRealDate(y, m, d)) {
+      return { ok: false, code: "invalid_date" };
+    }
+    for (var i = 0; i < ERA_STARTS.length; i++) {
+      var e = ERA_STARTS[i];
+      if (y > e[1] || (y === e[1] && (m > e[2] || (m === e[2] && d >= e[3])))) {
+        var eraYear = y - e[1] + 1;
+        var youbi = ["日", "月", "火", "水", "木", "金", "土"][new Date(y, m - 1, d).getDay()];
+        return { ok: true, era: e[0], eraYear: eraYear, label: label(e[0], eraYear), youbi: youbi };
+      }
+    }
+    return { ok: false, code: "invalid_date" };
+  }
+
+  /**
+   * 基準日時点の満年齢(誕生日前なら1歳引く)。
+   * @returns {{ok:true, age:number}|{ok:false, code:"invalid_date"|"invalid_order"}}
+   */
+  function ageOn(by, bm, bd, ry, rm, rd) {
+    if (!isRealDate(by, bm, bd) || !isRealDate(ry, rm, rd)) return { ok: false, code: "invalid_date" };
+    if (ry < by || (ry === by && (rm < bm || (rm === bm && rd < bd)))) {
+      return { ok: false, code: "invalid_order" };
+    }
+    var age = ry - by;
+    if (rm < bm || (rm === bm && rd < bd)) age--;
+    return { ok: true, age: age };
+  }
+
   function toWareki(year) {
     if (!isFiniteNumber(year) || year !== Math.floor(year) || year < YEAR_MIN || year > YEAR_MAX) {
       return { ok: false, code: "invalid_year" };
@@ -125,6 +176,8 @@
   var api = {
     ageThisYear: ageThisYear,
     fiscalYear: fiscalYear,
+    toWarekiExact: toWarekiExact,
+    ageOn: ageOn,
     toWareki: toWareki,
     toSeireki: toSeireki,
     YEAR_MIN: YEAR_MIN,

@@ -30,6 +30,7 @@
 <main>
   <h1>睡眠時間 計算機</h1>
   <form class="tool-form" id="sleep-form">
+    <span class="field-note">時刻を選ぶと、すぐ下に睡眠時間が表示されます</span>
     <label>就寝時刻
       <input type="time" id="bed" value="23:00" required>
     </label>
@@ -45,15 +46,15 @@
     <summary><span class="plus">＋</span>詳細機能: 1週間の睡眠記録・就寝時刻の逆算</summary>
     <div class="adv-inner">
       <h3 class="adv-h">この1週間、足りていた?(睡眠負債チェック)</h3>
-      <p class="adv-note">直近7日分の睡眠時間(時間単位・小数可)を入れると、平均・合計と、理想の1日7時間に対する過不足を計算します。</p>
+      <p class="adv-note">睡眠時間(時間単位・小数可)を入れるたびに、入力済みの日数分だけで平均と1日7時間に対する過不足を計算します(空欄の日は無視)。</p>
       <div id="adv-week" style="display:flex;flex-wrap:wrap;gap:8px;">
-        <input type="number" id="adv-d1" step="any" min="0" max="24" placeholder="1日目" aria-label="1日目の睡眠時間(時間)" style="width:6em;">
-        <input type="number" id="adv-d2" step="any" min="0" max="24" placeholder="2日目" aria-label="2日目の睡眠時間(時間)" style="width:6em;">
-        <input type="number" id="adv-d3" step="any" min="0" max="24" placeholder="3日目" aria-label="3日目の睡眠時間(時間)" style="width:6em;">
-        <input type="number" id="adv-d4" step="any" min="0" max="24" placeholder="4日目" aria-label="4日目の睡眠時間(時間)" style="width:6em;">
-        <input type="number" id="adv-d5" step="any" min="0" max="24" placeholder="5日目" aria-label="5日目の睡眠時間(時間)" style="width:6em;">
-        <input type="number" id="adv-d6" step="any" min="0" max="24" placeholder="6日目" aria-label="6日目の睡眠時間(時間)" style="width:6em;">
-        <input type="number" id="adv-d7" step="any" min="0" max="24" placeholder="7日目" aria-label="7日目の睡眠時間(時間)" style="width:6em;">
+        <input type="number" id="adv-d1" inputmode="decimal" step="any" min="0" max="24" placeholder="1日目" aria-label="1日目の睡眠時間(時間)" style="width:6em;">
+        <input type="number" id="adv-d2" inputmode="decimal" step="any" min="0" max="24" placeholder="2日目" aria-label="2日目の睡眠時間(時間)" style="width:6em;">
+        <input type="number" id="adv-d3" inputmode="decimal" step="any" min="0" max="24" placeholder="3日目" aria-label="3日目の睡眠時間(時間)" style="width:6em;">
+        <input type="number" id="adv-d4" inputmode="decimal" step="any" min="0" max="24" placeholder="4日目" aria-label="4日目の睡眠時間(時間)" style="width:6em;">
+        <input type="number" id="adv-d5" inputmode="decimal" step="any" min="0" max="24" placeholder="5日目" aria-label="5日目の睡眠時間(時間)" style="width:6em;">
+        <input type="number" id="adv-d6" inputmode="decimal" step="any" min="0" max="24" placeholder="6日目" aria-label="6日目の睡眠時間(時間)" style="width:6em;">
+        <input type="number" id="adv-d7" inputmode="decimal" step="any" min="0" max="24" placeholder="7日目" aria-label="7日目の睡眠時間(時間)" style="width:6em;">
       </div>
       <button type="button" id="adv-week-run">1週間の集計を見る</button>
 
@@ -76,7 +77,7 @@
   <h2>使い方</h2>
   <ol class="steps">
     <li>就寝時刻(眠りにつく時刻)を入力します。</li>
-    <li>起床時刻を入力して「計算する」を押すと、睡眠時間が表示されます。</li>
+    <li>起床時刻を入力すると同時に、睡眠時間がすぐ下に表示されます。ボタンは不要です。</li>
     <li>「6時起きで7時間寝たい」→ 起床時刻から逆算して就寝時刻を試すのにも使えます。</li>
   </ol>
 
@@ -134,10 +135,12 @@
     invalid_wake: "起床時刻を入力してください。",
     same_time: "就寝時刻と起床時刻が同じです。"
   };
-  document.getElementById("sleep-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var result = SleepCalc.calculate(document.getElementById("bed").value, document.getElementById("wake").value);
-    var box = document.getElementById("result");
+  var box = document.getElementById("result");
+  var bedEl = document.getElementById("bed");
+  var wakeEl = document.getElementById("wake");
+  function run() {
+    if (bedEl.value === "" || wakeEl.value === "") { box.hidden = true; return; }
+    var result = SleepCalc.calculate(bedEl.value, wakeEl.value);
     if (result.ok) {
       box.innerHTML = '<div class="result-main">' + result.hours + "時間" +
         (result.minutes > 0 ? result.minutes + "分" : "") + "</div>" +
@@ -146,7 +149,11 @@
       box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
     }
     box.hidden = false;
-  });
+  }
+  bedEl.addEventListener("input", run);
+  wakeEl.addEventListener("input", run);
+  document.getElementById("sleep-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
 })();
 </script>
 <script>
@@ -157,52 +164,71 @@
     advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
     advBox.hidden = false;
   }
-  document.getElementById("adv-week-run").addEventListener("click", function () {
+  var lastAdv = null;
+  function runWeek(fromButton) {
     var list = [];
+    var entered = 0;
     for (var i = 1; i <= 7; i++) {
       var v = document.getElementById("adv-d" + i).value;
-      if (v === "") { advErr("7日分すべての睡眠時間を入力してください(" + i + "日目が空欄です)。"); return; }
+      if (v === "") { list.push(null); continue; }
       list.push(parseFloat(v));
+      entered++;
     }
-    var r = SleepCalc.weekStats(list);
+    if (entered === 0) {
+      if (fromButton) advErr("1日分以上の睡眠時間を入力してください。");
+      else if (lastAdv === runWeek) advBox.hidden = true;
+      return;
+    }
+    var r = SleepCalc.weekStatsPartial(list);
     if (!r.ok) { advErr("睡眠時間は0〜24時間の範囲で入力してください。"); return; }
+    lastAdv = runWeek;
     var fmt1 = function (v) { return v.toLocaleString(undefined, { maximumFractionDigits: 1 }); };
+    var idealTotal = 7 * r.days;
     var judge;
     if (r.diffHours < 0) {
-      judge = "理想(1日7時間×7日=49時間)より <strong>約 " + fmt1(Math.abs(r.diffHours)) +
+      judge = "理想(1日7時間×" + r.days + "日=" + idealTotal + "時間)より <strong>約 " + fmt1(Math.abs(r.diffHours)) +
         " 時間不足</strong>しています。寝不足の積み重ね(睡眠負債)の目安です。";
     } else if (r.diffHours > 0) {
-      judge = "理想(49時間)より約 " + fmt1(r.diffHours) + " 時間多く眠れています。";
+      judge = "理想(" + idealTotal + "時間)より約 " + fmt1(r.diffHours) + " 時間多く眠れています。";
     } else {
       judge = "<strong>理想(1日7時間)どおりのペースです。</strong>";
     }
     advBox.innerHTML =
       '<div class="result-main">平均 ' + fmt1(r.avgHours) + " 時間/日</div>" +
+      "<p>入力済みの " + r.days + " 日分で計算しています。残りの日を入れると自動で更新されます。</p>" +
       '<div class="table-scroll"><table class="data-table"><tbody>' +
-      "<tr><td>7日間の合計</td><td>" + fmt1(r.totalHours) + " 時間</td></tr>" +
-      "<tr><td>理想(49時間)との差</td><td>" + (r.diffHours > 0 ? "+" : "") + fmt1(r.diffHours) + " 時間</td></tr>" +
+      "<tr><td>" + r.days + "日間の合計</td><td>" + fmt1(r.totalHours) + " 時間</td></tr>" +
+      "<tr><td>理想(" + idealTotal + "時間)との差</td><td>" + (r.diffHours > 0 ? "+" : "") + fmt1(r.diffHours) + " 時間</td></tr>" +
       "</tbody></table></div>" +
       "<p>" + judge + "</p>" +
       '<p class="adv-note">必要な睡眠時間には個人差があります。7時間はあくまで一般的な目安です。</p>';
     advBox.hidden = false;
-  });
-  document.getElementById("adv-bed-run").addEventListener("click", function () {
+  }
+  function runBed(fromButton) {
     var wake = document.getElementById("wake").value;
-    if (wake === "") { advErr("先に上のフォームの起床時刻を入力してください。"); return; }
+    if (wake === "") { if (fromButton) advErr("先に上のフォームの起床時刻を入力してください。"); return; }
     var tEl = document.getElementById("adv-target-hours");
-    if (tEl.value === "") { advErr("目標睡眠時間を入力してください。"); return; }
+    if (tEl.value === "") { if (fromButton) advErr("目標睡眠時間を入力してください。"); return; }
     var r = SleepCalc.bedTimeFor(wake, parseFloat(tEl.value));
     if (!r.ok) {
       advErr(r.code === "invalid_target" ? "目標睡眠時間は1〜16時間の範囲で入力してください。"
         : "起床時刻を確認してください。");
       return;
     }
+    lastAdv = runBed;
     advBox.innerHTML =
       '<div class="result-main">' + r.bedTime + " までに就寝</div>" +
       "<p>起床 " + wake + " で " + parseFloat(tEl.value).toLocaleString(undefined, { maximumFractionDigits: 1 }) +
       " 時間眠るには、<strong>" + r.bedTime + "</strong> までに眠りにつく計算です。寝つくまでの時間は含まないため、布団には少し早めに入るのがおすすめです。</p>";
     advBox.hidden = false;
-  });
+  }
+  document.getElementById("adv-week-run").addEventListener("click", function () { runWeek(true); });
+  document.getElementById("adv-bed-run").addEventListener("click", function () { runBed(true); });
+  for (var d = 1; d <= 7; d++) {
+    document.getElementById("adv-d" + d).addEventListener("input", function () { runWeek(false); });
+  }
+  document.getElementById("adv-target-hours").addEventListener("input", function () { runBed(false); });
+  document.getElementById("wake").addEventListener("input", function () { if (lastAdv === runBed) runBed(false); });
 })();
 </script>
 </body>

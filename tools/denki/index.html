@@ -51,7 +51,7 @@
     <summary><span class="plus">＋</span>詳細機能: 複数の家電をまとめて計算</summary>
     <div class="adv-inner">
       <h3 class="adv-h">家全体でいくら? 最大6つまでまとめて</h3>
-      <p class="adv-note">よく使う家電を並べて入力すると、合計の電気代と「どれが電気を食っているか」の割合がわかります。単価は上のフォームの値を使います。名前は空欄でも構いません。</p>
+      <p class="adv-note">よく使う家電を並べて入力すると、合計の電気代と「どれが電気を食っているか」の割合がわかります(単価は上のフォームの値・名前は空欄でも可)。</p>
       <div class="adv-rows" id="adv-rows">
         <label>家電1 名前 / 消費電力(W) / 1日の使用時間(h)
           <input type="text" id="adv-name-1" placeholder="エアコン" maxlength="20">
@@ -99,7 +99,7 @@
   <ol class="steps">
     <li>家電の消費電力(W)を入力します。製品本体のラベル・取扱説明書・メーカーサイトで確認できます。</li>
     <li>1日に使う時間を入力します。</li>
-    <li>必要なら電気料金単価を契約プランの値に変更し、「計算する」を押します。</li>
+    <li>入力するとすぐ下に電気代が自動表示されます。単価は契約プランの値に変更できます。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -159,13 +159,20 @@
     invalid_hours: "使用時間は " + DenkiCalc.HOURS_MIN + "〜" + DenkiCalc.HOURS_MAX + " 時間の範囲で入力してください。",
     invalid_price: "単価は " + DenkiCalc.PRICE_MIN + "〜" + DenkiCalc.PRICE_MAX + " 円/kWh の範囲で入力してください。"
   };
-  document.getElementById("denki-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var watts = parseFloat(document.getElementById("watts").value);
-    var hours = parseFloat(document.getElementById("hours").value);
-    var price = parseFloat(document.getElementById("price").value);
-    var result = DenkiCalc.calculate(watts, hours, price);
-    var box = document.getElementById("result");
+  var box = document.getElementById("result");
+  function raw(id) { return document.getElementById(id).value; }
+  function run(showErrors) {
+    if (raw("watts") === "" || raw("hours") === "" || raw("price") === "") {
+      if (showErrors) {
+        var code = raw("watts") === "" ? "invalid_watts" : raw("hours") === "" ? "invalid_hours" : "invalid_price";
+        box.innerHTML = '<p class="result-error">' + ERROR_MESSAGES[code] + "</p>";
+        box.hidden = false;
+      } else {
+        box.hidden = true;
+      }
+      return;
+    }
+    var result = DenkiCalc.calculate(parseFloat(raw("watts")), parseFloat(raw("hours")), parseFloat(raw("price")));
     if (result.ok) {
       box.innerHTML =
         '<div class="result-main">約 ' + result.costPerMonth.toLocaleString() + " 円/月</div>" +
@@ -175,6 +182,13 @@
       box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
     }
     box.hidden = false;
+  }
+  ["watts", "hours", "price"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { run(false); });
+  });
+  document.getElementById("denki-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
   });
 })();
 </script>
@@ -188,7 +202,7 @@
     invalid_hours: "使用時間は 0.1〜24時間 の範囲で入力してください。",
     invalid_price: "単価(上のフォーム)は 1〜100円/kWh の範囲で入力してください。"
   };
-  document.getElementById("adv-run").addEventListener("click", function () {
+  function runAdv(skipIncomplete) {
     var price = parseFloat(document.getElementById("price").value);
     var items = [];
     var names = [];
@@ -196,6 +210,7 @@
       var w = document.getElementById("adv-watts-" + i).value;
       var h = document.getElementById("adv-hours-" + i).value;
       if (w === "" && h === "") continue;
+      if (skipIncomplete && (w === "" || h === "")) continue;
       items.push({ watts: parseFloat(w), hours: parseFloat(h) });
       var n = document.getElementById("adv-name-" + i).value.trim();
       names.push(n || "家電" + i);
@@ -228,6 +243,29 @@
     }
     advBox.innerHTML = html;
     advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", function () { runAdv(false); });
+  function autoAdv() {
+    var hasComplete = false;
+    for (var i = 1; i <= 6; i++) {
+      if (document.getElementById("adv-watts-" + i).value !== "" &&
+          document.getElementById("adv-hours-" + i).value !== "") hasComplete = true;
+    }
+    if (hasComplete && document.getElementById("price").value !== "") {
+      runAdv(true);
+    } else {
+      advBox.hidden = true;
+    }
+  }
+  for (var i = 1; i <= 6; i++) {
+    document.getElementById("adv-watts-" + i).addEventListener("input", autoAdv);
+    document.getElementById("adv-hours-" + i).addEventListener("input", autoAdv);
+    document.getElementById("adv-name-" + i).addEventListener("input", function () {
+      if (!advBox.hidden) autoAdv();
+    });
+  }
+  document.getElementById("price").addEventListener("input", function () {
+    if (!advBox.hidden) autoAdv();
   });
 })();
 </script>

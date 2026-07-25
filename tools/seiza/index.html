@@ -30,28 +30,29 @@
 <main>
   <h1>星座・誕生石 早見計算機</h1>
   <form class="tool-form" id="seiza-form">
-    <label>誕生日(月・日)
-      <span style="display:flex;gap:.5em;align-items:center;">
-        <select id="month" aria-label="月"></select> 月
-        <select id="day" aria-label="日"></select> 日
-      </span>
-    </label>
-    <button type="submit">星座・誕生石を調べる</button>
+    <span class="field-note">誕生日を選ぶと、すぐ下に星座と誕生石が表示されます</span>
+    <div class="field-row">
+      <label>誕生日(月)
+        <select id="month"></select>
+      </label>
+      <label>日
+        <select id="day"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
   </form>
-
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
   <details class="adv-box">
     <summary><span class="plus">＋</span>詳細機能: 生まれた日の曜日と12星座の一覧表</summary>
     <div class="adv-inner">
       <h3 class="adv-h">生まれ年を足して詳しく調べる</h3>
-      <p class="adv-note">生まれ年を入れると(月・日は上の欄の選択を使います)、生まれた日の曜日を正確に計算します。星座の境目(カスプ)に近い誕生日には注記が付きます。</p>
+      <p class="adv-note">生まれ年を入れると、生まれた日の曜日と星座の境目(カスプ)の注記を表示します(月・日は上の欄の選択を使います)。</p>
       <label>生まれ年(西暦)
-        <input type="number" id="adv-year" min="1600" max="2200" step="1" placeholder="例: 1990">
+        <input type="number" id="adv-year" inputmode="numeric" min="1600" max="2200" step="1" placeholder="例: 1990">
       </label>
       <button type="button" id="adv-detail-run">曜日と星座を詳しく調べる</button>
       <h3 class="adv-h">12星座の期間一覧表</h3>
-      <p class="adv-note">全星座の日付区分をまとめて確認できます。家族や友だちの星座を一度に調べたい時に。</p>
+      <p class="adv-note">全星座の日付区分をまとめて確認できます。</p>
       <button type="button" id="adv-list-run">一覧表を見る</button>
       <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
     </div>
@@ -62,7 +63,7 @@
   <h2>使い方</h2>
   <ol class="steps">
     <li>誕生日の月と日を選びます(年は不要です)。</li>
-    <li>「調べる」を押すと、星座(日本語・英語)と誕生石が表示されます。</li>
+    <li>選んだ瞬間に、星座(日本語・英語)と誕生石が下に表示されます。ボタンは不要です。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -119,33 +120,45 @@
   var box = document.getElementById("result");
   var monthSel = document.getElementById("month");
   var daySel = document.getElementById("day");
+  var today = new Date();
   var DAYS = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-  for (var m = 1; m <= 12; m++) monthSel.add(new Option(m, m));
+  for (var m = 1; m <= 12; m++) monthSel.add(new Option(m + "月", m));
+  monthSel.value = today.getMonth() + 1;
   function fillDays() {
-    var cur = parseInt(daySel.value || "1", 10);
+    var cur = parseInt(daySel.value || String(today.getDate()), 10);
     daySel.innerHTML = "";
-    for (var d = 1; d <= DAYS[monthSel.value - 1]; d++) daySel.add(new Option(d, d));
+    for (var d = 1; d <= DAYS[monthSel.value - 1]; d++) daySel.add(new Option(d + "日", d));
     daySel.value = Math.min(cur, DAYS[monthSel.value - 1]);
   }
-  monthSel.addEventListener("change", fillDays);
   fillDays();
-  document.getElementById("seiza-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  function run() {
     var r = SeizaCalc.lookup(parseInt(monthSel.value, 10), parseInt(daySel.value, 10));
     if (!r.ok) { box.innerHTML = '<p class="result-error">日付を正しく選んでください。</p>'; box.hidden = false; return; }
     box.innerHTML =
       '<div class="result-main">' + r.sign + "</div>" +
       "<p>英語表記: <strong>" + r.signEn + "</strong> / 誕生石: <strong>" + r.stone + "</strong></p>";
     box.hidden = false;
+    if (window.__seizaAdvRefresh) { window.__seizaAdvRefresh(); }
+  }
+  monthSel.addEventListener("change", function () { fillDays(); run(); });
+  daySel.addEventListener("change", run);
+  document.getElementById("seiza-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run();
   });
+  run();
 })();
 </script>
 <script>
 (function () {
   "use strict";
   var advBox = document.getElementById("adv-result");
-  document.getElementById("adv-detail-run").addEventListener("click", function () {
-    var y = parseInt(document.getElementById("adv-year").value, 10);
+  var lastAdv = "";
+  function runDetail(fromButton) {
+    lastAdv = "detail";
+    var raw = document.getElementById("adv-year").value;
+    var y = parseInt(raw, 10);
+    if (!fromButton && !(y >= 1600 && y <= 2200)) { return; }
     var mo = parseInt(document.getElementById("month").value, 10);
     var d = parseInt(document.getElementById("day").value, 10);
     var r = SeizaCalc.detail(y, mo, d);
@@ -163,8 +176,14 @@
     }
     advBox.innerHTML = html;
     advBox.hidden = false;
-  });
+  }
+  document.getElementById("adv-detail-run").addEventListener("click", function () { runDetail(true); });
+  document.getElementById("adv-year").addEventListener("input", function () { runDetail(false); });
+  window.__seizaAdvRefresh = function () {
+    if (!advBox.hidden && lastAdv === "detail" && document.getElementById("adv-year").value !== "") { runDetail(false); }
+  };
   document.getElementById("adv-list-run").addEventListener("click", function () {
+    lastAdv = "list";
     var signs = SeizaCalc.SIGNS;
     var html = '<div class="result-main">12星座の期間一覧</div>' +
       '<div class="table-scroll"><table class="data-table"><thead><tr><th>星座</th><th>期間</th></tr></thead><tbody>';

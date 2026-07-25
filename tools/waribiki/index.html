@@ -37,21 +37,21 @@
       </select>
     </label>
     <label>定価(円)
-      <input type="number" id="price" min="1" step="any" required placeholder="例: 2980">
+      <input type="number" id="price" inputmode="decimal" min="1" step="any" required placeholder="例: 2980">
     </label>
     <label id="second-label">割引率(%)
-      <input type="number" id="second" min="0" max="100000000" step="any" required placeholder="例: 30">
+      <input type="number" id="second" inputmode="decimal" min="0" max="100000000" step="any" required placeholder="例: 30">
     </label>
+    <span class="field-note">2つ入力すると自動で計算されます</span>
     <button type="submit">計算する</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
   </form>
-
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
   <details class="adv-box">
     <summary><span class="plus">＋</span>詳細機能: 割引の重ね掛けとクーポン比較</summary>
     <div class="adv-inner">
       <h3 class="adv-h">割引の重ね掛け(さらに○%オフ)</h3>
-      <p class="adv-note">「30%オフからレジでさらに20%オフ」のような二重割引の最終価格を計算します。20%オフ+10%オフは28%オフで、30%オフにはなりません。</p>
+      <p class="adv-note">「30%オフからレジでさらに20%オフ」のような二重割引の最終価格を計算します。</p>
       <label>定価(円)
         <input type="number" id="adv-dprice" inputmode="numeric" step="any" min="1" placeholder="10000">
       </label>
@@ -62,6 +62,7 @@
         <input type="number" id="adv-p2" inputmode="decimal" step="any" min="0" max="100" placeholder="10">
       </label>
       <button type="button" id="adv-double-run">最終価格を計算</button>
+      <div class="tool-result" id="adv-double-result" hidden aria-live="polite"></div>
       <h3 class="adv-h">「○円引き」と「○%オフ」どっちが得?</h3>
       <p class="adv-note">クーポンが2種類あって選べる時に、どちらで払うほうが安いかを比べます。</p>
       <label>定価(円)
@@ -84,7 +85,7 @@
   <ol class="steps">
     <li>「○%オフ後の価格」か「割引率の逆算」を選びます。</li>
     <li>定価と、割引率(またはセール価格)を入力します。</li>
-    <li>「計算する」を押すと、割引後価格と値引き額(または割引率)が表示されます。</li>
+    <li>入力と同時に、割引後価格と値引き額(または割引率)が表示されます(ボタンを押す必要はありません)。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -148,14 +149,16 @@
     invalid_pct: "割引率は0〜100%の範囲で入力してください。",
     invalid_sale: "売価は0円〜定価の範囲で入力してください。"
   };
+  var priceEl = document.getElementById("price");
   mode.addEventListener("change", function () {
     var isOff = mode.value === "off";
     label.childNodes[0].textContent = isOff ? "割引率(%)" : "セール価格(円)";
     second.placeholder = isOff ? "例: 30" : "例: 1480";
+    runMain();
   });
-  document.getElementById("waribiki-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var price = parseFloat(document.getElementById("price").value);
+  function runMain() {
+    if (priceEl.value === "" || second.value === "") { box.hidden = true; return; }
+    var price = parseFloat(priceEl.value);
     var v = parseFloat(second.value);
     if (mode.value === "off") {
       var r = WaribikiCalc.off(price, v);
@@ -169,40 +172,48 @@
         "<p>値引き額: " + (price - v).toLocaleString() + "円</p>";
     }
     box.hidden = false;
+  }
+  document.getElementById("waribiki-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
+  });
+  [priceEl, second].forEach(function (el) {
+    el.addEventListener("input", runMain);
   });
 })();
 </script>
 <script>
 (function () {
   "use strict";
+  var doubleBox = document.getElementById("adv-double-result");
   var advBox = document.getElementById("adv-result");
-  function showError(msg) {
-    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
-    advBox.hidden = false;
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
   }
-  document.getElementById("adv-double-run").addEventListener("click", function () {
+  function runDouble() {
     var price = parseFloat(document.getElementById("adv-dprice").value);
     var p1 = parseFloat(document.getElementById("adv-p1").value);
     var p2 = parseFloat(document.getElementById("adv-p2").value);
-    if (isNaN(price) || isNaN(p1) || isNaN(p2)) { showError("定価と2つの割引率を入力してください。"); return; }
+    if (isNaN(price) || isNaN(p1) || isNaN(p2)) { showError(doubleBox, "定価と2つの割引率を入力してください。"); return; }
     var r = WaribikiCalc.doubleOff(price, p1, p2);
-    if (!r.ok) { showError("定価は1円以上、割引率は0〜100%で入力してください。"); return; }
-    advBox.innerHTML =
+    if (!r.ok) { showError(doubleBox, "定価は1円以上、割引率は0〜100%で入力してください。"); return; }
+    doubleBox.innerHTML =
       '<div class="result-main">' + r.sale.toLocaleString() + " 円</div>" +
       '<div class="table-scroll"><table class="data-table"><tbody>' +
       "<tr><td>値引き額の合計</td><td>" + r.saved.toLocaleString() + " 円</td></tr>" +
       "<tr><td>実質の割引率</td><td><strong>" + r.effectivePct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%オフ</strong></td></tr>" +
       "</tbody></table></div>" +
       '<p class="adv-note">' + p1.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%オフ + " + p2.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%オフ は、単純な足し算の " + r.naivePct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%オフではなく <strong>" + r.effectivePct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%オフ</strong> です(2回目の割引は、すでに安くなった価格にかかるため)。</p>";
-    advBox.hidden = false;
-  });
-  document.getElementById("adv-coupon-run").addEventListener("click", function () {
+    doubleBox.hidden = false;
+  }
+  function runCoupon() {
     var price = parseFloat(document.getElementById("adv-cprice").value);
     var yen = parseFloat(document.getElementById("adv-cyen").value);
     var pct = parseFloat(document.getElementById("adv-cpct").value);
-    if (isNaN(price) || isNaN(yen) || isNaN(pct)) { showError("定価・値引き額・割引率を入力してください。"); return; }
+    if (isNaN(price) || isNaN(yen) || isNaN(pct)) { showError(advBox, "定価・値引き額・割引率を入力してください。"); return; }
     var r = WaribikiCalc.couponCompare(price, yen, pct);
-    if (!r.ok) { showError("定価は1円以上、値引き額は0円以上、割引率は0〜100%で入力してください。"); return; }
+    if (!r.ok) { showError(advBox, "定価は1円以上、値引き額は0円以上、割引率は0〜100%で入力してください。"); return; }
     var verdict = r.better === "even"
       ? "どちらも同じ支払額です"
       : r.better === "yen"
@@ -215,6 +226,22 @@
       "<tr><td>クーポンB(" + pct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%オフ)</td><td>" + r.byPct.toLocaleString() + " 円</td></tr>" +
       "</tbody></table></div>";
     advBox.hidden = false;
+  }
+  document.getElementById("adv-double-run").addEventListener("click", runDouble);
+  document.getElementById("adv-coupon-run").addEventListener("click", runCoupon);
+  ["adv-dprice", "adv-p1", "adv-p2"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-dprice").value !== "" &&
+          document.getElementById("adv-p1").value !== "" &&
+          document.getElementById("adv-p2").value !== "") runDouble();
+    });
+  });
+  ["adv-cprice", "adv-cyen", "adv-cpct"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-cprice").value !== "" &&
+          document.getElementById("adv-cyen").value !== "" &&
+          document.getElementById("adv-cpct").value !== "") runCoupon();
+    });
   });
 })();
 </script>

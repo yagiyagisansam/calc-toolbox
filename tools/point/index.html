@@ -31,18 +31,18 @@
   <h1>割引とポイント還元 どっちが得? 計算機</h1>
   <form class="tool-form" id="point-form">
     <label>商品の価格(円)
-      <input type="number" id="price" min="1" step="1" required placeholder="例: 10000">
+      <input type="number" id="price" inputmode="numeric" min="1" step="1" required placeholder="例: 10000">
     </label>
     <label>案① 割引率(%オフ)
-      <input type="number" id="discount" min="0" max="99.9" step="any" required placeholder="例: 10">
+      <input type="number" id="discount" inputmode="decimal" min="0" max="99.9" step="any" required placeholder="例: 10">
     </label>
     <label>案② ポイント還元率(%)
-      <input type="number" id="point" min="0" max="100" step="any" required placeholder="例: 10">
+      <input type="number" id="point" inputmode="decimal" min="0" max="100" step="any" required placeholder="例: 10">
     </label>
+    <span class="field-note">3つ入力すると自動で判定されます</span>
     <button type="submit">どっちが得か計算する</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
   </form>
-
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
   <details class="adv-box">
     <summary><span class="plus">＋</span>詳細機能: 損益分岐の還元率とポイントの使い残し</summary>
@@ -53,8 +53,9 @@
         <input type="number" id="adv-bdisc" inputmode="decimal" step="any" min="0" max="99.9" placeholder="10">
       </label>
       <button type="button" id="adv-be-run">互角になる還元率を計算</button>
+      <div class="tool-result" id="adv-be-result" hidden aria-live="polite"></div>
       <h3 class="adv-h">ポイントを全部は使わないなら?</h3>
-      <p class="adv-note">ポイントは使い切らなければ価値が下がります。「たぶん7割くらいしか使わない」といった場合の実質的な得を計算します。</p>
+      <p class="adv-note">「たぶん7割くらいしか使わない」など、ポイントを使い切らない場合の実質的な得を計算します。</p>
       <label>商品の価格(円)
         <input type="number" id="adv-uprice" inputmode="numeric" step="1" min="1" placeholder="10000">
       </label>
@@ -75,7 +76,7 @@
   <ol class="steps">
     <li>商品の価格を入力します。</li>
     <li>比べたい「割引率」と「ポイント還元率」を入力します(片方が0でもOK)。</li>
-    <li>「計算する」を押すと、判定と実質価格の比較表が表示されます。</li>
+    <li>3つ入力すると同時に、判定と実質価格の比較表が表示されます(ボタンを押す必要はありません)。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -142,8 +143,10 @@
     point: "ポイント還元のほうが得",
     even: "どちらもほぼ互角"
   };
-  document.getElementById("point-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  function runMain() {
+    if (document.getElementById("price").value === "" ||
+        document.getElementById("discount").value === "" ||
+        document.getElementById("point").value === "") { box.hidden = true; return; }
     var price = parseFloat(document.getElementById("price").value);
     var d = parseFloat(document.getElementById("discount").value);
     var p = parseFloat(document.getElementById("point").value);
@@ -161,34 +164,42 @@
       "</tbody></table></div>" +
       "<p>" + p.toLocaleString() + "%還元は割引に換算すると約 <strong>" + r.pointEquivPct.toLocaleString() + "%オフ相当</strong>です(ポイントを全額使う前提)。</p>";
     box.hidden = false;
+  }
+  document.getElementById("point-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
+  });
+  ["price", "discount", "point"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runMain);
   });
 })();
 </script>
 <script>
 (function () {
   "use strict";
+  var beBox = document.getElementById("adv-be-result");
   var advBox = document.getElementById("adv-result");
-  function showError(msg) {
-    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
-    advBox.hidden = false;
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
   }
-  document.getElementById("adv-be-run").addEventListener("click", function () {
+  function runBreakeven() {
     var d = parseFloat(document.getElementById("adv-bdisc").value);
-    if (isNaN(d)) { showError("割引率を入力してください。"); return; }
+    if (isNaN(d)) { showError(beBox, "割引率を入力してください。"); return; }
     var r = PointCalc.breakevenPoint(d);
-    if (!r.ok) { showError("割引率は0以上100未満で入力してください。"); return; }
-    advBox.innerHTML =
+    if (!r.ok) { showError(beBox, "割引率は0以上100未満で入力してください。"); return; }
+    beBox.innerHTML =
       '<div class="result-main">還元率 ' + r.pointPct.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " % で互角</div>" +
       '<p class="adv-note">' + d.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%オフと同じ得になるには、ポイント還元は " + r.pointPct.toLocaleString(undefined, { maximumFractionDigits: 2 }) + "% 必要です。これより低い還元率なら割引を選ぶのが得です(ポイントを全額使い切る前提)。</p>";
-    advBox.hidden = false;
-  });
-  document.getElementById("adv-use-run").addEventListener("click", function () {
+    beBox.hidden = false;
+  }
+  function runPartialUse() {
     var price = parseFloat(document.getElementById("adv-uprice").value);
     var pt = parseFloat(document.getElementById("adv-upoint").value);
     var use = parseFloat(document.getElementById("adv-uuse").value);
-    if (isNaN(price) || isNaN(pt) || isNaN(use)) { showError("価格・還元率・利用率を入力してください。"); return; }
+    if (isNaN(price) || isNaN(pt) || isNaN(use)) { showError(advBox, "価格・還元率・利用率を入力してください。"); return; }
     var r = PointCalc.partialUse(price, pt, use);
-    if (!r.ok) { showError("価格は1〜1,000万円、還元率と利用率は0〜100%で入力してください。"); return; }
+    if (!r.ok) { showError(advBox, "価格は1〜1,000万円、還元率と利用率は0〜100%で入力してください。"); return; }
     advBox.innerHTML =
       '<div class="result-main">実質 ' + r.effectivePct.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " %オフ相当</div>" +
       '<div class="table-scroll"><table class="data-table"><tbody>' +
@@ -196,8 +207,20 @@
       "<tr><td>実際に使う分(" + use.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%)</td><td>" + r.used.toLocaleString() + " 円分</td></tr>" +
       "<tr><td>実質負担</td><td>" + r.net.toLocaleString() + " 円</td></tr>" +
       "</tbody></table></div>" +
-      '<p class="adv-note">使わない分のポイントは価値ゼロとして計算しています。有効期限切れが心配なら、上の「互角になる還元率」より高めの還元率でないと割引に勝てません。</p>';
+      '<p class="adv-note">使わない分のポイントは価値ゼロとして計算しています。</p>';
     advBox.hidden = false;
+  }
+  document.getElementById("adv-be-run").addEventListener("click", runBreakeven);
+  document.getElementById("adv-use-run").addEventListener("click", runPartialUse);
+  document.getElementById("adv-bdisc").addEventListener("input", function () {
+    if (document.getElementById("adv-bdisc").value !== "") runBreakeven();
+  });
+  ["adv-uprice", "adv-upoint", "adv-uuse"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-uprice").value !== "" &&
+          document.getElementById("adv-upoint").value !== "" &&
+          document.getElementById("adv-uuse").value !== "") runPartialUse();
+    });
   });
 })();
 </script>

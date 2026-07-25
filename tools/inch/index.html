@@ -31,6 +31,7 @@
   <h1>インチ⇔cm・ポンド⇔kg 変換計算機</h1>
   <form class="tool-form" id="length-form">
     <label>長さの変換(インチ⇔cm)</label>
+    <span class="field-note">数値を入れると、すぐ下に変換結果が表示されます</span>
     <label>値
       <input type="number" id="l-value" inputmode="decimal" step="any" min="0.001" max="1000000" placeholder="65" required>
     </label>
@@ -40,7 +41,7 @@
         <option value="cm">センチメートル(cm)</option>
       </select>
     </label>
-    <button type="submit">長さを変換</button>
+    <div class="tool-result" id="result-l" hidden aria-live="polite"></div>
   </form>
 
   <form class="tool-form" id="weight-form">
@@ -54,16 +55,14 @@
         <option value="kg">キログラム(kg)</option>
       </select>
     </label>
-    <button type="submit">重さを変換</button>
+    <div class="tool-result" id="result-w" hidden aria-live="polite"></div>
   </form>
-
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
   <details class="adv-box">
     <summary><span class="plus">＋</span>詳細機能: テレビ・モニターの実寸と視聴距離・サイズ比較</summary>
     <div class="adv-inner">
       <h3 class="adv-h">テレビ・モニターの実寸と視聴距離の目安</h3>
-      <p class="adv-note">「○インチ」は画面の対角線の長さです。実際の幅・高さ(cm)と、快適に見られる距離の目安(フルHD: 画面の高さ×3、4K: 高さ×1.5)を計算します。設置場所に入るかの確認に。</p>
+      <p class="adv-note">「○インチ」(=対角線の長さ)から、実際の幅・高さ(cm)と快適に見られる距離の目安(フルHD: 高さ×3、4K: 高さ×1.5)を計算します。</p>
       <label>画面サイズ(インチ)
         <input type="number" id="adv-inch" inputmode="decimal" step="any" min="0.001" max="1000" placeholder="例: 65">
       </label>
@@ -79,7 +78,7 @@
       <div class="tool-result" id="adv-screen-result" hidden aria-live="polite"></div>
 
       <h3 class="adv-h">買い替え前後のサイズ比較</h3>
-      <p class="adv-note">「24インチから27インチにすると、どれくらい大きくなる?」を数字で確認できます。画面比は上で選んだものを使います。</p>
+      <p class="adv-note">「24インチから27インチにすると、どれくらい大きくなる?」を上で選んだ画面比で数字にします。</p>
       <label>今のサイズ(インチ)
         <input type="number" id="adv-inch-a" inputmode="decimal" step="any" min="0.001" max="1000" placeholder="例: 24">
       </label>
@@ -100,7 +99,7 @@
   <h2>使い方</h2>
   <ol class="steps">
     <li>変換したい値を入力し、その値の単位を選びます。</li>
-    <li>「長さを変換」または「重さを変換」を押すと、両方の単位の値が表示されます。</li>
+    <li>入力した瞬間に、すぐ下に両方の単位の値が表示されます。ボタンは不要です。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -168,29 +167,36 @@
 <script>
 (function () {
   "use strict";
-  var box = document.getElementById("result");
   var ERROR_MESSAGES = {
     invalid_value: "値は 0.001〜1,000,000 の範囲で入力してください。",
     invalid_unit: "単位を選択してください。"
   };
-  function showError(code) {
+  function showError(box, code) {
     box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "入力値を確認してください。") + "</p>";
     box.hidden = false;
   }
-  document.getElementById("length-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  var lBox = document.getElementById("result-l");
+  var wBox = document.getElementById("result-w");
+  function runLength() {
+    if (document.getElementById("l-value").value.trim() === "") { lBox.hidden = true; return; }
     var r = InchCalc.convertLength(parseFloat(document.getElementById("l-value").value), document.getElementById("l-unit").value);
-    if (!r.ok) { showError(r.code); return; }
-    box.innerHTML = '<div class="result-main">' + r.inch.toLocaleString() + " in = " + r.cm.toLocaleString() + " cm</div>";
-    box.hidden = false;
-  });
-  document.getElementById("weight-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+    if (!r.ok) { showError(lBox, r.code); return; }
+    lBox.innerHTML = '<div class="result-main">' + r.inch.toLocaleString() + " in = " + r.cm.toLocaleString() + " cm</div>";
+    lBox.hidden = false;
+  }
+  function runWeight() {
+    if (document.getElementById("w-value").value.trim() === "") { wBox.hidden = true; return; }
     var r = InchCalc.convertWeight(parseFloat(document.getElementById("w-value").value), document.getElementById("w-unit").value);
-    if (!r.ok) { showError(r.code); return; }
-    box.innerHTML = '<div class="result-main">' + r.lb.toLocaleString() + " lb = " + r.kg.toLocaleString() + " kg</div>";
-    box.hidden = false;
-  });
+    if (!r.ok) { showError(wBox, r.code); return; }
+    wBox.innerHTML = '<div class="result-main">' + r.lb.toLocaleString() + " lb = " + r.kg.toLocaleString() + " kg</div>";
+    wBox.hidden = false;
+  }
+  document.getElementById("l-value").addEventListener("input", runLength);
+  document.getElementById("l-unit").addEventListener("change", runLength);
+  document.getElementById("length-form").addEventListener("submit", function (e) { e.preventDefault(); runLength(); });
+  document.getElementById("w-value").addEventListener("input", runWeight);
+  document.getElementById("w-unit").addEventListener("change", runWeight);
+  document.getElementById("weight-form").addEventListener("submit", function (e) { e.preventDefault(); runWeight(); });
 })();
 </script>
 <script>
@@ -202,7 +208,8 @@
     return [parseInt(v[0], 10), parseInt(v[1], 10)];
   }
   var screenBox = document.getElementById("adv-screen-result");
-  document.getElementById("adv-screen-run").addEventListener("click", function () {
+  function runScreen(force) {
+    if (document.getElementById("adv-inch").value.trim() === "" && !force) { screenBox.hidden = true; return; }
     var ratio = ratioParts();
     var r = InchCalc.screenSize(parseFloat(document.getElementById("adv-inch").value), ratio[0], ratio[1]);
     if (!r.ok) {
@@ -220,8 +227,13 @@
       '</tbody></table></div>' +
       '<p class="adv-note">画面部分だけの寸法です。実際の製品は枠(ベゼル)や台座のぶん少し大きくなります。</p>';
     screenBox.hidden = false;
-  });
-  document.getElementById("adv-compare-run").addEventListener("click", function () {
+  }
+  document.getElementById("adv-inch").addEventListener("input", function () { runScreen(false); });
+  document.getElementById("adv-ratio").addEventListener("change", function () { runScreen(false); });
+  document.getElementById("adv-screen-run").addEventListener("click", function () { runScreen(true); });
+  function runCompare(force) {
+    if ((document.getElementById("adv-inch-a").value.trim() === "" ||
+         document.getElementById("adv-inch-b").value.trim() === "") && !force) { advBox.hidden = true; return; }
     var ratio = ratioParts();
     var r = InchCalc.compareScreens(
       parseFloat(document.getElementById("adv-inch-a").value),
@@ -242,7 +254,11 @@
       '<tr><td>差</td><td>' + r.widthDiff.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td><td>' + r.heightDiff.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td></tr>' +
       '</tbody></table></div>';
     advBox.hidden = false;
-  });
+  }
+  document.getElementById("adv-inch-a").addEventListener("input", function () { runCompare(false); });
+  document.getElementById("adv-inch-b").addEventListener("input", function () { runCompare(false); });
+  document.getElementById("adv-ratio").addEventListener("change", function () { runCompare(false); });
+  document.getElementById("adv-compare-run").addEventListener("click", function () { runCompare(true); });
 })();
 </script>
 </body>
