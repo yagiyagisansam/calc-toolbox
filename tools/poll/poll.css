@@ -131,6 +131,7 @@ body {
 .pb-opt input { position: absolute; opacity: 0; pointer-events: none; }
 .pb-opt .rd { width: 21px; height: 21px; border-radius: 50%; border: 2.5px solid var(--chip-border); background: var(--card); flex: 0 0 auto; }
 .pb-opt.sel { border-color: var(--accent); background: var(--accent-soft); }
+.pb-opt.off { opacity: 0.45; cursor: default; }
 .pb-opt.sel .rd { border-color: var(--accent); background: radial-gradient(circle at center, var(--accent) 45%, var(--card) 52%); }
 
 /* 集計(結果) */

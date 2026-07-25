@@ -150,6 +150,32 @@
   }
 
   /**
+   * 0〜n-1 の並びを Fisher–Yates 法でシャッフルした順序を返す。
+   * randFn が一様乱数なら、すべての並び方が等確率になる(偏りなし)。
+   * @param {number} n 要素数(1以上の整数)
+   * @param {function(number):number} randFn 0以上max未満の一様な整数乱数を返す関数
+   * @returns {{ok:true, order:number[]}|{ok:false, code:string}}
+   */
+  function shuffleOrder(n, randFn) {
+    if (typeof n !== "number" || !isFinite(n) || n < 1 || Math.floor(n) !== n) {
+      return { ok: false, code: "invalid_counts" };
+    }
+    if (typeof randFn !== "function") return { ok: false, code: "invalid_rand" };
+    var order = [];
+    for (var i = 0; i < n; i++) order.push(i);
+    for (var k = n - 1; k > 0; k--) {
+      var j = randFn(k + 1);
+      if (typeof j !== "number" || !isFinite(j) || j < 0 || j > k || Math.floor(j) !== j) {
+        return { ok: false, code: "invalid_rand" };
+      }
+      var tmp = order[k];
+      order[k] = order[j];
+      order[j] = tmp;
+    }
+    return { ok: true, order: order };
+  }
+
+  /**
    * 乱数バイト列から投票ページ用のIDを作る(英小文字+数字の10桁)。
    * @param {number[]|Uint8Array} bytes 0以上の整数を10個以上
    * @returns {{ok:true, id:string}|{ok:false, code:string}}
@@ -176,7 +202,7 @@
     return typeof s === "string" && /^[a-z0-9]{10}$/.test(s);
   }
 
-  var api = { validatePoll: validatePoll, results: results, toCsv: toCsv, displayOrder: displayOrder, arcs: arcs, makeId: makeId, isValidId: isValidId, MAX_OPTIONS: MAX_OPTIONS };
+  var api = { validatePoll: validatePoll, results: results, toCsv: toCsv, displayOrder: displayOrder, arcs: arcs, shuffleOrder: shuffleOrder, makeId: makeId, isValidId: isValidId, MAX_OPTIONS: MAX_OPTIONS };
   if (typeof module !== "undefined" && module.exports) { module.exports = api; }
   else { global.PollCalc = api; }
 })(typeof window !== "undefined" ? window : globalThis);

@@ -28,7 +28,7 @@
   function base() { return conf().url.replace(/\/+$/, ""); }
 
   // アンケートを保存する。IDが既に使われていたら {ok:false, code:"conflict"}
-  // opts: { isPublic, multi, hideResults, shuffle, closesAt(ISO文字列|null) }
+  // opts: { isPublic, multi, maxChoices(2〜10|null), hideResults, shuffle, closesAt(ISO文字列|null) }
   function createPoll(id, question, options, opts) {
     var o = opts || {};
     var h = headers();
@@ -42,6 +42,7 @@
         options: options,
         is_public: !!o.isPublic,
         multi: !!o.multi,
+        max_choices: (o.multi && o.maxChoices) ? o.maxChoices : null,
         hide_results: !!o.hideResults,
         shuffle: !!o.shuffle,
         closes_at: o.closesAt || null

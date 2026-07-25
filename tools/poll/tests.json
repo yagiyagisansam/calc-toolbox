@@ -755,6 +755,30 @@
     "ok": false,
     "code": "invalid_counts"
    }
+  },
+  {
+   "name": "シャッフル: nが整数でないのはエラー",
+   "func": "shuffleOrder",
+   "args": [
+    2.5,
+    null
+   ],
+   "expect": {
+    "ok": false,
+    "code": "invalid_counts"
+   }
+  },
+  {
+   "name": "シャッフル: 乱数関数がないのはエラー",
+   "func": "shuffleOrder",
+   "args": [
+    3,
+    null
+   ],
+   "expect": {
+    "ok": false,
+    "code": "invalid_rand"
+   }
   }
  ]
 }

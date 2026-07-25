@@ -9,6 +9,7 @@ alter table public.polls add column if not exists multi boolean not null default
 alter table public.polls add column if not exists hide_results boolean not null default false;
 alter table public.polls add column if not exists shuffle boolean not null default false;
 alter table public.polls add column if not exists closes_at timestamptz;
+alter table public.polls add column if not exists max_choices integer check (max_choices between 2 and 10);
 
 -- votesを複数選択対応に作り直す
 drop table if exists public.votes;
@@ -37,7 +38,7 @@ declare
   n int;
   i int;
 begin
-  select options, multi, closes_at into p from public.polls where id = new.poll_id;
+  select options, multi, max_choices, closes_at into p from public.polls where id = new.poll_id;
   if p is null then
     raise exception 'poll not found';
   end if;
@@ -49,6 +50,9 @@ begin
     raise exception 'invalid choice';
   end if;
   if not p.multi and array_length(new.choices, 1) <> 1 then
+    raise exception 'invalid choice';
+  end if;
+  if p.multi and p.max_choices is not null and array_length(new.choices, 1) > p.max_choices then
     raise exception 'invalid choice';
   end if;
   if array_length(new.choices, 1) > n then
@@ -86,6 +90,7 @@ as $$
     'question', p.question,
     'options', p.options,
     'multi', p.multi,
+    'max_choices', p.max_choices,
     'shuffle', p.shuffle,
     'closes_at', p.closes_at,
     'closed', (p.closes_at is not null and now() >= p.closes_at),

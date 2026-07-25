@@ -511,19 +511,40 @@
     return canvas.toDataURL("image/png");
   }
 
+  // 偏りのない一様乱数(暗号乱数+棄却サンプリング)。Fisher–Yatesと組み合わせて
+  // すべての並び方が等確率になる
+  function randInt(maxExclusive) {
+    var limit = Math.floor(4294967296 / maxExclusive) * maxExclusive;
+    var buf = new Uint32Array(1);
+    do { crypto.getRandomValues(buf); } while (buf[0] >= limit);
+    return buf[0] % maxExclusive;
+  }
+
   function renderVoteForm(poll, id) {
     optsEl.innerHTML = "";
     // シャッフル表示(順序バイアス対策)。送信する番号は元の並びのまま
     var order = poll.options.map(function (_, i) { return i; });
     if (poll.shuffle) {
-      for (var s = order.length - 1; s > 0; s--) {
-        var t = Math.floor(Math.random() * (s + 1));
-        var tmp = order[s]; order[s] = order[t]; order[t] = tmp;
-      }
+      var sh = PollCalc.shuffleOrder(order.length, randInt);
+      if (sh.ok) order = sh.order;
     }
+    var limit = (poll.multi && poll.max_choices) ? Math.min(poll.max_choices, poll.options.length) : poll.options.length;
     document.getElementById("vote-note").textContent = poll.multi
-      ? "1人1回・あてはまるものを全部選んで投票"
+      ? (poll.max_choices
+        ? "1人1回・あてはまるものを最大" + limit + "個まで選んで投票"
+        : "1人1回・あてはまるものを全部選んで投票")
       : "1人1回・タップして投票";
+    function updateLimit() {
+      var checkedCount = optsEl.querySelectorAll("input:checked").length;
+      voteBtn.disabled = checkedCount === 0;
+      if (!poll.multi) return;
+      var full = checkedCount >= limit;
+      [].forEach.call(optsEl.querySelectorAll("input"), function (inp) {
+        var off = full && !inp.checked;
+        inp.disabled = off;
+        inp.parentElement.classList.toggle("off", off);
+      });
+    }
     order.forEach(function (origIndex) {
       var label = document.createElement("label");
       label.className = "pb-opt";
@@ -536,7 +557,7 @@
           [].forEach.call(optsEl.children, function (el) { el.classList.remove("sel"); });
         }
         label.classList.toggle("sel", input.checked);
-        voteBtn.disabled = optsEl.querySelectorAll("input:checked").length === 0;
+        updateLimit();
       });
       var rd = document.createElement("span");
       rd.className = "rd";

@@ -14,6 +14,7 @@
 
 -- アンケート本体
 --  multi        = 複数選択を許可
+--  max_choices  = 複数選択で選べる数の上限(nullなら選択肢数まで)
 --  hide_results = 投票するまで結果を隠す(締切後は公開)
 --  shuffle      = 選択肢をシャッフル表示
 --  closes_at    = 投票締切(nullなら無期限)
@@ -24,6 +25,7 @@ create table public.polls (
   options      jsonb not null,
   is_public    boolean not null default false,
   multi        boolean not null default false,
+  max_choices  integer check (max_choices between 2 and 10),
   hide_results boolean not null default false,
   shuffle      boolean not null default false,
   closes_at    timestamptz,
@@ -72,7 +74,7 @@ declare
   n int;
   i int;
 begin
-  select options, multi, closes_at into p from public.polls where id = new.poll_id;
+  select options, multi, max_choices, closes_at into p from public.polls where id = new.poll_id;
   if p is null then
     raise exception 'poll not found';
   end if;
@@ -84,6 +86,9 @@ begin
     raise exception 'invalid choice';
   end if;
   if not p.multi and array_length(new.choices, 1) <> 1 then
+    raise exception 'invalid choice';
+  end if;
+  if p.multi and p.max_choices is not null and array_length(new.choices, 1) > p.max_choices then
     raise exception 'invalid choice';
   end if;
   if array_length(new.choices, 1) > n then
@@ -141,6 +146,7 @@ as $$
     'question', p.question,
     'options', p.options,
     'multi', p.multi,
+    'max_choices', p.max_choices,
     'shuffle', p.shuffle,
     'closes_at', p.closes_at,
     'closed', (p.closes_at is not null and now() >= p.closes_at),

@@ -51,6 +51,19 @@
             <input type="checkbox" id="opt-multi">
             <span>複数選択を許可<small>「あてはまるもの全部」を選べるようになります(日程調整・持ち寄り決めなどに)。</small></span>
           </label>
+          <label id="max-row" hidden>選べる数の上限<span class="pb-note">複数選択のときに、1人が選べる個数を制限できます</span>
+            <select id="opt-max">
+              <option value="" selected>制限なし(全部選べる)</option>
+              <option value="2">2個まで</option>
+              <option value="3">3個まで</option>
+              <option value="4">4個まで</option>
+              <option value="5">5個まで</option>
+              <option value="6">6個まで</option>
+              <option value="7">7個まで</option>
+              <option value="8">8個まで</option>
+              <option value="9">9個まで</option>
+            </select>
+          </label>
           <label>投票の締切<span class="pb-note">締切後は投票できず、結果のみ表示されます</span>
             <select id="opt-deadline">
               <option value="" selected>なし(無期限)</option>
@@ -210,6 +223,11 @@
     document.getElementById("setup-note").hidden = false;
   }
 
+  // 「選べる数の上限」は複数選択がオンのときだけ表示
+  document.getElementById("opt-multi").addEventListener("change", function () {
+    document.getElementById("max-row").hidden = !this.checked;
+  });
+
   // QRコード表示(印刷・掲示用)
   document.getElementById("qr-btn").addEventListener("click", function () {
     var box = document.getElementById("qr-box");
@@ -245,9 +263,11 @@
     btn.disabled = true;
     btn.textContent = "作成中…";
     var hours = parseFloat(document.getElementById("opt-deadline").value);
+    var maxSel = parseInt(document.getElementById("opt-max").value, 10);
     var opts = {
       isPublic: document.getElementById("is-public").checked,
       multi: document.getElementById("opt-multi").checked,
+      maxChoices: isFinite(maxSel) && maxSel >= 2 ? maxSel : null,
       hideResults: document.getElementById("opt-hide").checked,
       shuffle: document.getElementById("opt-shuffle").checked,
       closesAt: isFinite(hours) && hours > 0 ? new Date(Date.now() + hours * 3600 * 1000).toISOString() : null
