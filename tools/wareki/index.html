@@ -30,19 +30,11 @@
 <main>
   <h1>西暦・和暦 変換計算機</h1>
   <form class="tool-form" id="to-wareki-form">
-    <span class="field-note">日付を選ぶと、すぐ下に和暦が表示されます</span>
-    <div class="field-row">
-      <label>西暦(年)
-        <select id="sel-year"></select>
-      </label>
-      <label>月
-        <select id="sel-month"></select>
-      </label>
-      <label>日
-        <select id="sel-day"></select>
-      </label>
-    </div>
-    <div class="tool-result" id="result" aria-live="polite"></div>
+    <label>西暦 → 和暦
+      <span class="field-note">年を入れるだけですぐ変換されます</span>
+      <input type="number" id="year" inputmode="numeric" step="1" min="1868" max="2100" placeholder="例: 1980" required>
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
   </form>
 
   <form class="tool-form" id="to-seireki-form">
@@ -65,9 +57,25 @@
   </form>
 
   <details class="adv-box">
-    <summary><span class="plus">＋</span>詳細機能: 基準日を変えて満年齢を計算</summary>
+    <summary><span class="plus">＋</span>詳細機能: 月日までの正確な変換・年度・満年齢</summary>
     <div class="adv-inner">
-      <p class="adv-note">「入社日時点」「今年4月1日時点」など、指定した日での満年齢を計算します(上で選んだ日付を誕生日として使います)。</p>
+      <h3 class="adv-h">月日まで入れて正確に変換</h3>
+      <p class="adv-note">改元日(1989年1月8日など)をまたぐ年も、正しい元号・曜日・年度がわかります。</p>
+      <div class="field-row">
+        <label>西暦(年)
+          <select id="sel-year"></select>
+        </label>
+        <label>月
+          <select id="sel-month"></select>
+        </label>
+        <label>日
+          <select id="sel-day"></select>
+        </label>
+      </div>
+      <div class="tool-result" id="adv-date-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">基準日時点の満年齢</h3>
+      <p class="adv-note">上の日付を誕生日として、「入社日時点」など指定した日での満年齢を計算します。</p>
       <div class="field-row">
         <label>基準日(年)
           <select id="ref-year"></select>
@@ -91,9 +99,9 @@
 
   <h2>使い方</h2>
   <ol class="steps">
-    <li>上の3つのボックスで年・月・日を選びます(最初は今日の日付が入っています)。</li>
-    <li>選んだ瞬間に、和暦・曜日・年度・その日生まれの人の満年齢が下に表示されます。ボタンは不要です。</li>
+    <li>西暦の年(例: 1980)を入れると、その瞬間に和暦が下に表示されます。ボタンは不要です。</li>
     <li>和暦から西暦を調べる時は、2段目で元号と年を選びます。</li>
+    <li>改元年の正確な元号・曜日・年度・満年齢を知りたい時は「＋詳細機能」を開いてください。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -174,31 +182,21 @@
     fillSelect(document.getElementById(dId), 1, max, "日", Math.min(keep, max));
   }
 
-  // ---- 西暦 → 和暦(即時) ----
+  // ---- 西暦 → 和暦(基本: 年だけで即時) ----
   var box = document.getElementById("result");
-  fillSelect(document.getElementById("sel-year"), 1868, 2100, "年", today.getFullYear());
-  fillSelect(document.getElementById("sel-month"), 1, 12, "月", today.getMonth() + 1);
-  fillSelect(document.getElementById("sel-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), "日", today.getDate());
-
+  var yearEl = document.getElementById("year");
   function runA() {
-    adjustDays("sel-year", "sel-month", "sel-day");
-    var y = val("sel-year"), m = val("sel-month"), d = val("sel-day");
-    var r = WarekiCalc.toWarekiExact(y, m, d);
-    if (!r.ok) { box.innerHTML = '<p class="result-error">日付を確認してください。</p>'; return; }
-    var fy = WarekiCalc.fiscalYear(y, m);
-    var age = WarekiCalc.ageOn(y, m, d, today.getFullYear(), today.getMonth() + 1, today.getDate());
-    box.innerHTML =
-      '<div class="result-main">' + r.label + m + "月" + d + "日(" + r.youbi + ")</div>" +
-      '<div class="table-scroll"><table class="data-table"><tbody>' +
-      (fy.ok ? "<tr><td>年度</td><td>" + fy.fiscalYear + "年度(" + fy.labels.join("・") + ")</td></tr>" : "") +
-      (age.ok ? "<tr><td>この日生まれの人</td><td>今日時点で 満" + age.age + "歳</td></tr>" : "") +
-      "</tbody></table></div>";
+    var y = parseInt(yearEl.value, 10);
+    if (yearEl.value === "" || isNaN(y)) { box.hidden = true; return; }
+    var r = WarekiCalc.toWareki(y);
+    if (!r.ok) { box.hidden = true; return; }
+    var labels = r.results.map(function (x) { return x.label; }).join(" / ");
+    box.innerHTML = '<div class="result-main">' + labels + "</div>" +
+      (r.results.length > 1 ? "<p>この年は改元年です。月日ごとの正確な元号は「＋詳細機能」で調べられます。</p>" : "");
     box.hidden = false;
-    runRef();
   }
-  ["sel-year", "sel-month", "sel-day"].forEach(function (id) {
-    document.getElementById(id).addEventListener("change", runA);
-  });
+  yearEl.addEventListener("input", runA);
+  document.getElementById("to-wareki-form").addEventListener("submit", function (e) { e.preventDefault(); runA(); });
 
   // ---- 和暦 → 西暦(即時) ----
   var boxB = document.getElementById("result-b");
@@ -225,7 +223,28 @@
   eraEl.addEventListener("change", function () { fillEraYears(); runB(); });
   eraYearEl.addEventListener("change", runB);
 
-  // ---- 詳細機能: 基準日時点の満年齢(即時) ----
+  // ---- 詳細機能1: 月日までの正確な変換(即時) ----
+  var advDateBox = document.getElementById("adv-date-result");
+  fillSelect(document.getElementById("sel-year"), 1868, 2100, "年", today.getFullYear());
+  fillSelect(document.getElementById("sel-month"), 1, 12, "月", today.getMonth() + 1);
+  fillSelect(document.getElementById("sel-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), "日", today.getDate());
+  function runDate() {
+    adjustDays("sel-year", "sel-month", "sel-day");
+    var y = val("sel-year"), m = val("sel-month"), d = val("sel-day");
+    var r = WarekiCalc.toWarekiExact(y, m, d);
+    if (!r.ok) { advDateBox.hidden = true; return; }
+    var fy = WarekiCalc.fiscalYear(y, m);
+    advDateBox.innerHTML =
+      '<div class="result-main">' + r.label + m + "月" + d + "日(" + r.youbi + ")</div>" +
+      (fy.ok ? "<p>年度: " + fy.fiscalYear + "年度(" + fy.labels.join("・") + ")</p>" : "");
+    advDateBox.hidden = false;
+    runRef();
+  }
+  ["sel-year", "sel-month", "sel-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runDate);
+  });
+
+  // ---- 詳細機能2: 基準日時点の満年齢(即時) ----
   var advBox = document.getElementById("adv-result");
   fillSelect(document.getElementById("ref-year"), 1868, 2100, "年", today.getFullYear());
   fillSelect(document.getElementById("ref-month"), 1, 12, "月", today.getMonth() + 1);
@@ -251,7 +270,7 @@
     document.getElementById(id).addEventListener("change", runRef);
   });
 
-  runA();
+  runDate();
 })();
 </script>
 </body>
