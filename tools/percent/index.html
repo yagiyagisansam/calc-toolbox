@@ -190,16 +190,9 @@
     show(box, '<div class="result-main">' + r.percent.toLocaleString() + " %</div>");
   });
   bind("of-form", "result-of", ["o-value", "o-percent"], function (box) {
-    var a = parseFloat(document.getElementById("o-value").value);
-    var r = PercentCalc.percentOf(a, parseFloat(document.getElementById("o-percent").value));
+    var r = PercentCalc.percentOf(parseFloat(document.getElementById("o-value").value), parseFloat(document.getElementById("o-percent").value));
     if (!r.ok) { showError(box, r.code); return; }
-    var minus = Math.round((a - r.value) * 100) / 100;
-    var plus = Math.round((a + r.value) * 100) / 100;
-    show(box, '<div class="result-main">' + r.value.toLocaleString() + "</div>" +
-      '<div class="table-scroll"><table class="data-table"><tbody>' +
-      "<tr><td>値引き後(A − この値)</td><td>" + minus.toLocaleString() + "</td></tr>" +
-      "<tr><td>増額後(A + この値)</td><td>" + plus.toLocaleString() + "</td></tr>" +
-      "</tbody></table></div>");
+    show(box, '<div class="result-main">' + r.value.toLocaleString() + "</div>");
   });
   bind("rate-form", "result-rate", ["r-from", "r-to"], function (box) {
     var r = PercentCalc.changeRate(parseFloat(document.getElementById("r-from").value), parseFloat(document.getElementById("r-to").value));
