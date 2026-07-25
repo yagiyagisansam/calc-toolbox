@@ -6,68 +6,239 @@
     {
       "name": "フルマラソン4時間 → 341秒/km(5分41秒)・時速10.55km",
       "func": "paceFor",
-      "args": [42.195, 14400],
-      "expect": { "ok": true, "paceSecPerKm": 341, "speedKmh": 10.55 }
+      "args": [
+        42.195,
+        14400
+      ],
+      "expect": {
+        "ok": true,
+        "paceSecPerKm": 341,
+        "speedKmh": 10.55
+      }
     },
     {
       "name": "10kmを50分 → 300秒/km(5分00秒)・時速12km",
       "func": "paceFor",
-      "args": [10, 3000],
-      "expect": { "ok": true, "paceSecPerKm": 300, "speedKmh": 12 }
+      "args": [
+        10,
+        3000
+      ],
+      "expect": {
+        "ok": true,
+        "paceSecPerKm": 300,
+        "speedKmh": 12
+      }
     },
     {
       "name": "5kmを25分 → 300秒/km",
       "func": "paceFor",
-      "args": [5, 1500],
-      "expect": { "ok": true, "paceSecPerKm": 300, "speedKmh": 12 }
+      "args": [
+        5,
+        1500
+      ],
+      "expect": {
+        "ok": true,
+        "paceSecPerKm": 300,
+        "speedKmh": 12
+      }
     },
     {
       "name": "ハーフ1時間45分 → 299秒/km・時速12.06km",
       "func": "paceFor",
-      "args": [21.0975, 6300],
-      "expect": { "ok": true, "paceSecPerKm": 299, "speedKmh": 12.06 }
+      "args": [
+        21.0975,
+        6300
+      ],
+      "expect": {
+        "ok": true,
+        "paceSecPerKm": 299,
+        "speedKmh": 12.06
+      }
     },
     {
       "name": "逆算: フルを5分00秒/kmで走ると12,659秒(3時間30分59秒)",
       "func": "timeFor",
-      "args": [42.195, 300],
-      "expect": { "ok": true, "totalSeconds": 12659 }
+      "args": [
+        42.195,
+        300
+      ],
+      "expect": {
+        "ok": true,
+        "totalSeconds": 12659
+      }
     },
     {
       "name": "逆算: 10kmを5分30秒/km → 3,300秒(55分)",
       "func": "timeFor",
-      "args": [10, 330],
-      "expect": { "ok": true, "totalSeconds": 3300 }
+      "args": [
+        10,
+        330
+      ],
+      "expect": {
+        "ok": true,
+        "totalSeconds": 3300
+      }
     },
     {
       "name": "異常入力: 距離0はエラー",
       "func": "paceFor",
-      "args": [0, 3000],
-      "expect": { "ok": false, "code": "invalid_distance" }
+      "args": [
+        0,
+        3000
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_distance"
+      }
     },
     {
       "name": "異常入力: 距離が範囲超過(2000km)はエラー",
       "func": "paceFor",
-      "args": [2000, 3000],
-      "expect": { "ok": false, "code": "invalid_distance" }
+      "args": [
+        2000,
+        3000
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_distance"
+      }
     },
     {
       "name": "異常入力: タイムが1分未満はエラー",
       "func": "paceFor",
-      "args": [10, 30],
-      "expect": { "ok": false, "code": "invalid_time" }
+      "args": [
+        10,
+        30
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_time"
+      }
     },
     {
       "name": "異常入力: ペースが範囲外(30秒/km)はエラー",
       "func": "timeFor",
-      "args": [10, 30],
-      "expect": { "ok": false, "code": "invalid_pace" }
+      "args": [
+        10,
+        30
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_pace"
+      }
     },
     {
       "name": "異常入力: 数値でない距離はエラー",
       "func": "paceFor",
-      "args": ["abc", 3000],
-      "expect": { "ok": false, "code": "invalid_distance" }
+      "args": [
+        "abc",
+        3000
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_distance"
+      }
+    },
+    {
+      "name": "通過表: フル4時間→ペース341秒/km・5km通過28分26秒",
+      "func": "raceSplits",
+      "args": [
+        42.195,
+        14400
+      ],
+      "expect": {
+        "ok": true,
+        "paceSecPerKm": 341,
+        "rows": {
+          "0": {
+            "km": 5,
+            "sec": 1706,
+            "goal": false
+          },
+          "1": {
+            "km": 10,
+            "sec": 3413,
+            "goal": false
+          },
+          "7": {
+            "km": 40,
+            "sec": 13651,
+            "goal": false
+          },
+          "8": {
+            "km": 42.195,
+            "sec": 14400,
+            "goal": true
+          }
+        }
+      }
+    },
+    {
+      "name": "通過表: 10kmを50分→ペース300秒/km・5km通過25分",
+      "func": "raceSplits",
+      "args": [
+        10,
+        3000
+      ],
+      "expect": {
+        "ok": true,
+        "paceSecPerKm": 300,
+        "rows": {
+          "0": {
+            "km": 5,
+            "sec": 1500,
+            "goal": false
+          },
+          "1": {
+            "km": 10,
+            "sec": 3000,
+            "goal": true
+          }
+        }
+      }
+    },
+    {
+      "name": "通過表: 5kmは途中通過なしでゴール行のみ",
+      "func": "raceSplits",
+      "args": [
+        5,
+        1500
+      ],
+      "expect": {
+        "ok": true,
+        "paceSecPerKm": 300,
+        "rows": {
+          "0": {
+            "km": 5,
+            "sec": 1500,
+            "goal": true
+          }
+        }
+      }
+    },
+    {
+      "name": "通過表: タイム0秒はエラー",
+      "func": "raceSplits",
+      "args": [
+        42.195,
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_time"
+      }
+    },
+    {
+      "name": "定番目標: サブ4はpaceForで341秒/km(5分41秒)",
+      "func": "paceFor",
+      "args": [
+        42.195,
+        14400
+      ],
+      "expect": {
+        "ok": true,
+        "paceSecPerKm": 341
+      }
     }
   ]
 }

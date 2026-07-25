@@ -51,7 +51,32 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>アメリカやハワイのレストランで会計のたびに悩むチップ。金額を入れて率を選ぶだけで、<strong>チップ額・合計・1人あたりの支払額</strong>を一発計算します。レシートを見ながらサッと使えるシンプル設計です。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: チップ率の逆算とサービス料込みの判定</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">結局チップを何%払った?(逆算)</h3>
+      <p class="adv-note">カード明細やレシートの支払い総額から、実際に払ったチップ率を逆算します。「多く払いすぎた?」の確認に。</p>
+      <label>実際に支払った総額
+        <input type="number" id="adv-paid" inputmode="decimal" step="any" min="0.01" placeholder="例: 118.00">
+      </label>
+      <label>元の金額(チップを掛ける前の飲食代)
+        <input type="number" id="adv-base" inputmode="decimal" step="any" min="0.01" placeholder="例: 100.00">
+      </label>
+      <button type="button" id="adv-rev-run">チップ率を逆算</button>
+      <h3 class="adv-h">サービス料が付いている時、チップは必要?</h3>
+      <p class="adv-note">レシートに「Service Charge」「Gratuity」がすでに入っている場合の、追加チップの要否と目安額を判定します。</p>
+      <label>金額(サービス料を掛ける前の飲食代)
+        <input type="number" id="adv-sbase" inputmode="decimal" step="any" min="0.01" placeholder="例: 100.00">
+      </label>
+      <label>サービス料率(%)
+        <input type="number" id="adv-spct" inputmode="decimal" step="any" min="0" max="50" placeholder="例: 18">
+      </label>
+      <button type="button" id="adv-svc-run">上乗せの要否を判定</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>金額を入れて率を選ぶだけで、海外レストランの<strong>チップがいくらか</strong>すぐわかるツールです。チップ込みの合計と1人あたりの支払額も同時に表示します。アメリカ・ハワイ旅行の会計時にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -134,6 +159,58 @@
       (people > 1 ? "<tr><td>1人あたり(" + people + "人)</td><td><strong>" + r.perPerson.toLocaleString() + "</strong></td></tr>" : "") +
       "</tbody></table></div><p>通貨単位はそのまま(ドルならドル)で表示しています。</p>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function showError(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function fmt(x) {
+    return x.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  }
+  document.getElementById("adv-rev-run").addEventListener("click", function () {
+    var paid = parseFloat(document.getElementById("adv-paid").value);
+    var base = parseFloat(document.getElementById("adv-base").value);
+    if (isNaN(paid) || isNaN(base)) { showError("支払い総額と元の金額を入力してください。"); return; }
+    var r = TipCalc.reverse(paid, base);
+    if (!r.ok) {
+      showError(r.code === "invalid_paid"
+        ? "支払い総額は元の金額以上(200万まで)で入力してください。"
+        : "元の金額は0より大きい値(100万まで)で入力してください。");
+      return;
+    }
+    var msg = r.verdict === "enough"
+      ? "アメリカの標準(15〜20%)を満たしています。"
+      : r.verdict === "low"
+        ? "アメリカの標準(15〜20%)よりは少なめです。"
+        : "チップは払っていません(サービス料込みの店なら問題ありません)。";
+    advBox.innerHTML =
+      '<div class="result-main">チップ率 ' + r.pct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " %</div>" +
+      "<p>チップとして払った額: <strong>" + fmt(r.tip) + "</strong></p>" +
+      '<p class="adv-note">' + msg + "</p>";
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-svc-run").addEventListener("click", function () {
+    var base = parseFloat(document.getElementById("adv-sbase").value);
+    var pct = parseFloat(document.getElementById("adv-spct").value);
+    if (isNaN(base) || isNaN(pct)) { showError("金額とサービス料率を入力してください。"); return; }
+    var r = TipCalc.serviceAdvice(base, pct);
+    if (!r.ok) { showError("金額は0より大きい値、サービス料率は0〜50%で入力してください。"); return; }
+    if (!r.need) {
+      advBox.innerHTML =
+        '<div class="result-main">追加のチップは不要です</div>' +
+        '<p class="adv-note">サービス料 ' + pct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%がすでに標準的なチップ(15%以上)に相当します。特別に良いサービスだった時だけ、少額を上乗せすれば十分です。</p>";
+    } else {
+      advBox.innerHTML =
+        '<div class="result-main">上乗せの目安 ' + fmt(r.add15) + " 〜 " + fmt(r.add18) + "</div>" +
+        '<p class="adv-note">サービス料 ' + pct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%だけでは標準(15〜18%)に届きません。合計で15%にするなら +" + fmt(r.add15) + "、18%にするなら +" + fmt(r.add18) + " が目安です。</p>";
+    }
+    advBox.hidden = false;
   });
 })();
 </script>

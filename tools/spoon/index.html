@@ -46,7 +46,53 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>「大さじ3って何ml?」「ドレッシング50mlは大さじ何杯?」——レシピでよく迷う<strong>大さじ・小さじ・カップ・mlの換算</strong>を一発で行います。計量スプーンが手元にないとき、分量を倍にしたいときに。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 材料の重さ(グラム)との換算</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">大さじ・小さじ → グラム</h3>
+      <p class="adv-note">同じ大さじ1でも、材料によって重さは違います(水15g、砂糖9g、しょうゆ18gなど)。杯数と材料から重さを計算します。</p>
+      <label>大さじ(杯)
+        <input type="number" id="adv-tbsp" min="0" step="any" value="1" placeholder="例: 2">
+      </label>
+      <label>小さじ(杯)
+        <input type="number" id="adv-tsp" min="0" step="any" value="0" placeholder="例: 1">
+      </label>
+      <label>材料
+        <select id="adv-mat">
+          <option value="water">水</option>
+          <option value="sugar" selected>砂糖(上白糖)</option>
+          <option value="salt">塩(食塩)</option>
+          <option value="flour">小麦粉(薄力粉)</option>
+          <option value="oil">油</option>
+          <option value="soy">しょうゆ</option>
+          <option value="miso">みそ</option>
+        </select>
+      </label>
+      <button type="button" id="adv-grams-run">グラムに換算する</button>
+      <div class="tool-result" id="adv-grams-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">グラム → 大さじ・小さじ</h3>
+      <p class="adv-note">「砂糖30g」のようにグラムで書かれたレシピを、はかりを使わずスプーンで量るための逆換算です。</p>
+      <label>重さ(g)
+        <input type="number" id="adv-grams" min="0" step="any" placeholder="例: 30">
+      </label>
+      <label>材料
+        <select id="adv-mat2">
+          <option value="water">水</option>
+          <option value="sugar" selected>砂糖(上白糖)</option>
+          <option value="salt">塩(食塩)</option>
+          <option value="flour">小麦粉(薄力粉)</option>
+          <option value="oil">油</option>
+          <option value="soy">しょうゆ</option>
+          <option value="miso">みそ</option>
+        </select>
+      </label>
+      <button type="button" id="adv-spoon-run">スプーンの杯数にする</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>「大さじ3は何ml?」「50mlは大さじ何杯?」——レシピに出てくる<strong>大さじ・小さじ・カップ・mlの量</strong>を、数字を入れるだけで言い換えられるツールです。計量スプーンやカップが手元にない時、分量を増やしたい時にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -123,6 +169,48 @@
       "<tr><td>カップ(200ml)</td><td>" + r.cup.toLocaleString() + " 杯</td></tr>" +
       "</tbody></table></div>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var gramsBox = document.getElementById("adv-grams-result");
+  var fmt = function (x) { return x.toLocaleString(undefined, { maximumFractionDigits: 2 }); };
+  document.getElementById("adv-grams-run").addEventListener("click", function () {
+    var tbsp = parseFloat(document.getElementById("adv-tbsp").value) || 0;
+    var tsp = parseFloat(document.getElementById("adv-tsp").value) || 0;
+    var r = SpoonCalc.toGrams(tbsp, tsp, document.getElementById("adv-mat").value);
+    if (!r.ok) {
+      gramsBox.innerHTML = '<p class="result-error">大さじ・小さじのどちらかに0より大きい杯数を入力してください。</p>';
+      gramsBox.hidden = false;
+      return;
+    }
+    gramsBox.innerHTML =
+      '<div class="result-main">約 ' + fmt(r.grams) + ' g</div>' +
+      '<p>' + r.label + ': 大さじ1杯 約' + r.gramsPerTbsp + 'g / 小さじ1杯 約' + r.gramsPerTsp + 'gの目安で計算しています。すりきり(山盛りにしない)での量です。</p>';
+    gramsBox.hidden = false;
+  });
+  document.getElementById("adv-spoon-run").addEventListener("click", function () {
+    var r = SpoonCalc.fromGrams(parseFloat(document.getElementById("adv-grams").value), document.getElementById("adv-mat2").value);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">重さを0より大きい数値(g)で入力してください。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var combo = "";
+    if (r.tbspWhole > 0 && r.tspRest > 0) combo = "大さじ" + r.tbspWhole.toLocaleString() + " + 小さじ" + fmt(r.tspRest);
+    else if (r.tbspWhole > 0) combo = "大さじ" + r.tbspWhole.toLocaleString() + "ちょうど";
+    else combo = "小さじ" + fmt(r.tsp);
+    advBox.innerHTML =
+      '<div class="result-main">' + combo + '</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>大さじだけなら</td><td>約 ' + fmt(r.tbsp) + ' 杯</td></tr>' +
+      '<tr><td>小さじだけなら</td><td>約 ' + fmt(r.tsp) + ' 杯</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">' + r.label + 'の目安値で計算した概算です。</p>';
+    advBox.hidden = false;
   });
 })();
 </script>

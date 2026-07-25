@@ -51,7 +51,36 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>「契約は3ヶ月後まで」「生後何ヶ月?」——<strong>○ヶ月後の日付</strong>と<strong>2つの日付の月数差(満○ヶ月と○日)</strong>を計算します。1月31日の1ヶ月後は2月28日、といった<strong>月末の調整</strong>も正確に処理します。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 契約更新日の一覧と生後○ヶ月の一覧</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">契約更新日の一覧を作る</h3>
+      <p class="adv-note">上のフォームの「基準日(開始日)」を契約開始日として、更新日を一覧にします。解約予告(「更新の1ヶ月前までに申し出」など)の期限も同時に出せます。月末は自動調整します(1/31開始の1ヶ月後=2/28)。</p>
+      <label>更新間隔(月)
+        <input type="number" id="adv-interval" min="1" max="120" step="1" value="12" placeholder="例: 12">
+      </label>
+      <label>更新回数
+        <input type="number" id="adv-count" min="1" max="48" step="1" value="5" placeholder="例: 5">
+      </label>
+      <label>解約予告の月数(任意)
+        <span class="field-note">「更新の◯ヶ月前までに申し出」の◯。不要なら0</span>
+        <input type="number" id="adv-notice" min="0" max="12" step="1" value="0">
+      </label>
+      <button type="button" id="adv-renew-run">更新日の一覧を作る</button>
+      <h3 class="adv-h">生後○ヶ月の日付一覧(月齢カレンダー)</h3>
+      <p class="adv-note">上のフォームの「基準日(開始日)」を誕生日として、生後1ヶ月・2ヶ月…の日付を一覧にします。お食い初め(100日は<a href="../days/">日数計算機</a>)やハーフバースデーの予定づくりに。</p>
+      <label>何ヶ月分を表示?
+        <select id="adv-baby-count">
+          <option value="12" selected>12ヶ月分</option>
+          <option value="24">24ヶ月分</option>
+        </select>
+      </label>
+      <button type="button" id="adv-baby-run">月齢の一覧を作る</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>日付を入れるだけで、<strong>○ヶ月後の日付</strong>や<strong>2つの日付が何ヶ月離れているか</strong>がすぐわかるツールです。1月31日の1ヶ月後は2月28日、といった月末の調整も自動で行います。契約期間の確認や赤ちゃんの月齢計算にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -143,6 +172,64 @@
       box.innerHTML = '<div class="result-main">満 ' + r2.months + " ヶ月と " + r2.extraDays + " 日</div>";
     }
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advFail(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function advJa(iso) {
+    return iso.slice(0, 4) + "年" + parseInt(iso.slice(5, 7), 10) + "月" + parseInt(iso.slice(8, 10), 10) + "日";
+  }
+  document.getElementById("adv-renew-run").addEventListener("click", function () {
+    var start = document.getElementById("start").value;
+    var interval = parseInt(document.getElementById("adv-interval").value, 10);
+    var count = parseInt(document.getElementById("adv-count").value, 10);
+    var notice = parseInt(document.getElementById("adv-notice").value, 10);
+    if (isNaN(notice)) notice = 0;
+    var r = TsukisuCalc.renewalDates(start, interval, count, notice);
+    if (!r.ok) {
+      advFail(r.code === "invalid_date" ? "上のフォームで基準日(契約開始日)を入力してください。"
+        : "更新間隔(1〜120)・回数(1〜48)・予告月数(0〜12)を整数で入力してください。");
+      return;
+    }
+    var hasNotice = notice > 0;
+    var html = '<div class="result-main">更新日の一覧(' + interval + 'ヶ月ごと)</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>回</th><th>更新日</th>' +
+      (hasNotice ? "<th>解約予告の期限</th>" : "") + "</tr></thead><tbody>";
+    for (var i = 0; i < r.rows.length; i++) {
+      var row = r.rows[i];
+      html += "<tr><td>" + row.n + "回目</td><td>" + advJa(row.date) + (row.clamped ? "(月末調整)" : "") + "</td>" +
+        (hasNotice ? "<td>" + advJa(row.notice) + " まで</td>" : "") + "</tr>";
+    }
+    html += "</tbody></table></div>" +
+      '<p class="adv-note">実際の契約の起算日・期限の扱いは契約書の定めが優先されます。必ず契約書をご確認ください。</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-baby-run").addEventListener("click", function () {
+    var start = document.getElementById("start").value;
+    var count = parseInt(document.getElementById("adv-baby-count").value, 10);
+    var r = TsukisuCalc.renewalDates(start, 1, count, 0);
+    if (!r.ok) {
+      advFail("上のフォームで基準日(誕生日)を入力してください。");
+      return;
+    }
+    var html = '<div class="result-main">生後○ヶ月の一覧</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>月齢</th><th>日付</th></tr></thead><tbody>';
+    for (var i = 0; i < r.rows.length; i++) {
+      var row = r.rows[i];
+      html += "<tr><td>生後" + row.months + "ヶ月</td><td>" + advJa(row.date) +
+        (row.clamped ? "(月末調整)" : "") + "</td></tr>";
+    }
+    html += "</tbody></table></div>";
+    advBox.innerHTML = html;
+    advBox.hidden = false;
   });
 })();
 </script>

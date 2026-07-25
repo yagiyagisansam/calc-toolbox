@@ -125,6 +125,172 @@
         "ok": false,
         "code": "invalid_activity"
       }
+    },
+    {
+      "name": "複数合計: ランニング30分のみ(60kg)は261kcal・脂肪36g",
+      "func": "totalCalories",
+      "args": [
+        60,
+        [
+          {
+            "activity": "running",
+            "minutes": 30
+          }
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "totalKcal": 261,
+        "fatG": 36,
+        "items": {
+          "0": {
+            "kcal": 261
+          },
+          "length": 1
+        }
+      }
+    },
+    {
+      "name": "複数合計: ランニング30分+ヨガ40分(60kg)は366kcal",
+      "func": "totalCalories",
+      "args": [
+        60,
+        [
+          {
+            "activity": "running",
+            "minutes": 30
+          },
+          {
+            "activity": "yoga",
+            "minutes": 40
+          }
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "totalKcal": 366,
+        "fatG": 51,
+        "items": {
+          "0": {
+            "kcal": 261
+          },
+          "1": {
+            "kcal": 105
+          },
+          "length": 2
+        }
+      }
+    },
+    {
+      "name": "複数合計: 6件はエラー(最大5件)",
+      "func": "totalCalories",
+      "args": [
+        60,
+        [
+          {
+            "activity": "jogging",
+            "minutes": 10
+          },
+          {
+            "activity": "jogging",
+            "minutes": 10
+          },
+          {
+            "activity": "jogging",
+            "minutes": 10
+          },
+          {
+            "activity": "jogging",
+            "minutes": 10
+          },
+          {
+            "activity": "jogging",
+            "minutes": 10
+          },
+          {
+            "activity": "jogging",
+            "minutes": 10
+          }
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_items"
+      }
+    },
+    {
+      "name": "複数合計: 空のリストはエラー",
+      "func": "totalCalories",
+      "args": [
+        60,
+        []
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_items"
+      }
+    },
+    {
+      "name": "複数合計: 時間0分はエラー",
+      "func": "totalCalories",
+      "args": [
+        60,
+        [
+          {
+            "activity": "yoga",
+            "minutes": 0
+          }
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_minutes"
+      }
+    },
+    {
+      "name": "種目別必要時間: 60kgで300kcalはジョギング41分(切り上げ)",
+      "func": "minutesForKcalAll",
+      "args": [
+        60,
+        300
+      ],
+      "expect": {
+        "ok": true,
+        "items": {
+          "0": {
+            "key": "jogging",
+            "minutes": 41
+          }
+        }
+      }
+    },
+    {
+      "name": "種目別必要時間: 70kgで500kcalはジョギング59分",
+      "func": "minutesForKcalAll",
+      "args": [
+        70,
+        500
+      ],
+      "expect": {
+        "ok": true,
+        "items": {
+          "0": {
+            "minutes": 59
+          }
+        }
+      }
+    },
+    {
+      "name": "種目別必要時間: 目標0kcalはエラー",
+      "func": "minutesForKcalAll",
+      "args": [
+        60,
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_kcal"
+      }
     }
   ]
 }

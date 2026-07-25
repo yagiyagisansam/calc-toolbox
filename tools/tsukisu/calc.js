@@ -75,7 +75,51 @@
     return { ok: true, months: months, extraDays: serial(b) - serial(bp) };
   }
 
-  var api = { addMonths: addMonths, monthsBetween: monthsBetween };
+  /**
+   * 契約の更新日一覧を作る(解約予告の期限も計算できる)。
+   * 各更新日 = 開始日の (間隔 × 回数目)ヶ月後。addMonths を使うため、
+   * 相手の月に同じ日がない場合は月末に丸める(1/31の1ヶ月後=2/28、うるう年は2/29)。
+   * 解約予告の期限 = 各更新日の noticeMonths ヶ月前(こちらも月末調整あり)。
+   * @param {string} startIso 開始日 "YYYY-MM-DD"
+   * @param {number} intervalMonths 更新間隔(月)。1〜120の整数
+   * @param {number} count 更新回数。1〜48の整数
+   * @param {number} noticeMonths 解約予告の月数。0〜12の整数(0=予告期限を出さない)
+   * @returns {{ok:true, rows:Array<{n:number, months:number, date:string,
+   *            clamped:boolean, notice:(string|null)}>}
+   *          |{ok:false, code:string}}
+   *   code: "invalid_date" | "invalid_interval" | "invalid_count" | "invalid_notice" | "out_of_range"
+   */
+  function renewalDates(startIso, intervalMonths, count, noticeMonths) {
+    if (!parseDate(startIso)) return { ok: false, code: "invalid_date" };
+    function isInt(v, lo, hi) {
+      return typeof v === "number" && isFinite(v) && v === Math.floor(v) && v >= lo && v <= hi;
+    }
+    if (!isInt(intervalMonths, 1, 120)) return { ok: false, code: "invalid_interval" };
+    if (!isInt(count, 1, 48)) return { ok: false, code: "invalid_count" };
+    if (!isInt(noticeMonths, 0, 12)) return { ok: false, code: "invalid_notice" };
+    var rows = [];
+    for (var i = 1; i <= count; i++) {
+      var r = addMonths(startIso, intervalMonths * i);
+      if (!r.ok) return r;
+      var notice = null;
+      if (noticeMonths > 0) {
+        var nr = addMonths(r.date, -noticeMonths);
+        if (!nr.ok) return nr;
+        notice = nr.date;
+      }
+      rows.push({
+        n: i,
+        months: intervalMonths * i,
+        date: r.date,
+        clamped: r.clamped,
+        notice: notice
+      });
+    }
+    return { ok: true, rows: rows };
+  }
+
+  var api = {
+    renewalDates: renewalDates, addMonths: addMonths, monthsBetween: monthsBetween };
   if (typeof module !== "undefined" && module.exports) { module.exports = api; }
   else { global.TsukisuCalc = api; }
 })(typeof window !== "undefined" ? window : globalThis);

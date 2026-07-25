@@ -157,6 +157,109 @@
         "ok": false,
         "code": "invalid_fall"
       }
+    },
+    {
+      "name": "カスタム周期: 80分・6:30起床→5サイクルは23:35就寝(約6.7時間)",
+      "func": "customOptions",
+      "args": [
+        "bed",
+        "6:30",
+        15,
+        80
+      ],
+      "expect": {
+        "ok": true,
+        "options": {
+          "0": {
+            "cycles": 6,
+            "sleepHours": 8,
+            "time": "22:15"
+          },
+          "1": {
+            "cycles": 5,
+            "sleepHours": 6.7,
+            "time": "23:35"
+          },
+          "2": {
+            "cycles": 4,
+            "sleepHours": 5.3,
+            "time": "0:55"
+          }
+        }
+      }
+    },
+    {
+      "name": "カスタム周期: 90分は既存計算と同じ(6:30起床→6サイクル21:15)",
+      "func": "customOptions",
+      "args": [
+        "bed",
+        "6:30",
+        15,
+        90
+      ],
+      "expect": {
+        "ok": true,
+        "options": {
+          "0": {
+            "cycles": 6,
+            "sleepHours": 9,
+            "time": "21:15"
+          }
+        }
+      }
+    },
+    {
+      "name": "カスタム周期: 100分・23:00就寝→4サイクルは5:55起床",
+      "func": "customOptions",
+      "args": [
+        "wake",
+        "23:00",
+        15,
+        100
+      ],
+      "expect": {
+        "ok": true,
+        "options": {
+          "0": {
+            "cycles": 4,
+            "sleepHours": 6.7,
+            "time": "5:55"
+          },
+          "2": {
+            "cycles": 6,
+            "sleepHours": 10,
+            "time": "9:15"
+          }
+        }
+      }
+    },
+    {
+      "name": "カスタム周期: 85分など未対応の周期はエラー",
+      "func": "customOptions",
+      "args": [
+        "bed",
+        "6:30",
+        15,
+        85
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_cycle"
+      }
+    },
+    {
+      "name": "カスタム周期: 不正な時刻はエラー",
+      "func": "customOptions",
+      "args": [
+        "bed",
+        "25:00",
+        15,
+        90
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_time"
+      }
     }
   ]
 }

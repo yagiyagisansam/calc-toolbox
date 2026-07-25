@@ -74,7 +74,57 @@
     return { ok: true, year: era[1] + eraYear - 1 };
   }
 
+  /**
+   * 年度(4月1日〜翌年3月31日)の和暦表示。1〜3月は前年の年度に属する。
+   * 年度の元号は toWareki と同じ年単位の概算で、改元年度は新旧両方のラベルを返す
+   * (例: 2019年度 → 平成31年度・令和元年度)。
+   * @param {number} year 西暦年(1868〜2100)
+   * @param {number} month 月(1〜12)
+   * @returns {{ok:true, fiscalYear:number, labels:string[]}|{ok:false, code:string}}
+   *   code: "invalid_year" | "invalid_month" | "out_of_range"
+   */
+  function fiscalYear(year, month) {
+    if (!isFiniteNumber(year) || year !== Math.floor(year) || year < YEAR_MIN || year > YEAR_MAX) {
+      return { ok: false, code: "invalid_year" };
+    }
+    if (!isFiniteNumber(month) || month !== Math.floor(month) || month < 1 || month > 12) {
+      return { ok: false, code: "invalid_month" };
+    }
+    var fy = month >= 4 ? year : year - 1;
+    if (fy < YEAR_MIN) return { ok: false, code: "out_of_range" };
+    var w = toWareki(fy);
+    var labels = [];
+    for (var i = 0; i < w.results.length; i++) {
+      var r = w.results[i];
+      labels.push(r.era + (r.eraYear === 1 ? "元" : String(r.eraYear)) + "年度");
+    }
+    return { ok: true, fiscalYear: fy, labels: labels };
+  }
+
+  /**
+   * その西暦年に生まれた人が、基準の年の誕生日を迎えた時点で満何歳になるかを計算する。
+   * 満年齢 = 基準年 − 生まれ年(誕生日前の時点ではこれより1歳下。ページに明記)。
+   * @param {number} birthYear 生まれ年(西暦、1868〜2100)
+   * @param {number} thisYear 基準の年(西暦、1868〜2100、生まれ年以降)
+   * @returns {{ok:true, age:number}|{ok:false, code:string}}
+   *   code: "invalid_year" | "invalid_order"
+   */
+  function ageThisYear(birthYear, thisYear) {
+    if (!isFiniteNumber(birthYear) || birthYear !== Math.floor(birthYear) ||
+        birthYear < YEAR_MIN || birthYear > YEAR_MAX) {
+      return { ok: false, code: "invalid_year" };
+    }
+    if (!isFiniteNumber(thisYear) || thisYear !== Math.floor(thisYear) ||
+        thisYear < YEAR_MIN || thisYear > YEAR_MAX) {
+      return { ok: false, code: "invalid_year" };
+    }
+    if (birthYear > thisYear) return { ok: false, code: "invalid_order" };
+    return { ok: true, age: thisYear - birthYear };
+  }
+
   var api = {
+    ageThisYear: ageThisYear,
+    fiscalYear: fiscalYear,
     toWareki: toWareki,
     toSeireki: toSeireki,
     YEAR_MIN: YEAR_MIN,

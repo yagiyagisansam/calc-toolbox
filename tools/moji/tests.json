@@ -102,6 +102,129 @@
         "ok": false,
         "code": "invalid_text"
       }
+    },
+    {
+      "name": "HTML除去: <p>こんにちは</p> は本文5文字",
+      "func": "countHtmlStripped",
+      "args": [
+        "<p>こんにちは</p>"
+      ],
+      "expect": {
+        "ok": true,
+        "chars": 5,
+        "charsNoSpace": 5
+      }
+    },
+    {
+      "name": "HTML除去: script/styleの中身は本文に数えない",
+      "func": "countHtmlStripped",
+      "args": [
+        "<style>p{color:red}</style><p>あい</p><script>alert(1)</script>"
+      ],
+      "expect": {
+        "ok": true,
+        "chars": 2
+      }
+    },
+    {
+      "name": "HTML除去: コメントとDOCTYPEは無視",
+      "func": "countHtmlStripped",
+      "args": [
+        "<!DOCTYPE html><!-- メモ --><b>あ</b>"
+      ],
+      "expect": {
+        "ok": true,
+        "chars": 1
+      }
+    },
+    {
+      "name": "HTML除去: 実体参照(&amp;等)は1文字に戻して数える",
+      "func": "countHtmlStripped",
+      "args": [
+        "A&amp;B&lt;C&gt;&#12354;"
+      ],
+      "expect": {
+        "ok": true,
+        "chars": 7
+      }
+    },
+    {
+      "name": "HTML除去: 文字列以外はエラー",
+      "func": "countHtmlStripped",
+      "args": [
+        123
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_text"
+      }
+    },
+    {
+      "name": "目標字数: 8文字の文章は400字以内に収まる(残り392)",
+      "func": "checkTarget",
+      "args": [
+        "あいう えお\nかき",
+        400,
+        "chars"
+      ],
+      "expect": {
+        "ok": true,
+        "count": 8,
+        "remaining": 392,
+        "over": 0,
+        "within": true
+      }
+    },
+    {
+      "name": "目標字数: スペース除く7文字で目標5字なら2文字オーバー",
+      "func": "checkTarget",
+      "args": [
+        "あいう えお\nかき",
+        5,
+        "noSpace"
+      ],
+      "expect": {
+        "ok": true,
+        "count": 7,
+        "remaining": 0,
+        "over": 2,
+        "within": false
+      }
+    },
+    {
+      "name": "目標字数: 0や小数はエラー",
+      "func": "checkTarget",
+      "args": [
+        "あ",
+        0,
+        "chars"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_limit"
+      }
+    },
+    {
+      "name": "単語数: 英文5語を数える",
+      "func": "wordCount",
+      "args": [
+        "This is a pen ."
+      ],
+      "expect": {
+        "ok": true,
+        "words": 4
+      }
+    },
+    {
+      "name": "単語数: 日本語のみは0語",
+      "func": "wordCount",
+      "args": [
+        "これは日本語の文章です。"
+      ],
+      "expect": {
+        "ok": true,
+        "words": 0
+      }
     }
   ]
 }

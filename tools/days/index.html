@@ -52,11 +52,29 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 週数・月数の内訳と○か月後の日付</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">週数・月数もあわせた内訳</h3>
+      <p class="adv-note">上の「開始日」「終了日」の差を、週数+端数日と月数の目安でも表示します。「初日を含める」に切り替えると、両端を含む数え方(入院日数・チケットの有効期間など)になります。</p>
+      <label><input type="checkbox" id="adv-include"> 初日を含めて数える(両端を含む)</label>
+      <button type="button" id="adv-bd-run">内訳を計算する</button>
+
+      <h3 class="adv-h">○か月後(○か月前)の日付</h3>
+      <p class="adv-note">上の「基準日」欄の日付から、指定した月数だけ後の日付と曜日を出します。支払期限や定期券の更新日などに。マイナスを入れると○か月前です。</p>
+      <label>何か月後?
+        <input type="number" id="adv-months" inputmode="numeric" min="-1200" max="1200" step="1" placeholder="例: 3">
+      </label>
+      <button type="button" id="adv-mo-run">日付を計算する</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
   <div class="note-box">
     日数の数え方には「初日を含めない(経過日数)」と「初日を含める(両端を含む日数)」の2通りがあります。本ツールは<strong>両方を表示</strong>します。契約・法律上の期間計算は数え方の規定が異なる場合があるためご注意ください。
   </div>
 
-  <p><strong>2つの日付の間の日数</strong>と、<strong>基準日から○日後(○日前)の日付・曜日</strong>を計算します。締切までの残り日数、支払期限、記念日の日数計算に。</p>
+  <p>2つの日付の間が<strong>何日あるか</strong>がすぐわかるツールです。「100日後は何月何日?」のような先の日付の計算もできます。イベントまでの日数を数えたい時や、書類の期間計算にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -149,6 +167,62 @@
     if (!result.ok) { showError(result.code); return; }
     box.innerHTML = '<div class="result-main">' + result.date + "(" + result.weekday + "曜日)</div>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function jpDate(iso) {
+    var p = iso.split("-");
+    return parseInt(p[0], 10) + "年" + parseInt(p[1], 10) + "月" + parseInt(p[2], 10) + "日";
+  }
+  document.getElementById("adv-bd-run").addEventListener("click", function () {
+    var from = document.getElementById("from").value;
+    var to = document.getElementById("to").value;
+    if (from === "" || to === "") { advErr("上のフォームに開始日と終了日を入力してください。"); return; }
+    var inc = document.getElementById("adv-include").checked;
+    var r = DaysCalc.breakdown(from, to, inc);
+    if (!r.ok) {
+      advErr(r.code === "from_after_to" ? "開始日が終了日より後になっています。" : "日付を正しく入力してください。");
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">' + r.days.toLocaleString() + " 日(" +
+      (inc ? "初日を含む" : "初日を含まない") + ")</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>週数でいうと</td><td>" + r.weeks.toLocaleString() + "週間" +
+      (r.weekDays > 0 ? "と" + r.weekDays + "日" : "") + "</td></tr>" +
+      "<tr><td>月数の目安</td><td>" + r.months.toLocaleString() + "か月" +
+      (r.monthDays > 0 ? "と" + r.monthDays + "日" : "") + "</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">月数の目安は暦の上での差(初日を含めない数え方)です。</p>';
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-mo-run").addEventListener("click", function () {
+    var base = document.getElementById("base").value;
+    var mo = document.getElementById("adv-months");
+    if (base === "") { advErr("上のフォームの「基準日」を入力してください。"); return; }
+    if (mo.value === "") { advErr("何か月後かを入力してください。"); return; }
+    var r = DaysCalc.addMonths(base, parseFloat(mo.value));
+    if (!r.ok) {
+      var msg = r.code === "invalid_months" ? "月数は-1,200〜1,200の整数で入力してください。"
+        : r.code === "out_of_range" ? "結果が対応範囲(1600〜2500年)を超えました。"
+        : "基準日を正しく入力してください。";
+      advErr(msg);
+      return;
+    }
+    var n = parseFloat(mo.value);
+    advBox.innerHTML =
+      '<div class="result-main">' + jpDate(r.date) + "(" + r.weekday + "曜日)</div>" +
+      "<p>" + jpDate(base) + " の " + Math.abs(n).toLocaleString() + " か月" + (n < 0 ? "前" : "後") + "</p>" +
+      '<p class="adv-note">相手の月に同じ日がない場合は月末に丸めます(1月31日の1か月後は2月28日)。</p>';
+    advBox.hidden = false;
   });
 })();
 </script>

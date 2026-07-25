@@ -109,6 +109,168 @@
         "ok": false,
         "code": "invalid_text"
       }
+    },
+    {
+      "name": "選択変換: 英数字のみONで記号は残る",
+      "func": "convertSelective",
+      "args": [
+        "ＡＢＣ１２３！",
+        "toHankaku",
+        {
+          "alnum": true,
+          "kana": false,
+          "symbol": false,
+          "space": false
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "text": "ABC123！",
+        "changed": 6
+      }
+    },
+    {
+      "name": "選択変換: 記号とスペースのみON(英数字は残る)",
+      "func": "convertSelective",
+      "args": [
+        "テスト！　１２３",
+        "toHankaku",
+        {
+          "alnum": false,
+          "kana": false,
+          "symbol": true,
+          "space": true
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "text": "テスト! １２３",
+        "changed": 2
+      }
+    },
+    {
+      "name": "選択変換: カタカナ→半角カナ(濁点は分解してｶﾞ)",
+      "func": "convertSelective",
+      "args": [
+        "ガンダム",
+        "toHankaku",
+        {
+          "alnum": false,
+          "kana": true,
+          "symbol": false,
+          "space": false
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "text": "ｶﾞﾝﾀﾞﾑ",
+        "changed": 4
+      }
+    },
+    {
+      "name": "選択変換: 半角カナ→全角カタカナ(ｶﾞは合成してガ)",
+      "func": "convertSelective",
+      "args": [
+        "ｶﾞｰﾙ",
+        "toZenkaku",
+        {
+          "alnum": false,
+          "kana": true,
+          "symbol": false,
+          "space": false
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "text": "ガール",
+        "changed": 4
+      }
+    },
+    {
+      "name": "選択変換: すべてOFFなら何も変わらない",
+      "func": "convertSelective",
+      "args": [
+        "ＡＢＣ　ｱｲｳ",
+        "toHankaku",
+        {
+          "alnum": false,
+          "kana": false,
+          "symbol": false,
+          "space": false
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "text": "ＡＢＣ　ｱｲｳ",
+        "changed": 0
+      }
+    },
+    {
+      "name": "選択変換: 文字列以外はエラー",
+      "func": "convertSelective",
+      "args": [
+        123,
+        "toHankaku",
+        {
+          "alnum": true
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_text"
+      }
+    },
+    {
+      "name": "混在チェック: ABC１23 は4文字目の１が全角英数字",
+      "func": "findMixed",
+      "args": [
+        "ABC１23"
+      ],
+      "expect": {
+        "ok": true,
+        "total": 1,
+        "counts": {
+          "zen_alnum": 1,
+          "zen_symbol": 0,
+          "zen_space": 0,
+          "han_kana": 0
+        },
+        "items": [
+          {
+            "ch": "１",
+            "index": 3,
+            "type": "zen_alnum"
+          }
+        ]
+      }
+    },
+    {
+      "name": "混在チェック: 半角カナと全角スペースを検出",
+      "func": "findMixed",
+      "args": [
+        "ｱｲ　x"
+      ],
+      "expect": {
+        "ok": true,
+        "total": 3,
+        "counts": {
+          "zen_alnum": 0,
+          "zen_symbol": 0,
+          "zen_space": 1,
+          "han_kana": 2
+        }
+      }
+    },
+    {
+      "name": "混在チェック: 半角だけなら0件",
+      "func": "findMixed",
+      "args": [
+        "abc 123!"
+      ],
+      "expect": {
+        "ok": true,
+        "total": 0
+      }
     }
   ]
 }

@@ -46,11 +46,53 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 建ぺい率・容積率と坪単価の計算</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">建ぺい率・容積率から建てられる広さを計算</h3>
+      <p class="adv-note"><strong>建ぺい率</strong>は「土地を真上から見て、建物が占めてよい面積の割合」、<strong>容積率</strong>は「全フロアの床面積の合計が土地の何%まで許されるか」です。土地の広告に書かれた%から、建てられる建物の上限を計算します。</p>
+      <label>土地面積
+        <input type="number" id="adv-land" inputmode="decimal" step="any" min="0.01" max="100000" placeholder="例: 100">
+      </label>
+      <label>土地面積の単位
+        <select id="adv-land-unit">
+          <option value="sqm" selected>平方メートル(㎡)</option>
+          <option value="tsubo">坪</option>
+        </select>
+      </label>
+      <label>建ぺい率(%)
+        <input type="number" id="adv-kenpei" inputmode="decimal" step="any" min="1" max="100" placeholder="例: 60">
+      </label>
+      <label>容積率(%)
+        <input type="number" id="adv-yoseki" inputmode="decimal" step="any" min="1" max="2000" placeholder="例: 200">
+      </label>
+      <button type="button" id="adv-limit-run">上限を計算する</button>
+      <div class="tool-result" id="adv-limit-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">坪単価の計算</h3>
+      <p class="adv-note">物件の価格と面積から、坪単価と㎡単価を計算します。相場との比較に。</p>
+      <label>価格(万円)
+        <input type="number" id="adv-price" inputmode="decimal" step="any" min="1" placeholder="例: 3000">
+      </label>
+      <label>面積
+        <input type="number" id="adv-area" inputmode="decimal" step="any" min="0.01" max="100000" placeholder="例: 100">
+      </label>
+      <label>面積の単位
+        <select id="adv-area-unit">
+          <option value="sqm" selected>平方メートル(㎡)</option>
+          <option value="tsubo">坪</option>
+        </select>
+      </label>
+      <button type="button" id="adv-price-run">坪単価を計算する</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
   <div class="note-box">
     このツールの変換結果は<strong>概算</strong>です。畳は広告表示基準の「1枚=1.62㎡」で換算しており、実際の畳の寸法(京間・中京間・江戸間・団地間)とは異なる場合があります。
   </div>
 
-  <p>面積の値と単位を入力すると、<strong>坪・平方メートル(㎡)・畳</strong>の3つの単位へ同時に変換します。不動産広告や間取り図でよく使う換算です。</p>
+  <p>面積の数字を入れるだけで、<strong>坪・平方メートル(㎡)・畳がお互いに何になるか</strong>がすぐわかるツールです。不動産の広告や間取り図に出てくる単位の読み替えにどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -143,6 +185,61 @@
       box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
     }
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var limitBox = document.getElementById("adv-limit-result");
+  var fmt = function (x, d) { return x.toLocaleString(undefined, { maximumFractionDigits: d === undefined ? 2 : d }); };
+  document.getElementById("adv-limit-run").addEventListener("click", function () {
+    var land = parseFloat(document.getElementById("adv-land").value);
+    if (document.getElementById("adv-land-unit").value === "tsubo") {
+      land = land * TsuboCalc.SQM_PER_TSUBO;
+    }
+    var r = TsuboCalc.buildingLimits(
+      land,
+      parseFloat(document.getElementById("adv-kenpei").value),
+      parseFloat(document.getElementById("adv-yoseki").value)
+    );
+    if (!r.ok) {
+      var msg = r.code === "invalid_kenpei" ? "建ぺい率は1〜100%で入力してください。"
+        : r.code === "invalid_yoseki" ? "容積率は1〜2000%で入力してください。"
+        : "土地面積を数値で入力してください。";
+      limitBox.innerHTML = '<p class="result-error">' + msg + '</p>';
+      limitBox.hidden = false;
+      return;
+    }
+    limitBox.innerHTML =
+      '<div class="result-main">延べ床の上限 ' + fmt(r.floorSqm) + ' ㎡(約' + fmt(r.floorTsubo) + '坪)</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>建築面積の上限(1階部分)</td><td>' + fmt(r.buildingSqm) + ' ㎡(約' + fmt(r.buildingTsubo) + '坪)</td></tr>' +
+      '<tr><td>延べ床面積の上限(全フロア合計)</td><td>' + fmt(r.floorSqm) + ' ㎡(約' + fmt(r.floorTsubo) + '坪)</td></tr>' +
+      '<tr><td>参考: 建ぺい率いっぱいに建てた場合の階数</td><td>約 ' + fmt(r.floorsHint, 1) + ' 階</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">高さ制限・斜線制限などでさらに制限される場合があります。正確には自治体・建築士にご確認ください。</p>';
+    limitBox.hidden = false;
+  });
+  document.getElementById("adv-price-run").addEventListener("click", function () {
+    var r = TsuboCalc.pricePerArea(
+      parseFloat(document.getElementById("adv-price").value),
+      parseFloat(document.getElementById("adv-area").value),
+      document.getElementById("adv-area-unit").value
+    );
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">価格と面積を0より大きい数値で入力してください。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">坪単価 約 ' + fmt(r.perTsubo) + ' 万円</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>坪単価</td><td>' + fmt(r.perTsubo) + ' 万円/坪(' + fmt(r.tsubo) + '坪)</td></tr>' +
+      '<tr><td>㎡単価</td><td>' + fmt(r.perSqm) + ' 万円/㎡(' + fmt(r.sqm) + '㎡)</td></tr>' +
+      '</tbody></table></div>';
+    advBox.hidden = false;
   });
 })();
 </script>

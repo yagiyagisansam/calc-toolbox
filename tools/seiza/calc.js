@@ -50,7 +50,68 @@
     return { ok: true, sign: sign[2], signEn: sign[3], stone: STONES[month - 1] };
   }
 
-  var api = { lookup: lookup, SIGNS: SIGNS, STONES: STONES };
+  /**
+   * 生まれ年も入れた誕生日の詳細判定。
+   * - 曜日はツェラーの公式(グレゴリオ暦)で計算:
+   *   h = (q + floor(13(m+1)/5) + K + floor(K/4) + floor(J/4) + 5J) mod 7
+   *   (1・2月は前年の13・14月として扱う。h=0が土曜)
+   * - 星座は lookup と同じ日付区分。境界日(カスプ)の前後1日以内なら、
+   *   生まれ年・時刻により隣の星座になる可能性がある旨を cusp で返す。
+   * - うるう年判定(2/29の実在チェック)も行う。
+   * @param {number} year 生まれ年(西暦1600〜2200)
+   * @param {number} month 月(1〜12)
+   * @param {number} day 日
+   * @returns {{ok:true, youbi:string, dow:number, sign:string, signEn:string, stone:string,
+   *            cusp:(null|{otherSign:string, otherSignEn:string, boundaryM:number, boundaryD:number})}
+   *          |{ok:false, code:string}}
+   *   dow: 0=日曜〜6=土曜 / code: "invalid_date"
+   */
+  function detail(year, month, day) {
+    if (typeof year !== "number" || year !== Math.floor(year) || year < 1600 || year > 2200) {
+      return { ok: false, code: "invalid_date" };
+    }
+    var base = lookup(month, day);
+    if (!base.ok) return base;
+    var leap = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+    if (month === 2 && day === 29 && !leap) {
+      return { ok: false, code: "invalid_date" };
+    }
+    // ツェラーの公式
+    var q = day;
+    var m = month;
+    var y = year;
+    if (m <= 2) { m += 12; y -= 1; }
+    var K = y % 100;
+    var J = Math.floor(y / 100);
+    var h = (q + Math.floor(13 * (m + 1) / 5) + K + Math.floor(K / 4) + Math.floor(J / 4) + 5 * J) % 7;
+    var dow = (h + 6) % 7; // 0=日曜
+    var NAMES = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"];
+    // カスプ判定: 境界日(各星座の開始日)の前後1日以内
+    var cusp = null;
+    for (var i = 0; i < SIGNS.length; i++) {
+      var sM = SIGNS[i][0];
+      var sD = SIGNS[i][1];
+      if (month === sM && Math.abs(day - sD) <= 1) {
+        var prev = SIGNS[(i + SIGNS.length - 1) % SIGNS.length];
+        var next = SIGNS[i];
+        var other = day < sD ? next : prev; // 境界の反対側の星座
+        cusp = { otherSign: other[2], otherSignEn: other[3], boundaryM: sM, boundaryD: sD };
+        break;
+      }
+    }
+    return {
+      ok: true,
+      youbi: NAMES[dow],
+      dow: dow,
+      sign: base.sign,
+      signEn: base.signEn,
+      stone: base.stone,
+      cusp: cusp
+    };
+  }
+
+  var api = {
+    detail: detail, lookup: lookup, SIGNS: SIGNS, STONES: STONES };
   if (typeof module !== "undefined" && module.exports) { module.exports = api; }
   else { global.SeizaCalc = api; }
 })(typeof window !== "undefined" ? window : globalThis);

@@ -101,7 +101,76 @@
     };
   }
 
+  /**
+   * 1〜10周年の日付一覧を計算する(暦の上で同じ月日。2月29日は平年では3月1日扱い)。
+   * daysUntil は基準日からの日数(正=これから、負=過去、0=当日)。
+   * 2200年(YEAR_MAX)を超える周年は一覧から除外する。
+   * @param {string} baseIso 記念日 "YYYY-MM-DD"
+   * @param {string} asOfIso 基準日 "YYYY-MM-DD"
+   * @returns {{ok:true, rows:Array<{years:number, date:string, weekday:string, daysUntil:number}>}
+   *          |{ok:false, code:string}}  code: "invalid_base"|"invalid_asof"|"base_after_asof"
+   */
+  function anniversaries(baseIso, asOfIso) {
+    var b = parseDate(baseIso);
+    if (!b) return { ok: false, code: "invalid_base" };
+    var a = parseDate(asOfIso);
+    if (!a) return { ok: false, code: "invalid_asof" };
+    var bs = toSerial(b.y, b.m, b.d);
+    var as = toSerial(a.y, a.m, a.d);
+    if (as < bs) return { ok: false, code: "base_after_asof" };
+    var rows = [];
+    for (var k = 1; k <= 10; k++) {
+      var y = b.y + k;
+      if (y > YEAR_MAX) continue;
+      var m = b.m;
+      var d = b.d;
+      if (m === 2 && d === 29 && !isLeapYear(y)) { m = 3; d = 1; }
+      var serial = toSerial(y, m, d);
+      rows.push({
+        years: k,
+        date: pad(y, 4) + "-" + pad(m, 2) + "-" + pad(d, 2),
+        weekday: WEEKDAYS[((serial + 3) % 7 + 7) % 7],
+        daysUntil: serial - as
+      });
+    }
+    return { ok: true, rows: rows };
+  }
+
+  /**
+   * 100日ごとの節目(100日目〜1000日目)の日付一覧を計算する。
+   * 「N日目」は初日を1日目と数える(milestones と同じ前提: N日目 = 記念日 + (N−1)日)。
+   * daysUntil は基準日からの日数(正=これから、負=過去、0=当日)。
+   * @param {string} baseIso 記念日 "YYYY-MM-DD"
+   * @param {string} asOfIso 基準日 "YYYY-MM-DD"
+   * @returns {{ok:true, rows:Array<{n:number, date:string, weekday:string, daysUntil:number}>}
+   *          |{ok:false, code:string}}  code: "invalid_base"|"invalid_asof"|"base_after_asof"
+   */
+  function hundredDays(baseIso, asOfIso) {
+    var b = parseDate(baseIso);
+    if (!b) return { ok: false, code: "invalid_base" };
+    var a = parseDate(asOfIso);
+    if (!a) return { ok: false, code: "invalid_asof" };
+    var bs = toSerial(b.y, b.m, b.d);
+    var as = toSerial(a.y, a.m, a.d);
+    if (as < bs) return { ok: false, code: "base_after_asof" };
+    var rows = [];
+    for (var n = 100; n <= 1000; n += 100) {
+      var serial = bs + n - 1;
+      var c = fromSerial(serial);
+      if (c.y > YEAR_MAX) continue;
+      rows.push({
+        n: n,
+        date: pad(c.y, 4) + "-" + pad(c.m, 2) + "-" + pad(c.d, 2),
+        weekday: WEEKDAYS[((serial + 3) % 7 + 7) % 7],
+        daysUntil: serial - as
+      });
+    }
+    return { ok: true, rows: rows };
+  }
+
   var api = {
+    hundredDays: hundredDays,
+    anniversaries: anniversaries,
     milestones: milestones,
     MILESTONES: MILESTONES,
     YEAR_MIN: YEAR_MIN,

@@ -48,11 +48,39 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 入居の初期費用をまとめて計算</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">敷金・礼金も入れて「最初に払う総額」を出す</h3>
+      <p class="adv-note">家賃と入居日は上のフォームの値を使います(日割りは「その月の日数で割る」方式)。敷金などは「家賃の何ヶ月分か」で入力してください。契約書や見積もりに書いてあります。</p>
+      <label>敷金(ヶ月分)
+        <input type="number" id="adv-shikikin" inputmode="decimal" step="any" min="0" max="12" value="1">
+      </label>
+      <label>礼金(ヶ月分)
+        <input type="number" id="adv-reikin" inputmode="decimal" step="any" min="0" max="12" value="1">
+      </label>
+      <label>仲介手数料(ヶ月分)
+        <span class="field-note">上限は家賃の1ヶ月分+消費税。税込みなら1.1と入力</span>
+        <input type="number" id="adv-chukai" inputmode="decimal" step="any" min="0" max="12" value="1">
+      </label>
+      <label>前家賃(ヶ月分)
+        <span class="field-note">翌月分の家賃を先に払う場合は1</span>
+        <input type="number" id="adv-mae" inputmode="decimal" step="any" min="0" max="12" value="1">
+      </label>
+      <label>その他の費用(円)
+        <span class="field-note">保証会社の利用料・火災保険・鍵交換代など。なければ0</span>
+        <input type="number" id="adv-other" inputmode="numeric" step="1" min="0" max="10000000" value="0">
+      </label>
+      <button type="button" id="adv-run">初期費用の総額を計算</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
   <div class="note-box">
     どちらの方式を使うか(円未満の端数処理を含む)は<strong>賃貸借契約書の定めが優先</strong>されます。本ツールは円未満切り捨てで計算しています。正確な金額は管理会社・大家さんへの確認をおすすめします。
   </div>
 
-  <p>月の途中で入居・退去するときの<strong>日割り家賃</strong>を計算します。よく使われる<strong>実日数方式</strong>(その月の日数で割る)と<strong>30日固定方式</strong>の両方を同時に表示するので、賃貸借契約書に書かれた方式に合わせて確認できます。</p>
+  <p>月の途中で引っ越す時の<strong>日割り家賃がいくらか</strong>がわかるツールです。契約でよく使われる2つの計算方式(その月の日数で割る/30日で割る)を同時に表示します。敷金や礼金を足した入居の初期費用もまとめて出せます。契約書の金額チェックにどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -140,6 +168,49 @@
       "</tbody></table></div>" +
       "<p>円未満は切り捨て。どちらの方式かは契約書をご確認ください。</p>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var ADV_ERRORS = {
+    invalid_rent: "月額家賃(上のフォーム)を 1〜10,000,000円 の範囲で入力してください。",
+    invalid_date: "入居日(上のフォーム)を入力してください。",
+    invalid_months: "敷金・礼金などのヶ月数は 0〜12 の範囲で入力してください。",
+    invalid_other: "その他の費用は 0〜10,000,000円 の範囲で入力してください。"
+  };
+  document.getElementById("adv-run").addEventListener("click", function () {
+    var rent = parseFloat(document.getElementById("rent").value);
+    var iso = document.getElementById("date").value;
+    function monthVal(id) {
+      var v = parseFloat(document.getElementById(id).value);
+      return isNaN(v) ? 0 : v;
+    }
+    var other = parseFloat(document.getElementById("adv-other").value);
+    if (isNaN(other)) other = 0;
+    var r = HiwariCalc.initialCost(rent, iso,
+      monthVal("adv-shikikin"), monthVal("adv-reikin"),
+      monthVal("adv-chukai"), monthVal("adv-mae"), other);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + (ADV_ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">初期費用の総額 約' + r.total.toLocaleString() + ' 円</div>' +
+      '<p>家賃の約 <strong>' + r.monthsOfRent.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' ヶ月分</strong> です。</p>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>日割り家賃(' + r.days + '日分)</td><td>' + r.prorated.toLocaleString() + ' 円</td></tr>' +
+      '<tr><td>敷金</td><td>' + r.shikikin.toLocaleString() + ' 円</td></tr>' +
+      '<tr><td>礼金</td><td>' + r.reikin.toLocaleString() + ' 円</td></tr>' +
+      '<tr><td>仲介手数料</td><td>' + r.chukai.toLocaleString() + ' 円</td></tr>' +
+      '<tr><td>前家賃</td><td>' + r.maeYachin.toLocaleString() + ' 円</td></tr>' +
+      '<tr><td>その他</td><td>' + r.other.toLocaleString() + ' 円</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">日割りを30日固定方式で計算する契約の場合は、上のフォームの結果(30日固定方式)との差額分だけ総額が変わります。正確な金額は契約書・見積書でご確認ください。</p>';
+    advBox.hidden = false;
   });
 })();
 </script>

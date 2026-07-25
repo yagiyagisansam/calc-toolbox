@@ -44,7 +44,32 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>「10%オフ」と「10%ポイント還元」、同じに見えて<strong>実は割引のほうが得</strong>です。このツールは両方の実質価格を計算し、還元率を割引率に換算(10%還元≒9.09%オフ)して、どちらが得かを一発判定します。セール価格とキャンペーン還元の比較に。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 損益分岐の還元率とポイントの使い残し</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">○%オフと互角になる還元率は?</h3>
+      <p class="adv-note">「セールの○%オフと、ポイント還元キャンペーン、どっちで買う?」の損益分岐を逆算します。</p>
+      <label>割引率(%オフ)
+        <input type="number" id="adv-bdisc" inputmode="decimal" step="any" min="0" max="99.9" placeholder="10">
+      </label>
+      <button type="button" id="adv-be-run">互角になる還元率を計算</button>
+      <h3 class="adv-h">ポイントを全部は使わないなら?</h3>
+      <p class="adv-note">ポイントは使い切らなければ価値が下がります。「たぶん7割くらいしか使わない」といった場合の実質的な得を計算します。</p>
+      <label>商品の価格(円)
+        <input type="number" id="adv-uprice" inputmode="numeric" step="1" min="1" placeholder="10000">
+      </label>
+      <label>ポイント還元率(%)
+        <input type="number" id="adv-upoint" inputmode="decimal" step="any" min="0" max="100" placeholder="10">
+      </label>
+      <label>ポイントの利用率(%・全部使うなら100)
+        <input type="number" id="adv-uuse" inputmode="decimal" step="any" min="0" max="100" value="70">
+      </label>
+      <button type="button" id="adv-use-run">実質の得を計算</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>「10%オフ」と「10%ポイント還元」——同じに見えて、<strong>実は割引のほうが少し得</strong>です。このツールは両方の実質的な支払いを計算して、どちらが得かを判定します。セール価格とポイントキャンペーンで迷った時にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -136,6 +161,43 @@
       "</tbody></table></div>" +
       "<p>" + p.toLocaleString() + "%還元は割引に換算すると約 <strong>" + r.pointEquivPct.toLocaleString() + "%オフ相当</strong>です(ポイントを全額使う前提)。</p>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function showError(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-be-run").addEventListener("click", function () {
+    var d = parseFloat(document.getElementById("adv-bdisc").value);
+    if (isNaN(d)) { showError("割引率を入力してください。"); return; }
+    var r = PointCalc.breakevenPoint(d);
+    if (!r.ok) { showError("割引率は0以上100未満で入力してください。"); return; }
+    advBox.innerHTML =
+      '<div class="result-main">還元率 ' + r.pointPct.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " % で互角</div>" +
+      '<p class="adv-note">' + d.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%オフと同じ得になるには、ポイント還元は " + r.pointPct.toLocaleString(undefined, { maximumFractionDigits: 2 }) + "% 必要です。これより低い還元率なら割引を選ぶのが得です(ポイントを全額使い切る前提)。</p>";
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-use-run").addEventListener("click", function () {
+    var price = parseFloat(document.getElementById("adv-uprice").value);
+    var pt = parseFloat(document.getElementById("adv-upoint").value);
+    var use = parseFloat(document.getElementById("adv-uuse").value);
+    if (isNaN(price) || isNaN(pt) || isNaN(use)) { showError("価格・還元率・利用率を入力してください。"); return; }
+    var r = PointCalc.partialUse(price, pt, use);
+    if (!r.ok) { showError("価格は1〜1,000万円、還元率と利用率は0〜100%で入力してください。"); return; }
+    advBox.innerHTML =
+      '<div class="result-main">実質 ' + r.effectivePct.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " %オフ相当</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>もらえるポイント</td><td>" + r.earned.toLocaleString() + " 円分</td></tr>" +
+      "<tr><td>実際に使う分(" + use.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%)</td><td>" + r.used.toLocaleString() + " 円分</td></tr>" +
+      "<tr><td>実質負担</td><td>" + r.net.toLocaleString() + " 円</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">使わない分のポイントは価値ゼロとして計算しています。有効期限切れが心配なら、上の「互角になる還元率」より高めの還元率でないと割引に勝てません。</p>';
+    advBox.hidden = false;
   });
 })();
 </script>

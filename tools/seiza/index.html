@@ -41,7 +41,23 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>誕生日を選ぶだけで、<strong>12星座と誕生石</strong>がすぐわかります。「4月20日は牡羊座?牡牛座?」といった境目の日もひと目で確認。プロフィール記入や、誕生日プレゼントのジュエリー選びに。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 生まれた日の曜日と12星座の一覧表</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">生まれ年を足して詳しく調べる</h3>
+      <p class="adv-note">生まれ年を入れると(月・日は上の欄の選択を使います)、生まれた日の曜日を正確に計算します。星座の境目(カスプ)に近い誕生日には注記が付きます。</p>
+      <label>生まれ年(西暦)
+        <input type="number" id="adv-year" min="1600" max="2200" step="1" placeholder="例: 1990">
+      </label>
+      <button type="button" id="adv-detail-run">曜日と星座を詳しく調べる</button>
+      <h3 class="adv-h">12星座の期間一覧表</h3>
+      <p class="adv-note">全星座の日付区分をまとめて確認できます。家族や友だちの星座を一度に調べたい時に。</p>
+      <button type="button" id="adv-list-run">一覧表を見る</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>誕生日(月と日)を選ぶだけで、<strong>あなたの星座と誕生石</strong>がすぐわかるツールです。「4月20日はおひつじ座?おうし座?」といった境目の日もひと目で確認。プロフィールの記入や、プレゼントの石選びにどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -121,6 +137,49 @@
       '<div class="result-main">' + r.sign + "</div>" +
       "<p>英語表記: <strong>" + r.signEn + "</strong> / 誕生石: <strong>" + r.stone + "</strong></p>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  document.getElementById("adv-detail-run").addEventListener("click", function () {
+    var y = parseInt(document.getElementById("adv-year").value, 10);
+    var mo = parseInt(document.getElementById("month").value, 10);
+    var d = parseInt(document.getElementById("day").value, 10);
+    var r = SeizaCalc.detail(y, mo, d);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">実在する日付を入力してください(年は西暦1600〜2200年)。うるう年以外に2月29日はありません。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var html = '<div class="result-main">' + y + "年" + mo + "月" + d + "日は " + r.youbi + '</div>' +
+      "<p>星座は <strong>" + r.sign + "(" + r.signEn + ")</strong>、誕生石は " + r.stone + " です。</p>";
+    if (r.cusp) {
+      html += '<p class="adv-note">この誕生日は星座の境界(カスプ、' + r.cusp.boundaryM + "/" + r.cusp.boundaryD +
+        "切り替わり)に近い日です。星座の境界は年によって1日前後するため、生まれ年・時刻によっては <strong>" +
+        r.cusp.otherSign + "(" + r.cusp.otherSignEn + ")</strong> になることもあります。</p>";
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-list-run").addEventListener("click", function () {
+    var signs = SeizaCalc.SIGNS;
+    var html = '<div class="result-main">12星座の期間一覧</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>星座</th><th>期間</th></tr></thead><tbody>';
+    for (var i = 0; i < signs.length; i++) {
+      var s = signs[i];
+      var n = signs[(i + 1) % signs.length];
+      var endM = n[0];
+      var endD = n[1] - 1;
+      html += "<tr><td>" + s[2] + "(" + s[3] + ")</td><td>" +
+        s[0] + "/" + s[1] + " 〜 " + endM + "/" + endD + "</td></tr>";
+    }
+    html += "</tbody></table></div>" +
+      '<p class="adv-note">境界日は年により1日前後することがあります。</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
   });
 })();
 </script>

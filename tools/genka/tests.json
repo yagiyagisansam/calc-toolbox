@@ -127,6 +127,97 @@
         "ok": false,
         "code": "invalid_margin"
       }
+    },
+    {
+      "name": "損益分岐: 固定費10万・変動費300円・単価800円は200個(売上16万円)",
+      "func": "breakEven",
+      "args": [
+        100000,
+        300,
+        800
+      ],
+      "expect": {
+        "ok": true,
+        "qty": 200,
+        "sales": 160000,
+        "unitMargin": 500,
+        "marginRatePct": 62.5
+      }
+    },
+    {
+      "name": "損益分岐: 割り切れない場合は切り上げ(固定費10万・変動費250円・単価600円→286個)",
+      "func": "breakEven",
+      "args": [
+        100000,
+        250,
+        600
+      ],
+      "expect": {
+        "ok": true,
+        "qty": 286,
+        "sales": 171600,
+        "unitMargin": 350
+      }
+    },
+    {
+      "name": "損益分岐: 目標利益5万円を足すと300個",
+      "func": "breakEven",
+      "args": [
+        100000,
+        300,
+        800,
+        50000
+      ],
+      "expect": {
+        "ok": true,
+        "qty": 300,
+        "sales": 240000
+      }
+    },
+    {
+      "name": "損益分岐: 単価が変動費以下はエラー(何個売っても黒字にならない)",
+      "func": "breakEven",
+      "args": [
+        100000,
+        800,
+        800
+      ],
+      "expect": {
+        "ok": false,
+        "code": "no_margin"
+      }
+    },
+    {
+      "name": "手取り: 3000円売り・手数料10%・送料210円・原価1000円は手取り1,490円",
+      "func": "netProfit",
+      "args": [
+        3000,
+        10,
+        210,
+        1000
+      ],
+      "expect": {
+        "ok": true,
+        "fee": 300,
+        "profit": 1490,
+        "marginPct": 49.7
+      }
+    },
+    {
+      "name": "手取り: 送料が高いと赤字になる(1000円売り・手数料10%・送料750円・原価500円)",
+      "func": "netProfit",
+      "args": [
+        1000,
+        10,
+        750,
+        500
+      ],
+      "expect": {
+        "ok": true,
+        "fee": 100,
+        "profit": -350,
+        "marginPct": -35
+      }
     }
   ]
 }

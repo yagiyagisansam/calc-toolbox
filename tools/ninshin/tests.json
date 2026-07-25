@@ -6,62 +6,279 @@
     {
       "name": "最終月経2026-01-01・基準2026-07-24: 予定日2026-10-08・29週1日・後期",
       "func": "dueDate",
-      "args": ["2026-01-01", "2026-07-24"],
-      "expect": { "ok": true, "due": "2026-10-08", "week": 29, "day": 1, "elapsedDays": 204, "trimester": "後期" }
+      "args": [
+        "2026-01-01",
+        "2026-07-24"
+      ],
+      "expect": {
+        "ok": true,
+        "due": "2026-10-08",
+        "week": 29,
+        "day": 1,
+        "elapsedDays": 204,
+        "trimester": "後期"
+      }
     },
     {
       "name": "周期35日の補正: 予定日は7日後ろへ(2026-10-15)・28週1日",
       "func": "dueDate",
-      "args": ["2026-01-01", "2026-07-24", 35],
-      "expect": { "ok": true, "due": "2026-10-15", "week": 28, "day": 1, "trimester": "後期" }
+      "args": [
+        "2026-01-01",
+        "2026-07-24",
+        35
+      ],
+      "expect": {
+        "ok": true,
+        "due": "2026-10-15",
+        "week": 28,
+        "day": 1,
+        "trimester": "後期"
+      }
     },
     {
       "name": "当日: 0週0日・初期・予定日は280日後(2027-04-30)",
       "func": "dueDate",
-      "args": ["2026-07-24", "2026-07-24"],
-      "expect": { "ok": true, "due": "2027-04-30", "week": 0, "day": 0, "trimester": "初期" }
+      "args": [
+        "2026-07-24",
+        "2026-07-24"
+      ],
+      "expect": {
+        "ok": true,
+        "due": "2027-04-30",
+        "week": 0,
+        "day": 0,
+        "trimester": "初期"
+      }
     },
     {
       "name": "14週0日ちょうどは中期(98日後)",
       "func": "dueDate",
-      "args": ["2026-01-01", "2026-04-09"],
-      "expect": { "ok": true, "week": 14, "day": 0, "elapsedDays": 98, "trimester": "中期" }
+      "args": [
+        "2026-01-01",
+        "2026-04-09"
+      ],
+      "expect": {
+        "ok": true,
+        "week": 14,
+        "day": 0,
+        "elapsedDays": 98,
+        "trimester": "中期"
+      }
     },
     {
       "name": "13週6日は初期(97日後)",
       "func": "dueDate",
-      "args": ["2026-01-01", "2026-04-08"],
-      "expect": { "ok": true, "week": 13, "day": 6, "trimester": "初期" }
+      "args": [
+        "2026-01-01",
+        "2026-04-08"
+      ],
+      "expect": {
+        "ok": true,
+        "week": 13,
+        "day": 6,
+        "trimester": "初期"
+      }
     },
     {
       "name": "周期25日の補正: 予定日は3日前へ(2026-10-05)",
       "func": "dueDate",
-      "args": ["2026-01-01", "2026-07-24", 25],
-      "expect": { "ok": true, "due": "2026-10-05", "week": 29, "day": 4 }
+      "args": [
+        "2026-01-01",
+        "2026-07-24",
+        25
+      ],
+      "expect": {
+        "ok": true,
+        "due": "2026-10-05",
+        "week": 29,
+        "day": 4
+      }
     },
     {
       "name": "異常入力: 周期範囲外(10日)はエラー",
       "func": "dueDate",
-      "args": ["2026-01-01", "2026-07-24", 10],
-      "expect": { "ok": false, "code": "invalid_cycle" }
+      "args": [
+        "2026-01-01",
+        "2026-07-24",
+        10
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_cycle"
+      }
     },
     {
       "name": "異常入力: 最終月経が基準日より未来はエラー",
       "func": "dueDate",
-      "args": ["2026-08-01", "2026-07-24"],
-      "expect": { "ok": false, "code": "lmp_after_asof" }
+      "args": [
+        "2026-08-01",
+        "2026-07-24"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "lmp_after_asof"
+      }
     },
     {
       "name": "異常入力: 存在しない日付はエラー",
       "func": "dueDate",
-      "args": ["2026-02-30", "2026-07-24"],
-      "expect": { "ok": false, "code": "invalid_lmp" }
+      "args": [
+        "2026-02-30",
+        "2026-07-24"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_lmp"
+      }
     },
     {
       "name": "異常入力: 基準日が不正はエラー",
       "func": "dueDate",
-      "args": ["2026-01-01", "bad"],
-      "expect": { "ok": false, "code": "invalid_asof" }
+      "args": [
+        "2026-01-01",
+        "bad"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_asof"
+      }
+    },
+    {
+      "name": "予定日逆算: 予定日2026-10-10・基準日2026-07-24は28週6日(後期)",
+      "func": "weeksFromDue",
+      "args": [
+        "2026-10-10",
+        "2026-07-24"
+      ],
+      "expect": {
+        "ok": true,
+        "week": 28,
+        "day": 6,
+        "elapsedDays": 202,
+        "trimester": "後期"
+      }
+    },
+    {
+      "name": "予定日逆算: 基準日=予定日は40週0日",
+      "func": "weeksFromDue",
+      "args": [
+        "2026-10-10",
+        "2026-10-10"
+      ],
+      "expect": {
+        "ok": true,
+        "week": 40,
+        "day": 0,
+        "elapsedDays": 280
+      }
+    },
+    {
+      "name": "予定日逆算: 妊娠0週より前の基準日はエラー",
+      "func": "weeksFromDue",
+      "args": [
+        "2026-10-10",
+        "2026-01-01"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "too_early"
+      }
+    },
+    {
+      "name": "予定日逆算: 予定日の3週間後(43週0日)はエラー",
+      "func": "weeksFromDue",
+      "args": [
+        "2026-10-10",
+        "2026-10-31"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "out_of_range"
+      }
+    },
+    {
+      "name": "節目一覧: 予定日2026-10-10の各節目(産後8週まで7件)",
+      "func": "milestones",
+      "args": [
+        "2026-10-10"
+      ],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "0": {
+            "weeks": "14週0日",
+            "date": "2026-04-11"
+          },
+          "1": {
+            "weeks": "16週0日",
+            "date": "2026-04-25"
+          },
+          "2": {
+            "weeks": "28週0日",
+            "date": "2026-07-18"
+          },
+          "3": {
+            "weeks": "34週0日",
+            "date": "2026-08-29"
+          },
+          "4": {
+            "weeks": "37週0日",
+            "date": "2026-09-19"
+          },
+          "5": {
+            "weeks": "40週0日",
+            "date": "2026-10-10"
+          },
+          "6": {
+            "date": "2026-12-05"
+          },
+          "length": 7
+        }
+      }
+    },
+    {
+      "name": "節目一覧: 年またぎ(予定日2026-03-01)の産前休業は2026-01-18",
+      "func": "milestones",
+      "args": [
+        "2026-03-01"
+      ],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "3": {
+            "date": "2026-01-18"
+          },
+          "4": {
+            "date": "2026-02-08"
+          }
+        }
+      }
+    },
+    {
+      "name": "節目一覧: うるう年(予定日2024-03-01)の37週0日は2024-02-09",
+      "func": "milestones",
+      "args": [
+        "2024-03-01"
+      ],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "4": {
+            "date": "2024-02-09"
+          }
+        }
+      }
+    },
+    {
+      "name": "節目一覧: 存在しない日付はエラー",
+      "func": "milestones",
+      "args": [
+        "2026-13-01"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_due"
+      }
     }
   ]
 }

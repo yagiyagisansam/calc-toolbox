@@ -53,7 +53,81 @@
     };
   }
 
+  /**
+   * 入社日から次回の有給付与日と付与日数を予測する。
+   * 労働基準法第39条: 雇入れの日から6ヶ月継続勤務で最初の付与、
+   * 以後は1年ごとに付与(付与日数は GRANT_TABLE の法定最低日数)。
+   * 8割以上の出勤率を満たしている前提の予測。
+   * 6ヶ月後・1年後の同日が存在しない場合(月末など)は月末に繰り上げる。
+   * @param {string} hireIso 入社日 "YYYY-MM-DD"
+   * @param {string} workerType "full" | "d4" | "d3" | "d2" | "d1"
+   * @param {string} todayIso 基準日 "YYYY-MM-DD"(通常は今日)
+   * @returns {{ok: true, nextDate: string, days: number, serviceLabel: string,
+   *            obligation5days: boolean, history: {date: string, days: number, label: string}[]}
+   *          |{ok: false, code: string}}
+   *   history: 基準日までに付与済みの日付と日数(古い順)
+   *   code: "invalid_worker_type" | "invalid_date" | "invalid_today"
+   */
+  function nextGrant(hireIso, workerType, todayIso) {
+    if (!(workerType in GRANT_TABLE)) {
+      return { ok: false, code: "invalid_worker_type" };
+    }
+    function isLeap(y) { return (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0; }
+    function dim(y, m) {
+      return [31, isLeap(y) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m - 1];
+    }
+    function parse(iso) {
+      if (typeof iso !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return null;
+      var y = parseInt(iso.slice(0, 4), 10);
+      var m = parseInt(iso.slice(5, 7), 10);
+      var d = parseInt(iso.slice(8, 10), 10);
+      if (y < 1900 || y > 2200 || m < 1 || m > 12 || d < 1 || d > dim(y, m)) return null;
+      return { y: y, m: m, d: d };
+    }
+    function fmt(y, m, d) {
+      return String(y) + "-" + (m < 10 ? "0" : "") + m + "-" + (d < 10 ? "0" : "") + d;
+    }
+    function addMonths(p, n) {
+      var t = p.m - 1 + n;
+      var y = p.y + Math.floor(t / 12);
+      var m = (t % 12) + 1;
+      return { y: y, m: m, d: Math.min(p.d, dim(y, m)) };
+    }
+    var hire = parse(hireIso);
+    if (!hire) return { ok: false, code: "invalid_date" };
+    var today = parse(todayIso);
+    if (!today) return { ok: false, code: "invalid_today" };
+    var todayStr = fmt(today.y, today.m, today.d);
+    var history = [];
+    var n = 0;
+    var g;
+    var gStr;
+    while (n < 200) {
+      g = addMonths(hire, 6 + 12 * n);
+      gStr = fmt(g.y, g.m, g.d);
+      if (gStr >= todayStr) break;
+      var stepPast = Math.min(n, 6);
+      history.push({
+        date: gStr,
+        days: GRANT_TABLE[workerType][stepPast],
+        label: SERVICE_LABELS[stepPast]
+      });
+      n++;
+    }
+    var step = Math.min(n, 6);
+    var days = GRANT_TABLE[workerType][step];
+    return {
+      ok: true,
+      nextDate: gStr,
+      days: days,
+      serviceLabel: SERVICE_LABELS[step],
+      obligation5days: days >= 10,
+      history: history
+    };
+  }
+
   var api = {
+    nextGrant: nextGrant,
     grantedDays: grantedDays,
     SERVICE_LABELS: SERVICE_LABELS,
     GRANT_TABLE: GRANT_TABLE

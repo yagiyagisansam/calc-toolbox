@@ -42,11 +42,27 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 周年の一覧と100日ごとの節目</summary>
+    <div class="adv-inner">
+      <p class="adv-note">記念日と基準日は、上のフォームに入力した値をそのまま使います。</p>
+
+      <h3 class="adv-h">1〜10周年の日付一覧</h3>
+      <p class="adv-note">毎年の記念日(周年)が何曜日か、あと何日かを一覧にします。お祝いの計画に。</p>
+      <button type="button" id="adv-anniv-run">周年の一覧を作る</button>
+
+      <h3 class="adv-h">100日ごとの節目(100日目〜1000日目)</h3>
+      <p class="adv-note">100日目・200日目…1000日目の日付を一覧にします。初日を1日目と数えます(お食い初めと同じ数え方)。</p>
+      <button type="button" id="adv-hund-run">100日ごとの一覧を作る</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
   <div class="note-box">
     「N日目」は<strong>記念日当日を1日目</strong>として数えています(お食い初めの「100日目」や交際記念日の一般的な数え方)。「N日経過」で数えたい場合は1日ずれるのでご注意ください。
   </div>
 
-  <p>誕生日・交際開始日・推しの記念日などを入れると、<strong>今日で何日目か</strong>と、<strong>100日目・1000日目・7777日目・1万日目…といった節目の日付</strong>を一括計算します。次のお祝いの計画に。</p>
+  <p>誕生日や付き合った日などの記念日を入れるだけで、<strong>今日で何日目か</strong>と、1000日・1万日といった節目の日付がすぐわかるツールです。赤ちゃんの100日祝いの日取りや、カップルの記念日チェックにどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -135,6 +151,60 @@
       '<div class="table-scroll"><table class="data-table"><thead><tr><th>節目</th><th>日付</th><th>カウント</th></tr></thead><tbody>' +
       rows + "</tbody></table></div>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function jpDate(iso) {
+    var p = iso.split("-");
+    return parseInt(p[0], 10) + "年" + parseInt(p[1], 10) + "月" + parseInt(p[2], 10) + "日";
+  }
+  function untilText(n) {
+    if (n === 0) return "今日";
+    if (n > 0) return "あと" + n.toLocaleString() + "日";
+    return Math.abs(n).toLocaleString() + "日前";
+  }
+  function readInputs() {
+    var base = document.getElementById("base").value;
+    var asof = document.getElementById("asof").value;
+    if (base === "" || asof === "") {
+      advErr("上のフォームに記念日と基準日を入力してください。");
+      return null;
+    }
+    return { base: base, asof: asof };
+  }
+  function showTable(r, headLabel, key, suffix) {
+    if (!r.ok) {
+      advErr(r.code === "base_after_asof" ? "基準日が記念日より前になっています。" : "日付を正しく入力してください。");
+      return;
+    }
+    var rows = "";
+    for (var i = 0; i < r.rows.length; i++) {
+      var m = r.rows[i];
+      rows += "<tr><td>" + m[key].toLocaleString() + suffix + "</td><td>" + jpDate(m.date) +
+        "(" + m.weekday + ")</td><td>" + untilText(m.daysUntil) + "</td></tr>";
+    }
+    advBox.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>' + headLabel +
+      "</th><th>日付</th><th>基準日から</th></tr></thead><tbody>" + rows + "</tbody></table></div>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-anniv-run").addEventListener("click", function () {
+    var v = readInputs();
+    if (!v) return;
+    showTable(KinenbiCalc.anniversaries(v.base, v.asof), "周年", "years", "周年");
+  });
+  document.getElementById("adv-hund-run").addEventListener("click", function () {
+    var v = readInputs();
+    if (!v) return;
+    showTable(KinenbiCalc.hundredDays(v.base, v.asof), "節目", "n", "日目");
   });
 })();
 </script>

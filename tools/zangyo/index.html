@@ -66,11 +66,36 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 月合計から自動計算・未払いチェック</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">残業の合計時間だけで詳細計算</h3>
+      <p class="adv-note">月の時間外の合計を入れるだけで、60時間を超えた分(割増50%)を自動で振り分けて計算します。基礎時給は上のフォームの値を使います。</p>
+      <label>月の時間外労働の合計(時間)
+        <span class="field-note">60時間以内は25%、超えた分は自動で50%で計算します</span>
+        <input type="number" id="adv-ot-total" inputmode="decimal" step="any" min="0" max="200" placeholder="70">
+      </label>
+      <label>法定休日労働(時間・なければ0)
+        <input type="number" id="adv-holiday" inputmode="decimal" step="any" min="0" max="200" value="0">
+      </label>
+      <label>深夜労働(22時〜5時・時間・なければ0)
+        <input type="number" id="adv-night" inputmode="decimal" step="any" min="0" max="200" value="0">
+      </label>
+      <h3 class="adv-h">未払いチェック(任意)</h3>
+      <p class="adv-note">給与明細の残業代を入れると、法定の最低額との差額(不足のめやす)を表示します。</p>
+      <label>実際に支払われた残業代(円)
+        <input type="number" id="adv-paid" inputmode="numeric" step="1" min="0" max="10000000" placeholder="50000">
+      </label>
+      <button type="button" id="adv-run">詳細計算する</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
   <div class="note-box">
     このツールは<strong>法定の最低割増率</strong>による概算です。会社の就業規則がこれより高い割増率を定めている場合や、変形労働時間制・固定残業代(みなし残業)・管理監督者の扱いなどにより、実際の金額は異なります。未払いが疑われる場合は労働基準監督署・専門家にご相談ください。
   </div>
 
-  <p>基礎時給と残業時間を入力すると、<strong>法定の最低割増率</strong>に基づく残業代(割増賃金)を計算します。「自分の残業代はいくらのはず?」の目安に。</p>
+  <p>残業した時間を入れると、<strong>もらえるはずの残業代</strong>がいくらになるかがわかるツールです。深夜(22時〜5時)や休日に働いた分の上乗せも、法律で決まった最低の割増率で計算します。給与明細のチェックにどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -175,6 +200,52 @@
       (r.holidayPay ? " / 法定休日(×1.35): <strong>" + r.holidayPay.toLocaleString() + "円</strong>" : "") +
       (r.lateNightExtra ? " / 深夜加算(+0.25): <strong>" + r.lateNightExtra.toLocaleString() + "円</strong>" : "") + "</p>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var ADV_ERRORS = {
+    invalid_hourly: "基礎時給(上のフォーム)は 500〜50,000円 の範囲で入力してください。",
+    invalid_hours: "時間は 0〜200時間 の範囲で入力してください。",
+    invalid_paid: "支払われた残業代は 0〜10,000,000円 の範囲で入力してください。"
+  };
+  document.getElementById("adv-run").addEventListener("click", function () {
+    var hourly = parseFloat(document.getElementById("hourly").value);
+    var otTotal = parseFloat(document.getElementById("adv-ot-total").value);
+    if (isNaN(otTotal)) otTotal = 0;
+    var holiday = parseFloat(document.getElementById("adv-holiday").value);
+    if (isNaN(holiday)) holiday = 0;
+    var night = parseFloat(document.getElementById("adv-night").value);
+    if (isNaN(night)) night = 0;
+    var paidStr = document.getElementById("adv-paid").value;
+    var paid = paidStr === "" ? undefined : parseFloat(paidStr);
+    var r = ZangyoCalc.calculateDetailed(hourly, otTotal, holiday, night, paid);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + (ADV_ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    var html =
+      '<div class="result-main">残業代(法定の最低額) 約' + r.totalPay.toLocaleString() + ' 円</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead>' +
+      '<tr><th>内訳</th><th>時間</th><th>割増率</th><th>金額</th></tr></thead><tbody>' +
+      '<tr><td>時間外(60時間以内)</td><td>' + r.within60Hours.toLocaleString() + ' h</td><td>25%</td><td>' + r.overtimePay.toLocaleString() + ' 円</td></tr>' +
+      '<tr><td>時間外(60時間超)</td><td>' + r.over60Hours.toLocaleString() + ' h</td><td>50%</td><td>' + r.overtime60Pay.toLocaleString() + ' 円</td></tr>' +
+      '<tr><td>法定休日</td><td>' + holiday.toLocaleString() + ' h</td><td>35%</td><td>' + r.holidayPay.toLocaleString() + ' 円</td></tr>' +
+      '<tr><td>深夜(22時〜5時)の加算</td><td>' + night.toLocaleString() + ' h</td><td>+25%</td><td>' + r.lateNightExtra.toLocaleString() + ' 円</td></tr>' +
+      '</tbody></table></div>';
+    if (r.shortfallYen !== undefined) {
+      if (r.shortfallYen > 0) {
+        html += '<p>支払われた額との差: <strong>約' + r.shortfallYen.toLocaleString() + ' 円 不足のめやす</strong>。就業規則の割増率や手当の扱いで変わるため、気になる場合は労働基準監督署・専門家にご相談ください。</p>';
+      } else {
+        html += '<p>支払われた額は法定の最低額を <strong>' + Math.abs(r.shortfallYen).toLocaleString() + ' 円 上回っています</strong>(この内訳の範囲では不足なし)。</p>';
+      }
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
   });
 })();
 </script>

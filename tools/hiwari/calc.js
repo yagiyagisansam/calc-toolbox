@@ -64,7 +64,59 @@
     };
   }
 
+  /**
+   * 入居時の初期費用の総額を計算する(日割り家賃+敷金・礼金・仲介手数料・前家賃+その他)。
+   * - 日割り家賃は prorate の実日数方式(入居日〜月末をその月の日数で割る・円未満切り捨て)
+   * - 敷金・礼金・仲介手数料・前家賃は「家賃の何ヶ月分」で指定し、円未満四捨五入
+   * - その他(保証会社利用料・火災保険・鍵交換代など)は金額でそのまま加算
+   * - monthsOfRent: 総額が家賃の約何ヶ月分か(小数第1位)
+   * @param {number} rent 月額家賃(円)
+   * @param {string} iso 入居日 "YYYY-MM-DD"
+   * @param {number} shikikinMonths 敷金(ヶ月・0〜12)
+   * @param {number} reikinMonths 礼金(ヶ月・0〜12)
+   * @param {number} chukaiMonths 仲介手数料(ヶ月・0〜12)
+   * @param {number} maeYachinMonths 前家賃(ヶ月・0〜12。翌月分を先払いするなら1)
+   * @param {number} [otherYen=0] その他の費用(円・0〜10,000,000)
+   * @returns {{ok: true, days: number, prorated: number, shikikin: number, reikin: number,
+   *            chukai: number, maeYachin: number, other: number, total: number, monthsOfRent: number}
+   *          |{ok: false, code: string}}
+   *   code: "invalid_rent" | "invalid_date" | "invalid_months" | "invalid_other"
+   */
+  function initialCost(rent, iso, shikikinMonths, reikinMonths, chukaiMonths, maeYachinMonths, otherYen) {
+    var pr = prorate(rent, iso, "movein");
+    if (!pr.ok) return pr;
+    var months = [shikikinMonths, reikinMonths, chukaiMonths, maeYachinMonths];
+    for (var i = 0; i < months.length; i++) {
+      if (typeof months[i] !== "number" || !isFinite(months[i]) || months[i] < 0 || months[i] > 12) {
+        return { ok: false, code: "invalid_months" };
+      }
+    }
+    var other = otherYen === undefined || otherYen === null ? 0 : otherYen;
+    if (typeof other !== "number" || !isFinite(other) || other < 0 || other > 10000000) {
+      return { ok: false, code: "invalid_other" };
+    }
+    var shikikin = Math.round(rent * shikikinMonths);
+    var reikin = Math.round(rent * reikinMonths);
+    var chukai = Math.round(rent * chukaiMonths);
+    var mae = Math.round(rent * maeYachinMonths);
+    var otherR = Math.round(other);
+    var total = pr.actual + shikikin + reikin + chukai + mae + otherR;
+    return {
+      ok: true,
+      days: pr.days,
+      prorated: pr.actual,
+      shikikin: shikikin,
+      reikin: reikin,
+      chukai: chukai,
+      maeYachin: mae,
+      other: otherR,
+      total: total,
+      monthsOfRent: Math.round(total / rent * 10) / 10
+    };
+  }
+
   var api = {
+    initialCost: initialCost,
     prorate: prorate,
     YEAR_MIN: YEAR_MIN,
     YEAR_MAX: YEAR_MAX

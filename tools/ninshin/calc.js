@@ -103,7 +103,73 @@
     };
   }
 
+  /**
+   * 出産予定日(=妊娠40週0日)から逆算して、基準日時点の妊娠週数を求める。
+   * 経過日数 = 280 − (予定日 − 基準日)。dueDate と同じ通日変換・区分を使用。
+   * 妊娠0週0日より前は too_early、43週0日以降(経過301日以上)は out_of_range。
+   * @param {string} dueIso 出産予定日 "YYYY-MM-DD"
+   * @param {string} asOfIso 基準日 "YYYY-MM-DD"
+   * @returns {{ok:true, week:number, day:number, elapsedDays:number, trimester:string}
+   *          |{ok:false, code:string}}
+   *   code: "invalid_due" | "invalid_asof" | "too_early" | "out_of_range"
+   */
+  function weeksFromDue(dueIso, asOfIso) {
+    var due = parseDate(dueIso);
+    if (!due) return { ok: false, code: "invalid_due" };
+    var asOf = parseDate(asOfIso);
+    if (!asOf) return { ok: false, code: "invalid_asof" };
+    var elapsed = 280 - (toSerial(due.y, due.m, due.d) - toSerial(asOf.y, asOf.m, asOf.d));
+    if (elapsed < 0) return { ok: false, code: "too_early" };
+    if (elapsed > 300) return { ok: false, code: "out_of_range" };
+    var week = Math.floor(elapsed / 7);
+    return {
+      ok: true,
+      week: week,
+      day: elapsed - week * 7,
+      elapsedDays: elapsed,
+      trimester: week < 14 ? "初期" : week < 28 ? "中期" : "後期"
+    };
+  }
+
+  /**
+   * 出産予定日(=妊娠40週0日)から、主要な節目の日付一覧を計算する。
+   * 各節目は「予定日 − (40 − 週数) × 7日」で求める(dueDate と同じ通日変換を使用)。
+   * 産前休業の開始は労働基準法第65条の「予定日の6週間前」(= 34週0日。多胎妊娠は14週間前)、
+   * 産後休業の終了は同条の「出産の8週間後」を予定日基準で計算した目安。
+   * あくまで概算であり、医学的判断は医師が優先。
+   * @param {string} dueIso 出産予定日 "YYYY-MM-DD"
+   * @returns {{ok:true, rows:Array<{label:string, weeks:string, date:string}>}
+   *          |{ok:false, code:string}}  code: "invalid_due"
+   */
+  function milestones(dueIso) {
+    var due = parseDate(dueIso);
+    if (!due) return { ok: false, code: "invalid_due" };
+    var ds = toSerial(due.y, due.m, due.d);
+    var defs = [
+      { label: "妊娠中期の開始", weeks: "14週0日", off: -26 * 7 },
+      { label: "安定期の目安(16週)", weeks: "16週0日", off: -24 * 7 },
+      { label: "妊娠後期の開始", weeks: "28週0日", off: -12 * 7 },
+      { label: "産前休業の開始(予定日の6週間前)", weeks: "34週0日", off: -6 * 7 },
+      { label: "正期産の開始", weeks: "37週0日", off: -3 * 7 },
+      { label: "出産予定日", weeks: "40週0日", off: 0 },
+      { label: "産後休業の終了(出産の8週間後)", weeks: "出産の8週間後", off: 8 * 7 }
+    ];
+    var rows = [];
+    for (var i = 0; i < defs.length; i++) {
+      var m = defs[i];
+      var d = fromSerial(ds + m.off);
+      rows.push({
+        label: m.label,
+        weeks: m.weeks,
+        date: pad(d.y, 4) + "-" + pad(d.m, 2) + "-" + pad(d.d, 2)
+      });
+    }
+    return { ok: true, rows: rows };
+  }
+
   var api = {
+    milestones: milestones,
+    weeksFromDue: weeksFromDue,
     dueDate: dueDate,
     YEAR_MIN: YEAR_MIN,
     YEAR_MAX: YEAR_MAX,

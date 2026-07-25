@@ -125,6 +125,100 @@
         "ok": false,
         "code": "invalid_people"
       }
+    },
+    {
+      "name": "逆算: 100ドルの会計で118ドル払ったらチップ18%(標準を満たす)",
+      "func": "reverse",
+      "args": [
+        118,
+        100
+      ],
+      "expect": {
+        "ok": true,
+        "tip": 18,
+        "pct": 18,
+        "verdict": "enough"
+      }
+    },
+    {
+      "name": "逆算: 105.5ドル払いは5.5%(少なめ)",
+      "func": "reverse",
+      "args": [
+        105.5,
+        100
+      ],
+      "expect": {
+        "ok": true,
+        "tip": 5.5,
+        "pct": 5.5,
+        "verdict": "low"
+      }
+    },
+    {
+      "name": "逆算: 同額支払いはチップ0%(none)",
+      "func": "reverse",
+      "args": [
+        100,
+        100
+      ],
+      "expect": {
+        "ok": true,
+        "tip": 0,
+        "pct": 0,
+        "verdict": "none"
+      }
+    },
+    {
+      "name": "逆算: 支払い総額が元の金額より少ないのはエラー",
+      "func": "reverse",
+      "args": [
+        90,
+        100
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_paid"
+      }
+    },
+    {
+      "name": "サービス料判定: 18%込みなら追加チップ不要",
+      "func": "serviceAdvice",
+      "args": [
+        100,
+        18
+      ],
+      "expect": {
+        "ok": true,
+        "need": false,
+        "add15": 0,
+        "add18": 0
+      }
+    },
+    {
+      "name": "サービス料判定: 10%込みなら15%まで+5、18%まで+8が目安",
+      "func": "serviceAdvice",
+      "args": [
+        100,
+        10
+      ],
+      "expect": {
+        "ok": true,
+        "need": true,
+        "add15": 5,
+        "add18": 8
+      }
+    },
+    {
+      "name": "サービス料判定: 50%超の率はエラー",
+      "func": "serviceAdvice",
+      "args": [
+        100,
+        60
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_pct"
+      }
     }
   ]
 }

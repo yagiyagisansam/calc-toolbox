@@ -47,11 +47,53 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 複数の家電をまとめて計算</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">家全体でいくら? 最大6つまでまとめて</h3>
+      <p class="adv-note">よく使う家電を並べて入力すると、合計の電気代と「どれが電気を食っているか」の割合がわかります。単価は上のフォームの値を使います。名前は空欄でも構いません。</p>
+      <div class="adv-rows" id="adv-rows">
+        <label>家電1 名前 / 消費電力(W) / 1日の使用時間(h)
+          <input type="text" id="adv-name-1" placeholder="エアコン" maxlength="20">
+          <input type="number" id="adv-watts-1" inputmode="decimal" step="any" min="0.1" max="20000" placeholder="500">
+          <input type="number" id="adv-hours-1" inputmode="decimal" step="any" min="0.1" max="24" placeholder="8">
+        </label>
+        <label>家電2
+          <input type="text" id="adv-name-2" placeholder="冷蔵庫" maxlength="20">
+          <input type="number" id="adv-watts-2" inputmode="decimal" step="any" min="0.1" max="20000" placeholder="60">
+          <input type="number" id="adv-hours-2" inputmode="decimal" step="any" min="0.1" max="24" placeholder="24">
+        </label>
+        <label>家電3
+          <input type="text" id="adv-name-3" maxlength="20">
+          <input type="number" id="adv-watts-3" inputmode="decimal" step="any" min="0.1" max="20000">
+          <input type="number" id="adv-hours-3" inputmode="decimal" step="any" min="0.1" max="24">
+        </label>
+        <label>家電4
+          <input type="text" id="adv-name-4" maxlength="20">
+          <input type="number" id="adv-watts-4" inputmode="decimal" step="any" min="0.1" max="20000">
+          <input type="number" id="adv-hours-4" inputmode="decimal" step="any" min="0.1" max="24">
+        </label>
+        <label>家電5
+          <input type="text" id="adv-name-5" maxlength="20">
+          <input type="number" id="adv-watts-5" inputmode="decimal" step="any" min="0.1" max="20000">
+          <input type="number" id="adv-hours-5" inputmode="decimal" step="any" min="0.1" max="24">
+        </label>
+        <label>家電6
+          <input type="text" id="adv-name-6" maxlength="20">
+          <input type="number" id="adv-watts-6" inputmode="decimal" step="any" min="0.1" max="20000">
+          <input type="number" id="adv-hours-6" inputmode="decimal" step="any" min="0.1" max="24">
+        </label>
+      </div>
+      <button type="button" id="adv-run">合計を計算する</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
   <div class="note-box">
     このツールの計算結果は<strong>概算</strong>です。実際の電気料金は契約プラン(基本料金・段階料金・燃料費調整額・再エネ賦課金など)により変わります。また、エアコンや冷蔵庫の実際の消費電力は設定温度・室温によって大きく変動します。
   </div>
 
-  <p>家電の<strong>消費電力(W)</strong>と1日の使用時間を入力すると、<strong>1日・1ヶ月・1年の電気代</strong>を計算します。エアコン・ヒーター・ゲーム機など「つけっぱなしだといくら?」がすぐわかります。</p>
+  <p>家電のワット数と1日に使う時間を入れると、<strong>電気代が1日・1ヶ月・1年でいくらか</strong>がわかるツールです。エアコンやこたつの「つけっぱなしだといくら?」が気になる時にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -133,6 +175,59 @@
       box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
     }
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var ADV_ERRORS = {
+    invalid_items: "家電を1つ以上(最大6つ)入力してください。W数と時間の両方が必要です。",
+    invalid_watts: "消費電力は 0.1〜20,000W の範囲で入力してください。",
+    invalid_hours: "使用時間は 0.1〜24時間 の範囲で入力してください。",
+    invalid_price: "単価(上のフォーム)は 1〜100円/kWh の範囲で入力してください。"
+  };
+  document.getElementById("adv-run").addEventListener("click", function () {
+    var price = parseFloat(document.getElementById("price").value);
+    var items = [];
+    var names = [];
+    for (var i = 1; i <= 6; i++) {
+      var w = document.getElementById("adv-watts-" + i).value;
+      var h = document.getElementById("adv-hours-" + i).value;
+      if (w === "" && h === "") continue;
+      items.push({ watts: parseFloat(w), hours: parseFloat(h) });
+      var n = document.getElementById("adv-name-" + i).value.trim();
+      names.push(n || "家電" + i);
+    }
+    var r = DenkiCalc.calculateMulti(items, price);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + (ADV_ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    var html =
+      '<div class="result-main">合計 約' + r.total.costPerMonth.toLocaleString() + ' 円/月</div>' +
+      '<p>1日: <strong>' + r.total.costPerDay.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' 円</strong>(' +
+      r.total.kwhPerDay.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' kWh) / 1年: <strong>' +
+      r.total.costPerYear.toLocaleString() + ' 円</strong></p>' +
+      '<div class="table-scroll"><table class="data-table"><thead>' +
+      '<tr><th>家電</th><th>1ヶ月</th><th>1年</th><th>割合</th></tr></thead><tbody>';
+    var maxIdx = 0;
+    for (var j = 0; j < r.items.length; j++) {
+      if (r.items[j].sharePercent > r.items[maxIdx].sharePercent) maxIdx = j;
+      html += '<tr><td>' + names[j].replace(/&/g, "&amp;").replace(/</g, "&lt;") + '</td>' +
+        '<td>' + r.items[j].costPerMonth.toLocaleString() + ' 円</td>' +
+        '<td>' + r.items[j].costPerYear.toLocaleString() + ' 円</td>' +
+        '<td>' + r.items[j].sharePercent.toLocaleString(undefined, { maximumFractionDigits: 1 }) + '%</td></tr>';
+    }
+    html += '</tbody></table></div>';
+    if (r.items.length > 1) {
+      html += '<p class="adv-note">いちばん電気を使っているのは「' + names[maxIdx].replace(/&/g, "&amp;").replace(/</g, "&lt;") + '」。' +
+        '1日の使用を1時間減らすと月 約' + r.items[maxIdx].savePerHourMonth.toLocaleString() + ' 円の節約になります。</p>';
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
   });
 })();
 </script>

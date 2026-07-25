@@ -59,7 +59,59 @@
     };
   }
 
-  var api = { schoolYears: schoolYears, wareki: wareki };
+  /**
+   * 浪人・留年・休学の年数を分けて入力できる、補正付きの入学・卒業年計算。
+   * - 浪人(ronin): 高校卒業から大学入学までの年数 → 大学入学以降を後ろにずらす
+   * - 留年(ryunen)・休学(kyugaku): 大学在学が延びる年数 → 大学卒業以降を後ろにずらす
+   * - 大学院は標準修業年限(修士2年・博士3年)で計算(学校教育法による標準年限)
+   * @param {string} birthIso 生年月日 "YYYY-MM-DD"
+   * @param {number} ronin 浪人の年数(0〜10の整数)
+   * @param {number} ryunen 大学での留年の年数(0〜10の整数)
+   * @param {number} kyugaku 大学での休学の年数(0〜10の整数)
+   * @param {string} grad 進学 "none"(大学まで) | "master"(修士まで) | "doctor"(博士まで)
+   * @returns {{ok:true, hayaumare:boolean, elemIn:number, elemOut:number,
+   *            jhsIn:number, jhsOut:number, hsIn:number, hsOut:number,
+   *            uniIn:number, uniOut:number,
+   *            msIn:(number|null), msOut:(number|null), drIn:(number|null), drOut:(number|null)}
+   *          |{ok:false, code:string}}
+   *   code: "invalid_date" | "invalid_years" | "invalid_grad"
+   */
+  function detailedYears(birthIso, ronin, ryunen, kyugaku, grad) {
+    var base = schoolYears(birthIso);
+    if (!base.ok) return base;
+    function validYears(v) {
+      return typeof v === "number" && v === Math.floor(v) && v >= 0 && v <= 10;
+    }
+    if (!validYears(ronin) || !validYears(ryunen) || !validYears(kyugaku)) {
+      return { ok: false, code: "invalid_years" };
+    }
+    if (grad !== "none" && grad !== "master" && grad !== "doctor") {
+      return { ok: false, code: "invalid_grad" };
+    }
+    var uniIn = base.hsOut + ronin;
+    var uniOut = uniIn + 4 + ryunen + kyugaku;
+    var msIn = null, msOut = null, drIn = null, drOut = null;
+    if (grad === "master" || grad === "doctor") {
+      msIn = uniOut;
+      msOut = msIn + 2;
+    }
+    if (grad === "doctor") {
+      drIn = msOut;
+      drOut = drIn + 3;
+    }
+    return {
+      ok: true,
+      hayaumare: base.hayaumare,
+      elemIn: base.elemIn, elemOut: base.elemOut,
+      jhsIn: base.jhsIn, jhsOut: base.jhsOut,
+      hsIn: base.hsIn, hsOut: base.hsOut,
+      uniIn: uniIn, uniOut: uniOut,
+      msIn: msIn, msOut: msOut, drIn: drIn, drOut: drOut
+    };
+  }
+
+  var api = {
+    detailedYears: detailedYears, schoolYears: schoolYears, wareki: wareki };
   if (typeof module !== "undefined" && module.exports) { module.exports = api; }
   else { global.RirekiCalc = api; }
 })(typeof window !== "undefined" ? window : globalThis);

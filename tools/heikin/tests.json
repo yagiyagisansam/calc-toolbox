@@ -145,6 +145,166 @@
         "ok": false,
         "code": "invalid_value"
       }
+    },
+    {
+      "name": "加重平均: 90点(重み2)と70点(重み3)は78",
+      "func": "weightedMean",
+      "args": [
+        [
+          [
+            90,
+            2
+          ],
+          [
+            70,
+            3
+          ]
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "n": 2,
+        "weightSum": 5,
+        "mean": 78
+      }
+    },
+    {
+      "name": "加重平均: 重みが同じなら普通の平均と一致",
+      "func": "weightedMean",
+      "args": [
+        [
+          [
+            80,
+            1
+          ],
+          [
+            60,
+            1
+          ]
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "mean": 70
+      }
+    },
+    {
+      "name": "加重平均: 重みの合計が0はエラー",
+      "func": "weightedMean",
+      "args": [
+        [
+          [
+            90,
+            0
+          ],
+          [
+            70,
+            0
+          ]
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_weight"
+      }
+    },
+    {
+      "name": "加重平均: 負の重みはエラー",
+      "func": "weightedMean",
+      "args": [
+        [
+          [
+            90,
+            -1
+          ]
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_weight"
+      }
+    },
+    {
+      "name": "トリム平均: 10,80,90,100 は最大最小を除いて85",
+      "func": "trimmedMean",
+      "args": [
+        [
+          10,
+          80,
+          90,
+          100
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "n": 4,
+        "used": 2,
+        "mean": 85,
+        "removedMin": 10,
+        "removedMax": 100
+      }
+    },
+    {
+      "name": "トリム平均: 3個ちょうどなら真ん中の値",
+      "func": "trimmedMean",
+      "args": [
+        [
+          1,
+          2,
+          3
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "used": 1,
+        "mean": 2
+      }
+    },
+    {
+      "name": "トリム平均: 2個以下はエラー",
+      "func": "trimmedMean",
+      "args": [
+        [
+          1,
+          2
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "too_few"
+      }
+    },
+    {
+      "name": "目標平均: 80点70点のあと3回平均80にするには90点",
+      "func": "needScore",
+      "args": [
+        [
+          80,
+          70
+        ],
+        80
+      ],
+      "expect": {
+        "ok": true,
+        "n": 2,
+        "needed": 90,
+        "currentMean": 75
+      }
+    },
+    {
+      "name": "目標平均: 目標が数値でないのはエラー",
+      "func": "needScore",
+      "args": [
+        [
+          80,
+          70
+        ],
+        "x"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_target"
+      }
     }
   ]
 }

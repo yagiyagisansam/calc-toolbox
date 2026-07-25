@@ -61,7 +61,35 @@
     return { ok: true, totalSeconds: Math.round(distanceKm * paceSecPerKm) };
   }
 
+  /**
+   * 大会の距離と目標タイムから、必要な1kmペースと5kmごとの通過タイムを計算する。
+   * 通過タイム(秒) = 総タイム × 通過距離 ÷ 全距離(一定ペース前提)。
+   * 丸め方針: ペース・通過タイムとも秒単位で四捨五入。
+   * @param {number} distanceKm 大会の距離(km)
+   * @param {number} totalSeconds 目標タイム(秒)
+   * @returns {{ok:true, paceSecPerKm:number, speedKmh:number,
+   *            rows:Array<{km:number, sec:number, goal:boolean}>}
+   *          |{ok:false, code:string}}
+   *   rows: 5km刻みの通過点+ゴール(goal:true) / code: "invalid_distance" | "invalid_time"
+   */
+  function raceSplits(distanceKm, totalSeconds) {
+    var base = paceFor(distanceKm, totalSeconds);
+    if (!base.ok) return base;
+    var rows = [];
+    for (var km = 5; km < distanceKm; km += 5) {
+      rows.push({ km: km, sec: Math.round(totalSeconds * km / distanceKm), goal: false });
+    }
+    rows.push({ km: distanceKm, sec: Math.round(totalSeconds), goal: true });
+    return {
+      ok: true,
+      paceSecPerKm: base.paceSecPerKm,
+      speedKmh: base.speedKmh,
+      rows: rows
+    };
+  }
+
   var api = {
+    raceSplits: raceSplits,
     paceFor: paceFor,
     timeFor: timeFor,
     DISTANCE_MIN_KM: DISTANCE_MIN_KM,

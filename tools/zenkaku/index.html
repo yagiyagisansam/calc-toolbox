@@ -44,7 +44,38 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>「電話番号は半角で入力してください」「全角英数字は使えません」——そんなとき、テキストを貼り付けるだけで<strong>全角の英数字・記号・スペースを半角に一括変換</strong>できます(逆方向も対応)。ひらがな・カタカナ・漢字はそのまま残ります。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 種類を選んで変換・全角混じりのチェック</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">変換する文字の種類を選ぶ</h3>
+      <p class="adv-note">「数字だけ半角にしたい」「カタカナはそのままにしたい」など、変換する文字の種類をチェックボックスで選べます。カタカナを選ぶと半角カナ(ｱｲｳ)との相互変換もできます。</p>
+      <label>変換の方向
+        <select id="adv-mode">
+          <option value="toHankaku" selected>全角 → 半角</option>
+          <option value="toZenkaku">半角 → 全角</option>
+        </select>
+      </label>
+      <fieldset style="border:1px solid var(--color-border);border-radius:8px;padding:8px 12px;">
+        <legend>変換する種類</legend>
+        <label style="display:inline-block;margin-right:12px;"><input type="checkbox" id="adv-alnum" checked> 英数字</label>
+        <label style="display:inline-block;margin-right:12px;"><input type="checkbox" id="adv-kana"> カタカナ</label>
+        <label style="display:inline-block;margin-right:12px;"><input type="checkbox" id="adv-symbol" checked> 記号</label>
+        <label style="display:inline-block;"><input type="checkbox" id="adv-space" checked> スペース</label>
+      </fieldset>
+      <label>テキスト
+        <textarea id="adv-text" rows="5" placeholder="例: 会員番号Ａ１２３(カナ: ｽｽﾞｷ)"></textarea>
+      </label>
+      <button type="button" id="adv-run">選んだ種類だけ変換する</button>
+      <div class="tool-result" id="adv-sel-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">全角・半角カナが混ざっていないかチェック</h3>
+      <p class="adv-note">「全角文字は使えません」とフォームにはじかれたとき、どの文字が全角なのかを探します。上の「テキスト」欄に入力した内容を検査し、混ざっている全角英数字・全角記号・全角スペース・半角カナの場所を一覧にします。</p>
+      <button type="button" id="adv-check-run">上のテキスト欄を検査する</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>貼り付けるだけで、<strong>全角の英数字・記号・スペースを半角にそろえられる</strong>ツールです(半角から全角への逆変換もできます)。ひらがな・カタカナ・漢字はそのまま残ります。「半角で入力してください」と言われた申し込みフォームや、住所録・名簿の表記そろえにどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -124,6 +155,63 @@
       });
     });
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var selBox = document.getElementById("adv-sel-result");
+  var TYPE_LABEL = { zen_alnum: "全角英数字", zen_symbol: "全角記号", zen_space: "全角スペース", han_kana: "半角カナ" };
+  document.getElementById("adv-run").addEventListener("click", function () {
+    var targets = {
+      alnum: document.getElementById("adv-alnum").checked,
+      kana: document.getElementById("adv-kana").checked,
+      symbol: document.getElementById("adv-symbol").checked,
+      space: document.getElementById("adv-space").checked
+    };
+    var mode = document.getElementById("adv-mode").value;
+    var r = ZenkakuCalc.convertSelective(document.getElementById("adv-text").value, mode, targets);
+    if (!r.ok) {
+      selBox.innerHTML = '<p class="result-error">テキストが長すぎます(10万文字まで)。</p>';
+      selBox.hidden = false;
+      return;
+    }
+    selBox.innerHTML =
+      '<p>変換結果(' + r.changed.toLocaleString() + '文字を変換):</p>' +
+      '<textarea id="adv-out" rows="5" style="width:100%;font-size:1rem;padding:10px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-bg);color:var(--color-text);" readonly></textarea>' +
+      '<p><button type="button" id="adv-copy" style="font-size:0.95rem;padding:8px 16px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-bg);color:var(--color-text);cursor:pointer;">コピー</button> <span id="adv-copy-done"></span></p>';
+    document.getElementById("adv-out").value = r.text;
+    document.getElementById("adv-copy").addEventListener("click", function () {
+      navigator.clipboard.writeText(r.text).then(function () {
+        document.getElementById("adv-copy-done").textContent = "コピーしました";
+      });
+    });
+    selBox.hidden = false;
+  });
+  document.getElementById("adv-check-run").addEventListener("click", function () {
+    var r = ZenkakuCalc.findMixed(document.getElementById("text").value);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">テキストが長すぎます(10万文字まで)。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    if (r.total === 0) {
+      advBox.innerHTML = '<div class="result-main">全角・半角カナは見つかりませんでした</div>';
+      advBox.hidden = false;
+      return;
+    }
+    var rows = r.items.map(function (it) {
+      return "<tr><td>" + (it.index + 1).toLocaleString() + " 文字目</td><td>「" + it.ch + "」</td><td>" + TYPE_LABEL[it.type] + "</td></tr>";
+    }).join("");
+    advBox.innerHTML =
+      '<div class="result-main">' + r.total.toLocaleString() + ' 文字見つかりました</div>' +
+      '<p>内訳: 全角英数字 ' + r.counts.zen_alnum.toLocaleString() + ' / 全角記号 ' + r.counts.zen_symbol.toLocaleString() +
+      ' / 全角スペース ' + r.counts.zen_space.toLocaleString() + ' / 半角カナ ' + r.counts.han_kana.toLocaleString() + '</p>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>場所</th><th>文字</th><th>種類</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      (r.total > 50 ? '<p class="adv-note">先頭の50件まで表示しています。</p>' : '');
+    advBox.hidden = false;
   });
 })();
 </script>

@@ -88,7 +88,65 @@
     };
   }
 
+  var PAID_MIN_YEN = 0;
+  var PAID_MAX_YEN = 10000000;
+
+  /**
+   * 月の時間外合計から、60時間超の分を自動で振り分けて残業代を計算する。
+   * 割増率は労働基準法第37条の法定最低率:
+   * - 時間外労働(月60時間以内): 25%(労働基準法第37条第1項本文)
+   * - 月60時間を超える時間外労働: 50%(同条第1項ただし書)
+   * - 法定休日労働: 35%(労働基準法第37条第1項の割増賃金に係る率の
+   *   最低限度を定める政令)
+   * - 深夜労働(22時〜5時): 25%を加算(同条第4項)。深夜分は加算分のみ計上
+   * 各区分の金額は円未満を四捨五入して合算する。
+   * @param {number} baseHourlyYen 基礎時給(円・500〜50,000)
+   * @param {number} totalOvertimeHours 月の時間外労働の合計(時間・0〜200)。
+   *        60時間以内は25%、超えた分は50%で自動計算
+   * @param {number} holidayHours 法定休日労働(時間・0〜200)
+   * @param {number} lateNightHours 深夜労働(時間・0〜200)
+   * @param {number} [paidYen] 実際に支払われた残業代(円・0〜10,000,000)。
+   *        指定すると不足額 shortfallYen も返す
+   * @returns {{ok: true, within60Hours: number, over60Hours: number,
+   *            overtimePay: number, overtime60Pay: number, holidayPay: number,
+   *            lateNightExtra: number, totalPay: number, shortfallYen?: number}
+   *          |{ok: false, code: string}}
+   *   code: "invalid_hourly" | "invalid_hours" | "invalid_paid"
+   */
+  function calculateDetailed(baseHourlyYen, totalOvertimeHours, holidayHours, lateNightHours, paidYen) {
+    if (!isFiniteNumber(baseHourlyYen) || baseHourlyYen < HOURLY_MIN_YEN || baseHourlyYen > HOURLY_MAX_YEN) {
+      return { ok: false, code: "invalid_hourly" };
+    }
+    if (!validHours(totalOvertimeHours) || !validHours(holidayHours) || !validHours(lateNightHours)) {
+      return { ok: false, code: "invalid_hours" };
+    }
+    var hasPaid = paidYen !== undefined && paidYen !== null;
+    if (hasPaid && (!isFiniteNumber(paidYen) || paidYen < PAID_MIN_YEN || paidYen > PAID_MAX_YEN)) {
+      return { ok: false, code: "invalid_paid" };
+    }
+    var within60 = Math.min(totalOvertimeHours, 60);
+    var over60 = Math.max(0, totalOvertimeHours - 60);
+    var overtimePay = Math.round(baseHourlyYen * RATE_OVERTIME * within60);
+    var overtime60Pay = Math.round(baseHourlyYen * RATE_OVERTIME_OVER60 * over60);
+    var holidayPay = Math.round(baseHourlyYen * RATE_HOLIDAY * holidayHours);
+    var lateNightExtra = Math.round(baseHourlyYen * RATE_LATE_NIGHT_EXTRA * lateNightHours);
+    var total = overtimePay + overtime60Pay + holidayPay + lateNightExtra;
+    var out = {
+      ok: true,
+      within60Hours: within60,
+      over60Hours: over60,
+      overtimePay: overtimePay,
+      overtime60Pay: overtime60Pay,
+      holidayPay: holidayPay,
+      lateNightExtra: lateNightExtra,
+      totalPay: total
+    };
+    if (hasPaid) out.shortfallYen = total - paidYen;
+    return out;
+  }
+
   var api = {
+    calculateDetailed: calculateDetailed,
     calculate: calculate,
     hourlyFromMonthly: hourlyFromMonthly,
     HOURLY_MIN_YEN: HOURLY_MIN_YEN,

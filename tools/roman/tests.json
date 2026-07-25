@@ -123,6 +123,144 @@
         "ok": false,
         "code": "invalid_roman"
       }
+    },
+    {
+      "name": "まとめて変換: 2026,7,24 を一括変換",
+      "func": "convertMany",
+      "args": [
+        "2026, 7, 24",
+        false
+      ],
+      "expect": {
+        "ok": true,
+        "count": 3,
+        "items": [
+          {
+            "input": "2026",
+            "ok": true,
+            "output": "MMXXVI"
+          },
+          {
+            "input": "7",
+            "ok": true,
+            "output": "VII"
+          },
+          {
+            "input": "24",
+            "ok": true,
+            "output": "XXIV"
+          }
+        ]
+      }
+    },
+    {
+      "name": "まとめて変換: 時計文字盤表記ONなら4はIIII、IIIIは4",
+      "func": "convertMany",
+      "args": [
+        "4\nIIII",
+        true
+      ],
+      "expect": {
+        "ok": true,
+        "count": 2,
+        "items": [
+          {
+            "input": "4",
+            "ok": true,
+            "output": "IIII"
+          },
+          {
+            "input": "IIII",
+            "ok": true,
+            "output": "4"
+          }
+        ]
+      }
+    },
+    {
+      "name": "まとめて変換: 時計文字盤表記OFFならIIIIはエラー項目",
+      "func": "convertMany",
+      "args": [
+        "IIII",
+        false
+      ],
+      "expect": {
+        "ok": true,
+        "count": 1,
+        "items": [
+          {
+            "input": "IIII",
+            "ok": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "まとめて変換: 21個はエラー",
+      "func": "convertMany",
+      "args": [
+        "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21",
+        false
+      ],
+      "expect": {
+        "ok": false,
+        "code": "too_many"
+      }
+    },
+    {
+      "name": "まとめて変換: 空入力はエラー",
+      "func": "convertMany",
+      "args": [
+        "  ",
+        false
+      ],
+      "expect": {
+        "ok": false,
+        "code": "empty"
+      }
+    },
+    {
+      "name": "日付変換: 2026年7月24日 = MMXXVI・VII・XXIV",
+      "func": "dateToRoman",
+      "args": [
+        2026,
+        7,
+        24
+      ],
+      "expect": {
+        "ok": true,
+        "year": "MMXXVI",
+        "month": "VII",
+        "day": "XXIV"
+      }
+    },
+    {
+      "name": "日付変換: 1994年12月3日 = MCMXCIV・XII・III",
+      "func": "dateToRoman",
+      "args": [
+        1994,
+        12,
+        3
+      ],
+      "expect": {
+        "ok": true,
+        "year": "MCMXCIV",
+        "month": "XII",
+        "day": "III"
+      }
+    },
+    {
+      "name": "日付変換: 2月30日は実在しないのでエラー",
+      "func": "dateToRoman",
+      "args": [
+        2026,
+        2,
+        30
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_date"
+      }
     }
   ]
 }

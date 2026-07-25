@@ -6,62 +6,232 @@
     {
       "name": "500W 3分 → 600W: 2分30秒(150秒)",
       "func": "convert",
-      "args": [180, 500, 600],
-      "expect": { "ok": true, "seconds": 150, "rounded10": 150 }
+      "args": [
+        180,
+        500,
+        600
+      ],
+      "expect": {
+        "ok": true,
+        "seconds": 150,
+        "rounded10": 150
+      }
     },
     {
       "name": "600W 1分30秒 → 500W: 108秒(目安110秒)",
       "func": "convert",
-      "args": [90, 600, 500],
-      "expect": { "ok": true, "seconds": 108, "rounded10": 110 }
+      "args": [
+        90,
+        600,
+        500
+      ],
+      "expect": {
+        "ok": true,
+        "seconds": 108,
+        "rounded10": 110
+      }
     },
     {
       "name": "1500W 1分 → 500W: 3分(180秒)",
       "func": "convert",
-      "args": [60, 1500, 500],
-      "expect": { "ok": true, "seconds": 180, "rounded10": 180 }
+      "args": [
+        60,
+        1500,
+        500
+      ],
+      "expect": {
+        "ok": true,
+        "seconds": 180,
+        "rounded10": 180
+      }
     },
     {
       "name": "700W 2分 → 600W: 140秒",
       "func": "convert",
-      "args": [120, 700, 600],
-      "expect": { "ok": true, "seconds": 140, "rounded10": 140 }
+      "args": [
+        120,
+        700,
+        600
+      ],
+      "expect": {
+        "ok": true,
+        "seconds": 140,
+        "rounded10": 140
+      }
     },
     {
       "name": "500W 10分 → 200W(解凍): 25分(1500秒)",
       "func": "convert",
-      "args": [600, 500, 200],
-      "expect": { "ok": true, "seconds": 1500, "rounded10": 1500 }
+      "args": [
+        600,
+        500,
+        200
+      ],
+      "expect": {
+        "ok": true,
+        "seconds": 1500,
+        "rounded10": 1500
+      }
     },
     {
       "name": "同じワット数なら時間は変わらない",
       "func": "convert",
-      "args": [90, 600, 600],
-      "expect": { "ok": true, "seconds": 90, "rounded10": 90 }
+      "args": [
+        90,
+        600,
+        600
+      ],
+      "expect": {
+        "ok": true,
+        "seconds": 90,
+        "rounded10": 90
+      }
     },
     {
       "name": "異常入力: 時間0はエラー",
       "func": "convert",
-      "args": [0, 500, 600],
-      "expect": { "ok": false, "code": "invalid_time" }
+      "args": [
+        0,
+        500,
+        600
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_time"
+      }
     },
     {
       "name": "異常入力: 時間が負はエラー",
       "func": "convert",
-      "args": [-10, 500, 600],
-      "expect": { "ok": false, "code": "invalid_time" }
+      "args": [
+        -10,
+        500,
+        600
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_time"
+      }
     },
     {
       "name": "異常入力: ワット数0はエラー",
       "func": "convert",
-      "args": [180, 0, 600],
-      "expect": { "ok": false, "code": "invalid_watt" }
+      "args": [
+        180,
+        0,
+        600
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_watt"
+      }
     },
     {
       "name": "異常入力: 範囲外のワット数(3000W)はエラー",
       "func": "convert",
-      "args": [180, 500, 3000],
-      "expect": { "ok": false, "code": "invalid_watt" }
+      "args": [
+        180,
+        500,
+        3000
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_watt"
+      }
+    },
+    {
+      "name": "一括表: 600Wで90秒→500Wは108秒/1000Wは54秒",
+      "func": "multiTable",
+      "args": [
+        90,
+        600
+      ],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "0": {
+            "w": 500,
+            "seconds": 108,
+            "rounded10": 110
+          },
+          "1": {
+            "w": 600,
+            "seconds": 90,
+            "rounded10": 90
+          },
+          "4": {
+            "w": 1000,
+            "seconds": 54,
+            "rounded10": 60
+          }
+        }
+      }
+    },
+    {
+      "name": "一括表: 500Wで60秒→700Wは43秒(切り上げ目安50秒)",
+      "func": "multiTable",
+      "args": [
+        60,
+        500
+      ],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "0": {
+            "w": 500,
+            "seconds": 60,
+            "rounded10": 60
+          },
+          "2": {
+            "w": 700,
+            "seconds": 43,
+            "rounded10": 50
+          },
+          "3": {
+            "w": 800,
+            "seconds": 38,
+            "rounded10": 40
+          }
+        }
+      }
+    },
+    {
+      "name": "一括表: 時間0秒はエラー",
+      "func": "multiTable",
+      "args": [
+        0,
+        600
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_time"
+      }
+    },
+    {
+      "name": "一括表: 範囲外のワット数(50W)はエラー",
+      "func": "multiTable",
+      "args": [
+        90,
+        50
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_watt"
+      }
+    },
+    {
+      "name": "自由入力: 600Wで90秒→850Wは64秒(目安70秒)",
+      "func": "convert",
+      "args": [
+        90,
+        600,
+        850
+      ],
+      "expect": {
+        "ok": true,
+        "seconds": 64,
+        "rounded10": 70
+      }
     }
   ]
 }

@@ -115,6 +115,97 @@
         "ok": false,
         "code": "invalid_days"
       }
+    },
+    {
+      "name": "定期比較: 1万/2.85万/5.4万・片道300円・月20日 → 6ヶ月定期が最安",
+      "func": "comparePasses",
+      "args": [
+        10000,
+        28500,
+        54000,
+        300,
+        20
+      ],
+      "expect": {
+        "ok": true,
+        "payg": 12000,
+        "perMonth1": 10000,
+        "perMonth3": 9500,
+        "perMonth6": 9000,
+        "breakEven1": 17,
+        "breakEven3": 16,
+        "breakEven6": 15,
+        "year1": 120000,
+        "year3": 114000,
+        "year6": 108000,
+        "best": "m6"
+      }
+    },
+    {
+      "name": "定期比較: 月8日しか乗らないなら都度払いが最安",
+      "func": "comparePasses",
+      "args": [
+        6000,
+        18000,
+        36000,
+        300,
+        8
+      ],
+      "expect": {
+        "ok": true,
+        "payg": 4800,
+        "perMonth1": 6000,
+        "breakEven1": 10,
+        "best": "payg"
+      }
+    },
+    {
+      "name": "定期比較: 同額の場合は柔軟な都度払いを選ぶ(境界)",
+      "func": "comparePasses",
+      "args": [
+        10000,
+        30000,
+        60000,
+        250,
+        20
+      ],
+      "expect": {
+        "ok": true,
+        "payg": 10000,
+        "perMonth3": 10000,
+        "breakEven1": 20,
+        "best": "payg"
+      }
+    },
+    {
+      "name": "定期比較: 3ヶ月定期の価格0はエラー",
+      "func": "comparePasses",
+      "args": [
+        10000,
+        0,
+        54000,
+        300,
+        20
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_pass3"
+      }
+    },
+    {
+      "name": "定期比較: 利用日数0はエラー",
+      "func": "comparePasses",
+      "args": [
+        10000,
+        28500,
+        54000,
+        300,
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_days"
+      }
     }
   ]
 }

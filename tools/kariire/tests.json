@@ -117,6 +117,140 @@
         "ok": false,
         "code": "invalid_years"
       }
+    },
+    {
+      "name": "金利シナリオ: 3000万/1.5%/35年は現在91,855円、+2%で123,987円",
+      "func": "rateScenarios",
+      "args": [
+        30000000,
+        1.5,
+        35
+      ],
+      "expect": {
+        "ok": true,
+        "rows": [
+          {
+            "delta": 0,
+            "rate": 1.5,
+            "monthly": 91855,
+            "total": 38579100,
+            "monthlyDiff": 0
+          },
+          {
+            "delta": 0.5,
+            "rate": 2,
+            "monthly": 99379,
+            "total": 41739180,
+            "monthlyDiff": 7524
+          },
+          {
+            "delta": 1,
+            "rate": 2.5,
+            "monthly": 107249,
+            "total": 45044580,
+            "monthlyDiff": 15394
+          },
+          {
+            "delta": 2,
+            "rate": 3.5,
+            "monthly": 123987,
+            "total": 52074540,
+            "monthlyDiff": 32132
+          }
+        ]
+      }
+    },
+    {
+      "name": "金利シナリオ: 金利0%(1200万/10年)は現在10万円、+0.5%で102,542円",
+      "func": "rateScenarios",
+      "args": [
+        12000000,
+        0,
+        10
+      ],
+      "expect": {
+        "ok": true,
+        "rows": [
+          {
+            "delta": 0,
+            "rate": 0,
+            "monthly": 100000,
+            "monthlyDiff": 0
+          },
+          {
+            "delta": 0.5,
+            "rate": 0.5,
+            "monthly": 102542,
+            "monthlyDiff": 2542
+          },
+          {
+            "delta": 1,
+            "rate": 1,
+            "monthly": 105125,
+            "monthlyDiff": 5125
+          },
+          {
+            "delta": 2,
+            "rate": 2,
+            "monthly": 110416,
+            "monthlyDiff": 10416
+          }
+        ]
+      }
+    },
+    {
+      "name": "金利シナリオ: 現在金利19%は+2%が上限を超えるためエラー",
+      "func": "rateScenarios",
+      "args": [
+        30000000,
+        19,
+        35
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_rate"
+      }
+    },
+    {
+      "name": "物件予算: 借入3400万+頭金500万・諸費用8%で約3,611万円",
+      "func": "propertyBudget",
+      "args": [
+        34000000,
+        5000000,
+        8
+      ],
+      "expect": {
+        "ok": true,
+        "budget": 36111111,
+        "fees": 2888889
+      }
+    },
+    {
+      "name": "物件予算: 諸費用0%なら借入+頭金がそのまま予算",
+      "func": "propertyBudget",
+      "args": [
+        30000000,
+        0,
+        0
+      ],
+      "expect": {
+        "ok": true,
+        "budget": 30000000,
+        "fees": 0
+      }
+    },
+    {
+      "name": "物件予算: 借入額100万円未満はエラー",
+      "func": "propertyBudget",
+      "args": [
+        500000,
+        0,
+        8
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_loan"
+      }
     }
   ]
 }

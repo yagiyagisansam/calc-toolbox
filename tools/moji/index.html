@@ -39,7 +39,33 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>エントリーシートの「400字以内」、レポートの字数指定、SNSの文字数制限……。テキストを貼り付けるだけで<strong>文字数(スペース込み/除く)・行数・原稿用紙換算</strong>を瞬時にカウントします。入力中も自動で更新されます。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能(目標字数チェック・単語数・HTML除去カウント)</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">目標字数チェック</h3>
+      <p class="adv-note">上のテキスト欄の文章が「〇字以内」に収まっているかを判定します。あと何文字書けるかも表示します。</p>
+      <label>目標字数
+        <input type="number" id="adv-limit" min="1" step="1" placeholder="例: 400">
+      </label>
+      <label>数え方
+        <select id="adv-basis">
+          <option value="chars">スペース込み</option>
+          <option value="noSpace">スペース除く</option>
+        </select>
+      </label>
+      <div class="tool-result" id="adv-target-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">HTMLを除いた本文だけを数える</h3>
+      <p class="adv-note">HTMLソースを貼り付けると、タグや&lt;script&gt;を取り除いた「本文だけ」の文字数を数えます。ブログ記事やWebページの実質的な文章量チェックに。</p>
+      <label>HTMLソース
+        <textarea id="adv-html" rows="6" placeholder="&lt;p&gt;こんにちは&lt;/p&gt; などのHTMLを貼り付け"></textarea>
+      </label>
+      <button type="button" id="adv-run">本文だけを数える</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>文章を貼り付けるだけで、<strong>何文字あるか</strong>がすぐわかるツールです。スペースを除いた文字数・行数・原稿用紙の枚数も同時に表示します。エントリーシートやレポートの「〇字以内」チェックにどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -118,6 +144,69 @@
   }
   input.addEventListener("input", run);
   document.getElementById("moji-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var advIn = document.getElementById("adv-html");
+  function runAdv() {
+    if (advIn.value === "") { advBox.hidden = true; return; }
+    var r = MojiCalc.countHtmlStripped(advIn.value);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">テキストが長すぎます(100万文字まで)。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">本文 ' + r.chars.toLocaleString() + ' 文字</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>スペース除く</td><td>' + r.charsNoSpace.toLocaleString() + ' 文字</td></tr>' +
+      '<tr><td>原稿用紙(400字)</td><td>約 ' + r.genkoyoshi.toLocaleString() + ' 枚</td></tr>' +
+      '</tbody></table></div>';
+    var head = r.stripped.replace(/\s+/g, " ").trim().slice(0, 80);
+    if (head) {
+      var pv = document.createElement("p");
+      pv.className = "adv-note";
+      pv.textContent = "本文の冒頭: " + head + (r.stripped.trim().length > 80 ? "…" : "");
+      advBox.appendChild(pv);
+    }
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", runAdv);
+  advIn.addEventListener("input", runAdv);
+
+  // 目標字数チェック(メインのテキスト欄を対象)
+  var mainText = document.getElementById("text");
+  var limitIn = document.getElementById("adv-limit");
+  var basisIn = document.getElementById("adv-basis");
+  var targetBox = document.getElementById("adv-target-result");
+  function runTarget() {
+    var limit = parseInt(limitIn.value, 10);
+    if (!limitIn.value || isNaN(limit)) { targetBox.hidden = true; return; }
+    var r = MojiCalc.checkTarget(mainText.value, limit, basisIn.value);
+    if (!r.ok) {
+      targetBox.innerHTML = '<p class="result-error">目標字数は1以上の整数で入力してください。</p>';
+      targetBox.hidden = false;
+      return;
+    }
+    var w = MojiCalc.wordCount(mainText.value);
+    targetBox.innerHTML =
+      '<div class="result-main">' +
+      (r.within
+        ? "収まっています(あと " + r.remaining.toLocaleString() + " 文字書けます)"
+        : r.over.toLocaleString() + " 文字オーバー") +
+      "</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>現在</td><td>" + r.count.toLocaleString() + " / " + r.limit.toLocaleString() + " 文字</td></tr>" +
+      (w.ok && w.words > 0 ? "<tr><td>英語の単語数(参考)</td><td>" + w.words.toLocaleString() + " 語</td></tr>" : "") +
+      "</tbody></table></div>";
+    targetBox.hidden = false;
+  }
+  limitIn.addEventListener("input", runTarget);
+  basisIn.addEventListener("change", runTarget);
+  mainText.addEventListener("input", runTarget);
 })();
 </script>
 </body>

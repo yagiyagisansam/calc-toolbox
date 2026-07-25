@@ -47,7 +47,71 @@
     return out;
   }
 
+  /**
+   * 実燃費がカタログ燃費の何%出ているかを計算する。
+   * 実燃費はカタログ値(WLTCモード等)より低くなるのが普通で、
+   * 7〜8割程度なら一般的な範囲。割合は小数第1位で四捨五入。
+   * @param {number} actualKmPerL 実燃費(km/L・1〜60)
+   * @param {number} catalogKmPerL カタログ燃費(km/L・1〜60)
+   * @returns {{ok: true, percent: number}|{ok: false, code: string}}
+   *   code: "invalid_actual" | "invalid_catalog"
+   */
+  function catalogRatio(actualKmPerL, catalogKmPerL) {
+    if (typeof actualKmPerL !== "number" || !isFinite(actualKmPerL) ||
+        actualKmPerL < 1 || actualKmPerL > 60) {
+      return { ok: false, code: "invalid_actual" };
+    }
+    if (typeof catalogKmPerL !== "number" || !isFinite(catalogKmPerL) ||
+        catalogKmPerL < 1 || catalogKmPerL > 60) {
+      return { ok: false, code: "invalid_catalog" };
+    }
+    return { ok: true, percent: Math.round(actualKmPerL / catalogKmPerL * 1000) / 10 };
+  }
+
+  /**
+   * 2台の車の年間ガソリン代を比較する(買い替え判断の目安)。
+   * 年間ガソリン代 = 年間走行距離 ÷ 燃費 × 単価(円未満四捨五入)。
+   * diffYen = 車Aの年間費 − 車Bの年間費(正なら車Bのほうが安い)。
+   * @param {number} kmPerLA 車Aの燃費(km/L・1〜60)
+   * @param {number} kmPerLB 車Bの燃費(km/L・1〜60)
+   * @param {number} annualKm 年間走行距離(km・100〜100,000)
+   * @param {number} pricePerL ガソリン単価(円/L・0超〜1,000)
+   * @returns {{ok: true, costA: number, costB: number, diffYen: number,
+   *            fuelLA: number, fuelLB: number}
+   *          |{ok: false, code: string}}
+   *   fuelLA/fuelLB: 年間使用燃料(L・小数第1位)
+   *   code: "invalid_efficiency_a" | "invalid_efficiency_b" | "invalid_distance" | "invalid_price"
+   */
+  function compareCars(kmPerLA, kmPerLB, annualKm, pricePerL) {
+    if (typeof kmPerLA !== "number" || !isFinite(kmPerLA) || kmPerLA < 1 || kmPerLA > 60) {
+      return { ok: false, code: "invalid_efficiency_a" };
+    }
+    if (typeof kmPerLB !== "number" || !isFinite(kmPerLB) || kmPerLB < 1 || kmPerLB > 60) {
+      return { ok: false, code: "invalid_efficiency_b" };
+    }
+    if (typeof annualKm !== "number" || !isFinite(annualKm) || annualKm < 100 || annualKm > 100000) {
+      return { ok: false, code: "invalid_distance" };
+    }
+    if (typeof pricePerL !== "number" || !isFinite(pricePerL) || pricePerL <= 0 || pricePerL > 1000) {
+      return { ok: false, code: "invalid_price" };
+    }
+    var fuelA = annualKm / kmPerLA;
+    var fuelB = annualKm / kmPerLB;
+    var costA = Math.round(fuelA * pricePerL);
+    var costB = Math.round(fuelB * pricePerL);
+    return {
+      ok: true,
+      costA: costA,
+      costB: costB,
+      diffYen: costA - costB,
+      fuelLA: Math.round(fuelA * 10) / 10,
+      fuelLB: Math.round(fuelB * 10) / 10
+    };
+  }
+
   var api = {
+    compareCars: compareCars,
+    catalogRatio: catalogRatio,
     calc: calc
   };
 

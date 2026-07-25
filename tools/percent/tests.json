@@ -6,92 +6,319 @@
     {
       "name": "30は200の15%",
       "func": "whatPercent",
-      "args": [30, 200],
-      "expect": { "ok": true, "percent": 15 }
+      "args": [
+        30,
+        200
+      ],
+      "expect": {
+        "ok": true,
+        "percent": 15
+      }
     },
     {
       "name": "75は80の93.75%",
       "func": "whatPercent",
-      "args": [75, 80],
-      "expect": { "ok": true, "percent": 93.75 }
+      "args": [
+        75,
+        80
+      ],
+      "expect": {
+        "ok": true,
+        "percent": 93.75
+      }
     },
     {
       "name": "割り切れない場合は小数第2位まで(1は3の33.33%)",
       "func": "whatPercent",
-      "args": [1, 3],
-      "expect": { "ok": true, "percent": 33.33 }
+      "args": [
+        1,
+        3
+      ],
+      "expect": {
+        "ok": true,
+        "percent": 33.33
+      }
     },
     {
       "name": "0は何かの0%(部分が0は許容)",
       "func": "whatPercent",
-      "args": [0, 100],
-      "expect": { "ok": true, "percent": 0 }
+      "args": [
+        0,
+        100
+      ],
+      "expect": {
+        "ok": true,
+        "percent": 0
+      }
     },
     {
       "name": "4980の20%は996",
       "func": "percentOf",
-      "args": [4980, 20],
-      "expect": { "ok": true, "value": 996 }
+      "args": [
+        4980,
+        20
+      ],
+      "expect": {
+        "ok": true,
+        "value": 996
+      }
     },
     {
       "name": "小数の率(158000の7.5%は11850)",
       "func": "percentOf",
-      "args": [158000, 7.5],
-      "expect": { "ok": true, "value": 11850 }
+      "args": [
+        158000,
+        7.5
+      ],
+      "expect": {
+        "ok": true,
+        "value": 11850
+      }
     },
     {
       "name": "100%超(200の150%は300)",
       "func": "percentOf",
-      "args": [200, 150],
-      "expect": { "ok": true, "value": 300 }
+      "args": [
+        200,
+        150
+      ],
+      "expect": {
+        "ok": true,
+        "value": 300
+      }
     },
     {
       "name": "増加率: 500→650 は +30%",
       "func": "changeRate",
-      "args": [500, 650],
-      "expect": { "ok": true, "rate": 30 }
+      "args": [
+        500,
+        650
+      ],
+      "expect": {
+        "ok": true,
+        "rate": 30
+      }
     },
     {
       "name": "減少率: 1280→980 は -23.44%",
       "func": "changeRate",
-      "args": [1280, 980],
-      "expect": { "ok": true, "rate": -23.44 }
+      "args": [
+        1280,
+        980
+      ],
+      "expect": {
+        "ok": true,
+        "rate": -23.44
+      }
     },
     {
       "name": "変化なし: 80→80 は 0%",
       "func": "changeRate",
-      "args": [80, 80],
-      "expect": { "ok": true, "rate": 0 }
+      "args": [
+        80,
+        80
+      ],
+      "expect": {
+        "ok": true,
+        "rate": 0
+      }
     },
     {
       "name": "異常入力: 全体が0はエラー(0除算防止)",
       "func": "whatPercent",
-      "args": [30, 0],
-      "expect": { "ok": false, "code": "invalid_whole" }
+      "args": [
+        30,
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_whole"
+      }
     },
     {
       "name": "異常入力: 負の部分はエラー",
       "func": "whatPercent",
-      "args": [-5, 100],
-      "expect": { "ok": false, "code": "invalid_part" }
+      "args": [
+        -5,
+        100
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_part"
+      }
     },
     {
       "name": "異常入力: 率が負はエラー",
       "func": "percentOf",
-      "args": [100, -10],
-      "expect": { "ok": false, "code": "invalid_percent" }
+      "args": [
+        100,
+        -10
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_percent"
+      }
     },
     {
       "name": "異常入力: 増減率の元の値が0はエラー",
       "func": "changeRate",
-      "args": [0, 100],
-      "expect": { "ok": false, "code": "invalid_from" }
+      "args": [
+        0,
+        100
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_from"
+      }
     },
     {
       "name": "異常入力: 数値でない値はエラー",
       "func": "percentOf",
-      "args": ["abc", 10],
-      "expect": { "ok": false, "code": "invalid_value" }
+      "args": [
+        "abc",
+        10
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
+    },
+    {
+      "name": "連続変化: +10%のあと-10%は合計-1%",
+      "func": "chainRates",
+      "args": [
+        [
+          10,
+          -10
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "totalRate": -1
+      }
+    },
+    {
+      "name": "連続変化: +50%を2回で+125%、元の値1000なら2250",
+      "func": "chainRates",
+      "args": [
+        [
+          50,
+          50
+        ],
+        1000
+      ],
+      "expect": {
+        "ok": true,
+        "totalRate": 125,
+        "finalValue": 2250
+      }
+    },
+    {
+      "name": "連続変化: +100%のあと-50%で変化なし(0%)",
+      "func": "chainRates",
+      "args": [
+        [
+          100,
+          -50
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "totalRate": 0
+      }
+    },
+    {
+      "name": "連続変化: -100%以下はエラー",
+      "func": "chainRates",
+      "args": [
+        [
+          -150
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_rate"
+      }
+    },
+    {
+      "name": "連続変化: 空の配列はエラー",
+      "func": "chainRates",
+      "args": [
+        []
+      ],
+      "expect": {
+        "ok": false,
+        "code": "empty"
+      }
+    },
+    {
+      "name": "打ち消し: +25%を打ち消すのは-20%",
+      "func": "cancelRate",
+      "args": [
+        25
+      ],
+      "expect": {
+        "ok": true,
+        "cancel": -20
+      }
+    },
+    {
+      "name": "打ち消し: -20%を打ち消すのは+25%",
+      "func": "cancelRate",
+      "args": [
+        -20
+      ],
+      "expect": {
+        "ok": true,
+        "cancel": 25
+      }
+    },
+    {
+      "name": "打ち消し: +100%を打ち消すのは-50%",
+      "func": "cancelRate",
+      "args": [
+        100
+      ],
+      "expect": {
+        "ok": true,
+        "cancel": -50
+      }
+    },
+    {
+      "name": "元の値の逆算: 5%増えて105なら元は100",
+      "func": "beforeChange",
+      "args": [
+        105,
+        5
+      ],
+      "expect": {
+        "ok": true,
+        "value": 100
+      }
+    },
+    {
+      "name": "元の値の逆算: 20%引きで8000なら定価10000",
+      "func": "beforeChange",
+      "args": [
+        8000,
+        -20
+      ],
+      "expect": {
+        "ok": true,
+        "value": 10000
+      }
+    },
+    {
+      "name": "元の値の逆算: 変化後の値が0はエラー",
+      "func": "beforeChange",
+      "args": [
+        0,
+        10
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_after"
+      }
     }
   ]
 }

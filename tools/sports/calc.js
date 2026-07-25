@@ -53,7 +53,79 @@
     };
   }
 
-  var api = { calories: calories, ACTIVITIES: ACTIVITIES };
+  /**
+   * 複数の運動の合計消費カロリーを計算する。
+   * 各種目: 1.05 × METs × 時間(h) × 体重(kg)(本体と同じ厚労省の式)。
+   * 脂肪換算は体脂肪1kg≒7,200kcalの目安。
+   * 丸め方針: 各種目・合計とも整数に四捨五入(合計は丸める前の値を合算してから丸める)。
+   * @param {number} weightKg 体重(kg・20〜300)
+   * @param {Array<{activity:string, minutes:number}>} items 種目と時間のリスト(1〜5件)
+   * @returns {{ok:true, totalKcal:number, fatG:number,
+   *            items:Array<{key:string, label:string, mets:number, minutes:number, kcal:number}>}
+   *          |{ok:false, code:string}}
+   *   code: "invalid_weight" | "invalid_items" | "invalid_activity" | "invalid_minutes"
+   */
+  function totalCalories(weightKg, items) {
+    if (typeof weightKg !== "number" || !isFinite(weightKg) || weightKg < 20 || weightKg > 300) {
+      return { ok: false, code: "invalid_weight" };
+    }
+    if (!Array.isArray(items) || items.length < 1 || items.length > 5) {
+      return { ok: false, code: "invalid_items" };
+    }
+    var sum = 0;
+    var out = [];
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i];
+      if (!it || !ACTIVITIES.hasOwnProperty(it.activity)) return { ok: false, code: "invalid_activity" };
+      if (typeof it.minutes !== "number" || !isFinite(it.minutes) || it.minutes < 1 || it.minutes > 600) {
+        return { ok: false, code: "invalid_minutes" };
+      }
+      var a = ACTIVITIES[it.activity];
+      var raw = 1.05 * a.mets * (it.minutes / 60) * weightKg;
+      sum += raw;
+      out.push({ key: it.activity, label: a.label, mets: a.mets, minutes: it.minutes, kcal: Math.round(raw) });
+    }
+    return {
+      ok: true,
+      totalKcal: Math.round(sum),
+      fatG: Math.round(sum / 7.2),
+      items: out
+    };
+  }
+
+  /**
+   * 目標消費カロリーに必要な時間を全種目まとめて計算する(種目選びの比較用)。
+   * 式: 時間(h) = 目標kcal ÷ (1.05 × METs × 体重kg)
+   * 丸め方針: 分は切り上げ(その時間で目標に届くことを示すため)。
+   * @param {number} weightKg 体重(kg・20〜300)
+   * @param {number} targetKcal 目標消費カロリー(kcal・1〜5000)
+   * @returns {{ok:true, items:Array<{key:string, label:string, mets:number, minutes:number}>}
+   *          |{ok:false, code:string}}  code: "invalid_weight" | "invalid_kcal"
+   */
+  function minutesForKcalAll(weightKg, targetKcal) {
+    if (typeof weightKg !== "number" || !isFinite(weightKg) || weightKg < 20 || weightKg > 300) {
+      return { ok: false, code: "invalid_weight" };
+    }
+    if (typeof targetKcal !== "number" || !isFinite(targetKcal) || targetKcal <= 0 || targetKcal > 5000) {
+      return { ok: false, code: "invalid_kcal" };
+    }
+    var keys = Object.keys(ACTIVITIES);
+    var out = [];
+    for (var i = 0; i < keys.length; i++) {
+      var a = ACTIVITIES[keys[i]];
+      out.push({
+        key: keys[i],
+        label: a.label,
+        mets: a.mets,
+        minutes: Math.ceil(targetKcal / (1.05 * a.mets * weightKg) * 60)
+      });
+    }
+    return { ok: true, items: out };
+  }
+
+  var api = {
+    minutesForKcalAll: minutesForKcalAll,
+    totalCalories: totalCalories, calories: calories, ACTIVITIES: ACTIVITIES };
   if (typeof module !== "undefined" && module.exports) { module.exports = api; }
   else { global.SportsCalc = api; }
 })(typeof window !== "undefined" ? window : globalThis);

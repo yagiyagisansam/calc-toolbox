@@ -122,6 +122,143 @@
         "ok": false,
         "code": "invalid_feet"
       }
+    },
+    {
+      "name": "早見表: 170cm中心は165〜175の11行、中心は5'7\"",
+      "func": "heightTable",
+      "args": [
+        170
+      ],
+      "expect": {
+        "ok": true,
+        "center": 170,
+        "rows": {
+          "0": {
+            "cm": 165,
+            "feet": 5,
+            "inches": 5
+          },
+          "5": {
+            "cm": 170,
+            "feet": 5,
+            "inches": 7
+          },
+          "10": {
+            "cm": 175,
+            "feet": 5,
+            "inches": 9
+          },
+          "length": 11
+        }
+      }
+    },
+    {
+      "name": "早見表: 下限近く(32cm)は30cm未満を除いた8行、30cmは繰り上げで1'0\"",
+      "func": "heightTable",
+      "args": [
+        32
+      ],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "0": {
+            "cm": 30,
+            "feet": 1,
+            "inches": 0
+          },
+          "length": 8
+        }
+      }
+    },
+    {
+      "name": "早見表: 上限近く(298cm)は300cm超を除いた8行",
+      "func": "heightTable",
+      "args": [
+        298
+      ],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "7": {
+            "cm": 300
+          },
+          "length": 8
+        }
+      }
+    },
+    {
+      "name": "早見表: 29cmはエラー",
+      "func": "heightTable",
+      "args": [
+        29
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_cm"
+      }
+    },
+    {
+      "name": "フィート別: 5フィートは0〜11インチの12行(5'0\"=152.4cm、5'7\"=170.18cm)",
+      "func": "feetTable",
+      "args": [
+        5
+      ],
+      "expect": {
+        "ok": true,
+        "feet": 5,
+        "rows": {
+          "0": {
+            "inches": 0,
+            "cm": 152.4
+          },
+          "7": {
+            "inches": 7,
+            "cm": 170.18
+          },
+          "11": {
+            "inches": 11,
+            "cm": 180.34
+          },
+          "length": 12
+        }
+      }
+    },
+    {
+      "name": "フィート別: 6'0\"は182.88cm",
+      "func": "feetTable",
+      "args": [
+        6
+      ],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "0": {
+            "cm": 182.88
+          }
+        }
+      }
+    },
+    {
+      "name": "フィート別: 小数フィートはエラー",
+      "func": "feetTable",
+      "args": [
+        5.5
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_feet"
+      }
+    },
+    {
+      "name": "フィート別: 0フィートはエラー",
+      "func": "feetTable",
+      "args": [
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_feet"
+      }
     }
   ]
 }

@@ -55,7 +55,36 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>「8:00 + 7:30 + 8:15 は合計何時間?」「9時から17時半までは何時間?」といった<strong>時間の足し算と時刻の差</strong>を計算します。給与計算やタイムシートで使う<strong>10進数表記(8時間30分=8.5時間)</strong>も同時に表示します。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: タイムカード計算と10進数の逆変換</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">タイムカード計算(実働時間とその日の給与)</h3>
+      <p class="adv-note">出勤・退勤の時刻と休憩を入れると実働時間を計算します。退勤が出勤より前の時刻なら夜勤(日またぎ)として扱います。時給を入れるとその日の給与額の目安も出ます。</p>
+      <label>出勤時刻
+        <input type="time" id="adv-start" value="09:00">
+      </label>
+      <label>退勤時刻
+        <input type="time" id="adv-end" value="18:00">
+      </label>
+      <label>休憩(分)
+        <input type="number" id="adv-break" inputmode="numeric" min="0" max="1440" step="1" value="60">
+      </label>
+      <label>時給(円・空欄なら給与計算なし)
+        <input type="number" id="adv-wage" inputmode="numeric" min="1" max="1000000" step="any" placeholder="例: 1200">
+      </label>
+      <button type="button" id="adv-tc-run">実働時間を計算する</button>
+
+      <h3 class="adv-h">10進数の時間を「時:分」に戻す</h3>
+      <p class="adv-note">給与明細やExcelの「7.75時間」が何時間何分かを確認できます。</p>
+      <label>10進数の時間
+        <input type="number" id="adv-dec" min="0" max="999" step="any" placeholder="例: 7.75">
+      </label>
+      <button type="button" id="adv-dec-run">時:分に変換する</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>「1:30 + 0:45」のような時間の足し算や、開始〜終了の<strong>経過時間</strong>がすぐわかるツールです。給与計算で使う10進数表記(7.75時間など)も同時に表示します。勤務時間や作業時間の集計にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -145,6 +174,62 @@
     } else {
       show(JikanCalc.span(document.getElementById("start").value, document.getElementById("end").value), "時刻の差");
     }
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function hm(min) {
+    return Math.floor(min / 60) + "時間" + (min % 60) + "分";
+  }
+  var MSG2 = {
+    invalid_start: "出勤時刻を正しく入力してください。",
+    invalid_end: "退勤時刻を正しく入力してください。",
+    invalid_break: "休憩は0〜1440分の整数で入力してください。",
+    break_too_long: "休憩が勤務時間より長くなっています。",
+    invalid_wage: "時給は1〜1,000,000円の範囲で入力してください。"
+  };
+  document.getElementById("adv-tc-run").addEventListener("click", function () {
+    var start = document.getElementById("adv-start").value;
+    var end = document.getElementById("adv-end").value;
+    var brkStr = document.getElementById("adv-break").value;
+    var wageStr = document.getElementById("adv-wage").value;
+    if (start === "" || end === "") { advErr("出勤時刻と退勤時刻を入力してください。"); return; }
+    var brk = brkStr === "" ? 0 : parseInt(brkStr, 10);
+    var wage = wageStr === "" ? null : parseFloat(wageStr);
+    var r = JikanCalc.timecard(start, end, brk, wage);
+    if (!r.ok) { advErr(MSG2[r.code] || "入力値を確認してください。"); return; }
+    var html =
+      '<div class="result-main">実働 ' + hm(r.totalMinutes) + "(" +
+      r.decimal.toLocaleString(undefined, { maximumFractionDigits: 2 }) + "時間)</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>拘束時間(出勤〜退勤)</td><td>" + hm(r.grossMinutes) + "</td></tr>" +
+      "<tr><td>休憩</td><td>" + brk.toLocaleString() + "分</td></tr>" +
+      "<tr><td>うち深夜時間帯(22時〜5時)</td><td>" + hm(r.nightMinutes) + "</td></tr>";
+    if (r.pay !== null) {
+      html += "<tr><td>その日の給与額の目安</td><td>" + r.pay.toLocaleString() + "円</td></tr>";
+    }
+    html += "</tbody></table></div>" +
+      '<p class="adv-note">深夜時間帯は休憩を引く前の勤務時間帯との重なりで、休憩をいつ取るかで実際の深夜労働時間は変わります。' +
+      "給与額は時給×実働時間の概算で、深夜・残業の割増(労働基準法第37条)は含みません。</p>";
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  });
+  document.getElementById("adv-dec-run").addEventListener("click", function () {
+    var decStr = document.getElementById("adv-dec").value;
+    if (decStr === "") { advErr("10進数の時間を入力してください。"); return; }
+    var r = JikanCalc.dec2hm(parseFloat(decStr));
+    if (!r.ok) { advErr("0〜999の範囲で入力してください。"); return; }
+    advBox.innerHTML =
+      '<div class="result-main">' + hm(r.totalMinutes) + "</div>" +
+      "<p>" + decStr + "時間 = " + r.totalMinutes.toLocaleString() + "分(分は四捨五入)</p>";
+    advBox.hidden = false;
   });
 })();
 </script>

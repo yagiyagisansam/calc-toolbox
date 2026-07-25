@@ -128,6 +128,114 @@
         "ok": false,
         "code": "date_order"
       }
+    },
+    {
+      "name": "会社休業日なしは通常の営業日計算と同じ(7/16木の3営業日後は祝日を飛ばして7/22水)",
+      "func": "addBusinessDaysCustom",
+      "args": [
+        "2026-07-16",
+        3,
+        "",
+        false
+      ],
+      "expect": {
+        "ok": true,
+        "date": "2026-07-22",
+        "weekday": "水",
+        "customCount": 0
+      }
+    },
+    {
+      "name": "会社休業日(カンマ区切り・スラッシュ形式混在)を飛ばして計算",
+      "func": "addBusinessDaysCustom",
+      "args": [
+        "2026-07-16",
+        3,
+        "2026-07-21, 2026/7/22",
+        false
+      ],
+      "expect": {
+        "ok": true,
+        "date": "2026-07-24",
+        "weekday": "金",
+        "customCount": 2
+      }
+    },
+    {
+      "name": "土曜営業なら土曜も1営業日と数える(7/16木の3営業日後は7/21火)",
+      "func": "addBusinessDaysCustom",
+      "args": [
+        "2026-07-16",
+        3,
+        "",
+        true
+      ],
+      "expect": {
+        "ok": true,
+        "date": "2026-07-21",
+        "weekday": "火",
+        "customCount": 0
+      }
+    },
+    {
+      "name": "休業日リストに読めない項目があればエラー",
+      "func": "addBusinessDaysCustom",
+      "args": [
+        "2026-07-16",
+        3,
+        "2026-07-xx",
+        false
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_holidays"
+      }
+    },
+    {
+      "name": "期間の営業日数: 7/20(祝)〜7/26は4営業日、会社休業日を1件入れると3営業日",
+      "func": "countBusinessDaysCustom",
+      "args": [
+        "2026-07-20",
+        "2026-07-26",
+        "2026-07-23",
+        false
+      ],
+      "expect": {
+        "ok": true,
+        "businessDays": 3,
+        "totalDays": 7,
+        "customCount": 1
+      }
+    },
+    {
+      "name": "期間の営業日数: 土曜営業なら7/20〜7/26は5営業日(休業日なし)",
+      "func": "countBusinessDaysCustom",
+      "args": [
+        "2026-07-20",
+        "2026-07-26",
+        "",
+        true
+      ],
+      "expect": {
+        "ok": true,
+        "businessDays": 5,
+        "totalDays": 7,
+        "customCount": 0
+      }
+    },
+    {
+      "name": "期間の営業日数: 終了日が前ならエラー",
+      "func": "countBusinessDaysCustom",
+      "args": [
+        "2026-07-26",
+        "2026-07-20",
+        "",
+        false
+      ],
+      "expect": {
+        "ok": false,
+        "code": "date_order"
+      }
     }
   ]
 }

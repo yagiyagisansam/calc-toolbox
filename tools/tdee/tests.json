@@ -6,74 +6,293 @@
     {
       "name": "30歳男性70kg・ふつう(Ⅱ): 1561kcal×1.75=2732kcal",
       "func": "calculate",
-      "args": [30, "male", 70, "normal"],
-      "expect": { "ok": true, "bmrKcal": 1561, "palValue": 1.75, "tdeeKcal": 2732 }
+      "args": [
+        30,
+        "male",
+        70,
+        "normal"
+      ],
+      "expect": {
+        "ok": true,
+        "bmrKcal": 1561,
+        "palValue": 1.75,
+        "tdeeKcal": 2732
+      }
     },
     {
       "name": "25歳女性50kg・低い(Ⅰ): 1105kcal×1.50=1658kcal",
       "func": "calculate",
-      "args": [25, "female", 50, "low"],
-      "expect": { "ok": true, "bmrKcal": 1105, "palValue": 1.5, "tdeeKcal": 1658 }
+      "args": [
+        25,
+        "female",
+        50,
+        "low"
+      ],
+      "expect": {
+        "ok": true,
+        "bmrKcal": 1105,
+        "palValue": 1.5,
+        "tdeeKcal": 1658
+      }
     },
     {
       "name": "45歳男性80kg・高い(Ⅲ): 3568kcal",
       "func": "calculate",
-      "args": [45, "male", 80, "high"],
-      "expect": { "ok": true, "bmrKcal": 1784, "tdeeKcal": 3568 }
+      "args": [
+        45,
+        "male",
+        80,
+        "high"
+      ],
+      "expect": {
+        "ok": true,
+        "bmrKcal": 1784,
+        "tdeeKcal": 3568
+      }
     },
     {
       "name": "55歳女性52kg・ふつう(Ⅱ): 1884kcal",
       "func": "calculate",
-      "args": [55, "female", 52, "normal"],
-      "expect": { "ok": true, "bmrKcal": 1076, "tdeeKcal": 1884 }
+      "args": [
+        55,
+        "female",
+        52,
+        "normal"
+      ],
+      "expect": {
+        "ok": true,
+        "bmrKcal": 1076,
+        "tdeeKcal": 1884
+      }
     },
     {
       "name": "70歳男性60kg・低い(Ⅰ): 1935kcal",
       "func": "calculate",
-      "args": [70, "male", 60, "low"],
-      "expect": { "ok": true, "bmrKcal": 1290, "tdeeKcal": 1935 }
+      "args": [
+        70,
+        "male",
+        60,
+        "low"
+      ],
+      "expect": {
+        "ok": true,
+        "bmrKcal": 1290,
+        "tdeeKcal": 1935
+      }
     },
     {
       "name": "境界値: 18歳は計算できる",
       "func": "calculate",
-      "args": [18, "male", 60, "normal"],
-      "expect": { "ok": true }
+      "args": [
+        18,
+        "male",
+        60,
+        "normal"
+      ],
+      "expect": {
+        "ok": true
+      }
     },
     {
       "name": "異常入力: 17歳(未成年区分)はエラー",
       "func": "calculate",
-      "args": [17, "male", 60, "normal"],
-      "expect": { "ok": false, "code": "invalid_age" }
+      "args": [
+        17,
+        "male",
+        60,
+        "normal"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_age"
+      }
     },
     {
       "name": "異常入力: 性別不正はエラー",
       "func": "calculate",
-      "args": [30, "man", 60, "normal"],
-      "expect": { "ok": false, "code": "invalid_sex" }
+      "args": [
+        30,
+        "man",
+        60,
+        "normal"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_sex"
+      }
     },
     {
       "name": "異常入力: 体重が範囲外はエラー",
       "func": "calculate",
-      "args": [30, "male", 10, "normal"],
-      "expect": { "ok": false, "code": "invalid_weight" }
+      "args": [
+        30,
+        "male",
+        10,
+        "normal"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_weight"
+      }
     },
     {
       "name": "異常入力: 活動レベル不正はエラー",
       "func": "calculate",
-      "args": [30, "male", 60, "medium"],
-      "expect": { "ok": false, "code": "invalid_pal" }
+      "args": [
+        30,
+        "male",
+        60,
+        "medium"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_pal"
+      }
     },
     {
       "name": "異常入力: 活動レベル未指定はエラー",
       "func": "calculate",
-      "args": [30, "male", 60],
-      "expect": { "ok": false, "code": "invalid_pal" }
+      "args": [
+        30,
+        "male",
+        60
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_pal"
+      }
     },
     {
       "name": "異常入力: 数値でない年齢はエラー",
       "func": "calculate",
-      "args": ["abc", "male", 60, "normal"],
-      "expect": { "ok": false, "code": "invalid_age" }
+      "args": [
+        "abc",
+        "male",
+        60,
+        "normal"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_age"
+      }
+    },
+    {
+      "name": "目標逆算: 30歳男性70kgふつう→65kg/6か月は1日2532kcal(警告なし)",
+      "func": "targetIntake",
+      "args": [
+        30,
+        "male",
+        70,
+        "normal",
+        65,
+        6
+      ],
+      "expect": {
+        "ok": true,
+        "bmrKcal": 1561,
+        "tdeeKcal": 2732,
+        "dailyAdjustKcal": 200,
+        "targetIntakeKcal": 2532,
+        "warning": false
+      }
+    },
+    {
+      "name": "目標逆算: 30歳女性60kg低い→50kg/3か月は基礎代謝割れで警告",
+      "func": "targetIntake",
+      "args": [
+        30,
+        "female",
+        60,
+        "low",
+        50,
+        3
+      ],
+      "expect": {
+        "ok": true,
+        "bmrKcal": 1302,
+        "tdeeKcal": 1953,
+        "dailyAdjustKcal": 800,
+        "targetIntakeKcal": 1153,
+        "warning": true
+      }
+    },
+    {
+      "name": "目標逆算: 増量(60kg→65kg/6か月)は1日+200kcalで2720kcal",
+      "func": "targetIntake",
+      "args": [
+        25,
+        "male",
+        60,
+        "normal",
+        65,
+        6
+      ],
+      "expect": {
+        "ok": true,
+        "tdeeKcal": 2520,
+        "dailyAdjustKcal": -200,
+        "targetIntakeKcal": 2720,
+        "warning": false
+      }
+    },
+    {
+      "name": "目標逆算: 期間0か月はエラー",
+      "func": "targetIntake",
+      "args": [
+        30,
+        "male",
+        70,
+        "normal",
+        65,
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_months"
+      }
+    },
+    {
+      "name": "PFC: 2000kcalはP65〜100g/F44〜67g/C250〜325g",
+      "func": "pfcBalance",
+      "args": [
+        2000
+      ],
+      "expect": {
+        "ok": true,
+        "proteinMinG": 65,
+        "proteinMaxG": 100,
+        "fatMinG": 44,
+        "fatMaxG": 67,
+        "carbMinG": 250,
+        "carbMaxG": 325
+      }
+    },
+    {
+      "name": "PFC: 1500kcalはP49〜75g/F33〜50g/C188〜244g",
+      "func": "pfcBalance",
+      "args": [
+        1500
+      ],
+      "expect": {
+        "ok": true,
+        "proteinMinG": 49,
+        "proteinMaxG": 75,
+        "fatMinG": 33,
+        "fatMaxG": 50,
+        "carbMinG": 188,
+        "carbMaxG": 244
+      }
+    },
+    {
+      "name": "PFC: 100kcalは範囲外エラー",
+      "func": "pfcBalance",
+      "args": [
+        100
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_kcal"
+      }
     }
   ]
 }

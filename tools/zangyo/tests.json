@@ -6,86 +6,305 @@
     {
       "name": "時間外20h(時給1500円): 1500×1.25×20=37,500円",
       "func": "calculate",
-      "args": [1500, 20, 0, 0, 0],
-      "expect": { "ok": true, "overtimePay": 37500, "totalPay": 37500 }
+      "args": [
+        1500,
+        20,
+        0,
+        0,
+        0
+      ],
+      "expect": {
+        "ok": true,
+        "overtimePay": 37500,
+        "totalPay": 37500
+      }
     },
     {
       "name": "月60h超あり(60h+10h・時給1500円): 112,500+22,500=135,000円",
       "func": "calculate",
-      "args": [1500, 60, 10, 0, 0],
-      "expect": { "ok": true, "overtimePay": 112500, "overtime60Pay": 22500, "totalPay": 135000 }
+      "args": [
+        1500,
+        60,
+        10,
+        0,
+        0
+      ],
+      "expect": {
+        "ok": true,
+        "overtimePay": 112500,
+        "overtime60Pay": 22500,
+        "totalPay": 135000
+      }
     },
     {
       "name": "法定休日労働あり(時給2000円・時間外10h+休日8h): 25,000+21,600=46,600円",
       "func": "calculate",
-      "args": [2000, 10, 0, 8, 0],
-      "expect": { "ok": true, "overtimePay": 25000, "holidayPay": 21600, "totalPay": 46600 }
+      "args": [
+        2000,
+        10,
+        0,
+        8,
+        0
+      ],
+      "expect": {
+        "ok": true,
+        "overtimePay": 25000,
+        "holidayPay": 21600,
+        "totalPay": 46600
+      }
     },
     {
       "name": "深夜加算(時給1200円・時間外15h+深夜5h): 22,500+1,500=24,000円",
       "func": "calculate",
-      "args": [1200, 15, 0, 0, 5],
-      "expect": { "ok": true, "overtimePay": 22500, "lateNightExtra": 1500, "totalPay": 24000 }
+      "args": [
+        1200,
+        15,
+        0,
+        0,
+        5
+      ],
+      "expect": {
+        "ok": true,
+        "overtimePay": 22500,
+        "lateNightExtra": 1500,
+        "totalPay": 24000
+      }
     },
     {
       "name": "小数の基礎時給(1875.5円×1.25×10h=23,444円・四捨五入)",
       "func": "calculate",
-      "args": [1875.5, 10, 0, 0, 0],
-      "expect": { "ok": true, "overtimePay": 23444 }
+      "args": [
+        1875.5,
+        10,
+        0,
+        0,
+        0
+      ],
+      "expect": {
+        "ok": true,
+        "overtimePay": 23444
+      }
     },
     {
       "name": "残業0時間は全て0円",
       "func": "calculate",
-      "args": [1500, 0, 0, 0, 0],
-      "expect": { "ok": true, "totalPay": 0 }
+      "args": [
+        1500,
+        0,
+        0,
+        0,
+        0
+      ],
+      "expect": {
+        "ok": true,
+        "totalPay": 0
+      }
     },
     {
       "name": "月給30万円・月平均160hから基礎時給1,875円",
       "func": "hourlyFromMonthly",
-      "args": [300000, 160],
-      "expect": { "ok": true, "hourlyYen": 1875 }
+      "args": [
+        300000,
+        160
+      ],
+      "expect": {
+        "ok": true,
+        "hourlyYen": 1875
+      }
     },
     {
       "name": "月給25万円・月平均173hから基礎時給1,445円",
       "func": "hourlyFromMonthly",
-      "args": [250000, 173],
-      "expect": { "ok": true, "hourlyYen": 1445 }
+      "args": [
+        250000,
+        173
+      ],
+      "expect": {
+        "ok": true,
+        "hourlyYen": 1445
+      }
     },
     {
       "name": "異常入力: 基礎時給が下限未満はエラー",
       "func": "calculate",
-      "args": [100, 10, 0, 0, 0],
-      "expect": { "ok": false, "code": "invalid_hourly" }
+      "args": [
+        100,
+        10,
+        0,
+        0,
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_hourly"
+      }
     },
     {
       "name": "異常入力: 時間が負はエラー",
       "func": "calculate",
-      "args": [1500, -5, 0, 0, 0],
-      "expect": { "ok": false, "code": "invalid_hours" }
+      "args": [
+        1500,
+        -5,
+        0,
+        0,
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_hours"
+      }
     },
     {
       "name": "異常入力: 時間が範囲超過(201h)はエラー",
       "func": "calculate",
-      "args": [1500, 201, 0, 0, 0],
-      "expect": { "ok": false, "code": "invalid_hours" }
+      "args": [
+        1500,
+        201,
+        0,
+        0,
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_hours"
+      }
     },
     {
       "name": "異常入力: 月給が下限未満はエラー",
       "func": "hourlyFromMonthly",
-      "args": [10000, 160],
-      "expect": { "ok": false, "code": "invalid_monthly" }
+      "args": [
+        10000,
+        160
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_monthly"
+      }
     },
     {
       "name": "異常入力: 月平均所定労働時間が範囲外はエラー",
       "func": "hourlyFromMonthly",
-      "args": [300000, 90],
-      "expect": { "ok": false, "code": "invalid_avg_hours" }
+      "args": [
+        300000,
+        90
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_avg_hours"
+      }
     },
     {
       "name": "異常入力: 数値でない時給はエラー",
       "func": "calculate",
-      "args": ["abc", 10, 0, 0, 0],
-      "expect": { "ok": false, "code": "invalid_hourly" }
+      "args": [
+        "abc",
+        10,
+        0,
+        0,
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_hourly"
+      }
+    },
+    {
+      "name": "詳細計算: 時給2000円・時間外70h → 60hは25%・10hは50%で計18万円",
+      "func": "calculateDetailed",
+      "args": [
+        2000,
+        70,
+        0,
+        0
+      ],
+      "expect": {
+        "ok": true,
+        "within60Hours": 60,
+        "over60Hours": 10,
+        "overtimePay": 150000,
+        "overtime60Pay": 30000,
+        "totalPay": 180000
+      }
+    },
+    {
+      "name": "詳細計算: 時給2000円・時間外50h・休日8h・深夜10h → 計151,600円",
+      "func": "calculateDetailed",
+      "args": [
+        2000,
+        50,
+        8,
+        10
+      ],
+      "expect": {
+        "ok": true,
+        "overtimePay": 125000,
+        "holidayPay": 21600,
+        "lateNightExtra": 5000,
+        "totalPay": 151600
+      }
+    },
+    {
+      "name": "詳細計算: 境界60hちょうどは全部25%(超過0h)",
+      "func": "calculateDetailed",
+      "args": [
+        1500,
+        60,
+        0,
+        0
+      ],
+      "expect": {
+        "ok": true,
+        "within60Hours": 60,
+        "over60Hours": 0,
+        "overtime60Pay": 0,
+        "totalPay": 112500
+      }
+    },
+    {
+      "name": "未払いチェック: 時給1875円・時間外45h・深夜12h・支払5万円 → 不足61,094円",
+      "func": "calculateDetailed",
+      "args": [
+        1875,
+        45,
+        0,
+        12,
+        50000
+      ],
+      "expect": {
+        "ok": true,
+        "overtimePay": 105469,
+        "lateNightExtra": 5625,
+        "totalPay": 111094,
+        "shortfallYen": 61094
+      }
+    },
+    {
+      "name": "詳細計算: 時給400円(下限未満)はエラー",
+      "func": "calculateDetailed",
+      "args": [
+        400,
+        10,
+        0,
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_hourly"
+      }
+    },
+    {
+      "name": "詳細計算: 時間外がマイナスはエラー",
+      "func": "calculateDetailed",
+      "args": [
+        2000,
+        -1,
+        0,
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_hours"
+      }
     }
   ]
 }

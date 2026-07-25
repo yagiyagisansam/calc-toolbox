@@ -64,11 +64,38 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 5kmごとの通過タイムと定番目標の早見表</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">目標タイムから5kmごとの通過タイムを出す</h3>
+      <p class="adv-note">種目と目標タイムを入れると、必要な1kmペースと5kmごとの通過タイム表を作ります。レース中のペース確認(腕時計との照合)に。</p>
+      <label>種目
+        <select id="adv-race">
+          <option value="42.195" selected>フルマラソン(42.195km)</option>
+          <option value="21.0975">ハーフマラソン(21.0975km)</option>
+          <option value="10">10km</option>
+          <option value="5">5km</option>
+        </select>
+      </label>
+      <label>目標タイム(時間・分・秒)</label>
+      <div style="display:flex; gap:8px;">
+        <input type="number" id="adv-th" inputmode="numeric" step="1" min="0" max="99" value="4" aria-label="時間">
+        <input type="number" id="adv-tm" inputmode="numeric" step="1" min="0" max="59" value="0" aria-label="分">
+        <input type="number" id="adv-ts" inputmode="numeric" step="1" min="0" max="59" value="0" aria-label="秒">
+      </div>
+      <button type="button" id="adv-split-run">通過タイム表を作る</button>
+      <h3 class="adv-h">定番目標の必要ペース早見表</h3>
+      <p class="adv-note">「サブ4」など、種目ごとの定番目標に必要な1kmペースを一覧にします(種目は上で選んだものを使います)。</p>
+      <button type="button" id="adv-goal-run">早見表を見る</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
   <div class="note-box">
     一定ペースで走った場合の<strong>概算</strong>です。実際のレースではコースの起伏・給水・混雑などでペースは変動します。
   </div>
 
-  <p>距離と目標タイムから<strong>1kmあたりのペース</strong>と時速を計算します。逆に、ペースから<strong>ゴールタイムの予測</strong>もできます。マラソン・ハーフ・ジョギングのペース配分に。</p>
+  <p>走る距離と目標タイムを入れるだけで、<strong>1kmを何分何秒で走ればいいか</strong>がすぐわかるツールです。逆に、いつものペースからゴールタイムの予測もできます。マラソン大会の目標づくりや、ジョギングのペース配分にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -171,6 +198,68 @@
     box.innerHTML = '<div class="result-main">' + fmtTime(r.totalSeconds) + "</div>" +
       "<p>距離 " + currentDistance() + " km を " + fmtPace(p) + " で走った場合</p>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advFmtTime(sec) {
+    var h = Math.floor(sec / 3600);
+    var m = Math.floor((sec % 3600) / 60);
+    var s = sec % 60;
+    function p(n) { return (n < 10 ? "0" : "") + n; }
+    return h > 0 ? h + ":" + p(m) + ":" + p(s) : m + ":" + p(s);
+  }
+  function advFmtPace(sec) {
+    return Math.floor(sec / 60) + "分" + ("0" + (sec % 60)).slice(-2) + "秒/km";
+  }
+  function advFail(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-split-run").addEventListener("click", function () {
+    var d = parseFloat(document.getElementById("adv-race").value);
+    var h = parseInt(document.getElementById("adv-th").value, 10) || 0;
+    var m = parseInt(document.getElementById("adv-tm").value, 10) || 0;
+    var s = parseInt(document.getElementById("adv-ts").value, 10) || 0;
+    var total = h * 3600 + m * 60 + s;
+    var r = PaceCalc.raceSplits(d, total);
+    if (!r.ok) { advFail("目標タイムを1分〜100時間の範囲で入力してください。"); return; }
+    var html = '<div class="result-main">必要ペース ' + advFmtPace(r.paceSecPerKm) + '</div>' +
+      "<p>時速に直すと約 " + r.speedKmh.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " km/h です。</p>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>通過点</th><th>通過タイム</th></tr></thead><tbody>';
+    for (var i = 0; i < r.rows.length; i++) {
+      var row = r.rows[i];
+      html += "<tr><td>" + (row.goal ? "ゴール(" + row.km.toLocaleString() + "km)" : row.km + "km") +
+        "</td><td>" + advFmtTime(row.sec) + "</td></tr>";
+    }
+    html += "</tbody></table></div>" +
+      '<p class="adv-note">一定ペースで走った場合の計算です。給水やトイレのロスがある分、少し速めのペースで見ておくと安心です。</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  });
+  var ADV_GOALS = {
+    "42.195": [["サブ3", 10800], ["サブ3.5", 12600], ["サブ4", 14400], ["サブ4.5", 16200], ["サブ5", 18000]],
+    "21.0975": [["1時間30分", 5400], ["1時間45分", 6300], ["2時間", 7200], ["2時間30分", 9000]],
+    "10": [["40分", 2400], ["50分", 3000], ["60分", 3600]],
+    "5": [["20分", 1200], ["25分", 1500], ["30分", 1800]]
+  };
+  document.getElementById("adv-goal-run").addEventListener("click", function () {
+    var key = document.getElementById("adv-race").value;
+    var d = parseFloat(key);
+    var goals = ADV_GOALS[key];
+    var html = '<div class="result-main">定番目標と必要ペース</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>目標</th><th>必要な1kmペース</th></tr></thead><tbody>';
+    for (var i = 0; i < goals.length; i++) {
+      var r = PaceCalc.paceFor(d, goals[i][1]);
+      if (!r.ok) continue;
+      html += "<tr><td>" + goals[i][0] + "</td><td>" + advFmtPace(r.paceSecPerKm) + "</td></tr>";
+    }
+    html += "</tbody></table></div>";
+    advBox.innerHTML = html;
+    advBox.hidden = false;
   });
 })();
 </script>

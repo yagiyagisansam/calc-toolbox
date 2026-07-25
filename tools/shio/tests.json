@@ -6,62 +6,290 @@
     {
       "name": "ナトリウム1000mg → 食塩相当量2.54g",
       "func": "toSalt",
-      "args": [1000],
-      "expect": { "ok": true, "saltG": 2.54, "pctMale": 34, "pctFemale": 39 }
+      "args": [
+        1000
+      ],
+      "expect": {
+        "ok": true,
+        "saltG": 2.54,
+        "pctMale": 34,
+        "pctFemale": 39
+      }
     },
     {
       "name": "ナトリウム400mg → 1.02g",
       "func": "toSalt",
-      "args": [400],
-      "expect": { "ok": true, "saltG": 1.02 }
+      "args": [
+        400
+      ],
+      "expect": {
+        "ok": true,
+        "saltG": 1.02
+      }
     },
     {
       "name": "ナトリウム2950mg → 7.49g(男性目標量の100%)",
       "func": "toSalt",
-      "args": [2950],
-      "expect": { "ok": true, "saltG": 7.49, "pctMale": 100 }
+      "args": [
+        2950
+      ],
+      "expect": {
+        "ok": true,
+        "saltG": 7.49,
+        "pctMale": 100
+      }
     },
     {
       "name": "カップ麺の例: ナトリウム2000mg → 5.08g",
       "func": "toSalt",
-      "args": [2000],
-      "expect": { "ok": true, "saltG": 5.08, "pctMale": 68, "pctFemale": 78 }
+      "args": [
+        2000
+      ],
+      "expect": {
+        "ok": true,
+        "saltG": 5.08,
+        "pctMale": 68,
+        "pctFemale": 78
+      }
     },
     {
       "name": "食塩相当量1g → ナトリウム394mg",
       "func": "toSodium",
-      "args": [1],
-      "expect": { "ok": true, "sodiumMg": 394 }
+      "args": [
+        1
+      ],
+      "expect": {
+        "ok": true,
+        "sodiumMg": 394
+      }
     },
     {
       "name": "食塩相当量6.5g(女性目標量) → ナトリウム2559mg",
       "func": "toSodium",
-      "args": [6.5],
-      "expect": { "ok": true, "sodiumMg": 2559 }
+      "args": [
+        6.5
+      ],
+      "expect": {
+        "ok": true,
+        "sodiumMg": 2559
+      }
     },
     {
       "name": "異常入力: ナトリウム0はエラー",
       "func": "toSalt",
-      "args": [0],
-      "expect": { "ok": false, "code": "invalid_value" }
+      "args": [
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
     },
     {
       "name": "異常入力: 負の値はエラー",
       "func": "toSalt",
-      "args": [-100],
-      "expect": { "ok": false, "code": "invalid_value" }
+      "args": [
+        -100
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
     },
     {
       "name": "異常入力: 数値以外はエラー",
       "func": "toSalt",
-      "args": ["1000"],
-      "expect": { "ok": false, "code": "invalid_value" }
+      "args": [
+        "1000"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
     },
     {
       "name": "異常入力: 食塩相当量100g超はエラー",
       "func": "toSodium",
-      "args": [200],
-      "expect": { "ok": false, "code": "invalid_value" }
+      "args": [
+        200
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
+    },
+    {
+      "name": "食べる量: 100gあたり1.4gを250g→3.5g(男性47%/女性54%)",
+      "func": "portionSalt",
+      "args": [
+        1.4,
+        250
+      ],
+      "expect": {
+        "ok": true,
+        "saltG": 3.5,
+        "pctMale": 47,
+        "pctFemale": 54
+      }
+    },
+    {
+      "name": "食べる量: 100gあたり5.6gを25g→1.4g",
+      "func": "portionSalt",
+      "args": [
+        5.6,
+        25
+      ],
+      "expect": {
+        "ok": true,
+        "saltG": 1.4,
+        "pctMale": 19,
+        "pctFemale": 22
+      }
+    },
+    {
+      "name": "食べる量: 食べる量0gはエラー",
+      "func": "portionSalt",
+      "args": [
+        1.4,
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
+    },
+    {
+      "name": "1日合計: みそ汁1.8g+カップ麺5g=6.8g、男性は残り0.7g",
+      "func": "dailyTotal",
+      "args": [
+        [
+          {
+            "name": "みそ汁",
+            "salt": 1.8
+          },
+          {
+            "name": "カップ麺",
+            "salt": 5
+          }
+        ],
+        "male"
+      ],
+      "expect": {
+        "ok": true,
+        "totalG": 6.8,
+        "targetG": 7.5,
+        "remainingG": 0.7,
+        "over": false,
+        "pct": 91
+      }
+    },
+    {
+      "name": "1日合計: 6.8gは女性の目標量6.5gを0.3g超過",
+      "func": "dailyTotal",
+      "args": [
+        [
+          {
+            "name": "みそ汁",
+            "salt": 1.8
+          },
+          {
+            "name": "カップ麺",
+            "salt": 5
+          }
+        ],
+        "female"
+      ],
+      "expect": {
+        "ok": true,
+        "totalG": 6.8,
+        "targetG": 6.5,
+        "remainingG": -0.3,
+        "over": true,
+        "pct": 105
+      }
+    },
+    {
+      "name": "1日合計: 1件だけでも計算できる(2g・女性は31%)",
+      "func": "dailyTotal",
+      "args": [
+        [
+          {
+            "name": "食パン",
+            "salt": 2
+          }
+        ],
+        "female"
+      ],
+      "expect": {
+        "ok": true,
+        "totalG": 2,
+        "remainingG": 4.5,
+        "over": false,
+        "pct": 31
+      }
+    },
+    {
+      "name": "1日合計: 空の配列はエラー",
+      "func": "dailyTotal",
+      "args": [
+        [],
+        "male"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_items"
+      }
+    },
+    {
+      "name": "1日合計: 7件はエラー(最大6件)",
+      "func": "dailyTotal",
+      "args": [
+        [
+          {
+            "salt": 1
+          },
+          {
+            "salt": 1
+          },
+          {
+            "salt": 1
+          },
+          {
+            "salt": 1
+          },
+          {
+            "salt": 1
+          },
+          {
+            "salt": 1
+          },
+          {
+            "salt": 1
+          }
+        ],
+        "male"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "too_many_items"
+      }
+    },
+    {
+      "name": "1日合計: マイナスの塩分はエラー",
+      "func": "dailyTotal",
+      "args": [
+        [
+          {
+            "name": "x",
+            "salt": -1
+          }
+        ],
+        "male"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
     }
   ]
 }

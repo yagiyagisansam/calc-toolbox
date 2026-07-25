@@ -54,7 +54,72 @@
     return { ok: true, value: total };
   }
 
-  var api = { toRoman: toRoman, fromRoman: fromRoman };
+  /**
+   * カンマ・読点・改行区切りのテキストを、1件ずつまとめてローマ数字⇔数字変換する。
+   * 各項目は自動判定: 数字だけなら「数字→ローマ数字」、それ以外は「ローマ数字→数字」。
+   *
+   * 時計文字盤表記(clockFace=true): 時計の文字盤では伝統的に4をIVではなくIIIIと
+   * 書く慣習があるため、4→IIIIで出力し、入力IIIIも4として受け付ける。
+   * それ以外の数(9=IXなど)は標準表記のまま。
+   *
+   * @param {string} text 区切りテキスト(最大20件)
+   * @param {boolean} clockFace 時計文字盤表記(4をIIIIとする)
+   * @returns {{ok:true, count:number, items:Array<{input:string, ok:boolean, output:string}>}
+   *          |{ok:false, code:string}} code: "empty" | "too_many"
+   */
+  function convertMany(text, clockFace) {
+    if (typeof text !== "string") return { ok: false, code: "empty" };
+    var parts = text.split(/[\n,、]+/).map(function (p) { return p.trim(); })
+      .filter(function (p) { return p !== ""; });
+    if (parts.length === 0) return { ok: false, code: "empty" };
+    if (parts.length > 20) return { ok: false, code: "too_many" };
+    var items = parts.map(function (p) {
+      if (/^[0-9]+$/.test(p)) {
+        var n = parseInt(p, 10);
+        var r = toRoman(n);
+        if (!r.ok) return { input: p, ok: false, output: "" };
+        return { input: p, ok: true, output: (clockFace && n === 4) ? "IIII" : r.roman };
+      }
+      if (clockFace && p.toUpperCase() === "IIII") {
+        return { input: p, ok: true, output: "4" };
+      }
+      var r2 = fromRoman(p);
+      if (!r2.ok) return { input: p, ok: false, output: "" };
+      return { input: p, ok: true, output: String(r2.value) };
+    });
+    return { ok: true, count: items.length, items: items };
+  }
+
+  /**
+   * 年月日をそれぞれローマ数字にする(記念日の刻印などの表記用)。
+   * 実在する日付かどうかを検証する(2月30日などはエラー)。
+   * @param {number} y 西暦年(1〜3999)
+   * @param {number} m 月(1〜12)
+   * @param {number} d 日(1〜31)
+   * @returns {{ok:true, year:string, month:string, day:string}|{ok:false, code:string}}
+   *   code: "invalid_date"
+   */
+  function dateToRoman(y, m, d) {
+    if (typeof y !== "number" || typeof m !== "number" || typeof d !== "number" ||
+        y !== Math.floor(y) || m !== Math.floor(m) || d !== Math.floor(d) ||
+        y < 1 || y > 3999 || m < 1 || m > 12 || d < 1 || d > 31) {
+      return { ok: false, code: "invalid_date" };
+    }
+    var dt = new Date(y, m - 1, d);
+    if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d) {
+      return { ok: false, code: "invalid_date" };
+    }
+    return {
+      ok: true,
+      year: toRoman(y).roman,
+      month: toRoman(m).roman,
+      day: toRoman(d).roman
+    };
+  }
+
+  var api = {
+    dateToRoman: dateToRoman,
+    convertMany: convertMany, toRoman: toRoman, fromRoman: fromRoman };
   if (typeof module !== "undefined" && module.exports) { module.exports = api; }
   else { global.RomanCalc = api; }
 })(typeof window !== "undefined" ? window : globalThis);

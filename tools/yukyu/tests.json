@@ -6,86 +6,262 @@
     {
       "name": "通常の労働者・6ヶ月 → 10日(年5日義務の対象)",
       "func": "grantedDays",
-      "args": ["full", 0],
-      "expect": { "ok": true, "days": 10, "serviceLabel": "6ヶ月", "obligation5days": true }
+      "args": [
+        "full",
+        0
+      ],
+      "expect": {
+        "ok": true,
+        "days": 10,
+        "serviceLabel": "6ヶ月",
+        "obligation5days": true
+      }
     },
     {
       "name": "通常の労働者・6年6ヶ月以上 → 上限20日",
       "func": "grantedDays",
-      "args": ["full", 6],
-      "expect": { "ok": true, "days": 20, "obligation5days": true }
+      "args": [
+        "full",
+        6
+      ],
+      "expect": {
+        "ok": true,
+        "days": 20,
+        "obligation5days": true
+      }
     },
     {
       "name": "通常の労働者・3年6ヶ月 → 14日(加算が2日刻みに変わる境界)",
       "func": "grantedDays",
-      "args": ["full", 3],
-      "expect": { "ok": true, "days": 14 }
+      "args": [
+        "full",
+        3
+      ],
+      "expect": {
+        "ok": true,
+        "days": 14
+      }
     },
     {
       "name": "週4日・6ヶ月 → 7日(義務対象外)",
       "func": "grantedDays",
-      "args": ["d4", 0],
-      "expect": { "ok": true, "days": 7, "obligation5days": false }
+      "args": [
+        "d4",
+        0
+      ],
+      "expect": {
+        "ok": true,
+        "days": 7,
+        "obligation5days": false
+      }
     },
     {
       "name": "週4日・3年6ヶ月 → 10日(比例付与でも10日に達すると義務対象)",
       "func": "grantedDays",
-      "args": ["d4", 3],
-      "expect": { "ok": true, "days": 10, "obligation5days": true }
+      "args": [
+        "d4",
+        3
+      ],
+      "expect": {
+        "ok": true,
+        "days": 10,
+        "obligation5days": true
+      }
     },
     {
       "name": "週4日・6年6ヶ月以上 → 15日",
       "func": "grantedDays",
-      "args": ["d4", 6],
-      "expect": { "ok": true, "days": 15 }
+      "args": [
+        "d4",
+        6
+      ],
+      "expect": {
+        "ok": true,
+        "days": 15
+      }
     },
     {
       "name": "週3日・2年6ヶ月 → 6日",
       "func": "grantedDays",
-      "args": ["d3", 2],
-      "expect": { "ok": true, "days": 6 }
+      "args": [
+        "d3",
+        2
+      ],
+      "expect": {
+        "ok": true,
+        "days": 6
+      }
     },
     {
       "name": "週3日・6年6ヶ月以上 → 11日",
       "func": "grantedDays",
-      "args": ["d3", 6],
-      "expect": { "ok": true, "days": 11 }
+      "args": [
+        "d3",
+        6
+      ],
+      "expect": {
+        "ok": true,
+        "days": 11
+      }
     },
     {
       "name": "週2日・4年6ヶ月 → 6日",
       "func": "grantedDays",
-      "args": ["d2", 4],
-      "expect": { "ok": true, "days": 6 }
+      "args": [
+        "d2",
+        4
+      ],
+      "expect": {
+        "ok": true,
+        "days": 6
+      }
     },
     {
       "name": "週1日・6ヶ月 → 1日",
       "func": "grantedDays",
-      "args": ["d1", 0],
-      "expect": { "ok": true, "days": 1 }
+      "args": [
+        "d1",
+        0
+      ],
+      "expect": {
+        "ok": true,
+        "days": 1
+      }
     },
     {
       "name": "週1日・6年6ヶ月以上 → 3日(4年6ヶ月以降は3日で頭打ち)",
       "func": "grantedDays",
-      "args": ["d1", 6],
-      "expect": { "ok": true, "days": 3, "obligation5days": false }
+      "args": [
+        "d1",
+        6
+      ],
+      "expect": {
+        "ok": true,
+        "days": 3,
+        "obligation5days": false
+      }
     },
     {
       "name": "異常入力: 不明な働き方区分はエラー",
       "func": "grantedDays",
-      "args": ["d5", 0],
-      "expect": { "ok": false, "code": "invalid_worker_type" }
+      "args": [
+        "d5",
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_worker_type"
+      }
     },
     {
       "name": "異常入力: 勤続区分が範囲外はエラー",
       "func": "grantedDays",
-      "args": ["full", 7],
-      "expect": { "ok": false, "code": "invalid_service" }
+      "args": [
+        "full",
+        7
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_service"
+      }
     },
     {
       "name": "異常入力: 勤続区分が小数はエラー",
       "func": "grantedDays",
-      "args": ["full", 1.5],
-      "expect": { "ok": false, "code": "invalid_service" }
+      "args": [
+        "full",
+        1.5
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_service"
+      }
+    },
+    {
+      "name": "付与予測: 入社2026-01-24(フル)→ 2026-07-24に10日(基準日当日)",
+      "func": "nextGrant",
+      "args": [
+        "2026-01-24",
+        "full",
+        "2026-07-24"
+      ],
+      "expect": {
+        "ok": true,
+        "nextDate": "2026-07-24",
+        "days": 10,
+        "serviceLabel": "6ヶ月",
+        "obligation5days": true
+      }
+    },
+    {
+      "name": "付与予測: 入社2020-04-01(フル)→ 次回2026-10-01に20日(6年6ヶ月以上)",
+      "func": "nextGrant",
+      "args": [
+        "2020-04-01",
+        "full",
+        "2026-07-24"
+      ],
+      "expect": {
+        "ok": true,
+        "nextDate": "2026-10-01",
+        "days": 20,
+        "serviceLabel": "6年6ヶ月以上"
+      }
+    },
+    {
+      "name": "付与予測: 週3日パート・入社2024-10-15 → 次回2027-04-15に6日(義務対象外)",
+      "func": "nextGrant",
+      "args": [
+        "2024-10-15",
+        "d3",
+        "2026-07-24"
+      ],
+      "expect": {
+        "ok": true,
+        "nextDate": "2027-04-15",
+        "days": 6,
+        "obligation5days": false
+      }
+    },
+    {
+      "name": "付与予測: 月末入社2024-08-31は6ヶ月後2025-02-28に繰り上げ→次回2027-02-28に12日",
+      "func": "nextGrant",
+      "args": [
+        "2024-08-31",
+        "full",
+        "2026-07-24"
+      ],
+      "expect": {
+        "ok": true,
+        "nextDate": "2027-02-28",
+        "days": 12
+      }
+    },
+    {
+      "name": "付与予測: 存在しない日付はエラー",
+      "func": "nextGrant",
+      "args": [
+        "2024-13-01",
+        "full",
+        "2026-07-24"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_date"
+      }
+    },
+    {
+      "name": "付与予測: 不正な働き方区分はエラー",
+      "func": "nextGrant",
+      "args": [
+        "2024-04-01",
+        "x",
+        "2026-07-24"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_worker_type"
+      }
     }
   ]
 }

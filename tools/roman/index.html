@@ -44,7 +44,35 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>時計の文字盤、映画・ゲームのタイトル(「ファイナルファンタジーⅦ」)、建物の定礎に刻まれた年号……。<strong>アラビア数字とローマ数字を相互変換</strong>します。IV(4)やIX(9)のような減算則にも正確に対応しています。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: まとめて変換・日付のローマ数字表記</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">複数まとめて変換</h3>
+      <p class="adv-note">カンマまたは改行で区切って入力すると、最大20個を一度に変換して表にします。数字はローマ数字に、ローマ数字は数字に自動で変換します。「時計文字盤表記」にチェックすると、時計の慣習にならって4をIIIIと書きます。</p>
+      <label>変換したい数字・ローマ数字(カンマか改行区切り、最大20個)
+        <textarea id="adv-list" rows="4" placeholder="例: 1, 2, 3, 4 または MMXXVI"></textarea>
+      </label>
+      <label style="display:block;"><input type="checkbox" id="adv-clock"> 時計文字盤表記(4をIIIIにする)</label>
+      <button type="button" id="adv-list-run">まとめて変換する</button>
+      <div class="tool-result" id="adv-list-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">日付をローマ数字にする</h3>
+      <p class="adv-note">誕生日や記念日を「MMXXVI・VII・XXIV」のようなローマ数字表記にします。指輪の刻印やデザインの下書きに。</p>
+      <label>年(西暦)
+        <input type="number" id="adv-year" min="1" max="3999" step="1" placeholder="例: 2026">
+      </label>
+      <label>月
+        <input type="number" id="adv-month" min="1" max="12" step="1" placeholder="例: 7">
+      </label>
+      <label>日
+        <input type="number" id="adv-day" min="1" max="31" step="1" placeholder="例: 24">
+      </label>
+      <button type="button" id="adv-date-run">日付を変換する</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>数字を入れるだけで、<strong>ローマ数字(I・V・X・M など)の書き方</strong>がすぐわかるツールです。逆に、時計の文字盤や映画のタイトルで見かけたローマ数字を普通の数字に戻すこともできます。年号の刻印や作品名の読み方を調べたい時にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -126,6 +154,51 @@
       box.innerHTML = '<div class="result-main">' + r2.value.toLocaleString() + "</div>";
     }
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var listBox = document.getElementById("adv-list-result");
+  document.getElementById("adv-list-run").addEventListener("click", function () {
+    var clock = document.getElementById("adv-clock").checked;
+    var r = RomanCalc.convertMany(document.getElementById("adv-list").value, clock);
+    if (!r.ok) {
+      listBox.innerHTML = '<p class="result-error">' +
+        (r.code === "too_many" ? "一度に変換できるのは20個までです。" : "変換したい数字またはローマ数字を入力してください。") +
+        '</p>';
+      listBox.hidden = false;
+      return;
+    }
+    var rows = r.items.map(function (it) {
+      var out = it.ok ? it.output : "変換できません(1〜3999の数字か正しいローマ数字を入力)";
+      return "<tr><td>" + it.input.replace(/[<>&]/g, "") + "</td><td>" + out + "</td></tr>";
+    }).join("");
+    listBox.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>入力</th><th>変換結果</th></tr></thead><tbody>' +
+      rows + '</tbody></table></div>';
+    listBox.hidden = false;
+  });
+  document.getElementById("adv-date-run").addEventListener("click", function () {
+    var y = parseInt(document.getElementById("adv-year").value, 10);
+    var m = parseInt(document.getElementById("adv-month").value, 10);
+    var d = parseInt(document.getElementById("adv-day").value, 10);
+    var r = RomanCalc.dateToRoman(y, m, d);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">実在する日付を西暦(1〜3999年)で入力してください。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">' + r.year + '・' + r.month + '・' + r.day + '</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>中黒区切り</td><td>' + r.year + '・' + r.month + '・' + r.day + '</td></tr>' +
+      '<tr><td>ピリオド区切り</td><td>' + r.year + '.' + r.month + '.' + r.day + '</td></tr>' +
+      '<tr><td>ハイフン区切り</td><td>' + r.year + '-' + r.month + '-' + r.day + '</td></tr>' +
+      '</tbody></table></div>';
+    advBox.hidden = false;
   });
 })();
 </script>

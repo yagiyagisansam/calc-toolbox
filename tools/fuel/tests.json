@@ -6,74 +6,292 @@
     {
       "name": "通勤想定(100km/15km/L/170円): 6.67L・1,133円",
       "func": "calculate",
-      "args": [100, 15, 170],
-      "expect": { "ok": true, "fuelL": 6.67, "costYen": 1133 }
+      "args": [
+        100,
+        15,
+        170
+      ],
+      "expect": {
+        "ok": true,
+        "fuelL": 6.67,
+        "costYen": 1133
+      }
     },
     {
       "name": "帰省想定(400km/20km/L/165円): 20L・3,300円",
       "func": "calculate",
-      "args": [400, 20, 165],
-      "expect": { "ok": true, "fuelL": 20, "costYen": 3300 }
+      "args": [
+        400,
+        20,
+        165
+      ],
+      "expect": {
+        "ok": true,
+        "fuelL": 20,
+        "costYen": 3300
+      }
     },
     {
       "name": "小数入力(35.5km/12.3km/L/168.4円): 2.89L・486円",
       "func": "calculate",
-      "args": [35.5, 12.3, 168.4],
-      "expect": { "ok": true, "fuelL": 2.89, "costYen": 486 }
+      "args": [
+        35.5,
+        12.3,
+        168.4
+      ],
+      "expect": {
+        "ok": true,
+        "fuelL": 2.89,
+        "costYen": 486
+      }
     },
     {
       "name": "長距離(1000km/25.5km/L/155円): 39.22L・6,078円",
       "func": "calculate",
-      "args": [1000, 25.5, 155],
-      "expect": { "ok": true, "fuelL": 39.22, "costYen": 6078 }
+      "args": [
+        1000,
+        25.5,
+        155
+      ],
+      "expect": {
+        "ok": true,
+        "fuelL": 39.22,
+        "costYen": 6078
+      }
     },
     {
       "name": "境界値: 最小距離0.1kmは計算できる",
       "func": "calculate",
-      "args": [0.1, 15, 170],
-      "expect": { "ok": true, "fuelL": 0.01, "costYen": 1 }
+      "args": [
+        0.1,
+        15,
+        170
+      ],
+      "expect": {
+        "ok": true,
+        "fuelL": 0.01,
+        "costYen": 1
+      }
     },
     {
       "name": "異常入力: 距離0はエラー",
       "func": "calculate",
-      "args": [0, 15, 170],
-      "expect": { "ok": false, "code": "invalid_distance" }
+      "args": [
+        0,
+        15,
+        170
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_distance"
+      }
     },
     {
       "name": "異常入力: 距離が範囲超過(20000km)はエラー",
       "func": "calculate",
-      "args": [20000, 15, 170],
-      "expect": { "ok": false, "code": "invalid_distance" }
+      "args": [
+        20000,
+        15,
+        170
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_distance"
+      }
     },
     {
       "name": "異常入力: 燃費0はエラー",
       "func": "calculate",
-      "args": [100, 0, 170],
-      "expect": { "ok": false, "code": "invalid_efficiency" }
+      "args": [
+        100,
+        0,
+        170
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_efficiency"
+      }
     },
     {
       "name": "異常入力: 燃費61km/L(上限超過)はエラー",
       "func": "calculate",
-      "args": [100, 61, 170],
-      "expect": { "ok": false, "code": "invalid_efficiency" }
+      "args": [
+        100,
+        61,
+        170
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_efficiency"
+      }
     },
     {
       "name": "異常入力: 単価が下限未満(30円)はエラー",
       "func": "calculate",
-      "args": [100, 15, 30],
-      "expect": { "ok": false, "code": "invalid_price" }
+      "args": [
+        100,
+        15,
+        30
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_price"
+      }
     },
     {
       "name": "異常入力: 単価が上限超過(600円)はエラー",
       "func": "calculate",
-      "args": [100, 15, 600],
-      "expect": { "ok": false, "code": "invalid_price" }
+      "args": [
+        100,
+        15,
+        600
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_price"
+      }
     },
     {
       "name": "異常入力: 数値でない距離はエラー",
       "func": "calculate",
-      "args": ["abc", 15, 170],
-      "expect": { "ok": false, "code": "invalid_distance" }
+      "args": [
+        "abc",
+        15,
+        170
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_distance"
+      }
+    },
+    {
+      "name": "割り勘: 400km・20km/L・170円+高速6,600円を4人 → 1人2,500円",
+      "func": "splitCost",
+      "args": [
+        400,
+        20,
+        170,
+        4,
+        6600
+      ],
+      "expect": {
+        "ok": true,
+        "fuelYen": 3400,
+        "tollYen": 6600,
+        "totalYen": 10000,
+        "perPersonYen": 2500
+      }
+    },
+    {
+      "name": "割り勘: 高速代0円・100km・10km/L・150円を3人 → 1人500円",
+      "func": "splitCost",
+      "args": [
+        100,
+        10,
+        150,
+        3,
+        0
+      ],
+      "expect": {
+        "ok": true,
+        "fuelYen": 1500,
+        "totalYen": 1500,
+        "perPersonYen": 500
+      }
+    },
+    {
+      "name": "割り勘: 端数(1,067円を2人)は四捨五入で534円",
+      "func": "splitCost",
+      "args": [
+        100,
+        15,
+        160,
+        2,
+        0
+      ],
+      "expect": {
+        "ok": true,
+        "fuelYen": 1067,
+        "perPersonYen": 534
+      }
+    },
+    {
+      "name": "割り勘: 人数0はエラー",
+      "func": "splitCost",
+      "args": [
+        100,
+        15,
+        160,
+        0,
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_people"
+      }
+    },
+    {
+      "name": "割り勘: 高速代マイナスはエラー",
+      "func": "splitCost",
+      "args": [
+        100,
+        15,
+        160,
+        2,
+        -10
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_toll"
+      }
+    },
+    {
+      "name": "通勤: 片道15km・月20日・15km/L・170円 → 月6,800円・年81,600円",
+      "func": "commuteCost",
+      "args": [
+        15,
+        20,
+        15,
+        170
+      ],
+      "expect": {
+        "ok": true,
+        "monthlyKm": 600,
+        "fuelLPerMonth": 40,
+        "costPerMonth": 6800,
+        "costPerYear": 81600
+      }
+    },
+    {
+      "name": "通勤: 片道10.5km・月22日・21km/L・168円 → 月3,696円",
+      "func": "commuteCost",
+      "args": [
+        10.5,
+        22,
+        21,
+        168
+      ],
+      "expect": {
+        "ok": true,
+        "monthlyKm": 462,
+        "fuelLPerMonth": 22,
+        "costPerMonth": 3696,
+        "costPerYear": 44352
+      }
+    },
+    {
+      "name": "通勤: 出勤日数0はエラー",
+      "func": "commuteCost",
+      "args": [
+        15,
+        0,
+        15,
+        170
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_days"
+      }
     }
   ]
 }

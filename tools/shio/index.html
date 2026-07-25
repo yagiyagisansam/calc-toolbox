@@ -44,7 +44,58 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>食品の栄養成分表示に「ナトリウム○mg」と書かれているとき、それが<strong>食塩何gにあたるか</strong>を換算します。1日の目標量に対する割合も表示するので、減塩中の方の食品選びに。逆方向(食塩→ナトリウム)の換算もできます。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 食べる量あたりの塩分と1日の合計管理</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">「100gあたり」表示から実際に食べる量の塩分を出す</h3>
+      <p class="adv-note">栄養成分表示が「100gあたり」の食品で、実際に食べる量に含まれる食塩相当量を計算します。</p>
+      <label>100gあたりの食塩相当量(g)
+        <input type="number" id="adv-per100" min="0.01" max="100" step="any" placeholder="例: 1.4">
+      </label>
+      <label>実際に食べる量(g)
+        <input type="number" id="adv-grams" min="1" max="5000" step="any" placeholder="例: 250">
+      </label>
+      <button type="button" id="adv-portion-run">食べる量の塩分を計算する</button>
+      <h3 class="adv-h">1日の塩分合計を管理する</h3>
+      <p class="adv-note">今日食べたもの(最大6件)の食塩相当量(g)を入れると、合計と、1日の目標量までの残りを計算します。食品名は自由に入力できます。ナトリウム(mg)表示のものは、上の簡易換算で食塩相当量に直してから入力してください。</p>
+      <div id="adv-rows">
+        <label>食品1 <span style="display:flex;gap:.5em;align-items:center;">
+          <input type="text" id="adv-name-1" placeholder="例: みそ汁" style="flex:1;">
+          <input type="number" id="adv-salt-1" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食塩相当量(g)"> g
+        </span></label>
+        <label>食品2 <span style="display:flex;gap:.5em;align-items:center;">
+          <input type="text" id="adv-name-2" placeholder="例: 塩さけ" style="flex:1;">
+          <input type="number" id="adv-salt-2" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食塩相当量(g)"> g
+        </span></label>
+        <label>食品3 <span style="display:flex;gap:.5em;align-items:center;">
+          <input type="text" id="adv-name-3" style="flex:1;">
+          <input type="number" id="adv-salt-3" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食塩相当量(g)"> g
+        </span></label>
+        <label>食品4 <span style="display:flex;gap:.5em;align-items:center;">
+          <input type="text" id="adv-name-4" style="flex:1;">
+          <input type="number" id="adv-salt-4" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食塩相当量(g)"> g
+        </span></label>
+        <label>食品5 <span style="display:flex;gap:.5em;align-items:center;">
+          <input type="text" id="adv-name-5" style="flex:1;">
+          <input type="number" id="adv-salt-5" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食塩相当量(g)"> g
+        </span></label>
+        <label>食品6 <span style="display:flex;gap:.5em;align-items:center;">
+          <input type="text" id="adv-name-6" style="flex:1;">
+          <input type="number" id="adv-salt-6" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食塩相当量(g)"> g
+        </span></label>
+      </div>
+      <label>性別(目標量の区分)
+        <select id="adv-sex">
+          <option value="male">男性(7.5g未満)</option>
+          <option value="female">女性(6.5g未満)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-run">合計を計算する</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>食品の袋に書いてある「ナトリウム〇mg」が<strong>食塩何gにあたるか</strong>がすぐわかるツールです。1日の目標量(男性7.5g・女性6.5g未満)の何%かも同時に表示。減塩中の食品選びにどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -138,6 +189,69 @@
     }
     box.hidden = false;
   });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  document.getElementById("adv-portion-run").addEventListener("click", function () {
+    var per = parseFloat(document.getElementById("adv-per100").value);
+    var g = parseFloat(document.getElementById("adv-grams").value);
+    var r = ShioCalc.portionSalt(per, g);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">100gあたりの食塩相当量(0〜100g)と食べる量(1〜5000g)を数値で入力してください。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">食塩相当量 ' + r.saltG.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' g</div>' +
+      "<p>" + g.toLocaleString() + "g 食べると食塩相当量は <strong>" +
+      r.saltG.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " g</strong>。" +
+      "1日の目標量に対して男性(7.5g未満)の " + r.pctMale.toLocaleString() + "% / 女性(6.5g未満)の " +
+      r.pctFemale.toLocaleString() + "% です。</p>";
+    advBox.hidden = false;
+  });
+  function runAdvTotal() {
+    var items = [];
+    for (var i = 1; i <= 6; i++) {
+      var raw = document.getElementById("adv-salt-" + i).value;
+      if (raw === "") continue;
+      var g = parseFloat(raw);
+      var name = document.getElementById("adv-name-" + i).value || ("食品" + i);
+      items.push({ name: name, salt: g });
+    }
+    if (items.length === 0) {
+      advBox.innerHTML = '<p class="result-error">食塩相当量(g)を1件以上入力してください。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var sex = document.getElementById("adv-sex").value;
+    var r = ShioCalc.dailyTotal(items, sex);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">食塩相当量は0〜100gの数値で入力してください。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var html = '<div class="result-main">合計 ' +
+      r.totalG.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' g(目標量の' + r.pct.toLocaleString() + '%)</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>食品</th><th>食塩相当量</th></tr></thead><tbody>';
+    for (var j = 0; j < items.length; j++) {
+      html += "<tr><td>" + items[j].name.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") +
+        "</td><td>" + items[j].salt.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " g</td></tr>";
+    }
+    html += "</tbody></table></div>";
+    if (r.over) {
+      html += '<p class="result-error">目標量(' + r.targetG + 'g未満)を ' +
+        Math.abs(r.remainingG).toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' g 超えています。</p>';
+    } else {
+      html += "<p>目標量(" + r.targetG + "g未満)まで、あと <strong>" +
+        r.remainingG.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " g</strong> です。</p>";
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", runAdvTotal);
 })();
 </script>
 </body>

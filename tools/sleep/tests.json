@@ -6,68 +6,291 @@
     {
       "name": "23:00就寝→6:30起床 = 7時間30分",
       "func": "calculate",
-      "args": ["23:00", "06:30"],
-      "expect": { "ok": true, "totalMinutes": 450, "hours": 7, "minutes": 30 }
+      "args": [
+        "23:00",
+        "06:30"
+      ],
+      "expect": {
+        "ok": true,
+        "totalMinutes": 450,
+        "hours": 7,
+        "minutes": 30
+      }
     },
     {
       "name": "日をまたがない(01:15→07:45)= 6時間30分",
       "func": "calculate",
-      "args": ["01:15", "07:45"],
-      "expect": { "ok": true, "totalMinutes": 390, "hours": 6, "minutes": 30 }
+      "args": [
+        "01:15",
+        "07:45"
+      ],
+      "expect": {
+        "ok": true,
+        "totalMinutes": 390,
+        "hours": 6,
+        "minutes": 30
+      }
     },
     {
       "name": "22:30就寝→5:00起床 = 6時間30分",
       "func": "calculate",
-      "args": ["22:30", "05:00"],
-      "expect": { "ok": true, "totalMinutes": 390, "hours": 6, "minutes": 30 }
+      "args": [
+        "22:30",
+        "05:00"
+      ],
+      "expect": {
+        "ok": true,
+        "totalMinutes": 390,
+        "hours": 6,
+        "minutes": 30
+      }
     },
     {
       "name": "ほぼ24時間(12:00→11:59)= 23時間59分",
       "func": "calculate",
-      "args": ["12:00", "11:59"],
-      "expect": { "ok": true, "totalMinutes": 1439, "hours": 23, "minutes": 59 }
+      "args": [
+        "12:00",
+        "11:59"
+      ],
+      "expect": {
+        "ok": true,
+        "totalMinutes": 1439,
+        "hours": 23,
+        "minutes": 59
+      }
     },
     {
       "name": "0時就寝→8:00起床 = 8時間",
       "func": "calculate",
-      "args": ["00:00", "08:00"],
-      "expect": { "ok": true, "totalMinutes": 480, "hours": 8, "minutes": 0 }
+      "args": [
+        "00:00",
+        "08:00"
+      ],
+      "expect": {
+        "ok": true,
+        "totalMinutes": 480,
+        "hours": 8,
+        "minutes": 0
+      }
     },
     {
       "name": "1桁時刻の表記も受け付ける(9:00→17:00 = 8時間)",
       "func": "calculate",
-      "args": ["9:00", "17:00"],
-      "expect": { "ok": true, "totalMinutes": 480, "hours": 8, "minutes": 0 }
+      "args": [
+        "9:00",
+        "17:00"
+      ],
+      "expect": {
+        "ok": true,
+        "totalMinutes": 480,
+        "hours": 8,
+        "minutes": 0
+      }
     },
     {
       "name": "異常入力: 同時刻はエラー",
       "func": "calculate",
-      "args": ["23:00", "23:00"],
-      "expect": { "ok": false, "code": "same_time" }
+      "args": [
+        "23:00",
+        "23:00"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "same_time"
+      }
     },
     {
       "name": "異常入力: 存在しない時刻(25:00)はエラー",
       "func": "calculate",
-      "args": ["25:00", "06:30"],
-      "expect": { "ok": false, "code": "invalid_bed" }
+      "args": [
+        "25:00",
+        "06:30"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_bed"
+      }
     },
     {
       "name": "異常入力: 分が60はエラー",
       "func": "calculate",
-      "args": ["23:00", "06:60"],
-      "expect": { "ok": false, "code": "invalid_wake" }
+      "args": [
+        "23:00",
+        "06:60"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_wake"
+      }
     },
     {
       "name": "異常入力: 形式不正はエラー",
       "func": "calculate",
-      "args": ["23時", "06:30"],
-      "expect": { "ok": false, "code": "invalid_bed" }
+      "args": [
+        "23時",
+        "06:30"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_bed"
+      }
     },
     {
       "name": "異常入力: 空文字はエラー",
       "func": "calculate",
-      "args": ["", "06:30"],
-      "expect": { "ok": false, "code": "invalid_bed" }
+      "args": [
+        "",
+        "06:30"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_bed"
+      }
+    },
+    {
+      "name": "週間集計: 計49時間なら平均7時間で差0",
+      "func": "weekStats",
+      "args": [
+        [
+          7,
+          6.5,
+          8,
+          7,
+          6,
+          7.5,
+          7
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "avgHours": 7,
+        "totalHours": 49,
+        "diffHours": 0
+      }
+    },
+    {
+      "name": "週間集計: 計42時間は平均6時間で7時間の不足(睡眠負債)",
+      "func": "weekStats",
+      "args": [
+        [
+          6,
+          5.5,
+          6,
+          7,
+          5,
+          6.5,
+          6
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "avgHours": 6,
+        "totalHours": 42,
+        "diffHours": -7
+      }
+    },
+    {
+      "name": "週間集計: 毎日8時間は+7時間",
+      "func": "weekStats",
+      "args": [
+        [
+          8,
+          8,
+          8,
+          8,
+          8,
+          8,
+          8
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "avgHours": 8,
+        "totalHours": 56,
+        "diffHours": 7
+      }
+    },
+    {
+      "name": "週間集計: 3日分しかない場合はエラー",
+      "func": "weekStats",
+      "args": [
+        [
+          7,
+          7,
+          7
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_days"
+      }
+    },
+    {
+      "name": "週間集計: 25時間の日が混ざるとエラー",
+      "func": "weekStats",
+      "args": [
+        [
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          25
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_hours"
+      }
+    },
+    {
+      "name": "就寝逆算: 6:30起床で7時間眠るには23:30就寝",
+      "func": "bedTimeFor",
+      "args": [
+        "06:30",
+        7
+      ],
+      "expect": {
+        "ok": true,
+        "bedTime": "23:30"
+      }
+    },
+    {
+      "name": "就寝逆算: 7:00起床で7.5時間は23:30就寝",
+      "func": "bedTimeFor",
+      "args": [
+        "07:00",
+        7.5
+      ],
+      "expect": {
+        "ok": true,
+        "bedTime": "23:30"
+      }
+    },
+    {
+      "name": "就寝逆算: 6:00起床で8時間は22:00就寝",
+      "func": "bedTimeFor",
+      "args": [
+        "06:00",
+        8
+      ],
+      "expect": {
+        "ok": true,
+        "bedTime": "22:00"
+      }
+    },
+    {
+      "name": "就寝逆算: 目標0時間はエラー",
+      "func": "bedTimeFor",
+      "args": [
+        "06:30",
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_target"
+      }
     }
   ]
 }

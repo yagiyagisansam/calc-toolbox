@@ -6,92 +6,329 @@
     {
       "name": "成人男性(25歳/70kg): 24.0×70=1680kcal",
       "func": "calculate",
-      "args": [25, "male", 70],
-      "expect": { "ok": true, "standardValue": 24.0, "bmrKcal": 1680 }
+      "args": [
+        25,
+        "male",
+        70
+      ],
+      "expect": {
+        "ok": true,
+        "standardValue": 24,
+        "bmrKcal": 1680
+      }
     },
     {
       "name": "成人女性(55歳/50kg): 20.7×50=1035kcal",
       "func": "calculate",
-      "args": [55, "female", 50],
-      "expect": { "ok": true, "standardValue": 20.7, "bmrKcal": 1035 }
+      "args": [
+        55,
+        "female",
+        50
+      ],
+      "expect": {
+        "ok": true,
+        "standardValue": 20.7,
+        "bmrKcal": 1035
+      }
     },
     {
       "name": "境界値: 30歳男性は30-49歳区分(22.3)",
       "func": "calculate",
-      "args": [30, "male", 60],
-      "expect": { "ok": true, "standardValue": 22.3, "bmrKcal": 1338 }
+      "args": [
+        30,
+        "male",
+        60
+      ],
+      "expect": {
+        "ok": true,
+        "standardValue": 22.3,
+        "bmrKcal": 1338
+      }
     },
     {
       "name": "境界値: 29歳男性は18-29歳区分(24.0)",
       "func": "calculate",
-      "args": [29, "male", 60],
-      "expect": { "ok": true, "standardValue": 24.0, "bmrKcal": 1440 }
+      "args": [
+        29,
+        "male",
+        60
+      ],
+      "expect": {
+        "ok": true,
+        "standardValue": 24,
+        "bmrKcal": 1440
+      }
     },
     {
       "name": "17歳女性(15-17歳区分 25.3): 50kgで1265kcal",
       "func": "calculate",
-      "args": [17, "female", 50],
-      "expect": { "ok": true, "standardValue": 25.3, "bmrKcal": 1265 }
+      "args": [
+        17,
+        "female",
+        50
+      ],
+      "expect": {
+        "ok": true,
+        "standardValue": 25.3,
+        "bmrKcal": 1265
+      }
     },
     {
       "name": "70歳男性(70歳以上区分 21.5): 60kgで1290kcal",
       "func": "calculate",
-      "args": [70, "male", 60],
-      "expect": { "ok": true, "standardValue": 21.5, "bmrKcal": 1290 }
+      "args": [
+        70,
+        "male",
+        60
+      ],
+      "expect": {
+        "ok": true,
+        "standardValue": 21.5,
+        "bmrKcal": 1290
+      }
     },
     {
       "name": "12歳男性(12-14歳区分 31.0): 40kgで1240kcal",
       "func": "calculate",
-      "args": [12, "male", 40],
-      "expect": { "ok": true, "standardValue": 31.0, "bmrKcal": 1240 }
+      "args": [
+        12,
+        "male",
+        40
+      ],
+      "expect": {
+        "ok": true,
+        "standardValue": 31,
+        "bmrKcal": 1240
+      }
     },
     {
       "name": "小数の体重(45歳女性/52.5kg): 21.7×52.5=1139kcal(四捨五入)",
       "func": "calculate",
-      "args": [45, "female", 52.5],
-      "expect": { "ok": true, "standardValue": 21.7, "bmrKcal": 1139 }
+      "args": [
+        45,
+        "female",
+        52.5
+      ],
+      "expect": {
+        "ok": true,
+        "standardValue": 21.7,
+        "bmrKcal": 1139
+      }
     },
     {
       "name": "異常入力: 年齢0はエラー",
       "func": "calculate",
-      "args": [0, "male", 60],
-      "expect": { "ok": false, "code": "invalid_age" }
+      "args": [
+        0,
+        "male",
+        60
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_age"
+      }
     },
     {
       "name": "異常入力: 年齢121はエラー",
       "func": "calculate",
-      "args": [121, "male", 60],
-      "expect": { "ok": false, "code": "invalid_age" }
+      "args": [
+        121,
+        "male",
+        60
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_age"
+      }
     },
     {
       "name": "異常入力: 年齢が小数はエラー",
       "func": "calculate",
-      "args": [25.5, "male", 60],
-      "expect": { "ok": false, "code": "invalid_age" }
+      "args": [
+        25.5,
+        "male",
+        60
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_age"
+      }
     },
     {
       "name": "異常入力: 性別不正はエラー",
       "func": "calculate",
-      "args": [25, "man", 60],
-      "expect": { "ok": false, "code": "invalid_sex" }
+      "args": [
+        25,
+        "man",
+        60
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_sex"
+      }
     },
     {
       "name": "異常入力: 体重0はエラー",
       "func": "calculate",
-      "args": [25, "male", 0],
-      "expect": { "ok": false, "code": "invalid_weight" }
+      "args": [
+        25,
+        "male",
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_weight"
+      }
     },
     {
       "name": "異常入力: 体重が範囲超過(500kg)はエラー",
       "func": "calculate",
-      "args": [25, "male", 500],
-      "expect": { "ok": false, "code": "invalid_weight" }
+      "args": [
+        25,
+        "male",
+        500
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_weight"
+      }
     },
     {
       "name": "異常入力: 数値でない年齢はエラー",
       "func": "calculate",
-      "args": ["abc", "male", 60],
-      "expect": { "ok": false, "code": "invalid_age" }
+      "args": [
+        "abc",
+        "male",
+        60
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_age"
+      }
+    },
+    {
+      "name": "Katch-McArdle: 60kg/体脂肪25%は除脂肪45kgで1342kcal",
+      "func": "katchMcArdle",
+      "args": [
+        60,
+        25
+      ],
+      "expect": {
+        "ok": true,
+        "lbmKg": 45,
+        "fatKg": 15,
+        "bmrKcal": 1342
+      }
+    },
+    {
+      "name": "Katch-McArdle: 70kg/体脂肪20%は除脂肪56kgで1580kcal",
+      "func": "katchMcArdle",
+      "args": [
+        70,
+        20
+      ],
+      "expect": {
+        "ok": true,
+        "lbmKg": 56,
+        "fatKg": 14,
+        "bmrKcal": 1580
+      }
+    },
+    {
+      "name": "Katch-McArdle: 80kg/体脂肪15%は1839kcal",
+      "func": "katchMcArdle",
+      "args": [
+        80,
+        15
+      ],
+      "expect": {
+        "ok": true,
+        "lbmKg": 68,
+        "bmrKcal": 1839
+      }
+    },
+    {
+      "name": "Katch-McArdle: 体脂肪率0.5%は範囲外エラー",
+      "func": "katchMcArdle",
+      "args": [
+        60,
+        0.5
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_body_fat"
+      }
+    },
+    {
+      "name": "年代別一覧: 男性60kgは1440/1338/1290/1290kcal",
+      "func": "byAgeGroups",
+      "args": [
+        "male",
+        60
+      ],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "0": {
+            "ageLabel": "18〜29歳",
+            "standardValue": 24,
+            "bmrKcal": 1440
+          },
+          "1": {
+            "ageLabel": "30〜49歳",
+            "standardValue": 22.3,
+            "bmrKcal": 1338
+          },
+          "2": {
+            "ageLabel": "50〜69歳",
+            "standardValue": 21.5,
+            "bmrKcal": 1290
+          },
+          "3": {
+            "ageLabel": "70歳以上",
+            "standardValue": 21.5,
+            "bmrKcal": 1290
+          },
+          "length": 4
+        }
+      }
+    },
+    {
+      "name": "年代別一覧: 女性50kgは1105/1085/1035/1035kcal",
+      "func": "byAgeGroups",
+      "args": [
+        "female",
+        50
+      ],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "0": {
+            "bmrKcal": 1105
+          },
+          "1": {
+            "bmrKcal": 1085
+          },
+          "2": {
+            "bmrKcal": 1035
+          },
+          "3": {
+            "bmrKcal": 1035
+          }
+        }
+      }
+    },
+    {
+      "name": "年代別一覧: 性別が不正はエラー",
+      "func": "byAgeGroups",
+      "args": [
+        "other",
+        60
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_sex"
+      }
     }
   ]
 }

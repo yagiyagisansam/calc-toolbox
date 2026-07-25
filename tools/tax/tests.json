@@ -6,92 +6,400 @@
     {
       "name": "税抜1000円→税込1100円(10%)",
       "func": "calculate",
-      "args": [1000, 10, "add"],
-      "expect": { "ok": true, "taxExcluded": 1000, "taxAmount": 100, "taxIncluded": 1100 }
+      "args": [
+        1000,
+        10,
+        "add"
+      ],
+      "expect": {
+        "ok": true,
+        "taxExcluded": 1000,
+        "taxAmount": 100,
+        "taxIncluded": 1100
+      }
     },
     {
       "name": "税抜1980円→税込2138円(軽減8%・端数四捨五入)",
       "func": "calculate",
-      "args": [1980, 8, "add"],
-      "expect": { "ok": true, "taxExcluded": 1980, "taxAmount": 158, "taxIncluded": 2138 }
+      "args": [
+        1980,
+        8,
+        "add"
+      ],
+      "expect": {
+        "ok": true,
+        "taxExcluded": 1980,
+        "taxAmount": 158,
+        "taxIncluded": 2138
+      }
     },
     {
       "name": "税込1100円→税抜1000円(10%)",
       "func": "calculate",
-      "args": [1100, 10, "remove"],
-      "expect": { "ok": true, "taxExcluded": 1000, "taxAmount": 100, "taxIncluded": 1100 }
+      "args": [
+        1100,
+        10,
+        "remove"
+      ],
+      "expect": {
+        "ok": true,
+        "taxExcluded": 1000,
+        "taxAmount": 100,
+        "taxIncluded": 1100
+      }
     },
     {
       "name": "税込1980円→税抜1800円(10%)",
       "func": "calculate",
-      "args": [1980, 10, "remove"],
-      "expect": { "ok": true, "taxExcluded": 1800, "taxAmount": 180, "taxIncluded": 1980 }
+      "args": [
+        1980,
+        10,
+        "remove"
+      ],
+      "expect": {
+        "ok": true,
+        "taxExcluded": 1800,
+        "taxAmount": 180,
+        "taxIncluded": 1980
+      }
     },
     {
       "name": "税込1080円→税抜1000円(軽減8%)",
       "func": "calculate",
-      "args": [1080, 8, "remove"],
-      "expect": { "ok": true, "taxExcluded": 1000, "taxAmount": 80, "taxIncluded": 1080 }
+      "args": [
+        1080,
+        8,
+        "remove"
+      ],
+      "expect": {
+        "ok": true,
+        "taxExcluded": 1000,
+        "taxAmount": 80,
+        "taxIncluded": 1080
+      }
     },
     {
       "name": "端数の出る税抜998円→税込1098円(税99.8→100円)",
       "func": "calculate",
-      "args": [998, 10, "add"],
-      "expect": { "ok": true, "taxExcluded": 998, "taxAmount": 100, "taxIncluded": 1098 }
+      "args": [
+        998,
+        10,
+        "add"
+      ],
+      "expect": {
+        "ok": true,
+        "taxExcluded": 998,
+        "taxAmount": 100,
+        "taxIncluded": 1098
+      }
     },
     {
       "name": "端数の出る税込999円→税抜908円(10%)",
       "func": "calculate",
-      "args": [999, 10, "remove"],
-      "expect": { "ok": true, "taxExcluded": 908, "taxAmount": 91, "taxIncluded": 999 }
+      "args": [
+        999,
+        10,
+        "remove"
+      ],
+      "expect": {
+        "ok": true,
+        "taxExcluded": 908,
+        "taxAmount": 91,
+        "taxIncluded": 999
+      }
     },
     {
       "name": "端数の出る税抜538円→税込581円(軽減8%・税43円)",
       "func": "calculate",
-      "args": [538, 8, "add"],
-      "expect": { "ok": true, "taxExcluded": 538, "taxAmount": 43, "taxIncluded": 581 }
+      "args": [
+        538,
+        8,
+        "add"
+      ],
+      "expect": {
+        "ok": true,
+        "taxExcluded": 538,
+        "taxAmount": 43,
+        "taxIncluded": 581
+      }
     },
     {
       "name": "境界値: 1円は計算できる",
       "func": "calculate",
-      "args": [1, 10, "add"],
-      "expect": { "ok": true, "taxExcluded": 1, "taxAmount": 0, "taxIncluded": 1 }
+      "args": [
+        1,
+        10,
+        "add"
+      ],
+      "expect": {
+        "ok": true,
+        "taxExcluded": 1,
+        "taxAmount": 0,
+        "taxIncluded": 1
+      }
     },
     {
       "name": "異常入力: 0円はエラー",
       "func": "calculate",
-      "args": [0, 10, "add"],
-      "expect": { "ok": false, "code": "invalid_price" }
+      "args": [
+        0,
+        10,
+        "add"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_price"
+      }
     },
     {
       "name": "異常入力: 負の金額はエラー",
       "func": "calculate",
-      "args": [-100, 10, "add"],
-      "expect": { "ok": false, "code": "invalid_price" }
+      "args": [
+        -100,
+        10,
+        "add"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_price"
+      }
     },
     {
       "name": "異常入力: 小数の金額はエラー",
       "func": "calculate",
-      "args": [100.5, 10, "add"],
-      "expect": { "ok": false, "code": "invalid_price" }
+      "args": [
+        100.5,
+        10,
+        "add"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_price"
+      }
     },
     {
       "name": "異常入力: 税率5%(対象外)はエラー",
       "func": "calculate",
-      "args": [1000, 5, "add"],
-      "expect": { "ok": false, "code": "invalid_rate" }
+      "args": [
+        1000,
+        5,
+        "add"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_rate"
+      }
     },
     {
       "name": "異常入力: 変換方向の指定不正はエラー",
       "func": "calculate",
-      "args": [1000, 10, "plus"],
-      "expect": { "ok": false, "code": "invalid_direction" }
+      "args": [
+        1000,
+        10,
+        "plus"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_direction"
+      }
     },
     {
       "name": "異常入力: 数値でない金額はエラー",
       "func": "calculate",
-      "args": ["abc", 10, "add"],
-      "expect": { "ok": false, "code": "invalid_price" }
+      "args": [
+        "abc",
+        10,
+        "add"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_price"
+      }
+    },
+    {
+      "name": "複数合計: 1000円(10%)+500円(8%)は税100円+40円で税込1,640円",
+      "func": "itemsTotal",
+      "args": [
+        [
+          {
+            "price": 1000,
+            "rate": 10
+          },
+          {
+            "price": 500,
+            "rate": 8
+          }
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "base10": 1000,
+        "tax10": 100,
+        "total10": 1100,
+        "base8": 500,
+        "tax8": 40,
+        "total8": 540,
+        "base": 1500,
+        "tax": 140,
+        "total": 1640
+      }
+    },
+    {
+      "name": "複数合計: 端数は切り捨てが既定(333円の10%は33円)",
+      "func": "itemsTotal",
+      "args": [
+        [
+          {
+            "price": 333,
+            "rate": 10
+          }
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "tax10": 33,
+        "total": 366
+      }
+    },
+    {
+      "name": "複数合計: 切り上げ指定なら333円の10%は34円",
+      "func": "itemsTotal",
+      "args": [
+        [
+          {
+            "price": 333,
+            "rate": 10
+          }
+        ],
+        "ceil"
+      ],
+      "expect": {
+        "ok": true,
+        "tax10": 34,
+        "total": 367
+      }
+    },
+    {
+      "name": "複数合計: 税率ごとにまとめてから1回だけ端数処理(101円+102円の8%は16円)",
+      "func": "itemsTotal",
+      "args": [
+        [
+          {
+            "price": 101,
+            "rate": 8
+          },
+          {
+            "price": 102,
+            "rate": 8
+          }
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "base8": 203,
+        "tax8": 16,
+        "total": 219
+      }
+    },
+    {
+      "name": "複数合計: 9行はエラー",
+      "func": "itemsTotal",
+      "args": [
+        [
+          {
+            "price": 1,
+            "rate": 10
+          },
+          {
+            "price": 1,
+            "rate": 10
+          },
+          {
+            "price": 1,
+            "rate": 10
+          },
+          {
+            "price": 1,
+            "rate": 10
+          },
+          {
+            "price": 1,
+            "rate": 10
+          },
+          {
+            "price": 1,
+            "rate": 10
+          },
+          {
+            "price": 1,
+            "rate": 10
+          },
+          {
+            "price": 1,
+            "rate": 10
+          },
+          {
+            "price": 1,
+            "rate": 10
+          }
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_items"
+      }
+    },
+    {
+      "name": "複数合計: 税率5%の行はエラー",
+      "func": "itemsTotal",
+      "args": [
+        [
+          {
+            "price": 100,
+            "rate": 5
+          }
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_row"
+      }
+    },
+    {
+      "name": "源泉徴収: 10万円の報酬は税10,210円・手取り89,790円",
+      "func": "withholding",
+      "args": [
+        100000
+      ],
+      "expect": {
+        "ok": true,
+        "tax": 10210,
+        "net": 89790
+      }
+    },
+    {
+      "name": "源泉徴収: 150万円は102,100円+50万円の20.42%で204,200円",
+      "func": "withholding",
+      "args": [
+        1500000
+      ],
+      "expect": {
+        "ok": true,
+        "tax": 204200,
+        "net": 1295800
+      }
+    },
+    {
+      "name": "源泉徴収: 1円未満は切り捨て(333円→33円)",
+      "func": "withholding",
+      "args": [
+        333
+      ],
+      "expect": {
+        "ok": true,
+        "tax": 33,
+        "net": 300
+      }
     }
   ]
 }

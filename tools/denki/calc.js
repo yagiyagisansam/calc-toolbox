@@ -57,7 +57,74 @@
     };
   }
 
+  var ITEMS_MAX = 6;
+
+  /**
+   * 複数の家電の電気代をまとめて計算する。
+   * 単価は calculate と同じ(既定31円/kWh: 全国家庭電気製品公正取引協議会の目安単価)。
+   * 丸めも calculate と同じ方針: kWhは小数第2位、1日は小数第1位、月(30日)・年(365日)は
+   * 円未満四捨五入。合計は丸め前の値を合算してから丸める。
+   * sharePercent は1日の電気代に占める割合(小数第1位)。
+   * savePerHourMonth は「1日の使用時間を1時間減らした場合に月いくら安くなるか」(円未満四捨五入)。
+   * @param {{watts: number, hours: number}[]} items 家電ごとの消費電力(W)と1日の使用時間(h)。1〜6件
+   * @param {number} [pricePerKwh=31] 料金単価(円/kWh)
+   * @returns {{ok: true,
+   *            items: {kwhPerDay: number, costPerDay: number, costPerMonth: number,
+   *                    costPerYear: number, sharePercent: number, savePerHourMonth: number}[],
+   *            total: {kwhPerDay: number, costPerDay: number, costPerMonth: number, costPerYear: number}}
+   *          |{ok: false, code: string}}
+   *   code: "invalid_items" | "invalid_watts" | "invalid_hours" | "invalid_price"
+   */
+  function calculateMulti(items, pricePerKwh) {
+    var price = pricePerKwh === undefined ? DEFAULT_PRICE_PER_KWH : pricePerKwh;
+    if (!isFiniteNumber(price) || price < PRICE_MIN || price > PRICE_MAX) {
+      return { ok: false, code: "invalid_price" };
+    }
+    if (!Array.isArray(items) || items.length < 1 || items.length > ITEMS_MAX) {
+      return { ok: false, code: "invalid_items" };
+    }
+    var raws = [];
+    var totalKwh = 0;
+    for (var i = 0; i < items.length; i++) {
+      var w = items[i] && items[i].watts;
+      var h = items[i] && items[i].hours;
+      if (!isFiniteNumber(w) || w < WATTS_MIN || w > WATTS_MAX) {
+        return { ok: false, code: "invalid_watts" };
+      }
+      if (!isFiniteNumber(h) || h < HOURS_MIN || h > HOURS_MAX) {
+        return { ok: false, code: "invalid_hours" };
+      }
+      var kwh = w * h / 1000;
+      totalKwh += kwh;
+      raws.push({ kwh: kwh, watts: w });
+    }
+    var out = [];
+    for (var j = 0; j < raws.length; j++) {
+      var costDay = raws[j].kwh * price;
+      out.push({
+        kwhPerDay: Math.round(raws[j].kwh * 100) / 100,
+        costPerDay: Math.round(costDay * 10) / 10,
+        costPerMonth: Math.round(costDay * 30),
+        costPerYear: Math.round(costDay * 365),
+        sharePercent: Math.round(raws[j].kwh / totalKwh * 1000) / 10,
+        savePerHourMonth: Math.round(raws[j].watts / 1000 * price * 30)
+      });
+    }
+    var totalCostDay = totalKwh * price;
+    return {
+      ok: true,
+      items: out,
+      total: {
+        kwhPerDay: Math.round(totalKwh * 100) / 100,
+        costPerDay: Math.round(totalCostDay * 10) / 10,
+        costPerMonth: Math.round(totalCostDay * 30),
+        costPerYear: Math.round(totalCostDay * 365)
+      }
+    };
+  }
+
   var api = {
+    calculateMulti: calculateMulti,
     calculate: calculate,
     WATTS_MIN: WATTS_MIN,
     WATTS_MAX: WATTS_MAX,

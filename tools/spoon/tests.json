@@ -118,6 +118,114 @@
         "ok": false,
         "code": "invalid_unit"
       }
+    },
+    {
+      "name": "重さ換算: 砂糖大さじ1は約9g",
+      "func": "toGrams",
+      "args": [
+        1,
+        0,
+        "sugar"
+      ],
+      "expect": {
+        "ok": true,
+        "grams": 9,
+        "gramsPerTbsp": 9,
+        "gramsPerTsp": 3
+      }
+    },
+    {
+      "name": "重さ換算: しょうゆ大さじ2+小さじ1は42g",
+      "func": "toGrams",
+      "args": [
+        2,
+        1,
+        "soy"
+      ],
+      "expect": {
+        "ok": true,
+        "grams": 42
+      }
+    },
+    {
+      "name": "重さ換算: 水は大さじ1=15g(容量と同じ)",
+      "func": "toGrams",
+      "args": [
+        1,
+        0,
+        "water"
+      ],
+      "expect": {
+        "ok": true,
+        "grams": 15
+      }
+    },
+    {
+      "name": "重さ換算: 杯数が両方0はエラー",
+      "func": "toGrams",
+      "args": [
+        0,
+        0,
+        "sugar"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_amount"
+      }
+    },
+    {
+      "name": "重さ換算: 未対応の材料はエラー",
+      "func": "toGrams",
+      "args": [
+        1,
+        0,
+        "butter"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_material"
+      }
+    },
+    {
+      "name": "逆換算: 砂糖30gは大さじ3+小さじ1",
+      "func": "fromGrams",
+      "args": [
+        30,
+        "sugar"
+      ],
+      "expect": {
+        "ok": true,
+        "tbsp": 3.33,
+        "tsp": 10,
+        "tbspWhole": 3,
+        "tspRest": 1
+      }
+    },
+    {
+      "name": "逆換算: 水45gは大さじ3ちょうど",
+      "func": "fromGrams",
+      "args": [
+        45,
+        "water"
+      ],
+      "expect": {
+        "ok": true,
+        "tbsp": 3,
+        "tbspWhole": 3,
+        "tspRest": 0
+      }
+    },
+    {
+      "name": "逆換算: 0gはエラー",
+      "func": "fromGrams",
+      "args": [
+        0,
+        "sugar"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
     }
   ]
 }

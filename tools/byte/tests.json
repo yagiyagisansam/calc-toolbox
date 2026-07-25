@@ -125,6 +125,124 @@
         "ok": false,
         "code": "invalid_base"
       }
+    },
+    {
+      "name": "ダウンロード時間: 100MB(1000換算)を100Mbpsで理論8秒",
+      "func": "downloadTime",
+      "args": [
+        100,
+        "mb",
+        100,
+        1000
+      ],
+      "expect": {
+        "ok": true,
+        "seconds": 8,
+        "secondsEffective": 11.43,
+        "mbPerSec": 12.5
+      }
+    },
+    {
+      "name": "ダウンロード時間: 1GB(1000換算)を40Mbpsで理論200秒",
+      "func": "downloadTime",
+      "args": [
+        1,
+        "gb",
+        40,
+        1000
+      ],
+      "expect": {
+        "ok": true,
+        "seconds": 200,
+        "secondsEffective": 285.71,
+        "mbPerSec": 5
+      }
+    },
+    {
+      "name": "ダウンロード時間: 1GB(1024換算)を100Mbpsで理論85.9秒",
+      "func": "downloadTime",
+      "args": [
+        1,
+        "gb",
+        100,
+        1024
+      ],
+      "expect": {
+        "ok": true,
+        "seconds": 85.9,
+        "bytes": 1073741824
+      }
+    },
+    {
+      "name": "ダウンロード時間: 速度0はエラー",
+      "func": "downloadTime",
+      "args": [
+        1,
+        "gb",
+        0,
+        1024
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_speed"
+      }
+    },
+    {
+      "name": "ダウンロード時間: 容量が負はエラー",
+      "func": "downloadTime",
+      "args": [
+        -1,
+        "gb",
+        100,
+        1024
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_value"
+      }
+    },
+    {
+      "name": "容量の目安: 8GB(1000換算)は写真2000枚・音楽1000曲・動画4時間",
+      "func": "capacityUsage",
+      "args": [
+        8,
+        "gb",
+        1000
+      ],
+      "expect": {
+        "ok": true,
+        "photos": 2000,
+        "songs": 1000,
+        "videoHours": 4
+      }
+    },
+    {
+      "name": "容量の目安: 512GB(1000換算)は写真128,000枚",
+      "func": "capacityUsage",
+      "args": [
+        512,
+        "gb",
+        1000
+      ],
+      "expect": {
+        "ok": true,
+        "photos": 128000,
+        "songs": 64000,
+        "videoHours": 256
+      }
+    },
+    {
+      "name": "容量の目安: 単位が不正ならエラー",
+      "func": "capacityUsage",
+      "args": [
+        1,
+        "xx",
+        1000
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_unit"
+      }
     }
   ]
 }

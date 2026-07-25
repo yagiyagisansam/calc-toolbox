@@ -38,7 +38,33 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>テストの点数、毎月の売上、体重の記録……数値を貼り付けるだけで<strong>平均値・中央値・最大・最小・合計</strong>をまとめて計算します。外れ値に引っ張られやすい平均値と、実感に近い中央値を並べて確認できます。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 加重平均・トリム平均・目標平均の逆算</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">加重平均(重み付き平均)</h3>
+      <p class="adv-note">「中間は2割・期末は3割」のように重みが違うときの平均です。1行に「値,重み」の組を1つずつ入力してください。</p>
+      <label>値と重み(1行に「値,重み」。例: 90,2)
+        <textarea id="adv-pairs" rows="4" placeholder="例:&#10;90,2&#10;70,3"></textarea>
+      </label>
+      <button type="button" id="adv-weighted-run">加重平均を計算</button>
+      <div class="tool-result" id="adv-weighted-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">最大・最小を除いた平均(トリム平均)</h3>
+      <p class="adv-note">上の入力欄の数値から、最高と最低を1つずつ除いて平均します。極端な値に引っ張られたくないときに。</p>
+      <button type="button" id="adv-trim-run">上の数値で計算する</button>
+      <div class="tool-result" id="adv-trim-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">次に何点取れば目標の平均に届く?</h3>
+      <p class="adv-note">上の入力欄の数値を「これまでの結果」として、あと1回で目標の平均にするために必要な値を逆算します。</p>
+      <label>目標の平均
+        <input type="number" id="adv-target" inputmode="decimal" step="any" placeholder="例: 80">
+      </label>
+      <button type="button" id="adv-need-run">必要な値を計算</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>テストの点数や売上などの数字を貼り付けるだけで、<strong>平均値と中央値</strong>がすぐわかるツールです。合計・最大・最小も同時に表示します。成績の集計や記録の整理にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -119,6 +145,70 @@
       "<tr><td>最小 / 最大</td><td>" + r.min.toLocaleString() + " / " + r.max.toLocaleString() + "</td></tr>" +
       "</tbody></table></div>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function parseList() {
+    return document.getElementById("list").value.split(/[\s,、]+/)
+      .filter(function (p) { return p !== ""; })
+      .map(function (p) { return parseFloat(p); });
+  }
+  var wBox = document.getElementById("adv-weighted-result");
+  var tBox = document.getElementById("adv-trim-result");
+  document.getElementById("adv-weighted-run").addEventListener("click", function () {
+    var lines = document.getElementById("adv-pairs").value.split(/\n+/)
+      .map(function (l) { return l.trim(); })
+      .filter(function (l) { return l !== ""; });
+    var pairs = lines.map(function (l) {
+      var nums = l.split(/[\s,、:]+/).filter(function (p) { return p !== ""; })
+        .map(function (p) { return parseFloat(p); });
+      return nums.length === 2 ? nums : [NaN, NaN];
+    });
+    var r = HeikinCalc.weightedMean(pairs);
+    if (!r.ok) {
+      var msg = r.code === "invalid_weight" ? "重みは0以上の数値で、合計が0より大きくなるようにしてください。"
+        : "1行に「値,重み」の2つの数値を入力してください(例: 90,2)。";
+      wBox.innerHTML = '<p class="result-error">' + msg + '</p>';
+      wBox.hidden = false;
+      return;
+    }
+    wBox.innerHTML =
+      '<div class="result-main">加重平均 ' + r.mean.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '</div>' +
+      '<p>' + r.n.toLocaleString() + ' 組 / 重みの合計 ' + r.weightSum.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '</p>';
+    wBox.hidden = false;
+  });
+  document.getElementById("adv-trim-run").addEventListener("click", function () {
+    var r = HeikinCalc.trimmedMean(parseList());
+    if (!r.ok) {
+      tBox.innerHTML = '<p class="result-error">上の入力欄に数値を3個以上入れてください。</p>';
+      tBox.hidden = false;
+      return;
+    }
+    tBox.innerHTML =
+      '<div class="result-main">トリム平均 ' + r.mean.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '</div>' +
+      '<p>最小 ' + r.removedMin.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' と最大 ' +
+      r.removedMax.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' を除いた ' +
+      r.used.toLocaleString() + ' 個の平均です。</p>';
+    tBox.hidden = false;
+  });
+  document.getElementById("adv-need-run").addEventListener("click", function () {
+    var target = parseFloat(document.getElementById("adv-target").value);
+    var r = HeikinCalc.needScore(parseList(), target);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">上の入力欄に数値を入れて、目標の平均を数値で指定してください。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">次に ' + r.needed.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' が必要</div>' +
+      '<p>今の平均は ' + r.currentMean.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '(' + r.n.toLocaleString() +
+      ' 個)。次の1回で上の値を取ると、' + (r.n + 1).toLocaleString() + ' 個の平均が ' +
+      target.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' になります。</p>';
+    advBox.hidden = false;
   });
 })();
 </script>
