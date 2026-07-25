@@ -4,7 +4,7 @@
 --  ① テーブル権限の最小化(列単位のINSERTのみ。created_atの改ざん防止)
 --  ② 関数の実行権限の最小化
 --  ③ 作成・投票・通報のレート制限(荒らし・容量枯渇対策)
---  ④ 締切の上限(32日以内)などの入力健全性チェック
+--  ④ 締切の上限(63日=約2ヶ月以内)などの入力健全性チェック
 -- =============================================================
 
 -- ① テーブル権限の最小化
@@ -44,8 +44,8 @@ begin
   if (select count(*) from public.polls where created_at > now() - interval '1 hour') >= 300 then
     raise exception 'rate limited';
   end if;
-  -- 締切は32日以内(遠未来の不正な値を防止)
-  if new.closes_at is not null and new.closes_at > now() + interval '32 days' then
+  -- 締切は63日以内=約2ヶ月(遠未来の不正な値を防止)
+  if new.closes_at is not null and new.closes_at > now() + interval '63 days' then
     raise exception 'invalid deadline';
   end if;
   -- 上限個数は複数選択のときだけ意味を持つ
