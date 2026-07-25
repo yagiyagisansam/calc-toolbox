@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.supabase.co; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://ssxskriqlaiohdutxprn.supabase.co; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'; require-trusted-types-for 'script'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>みんなの投票 | 無料アンケート作成・リアルタイム集計(選択肢10個まで)</title>
   <meta name="description" content="質問と選択肢(最大10個)を入れるだけで投票ページのリンクを発行できる無料アンケートツール。X(旧Twitter)・LINE・InstagramなどのSNSで共有して、みんなの回答をリアルタイム集計。人気のアンケートにその場で投票もできます。登録不要・スマホ対応。">
@@ -94,82 +94,6 @@
 <script src="./config.js"></script>
 <script src="./calc.js"></script>
 <script src="./net.js"></script>
-<script>
-(function () {
-  "use strict";
-
-  function renderList(el, items, ranked) {
-    el.innerHTML = "";
-    if (!items.length) {
-      var p = document.createElement("p");
-      p.className = "pb-empty";
-      p.textContent = "まだ公開アンケートがありません。最初の1件を作ってみましょう。";
-      el.appendChild(p);
-      return;
-    }
-    items.forEach(function (it, i) {
-      var a = document.createElement("a");
-      a.className = "pb-item";
-      a.href = "./v.html?id=" + encodeURIComponent(it.id);
-      if (ranked) {
-        var rk = document.createElement("span");
-        rk.className = "pb-rank";
-        rk.textContent = i + 1;
-        a.appendChild(rk);
-      }
-      var q = document.createElement("span");
-      q.className = "qq";
-      q.textContent = it.question;
-      var t = document.createElement("span");
-      t.className = "tt";
-      t.textContent = Number(it.total).toLocaleString() + "票";
-      a.appendChild(q);
-      a.appendChild(t);
-      el.appendChild(a);
-    });
-  }
-
-  function fail(el) {
-    el.innerHTML = "";
-    var p = document.createElement("p");
-    p.className = "pb-empty";
-    p.textContent = "読み込みに失敗しました。再読み込みしてください。";
-    el.appendChild(p);
-  }
-
-  var popEl = document.getElementById("popular");
-  var recEl = document.getElementById("recent");
-  if (!PollNet.ready()) {
-    document.getElementById("setup-note").hidden = false;
-    popEl.innerHTML = "";
-    recEl.innerHTML = "";
-  } else {
-    PollNet.listPublic("popular", 5).then(function (r) {
-      if (r.ok) renderList(popEl, r.items, true); else fail(popEl);
-    });
-    PollNet.listPublic("new", 10).then(function (r) {
-      if (r.ok) renderList(recEl, r.items, false); else fail(recEl);
-    });
-  }
-
-  // この端末で作ったアンケート(localStorage)
-  var mine = [];
-  try { mine = JSON.parse(window.localStorage.getItem("pollMine")) || []; } catch (e) { mine = []; }
-  if (mine.length) {
-    document.getElementById("mine-sec").hidden = false;
-    var mineEl = document.getElementById("mine");
-    mine.slice(0, 10).forEach(function (m) {
-      var a = document.createElement("a");
-      a.className = "pb-item";
-      a.href = "./v.html?id=" + encodeURIComponent(m.id);
-      var q = document.createElement("span");
-      q.className = "qq";
-      q.textContent = m.q;
-      a.appendChild(q);
-      mineEl.appendChild(a);
-    });
-  }
-})();
-</script>
+<script src="./home.js"></script>
 </body>
 </html>

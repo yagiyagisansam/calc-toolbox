@@ -252,6 +252,13 @@ body {
 .pb-deadline.closed { color: #d43c3c; }
 @media (prefers-color-scheme: dark) { .pb-deadline.closed { color: #ff8a80; } }
 
+/* ユーティリティ(CSP強化でstyle属性を廃止したため) */
+.mt12 { margin-top: 12px; }
+.mt14 { margin-top: 14px; }
+.mt16 { margin-top: 16px; }
+.mt20 { margin-top: 20px; }
+.pb-q-sm { font-size: 1.1rem; }
+
 /* フッタ */
 .pb-footer { margin-top: 36px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.78rem; }
 .pb-footer nav { display: flex; flex-wrap: wrap; gap: 14px; margin: 10px 0; }
