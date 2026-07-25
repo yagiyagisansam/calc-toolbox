@@ -51,21 +51,11 @@
             <input type="checkbox" id="opt-multi">
             <span>複数選択を許可<small>「あてはまるもの全部」を選べるようになります(日程調整・持ち寄り決めなどに)。</small></span>
           </label>
-          <label id="max-row" hidden>選べる数の上限<span class="pb-note">複数選択のときに、1人が選べる個数を制限できます</span>
-            <select id="opt-max">
-              <option value="" selected>制限なし(全部選べる)</option>
-              <option value="2">2個まで</option>
-              <option value="3">3個まで</option>
-              <option value="4">4個まで</option>
-              <option value="5">5個まで</option>
-              <option value="6">6個まで</option>
-              <option value="7">7個まで</option>
-              <option value="8">8個まで</option>
-              <option value="9">9個まで</option>
-            </select>
+          <label id="max-row" hidden>選べる数の上限<span class="pb-note">1人が選べる個数の制限。選択肢の数に合わせて選べる値が変わります</span>
+            <select id="opt-max"></select>
           </label>
-          <label>投票の締切<span class="pb-note">カレンダーから選択(その日の23:59まで)。未設定なら無期限。設定できるのは2ヶ月先まで、それ以上先にしたい場合は無期限のままにしてください</span>
-            <input type="date" id="opt-deadline">
+          <label>投票の締切<span class="pb-note">選んだ日の23:59に締切。選べるのは2ヶ月先まで、それ以上先にしたい場合は「無期限」のままにしてください</span>
+            <select id="opt-deadline"></select>
           </label>
           <label class="pb-toggle">
             <input type="checkbox" id="opt-hide">
