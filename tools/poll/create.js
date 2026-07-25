@@ -120,18 +120,20 @@ if (window.top !== window.self) {
     var none = document.createElement("option");
     none.value = "";
     none.textContent = "無期限(締切なし)";
-    none.selected = true;
     deadlineEl.appendChild(none);
     var max = deadlineMax();
     var d = new Date();
     var today = ymd(new Date());
     var tomorrow = ymd(new Date(Date.now() + 24 * 3600 * 1000));
+    var oneWeek = ymd(new Date(Date.now() + 7 * 24 * 3600 * 1000));
     while (d.getTime() <= max.getTime()) {
       var o = document.createElement("option");
       var v = ymd(d);
       o.value = v;
-      var prefix = v === today ? "今日 " : v === tomorrow ? "明日 " : "";
+      var prefix = v === today ? "今日 " : v === tomorrow ? "明日 " : v === oneWeek ? "1週間後 " : "";
       o.textContent = prefix + (d.getMonth() + 1) + "/" + d.getDate() + "(" + YOUBI[d.getDay()] + ") 23:59まで";
+      // デフォルトは1週間後
+      if (v === oneWeek) o.selected = true;
       deadlineEl.appendChild(o);
       d.setDate(d.getDate() + 1);
     }
