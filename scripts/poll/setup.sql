@@ -48,9 +48,13 @@ create table public.votes (
 );
 
 -- choiceが実際の選択肢数の範囲内かを検証
+-- security definer: 匿名クライアントはpollsを直接読めない(RLS)ため、
+-- このチェックだけは所有者権限でpollsを参照する
 create or replace function public.check_vote_choice()
 returns trigger
 language plpgsql
+security definer
+set search_path = public
 as $$
 begin
   if not exists (
