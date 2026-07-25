@@ -30,6 +30,7 @@
 <main>
   <h1>BMI・適正体重 計算機</h1>
   <form class="tool-form" id="bmi-form">
+    <span class="field-note">身長と体重を入れると、すぐ下に結果が表示されます</span>
     <label>身長(cm)
       <span class="field-note">例: 170(対応範囲: 100〜250cm)</span>
       <input type="number" id="height" inputmode="decimal" step="0.1" min="100" max="250" placeholder="170" required>
@@ -47,14 +48,14 @@
     <summary><span class="plus">＋</span>詳細機能: 目標BMIから逆算・体重早見表</summary>
     <div class="adv-inner">
       <h3 class="adv-h">目標BMIから目標体重を逆算</h3>
-      <p class="adv-note">なりたいBMIを入れると、目標体重と「あと何kgか」を逆算します。身長・体重は上のフォームの値を使います。</p>
+      <p class="adv-note">なりたいBMIを入れると、目標体重と「あと何kgか」を逆算します(身長・体重は上の値を使用)。</p>
       <label>目標BMI
         <input type="number" id="adv-target-bmi" inputmode="decimal" step="any" min="10" max="40" value="22">
       </label>
       <button type="button" id="adv-goal-run">目標体重を逆算する</button>
 
       <h3 class="adv-h">あなたの身長の体重早見表</h3>
-      <p class="adv-note">上のフォームの身長で、BMI 18.5〜30 に当たる体重を一覧にします。「あと何kgで普通体重か」がひと目でわかります。</p>
+      <p class="adv-note">上の身長で BMI 18.5〜30 に当たる体重を一覧にします。</p>
       <button type="button" id="adv-table-run">早見表を表示する</button>
       <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
     </div>
@@ -70,7 +71,7 @@
   <ol class="steps">
     <li>身長をcm単位で入力します(例: 170)。</li>
     <li>体重をkg単位で入力します(例: 60)。</li>
-    <li>「計算する」を押すと、BMI・判定・適正体重が表示されます。</li>
+    <li>入力すると同時に、BMI・判定・適正体重がすぐ下に表示されます。ボタンは不要です。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -147,35 +148,43 @@
     invalid_height: "身長は " + BmiCalc.HEIGHT_MIN_CM + "〜" + BmiCalc.HEIGHT_MAX_CM + " cm の範囲で入力してください。",
     invalid_weight: "体重は " + BmiCalc.WEIGHT_MIN_KG + "〜" + BmiCalc.WEIGHT_MAX_KG + " kg の範囲で入力してください。"
   };
-  document.getElementById("bmi-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var height = parseFloat(document.getElementById("height").value);
-    var weight = parseFloat(document.getElementById("weight").value);
-    var result = BmiCalc.calculate(height, weight);
-    var box = document.getElementById("result");
+  var box = document.getElementById("result");
+  var heightEl = document.getElementById("height");
+  var weightEl = document.getElementById("weight");
+  function run() {
+    if (heightEl.value === "" || weightEl.value === "") { box.hidden = true; return; }
+    var result = BmiCalc.calculate(parseFloat(heightEl.value), parseFloat(weightEl.value));
     if (result.ok) {
       box.innerHTML =
         '<div class="result-main">BMI ' + result.bmi.toFixed(1) + "(" + result.category + ")</div>" +
-        "<p>あなたの適正体重(BMI22基準)は約 <strong>" + result.idealWeightKg.toFixed(1) + " kg</strong> です。</p>";
+        "<p>あなたの適正体重(BMI22基準)は約 <strong>" + result.idealWeightKg.toFixed(1) + " kg</strong> です。</p>" +
+        '<p>同じ身長・体重で続けて計算: <a href="../bmr/">基礎代謝量</a> / <a href="../tdee/">1日の摂取カロリー目安</a></p>';
     } else {
       box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
     }
     box.hidden = false;
-  });
+  }
+  heightEl.addEventListener("input", run);
+  weightEl.addEventListener("input", run);
+  document.getElementById("bmi-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
 })();
 </script>
 <script>
 (function () {
   "use strict";
   var advBox = document.getElementById("adv-result");
+  var lastAdv = null;
   function advErr(msg) {
     advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
     advBox.hidden = false;
   }
-  document.getElementById("adv-goal-run").addEventListener("click", function () {
+  function runGoal(fromButton) {
     var h = parseFloat(document.getElementById("height").value);
     var w = parseFloat(document.getElementById("weight").value);
-    if (!isFinite(h) || !isFinite(w)) { advErr("先に上のフォームに身長と体重を入力してください。"); return; }
+    if (!isFinite(h) || !isFinite(w)) {
+      if (fromButton) advErr("先に上のフォームに身長と体重を入力してください。");
+      return;
+    }
     var tbRaw = document.getElementById("adv-target-bmi").value;
     var r = BmiCalc.targetFromBmi(h, w, tbRaw === "" ? undefined : parseFloat(tbRaw));
     if (!r.ok) {
@@ -192,14 +201,18 @@
     } else {
       msg = "<strong>目標体重をほぼ達成しています。</strong>";
     }
+    lastAdv = runGoal;
     advBox.innerHTML =
       '<div class="result-main">目標体重 約 ' + r.targetWeightKg.toFixed(1) + " kg</div>" +
       "<p>BMI " + r.targetBmi + " のときの体重です。" + msg + "</p>";
     advBox.hidden = false;
-  });
-  document.getElementById("adv-table-run").addEventListener("click", function () {
+  }
+  function runTable(fromButton) {
     var h = parseFloat(document.getElementById("height").value);
-    if (!isFinite(h)) { advErr("先に上のフォームに身長を入力してください。"); return; }
+    if (!isFinite(h)) {
+      if (fromButton) advErr("先に上のフォームに身長を入力してください。");
+      return;
+    }
     var r = BmiCalc.bmiWeightTable(h);
     if (!r.ok) { advErr("身長は100〜250cmの範囲で入力してください。"); return; }
     var rows = "";
@@ -207,11 +220,20 @@
       rows += "<tr><td>BMI " + r.rows[i].bmi + "</td><td>" + r.rows[i].weightKg.toFixed(1) +
         " kg</td><td>" + r.rows[i].label + "</td></tr>";
     }
+    lastAdv = runTable;
     advBox.innerHTML =
       '<div class="result-main">身長 ' + h + " cm の体重早見表</div>" +
       '<div class="table-scroll"><table class="data-table"><thead><tr><th>BMI</th><th>体重</th><th>意味</th></tr></thead><tbody>' +
       rows + "</tbody></table></div>";
     advBox.hidden = false;
+  }
+  document.getElementById("adv-goal-run").addEventListener("click", function () { runGoal(true); });
+  document.getElementById("adv-table-run").addEventListener("click", function () { runTable(true); });
+  document.getElementById("adv-target-bmi").addEventListener("input", function () { runGoal(false); });
+  ["height", "weight"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (lastAdv) lastAdv(false);
+    });
   });
 })();
 </script>

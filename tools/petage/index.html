@@ -37,19 +37,17 @@
       </select>
     </label>
     <label>ペットの年齢(歳)
-      <span class="field-note">生後6ヶ月なら0.5と入力</span>
-      <input type="number" id="age" min="0.1" max="30" step="0.1" required placeholder="例: 3">
+      <span class="field-note">生後6ヶ月なら0.5と入力。入力と同時に換算されます</span>
+      <input type="number" id="age" inputmode="decimal" min="0.1" max="30" step="0.1" required placeholder="例: 3">
     </label>
-    <button type="submit">人間の年齢に換算する</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
   </form>
-
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
   <details class="adv-box">
     <summary><span class="plus">＋</span>詳細機能: 逆換算(人間→ペット)と年齢早見表</summary>
     <div class="adv-inner">
       <h3 class="adv-h">逆換算: 人間の年齢はペットの何歳?</h3>
-      <p class="adv-note">「自分の年齢は、うちの子でいうと何歳くらい?」を計算します。飼い主とペットの年齢を比べてみたい時に。</p>
+      <p class="adv-note">「自分の年齢は、うちの子でいうと何歳くらい?」を計算します。</p>
       <label>種類
         <select id="adv-type">
           <option value="cat">猫</option>
@@ -57,13 +55,12 @@
         </select>
       </label>
       <label>人間の年齢(歳)
-        <input type="number" id="adv-human" min="2" max="136" step="1" placeholder="例: 35">
+        <input type="number" id="adv-human" inputmode="numeric" min="2" max="136" step="1" placeholder="例: 35">
       </label>
-      <button type="button" id="adv-rev-run">ペットの年齢に換算する</button>
+      <div class="tool-result" id="adv-rev-result" hidden aria-live="polite"></div>
 
       <h3 class="adv-h">1〜20歳の年齢早見表</h3>
       <p class="adv-note">ペットの1〜20歳が人間の何歳にあたるかの一覧です(換算式は猫と小型・中型犬で共通)。</p>
-      <button type="button" id="adv-table-run">早見表を表示する</button>
       <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
     </div>
   </details>
@@ -74,7 +71,7 @@
   <ol class="steps">
     <li>猫か犬(小型・中型)かを選びます。</li>
     <li>ペットの年齢を入力します(生後6ヶ月なら0.5)。</li>
-    <li>「換算する」を押すと、人間の年齢の目安とライフステージが表示されます。</li>
+    <li>入力した瞬間に、人間の年齢の目安とライフステージが自動で表示されます。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -129,8 +126,8 @@
 (function () {
   "use strict";
   var box = document.getElementById("result");
-  document.getElementById("petage-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  function run() {
+    if (document.getElementById("age").value === "") { box.hidden = true; return; }
     var type = document.getElementById("type").value;
     var r = PetageCalc.humanAge(type, parseFloat(document.getElementById("age").value));
     if (!r.ok) {
@@ -143,31 +140,44 @@
       "<p>ライフステージの目安: <strong>" + r.stage + "</strong>" + (r.stage === "シニア期" ? "(健康診断は年2回が目安)" : "") + "</p>" +
       "<p>※小型・中型犬と猫の目安です。大型犬には当てはまりません。</p>";
     box.hidden = false;
+  }
+  document.getElementById("age").addEventListener("input", run);
+  document.getElementById("type").addEventListener("change", run);
+  document.getElementById("petage-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run();
   });
 })();
 </script>
 <script>
 (function () {
   "use strict";
-  var advBox = document.getElementById("adv-result");
-  function advErr(msg) {
-    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
-    advBox.hidden = false;
-  }
-  document.getElementById("adv-rev-run").addEventListener("click", function () {
+  var revBox = document.getElementById("adv-rev-result");
+  var tableBox = document.getElementById("adv-result");
+
+  // ---- 逆換算(即時) ----
+  function runRev() {
     var human = document.getElementById("adv-human");
     var type = document.getElementById("adv-type").value;
-    if (human.value === "") { advErr("人間の年齢を入力してください。"); return; }
+    if (human.value === "") { revBox.hidden = true; return; }
     var r = PetageCalc.petAge(type, parseFloat(human.value));
-    if (!r.ok) { advErr("人間の年齢は2〜136歳の範囲で入力してください。"); return; }
+    if (!r.ok) {
+      revBox.innerHTML = '<p class="result-error">人間の年齢は2〜136歳の範囲で入力してください。</p>';
+      revBox.hidden = false;
+      return;
+    }
     var name = type === "cat" ? "猫" : "犬(小型・中型)";
-    advBox.innerHTML =
+    revBox.innerHTML =
       '<div class="result-main">' + name + "の約 " +
       r.petAge.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " 歳に相当</div>" +
       '<p class="adv-note">獣医療で使われる目安式による概算です。</p>';
-    advBox.hidden = false;
-  });
-  document.getElementById("adv-table-run").addEventListener("click", function () {
+    revBox.hidden = false;
+  }
+  document.getElementById("adv-human").addEventListener("input", runRev);
+  document.getElementById("adv-type").addEventListener("change", runRev);
+
+  // ---- 年齢早見表(即時表示) ----
+  (function () {
     var r = PetageCalc.ageTable();
     var rows = "";
     for (var i = 0; i < r.rows.length; i++) {
@@ -175,11 +185,11 @@
       rows += "<tr><td>" + row.age + "歳</td><td>約 " +
         row.human.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "歳</td><td>" + row.stage + "</td></tr>";
     }
-    advBox.innerHTML =
+    tableBox.innerHTML =
       '<div class="table-scroll"><table class="data-table"><thead><tr><th>ペットの年齢</th><th>人間の年齢の目安</th><th>区分</th></tr></thead><tbody>' +
       rows + "</tbody></table></div>";
-    advBox.hidden = false;
-  });
+    tableBox.hidden = false;
+  })();
 })();
 </script>
 </body>

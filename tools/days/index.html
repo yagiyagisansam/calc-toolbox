@@ -30,42 +30,65 @@
 <main>
   <h1>日数計算機(日付の差・○日後)</h1>
   <form class="tool-form" id="between-form">
-    <label>開始日
-      <input type="date" id="from" min="1600-01-01" max="2500-12-31" required>
-    </label>
-    <label>終了日
-      <input type="date" id="to" min="1600-01-01" max="2500-12-31" required>
-    </label>
-    <button type="submit">日数を計算</button>
+    <span class="field-note">開始日と終了日を選ぶと、すぐ下に日数が表示されます</span>
+    <div class="field-row">
+      <label>開始日(年)
+        <select id="from-year"></select>
+      </label>
+      <label>月
+        <select id="from-month"></select>
+      </label>
+      <label>日
+        <select id="from-day"></select>
+      </label>
+    </div>
+    <div class="field-row">
+      <label>終了日(年)
+        <select id="to-year"></select>
+      </label>
+      <label>月
+        <select id="to-month"></select>
+      </label>
+      <label>日
+        <select id="to-day"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" aria-live="polite"></div>
   </form>
 
   <form class="tool-form" id="add-form">
-    <label>基準日
-      <input type="date" id="base" min="1600-01-01" max="2500-12-31" required>
-    </label>
+    <span class="field-note">「100日後は何月何日?」はこちら(前はマイナス)</span>
+    <div class="field-row">
+      <label>基準日(年)
+        <select id="base-year"></select>
+      </label>
+      <label>月
+        <select id="base-month"></select>
+      </label>
+      <label>日
+        <select id="base-day"></select>
+      </label>
+    </div>
     <label>何日後?(前はマイナス)
       <span class="field-note">例: 100 / -30(対応範囲: ±36,500日)</span>
       <input type="number" id="offset" inputmode="numeric" step="1" min="-36500" max="36500" placeholder="100" required>
     </label>
-    <button type="submit">日付を計算</button>
+    <div class="tool-result" id="result-b" hidden aria-live="polite"></div>
   </form>
-
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
   <details class="adv-box">
     <summary><span class="plus">＋</span>詳細機能: 週数・月数の内訳と○か月後の日付</summary>
     <div class="adv-inner">
       <h3 class="adv-h">週数・月数もあわせた内訳</h3>
-      <p class="adv-note">上の「開始日」「終了日」の差を、週数+端数日と月数の目安でも表示します。「初日を含める」に切り替えると、両端を含む数え方(入院日数・チケットの有効期間など)になります。</p>
+      <p class="adv-note">上の「開始日」「終了日」の差を、週数+端数日と月数の目安でも表示します(初日を含めると入院日数などの数え方になります)。</p>
       <label><input type="checkbox" id="adv-include"> 初日を含めて数える(両端を含む)</label>
-      <button type="button" id="adv-bd-run">内訳を計算する</button>
+      <div class="tool-result" id="adv-bd-result" hidden aria-live="polite"></div>
 
       <h3 class="adv-h">○か月後(○か月前)の日付</h3>
-      <p class="adv-note">上の「基準日」欄の日付から、指定した月数だけ後の日付と曜日を出します。支払期限や定期券の更新日などに。マイナスを入れると○か月前です。</p>
+      <p class="adv-note">上の「基準日」から指定した月数だけ後(マイナスなら前)の日付と曜日を出します。</p>
       <label>何か月後?
         <input type="number" id="adv-months" inputmode="numeric" min="-1200" max="1200" step="1" placeholder="例: 3">
       </label>
-      <button type="button" id="adv-mo-run">日付を計算する</button>
       <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
     </div>
   </details>
@@ -78,8 +101,8 @@
 
   <h2>使い方</h2>
   <ol class="steps">
-    <li>「日数を計算」: 開始日と終了日を選ぶと、間の日数が表示されます。</li>
-    <li>「日付を計算」: 基準日と日数(過去はマイナス)を入れると、該当する日付と曜日が表示されます。</li>
+    <li>日数の計算: 開始日と終了日を選ぶと、選んだ瞬間に間の日数が表示されます。ボタンは不要です。</li>
+    <li>○日後の計算: 基準日を選んで日数(過去はマイナス)を入れると、該当する日付と曜日が自動で表示されます。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -133,66 +156,87 @@
 <script>
 (function () {
   "use strict";
-  var box = document.getElementById("result");
-  // 開始日・基準日の初期値に今日を設定
-  var now = new Date();
-  var today = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
-  document.getElementById("from").value = today;
-  document.getElementById("base").value = today;
+  var today = new Date();
 
-  var ERROR_MESSAGES = {
-    invalid_from: "開始日を正しく入力してください。",
-    invalid_to: "終了日を正しく入力してください。",
-    from_after_to: "開始日が終了日より後になっています。",
-    invalid_base: "基準日を正しく入力してください。",
-    invalid_offset: "日数は ±36,500 の整数で入力してください。",
-    out_of_range: "計算結果が対応範囲(1600〜2500年)を超えました。"
-  };
-  function showError(code) {
-    box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "入力値を確認してください。") + "</p>";
-    box.hidden = false;
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
   }
-  document.getElementById("between-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var result = DaysCalc.between(document.getElementById("from").value, document.getElementById("to").value);
-    if (!result.ok) { showError(result.code); return; }
-    box.innerHTML =
-      '<div class="result-main">' + result.days.toLocaleString() + " 日</div>" +
-      "<p>両端(初日・最終日)を含む場合: <strong>" + result.inclusiveDays.toLocaleString() + " 日</strong></p>";
-    box.hidden = false;
-  });
-  document.getElementById("add-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var result = DaysCalc.addDays(document.getElementById("base").value, parseFloat(document.getElementById("offset").value));
-    if (!result.ok) { showError(result.code); return; }
-    box.innerHTML = '<div class="result-main">' + result.date + "(" + result.weekday + "曜日)</div>";
-    box.hidden = false;
-  });
-})();
-</script>
-<script>
-(function () {
-  "use strict";
-  var advBox = document.getElementById("adv-result");
-  function advErr(msg) {
-    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
-    advBox.hidden = false;
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, "日", Math.min(keep, max));
+  }
+  function isoOf(prefix) {
+    adjustDays(prefix + "-year", prefix + "-month", prefix + "-day");
+    return val(prefix + "-year") + "-" +
+      String(val(prefix + "-month")).padStart(2, "0") + "-" +
+      String(val(prefix + "-day")).padStart(2, "0");
   }
   function jpDate(iso) {
     var p = iso.split("-");
     return parseInt(p[0], 10) + "年" + parseInt(p[1], 10) + "月" + parseInt(p[2], 10) + "日";
   }
-  document.getElementById("adv-bd-run").addEventListener("click", function () {
-    var from = document.getElementById("from").value;
-    var to = document.getElementById("to").value;
-    if (from === "" || to === "") { advErr("上のフォームに開始日と終了日を入力してください。"); return; }
-    var inc = document.getElementById("adv-include").checked;
-    var r = DaysCalc.breakdown(from, to, inc);
-    if (!r.ok) {
-      advErr(r.code === "from_after_to" ? "開始日が終了日より後になっています。" : "日付を正しく入力してください。");
-      return;
+  function initDate(prefix) {
+    fillSelect(document.getElementById(prefix + "-year"), 1600, 2500, "年", today.getFullYear());
+    fillSelect(document.getElementById(prefix + "-month"), 1, 12, "月", today.getMonth() + 1);
+    fillSelect(document.getElementById(prefix + "-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), "日", today.getDate());
+  }
+  initDate("from");
+  initDate("to");
+  initDate("base");
+
+  var box = document.getElementById("result");
+  var boxB = document.getElementById("result-b");
+  var bdBox = document.getElementById("adv-bd-result");
+  var moBox = document.getElementById("adv-result");
+
+  var ERROR_MESSAGES = {
+    from_after_to: "開始日が終了日より後になっています。",
+    invalid_offset: "日数は ±36,500 の整数で入力してください。",
+    out_of_range: "計算結果が対応範囲(1600〜2500年)を超えました。"
+  };
+
+  // ---- 日付の差(即時) ----
+  function runBetween() {
+    var result = DaysCalc.between(isoOf("from"), isoOf("to"));
+    if (!result.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
+    } else {
+      box.innerHTML =
+        '<div class="result-main">' + result.days.toLocaleString() + " 日</div>" +
+        "<p>両端(初日・最終日)を含む場合: <strong>" + result.inclusiveDays.toLocaleString() + " 日</strong></p>";
     }
-    advBox.innerHTML =
+    box.hidden = false;
+    runBreakdown();
+  }
+
+  // ---- ○日後の日付(即時) ----
+  function runAdd() {
+    var offset = document.getElementById("offset").value;
+    var base = isoOf("base");
+    if (offset === "") { boxB.hidden = true; runMonths(); return; }
+    var result = DaysCalc.addDays(base, parseFloat(offset));
+    if (!result.ok) {
+      boxB.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
+    } else {
+      boxB.innerHTML = '<div class="result-main">' + result.date + "(" + result.weekday + "曜日)</div>";
+    }
+    boxB.hidden = false;
+    runMonths();
+  }
+
+  // ---- 詳細機能: 週数・月数の内訳(即時) ----
+  function runBreakdown() {
+    var inc = document.getElementById("adv-include").checked;
+    var r = DaysCalc.breakdown(isoOf("from"), isoOf("to"), inc);
+    if (!r.ok) { bdBox.hidden = true; return; }
+    bdBox.innerHTML =
       '<div class="result-main">' + r.days.toLocaleString() + " 日(" +
       (inc ? "初日を含む" : "初日を含まない") + ")</div>" +
       '<div class="table-scroll"><table class="data-table"><tbody>' +
@@ -202,28 +246,44 @@
       (r.monthDays > 0 ? "と" + r.monthDays + "日" : "") + "</td></tr>" +
       "</tbody></table></div>" +
       '<p class="adv-note">月数の目安は暦の上での差(初日を含めない数え方)です。</p>';
-    advBox.hidden = false;
-  });
-  document.getElementById("adv-mo-run").addEventListener("click", function () {
-    var base = document.getElementById("base").value;
+    bdBox.hidden = false;
+  }
+
+  // ---- 詳細機能: ○か月後の日付(即時) ----
+  function runMonths() {
     var mo = document.getElementById("adv-months");
-    if (base === "") { advErr("上のフォームの「基準日」を入力してください。"); return; }
-    if (mo.value === "") { advErr("何か月後かを入力してください。"); return; }
+    if (mo.value === "") { moBox.hidden = true; return; }
+    var base = isoOf("base");
     var r = DaysCalc.addMonths(base, parseFloat(mo.value));
     if (!r.ok) {
       var msg = r.code === "invalid_months" ? "月数は-1,200〜1,200の整数で入力してください。"
         : r.code === "out_of_range" ? "結果が対応範囲(1600〜2500年)を超えました。"
         : "基準日を正しく入力してください。";
-      advErr(msg);
+      moBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+      moBox.hidden = false;
       return;
     }
     var n = parseFloat(mo.value);
-    advBox.innerHTML =
+    moBox.innerHTML =
       '<div class="result-main">' + jpDate(r.date) + "(" + r.weekday + "曜日)</div>" +
       "<p>" + jpDate(base) + " の " + Math.abs(n).toLocaleString() + " か月" + (n < 0 ? "前" : "後") + "</p>" +
       '<p class="adv-note">相手の月に同じ日がない場合は月末に丸めます(1月31日の1か月後は2月28日)。</p>';
-    advBox.hidden = false;
+    moBox.hidden = false;
+  }
+
+  ["from-year", "from-month", "from-day", "to-year", "to-month", "to-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runBetween);
   });
+  ["base-year", "base-month", "base-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runAdd);
+  });
+  document.getElementById("offset").addEventListener("input", runAdd);
+  document.getElementById("adv-include").addEventListener("change", runBreakdown);
+  document.getElementById("adv-months").addEventListener("input", runMonths);
+  document.getElementById("between-form").addEventListener("submit", function (e) { e.preventDefault(); runBetween(); });
+  document.getElementById("add-form").addEventListener("submit", function (e) { e.preventDefault(); runAdd(); });
+
+  runBetween();
 })();
 </script>
 </body>

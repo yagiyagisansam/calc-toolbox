@@ -37,6 +37,7 @@
       </select>
     </label>
     <label>テキスト
+      <span class="field-note">貼り付けると、すぐ下に変換結果が表示されます</span>
       <textarea id="text" rows="5" placeholder="例: TEL:03-1234-5678"></textarea>
     </label>
     <button type="submit">変換する</button>
@@ -48,7 +49,7 @@
     <summary><span class="plus">＋</span>詳細機能: 種類を選んで変換・全角混じりのチェック</summary>
     <div class="adv-inner">
       <h3 class="adv-h">変換する文字の種類を選ぶ</h3>
-      <p class="adv-note">「数字だけ半角にしたい」「カタカナはそのままにしたい」など、変換する文字の種類をチェックボックスで選べます。カタカナを選ぶと半角カナ(ｱｲｳ)との相互変換もできます。</p>
+      <p class="adv-note">「数字だけ半角にしたい」など変換する種類を選べます(カタカナを選ぶと半角カナｱｲｳとの相互変換も可能)。</p>
       <label>変換の方向
         <select id="adv-mode">
           <option value="toHankaku" selected>全角 → 半角</option>
@@ -69,7 +70,7 @@
       <div class="tool-result" id="adv-sel-result" hidden aria-live="polite"></div>
 
       <h3 class="adv-h">全角・半角カナが混ざっていないかチェック</h3>
-      <p class="adv-note">「全角文字は使えません」とフォームにはじかれたとき、どの文字が全角なのかを探します。上の「テキスト」欄に入力した内容を検査し、混ざっている全角英数字・全角記号・全角スペース・半角カナの場所を一覧にします。</p>
+      <p class="adv-note">上の「テキスト」欄の内容を検査し、混ざっている全角英数字・全角記号・全角スペース・半角カナの場所を一覧にします。</p>
       <button type="button" id="adv-check-run">上のテキスト欄を検査する</button>
       <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
     </div>
@@ -80,7 +81,7 @@
   <h2>使い方</h2>
   <ol class="steps">
     <li>変換の方向(全角→半角 / 半角→全角)を選びます。</li>
-    <li>テキストを貼り付けて「変換する」を押します。</li>
+    <li>テキストを貼り付けると、その瞬間に変換結果が表示されます。ボタンは不要です。</li>
     <li>変換結果の「コピー」ボタンでコピーして貼り付け直してください。</li>
   </ol>
 
@@ -135,10 +136,11 @@
 (function () {
   "use strict";
   var box = document.getElementById("result");
-  document.getElementById("zenkaku-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  var textEl = document.getElementById("text");
+  function run() {
+    if (textEl.value === "") { box.hidden = true; return; }
     var mode = document.getElementById("mode").value;
-    var r = ZenkakuCalc[mode](document.getElementById("text").value);
+    var r = ZenkakuCalc[mode](textEl.value);
     if (!r.ok) {
       box.innerHTML = '<p class="result-error">テキストが長すぎます(10万文字まで)。</p>';
       box.hidden = false;
@@ -155,7 +157,10 @@
       });
     });
     box.hidden = false;
-  });
+  }
+  textEl.addEventListener("input", run);
+  document.getElementById("mode").addEventListener("change", run);
+  document.getElementById("zenkaku-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
 })();
 </script>
 <script>
@@ -164,7 +169,8 @@
   var advBox = document.getElementById("adv-result");
   var selBox = document.getElementById("adv-sel-result");
   var TYPE_LABEL = { zen_alnum: "全角英数字", zen_symbol: "全角記号", zen_space: "全角スペース", han_kana: "半角カナ" };
-  document.getElementById("adv-run").addEventListener("click", function () {
+  function runSel() {
+    if (document.getElementById("adv-text").value === "") { selBox.hidden = true; return; }
     var targets = {
       alnum: document.getElementById("adv-alnum").checked,
       kana: document.getElementById("adv-kana").checked,
@@ -189,8 +195,14 @@
       });
     });
     selBox.hidden = false;
+  }
+  document.getElementById("adv-text").addEventListener("input", runSel);
+  document.getElementById("adv-mode").addEventListener("change", runSel);
+  ["adv-alnum", "adv-kana", "adv-symbol", "adv-space"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runSel);
   });
-  document.getElementById("adv-check-run").addEventListener("click", function () {
+  document.getElementById("adv-run").addEventListener("click", runSel);
+  function runCheck() {
     var r = ZenkakuCalc.findMixed(document.getElementById("text").value);
     if (!r.ok) {
       advBox.innerHTML = '<p class="result-error">テキストが長すぎます(10万文字まで)。</p>';
@@ -212,6 +224,10 @@
       '<div class="table-scroll"><table class="data-table"><thead><tr><th>場所</th><th>文字</th><th>種類</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
       (r.total > 50 ? '<p class="adv-note">先頭の50件まで表示しています。</p>' : '');
     advBox.hidden = false;
+  }
+  document.getElementById("adv-check-run").addEventListener("click", runCheck);
+  document.getElementById("text").addEventListener("input", function () {
+    if (!advBox.hidden) runCheck();
   });
 })();
 </script>

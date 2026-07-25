@@ -37,7 +37,8 @@
       </select>
     </label>
     <label id="value-label">ナトリウム量(mg)
-      <input type="number" id="value" min="0" step="any" required placeholder="例: 1200">
+      <span class="field-note">数値を入れると、すぐ下に結果が表示されます</span>
+      <input type="number" id="value" inputmode="decimal" min="0" step="any" required placeholder="例: 1200">
     </label>
     <button type="submit">換算する</button>
   </form>
@@ -50,38 +51,38 @@
       <h3 class="adv-h">「100gあたり」表示から実際に食べる量の塩分を出す</h3>
       <p class="adv-note">栄養成分表示が「100gあたり」の食品で、実際に食べる量に含まれる食塩相当量を計算します。</p>
       <label>100gあたりの食塩相当量(g)
-        <input type="number" id="adv-per100" min="0.01" max="100" step="any" placeholder="例: 1.4">
+        <input type="number" id="adv-per100" inputmode="decimal" min="0.01" max="100" step="any" placeholder="例: 1.4">
       </label>
       <label>実際に食べる量(g)
-        <input type="number" id="adv-grams" min="1" max="5000" step="any" placeholder="例: 250">
+        <input type="number" id="adv-grams" inputmode="decimal" min="1" max="5000" step="any" placeholder="例: 250">
       </label>
       <button type="button" id="adv-portion-run">食べる量の塩分を計算する</button>
       <h3 class="adv-h">1日の塩分合計を管理する</h3>
-      <p class="adv-note">今日食べたもの(最大6件)の食塩相当量(g)を入れると、合計と、1日の目標量までの残りを計算します。食品名は自由に入力できます。ナトリウム(mg)表示のものは、上の簡易換算で食塩相当量に直してから入力してください。</p>
+      <p class="adv-note">今日食べたもの(最大6件)の食塩相当量(g)を入れると、合計と1日の目標量までの残りを計算します。</p>
       <div id="adv-rows">
         <label>食品1 <span style="display:flex;gap:.5em;align-items:center;">
           <input type="text" id="adv-name-1" placeholder="例: みそ汁" style="flex:1;">
-          <input type="number" id="adv-salt-1" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食塩相当量(g)"> g
+          <input type="number" inputmode="decimal" id="adv-salt-1" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食塩相当量(g)"> g
         </span></label>
         <label>食品2 <span style="display:flex;gap:.5em;align-items:center;">
           <input type="text" id="adv-name-2" placeholder="例: 塩さけ" style="flex:1;">
-          <input type="number" id="adv-salt-2" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食塩相当量(g)"> g
+          <input type="number" inputmode="decimal" id="adv-salt-2" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食塩相当量(g)"> g
         </span></label>
         <label>食品3 <span style="display:flex;gap:.5em;align-items:center;">
           <input type="text" id="adv-name-3" style="flex:1;">
-          <input type="number" id="adv-salt-3" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食塩相当量(g)"> g
+          <input type="number" inputmode="decimal" id="adv-salt-3" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食塩相当量(g)"> g
         </span></label>
         <label>食品4 <span style="display:flex;gap:.5em;align-items:center;">
           <input type="text" id="adv-name-4" style="flex:1;">
-          <input type="number" id="adv-salt-4" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食塩相当量(g)"> g
+          <input type="number" inputmode="decimal" id="adv-salt-4" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食塩相当量(g)"> g
         </span></label>
         <label>食品5 <span style="display:flex;gap:.5em;align-items:center;">
           <input type="text" id="adv-name-5" style="flex:1;">
-          <input type="number" id="adv-salt-5" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食塩相当量(g)"> g
+          <input type="number" inputmode="decimal" id="adv-salt-5" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食塩相当量(g)"> g
         </span></label>
         <label>食品6 <span style="display:flex;gap:.5em;align-items:center;">
           <input type="text" id="adv-name-6" style="flex:1;">
-          <input type="number" id="adv-salt-6" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食塩相当量(g)"> g
+          <input type="number" inputmode="decimal" id="adv-salt-6" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食塩相当量(g)"> g
         </span></label>
       </div>
       <label>性別(目標量の区分)
@@ -100,7 +101,7 @@
   <h2>使い方</h2>
   <ol class="steps">
     <li>食品パッケージの栄養成分表示で「ナトリウム」の量(mg)を確認します。</li>
-    <li>数値を入力して「換算する」を押すと、食塩相当量(g)と1日目標量に対する割合が表示されます。</li>
+    <li>数値を入力すると同時に、食塩相当量(g)と1日目標量に対する割合が下に表示されます。ボタンは不要です。</li>
     <li>「食塩相当量→ナトリウム」の逆換算もプルダウンで選べます。</li>
   </ol>
 
@@ -164,9 +165,15 @@
     var toSalt = mode.value === "toSalt";
     label.childNodes[0].textContent = toSalt ? "ナトリウム量(mg)" : "食塩相当量(g)";
     input.placeholder = toSalt ? "例: 1200" : "例: 3";
+    run(false);
   });
-  document.getElementById("shio-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  function run(fromSubmit) {
+    if (input.value === "") {
+      if (!fromSubmit) { box.hidden = true; return; }
+      box.innerHTML = '<p class="result-error">数値を入力してください。</p>';
+      box.hidden = false;
+      return;
+    }
     var v = parseFloat(input.value);
     if (mode.value === "toSalt") {
       var r = ShioCalc.toSalt(v);
@@ -188,14 +195,22 @@
       box.innerHTML = '<div class="result-main">ナトリウム 約' + r2.sodiumMg.toLocaleString() + " mg</div>";
     }
     box.hidden = false;
+  }
+  document.getElementById("shio-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
   });
+  input.addEventListener("input", function () { run(false); });
 })();
 </script>
 <script>
 (function () {
   "use strict";
   var advBox = document.getElementById("adv-result");
-  document.getElementById("adv-portion-run").addEventListener("click", function () {
+  function runPortion(fromButton) {
+    if (!fromButton &&
+        (document.getElementById("adv-per100").value === "" ||
+         document.getElementById("adv-grams").value === "")) { return; }
     var per = parseFloat(document.getElementById("adv-per100").value);
     var g = parseFloat(document.getElementById("adv-grams").value);
     var r = ShioCalc.portionSalt(per, g);
@@ -211,8 +226,8 @@
       "1日の目標量に対して男性(7.5g未満)の " + r.pctMale.toLocaleString() + "% / 女性(6.5g未満)の " +
       r.pctFemale.toLocaleString() + "% です。</p>";
     advBox.hidden = false;
-  });
-  function runAdvTotal() {
+  }
+  function runAdvTotal(fromButton) {
     var items = [];
     for (var i = 1; i <= 6; i++) {
       var raw = document.getElementById("adv-salt-" + i).value;
@@ -222,6 +237,7 @@
       items.push({ name: name, salt: g });
     }
     if (items.length === 0) {
+      if (!fromButton) { return; }
       advBox.innerHTML = '<p class="result-error">食塩相当量(g)を1件以上入力してください。</p>';
       advBox.hidden = false;
       return;
@@ -251,7 +267,16 @@
     advBox.innerHTML = html;
     advBox.hidden = false;
   }
-  document.getElementById("adv-run").addEventListener("click", runAdvTotal);
+  document.getElementById("adv-portion-run").addEventListener("click", function () { runPortion(true); });
+  document.getElementById("adv-run").addEventListener("click", function () { runAdvTotal(true); });
+  ["adv-per100", "adv-grams"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runPortion(false); });
+  });
+  for (var i = 1; i <= 6; i++) {
+    document.getElementById("adv-salt-" + i).addEventListener("input", function () { runAdvTotal(false); });
+    document.getElementById("adv-name-" + i).addEventListener("input", function () { runAdvTotal(false); });
+  }
+  document.getElementById("adv-sex").addEventListener("change", function () { runAdvTotal(false); });
 })();
 </script>
 </body>

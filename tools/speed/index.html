@@ -30,16 +30,16 @@
 <main>
   <h1>速さ・時間・距離 計算機</h1>
   <form class="tool-form" id="speed-form">
-    <p style="margin:0;font-size:0.88rem;color:var(--color-muted);">3つのうち<strong>2つ</strong>を入力してください(残りを計算します)</p>
+    <p style="margin:0;font-size:0.88rem;color:var(--color-muted);">3つのうち<strong>2つ</strong>を入力すると、残りをすぐ下に自動計算します</p>
     <label>速さ(km/h)
-      <input type="number" id="speed" min="0" step="any" placeholder="例: 80">
+      <input type="number" id="speed" inputmode="decimal" min="0" step="any" placeholder="例: 80">
     </label>
     <label>距離(km)
-      <input type="number" id="distance" min="0" step="any" placeholder="例: 150">
+      <input type="number" id="distance" inputmode="decimal" min="0" step="any" placeholder="例: 150">
     </label>
     <label>時間(分)
       <span class="field-note">1時間30分なら90と入力</span>
-      <input type="number" id="time" min="0" step="any" placeholder="例: 112">
+      <input type="number" id="time" inputmode="decimal" min="0" step="any" placeholder="例: 112">
     </label>
     <button type="submit">残りを計算する</button>
   </form>
@@ -50,22 +50,22 @@
     <summary><span class="plus">＋</span>詳細機能: 到着時刻・出発時刻・分速/秒速</summary>
     <div class="adv-inner">
       <h3 class="adv-h">何時に着く? 到着時刻を計算</h3>
-      <p class="adv-note">出発時刻・距離・速さ(平均時速)を入れると到着予定時刻を計算します。途中の休憩時間(合計)も足せます。ドライブや帰省の計画に。</p>
+      <p class="adv-note">出発時刻・距離・速さ(平均時速)から、休憩時間も含めた到着予定時刻を計算します。</p>
       <label>出発時刻
         <input type="time" id="adv-dep-time" value="09:00">
       </label>
       <label>距離(km)
-        <input type="number" id="adv-dist" min="0.1" max="100000" step="any" value="150" placeholder="例: 150">
+        <input type="number" id="adv-dist" inputmode="decimal" min="0.1" max="100000" step="any" value="150" placeholder="例: 150">
       </label>
       <label>速さ(平均時速 km/h)
-        <input type="number" id="adv-speed" min="0.1" max="5000" step="any" value="80" placeholder="例: 80">
+        <input type="number" id="adv-speed" inputmode="decimal" min="0.1" max="5000" step="any" value="80" placeholder="例: 80">
       </label>
       <label>休憩時間の合計(分)
-        <input type="number" id="adv-break" min="0" max="100000" step="1" value="0" placeholder="例: 20">
+        <input type="number" id="adv-break" inputmode="numeric" min="0" max="100000" step="1" value="0" placeholder="例: 20">
       </label>
       <button type="button" id="adv-arr-run">到着時刻を計算する</button>
       <h3 class="adv-h">何時に出発すればいい? 逆算</h3>
-      <p class="adv-note">着きたい時刻を入れると、出発すべき時刻を逆算します。距離・速さ・休憩は上の欄の値を使います。</p>
+      <p class="adv-note">着きたい時刻から出発すべき時刻を逆算します(距離・速さ・休憩は上の欄の値を使います)。</p>
       <label>到着したい時刻
         <input type="time" id="adv-arr-time" value="12:00">
       </label>
@@ -73,7 +73,7 @@
       <h3 class="adv-h">時速を分速・秒速に直す</h3>
       <p class="adv-note">理科の宿題でよく使う「時速→分速・秒速(m/s)」の換算です。</p>
       <label>時速(km/h)
-        <input type="number" id="adv-kmh" min="0.1" max="5000" step="any" placeholder="例: 60">
+        <input type="number" id="adv-kmh" inputmode="decimal" min="0.1" max="5000" step="any" placeholder="例: 60">
       </label>
       <button type="button" id="adv-unit-run">分速・秒速に直す</button>
       <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
@@ -86,7 +86,7 @@
   <ol class="steps">
     <li>わかっている2つ(速さ・距離・時間のどれか)を入力します。</li>
     <li>残り1つは空欄のままにします。</li>
-    <li>「計算する」を押すと、3つすべての値が表示されます。</li>
+    <li>2つ目を入力した瞬間に、3つすべての値が下に表示されます。ボタンは不要です。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -144,15 +144,16 @@
     invalid_input: "3つのうち、ちょうど2つを入力してください(残り1つは空欄)。",
     invalid_value: "0より大きい数値で入力してください。"
   };
-  document.getElementById("speed-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  function run(fromSubmit) {
     var g = {};
+    var filled = 0;
     var s = document.getElementById("speed").value;
     var d = document.getElementById("distance").value;
     var t = document.getElementById("time").value;
-    if (s !== "") g.speedKmh = parseFloat(s);
-    if (d !== "") g.distanceKm = parseFloat(d);
-    if (t !== "") g.timeMin = parseFloat(t);
+    if (s !== "") { g.speedKmh = parseFloat(s); filled++; }
+    if (d !== "") { g.distanceKm = parseFloat(d); filled++; }
+    if (t !== "") { g.timeMin = parseFloat(t); filled++; }
+    if (!fromSubmit && filled < 2) { box.hidden = true; return; }
     var r = SpeedCalc.solve(g);
     if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "入力値を確認してください。") + "</p>"; box.hidden = false; return; }
     box.innerHTML =
@@ -162,6 +163,13 @@
       "<tr><td>時間</td><td><strong>" + r.timeH + "時間" + r.timeM + "分</strong>(" + r.timeMin.toLocaleString() + "分)</td></tr>" +
       "</tbody></table></div>";
     box.hidden = false;
+  }
+  document.getElementById("speed-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+  ["speed", "distance", "time"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { run(false); });
   });
 })();
 </script>
@@ -192,10 +200,11 @@
     advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
     advBox.hidden = false;
   }
-  document.getElementById("adv-arr-run").addEventListener("click", function () {
+  function runArrival(fromButton) {
     var t = advParseTime("adv-dep-time");
-    if (!t) { advFail("出発時刻を入力してください。"); return; }
+    if (!t) { if (fromButton) { advFail("出発時刻を入力してください。"); } return; }
     var c = advReadCommon();
+    if (!fromButton && (isNaN(c.d) || isNaN(c.s))) { return; }
     var r = SpeedCalc.arrival(t.h, t.m, c.d, c.s, c.b);
     if (!r.ok) { advFail("距離・速さ・休憩時間を正しく入力してください。"); return; }
     advBox.innerHTML =
@@ -203,13 +212,14 @@
       "<p>移動 " + advDur(r.travelMin) + (c.b > 0 ? " + 休憩 " + advDur(Math.round(c.b)) : "") +
       " = 合計 <strong>" + advDur(r.totalMin) + "</strong> かかります。" +
       (r.daysLater > 1 ? "(" + r.daysLater + "日後の到着です)" : "") + "</p>" +
-      '<p class="adv-note">信号や渋滞は含みません。車では平均時速を控えめに(高速80km/h・一般道30km/h程度)見積もると現実的です。</p>';
+      '<p class="adv-note">信号や渋滞は含まない概算です。</p>';
     advBox.hidden = false;
-  });
-  document.getElementById("adv-dep-run").addEventListener("click", function () {
+  }
+  function runDeparture(fromButton) {
     var t = advParseTime("adv-arr-time");
-    if (!t) { advFail("到着したい時刻を入力してください。"); return; }
+    if (!t) { if (fromButton) { advFail("到着したい時刻を入力してください。"); } return; }
     var c = advReadCommon();
+    if (!fromButton && (isNaN(c.d) || isNaN(c.s))) { return; }
     var r = SpeedCalc.departure(t.h, t.m, c.d, c.s, c.b);
     if (!r.ok) { advFail("距離・速さ・休憩時間を正しく入力してください。"); return; }
     advBox.innerHTML =
@@ -217,8 +227,9 @@
       "<p>所要時間は合計 <strong>" + advDur(r.totalMin) + "</strong>(移動 " + advDur(r.travelMin) +
       (c.b > 0 ? " + 休憩 " + advDur(Math.round(c.b)) : "") + ")です。</p>";
     advBox.hidden = false;
-  });
-  document.getElementById("adv-unit-run").addEventListener("click", function () {
+  }
+  function runUnits(fromButton) {
+    if (!fromButton && document.getElementById("adv-kmh").value === "") { return; }
     var kmh = parseFloat(document.getElementById("adv-kmh").value);
     var r = SpeedCalc.speedUnits(kmh);
     if (!r.ok) { advFail("時速を0より大きい数値で入力してください。"); return; }
@@ -230,7 +241,16 @@
       "<tr><td>秒速</td><td>" + r.mPerSec.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " m/s</td></tr>" +
       "</tbody></table></div>";
     advBox.hidden = false;
+  }
+  document.getElementById("adv-arr-run").addEventListener("click", function () { runArrival(true); });
+  document.getElementById("adv-dep-run").addEventListener("click", function () { runDeparture(true); });
+  document.getElementById("adv-unit-run").addEventListener("click", function () { runUnits(true); });
+  document.getElementById("adv-dep-time").addEventListener("change", function () { runArrival(false); });
+  ["adv-dist", "adv-speed", "adv-break"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runArrival(false); });
   });
+  document.getElementById("adv-arr-time").addEventListener("change", function () { runDeparture(false); });
+  document.getElementById("adv-kmh").addEventListener("input", function () { runUnits(false); });
 })();
 </script>
 </body>

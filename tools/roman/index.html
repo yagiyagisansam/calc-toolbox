@@ -37,6 +37,7 @@
       </select>
     </label>
     <label id="input-label">数字(1〜3999)
+      <span class="field-note">入力すると、すぐ下に変換結果が表示されます</span>
       <input type="text" id="value" required placeholder="例: 2026" inputmode="numeric">
     </label>
     <button type="submit">変換する</button>
@@ -48,7 +49,7 @@
     <summary><span class="plus">＋</span>詳細機能: まとめて変換・日付のローマ数字表記</summary>
     <div class="adv-inner">
       <h3 class="adv-h">複数まとめて変換</h3>
-      <p class="adv-note">カンマまたは改行で区切って入力すると、最大20個を一度に変換して表にします。数字はローマ数字に、ローマ数字は数字に自動で変換します。「時計文字盤表記」にチェックすると、時計の慣習にならって4をIIIIと書きます。</p>
+      <p class="adv-note">カンマまたは改行区切りで最大20個を一度に変換します(「時計文字盤表記」にチェックすると4をIIIIと書きます)。</p>
       <label>変換したい数字・ローマ数字(カンマか改行区切り、最大20個)
         <textarea id="adv-list" rows="4" placeholder="例: 1, 2, 3, 4 または MMXXVI"></textarea>
       </label>
@@ -57,16 +58,18 @@
       <div class="tool-result" id="adv-list-result" hidden aria-live="polite"></div>
 
       <h3 class="adv-h">日付をローマ数字にする</h3>
-      <p class="adv-note">誕生日や記念日を「MMXXVI・VII・XXIV」のようなローマ数字表記にします。指輪の刻印やデザインの下書きに。</p>
-      <label>年(西暦)
-        <input type="number" id="adv-year" min="1" max="3999" step="1" placeholder="例: 2026">
-      </label>
-      <label>月
-        <input type="number" id="adv-month" min="1" max="12" step="1" placeholder="例: 7">
-      </label>
-      <label>日
-        <input type="number" id="adv-day" min="1" max="31" step="1" placeholder="例: 24">
-      </label>
+      <p class="adv-note">誕生日や記念日を「MMXXVI・VII・XXIV」のようなローマ数字表記にします(指輪の刻印やデザインの下書きに)。</p>
+      <div class="field-row">
+        <label>年(西暦)
+          <input type="number" id="adv-year" inputmode="numeric" min="1" max="3999" step="1" placeholder="例: 2026">
+        </label>
+        <label>月
+          <input type="number" id="adv-month" inputmode="numeric" min="1" max="12" step="1" placeholder="例: 7">
+        </label>
+        <label>日
+          <input type="number" id="adv-day" inputmode="numeric" min="1" max="31" step="1" placeholder="例: 24">
+        </label>
+      </div>
       <button type="button" id="adv-date-run">日付を変換する</button>
       <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
     </div>
@@ -78,7 +81,7 @@
   <ol class="steps">
     <li>変換の方向を選びます。</li>
     <li>数字(1〜3999)またはローマ数字(例: MMXXVI)を入力します。</li>
-    <li>「変換する」を押すと結果が表示されます。</li>
+    <li>入力した瞬間に結果が表示されます。ボタンは不要です。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -141,9 +144,10 @@
     label.childNodes[0].textContent = isTo ? "数字(1〜3999)" : "ローマ数字";
     input.placeholder = isTo ? "例: 2026" : "例: MMXXVI";
     input.inputMode = isTo ? "numeric" : "text";
+    run();
   });
-  document.getElementById("roman-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  function run() {
+    if (input.value.trim() === "") { box.hidden = true; return; }
     if (mode.value === "toRoman") {
       var r = RomanCalc.toRoman(parseInt(input.value, 10));
       if (!r.ok) { box.innerHTML = '<p class="result-error">1〜3999の整数を入力してください。</p>'; box.hidden = false; return; }
@@ -154,7 +158,9 @@
       box.innerHTML = '<div class="result-main">' + r2.value.toLocaleString() + "</div>";
     }
     box.hidden = false;
-  });
+  }
+  input.addEventListener("input", run);
+  document.getElementById("roman-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
 })();
 </script>
 <script>
@@ -162,7 +168,8 @@
   "use strict";
   var advBox = document.getElementById("adv-result");
   var listBox = document.getElementById("adv-list-result");
-  document.getElementById("adv-list-run").addEventListener("click", function () {
+  function runList() {
+    if (document.getElementById("adv-list").value.trim() === "") { listBox.hidden = true; return; }
     var clock = document.getElementById("adv-clock").checked;
     var r = RomanCalc.convertMany(document.getElementById("adv-list").value, clock);
     if (!r.ok) {
@@ -180,11 +187,18 @@
       '<div class="table-scroll"><table class="data-table"><thead><tr><th>入力</th><th>変換結果</th></tr></thead><tbody>' +
       rows + '</tbody></table></div>';
     listBox.hidden = false;
-  });
-  document.getElementById("adv-date-run").addEventListener("click", function () {
-    var y = parseInt(document.getElementById("adv-year").value, 10);
-    var m = parseInt(document.getElementById("adv-month").value, 10);
-    var d = parseInt(document.getElementById("adv-day").value, 10);
+  }
+  document.getElementById("adv-list").addEventListener("input", runList);
+  document.getElementById("adv-clock").addEventListener("change", runList);
+  document.getElementById("adv-list-run").addEventListener("click", runList);
+  function runDate(force) {
+    var yRaw = document.getElementById("adv-year").value;
+    var mRaw = document.getElementById("adv-month").value;
+    var dRaw = document.getElementById("adv-day").value;
+    if ((yRaw.trim() === "" || mRaw.trim() === "" || dRaw.trim() === "") && !force) { advBox.hidden = true; return; }
+    var y = parseInt(yRaw, 10);
+    var m = parseInt(mRaw, 10);
+    var d = parseInt(dRaw, 10);
     var r = RomanCalc.dateToRoman(y, m, d);
     if (!r.ok) {
       advBox.innerHTML = '<p class="result-error">実在する日付を西暦(1〜3999年)で入力してください。</p>';
@@ -199,7 +213,11 @@
       '<tr><td>ハイフン区切り</td><td>' + r.year + '-' + r.month + '-' + r.day + '</td></tr>' +
       '</tbody></table></div>';
     advBox.hidden = false;
+  }
+  ["adv-year", "adv-month", "adv-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runDate(false); });
   });
+  document.getElementById("adv-date-run").addEventListener("click", function () { runDate(true); });
 })();
 </script>
 </body>

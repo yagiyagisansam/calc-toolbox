@@ -31,13 +31,14 @@
   <h1>パーセント計算機</h1>
   <form class="tool-form" id="what-form">
     <label>① AはBの何%?</label>
+    <span class="field-note">2つの数値が揃うと、すぐ下に結果が表示されます</span>
     <label>A(部分)
       <input type="number" id="w-part" inputmode="decimal" step="any" min="0" placeholder="30" required>
     </label>
     <label>B(全体)
       <input type="number" id="w-whole" inputmode="decimal" step="any" min="0.000001" placeholder="200" required>
     </label>
-    <button type="submit">何%か計算</button>
+    <div class="tool-result" id="result-what" hidden aria-live="polite"></div>
   </form>
 
   <form class="tool-form" id="of-form">
@@ -48,7 +49,7 @@
     <label>○%
       <input type="number" id="o-percent" inputmode="decimal" step="any" min="0" max="10000" placeholder="20" required>
     </label>
-    <button type="submit">値を計算</button>
+    <div class="tool-result" id="result-of" hidden aria-live="polite"></div>
   </form>
 
   <form class="tool-form" id="rate-form">
@@ -59,16 +60,14 @@
     <label>B(後の値)
       <input type="number" id="r-to" inputmode="decimal" step="any" min="0" placeholder="650" required>
     </label>
-    <button type="submit">増減率を計算</button>
+    <div class="tool-result" id="result-rate" hidden aria-live="polite"></div>
   </form>
-
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
   <details class="adv-box">
     <summary><span class="plus">＋</span>詳細機能: 連続の増減・打ち消し・元の値の逆算</summary>
     <div class="adv-inner">
       <h3 class="adv-h">連続の増減で結局何%変わった?</h3>
-      <p class="adv-note">「10%増えたあと10%減った」は、実は元どおりではなく1%の減少です。変化率をカンマか改行で区切って入力すると(増加はそのまま、減少はマイナス)、掛け合わせた合計の変化率を計算します。</p>
+      <p class="adv-note">「10%増→10%減」のような連続の変化率(減少はマイナス)をカンマか改行区切りで入れると、掛け合わせた合計の変化率を計算します。</p>
       <label>変化率(%)を順番に(最大10件。例: 10, -10)
         <textarea id="adv-chain" rows="2" placeholder="例: 10, -10"></textarea>
       </label>
@@ -79,7 +78,7 @@
       <div class="tool-result" id="adv-chain-result" hidden aria-live="polite"></div>
 
       <h3 class="adv-h">○%の変化を打ち消すには?</h3>
-      <p class="adv-note">「25%値上げを元に戻すには25%引きではダメ」——増えた分と同じ%では戻りません。打ち消しに必要な逆方向の%を計算します。</p>
+      <p class="adv-note">「25%値上げは25%引きでは元に戻らない」ため、打ち消しに必要な逆方向の%を計算します。</p>
       <label>適用済みの変化率(%。減少はマイナスで)
         <input type="number" id="adv-cancel-rate" inputmode="decimal" step="any" placeholder="例: 25">
       </label>
@@ -107,7 +106,7 @@
 
   <h2>使い方</h2>
   <ol class="steps">
-    <li>調べたい計算(①〜③)の欄に数値を入れ、それぞれのボタンを押します。</li>
+    <li>調べたい計算(①〜③)の欄に数値を入れます。2つ揃った瞬間に、その欄のすぐ下に結果が表示されます。</li>
     <li>例: 「テスト200点中30点は?」→①へ / 「4,980円の20%引きの割引額は?」→②へ / 「売上500→650は何%増?」→③へ。</li>
   </ol>
 
@@ -161,7 +160,6 @@
 <script>
 (function () {
   "use strict";
-  var box = document.getElementById("result");
   var ERROR_MESSAGES = {
     invalid_part: "A(部分)は0以上の数値で入力してください。",
     invalid_whole: "B(全体)は0より大きい数値で入力してください。",
@@ -170,27 +168,43 @@
     invalid_from: "A(元の値)は0より大きい数値で入力してください。",
     invalid_to: "B(後の値)は0以上の数値で入力してください。"
   };
-  function show(html) { box.innerHTML = html; box.hidden = false; }
-  function showError(code) {
-    show('<p class="result-error">' + (ERROR_MESSAGES[code] || "入力値を確認してください。") + "</p>");
+  function show(box, html) { box.innerHTML = html; box.hidden = false; }
+  function showError(box, code) {
+    show(box, '<p class="result-error">' + (ERROR_MESSAGES[code] || "入力値を確認してください。") + "</p>");
   }
-  document.getElementById("what-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  function bind(formId, boxId, inputIds, compute) {
+    var box = document.getElementById(boxId);
+    function run() {
+      var empty = inputIds.some(function (id) { return document.getElementById(id).value.trim() === ""; });
+      if (empty) { box.hidden = true; return; }
+      compute(box);
+    }
+    inputIds.forEach(function (id) {
+      document.getElementById(id).addEventListener("input", run);
+    });
+    document.getElementById(formId).addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  }
+  bind("what-form", "result-what", ["w-part", "w-whole"], function (box) {
     var r = PercentCalc.whatPercent(parseFloat(document.getElementById("w-part").value), parseFloat(document.getElementById("w-whole").value));
-    if (!r.ok) { showError(r.code); return; }
-    show('<div class="result-main">' + r.percent.toLocaleString() + " %</div>");
+    if (!r.ok) { showError(box, r.code); return; }
+    show(box, '<div class="result-main">' + r.percent.toLocaleString() + " %</div>");
   });
-  document.getElementById("of-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var r = PercentCalc.percentOf(parseFloat(document.getElementById("o-value").value), parseFloat(document.getElementById("o-percent").value));
-    if (!r.ok) { showError(r.code); return; }
-    show('<div class="result-main">' + r.value.toLocaleString() + "</div>");
+  bind("of-form", "result-of", ["o-value", "o-percent"], function (box) {
+    var a = parseFloat(document.getElementById("o-value").value);
+    var r = PercentCalc.percentOf(a, parseFloat(document.getElementById("o-percent").value));
+    if (!r.ok) { showError(box, r.code); return; }
+    var minus = Math.round((a - r.value) * 100) / 100;
+    var plus = Math.round((a + r.value) * 100) / 100;
+    show(box, '<div class="result-main">' + r.value.toLocaleString() + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>値引き後(A − この値)</td><td>" + minus.toLocaleString() + "</td></tr>" +
+      "<tr><td>増額後(A + この値)</td><td>" + plus.toLocaleString() + "</td></tr>" +
+      "</tbody></table></div>");
   });
-  document.getElementById("rate-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  bind("rate-form", "result-rate", ["r-from", "r-to"], function (box) {
     var r = PercentCalc.changeRate(parseFloat(document.getElementById("r-from").value), parseFloat(document.getElementById("r-to").value));
-    if (!r.ok) { showError(r.code); return; }
-    show('<div class="result-main">' + (r.rate > 0 ? "+" : "") + r.rate.toLocaleString() + " %</div>" +
+    if (!r.ok) { showError(box, r.code); return; }
+    show(box, '<div class="result-main">' + (r.rate > 0 ? "+" : "") + r.rate.toLocaleString() + " %</div>" +
       "<p>" + (r.rate > 0 ? "増加" : r.rate < 0 ? "減少" : "変化なし") + "</p>");
   });
 })();
@@ -201,7 +215,8 @@
   var advBox = document.getElementById("adv-result");
   var chainBox = document.getElementById("adv-chain-result");
   var cancelBox = document.getElementById("adv-cancel-result");
-  document.getElementById("adv-chain-run").addEventListener("click", function () {
+  function runChain() {
+    if (document.getElementById("adv-chain").value.trim() === "") { chainBox.hidden = true; return; }
     var parts = document.getElementById("adv-chain").value.split(/[\n,、]+/)
       .map(function (p) { return p.trim(); })
       .filter(function (p) { return p !== ""; });
@@ -225,8 +240,12 @@
     }
     chainBox.innerHTML = html;
     chainBox.hidden = false;
-  });
-  document.getElementById("adv-cancel-run").addEventListener("click", function () {
+  }
+  document.getElementById("adv-chain").addEventListener("input", runChain);
+  document.getElementById("adv-chain-start").addEventListener("input", runChain);
+  document.getElementById("adv-chain-run").addEventListener("click", runChain);
+  function runCancel() {
+    if (document.getElementById("adv-cancel-rate").value.trim() === "") { cancelBox.hidden = true; return; }
     var p = parseFloat(document.getElementById("adv-cancel-rate").value);
     var r = PercentCalc.cancelRate(p);
     if (!r.ok) {
@@ -240,8 +259,12 @@
       '<div class="result-main">' + Math.abs(r.cancel).toLocaleString(undefined, { maximumFractionDigits: 2 }) + dir2 + '</div>' +
       '<p>' + Math.abs(p).toLocaleString(undefined, { maximumFractionDigits: 2 }) + '%' + dir1 + ' を打ち消して元に戻すために必要な変化です。</p>';
     cancelBox.hidden = false;
-  });
-  document.getElementById("adv-before-run").addEventListener("click", function () {
+  }
+  document.getElementById("adv-cancel-rate").addEventListener("input", runCancel);
+  document.getElementById("adv-cancel-run").addEventListener("click", runCancel);
+  function runBefore() {
+    if (document.getElementById("adv-after").value.trim() === "" ||
+        document.getElementById("adv-after-rate").value.trim() === "") { advBox.hidden = true; return; }
     var after = parseFloat(document.getElementById("adv-after").value);
     var rate = parseFloat(document.getElementById("adv-after-rate").value);
     var r = PercentCalc.beforeChange(after, rate);
@@ -255,7 +278,10 @@
       '<p>元の値に ' + rate.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '% の変化を適用すると ' +
       after.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' になります。</p>';
     advBox.hidden = false;
-  });
+  }
+  document.getElementById("adv-after").addEventListener("input", runBefore);
+  document.getElementById("adv-after-rate").addEventListener("input", runBefore);
+  document.getElementById("adv-before-run").addEventListener("click", runBefore);
 })();
 </script>
 </body>

@@ -30,16 +30,17 @@
 <main>
   <h1>歩数→距離・カロリー換算 計算機</h1>
   <form class="tool-form" id="hosu-form">
+    <span class="field-note">歩数と身長を入れると、すぐ下に結果が表示されます</span>
     <label>歩数
-      <input type="number" id="steps" min="1" max="200000" step="1" required placeholder="例: 10000">
+      <input type="number" id="steps" inputmode="numeric" min="1" max="200000" step="1" required placeholder="例: 10000">
     </label>
     <label>身長(cm)
       <span class="field-note">歩幅の推定に使います</span>
-      <input type="number" id="height" min="100" max="250" step="0.1" required placeholder="例: 170">
+      <input type="number" id="height" inputmode="decimal" min="100" max="250" step="0.1" required placeholder="例: 170">
     </label>
     <label>体重(kg・任意)
       <span class="field-note">入れると消費カロリーも計算</span>
-      <input type="number" id="weight" min="20" max="300" step="0.1" placeholder="例: 60">
+      <input type="number" id="weight" inputmode="decimal" min="20" max="300" step="0.1" placeholder="例: 60">
     </label>
     <button type="submit">距離・カロリーを計算する</button>
   </form>
@@ -50,7 +51,7 @@
     <summary><span class="plus">＋</span>詳細機能: 目標歩数まであと何歩・実測歩幅で計算</summary>
     <div class="adv-inner">
       <h3 class="adv-h">目標歩数まであと何歩?</h3>
-      <p class="adv-note">目標と今の歩数を入れると、残り歩数を「あと何km・何分・何kcal」に換算します。身長(と体重)は上のフォームの値を使います。</p>
+      <p class="adv-note">目標と今の歩数を入れると、残り歩数を「あと何km・何分・何kcal」に換算します(身長・体重は上の値を使用)。</p>
       <label>目標歩数
         <input type="number" id="adv-goal" inputmode="numeric" step="1" min="1" max="200000" value="10000">
       </label>
@@ -60,7 +61,7 @@
       <button type="button" id="adv-goal-run">残りを計算する</button>
 
       <h3 class="adv-h">自分の歩幅で正確に計算</h3>
-      <p class="adv-note">身長からの推定(身長×0.45)だと距離が合わない方は、実際の歩幅を入れて計算し直せます。10歩歩いた距離を10で割ると歩幅がわかります。歩数(と体重)は上のフォームの値を使います。</p>
+      <p class="adv-note">実際の歩幅(10歩歩いた距離÷10)を入れると、その歩幅で距離を計算し直します。</p>
       <label>歩幅(cm)
         <input type="number" id="adv-stride" inputmode="decimal" step="any" min="20" max="150" placeholder="例: 65">
       </label>
@@ -74,7 +75,7 @@
   <h2>使い方</h2>
   <ol class="steps">
     <li>スマホや歩数計の歩数を入力します。</li>
-    <li>身長を入力します(歩幅=身長×0.45の目安で距離を推定します)。</li>
+    <li>身長を入力すると同時に、距離がすぐ下に表示されます(歩幅=身長×0.45の目安)。</li>
     <li>体重も入れると消費カロリーの目安が表示されます。</li>
   </ol>
 
@@ -136,12 +137,15 @@
     invalid_height: "身長は100〜250cmの範囲で入力してください。",
     invalid_weight: "体重は20〜300kgの範囲で入力してください。"
   };
-  document.getElementById("hosu-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var w = document.getElementById("weight").value;
+  var stepsEl = document.getElementById("steps");
+  var heightEl = document.getElementById("height");
+  var weightEl = document.getElementById("weight");
+  function run() {
+    if (stepsEl.value === "" || heightEl.value === "") { box.hidden = true; return; }
+    var w = weightEl.value;
     var r = HosuCalc.calc(
-      parseFloat(document.getElementById("steps").value),
-      parseFloat(document.getElementById("height").value),
+      parseFloat(stepsEl.value),
+      parseFloat(heightEl.value),
       w === "" ? undefined : parseFloat(w)
     );
     if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "入力値を確認してください。") + "</p>"; box.hidden = false; return; }
@@ -153,7 +157,11 @@
       (r.kcal !== undefined ? "<tr><td>消費カロリーの目安</td><td>約 " + r.kcal.toLocaleString() + " kcal</td></tr>" : "") +
       "</tbody></table></div>";
     box.hidden = false;
-  });
+  }
+  stepsEl.addEventListener("input", run);
+  heightEl.addEventListener("input", run);
+  weightEl.addEventListener("input", run);
+  document.getElementById("hosu-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
 })();
 </script>
 <script>
@@ -168,11 +176,13 @@
     var v = document.getElementById("weight").value;
     return v === "" ? undefined : parseFloat(v);
   }
-  document.getElementById("adv-goal-run").addEventListener("click", function () {
+  var lastAdv = null;
+  function runGoal(fromButton) {
     var h = parseFloat(document.getElementById("height").value);
-    if (!isFinite(h)) { advErr("先に上のフォームに身長を入力してください。"); return; }
+    if (!isFinite(h)) { if (fromButton) advErr("先に上のフォームに身長を入力してください。"); return; }
     var curEl = document.getElementById("adv-current");
-    if (curEl.value === "") { advErr("現在の歩数を入力してください。"); return; }
+    if (curEl.value === "") { if (fromButton) advErr("現在の歩数を入力してください。"); return; }
+    if (document.getElementById("adv-goal").value === "") { if (fromButton) advErr("目標歩数を入力してください。"); return; }
     var r = HosuCalc.remainingToGoal(
       parseFloat(document.getElementById("adv-goal").value),
       parseFloat(curEl.value),
@@ -187,6 +197,7 @@
       advErr(msg);
       return;
     }
+    lastAdv = runGoal;
     if (r.achieved) {
       advBox.innerHTML =
         '<div class="result-main">目標達成です</div>' +
@@ -206,12 +217,12 @@
     }
     advBox.innerHTML = html;
     advBox.hidden = false;
-  });
-  document.getElementById("adv-stride-run").addEventListener("click", function () {
+  }
+  function runStride(fromButton) {
     var steps = parseFloat(document.getElementById("steps").value);
-    if (!isFinite(steps)) { advErr("先に上のフォームに歩数を入力してください。"); return; }
+    if (!isFinite(steps)) { if (fromButton) advErr("先に上のフォームに歩数を入力してください。"); return; }
     var strideEl = document.getElementById("adv-stride");
-    if (strideEl.value === "") { advErr("歩幅を入力してください。"); return; }
+    if (strideEl.value === "") { if (fromButton) advErr("歩幅を入力してください。"); return; }
     var r = HosuCalc.calcWithStride(steps, parseFloat(strideEl.value), optWeight());
     if (!r.ok) {
       var msg = r.code === "invalid_stride" ? "歩幅は20〜150cmの範囲で入力してください。"
@@ -220,12 +231,22 @@
       advErr(msg);
       return;
     }
+    lastAdv = runStride;
     advBox.innerHTML =
       '<div class="result-main">約 ' + r.distanceKm.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " km</div>" +
       "<p>実測歩幅での距離です。時間にすると約 <strong>" + r.timeMin.toLocaleString() + " 分</strong>" +
       (r.kcal !== undefined ? "、消費カロリーは約 <strong>" + r.kcal.toLocaleString() + " kcal</strong>" : "") +
       "(4km/h・3.0METsの目安)。</p>";
     advBox.hidden = false;
+  }
+  document.getElementById("adv-goal-run").addEventListener("click", function () { runGoal(true); });
+  document.getElementById("adv-stride-run").addEventListener("click", function () { runStride(true); });
+  ["adv-goal", "adv-current"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runGoal(false); });
+  });
+  document.getElementById("adv-stride").addEventListener("input", function () { runStride(false); });
+  ["steps", "height", "weight"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { if (lastAdv) lastAdv(false); });
   });
 })();
 </script>

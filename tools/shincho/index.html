@@ -38,31 +38,29 @@
     </label>
     <div id="cm-field">
       <label>身長(cm)
-        <input type="number" id="cm" min="30" max="300" step="any" placeholder="例: 170">
+        <input type="number" id="cm" inputmode="decimal" min="30" max="300" step="any" placeholder="例: 170">
       </label>
     </div>
     <div id="ft-fields" hidden>
       <label>フィート・インチ
         <span style="display:flex;gap:.5em;align-items:center;">
-          <input type="number" id="feet" min="1" max="9" step="1" style="width:5em;" aria-label="フィート"> ft
-          <input type="number" id="inches" min="0" max="11.9" step="any" style="width:5em;" aria-label="インチ"> in
+          <input type="number" id="feet" inputmode="numeric" min="1" max="9" step="1" style="width:5em;" aria-label="フィート"> ft
+          <input type="number" id="inches" inputmode="decimal" min="0" max="11.9" step="any" style="width:5em;" aria-label="インチ"> in
         </span>
       </label>
     </div>
-    <button type="submit">換算する</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
   </form>
-
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
   <details class="adv-box">
     <summary><span class="plus">＋</span>詳細機能: 前後5cmとフィート別の早見表</summary>
     <div class="adv-inner">
       <h3 class="adv-h">±5cmのフィート・インチ早見表</h3>
-      <p class="adv-note">入力した身長を中心に、前後5cm(1cm刻み)の換算表を作ります。家族や友人の分もまとめて確認したい時に。</p>
+      <p class="adv-note">入力した身長を中心に、前後5cm(1cm刻み)の換算表を作ります。</p>
       <label>中心にする身長(cm)
-        <input type="number" id="adv-cm" min="30" max="300" step="any" placeholder="例: 170">
+        <input type="number" id="adv-cm" inputmode="decimal" min="30" max="300" step="any" placeholder="例: 170">
       </label>
-      <button type="button" id="adv-cm-run">早見表を作る</button>
+      <div class="tool-result" id="adv-cm-result" hidden aria-live="polite"></div>
 
       <h3 class="adv-h">フィート別・インチ0〜11の早見表</h3>
       <p class="adv-note">「5'9"って何cm?」のように海外の身長表記を続けて読む時は、フィートを1つ選ぶとインチ0〜11のcm換算を一覧できます。</p>
@@ -74,7 +72,6 @@
           <option value="7">7フィート(約213〜241cm)</option>
         </select>
       </label>
-      <button type="button" id="adv-feet-run">インチ0〜11の一覧を見る</button>
       <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
     </div>
   </details>
@@ -85,7 +82,7 @@
   <ol class="steps">
     <li>変換の方向を選びます。</li>
     <li>身長(cm)またはフィート・インチを入力します。</li>
-    <li>「換算する」を押すと結果が表示されます。</li>
+    <li>入力した瞬間に結果が自動で表示されます。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -142,40 +139,52 @@
   var mode = document.getElementById("mode");
   var cmField = document.getElementById("cm-field");
   var ftFields = document.getElementById("ft-fields");
-  mode.addEventListener("change", function () {
-    var isTo = mode.value === "toFeet";
-    cmField.hidden = !isTo;
-    ftFields.hidden = isTo;
-  });
-  document.getElementById("shincho-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  function run() {
     if (mode.value === "toFeet") {
+      if (document.getElementById("cm").value === "") { box.hidden = true; return; }
       var r = ShinchoCalc.toFeet(parseFloat(document.getElementById("cm").value));
       if (!r.ok) { box.innerHTML = '<p class="result-error">身長は30〜300cmの範囲で入力してください。</p>'; box.hidden = false; return; }
       box.innerHTML = '<div class="result-main">' + r.feet + "'" + r.inches + "″</div>" +
         "<p>" + r.feet + "フィート" + r.inches + "インチ(正確には" + r.totalInches.toLocaleString() + "インチ)</p>";
     } else {
+      if (document.getElementById("feet").value === "") { box.hidden = true; return; }
       var r2 = ShinchoCalc.toCm(parseFloat(document.getElementById("feet").value), parseFloat(document.getElementById("inches").value || "0"));
       if (!r2.ok) { box.innerHTML = '<p class="result-error">フィートは1〜9の整数、インチは0〜11.9の範囲で入力してください。</p>'; box.hidden = false; return; }
       box.innerHTML = '<div class="result-main">' + r2.cm.toLocaleString() + " cm</div>";
     }
     box.hidden = false;
+  }
+  mode.addEventListener("change", function () {
+    var isTo = mode.value === "toFeet";
+    cmField.hidden = !isTo;
+    ftFields.hidden = isTo;
+    run();
+  });
+  ["cm", "feet", "inches"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", run);
+  });
+  document.getElementById("shincho-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run();
   });
 })();
 </script>
 <script>
 (function () {
   "use strict";
-  var advBox = document.getElementById("adv-result");
-  function advErr(msg) {
-    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
-    advBox.hidden = false;
-  }
-  document.getElementById("adv-cm-run").addEventListener("click", function () {
+  var cmBox = document.getElementById("adv-cm-result");
+  var feetBox = document.getElementById("adv-result");
+
+  // ---- ±5cm早見表(即時) ----
+  function runCmTable() {
     var advCm = document.getElementById("adv-cm");
-    if (advCm.value === "") { advErr("身長(cm)を入力してください。"); return; }
+    if (advCm.value === "") { cmBox.hidden = true; return; }
     var r = ShinchoCalc.heightTable(parseFloat(advCm.value));
-    if (!r.ok) { advErr("身長は30〜300cmの範囲で入力してください。"); return; }
+    if (!r.ok) {
+      cmBox.innerHTML = '<p class="result-error">身長は30〜300cmの範囲で入力してください。</p>';
+      cmBox.hidden = false;
+      return;
+    }
     var rows = "";
     for (var i = 0; i < r.rows.length; i++) {
       var row = r.rows[i];
@@ -183,25 +192,30 @@
       rows += "<tr><td>" + row.cm.toLocaleString() + " cm" + mark + "</td><td>" +
         row.feet + "'" + row.inches + '"' + "(" + row.feet + "フィート" + row.inches + "インチ)</td></tr>";
     }
-    advBox.innerHTML =
+    cmBox.innerHTML =
       '<div class="table-scroll"><table class="data-table"><thead><tr><th>身長</th><th>フィート・インチ表記</th></tr></thead><tbody>' +
       rows + "</tbody></table></div>";
-    advBox.hidden = false;
-  });
-  document.getElementById("adv-feet-run").addEventListener("click", function () {
+    cmBox.hidden = false;
+  }
+  document.getElementById("adv-cm").addEventListener("input", runCmTable);
+
+  // ---- フィート別早見表(即時) ----
+  function runFeetTable() {
     var r = ShinchoCalc.feetTable(parseInt(document.getElementById("adv-feet").value, 10));
-    if (!r.ok) { advErr("フィートを選び直してください。"); return; }
+    if (!r.ok) { feetBox.hidden = true; return; }
     var rows = "";
     for (var i = 0; i < r.rows.length; i++) {
       var row = r.rows[i];
       rows += "<tr><td>" + r.feet + "'" + row.inches + '"' + "</td><td>" +
         row.cm.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " cm</td></tr>";
     }
-    advBox.innerHTML =
+    feetBox.innerHTML =
       '<div class="table-scroll"><table class="data-table"><thead><tr><th>表記</th><th>身長</th></tr></thead><tbody>' +
       rows + "</tbody></table></div>";
-    advBox.hidden = false;
-  });
+    feetBox.hidden = false;
+  }
+  document.getElementById("adv-feet").addEventListener("change", runFeetTable);
+  runFeetTable();
 })();
 </script>
 </body>

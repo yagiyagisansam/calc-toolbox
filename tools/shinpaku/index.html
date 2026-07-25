@@ -30,37 +30,35 @@
 <main>
   <h1>目標心拍数 計算機(カルボーネン法)</h1>
   <form class="tool-form" id="shinpaku-form">
+    <span class="field-note">年齢を入れると、すぐ下に目標心拍数が表示されます</span>
     <label>年齢
-      <input type="number" id="age" min="15" max="100" step="1" required placeholder="例: 40">
+      <input type="number" id="age" inputmode="numeric" min="15" max="100" step="1" required placeholder="例: 40">
     </label>
     <label>安静時心拍数(拍/分)
       <span class="field-note">朝、起き上がる前に測った1分間の脈拍。不明なら70前後</span>
-      <input type="number" id="rest" min="30" max="120" step="1" value="70" required>
+      <input type="number" id="rest" inputmode="numeric" min="30" max="120" step="1" value="70" required>
     </label>
-    <button type="submit">目標心拍数を計算する</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
   </form>
-
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
   <details class="adv-box">
     <summary><span class="plus">＋</span>詳細機能: 5ゾーン一覧表と運動中の脈拍チェック</summary>
     <div class="adv-inner">
       <h3 class="adv-h">目的別5ゾーン一覧表(最大心拍数ベース)</h3>
-      <p class="adv-note">年齢を入れると、最大心拍数(220−年齢)に対する割合で「回復〜最大強度」の5段階ゾーンを一覧表示します。スマートウォッチのゾーン表示と同じ考え方です。</p>
+      <p class="adv-note">最大心拍数(220−年齢)に対する割合で、スマートウォッチと同じ考え方の5段階ゾーンを一覧表示します。</p>
       <label>年齢
-        <input type="number" id="adv-age" min="15" max="100" step="1" placeholder="例: 40">
+        <input type="number" id="adv-age" inputmode="numeric" min="15" max="100" step="1" placeholder="例: 40">
       </label>
-      <button type="button" id="adv-zones-run">5ゾーン一覧を表示する</button>
+      <div class="tool-result" id="adv-zones-result" hidden aria-live="polite"></div>
 
       <h3 class="adv-h">いま測った脈拍で強度チェック</h3>
-      <p class="adv-note">運動を少し止めて手首の脈を10秒数え、その数を入れてください。1分あたりの心拍数に直し、今の運動がどの強度だったかを判定します(年齢は上の欄を使います)。</p>
+      <p class="adv-note">運動を少し止めて手首の脈を10秒数えて入れると、今の運動強度を判定します(年齢は上の欄を使います)。</p>
       <label>安静時心拍数(拍/分)
-        <input type="number" id="adv-rest" min="30" max="120" step="1" value="70">
+        <input type="number" id="adv-rest" inputmode="numeric" min="30" max="120" step="1" value="70">
       </label>
       <label>10秒間に数えた脈拍数
-        <input type="number" id="adv-pulse" min="5" max="40" step="1" placeholder="例: 21">
+        <input type="number" id="adv-pulse" inputmode="numeric" min="5" max="40" step="1" placeholder="例: 21">
       </label>
-      <button type="button" id="adv-pulse-run">今の強度を判定する</button>
       <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
     </div>
   </details>
@@ -71,7 +69,7 @@
   <ol class="steps">
     <li>年齢を入力します。</li>
     <li>安静時心拍数を入力します(朝目覚めた直後、起き上がる前に手首の脈を1分数えるのが正確)。</li>
-    <li>「計算する」を押すと、強度40〜70%の目標心拍数ゾーンが表示されます。</li>
+    <li>入力と同時に、強度40〜70%の目標心拍数ゾーンが自動で表示されます。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -132,9 +130,11 @@
     invalid_age: "年齢は15〜100歳の範囲で入力してください。",
     invalid_rest: "安静時心拍数は30〜120の範囲で入力してください。"
   };
-  document.getElementById("shinpaku-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var r = ShinpakuCalc.zones(parseFloat(document.getElementById("age").value), parseFloat(document.getElementById("rest").value));
+  function run() {
+    var age = document.getElementById("age").value;
+    var rest = document.getElementById("rest").value;
+    if (age === "" || rest === "") { box.hidden = true; return; }
+    var r = ShinpakuCalc.zones(parseFloat(age), parseFloat(rest));
     if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "入力値を確認してください。") + "</p>"; box.hidden = false; return; }
     box.innerHTML =
       '<div class="result-main">脂肪燃焼ゾーン ' + r.z40 + "〜" + r.z60 + " 拍/分</div>" +
@@ -146,52 +146,77 @@
       "</tbody></table></div>" +
       "<p>推定最大心拍数: " + r.maxHr + "拍/分(220−年齢)</p>";
     box.hidden = false;
+  }
+  document.getElementById("age").addEventListener("input", run);
+  document.getElementById("rest").addEventListener("input", run);
+  document.getElementById("shinpaku-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run();
   });
 })();
 </script>
 <script>
 (function () {
   "use strict";
-  var advBox = document.getElementById("adv-result");
+  var zonesBox = document.getElementById("adv-zones-result");
+  var pulseBox = document.getElementById("adv-result");
   var advAge = document.getElementById("adv-age");
-  function advErr(msg) {
-    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
-    advBox.hidden = false;
-  }
-  document.getElementById("adv-zones-run").addEventListener("click", function () {
-    if (advAge.value === "") { advErr("年齢を入力してください。"); return; }
+  var mainAge = document.getElementById("age");
+  var advAgeTouched = false;
+
+  // ---- 5ゾーン一覧(即時) ----
+  function runZones() {
+    if (advAge.value === "") { zonesBox.hidden = true; return; }
     var r = ShinpakuCalc.fiveZones(parseFloat(advAge.value));
-    if (!r.ok) { advErr("年齢は15〜100歳の範囲で入力してください。"); return; }
+    if (!r.ok) {
+      zonesBox.innerHTML = '<p class="result-error">年齢は15〜100歳の範囲で入力してください。</p>';
+      zonesBox.hidden = false;
+      return;
+    }
     var rows = "";
     for (var i = 0; i < r.zones.length; i++) {
       var z = r.zones[i];
       rows += "<tr><td>ゾーン" + z.no + "</td><td>" + z.label + "</td><td>" + z.pct + "</td><td>" +
         z.lo + "〜" + z.hi + " 拍/分</td></tr>";
     }
-    advBox.innerHTML =
+    zonesBox.innerHTML =
       '<div class="result-main">推定最大心拍数 ' + r.maxHr + ' 拍/分</div>' +
       '<div class="table-scroll"><table class="data-table"><thead><tr><th>ゾーン</th><th>目的</th><th>最大心拍数比</th><th>心拍数</th></tr></thead><tbody>' +
       rows + "</tbody></table></div>" +
-      '<p class="adv-note">最大心拍数は「220−年齢」による推定値です。実際には個人差があります。</p>';
-    advBox.hidden = false;
-  });
-  document.getElementById("adv-pulse-run").addEventListener("click", function () {
+      '<p class="adv-note">最大心拍数は「220−年齢」による推定値のため、実際には個人差があります。</p>';
+    zonesBox.hidden = false;
+  }
+
+  // ---- 脈拍チェック(即時) ----
+  function runPulse() {
     var pulse = document.getElementById("adv-pulse");
     var rest = document.getElementById("adv-rest");
-    if (advAge.value === "") { advErr("年齢を入力してください(いちばん上の欄)。"); return; }
-    if (pulse.value === "") { advErr("10秒間に数えた脈拍数を入力してください。"); return; }
+    if (advAge.value === "" || pulse.value === "" || rest.value === "") { pulseBox.hidden = true; return; }
     var r = ShinpakuCalc.pulseCheck(parseFloat(advAge.value), parseFloat(rest.value), parseFloat(pulse.value));
     if (!r.ok) {
       var msg = r.code === "invalid_age" ? "年齢は15〜100歳の範囲で入力してください。"
         : r.code === "invalid_rest" ? "安静時心拍数は30〜120の範囲で入力してください。"
         : "10秒間の脈拍数は5〜40の範囲で入力してください。";
-      advErr(msg);
+      pulseBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+      pulseBox.hidden = false;
       return;
     }
-    advBox.innerHTML =
+    pulseBox.innerHTML =
       '<div class="result-main">約 ' + r.bpm + ' 拍/分 = 強度 ' + r.pct + '%</div>' +
       "<p>判定: <strong>" + r.label + "</strong>(カルボーネン法による運動強度)</p>";
-    advBox.hidden = false;
+    pulseBox.hidden = false;
+  }
+
+  function runAdv() { runZones(); runPulse(); }
+  advAge.addEventListener("input", function () { advAgeTouched = true; runAdv(); });
+  document.getElementById("adv-rest").addEventListener("input", runPulse);
+  document.getElementById("adv-pulse").addEventListener("input", runPulse);
+  // メインの年齢を入れたら詳細機能の年齢にも自動で反映(手入力後は上書きしない)
+  mainAge.addEventListener("input", function () {
+    if (!advAgeTouched) {
+      advAge.value = mainAge.value;
+      runAdv();
+    }
   });
 })();
 </script>

@@ -291,6 +291,88 @@
         "ok": false,
         "code": "invalid_target"
       }
+    },
+    {
+      "name": "weekStatsPartial: 3日分(7,6.5,8)のみ入力 → 平均7.2h・差+0.5h",
+      "func": "weekStatsPartial",
+      "args": [
+        [
+          7,
+          6.5,
+          null,
+          8,
+          null,
+          null,
+          null
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "days": 3,
+        "avgHours": 7.2,
+        "totalHours": 21.5,
+        "diffHours": 0.5
+      }
+    },
+    {
+      "name": "weekStatsPartial: 7日全部入力(毎日6h)→ 平均6h・差-7h",
+      "func": "weekStatsPartial",
+      "args": [
+        [
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "days": 7,
+        "avgHours": 6,
+        "totalHours": 42,
+        "diffHours": -7
+      }
+    },
+    {
+      "name": "weekStatsPartial: 全日空欄はエラー(invalid_days)",
+      "func": "weekStatsPartial",
+      "args": [
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_days"
+      }
+    },
+    {
+      "name": "weekStatsPartial: 範囲外(25h)はエラー(invalid_hours)",
+      "func": "weekStatsPartial",
+      "args": [
+        [
+          25,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_hours"
+      }
     }
   ]
 }

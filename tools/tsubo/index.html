@@ -31,7 +31,7 @@
   <h1>坪・平米(㎡)・畳 変換計算機</h1>
   <form class="tool-form" id="tsubo-form">
     <label>面積の値
-      <span class="field-note">例: 100(対応範囲: 0.01〜100,000)</span>
+      <span class="field-note">数値を入れると、すぐ下に変換結果が表示されます(対応範囲: 0.01〜100,000)</span>
       <input type="number" id="value" inputmode="decimal" step="0.01" min="0.01" max="100000" placeholder="100" required>
     </label>
     <label>入力した値の単位
@@ -50,7 +50,7 @@
     <summary><span class="plus">＋</span>詳細機能: 建ぺい率・容積率と坪単価の計算</summary>
     <div class="adv-inner">
       <h3 class="adv-h">建ぺい率・容積率から建てられる広さを計算</h3>
-      <p class="adv-note"><strong>建ぺい率</strong>は「土地を真上から見て、建物が占めてよい面積の割合」、<strong>容積率</strong>は「全フロアの床面積の合計が土地の何%まで許されるか」です。土地の広告に書かれた%から、建てられる建物の上限を計算します。</p>
+      <p class="adv-note">土地の広告に書かれた<strong>建ぺい率</strong>(建物が土地を占めてよい割合)と<strong>容積率</strong>(全フロア床面積の上限割合)から、建てられる建物の上限を計算します。</p>
       <label>土地面積
         <input type="number" id="adv-land" inputmode="decimal" step="any" min="0.01" max="100000" placeholder="例: 100">
       </label>
@@ -70,7 +70,7 @@
       <div class="tool-result" id="adv-limit-result" hidden aria-live="polite"></div>
 
       <h3 class="adv-h">坪単価の計算</h3>
-      <p class="adv-note">物件の価格と面積から、坪単価と㎡単価を計算します。相場との比較に。</p>
+      <p class="adv-note">物件の価格と面積から、坪単価と㎡単価を計算します。</p>
       <label>価格(万円)
         <input type="number" id="adv-price" inputmode="decimal" step="any" min="1" placeholder="例: 3000">
       </label>
@@ -98,7 +98,7 @@
   <ol class="steps">
     <li>変換したい面積の値を入力します(例: 100)。</li>
     <li>その値の単位(㎡・坪・畳)を選びます。</li>
-    <li>「変換する」を押すと、3つの単位すべての値が表示されます。</li>
+    <li>入力した瞬間に、3つの単位すべての値が表示されます。ボタンは不要です。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -171,12 +171,12 @@
     invalid_value: "面積は " + TsuboCalc.VALUE_MIN + "〜" + TsuboCalc.VALUE_MAX + " の範囲で入力してください。",
     invalid_unit: "単位を選択してください。"
   };
-  document.getElementById("tsubo-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  var box = document.getElementById("result");
+  function run() {
+    if (document.getElementById("value").value.trim() === "") { box.hidden = true; return; }
     var value = parseFloat(document.getElementById("value").value);
     var unit = document.getElementById("unit").value;
     var result = TsuboCalc.convert(value, unit);
-    var box = document.getElementById("result");
     if (result.ok) {
       box.innerHTML =
         '<div class="result-main">' + result.sqm.toLocaleString() + " ㎡</div>" +
@@ -185,7 +185,10 @@
       box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
     }
     box.hidden = false;
-  });
+  }
+  document.getElementById("value").addEventListener("input", run);
+  document.getElementById("unit").addEventListener("change", run);
+  document.getElementById("tsubo-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
 })();
 </script>
 <script>
@@ -194,7 +197,10 @@
   var advBox = document.getElementById("adv-result");
   var limitBox = document.getElementById("adv-limit-result");
   var fmt = function (x, d) { return x.toLocaleString(undefined, { maximumFractionDigits: d === undefined ? 2 : d }); };
-  document.getElementById("adv-limit-run").addEventListener("click", function () {
+  function runLimit(force) {
+    if ((document.getElementById("adv-land").value.trim() === "" ||
+         document.getElementById("adv-kenpei").value.trim() === "" ||
+         document.getElementById("adv-yoseki").value.trim() === "") && !force) { limitBox.hidden = true; return; }
     var land = parseFloat(document.getElementById("adv-land").value);
     if (document.getElementById("adv-land-unit").value === "tsubo") {
       land = land * TsuboCalc.SQM_PER_TSUBO;
@@ -221,8 +227,15 @@
       '</tbody></table></div>' +
       '<p class="adv-note">高さ制限・斜線制限などでさらに制限される場合があります。正確には自治体・建築士にご確認ください。</p>';
     limitBox.hidden = false;
+  }
+  ["adv-land", "adv-kenpei", "adv-yoseki"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runLimit(false); });
   });
-  document.getElementById("adv-price-run").addEventListener("click", function () {
+  document.getElementById("adv-land-unit").addEventListener("change", function () { runLimit(false); });
+  document.getElementById("adv-limit-run").addEventListener("click", function () { runLimit(true); });
+  function runPrice(force) {
+    if ((document.getElementById("adv-price").value.trim() === "" ||
+         document.getElementById("adv-area").value.trim() === "") && !force) { advBox.hidden = true; return; }
     var r = TsuboCalc.pricePerArea(
       parseFloat(document.getElementById("adv-price").value),
       parseFloat(document.getElementById("adv-area").value),
@@ -240,7 +253,12 @@
       '<tr><td>㎡単価</td><td>' + fmt(r.perSqm) + ' 万円/㎡(' + fmt(r.sqm) + '㎡)</td></tr>' +
       '</tbody></table></div>';
     advBox.hidden = false;
+  }
+  ["adv-price", "adv-area"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runPrice(false); });
   });
+  document.getElementById("adv-area-unit").addEventListener("change", function () { runPrice(false); });
+  document.getElementById("adv-price-run").addEventListener("click", function () { runPrice(true); });
 })();
 </script>
 </body>

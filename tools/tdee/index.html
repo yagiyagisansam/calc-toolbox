@@ -30,6 +30,7 @@
 <main>
   <h1>1日の摂取カロリー目安 計算機</h1>
   <form class="tool-form" id="tdee-form">
+    <span class="field-note">年齢・性別・体重・活動レベルを入れると、すぐ下に結果が表示されます</span>
     <label>年齢(歳)
       <span class="field-note">対応範囲: 18〜120歳(成人向け)</span>
       <input type="number" id="age" inputmode="numeric" step="1" min="18" max="120" placeholder="30" required>
@@ -59,7 +60,7 @@
     <summary><span class="plus">＋</span>詳細機能: 目標体重から逆算・PFCバランス</summary>
     <div class="adv-inner">
       <h3 class="adv-h">目標体重までの「1日の目標摂取カロリー」を逆算</h3>
-      <p class="adv-note">目標体重と期間を入れると、体脂肪1kg≒7,200kcalの目安で「1日何kcalに抑えれば(増やせば)よいか」を逆算します。年齢・性別・体重・活動レベルは上のフォームの値を使います。</p>
+      <p class="adv-note">目標体重と期間を入れると、体脂肪1kg≒7,200kcalの目安で「1日何kcalに抑えれば(増やせば)よいか」を逆算します(他の項目は上の値を使用)。</p>
       <label>目標体重(kg)
         <input type="number" id="adv-target-weight" inputmode="decimal" step="any" min="20" max="300" placeholder="例: 60">
       </label>
@@ -69,7 +70,7 @@
       <button type="button" id="adv-goal-run">目標摂取カロリーを逆算する</button>
 
       <h3 class="adv-h">そのカロリー、何をどれだけ食べる?(PFCバランス)</h3>
-      <p class="adv-note">1日の摂取カロリーを入れると、たんぱく質(P)・脂質(F)・炭水化物(C)を何グラムずつ摂ればよいかの範囲を、国の食事摂取基準の目標量から計算します。上で逆算した目標摂取カロリーを入れるのがおすすめです。</p>
+      <p class="adv-note">1日の摂取カロリーから、たんぱく質(P)・脂質(F)・炭水化物(C)を何グラムずつ摂ればよいかを国の目標量で計算します(上で逆算すると自動で入ります)。</p>
       <label>1日の摂取カロリー(kcal)
         <input type="number" id="adv-pfc-kcal" inputmode="numeric" step="1" min="400" max="10000" placeholder="例: 2000">
       </label>
@@ -88,7 +89,7 @@
   <ol class="steps">
     <li>年齢・性別・体重を入力します。</li>
     <li>ふだんの活動量に近い「身体活動レベル」を選びます。迷ったら「Ⅱ ふつう」が目安です。</li>
-    <li>「計算する」を押すと、1日の摂取カロリー目安と基礎代謝量が表示されます。</li>
+    <li>入力すると同時に、1日の摂取カロリー目安と基礎代謝量がすぐ下に表示されます。ボタンは不要です。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -152,40 +153,50 @@
     invalid_weight: "体重は 20〜300kg の範囲で入力してください。",
     invalid_pal: "身体活動レベルを選択してください。"
   };
-  document.getElementById("tdee-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  var box = document.getElementById("result");
+  var ageEl = document.getElementById("age");
+  var weightEl = document.getElementById("weight");
+  function run() {
+    if (ageEl.value === "" || weightEl.value === "") { box.hidden = true; return; }
     var result = TdeeCalc.calculate(
-      parseFloat(document.getElementById("age").value),
+      parseFloat(ageEl.value),
       document.getElementById("sex").value,
-      parseFloat(document.getElementById("weight").value),
+      parseFloat(weightEl.value),
       document.getElementById("pal").value
     );
-    var box = document.getElementById("result");
     if (result.ok) {
       box.innerHTML =
         '<div class="result-main">約 ' + result.tdeeKcal.toLocaleString() + " kcal/日</div>" +
-        "<p>基礎代謝量: <strong>約" + result.bmrKcal.toLocaleString() + " kcal/日</strong> × 身体活動レベル " + result.palValue.toFixed(2) + "</p>";
+        "<p>基礎代謝量: <strong>約" + result.bmrKcal.toLocaleString() + " kcal/日</strong> × 身体活動レベル " + result.palValue.toFixed(2) + "</p>" +
+        '<p>同じ入力で続けて計算: <a href="../bmr/">基礎代謝量</a> / <a href="../bmi/">BMI・適正体重</a></p>';
     } else {
       box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
     }
     box.hidden = false;
-  });
+  }
+  ageEl.addEventListener("input", run);
+  weightEl.addEventListener("input", run);
+  document.getElementById("sex").addEventListener("change", run);
+  document.getElementById("pal").addEventListener("change", run);
+  document.getElementById("tdee-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
 })();
 </script>
 <script>
 (function () {
   "use strict";
   var advBox = document.getElementById("adv-result");
+  var lastAdv = null;
   function advErr(msg) {
     advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
     advBox.hidden = false;
   }
-  document.getElementById("adv-goal-run").addEventListener("click", function () {
+  function runGoal(fromButton) {
     var age = parseInt(document.getElementById("age").value, 10);
     var w = parseFloat(document.getElementById("weight").value);
-    if (!isFinite(age) || !isFinite(w)) { advErr("先に上のフォームに年齢・性別・体重を入力してください。"); return; }
+    if (!isFinite(age) || !isFinite(w)) { if (fromButton) advErr("先に上のフォームに年齢・性別・体重を入力してください。"); return; }
     var twEl = document.getElementById("adv-target-weight");
-    if (twEl.value === "") { advErr("目標体重を入力してください。"); return; }
+    if (twEl.value === "") { if (fromButton) advErr("目標体重を入力してください。"); return; }
+    if (document.getElementById("adv-months").value === "") { if (fromButton) advErr("目標期間を入力してください。"); return; }
     var r = TdeeCalc.targetIntake(
       age,
       document.getElementById("sex").value,
@@ -217,14 +228,20 @@
         " kcal)を下回っています。極端な食事制限は体調を崩すもとです。期間を長くするか、目標を見直してください。</p>";
     }
     html += '<p class="adv-note">体脂肪1kg≒7,200kcal・1か月≒30日の概算です。実際の減り方は個人差があります。</p>';
+    var pfcEl = document.getElementById("adv-pfc-kcal");
+    if (pfcEl.value === "" && r.targetIntakeKcal >= 400) {
+      pfcEl.value = r.targetIntakeKcal;
+    }
+    lastAdv = runGoal;
     advBox.innerHTML = html;
     advBox.hidden = false;
-  });
-  document.getElementById("adv-pfc-run").addEventListener("click", function () {
+  }
+  function runPfc(fromButton) {
     var kEl = document.getElementById("adv-pfc-kcal");
-    if (kEl.value === "") { advErr("1日の摂取カロリーを入力してください。"); return; }
+    if (kEl.value === "") { if (fromButton) advErr("1日の摂取カロリーを入力してください。"); return; }
     var r = TdeeCalc.pfcBalance(parseFloat(kEl.value));
     if (!r.ok) { advErr("カロリーは400〜10,000kcalの範囲で入力してください。"); return; }
+    lastAdv = runPfc;
     advBox.innerHTML =
       '<div class="result-main">' + parseFloat(kEl.value).toLocaleString() + " kcal のPFCバランス目安</div>" +
       '<div class="table-scroll"><table class="data-table"><thead><tr><th>栄養素</th><th>1日の目安</th></tr></thead><tbody>' +
@@ -234,6 +251,17 @@
       "</tbody></table></div>" +
       '<p class="adv-note">「日本人の食事摂取基準(2020年版)」の目標量(たんぱく質13〜20%・脂質20〜30%・炭水化物50〜65%)による目安です。</p>';
     advBox.hidden = false;
+  }
+  document.getElementById("adv-goal-run").addEventListener("click", function () { runGoal(true); });
+  document.getElementById("adv-pfc-run").addEventListener("click", function () { runPfc(true); });
+  document.getElementById("adv-target-weight").addEventListener("input", function () { runGoal(false); });
+  document.getElementById("adv-months").addEventListener("input", function () { runGoal(false); });
+  document.getElementById("adv-pfc-kcal").addEventListener("input", function () { runPfc(false); });
+  ["age", "weight"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { if (lastAdv === runGoal) runGoal(false); });
+  });
+  ["sex", "pal"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", function () { if (lastAdv === runGoal) runGoal(false); });
   });
 })();
 </script>

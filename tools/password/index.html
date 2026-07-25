@@ -37,7 +37,8 @@
     <label><input type="checkbox" id="upper" checked> 英大文字(ABC)</label>
     <label><input type="checkbox" id="digits" checked> 数字(123)</label>
     <label><input type="checkbox" id="symbols" checked> 記号(!#$…)</label>
-    <button type="submit">パスワードを生成する</button>
+    <span class="field-note">開いた時点で1個生成済みです。長さや文字種を変えると自動で作り直します</span>
+    <button type="submit">別のパスワードを生成する</button>
   </form>
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
@@ -46,19 +47,19 @@
     <summary><span class="plus">＋</span>詳細機能: 条件を決めて一括生成・強度チェック</summary>
     <div class="adv-inner">
       <h3 class="adv-h">条件を決めてまとめて生成</h3>
-      <p class="adv-note">長さと文字種は上のフォームの設定をそのまま使います。「似た文字を除外」すると、l(エル)と1、O(オー)と0のような見間違えやすい文字が入りません。紙にメモして手入力する場合におすすめです。</p>
+      <p class="adv-note">長さと文字種は上のフォームの設定を使い、「似た文字を除外」するとl(エル)と1、O(オー)と0のような見間違えやすい文字が入りません。</p>
       <label style="display:block;"><input type="checkbox" id="adv-similar" checked> 似た文字(l 1 I O 0 o)を除外する</label>
       <label>使う記号を限定(空欄なら標準の記号すべて)
         <input type="text" id="adv-symset" placeholder="例: !#_-@" autocomplete="off">
       </label>
       <label>生成する個数(1〜10)
-        <input type="number" id="adv-count" min="1" max="10" step="1" value="5">
+        <input type="number" id="adv-count" inputmode="numeric" min="1" max="10" step="1" value="5">
       </label>
       <button type="button" id="adv-gen-run">まとめて生成する</button>
       <div class="tool-result" id="adv-gen-result" hidden aria-live="polite"></div>
 
       <h3 class="adv-h">手持ちのパスワードの強度チェック</h3>
-      <p class="adv-note">今使っているパスワードがどれくらい推測されにくいかを、文字の種類と長さから概算します。入力内容は端末の中だけで処理され、どこにも送信・保存されません。※辞書にある単語や使い回しの危険までは判定できません。</p>
+      <p class="adv-note">文字の種類と長さから推測されにくさを概算します(入力内容は端末内だけで処理され、どこにも送信・保存されません)。</p>
       <label>チェックしたいパスワード
         <input type="text" id="adv-check-pw" autocomplete="off" placeholder="例: mypassword123">
       </label>
@@ -73,7 +74,7 @@
   <ol class="steps">
     <li>スライダーで長さを選びます(推奨: 12文字以上、重要なアカウントは16文字以上)。</li>
     <li>使う文字種にチェックを入れます(サイトの制限に合わせて調整)。</li>
-    <li>「生成する」を押し、表示されたパスワードをコピーして使います。何度でも作り直せます。</li>
+    <li>開いた時点で1個生成済みです。「コピー」で使うか、「別のパスワードを生成する」で何度でも作り直せます。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -131,8 +132,7 @@
   var lenInput = document.getElementById("length");
   var lenView = document.getElementById("len-view");
   lenInput.addEventListener("input", function () { lenView.textContent = lenInput.value; });
-  document.getElementById("password-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  function run() {
     var r = PasswordCalc.generate(parseInt(lenInput.value, 10), {
       lower: document.getElementById("lower").checked,
       upper: document.getElementById("upper").checked,
@@ -156,7 +156,13 @@
       });
     });
     box.hidden = false;
+  }
+  lenInput.addEventListener("input", run);
+  ["lower", "upper", "digits", "symbols"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", run);
   });
+  document.getElementById("password-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
 })();
 </script>
 <script>
@@ -164,7 +170,9 @@
   "use strict";
   var advBox = document.getElementById("adv-result");
   var genBox = document.getElementById("adv-gen-result");
-  document.getElementById("adv-gen-run").addEventListener("click", function () {
+  function runGen(force) {
+    if (!force && genBox.hidden) return;
+    if (document.getElementById("adv-count").value.trim() === "" && !force) { genBox.hidden = true; return; }
     var r = PasswordCalc.generateCustom(
       parseInt(document.getElementById("length").value, 10),
       {
@@ -197,9 +205,19 @@
       });
     });
     genBox.hidden = false;
+  }
+  document.getElementById("adv-gen-run").addEventListener("click", function () { runGen(true); });
+  document.getElementById("adv-similar").addEventListener("change", function () { runGen(false); });
+  document.getElementById("adv-symset").addEventListener("input", function () { runGen(false); });
+  document.getElementById("adv-count").addEventListener("input", function () { runGen(false); });
+  document.getElementById("length").addEventListener("input", function () { runGen(false); });
+  ["lower", "upper", "digits", "symbols"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", function () { runGen(false); });
   });
-  document.getElementById("adv-check-run").addEventListener("click", function () {
-    var r = PasswordCalc.checkStrength(document.getElementById("adv-check-pw").value);
+  function runCheck(force) {
+    var pw = document.getElementById("adv-check-pw").value;
+    if (pw === "" && !force) { advBox.hidden = true; return; }
+    var r = PasswordCalc.checkStrength(pw);
     if (!r.ok) {
       advBox.innerHTML = '<p class="result-error">チェックしたいパスワードを入力してください(256文字まで)。</p>';
       advBox.hidden = false;
@@ -214,7 +232,9 @@
       '</tbody></table></div>' +
       '<p class="adv-note">単語そのままの使用や他サービスとの使い回しは、ビット数が高くても危険です。</p>';
     advBox.hidden = false;
-  });
+  }
+  document.getElementById("adv-check-pw").addEventListener("input", function () { runCheck(false); });
+  document.getElementById("adv-check-run").addEventListener("click", function () { runCheck(true); });
 })();
 </script>
 </body>

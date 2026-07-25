@@ -30,41 +30,49 @@
 <main>
   <h1>営業日計算機(土日祝を除く)</h1>
   <form class="tool-form" id="eigyobi-form">
+    <span class="field-note">値を選ぶと、すぐ下に結果が表示されます</span>
     <label>計算の種類
       <select id="mode">
         <option value="add" selected>○営業日後の日付</option>
         <option value="count">期間内の営業日数</option>
       </select>
     </label>
-    <label>起算日(開始日)
-      <input type="date" id="start" min="2026-01-01" max="2027-12-31" required>
-    </label>
+    <div class="field-row">
+      <label>起算日(年)
+        <select id="start-year"></select>
+      </label>
+      <label>月
+        <select id="start-month"></select>
+      </label>
+      <label>日
+        <select id="start-day"></select>
+      </label>
+    </div>
     <label id="n-label">何営業日後?
-      <input type="number" id="n" min="1" max="200" step="1" value="3">
+      <input type="number" id="n" inputmode="numeric" min="1" max="200" step="1" value="3">
     </label>
-    <label id="end-label" hidden>終了日
-      <input type="date" id="end" min="2026-01-01" max="2027-12-31">
-    </label>
-    <button type="submit">営業日を計算する</button>
+    <div class="field-row" id="end-row" hidden>
+      <label>終了日(年)
+        <select id="end-year"></select>
+      </label>
+      <label>月
+        <select id="end-month"></select>
+      </label>
+      <label>日
+        <select id="end-day"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" aria-live="polite"></div>
   </form>
-
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
   <details class="adv-box">
     <summary><span class="plus">＋</span>詳細機能: 会社の休業日・土曜営業を反映する</summary>
     <div class="adv-inner">
-      <p class="adv-note">夏季休業や年末年始など会社独自の休みを入れると、それも除いて計算し直します。起算日・営業日数・終了日は上のフォームの値を使います。</p>
+      <p class="adv-note">夏季休業など会社独自の休みを入れる(または土曜営業に切り替える)と、上と同じ計算を会社カレンダーでやり直します。</p>
       <label>会社の休業日リスト(カンマまたは改行区切り)
         <textarea id="adv-holidays" rows="3" placeholder="例: 2026-08-13, 2026-08-14, 2026-12-30"></textarea>
       </label>
       <label><input type="checkbox" id="adv-sat"> 土曜日も営業日に数える(日曜・祝日は休み)</label>
-
-      <h3 class="adv-h">○営業日後の日付(会社カレンダーで)</h3>
-      <button type="button" id="adv-add-run">○営業日後を計算し直す</button>
-
-      <h3 class="adv-h">期間内の営業日数(会社カレンダーで)</h3>
-      <p class="adv-note">上のフォームで「期間内の営業日数」を選ぶと終了日を入力できます。</p>
-      <button type="button" id="adv-count-run">営業日数を数え直す</button>
       <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
     </div>
   </details>
@@ -79,7 +87,7 @@
   <ol class="steps">
     <li>「○営業日後の日付」か「期間内の営業日数」を選びます。</li>
     <li>起算日と営業日数(または終了日)を入力します。</li>
-    <li>「計算する」を押すと結果が表示されます。</li>
+    <li>入力した瞬間に結果が表示されます。ボタンは不要です。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -135,94 +143,126 @@
 <script>
 (function () {
   "use strict";
-  var box = document.getElementById("result");
-  var mode = document.getElementById("mode");
-  var nLabel = document.getElementById("n-label");
-  var endLabel = document.getElementById("end-label");
   var today = new Date();
-  document.getElementById("start").value = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + String(today.getDate()).padStart(2, "0");
-  var MSG = {
-    invalid_date: "日付を正しく入力してください。",
-    invalid_n: "営業日数は1〜200の整数で入力してください。",
-    out_of_range: "対応範囲は2026年1月1日〜2027年12月31日です。",
-    date_order: "終了日は開始日以降にしてください。"
-  };
-  mode.addEventListener("change", function () {
-    var isAdd = mode.value === "add";
-    nLabel.hidden = !isAdd;
-    endLabel.hidden = isAdd;
-  });
-  document.getElementById("eigyobi-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var start = document.getElementById("start").value;
-    if (mode.value === "add") {
-      var r = EigyobiCalc.addBusinessDays(start, parseInt(document.getElementById("n").value, 10));
-      if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "入力値を確認してください。") + "</p>"; box.hidden = false; return; }
-      box.innerHTML = '<div class="result-main">' + r.date + "(" + r.weekday + ")</div>" +
-        "<p>土日祝を除いて数えた日付です。</p>";
-    } else {
-      var r2 = EigyobiCalc.countBusinessDays(start, document.getElementById("end").value);
-      if (!r2.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r2.code] || "入力値を確認してください。") + "</p>"; box.hidden = false; return; }
-      box.innerHTML = '<div class="result-main">' + r2.businessDays + " 営業日</div>" +
-        "<p>暦日では" + r2.totalDays + "日間(両端を含む)です。</p>";
+
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
     }
-    box.hidden = false;
-  });
-})();
-</script>
-<script>
-(function () {
-  "use strict";
-  var advBox = document.getElementById("adv-result");
-  function advErr(msg) {
-    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
-    advBox.hidden = false;
+    el.innerHTML = html;
   }
-  var MSG2 = {
-    invalid_date: "日付を正しく入力してください。",
-    invalid_n: "営業日数は1〜200の整数で入力してください。",
-    invalid_holidays: "休業日リストに日付として読めない項目があります。「2026-08-13」の形式で入力してください。",
-    out_of_range: "対応範囲(2026-01-01〜2027-12-31)の外の日付になりました。",
-    date_order: "終了日が開始日より前になっています。"
-  };
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, "日", Math.min(keep, max));
+  }
+  function isoOf(prefix) {
+    adjustDays(prefix + "-year", prefix + "-month", prefix + "-day");
+    return val(prefix + "-year") + "-" +
+      String(val(prefix + "-month")).padStart(2, "0") + "-" +
+      String(val(prefix + "-day")).padStart(2, "0");
+  }
   function jpDate(iso) {
     var p = iso.split("-");
     return parseInt(p[0], 10) + "年" + parseInt(p[1], 10) + "月" + parseInt(p[2], 10) + "日";
   }
+  // 対応範囲(2026〜2027年)に収めた初期値
+  var initY = Math.min(Math.max(today.getFullYear(), 2026), 2027);
+  var initM = today.getFullYear() === initY ? today.getMonth() + 1 : 1;
+  var initD = today.getFullYear() === initY ? today.getDate() : 1;
+  function initDate(prefix) {
+    fillSelect(document.getElementById(prefix + "-year"), 2026, 2027, "年", initY);
+    fillSelect(document.getElementById(prefix + "-month"), 1, 12, "月", initM);
+    fillSelect(document.getElementById(prefix + "-day"), 1, daysInMonth(initY, initM), "日", initD);
+  }
+  initDate("start");
+  initDate("end");
+
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var mode = document.getElementById("mode");
+  var nLabel = document.getElementById("n-label");
+  var endRow = document.getElementById("end-row");
+
+  var MSG = {
+    invalid_date: "日付を正しく入力してください。",
+    invalid_n: "営業日数は1〜200の整数で入力してください。",
+    invalid_holidays: "休業日リストに日付として読めない項目があります。「2026-08-13」の形式で入力してください。",
+    out_of_range: "対応範囲は2026年1月1日〜2027年12月31日です。",
+    date_order: "終了日は開始日以降にしてください。"
+  };
+  function err(boxEl, code) {
+    boxEl.innerHTML = '<p class="result-error">' + (MSG[code] || "入力値を確認してください。") + "</p>";
+    boxEl.hidden = false;
+  }
+
+  // ---- メイン: 土日祝カレンダーで即時計算 ----
+  function run() {
+    var start = isoOf("start");
+    if (mode.value === "add") {
+      var n = document.getElementById("n").value;
+      if (n === "") { box.hidden = true; runCustom(); return; }
+      var r = EigyobiCalc.addBusinessDays(start, parseInt(n, 10));
+      if (!r.ok) { err(box, r.code); runCustom(); return; }
+      box.innerHTML = '<div class="result-main">' + r.date + "(" + r.weekday + ")</div>" +
+        "<p>土日祝を除いて数えた日付です。</p>";
+    } else {
+      var r2 = EigyobiCalc.countBusinessDays(start, isoOf("end"));
+      if (!r2.ok) { err(box, r2.code); runCustom(); return; }
+      box.innerHTML = '<div class="result-main">' + r2.businessDays + " 営業日</div>" +
+        "<p>暦日では" + r2.totalDays + "日間(両端を含む)です。</p>";
+    }
+    box.hidden = false;
+    runCustom();
+  }
+
+  // ---- 詳細機能: 会社カレンダーで即時計算 ----
   function customNote(r, satOpen) {
     return '<p class="adv-note">会社休業日 ' + r.customCount.toLocaleString() + ' 件を反映' +
       (satOpen ? "、土曜日は営業日として計算" : "") + "しました。</p>";
   }
-  document.getElementById("adv-add-run").addEventListener("click", function () {
-    var start = document.getElementById("start").value;
-    var n = document.getElementById("n").value;
-    if (start === "" || n === "") { advErr("上のフォームに起算日と営業日数を入力してください。"); return; }
+  function runCustom() {
+    var holidays = document.getElementById("adv-holidays").value;
     var satOpen = document.getElementById("adv-sat").checked;
-    var r = EigyobiCalc.addBusinessDaysCustom(start, parseInt(n, 10),
-      document.getElementById("adv-holidays").value, satOpen);
-    if (!r.ok) { advErr(MSG2[r.code] || "入力値を確認してください。"); return; }
-    advBox.innerHTML =
-      '<div class="result-main">' + jpDate(r.date) + "(" + r.weekday + "曜日)</div>" +
-      customNote(r, satOpen);
-    advBox.hidden = false;
-  });
-  document.getElementById("adv-count-run").addEventListener("click", function () {
-    var start = document.getElementById("start").value;
-    var end = document.getElementById("end").value;
-    if (start === "" || end === "") {
-      advErr("上のフォームで「期間内の営業日数」を選び、開始日と終了日を入力してください。");
-      return;
+    if (holidays.trim() === "" && !satOpen) { advBox.hidden = true; return; }
+    var start = isoOf("start");
+    if (mode.value === "add") {
+      var n = document.getElementById("n").value;
+      if (n === "") { advBox.hidden = true; return; }
+      var r = EigyobiCalc.addBusinessDaysCustom(start, parseInt(n, 10), holidays, satOpen);
+      if (!r.ok) { err(advBox, r.code); return; }
+      advBox.innerHTML =
+        '<div class="result-main">' + jpDate(r.date) + "(" + r.weekday + "曜日)</div>" +
+        customNote(r, satOpen);
+    } else {
+      var r2 = EigyobiCalc.countBusinessDaysCustom(start, isoOf("end"), holidays, satOpen);
+      if (!r2.ok) { err(advBox, r2.code); return; }
+      advBox.innerHTML =
+        '<div class="result-main">営業日数 ' + r2.businessDays.toLocaleString() + ' 日</div>' +
+        "<p>期間全体: " + r2.totalDays.toLocaleString() + "日(開始日・終了日を含む)</p>" +
+        customNote(r2, satOpen);
     }
-    var satOpen = document.getElementById("adv-sat").checked;
-    var r = EigyobiCalc.countBusinessDaysCustom(start, end,
-      document.getElementById("adv-holidays").value, satOpen);
-    if (!r.ok) { advErr(MSG2[r.code] || "入力値を確認してください。"); return; }
-    advBox.innerHTML =
-      '<div class="result-main">営業日数 ' + r.businessDays.toLocaleString() + ' 日</div>' +
-      "<p>期間全体: " + r.totalDays.toLocaleString() + "日(開始日・終了日を含む)</p>" +
-      customNote(r, satOpen);
     advBox.hidden = false;
+  }
+
+  mode.addEventListener("change", function () {
+    var isAdd = mode.value === "add";
+    nLabel.hidden = !isAdd;
+    endRow.hidden = isAdd;
+    run();
   });
+  ["start-year", "start-month", "start-day", "end-year", "end-month", "end-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", run);
+  });
+  document.getElementById("n").addEventListener("input", run);
+  document.getElementById("adv-holidays").addEventListener("input", runCustom);
+  document.getElementById("adv-sat").addEventListener("change", runCustom);
+  document.getElementById("eigyobi-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+
+  run();
 })();
 </script>
 </body>

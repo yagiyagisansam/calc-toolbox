@@ -30,8 +30,9 @@
 <main>
   <h1>タンパク質摂取量 計算機</h1>
   <form class="tool-form" id="protein-form">
+    <span class="field-note">体重を入れると、すぐ下に結果が表示されます</span>
     <label>体重(kg)
-      <input type="number" id="weight" min="20" max="300" step="0.1" required placeholder="例: 60">
+      <input type="number" id="weight" inputmode="decimal" min="20" max="300" step="0.1" required placeholder="例: 60">
     </label>
     <label>運動量
       <select id="level">
@@ -49,28 +50,28 @@
     <summary><span class="plus">＋</span>詳細機能: 食品への換算・今日の摂取量チェック</summary>
     <div class="adv-inner">
       <h3 class="adv-h">必要量を身近な食品に換算</h3>
-      <p class="adv-note">タンパク質の量(g)を入れると、「その食品だけでまかなうなら」の量に換算します。空欄のまま押すと、上のフォームの体重・運動量から計算した1日の必要量を使います。</p>
+      <p class="adv-note">タンパク質の量(g)を「その食品だけでまかなうなら」の量に換算します(空欄なら上で計算した必要量を使用)。</p>
       <label>タンパク質の量(g)
         <input type="number" id="adv-grams" inputmode="decimal" step="any" min="1" max="500" placeholder="空欄なら上の計算結果を使用">
       </label>
       <button type="button" id="adv-conv-run">食品に換算する</button>
 
       <h3 class="adv-h">今日どれだけ摂れた?(食べた量から合計)</h3>
-      <p class="adv-note">今日食べた量を入れると、タンパク質の合計を計算します。上のフォームに体重を入れておくと、1日の必要量に対する過不足も表示します。使わない欄は空欄のままで構いません。</p>
+      <p class="adv-note">今日食べた量を入れるとタンパク質の合計と必要量への過不足を計算します(使わない欄は空欄のままでOK)。</p>
       <label>鶏むね肉(g)
-        <input type="number" id="adv-f-chicken" inputmode="numeric" step="any" min="0" max="2000" placeholder="例: 100">
+        <input type="number" id="adv-f-chicken" inputmode="decimal" step="any" min="0" max="2000" placeholder="例: 100">
       </label>
       <label>卵(個)
-        <input type="number" id="adv-f-egg" inputmode="numeric" step="any" min="0" max="30" placeholder="例: 2">
+        <input type="number" id="adv-f-egg" inputmode="decimal" step="any" min="0" max="30" placeholder="例: 2">
       </label>
       <label>納豆(パック)
-        <input type="number" id="adv-f-natto" inputmode="numeric" step="any" min="0" max="20" placeholder="例: 1">
+        <input type="number" id="adv-f-natto" inputmode="decimal" step="any" min="0" max="20" placeholder="例: 1">
       </label>
       <label>牛乳(ml)
-        <input type="number" id="adv-f-milk" inputmode="numeric" step="any" min="0" max="3000" placeholder="例: 200">
+        <input type="number" id="adv-f-milk" inputmode="decimal" step="any" min="0" max="3000" placeholder="例: 200">
       </label>
       <label>プロテイン(杯)
-        <input type="number" id="adv-f-powder" inputmode="numeric" step="any" min="0" max="10" placeholder="例: 1">
+        <input type="number" id="adv-f-powder" inputmode="decimal" step="any" min="0" max="10" placeholder="例: 1">
       </label>
       <button type="button" id="adv-intake-run">今日の合計を計算する</button>
       <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
@@ -83,7 +84,7 @@
   <ol class="steps">
     <li>体重を入力します。</li>
     <li>運動量(ふつう/運動習慣あり/筋トレ)を選びます。</li>
-    <li>「計算する」を押すと、1日の目安と食品換算が表示されます。</li>
+    <li>入力すると同時に、1日の目安と食品換算がすぐ下に表示されます。ボタンは不要です。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -145,9 +146,10 @@
     ["牛乳(200ml)", 6.8, "杯", 1],
     ["納豆(1パック)", 8.3, "パック", 1]
   ];
-  document.getElementById("protein-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var r = ProteinCalc.needs(parseFloat(document.getElementById("weight").value), document.getElementById("level").value);
+  var weightEl = document.getElementById("weight");
+  function run() {
+    if (weightEl.value === "") { box.hidden = true; return; }
+    var r = ProteinCalc.needs(parseFloat(weightEl.value), document.getElementById("level").value);
     if (!r.ok) { box.innerHTML = '<p class="result-error">体重は20〜300kgの範囲で入力してください。</p>'; box.hidden = false; return; }
     var rows = FOODS.map(function (f) {
       var amount = f[0] === "鶏むね肉(皮なし)" ? Math.round(r.grams / f[1] * f[3] / 10) * 10 + "g" : Math.round(r.grams / f[1] * 10) / 10 + f[2];
@@ -159,7 +161,10 @@
       '<div class="table-scroll"><table class="data-table"><thead><tr><th>食品換算</th><th>量</th></tr></thead><tbody>' +
       rows + "</tbody></table></div><p>実際は複数の食品を組み合わせて摂ります。</p>";
     box.hidden = false;
-  });
+  }
+  weightEl.addEventListener("input", run);
+  document.getElementById("level").addEventListener("change", run);
+  document.getElementById("protein-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
 })();
 </script>
 <script>
@@ -176,12 +181,13 @@
     var r = ProteinCalc.needs(w, document.getElementById("level").value);
     return r.ok ? r : null;
   }
-  document.getElementById("adv-conv-run").addEventListener("click", function () {
+  var lastAdv = null;
+  function runConv(fromButton) {
     var gEl = document.getElementById("adv-grams");
     var grams;
     if (gEl.value === "") {
       var n = currentNeeds();
-      if (!n) { advErr("グラム数を入力するか、上のフォームに体重を入力してください。"); return; }
+      if (!n) { if (fromButton) advErr("グラム数を入力するか、上のフォームに体重を入力してください。"); return; }
       grams = n.grams;
     } else {
       grams = parseFloat(gEl.value);
@@ -199,9 +205,10 @@
       "<tr><td>プロテイン(1杯≒20g)</td><td>約 " + fmt1(r.scoops) + " 杯</td></tr>" +
       "</tbody></table></div>" +
       '<p class="adv-note">タンパク質量はいずれも目安です。実際はいろいろな食品を組み合わせて摂ります。</p>';
+    lastAdv = runConv;
     advBox.hidden = false;
-  });
-  document.getElementById("adv-intake-run").addEventListener("click", function () {
+  }
+  function runIntake(fromButton) {
     function val(id) {
       var v = document.getElementById(id).value;
       return v === "" ? undefined : parseFloat(v);
@@ -214,10 +221,13 @@
       scoops: val("adv-f-powder")
     });
     if (!r.ok) {
-      advErr(r.code === "invalid_foods" ? "いずれかの食品の量を入力してください。"
-        : "入力欄の範囲内の値を入力してください。");
+      if (fromButton || r.code !== "invalid_foods") {
+        advErr(r.code === "invalid_foods" ? "いずれかの食品の量を入力してください。"
+          : "入力欄の範囲内の値を入力してください。");
+      }
       return;
     }
+    lastAdv = runIntake;
     var html = '<div class="result-main">今日の合計 約 ' +
       r.totalG.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " g</div>";
     var n = currentNeeds();
@@ -234,7 +244,15 @@
     }
     advBox.innerHTML = html;
     advBox.hidden = false;
+  }
+  document.getElementById("adv-conv-run").addEventListener("click", function () { runConv(true); });
+  document.getElementById("adv-intake-run").addEventListener("click", function () { runIntake(true); });
+  document.getElementById("adv-grams").addEventListener("input", function () { runConv(false); });
+  ["adv-f-chicken", "adv-f-egg", "adv-f-natto", "adv-f-milk", "adv-f-powder"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runIntake(false); });
   });
+  document.getElementById("weight").addEventListener("input", function () { if (lastAdv) lastAdv(false); });
+  document.getElementById("level").addEventListener("change", function () { if (lastAdv) lastAdv(false); });
 })();
 </script>
 </body>

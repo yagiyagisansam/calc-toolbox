@@ -51,15 +51,14 @@
       </label>
     </div>
     <button type="submit">時間を計算する</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
   </form>
-
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
   <details class="adv-box">
     <summary><span class="plus">＋</span>詳細機能: タイムカード計算と10進数の逆変換</summary>
     <div class="adv-inner">
       <h3 class="adv-h">タイムカード計算(実働時間とその日の給与)</h3>
-      <p class="adv-note">出勤・退勤の時刻と休憩を入れると実働時間を計算します。退勤が出勤より前の時刻なら夜勤(日またぎ)として扱います。時給を入れるとその日の給与額の目安も出ます。</p>
+      <p class="adv-note">退勤が出勤より前なら夜勤(日またぎ)として扱い、時給を入れるとその日の給与額の目安も出ます。</p>
       <label>出勤時刻
         <input type="time" id="adv-start" value="09:00">
       </label>
@@ -72,14 +71,13 @@
       <label>時給(円・空欄なら給与計算なし)
         <input type="number" id="adv-wage" inputmode="numeric" min="1" max="1000000" step="any" placeholder="例: 1200">
       </label>
-      <button type="button" id="adv-tc-run">実働時間を計算する</button>
+      <div class="tool-result" id="adv-tc-result" hidden aria-live="polite"></div>
 
       <h3 class="adv-h">10進数の時間を「時:分」に戻す</h3>
       <p class="adv-note">給与明細やExcelの「7.75時間」が何時間何分かを確認できます。</p>
       <label>10進数の時間
-        <input type="number" id="adv-dec" min="0" max="999" step="any" placeholder="例: 7.75">
+        <input type="number" id="adv-dec" inputmode="decimal" min="0" max="999" step="any" placeholder="例: 7.75">
       </label>
-      <button type="button" id="adv-dec-run">時:分に変換する</button>
       <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
     </div>
   </details>
@@ -90,7 +88,7 @@
   <ol class="steps">
     <li>「時間の合計」か「時刻の差」を選びます。</li>
     <li>合計なら「時:分」を1行ずつ(またはカンマ区切りで)入力、差なら開始・終了時刻を選びます。</li>
-    <li>「計算する」を押すと、合計時間と10進数換算が表示されます。</li>
+    <li>入力と同時に、合計時間と10進数換算が自動で表示されます(ボタンを押してもOK)。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -154,11 +152,6 @@
     invalid_start: "開始時刻を正しく入力してください。",
     invalid_end: "終了時刻を正しく入力してください。"
   };
-  mode.addEventListener("change", function () {
-    var isTotal = mode.value === "total";
-    totalFields.hidden = !isTotal;
-    spanFields.hidden = isTotal;
-  });
   function show(r, label) {
     if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "入力値を確認してください。") + "</p>"; box.hidden = false; return; }
     box.innerHTML =
@@ -166,25 +159,39 @@
       "<p>" + label + " / 10進数換算: <strong>" + r.decimal.toLocaleString() + "時間</strong>(" + r.totalMinutes.toLocaleString() + "分)</p>";
     box.hidden = false;
   }
-  document.getElementById("jikan-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  function run() {
     if (mode.value === "total") {
-      var parts = document.getElementById("list").value.split(/[\n,、\s]+/).filter(function (s) { return s !== ""; });
+      var raw = document.getElementById("list").value;
+      if (raw.trim() === "") { box.hidden = true; return; }
+      var parts = raw.split(/[\n,、\s]+/).filter(function (s) { return s !== ""; });
       show(JikanCalc.total(parts), parts.length + "件の合計");
     } else {
-      show(JikanCalc.span(document.getElementById("start").value, document.getElementById("end").value), "時刻の差");
+      var start = document.getElementById("start").value;
+      var end = document.getElementById("end").value;
+      if (start === "" || end === "") { box.hidden = true; return; }
+      show(JikanCalc.span(start, end), "時刻の差");
     }
+  }
+  mode.addEventListener("change", function () {
+    var isTotal = mode.value === "total";
+    totalFields.hidden = !isTotal;
+    spanFields.hidden = isTotal;
+    run();
+  });
+  document.getElementById("list").addEventListener("input", run);
+  document.getElementById("start").addEventListener("input", run);
+  document.getElementById("end").addEventListener("input", run);
+  document.getElementById("jikan-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run();
   });
 })();
 </script>
 <script>
 (function () {
   "use strict";
-  var advBox = document.getElementById("adv-result");
-  function advErr(msg) {
-    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
-    advBox.hidden = false;
-  }
+  var tcBox = document.getElementById("adv-tc-result");
+  var decBox = document.getElementById("adv-result");
   function hm(min) {
     return Math.floor(min / 60) + "時間" + (min % 60) + "分";
   }
@@ -195,16 +202,21 @@
     break_too_long: "休憩が勤務時間より長くなっています。",
     invalid_wage: "時給は1〜1,000,000円の範囲で入力してください。"
   };
-  document.getElementById("adv-tc-run").addEventListener("click", function () {
+  // ---- タイムカード計算(即時) ----
+  function runTimecard() {
     var start = document.getElementById("adv-start").value;
     var end = document.getElementById("adv-end").value;
     var brkStr = document.getElementById("adv-break").value;
     var wageStr = document.getElementById("adv-wage").value;
-    if (start === "" || end === "") { advErr("出勤時刻と退勤時刻を入力してください。"); return; }
+    if (start === "" || end === "") { tcBox.hidden = true; return; }
     var brk = brkStr === "" ? 0 : parseInt(brkStr, 10);
     var wage = wageStr === "" ? null : parseFloat(wageStr);
     var r = JikanCalc.timecard(start, end, brk, wage);
-    if (!r.ok) { advErr(MSG2[r.code] || "入力値を確認してください。"); return; }
+    if (!r.ok) {
+      tcBox.innerHTML = '<p class="result-error">' + (MSG2[r.code] || "入力値を確認してください。") + "</p>";
+      tcBox.hidden = false;
+      return;
+    }
     var html =
       '<div class="result-main">実働 ' + hm(r.totalMinutes) + "(" +
       r.decimal.toLocaleString(undefined, { maximumFractionDigits: 2 }) + "時間)</div>" +
@@ -216,21 +228,31 @@
       html += "<tr><td>その日の給与額の目安</td><td>" + r.pay.toLocaleString() + "円</td></tr>";
     }
     html += "</tbody></table></div>" +
-      '<p class="adv-note">深夜時間帯は休憩を引く前の勤務時間帯との重なりで、休憩をいつ取るかで実際の深夜労働時間は変わります。' +
-      "給与額は時給×実働時間の概算で、深夜・残業の割増(労働基準法第37条)は含みません。</p>";
-    advBox.innerHTML = html;
-    advBox.hidden = false;
+      '<p class="adv-note">深夜時間帯は休憩を引く前の重なりで、給与額は割増(労働基準法第37条)を含まない時給×実働時間の概算です。</p>';
+    tcBox.innerHTML = html;
+    tcBox.hidden = false;
+  }
+  ["adv-start", "adv-end", "adv-break", "adv-wage"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runTimecard);
   });
-  document.getElementById("adv-dec-run").addEventListener("click", function () {
+  runTimecard();
+
+  // ---- 10進数→時:分(即時) ----
+  function runDec() {
     var decStr = document.getElementById("adv-dec").value;
-    if (decStr === "") { advErr("10進数の時間を入力してください。"); return; }
+    if (decStr === "") { decBox.hidden = true; return; }
     var r = JikanCalc.dec2hm(parseFloat(decStr));
-    if (!r.ok) { advErr("0〜999の範囲で入力してください。"); return; }
-    advBox.innerHTML =
+    if (!r.ok) {
+      decBox.innerHTML = '<p class="result-error">0〜999の範囲で入力してください。</p>';
+      decBox.hidden = false;
+      return;
+    }
+    decBox.innerHTML =
       '<div class="result-main">' + hm(r.totalMinutes) + "</div>" +
       "<p>" + decStr + "時間 = " + r.totalMinutes.toLocaleString() + "分(分は四捨五入)</p>";
-    advBox.hidden = false;
-  });
+    decBox.hidden = false;
+  }
+  document.getElementById("adv-dec").addEventListener("input", runDec);
 })();
 </script>
 </body>

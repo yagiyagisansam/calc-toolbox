@@ -31,7 +31,8 @@
   <h1>大さじ・小さじ・カップ 換算計算機</h1>
   <form class="tool-form" id="spoon-form">
     <label>分量
-      <input type="number" id="value" min="0" step="any" required placeholder="例: 3">
+      <span class="field-note">数値を入れると、すぐ下に換算結果が表示されます</span>
+      <input type="number" id="value" inputmode="decimal" min="0" step="any" required placeholder="例: 3">
     </label>
     <label>単位
       <select id="unit">
@@ -50,12 +51,12 @@
     <summary><span class="plus">＋</span>詳細機能: 材料の重さ(グラム)との換算</summary>
     <div class="adv-inner">
       <h3 class="adv-h">大さじ・小さじ → グラム</h3>
-      <p class="adv-note">同じ大さじ1でも、材料によって重さは違います(水15g、砂糖9g、しょうゆ18gなど)。杯数と材料から重さを計算します。</p>
+      <p class="adv-note">同じ大さじ1でも材料によって重さが違うため(水15g・砂糖9g・しょうゆ18gなど)、杯数と材料から重さを計算します。</p>
       <label>大さじ(杯)
-        <input type="number" id="adv-tbsp" min="0" step="any" value="1" placeholder="例: 2">
+        <input type="number" id="adv-tbsp" inputmode="decimal" min="0" step="any" value="1" placeholder="例: 2">
       </label>
       <label>小さじ(杯)
-        <input type="number" id="adv-tsp" min="0" step="any" value="0" placeholder="例: 1">
+        <input type="number" id="adv-tsp" inputmode="decimal" min="0" step="any" value="0" placeholder="例: 1">
       </label>
       <label>材料
         <select id="adv-mat">
@@ -74,7 +75,7 @@
       <h3 class="adv-h">グラム → 大さじ・小さじ</h3>
       <p class="adv-note">「砂糖30g」のようにグラムで書かれたレシピを、はかりを使わずスプーンで量るための逆換算です。</p>
       <label>重さ(g)
-        <input type="number" id="adv-grams" min="0" step="any" placeholder="例: 30">
+        <input type="number" id="adv-grams" inputmode="decimal" min="0" step="any" placeholder="例: 30">
       </label>
       <label>材料
         <select id="adv-mat2">
@@ -98,7 +99,7 @@
   <ol class="steps">
     <li>レシピの分量(数値)を入力します。</li>
     <li>その単位(大さじ・小さじ・カップ・ml)を選びます。</li>
-    <li>「換算する」を押すと、すべての単位での量が表示されます。</li>
+    <li>入力した瞬間に、すべての単位での量が表示されます。ボタンは不要です。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -153,8 +154,8 @@
 (function () {
   "use strict";
   var box = document.getElementById("result");
-  document.getElementById("spoon-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  function run() {
+    if (document.getElementById("value").value.trim() === "") { box.hidden = true; return; }
     var r = SpoonCalc.convert(parseFloat(document.getElementById("value").value), document.getElementById("unit").value);
     if (!r.ok) {
       box.innerHTML = '<p class="result-error">分量を0より大きい数値で入力してください。</p>';
@@ -169,7 +170,10 @@
       "<tr><td>カップ(200ml)</td><td>" + r.cup.toLocaleString() + " 杯</td></tr>" +
       "</tbody></table></div>";
     box.hidden = false;
-  });
+  }
+  document.getElementById("value").addEventListener("input", run);
+  document.getElementById("unit").addEventListener("change", run);
+  document.getElementById("spoon-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
 })();
 </script>
 <script>
@@ -178,11 +182,15 @@
   var advBox = document.getElementById("adv-result");
   var gramsBox = document.getElementById("adv-grams-result");
   var fmt = function (x) { return x.toLocaleString(undefined, { maximumFractionDigits: 2 }); };
-  document.getElementById("adv-grams-run").addEventListener("click", function () {
-    var tbsp = parseFloat(document.getElementById("adv-tbsp").value) || 0;
-    var tsp = parseFloat(document.getElementById("adv-tsp").value) || 0;
+  function runGrams(force) {
+    var tbspRaw = document.getElementById("adv-tbsp").value;
+    var tspRaw = document.getElementById("adv-tsp").value;
+    if (tbspRaw.trim() === "" && tspRaw.trim() === "" && !force) { gramsBox.hidden = true; return; }
+    var tbsp = parseFloat(tbspRaw) || 0;
+    var tsp = parseFloat(tspRaw) || 0;
     var r = SpoonCalc.toGrams(tbsp, tsp, document.getElementById("adv-mat").value);
     if (!r.ok) {
+      if (!force) { gramsBox.hidden = true; return; }
       gramsBox.innerHTML = '<p class="result-error">大さじ・小さじのどちらかに0より大きい杯数を入力してください。</p>';
       gramsBox.hidden = false;
       return;
@@ -191,8 +199,14 @@
       '<div class="result-main">約 ' + fmt(r.grams) + ' g</div>' +
       '<p>' + r.label + ': 大さじ1杯 約' + r.gramsPerTbsp + 'g / 小さじ1杯 約' + r.gramsPerTsp + 'gの目安で計算しています。すりきり(山盛りにしない)での量です。</p>';
     gramsBox.hidden = false;
+  }
+  ["adv-tbsp", "adv-tsp"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runGrams(false); });
   });
-  document.getElementById("adv-spoon-run").addEventListener("click", function () {
+  document.getElementById("adv-mat").addEventListener("change", function () { runGrams(false); });
+  document.getElementById("adv-grams-run").addEventListener("click", function () { runGrams(true); });
+  function runSpoon(force) {
+    if (document.getElementById("adv-grams").value.trim() === "" && !force) { advBox.hidden = true; return; }
     var r = SpoonCalc.fromGrams(parseFloat(document.getElementById("adv-grams").value), document.getElementById("adv-mat2").value);
     if (!r.ok) {
       advBox.innerHTML = '<p class="result-error">重さを0より大きい数値(g)で入力してください。</p>';
@@ -211,7 +225,11 @@
       '</tbody></table></div>' +
       '<p class="adv-note">' + r.label + 'の目安値で計算した概算です。</p>';
     advBox.hidden = false;
-  });
+  }
+  document.getElementById("adv-grams").addEventListener("input", function () { runSpoon(false); });
+  document.getElementById("adv-mat2").addEventListener("change", function () { runSpoon(false); });
+  document.getElementById("adv-spoon-run").addEventListener("click", function () { runSpoon(true); });
+  runGrams(false);
 })();
 </script>
 </body>

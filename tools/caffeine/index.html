@@ -30,6 +30,7 @@
 <main>
   <h1>カフェイン摂取量 計算機</h1>
   <form class="tool-form" id="caffeine-form">
+    <span class="field-note">飲み物と量を入れると、すぐ下に合計が表示されます</span>
     <div id="rows"></div>
     <button type="button" id="add-row" style="font-size:0.95rem;padding:8px;border:1px dashed var(--color-border);border-radius:8px;background:transparent;color:var(--color-accent);cursor:pointer;">+ 飲み物を追加</button>
     <button type="submit">カフェイン量を計算する</button>
@@ -41,7 +42,7 @@
     <summary><span class="plus">＋</span>詳細機能: 就寝時に残るカフェイン・最後の1杯の時刻</summary>
     <div class="adv-inner">
       <h3 class="adv-h">寝る時にどれだけ残っている?</h3>
-      <p class="adv-note">コーヒーを飲む時刻・杯数と就寝予定を入れると、半減期約5時間の目安で就寝時に体に残るカフェイン量を計算します(1杯150ml≒90mgで計算)。</p>
+      <p class="adv-note">飲む時刻・杯数・就寝予定から、半減期約5時間の目安で就寝時に残るカフェイン量を計算します(1杯150ml≒90mg)。</p>
       <label>コーヒーを飲む時刻
         <input type="time" id="adv-drink-time" value="15:00">
       </label>
@@ -54,7 +55,7 @@
       <button type="button" id="adv-remain-run">残る量を計算する</button>
 
       <h3 class="adv-h">何時までに飲み終えればいい?</h3>
-      <p class="adv-note">上の杯数と就寝予定から、就寝時の残りが100mg(眠りに影響しやすい目安)を下回る「最後の1杯の時刻」を逆算します。</p>
+      <p class="adv-note">上の杯数と就寝予定から、就寝時の残りが100mg(眠りに影響しやすい目安)を下回る最後の1杯の時刻を逆算します。</p>
       <button type="button" id="adv-last-run">最後の1杯の時刻を逆算する</button>
       <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
     </div>
@@ -66,7 +67,7 @@
   <ol class="steps">
     <li>飲んだもの(コーヒー・お茶・エナジードリンクなど)と量(ml)を入力します。</li>
     <li>「+ 飲み物を追加」で1日分をまとめて入れられます。</li>
-    <li>「計算する」を押すと、合計mgと目安に対する割合が表示されます。</li>
+    <li>入力すると同時に、合計mgと目安に対する割合がすぐ下に表示されます。飲み物を選び直すと即座に再計算されます。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -136,18 +137,20 @@
     var input = document.createElement("input");
     input.type = "number";
     input.min = "1"; input.max = "5000"; input.step = "any";
+    input.setAttribute("inputmode", "decimal");
     input.placeholder = "量(ml)";
     input.value = ml || "";
     input.setAttribute("aria-label", "量(ml)");
     input.style.width = "7em";
+    sel.addEventListener("change", function () { run(false); });
+    input.addEventListener("input", function () { run(false); });
     div.appendChild(sel);
     div.appendChild(input);
     rows.appendChild(div);
   }
   addRow("coffee", 200);
   document.getElementById("add-row").addEventListener("click", function () { addRow(); });
-  document.getElementById("caffeine-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  function run(fromSubmit) {
     var items = [];
     var rowEls = rows.querySelectorAll(".caffeine-row");
     for (var i = 0; i < rowEls.length; i++) {
@@ -157,8 +160,12 @@
     }
     var r = CaffeineCalc.total(items);
     if (!r.ok) {
-      box.innerHTML = '<p class="result-error">飲み物と量(ml)を1件以上入力してください。</p>';
-      box.hidden = false;
+      if (fromSubmit) {
+        box.innerHTML = '<p class="result-error">飲み物と量(ml)を1件以上入力してください。</p>';
+        box.hidden = false;
+      } else {
+        box.hidden = true;
+      }
       return;
     }
     var status = r.pctAdult >= 100 ? "⚠️ 成人の1日の目安を超えています" : r.pctAdult >= 75 ? "目安に近づいています" : "目安の範囲内です";
@@ -170,7 +177,9 @@
       "<tr><td>妊娠中の目安(200mg)</td><td>" + r.pctPregnant + "%</td></tr>" +
       "</tbody></table></div>";
     box.hidden = false;
-  });
+  }
+  document.getElementById("caffeine-form").addEventListener("submit", function (e) { e.preventDefault(); run(true); });
+  run(false);
 })();
 </script>
 <script>
@@ -182,16 +191,21 @@
     advBox.hidden = false;
   }
   var NOTE = '<p class="adv-note">半減期約5時間は一般的な平均値で、実際は2.5〜10時間程度と個人差があります。妊娠中は分解が遅くなるため、より少なめが目安です。</p>';
-  document.getElementById("adv-remain-run").addEventListener("click", function () {
-    var r = CaffeineCalc.remainingAtBed(
-      document.getElementById("adv-drink-time").value,
-      document.getElementById("adv-bed-time").value,
-      parseInt(document.getElementById("adv-cups").value, 10)
-    );
+  var lastAdv = null;
+  function runRemain(fromButton) {
+    var drink = document.getElementById("adv-drink-time").value;
+    var bed = document.getElementById("adv-bed-time").value;
+    var cupsRaw = document.getElementById("adv-cups").value;
+    if (drink === "" || bed === "" || cupsRaw === "") {
+      if (fromButton) advErr("時刻と杯数を入力してください。");
+      return;
+    }
+    var r = CaffeineCalc.remainingAtBed(drink, bed, parseInt(cupsRaw, 10));
     if (!r.ok) {
       advErr(r.code === "invalid_cups" ? "杯数は1〜10杯の整数で入力してください。" : "時刻を入力してください。");
       return;
     }
+    lastAdv = runRemain;
     var judge = r.affectSleep
       ? "<strong>100mg以上残っており、寝つき・眠りの質に影響しやすい目安です。</strong>"
       : "100mg未満で、影響は比較的小さい目安です。";
@@ -201,16 +215,20 @@
       r.hoursUntilBed.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
       " 時間後)の時点で体に残る計算です。" + judge + "</p>" + NOTE;
     advBox.hidden = false;
-  });
-  document.getElementById("adv-last-run").addEventListener("click", function () {
-    var r = CaffeineCalc.lastCupTime(
-      document.getElementById("adv-bed-time").value,
-      parseInt(document.getElementById("adv-cups").value, 10)
-    );
+  }
+  function runLast(fromButton) {
+    var bed = document.getElementById("adv-bed-time").value;
+    var cupsRaw = document.getElementById("adv-cups").value;
+    if (bed === "" || cupsRaw === "") {
+      if (fromButton) advErr("就寝予定時刻と杯数を入力してください。");
+      return;
+    }
+    var r = CaffeineCalc.lastCupTime(bed, parseInt(cupsRaw, 10));
     if (!r.ok) {
       advErr(r.code === "invalid_cups" ? "杯数は1〜10杯の整数で入力してください。" : "就寝予定時刻を入力してください。");
       return;
     }
+    lastAdv = runLast;
     if (r.anytime) {
       advBox.innerHTML =
         '<div class="result-main">時間の制限は特にありません</div>' +
@@ -225,6 +243,12 @@
       r.hoursBefore.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
       " 時間前</strong>までに飲み終えると、就寝時の残りが100mgを下回る計算です。</p>" + NOTE;
     advBox.hidden = false;
+  }
+  document.getElementById("adv-remain-run").addEventListener("click", function () { runRemain(true); });
+  document.getElementById("adv-last-run").addEventListener("click", function () { runLast(true); });
+  document.getElementById("adv-drink-time").addEventListener("input", function () { runRemain(false); });
+  ["adv-bed-time", "adv-cups"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { (lastAdv || runRemain)(false); });
   });
 })();
 </script>
