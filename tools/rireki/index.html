@@ -284,14 +284,15 @@
     if (lastAdv === "detail") { runDetail(); }
     else if (lastAdv === "text") { runText(); }
   }
+  function onDetailParam() {
+    if (!advBox.hidden && lastAdv === "text") { runText(); } else { runDetail(); }
+  }
   ["adv-ronin", "adv-ryunen", "adv-kyugaku"].forEach(function (id) {
-    document.getElementById(id).addEventListener("input", refreshLast);
+    document.getElementById(id).addEventListener("input", onDetailParam);
   });
-  document.getElementById("adv-grad").addEventListener("change", refreshLast);
+  document.getElementById("adv-grad").addEventListener("change", onDetailParam);
   ["adv-jhs-name", "adv-hs-name", "adv-uni-name"].forEach(function (id) {
-    document.getElementById(id).addEventListener("input", function () {
-      if (!advBox.hidden && lastAdv === "text") { runText(); }
-    });
+    document.getElementById(id).addEventListener("input", runText);
   });
   window.__rirekiAdvRefresh = refreshLast;
 })();

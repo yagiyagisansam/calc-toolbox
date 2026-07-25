@@ -285,13 +285,9 @@
   document.getElementById("adv-renew-run").addEventListener("click", function () { runRenew(true); });
   document.getElementById("adv-baby-run").addEventListener("click", runBaby);
   ["adv-interval", "adv-count", "adv-notice"].forEach(function (id) {
-    document.getElementById(id).addEventListener("input", function () {
-      if (!advBox.hidden) { runRenew(false); }
-    });
+    document.getElementById(id).addEventListener("input", function () { runRenew(false); });
   });
-  document.getElementById("adv-baby-count").addEventListener("change", function () {
-    if (!advBox.hidden && lastAdv === "baby") { runBaby(); }
-  });
+  document.getElementById("adv-baby-count").addEventListener("change", runBaby);
   window.__tsukisuAdvRefresh = function () {
     if (advBox.hidden) { return; }
     if (lastAdv === "renew") { runRenew(false); }
