@@ -51,7 +51,7 @@
     <summary><span class="plus">＋</span>詳細機能: 割り勘・通勤ガソリン代</summary>
     <div class="adv-inner">
       <h3 class="adv-h">みんなで割り勘(高速代も込み)</h3>
-      <p class="adv-note">距離・燃費・単価は上のフォームの値を使います。人数と高速代を足すと、1人あたりの負担額が出ます。</p>
+      <p class="adv-note">人数と高速代を入れると、1人あたりの負担額が出ます(距離・燃費・単価は上のフォームの値)。</p>
       <label>人数(運転する人も含めて)
         <input type="number" id="adv-people" inputmode="numeric" step="1" min="1" max="20" placeholder="4">
       </label>
@@ -61,7 +61,7 @@
       <button type="button" id="adv-split-run">1人あたりを計算</button>
       <div class="tool-result" id="adv-result-split" hidden aria-live="polite"></div>
       <h3 class="adv-h">通勤のガソリン代(月・年)</h3>
-      <p class="adv-note">片道の距離と出勤日数から、毎月・毎年のガソリン代を出します。燃費と単価は上のフォームの値を使います。</p>
+      <p class="adv-note">片道の距離と出勤日数から、毎月・毎年のガソリン代を出します(燃費・単価は上のフォームの値)。</p>
       <label>片道の通勤距離(km)
         <input type="number" id="adv-oneway" inputmode="decimal" step="any" min="0.1" max="500" placeholder="12">
       </label>
@@ -83,7 +83,7 @@
   <ol class="steps">
     <li>走行する(した)距離をkm単位で入力します。地図アプリのルート検索の距離が便利です。</li>
     <li>車の燃費(km/L)を入力します。実燃費がわかればその値がおすすめです。</li>
-    <li>ガソリン単価(円/L)を入力して「計算する」を押します。</li>
+    <li>ガソリン単価(円/L)を入力すると、すぐ下に金額が自動表示されます。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -141,13 +141,20 @@
     invalid_efficiency: "燃費は " + FuelCalc.EFFICIENCY_MIN + "〜" + FuelCalc.EFFICIENCY_MAX + " km/L の範囲で入力してください。",
     invalid_price: "単価は " + FuelCalc.PRICE_MIN + "〜" + FuelCalc.PRICE_MAX + " 円/L の範囲で入力してください。"
   };
-  document.getElementById("fuel-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var distance = parseFloat(document.getElementById("distance").value);
-    var efficiency = parseFloat(document.getElementById("efficiency").value);
-    var price = parseFloat(document.getElementById("price").value);
-    var result = FuelCalc.calculate(distance, efficiency, price);
-    var box = document.getElementById("result");
+  var box = document.getElementById("result");
+  function raw(id) { return document.getElementById(id).value; }
+  function run(showErrors) {
+    if (raw("distance") === "" || raw("efficiency") === "" || raw("price") === "") {
+      if (showErrors) {
+        var code = raw("distance") === "" ? "invalid_distance" : raw("efficiency") === "" ? "invalid_efficiency" : "invalid_price";
+        box.innerHTML = '<p class="result-error">' + ERROR_MESSAGES[code] + "</p>";
+        box.hidden = false;
+      } else {
+        box.hidden = true;
+      }
+      return;
+    }
+    var result = FuelCalc.calculate(parseFloat(raw("distance")), parseFloat(raw("efficiency")), parseFloat(raw("price")));
     if (result.ok) {
       box.innerHTML =
         '<div class="result-main">約 ' + result.costYen.toLocaleString() + " 円</div>" +
@@ -156,6 +163,13 @@
       box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
     }
     box.hidden = false;
+  }
+  ["distance", "efficiency", "price"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { run(false); });
+  });
+  document.getElementById("fuel-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
   });
 })();
 </script>
@@ -183,7 +197,7 @@
       price: parseFloat(document.getElementById("price").value)
     };
   }
-  document.getElementById("adv-split-run").addEventListener("click", function () {
+  function runSplit() {
     var m = mainInputs();
     var people = parseFloat(document.getElementById("adv-people").value);
     var toll = parseFloat(document.getElementById("adv-toll").value);
@@ -195,8 +209,8 @@
       '<p>ガソリン代 ' + r.fuelYen.toLocaleString() + ' 円 + 高速代 ' + r.tollYen.toLocaleString() +
       ' 円 = 合計 <strong>' + r.totalYen.toLocaleString() + ' 円</strong></p>';
     splitBox.hidden = false;
-  });
-  document.getElementById("adv-commute-run").addEventListener("click", function () {
+  }
+  function runCommute() {
     var m = mainInputs();
     var oneWay = parseFloat(document.getElementById("adv-oneway").value);
     var days = parseFloat(document.getElementById("adv-days").value);
@@ -208,6 +222,32 @@
       '月の走行距離 ' + r.monthlyKm.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' km / 使用燃料 約' +
       r.fuelLPerMonth.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' L</p>';
     advBox.hidden = false;
+  }
+  document.getElementById("adv-split-run").addEventListener("click", runSplit);
+  document.getElementById("adv-commute-run").addEventListener("click", runCommute);
+  function filled(id) { return document.getElementById(id).value !== ""; }
+  function mainFilled() { return filled("distance") && filled("efficiency") && filled("price"); }
+  function autoSplit() {
+    if (mainFilled() && filled("adv-people")) { runSplit(); } else { splitBox.hidden = true; }
+  }
+  function autoCommute() {
+    if (filled("efficiency") && filled("price") && filled("adv-oneway") && filled("adv-days")) {
+      runCommute();
+    } else {
+      advBox.hidden = true;
+    }
+  }
+  ["adv-people", "adv-toll"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoSplit);
+  });
+  ["adv-oneway", "adv-days"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoCommute);
+  });
+  ["distance", "efficiency", "price"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (filled("adv-people")) autoSplit();
+      if (filled("adv-oneway") && filled("adv-days")) autoCommute();
+    });
   });
 })();
 </script>

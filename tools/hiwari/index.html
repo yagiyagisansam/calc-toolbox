@@ -32,7 +32,7 @@
   <form class="tool-form" id="hiwari-form">
     <label>月額家賃(円)
       <span class="field-note">共益費・管理費も日割りされる場合は合算した額で</span>
-      <input type="number" id="rent" min="1" max="10000000" step="1" required placeholder="例: 80000">
+      <input type="number" id="rent" inputmode="numeric" min="1" max="10000000" step="1" required placeholder="例: 80000">
     </label>
     <label>入居 or 退去
       <select id="mode">
@@ -40,19 +40,26 @@
         <option value="moveout">退去(月初〜退去日分を支払う)</option>
       </select>
     </label>
-    <label>入居日/退去日
-      <input type="date" id="date" min="1900-01-01" max="2200-12-31" required>
-    </label>
+    <div class="field-row">
+      <label><span id="date-label">入居日</span>(年)
+        <select id="date-year"></select>
+      </label>
+      <label>月
+        <select id="date-month"></select>
+      </label>
+      <label>日
+        <select id="date-day"></select>
+      </label>
+    </div>
     <button type="submit">日割り家賃を計算する</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
   </form>
-
-  <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
   <details class="adv-box">
     <summary><span class="plus">＋</span>詳細機能: 入居の初期費用をまとめて計算</summary>
     <div class="adv-inner">
       <h3 class="adv-h">敷金・礼金も入れて「最初に払う総額」を出す</h3>
-      <p class="adv-note">家賃と入居日は上のフォームの値を使います(日割りは「その月の日数で割る」方式)。敷金などは「家賃の何ヶ月分か」で入力してください。契約書や見積もりに書いてあります。</p>
+      <p class="adv-note">敷金などは契約書・見積書にある「家賃の何ヶ月分か」で入力してください(家賃・入居日は上のフォームの値、日割りは実日数方式)。</p>
       <label>敷金(ヶ月分)
         <input type="number" id="adv-shikikin" inputmode="decimal" step="any" min="0" max="12" value="1">
       </label>
@@ -85,8 +92,8 @@
   <h2>使い方</h2>
   <ol class="steps">
     <li>月額家賃を入力します(共益費も日割り対象なら合算)。</li>
-    <li>「入居」か「退去」かを選び、日付を入力します。</li>
-    <li>「計算する」を押すと、2方式の日割り額が並んで表示されます。</li>
+    <li>「入居」か「退去」かを選び、日付を選びます(最初は今日の日付が入っています)。</li>
+    <li>選んだ瞬間に、2方式の日割り額が並んですぐ下に表示されます。ボタンは不要です。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -144,16 +151,48 @@
 (function () {
   "use strict";
   var box = document.getElementById("result");
+  var today = new Date();
   var ERROR_MESSAGES = {
     invalid_rent: "月額家賃を1円以上で入力してください。",
     invalid_date: "日付を正しく入力してください。",
     invalid_mode: "入居か退去かを選んでください。"
   };
-  document.getElementById("hiwari-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var rent = parseInt(document.getElementById("rent").value, 10);
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, "日", Math.min(keep, max));
+  }
+  fillSelect(document.getElementById("date-year"), today.getFullYear() - 10, today.getFullYear() + 10, "年", today.getFullYear());
+  fillSelect(document.getElementById("date-month"), 1, 12, "月", today.getMonth() + 1);
+  fillSelect(document.getElementById("date-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), "日", today.getDate());
+  function pad2(n) { return n < 10 ? "0" + n : String(n); }
+  function selectedIso() {
+    adjustDays("date-year", "date-month", "date-day");
+    return val("date-year") + "-" + pad2(val("date-month")) + "-" + pad2(val("date-day"));
+  }
+  function run(showErrors) {
+    var rentRaw = document.getElementById("rent").value;
+    if (rentRaw === "") {
+      if (showErrors) {
+        box.innerHTML = '<p class="result-error">' + ERROR_MESSAGES.invalid_rent + "</p>";
+        box.hidden = false;
+      } else {
+        box.hidden = true;
+      }
+      return;
+    }
+    var rent = parseInt(rentRaw, 10);
     var mode = document.getElementById("mode").value;
-    var r = HiwariCalc.prorate(rent, document.getElementById("date").value, mode);
+    var r = HiwariCalc.prorate(rent, selectedIso(), mode);
     if (!r.ok) {
       box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "入力値を確認してください。") + "</p>";
       box.hidden = false;
@@ -168,7 +207,21 @@
       "</tbody></table></div>" +
       "<p>円未満は切り捨て。どちらの方式かは契約書をご確認ください。</p>";
     box.hidden = false;
+  }
+  document.getElementById("mode").addEventListener("change", function () {
+    document.getElementById("date-label").textContent =
+      document.getElementById("mode").value === "movein" ? "入居日" : "退去日";
+    run(false);
   });
+  ["date-year", "date-month", "date-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", function () { run(false); });
+  });
+  document.getElementById("rent").addEventListener("input", function () { run(false); });
+  document.getElementById("hiwari-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+  window.HiwariPage = { selectedIso: selectedIso, rerun: run };
 })();
 </script>
 <script>
@@ -181,9 +234,9 @@
     invalid_months: "敷金・礼金などのヶ月数は 0〜12 の範囲で入力してください。",
     invalid_other: "その他の費用は 0〜10,000,000円 の範囲で入力してください。"
   };
-  document.getElementById("adv-run").addEventListener("click", function () {
+  function runAdv() {
     var rent = parseFloat(document.getElementById("rent").value);
-    var iso = document.getElementById("date").value;
+    var iso = window.HiwariPage.selectedIso();
     function monthVal(id) {
       var v = parseFloat(document.getElementById(id).value);
       return isNaN(v) ? 0 : v;
@@ -211,6 +264,19 @@
       '</tbody></table></div>' +
       '<p class="adv-note">日割りを30日固定方式で計算する契約の場合は、上のフォームの結果(30日固定方式)との差額分だけ総額が変わります。正確な金額は契約書・見積書でご確認ください。</p>';
     advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", runAdv);
+  function autoAdv() {
+    if (document.getElementById("rent").value !== "") { runAdv(); } else { advBox.hidden = true; }
+  }
+  ["adv-shikikin", "adv-reikin", "adv-chukai", "adv-mae", "adv-other"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoAdv);
+  });
+  ["rent"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { if (!advBox.hidden) autoAdv(); });
+  });
+  ["date-year", "date-month", "date-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", function () { if (!advBox.hidden) autoAdv(); });
   });
 })();
 </script>

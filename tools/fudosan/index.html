@@ -49,7 +49,7 @@
   <h1>不動産投資 収支・損益分岐計算機</h1>
   <form class="tool-form" id="fudosan-form">
     <label>物件価格(万円)
-      <input type="number" id="price" min="100" max="100000" step="any" required placeholder="例: 2000">
+      <input type="number" id="price" inputmode="decimal" min="100" max="100000" step="any" required placeholder="例: 2000">
     </label>
     <label>建物の構造と築年数
       <span style="display:flex;gap:.5em;align-items:center;">
@@ -58,31 +58,31 @@
           <option value="steel">鉄骨</option>
           <option value="wood">木造</option>
         </select>
-        築 <input type="number" id="age" min="0" max="80" step="1" value="10" style="width:5em;" aria-label="築年数"> 年
+        築 <input type="number" id="age" inputmode="numeric" min="0" max="80" step="1" value="10" style="width:5em;" aria-label="築年数"> 年
       </span>
     </label>
     <label>月額家賃(円)
-      <input type="number" id="rentm" min="1000" max="10000000" step="any" required placeholder="例: 85000">
+      <input type="number" id="rentm" inputmode="decimal" min="1000" max="10000000" step="any" required placeholder="例: 85000">
     </label>
     <label>本業の給与年収(万円・額面)
       <span class="field-note">節税(損益通算)の計算に使います</span>
-      <input type="number" id="salary" min="0" max="100000" step="any" required placeholder="例: 600">
+      <input type="number" id="salary" inputmode="decimal" min="0" max="100000" step="any" required placeholder="例: 600">
     </label>
     <details id="adv">
       <summary style="cursor:pointer;font-weight:600;font-size:0.92rem;color:var(--color-accent);">⚙️ 詳細設定(自動推定値を変更したい方向け)</summary>
       <div style="display:grid;gap:14px;margin-top:14px;">
-        <label>頭金(万円)<input type="number" id="down" min="0" step="any" value="0"></label>
-        <label>購入諸費用率(%)<span class="field-note">登記・税・手数料など。既定7%</span><input type="number" id="costrate" min="0" max="20" step="0.1" value="7"></label>
-        <label>金利(年%)<input type="number" id="rate" min="0" max="20" step="0.01" value="2"></label>
-        <label>返済期間(年)<input type="number" id="years" min="1" max="50" step="1" value="35"></label>
-        <label>物件価格に占める建物の割合(%)<span class="field-note">減価償却と土地利息制限に影響。既定50%</span><input type="number" id="bratio" min="0" max="100" step="1" value="50"></label>
-        <label>空室率(%)<input type="number" id="vacancy" min="0" max="90" step="1" value="5"></label>
-        <label>家賃下落率(%/年)<input type="number" id="decline" min="-5" max="10" step="0.1" value="1"></label>
-        <label>運営経費率(満室家賃比%)<span class="field-note">管理費・修繕積立・固都税・賃貸管理など。既定20%</span><input type="number" id="opex" min="0" max="90" step="1" value="20"></label>
-        <label>売却時の表面利回り(%)<span class="field-note">空欄=購入時と同じ利回りで売れる想定。高くすると保守的</span><input type="number" id="saleyield" min="0.1" max="30" step="0.1" placeholder="空欄=購入時と同じ"></label>
-        <label>売却費用率(%)<span class="field-note">仲介手数料など。既定4%</span><input type="number" id="salecost" min="0" max="20" step="0.1" value="4"></label>
-        <label>社会保険料(円/年)<span class="field-note">空欄=給与の15%で概算</span><input type="number" id="socialins" min="0" step="any" placeholder="空欄=年収の15%"></label>
-        <label>その他の所得控除(円/年)<input type="number" id="otherded" min="0" step="any" value="0"></label>
+        <label>頭金(万円)<input type="number" id="down" inputmode="decimal" min="0" step="any" value="0"></label>
+        <label>購入諸費用率(%)<span class="field-note">登記・税・手数料など。既定7%</span><input type="number" id="costrate" inputmode="decimal" min="0" max="20" step="0.1" value="7"></label>
+        <label>金利(年%)<input type="number" id="rate" inputmode="decimal" min="0" max="20" step="0.01" value="2"></label>
+        <label>返済期間(年)<input type="number" id="years" inputmode="numeric" min="1" max="50" step="1" value="35"></label>
+        <label>物件価格に占める建物の割合(%)<span class="field-note">減価償却と土地利息制限に影響。既定50%</span><input type="number" id="bratio" inputmode="numeric" min="0" max="100" step="1" value="50"></label>
+        <label>空室率(%)<input type="number" id="vacancy" inputmode="numeric" min="0" max="90" step="1" value="5"></label>
+        <label>家賃下落率(%/年)<input type="number" id="decline" inputmode="decimal" min="-5" max="10" step="0.1" value="1"></label>
+        <label>運営経費率(満室家賃比%)<span class="field-note">管理費・修繕積立・固都税・賃貸管理など。既定20%</span><input type="number" id="opex" inputmode="numeric" min="0" max="90" step="1" value="20"></label>
+        <label>売却時の表面利回り(%)<span class="field-note">空欄=購入時と同じ利回りで売れる想定(高くすると保守的)</span><input type="number" id="saleyield" inputmode="decimal" min="0.1" max="30" step="0.1" placeholder="空欄=購入時と同じ"></label>
+        <label>売却費用率(%)<span class="field-note">仲介手数料など。既定4%</span><input type="number" id="salecost" inputmode="decimal" min="0" max="20" step="0.1" value="4"></label>
+        <label>社会保険料(円/年)<span class="field-note">空欄=給与の15%で概算</span><input type="number" id="socialins" inputmode="decimal" min="0" step="any" placeholder="空欄=年収の15%"></label>
+        <label>その他の所得控除(円/年)<input type="number" id="otherded" inputmode="decimal" min="0" step="any" value="0"></label>
       </div>
     </details>
     <button type="submit">長期収支をグラフで見る</button>
@@ -99,8 +99,8 @@
   <h2>使い方</h2>
   <ol class="steps">
     <li>物件価格・構造と築年数・月額家賃・給与年収を入力します(残りはツールが推定します)。</li>
-    <li>「グラフで見る」を押すと、損益分岐の年と2つのグラフ・年次表が表示されます。</li>
-    <li>前提を変えたいときは「詳細設定」を開いて金利・空室率・売却利回りなどを調整してください。</li>
+    <li>4項目が揃うと、損益分岐の年と2つのグラフ・年次表が自動で表示されます(ボタンでも計算できます)。</li>
+    <li>前提を変えたいときは「詳細設定」を開いて金利・空室率・売却利回りなどを調整してください(変更すると自動で再計算されます)。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -248,8 +248,7 @@
     });
   }
 
-  document.getElementById("fudosan-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+  function runSim(auto) {
     var input = {
       price: val("price") * 10000,
       structure: document.getElementById("structure").value,
@@ -316,8 +315,29 @@
       '<p style="font-size:0.8rem;color:var(--color-muted);">※印の年は短期譲渡(税率39.63%)。7年目以降は長期(20.315%)。損益分岐の年は色付きで表示。<br>使った前提: ' + assumptions + "</p>";
     box.hidden = false;
     attachTips(box, r);
-    box.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (!auto) box.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  document.getElementById("fudosan-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runSim(false);
   });
+  // 必須4項目(物件価格・築年数・家賃・年収)が揃っていれば、入力変更から300msで自動再計算
+  var debounceTimer = null;
+  function requiredFilled() {
+    return ["price", "age", "rentm", "salary"].every(function (id) {
+      return document.getElementById(id).value !== "";
+    });
+  }
+  function scheduleAuto() {
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(function () {
+      debounceTimer = null;
+      if (requiredFilled()) runSim(true);
+    }, 300);
+  }
+  var form = document.getElementById("fudosan-form");
+  form.addEventListener("input", scheduleAuto);
+  form.addEventListener("change", scheduleAuto);
 })();
 </script>
 </body>

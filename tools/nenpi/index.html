@@ -32,15 +32,15 @@
   <form class="tool-form" id="nenpi-form">
     <label>走行距離(km)
       <span class="field-note">前回満タン給油からの走行距離(トリップメーター)</span>
-      <input type="number" id="distance" min="0" max="10000" step="0.1" required placeholder="例: 400">
+      <input type="number" id="distance" inputmode="decimal" min="0" max="10000" step="0.1" required placeholder="例: 400">
     </label>
     <label>給油量(L)
       <span class="field-note">今回満タンにした量(レシート記載)</span>
-      <input type="number" id="liters" min="0" max="500" step="0.01" required placeholder="例: 25.5">
+      <input type="number" id="liters" inputmode="decimal" min="0" max="500" step="0.01" required placeholder="例: 25.5">
     </label>
     <label>ガソリン単価(円/L)
       <span class="field-note">任意。入れると給油代と1kmあたり費用も計算</span>
-      <input type="number" id="price" min="0" max="1000" step="0.1" placeholder="例: 170">
+      <input type="number" id="price" inputmode="decimal" min="0" max="1000" step="0.1" placeholder="例: 170">
     </label>
     <button type="submit">燃費を計算する</button>
   </form>
@@ -51,7 +51,7 @@
     <summary><span class="plus">＋</span>詳細機能: カタログ燃費との比較・2台の年間比較</summary>
     <div class="adv-inner">
       <h3 class="adv-h">カタログ燃費の何%出ている?</h3>
-      <p class="adv-note">計算した実燃費と、カタログに書いてある燃費(WLTCモードなど)をくらべます。7〜8割程度出ていれば一般的な範囲です。</p>
+      <p class="adv-note">実燃費がカタログ燃費(WLTCモードなど)の何%かを調べます(7〜8割出ていれば一般的な範囲)。</p>
       <label>実燃費(km/L)
         <span class="field-note">上のフォームを計算済みなら自動で入ります</span>
         <input type="number" id="adv-actual" inputmode="decimal" step="any" min="1" max="60" placeholder="15.2">
@@ -88,7 +88,7 @@
   <ol class="steps">
     <li>給油のたびに満タンにし、トリップメーターをリセットしておきます。</li>
     <li>次の給油時に「走った距離」と「入った量」を入力します。</li>
-    <li>「燃費を計算する」を押すと実燃費が表示されます。単価を入れれば費用も出ます。</li>
+    <li>2つ入力した時点で実燃費がすぐ下に自動表示されます。単価を入れれば費用も出ます。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -149,10 +149,20 @@
     invalid_liters: "給油量を0より大きい値で入力してください(500L以下)。",
     invalid_price: "ガソリン単価は0より大きい値で入力してください(1,000円/L以下)。"
   };
-  document.getElementById("nenpi-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var d = parseFloat(document.getElementById("distance").value);
-    var l = parseFloat(document.getElementById("liters").value);
+  function run(showErrors) {
+    var distRaw = document.getElementById("distance").value;
+    var litersRaw = document.getElementById("liters").value;
+    if (distRaw === "" || litersRaw === "") {
+      if (showErrors) {
+        box.innerHTML = '<p class="result-error">' + ERROR_MESSAGES[distRaw === "" ? "invalid_distance" : "invalid_liters"] + "</p>";
+        box.hidden = false;
+      } else {
+        box.hidden = true;
+      }
+      return;
+    }
+    var d = parseFloat(distRaw);
+    var l = parseFloat(litersRaw);
     var priceRaw = document.getElementById("price").value;
     var r = priceRaw === "" ? NenpiCalc.calc(d, l) : NenpiCalc.calc(d, l, parseFloat(priceRaw));
     if (!r.ok) {
@@ -173,6 +183,13 @@
       '<div class="table-scroll"><table class="data-table"><thead><tr><th>項目</th><th>値</th></tr></thead><tbody>' +
       rows + "</tbody></table></div>";
     box.hidden = false;
+  }
+  ["distance", "liters", "price"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { run(false); });
+  });
+  document.getElementById("nenpi-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
   });
 })();
 </script>
@@ -203,7 +220,7 @@
     }
   }
   document.querySelector(".adv-box").addEventListener("toggle", prefillActual);
-  document.getElementById("adv-ratio-run").addEventListener("click", function () {
+  function runRatio() {
     prefillActual();
     var actual = parseFloat(document.getElementById("adv-actual").value);
     var catalog = parseFloat(document.getElementById("adv-catalog").value);
@@ -221,8 +238,8 @@
       '<div class="result-main">カタログ燃費の ' + r.percent.toLocaleString(undefined, { maximumFractionDigits: 1 }) + '%</div>' +
       '<p>' + note + '</p>';
     ratioBox.hidden = false;
-  });
-  document.getElementById("adv-cmp-run").addEventListener("click", function () {
+  }
+  function runCmp() {
     var a = parseFloat(document.getElementById("adv-car-a").value);
     var b = parseFloat(document.getElementById("adv-car-b").value);
     var annual = parseFloat(document.getElementById("adv-annual").value);
@@ -248,6 +265,29 @@
       '</tbody></table></div>' +
       '<p class="adv-note">車両価格・税金・保険などの差は含みません。「差額 × 乗る年数」が買い替え費用に見合うかの目安にどうぞ。</p>';
     advBox.hidden = false;
+  }
+  document.getElementById("adv-ratio-run").addEventListener("click", runRatio);
+  document.getElementById("adv-cmp-run").addEventListener("click", runCmp);
+  function filled(id) { return document.getElementById(id).value !== ""; }
+  function autoRatio() {
+    if (filled("adv-actual") && filled("adv-catalog")) { runRatio(); } else { ratioBox.hidden = true; }
+  }
+  function autoCmp() {
+    if (filled("adv-car-a") && filled("adv-car-b") && filled("adv-annual") &&
+        (filled("adv-price2") || filled("price"))) {
+      runCmp();
+    } else {
+      advBox.hidden = true;
+    }
+  }
+  ["adv-actual", "adv-catalog"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoRatio);
+  });
+  ["adv-car-a", "adv-car-b", "adv-annual", "adv-price2"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoCmp);
+  });
+  document.getElementById("price").addEventListener("input", function () {
+    if (!advBox.hidden) autoCmp();
   });
 })();
 </script>
