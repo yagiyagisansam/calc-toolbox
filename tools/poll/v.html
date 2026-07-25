@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.supabase.co; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>アンケートに投票する | 計算ツールボックス</title>
+  <meta name="description" content="共有されたアンケートに投票して、みんなの回答のリアルタイム集計を見られるページです。登録不要・無料。">
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="アンケートに投票する | 計算ツールボックス">
+  <meta property="og:description" content="共有されたアンケートに投票して、みんなの回答のリアルタイム集計を見られるページです。登録不要・無料。">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <!-- @meta end -->
+  <style>
+    .tool-form[hidden] { display: none; }
+    .opt { display: flex; align-items: center; gap: 10px; border: 1.5px solid rgba(120,124,130,0.35); border-radius: 10px; padding: 12px 14px; margin: 8px 0; cursor: pointer; }
+    .opt input { width: auto; margin: 0; flex: 0 0 auto; }
+    .opt:has(input:checked) { border-color: var(--color-accent); background: rgba(11,110,79,0.06); }
+    .pr-row { margin: 12px 0; }
+    .pr-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 0.95rem; }
+    .pr-top .pr-label { word-break: break-word; }
+    .pr-top .pr-num { white-space: nowrap; color: rgba(120,124,130,0.95); font-size: 0.85rem; }
+    .pr-row.top .pr-label, .pr-row.top .pr-num { font-weight: 700; color: inherit; }
+    .pr-bar { height: 10px; border-radius: 6px; background: rgba(120,124,130,0.18); overflow: hidden; margin-top: 4px; }
+    .pr-fill { height: 100%; border-radius: 6px; background: var(--color-accent); }
+    .share-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .share-row a, .share-row button { display: inline-block; width: auto; padding: 8px 14px; border: 1.5px solid var(--color-accent); border-radius: 8px; color: var(--color-accent); background: none; text-decoration: none; font-size: 0.9rem; font-weight: 600; margin: 0; cursor: pointer; }
+    .sub-link { font-size: 0.9rem; }
+    #refresh-btn { width: auto; padding: 8px 14px; margin-top: 10px; background: none; color: var(--color-accent); border: 1.5px solid var(--color-accent); }
+  </style>
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../">🧮 計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search">🔍 ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1 id="q-title">アンケートを読み込んでいます…</h1>
+  <p id="status" hidden></p>
+  <form class="tool-form" id="vote-form" hidden>
+    <div id="opts"></div>
+    <button type="submit" id="vote-btn" disabled>投票する</button>
+    <p class="sub-link"><a href="#" id="peek-link">投票せずに結果だけ見る</a></p>
+  </form>
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  <div id="share-box" hidden>
+    <h2>このアンケートを広める</h2>
+    <div class="share-row" id="share-row"></div>
+  </div>
+  <p><a href="./">自分もアンケートを作ってみる(無料・登録不要)</a></p>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>このページの投票データ(選んだ選択肢)は、集計のため外部データベースに保存されます(個人を特定する情報は収集しません)。詳しくは<a href="../../privacy.html">プライバシーポリシー</a>をご覧ください。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./config.js"></script>
+<script src="./calc.js"></script>
+<script src="./net.js"></script>
+<script>
+(function () {
+  "use strict";
+  var qTitle = document.getElementById("q-title");
+  var statusEl = document.getElementById("status");
+  var form = document.getElementById("vote-form");
+  var optsEl = document.getElementById("opts");
+  var voteBtn = document.getElementById("vote-btn");
+  var resultEl = document.getElementById("result");
+  var VOTED_KEY = "pollVoted";
+  var VOTER_KEY = "pollVoter";
+
+  function store() {
+    try { return window.localStorage; } catch (e) { return null; }
+  }
+  function votedMap() {
+    var s = store();
+    if (!s) return {};
+    try { return JSON.parse(s.getItem(VOTED_KEY)) || {}; } catch (e) { return {}; }
+  }
+  function markVoted(id, choice) {
+    var s = store();
+    if (!s) return;
+    var m = votedMap();
+    m[id] = choice;
+    try { s.setItem(VOTED_KEY, JSON.stringify(m)); } catch (e) { /* 保存できない環境では諦める */ }
+  }
+  function voterId() {
+    var s = store();
+    var v = s && s.getItem(VOTER_KEY);
+    if (v) return v;
+    if (window.crypto && crypto.randomUUID) {
+      v = crypto.randomUUID();
+    } else {
+      var b = new Uint8Array(16);
+      crypto.getRandomValues(b);
+      v = [].map.call(b, function (x) { return ("0" + x.toString(16)).slice(-2); }).join("");
+    }
+    if (s) { try { s.setItem(VOTER_KEY, v); } catch (e) { /* 保存不可なら毎回変わる */ } }
+    return v;
+  }
+
+  function showStatus(msg) {
+    statusEl.textContent = msg;
+    statusEl.hidden = false;
+  }
+
+  function renderShare(question) {
+    var row = document.getElementById("share-row");
+    row.innerHTML = "";
+    var url = location.href;
+    var text = question + " | みんなに聞いてみた(投票はこちら)";
+    var copyBtn = document.createElement("button");
+    copyBtn.type = "button";
+    copyBtn.textContent = "リンクをコピー";
+    copyBtn.addEventListener("click", function () {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function () {
+          copyBtn.textContent = "コピー済み";
+          setTimeout(function () { copyBtn.textContent = "リンクをコピー"; }, 1500);
+        });
+      }
+    });
+    row.appendChild(copyBtn);
+    [
+      ["Xでシェア", "https://twitter.com/intent/tweet?text=" + encodeURIComponent(text) + "&url=" + encodeURIComponent(url)],
+      ["LINEで送る", "https://line.me/R/share?text=" + encodeURIComponent(text + " " + url)],
+      ["Facebookでシェア", "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(url)]
+    ].forEach(function (it) {
+      var a = document.createElement("a");
+      a.href = it[1];
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.textContent = it[0];
+      row.appendChild(a);
+    });
+    document.getElementById("share-box").hidden = false;
+  }
+
+  function renderResults(poll, note) {
+    var counts = (poll.counts || []).map(Number);
+    var r = PollCalc.results(poll.options, counts);
+    resultEl.innerHTML = "";
+    form.hidden = true;
+    if (!r.ok) { showStatus("集計結果を表示できませんでした。"); return; }
+
+    var main = document.createElement("div");
+    main.className = "result-main";
+    main.textContent = "合計 " + r.total + " 票";
+    resultEl.appendChild(main);
+    if (note) {
+      var p = document.createElement("p");
+      p.textContent = note;
+      resultEl.appendChild(p);
+    }
+    r.rows.forEach(function (row, i) {
+      var div = document.createElement("div");
+      div.className = "pr-row" + (r.top.indexOf(i) !== -1 ? " top" : "");
+      var top = document.createElement("div");
+      top.className = "pr-top";
+      var label = document.createElement("span");
+      label.className = "pr-label";
+      label.textContent = row.label;
+      var num = document.createElement("span");
+      num.className = "pr-num";
+      num.textContent = row.pct + "%(" + row.count + "票)";
+      top.appendChild(label);
+      top.appendChild(num);
+      var bar = document.createElement("div");
+      bar.className = "pr-bar";
+      var fill = document.createElement("div");
+      fill.className = "pr-fill";
+      fill.style.width = row.pct + "%";
+      bar.appendChild(fill);
+      div.appendChild(top);
+      div.appendChild(bar);
+      resultEl.appendChild(div);
+    });
+
+    var refresh = document.createElement("button");
+    refresh.type = "button";
+    refresh.id = "refresh-btn";
+    refresh.textContent = "最新の結果に更新";
+    refresh.addEventListener("click", function () { load(true); });
+    resultEl.appendChild(refresh);
+    resultEl.hidden = false;
+  }
+
+  function renderVoteForm(poll, id) {
+    optsEl.innerHTML = "";
+    poll.options.forEach(function (opt, i) {
+      var label = document.createElement("label");
+      label.className = "opt";
+      var input = document.createElement("input");
+      input.type = "radio";
+      input.name = "choice";
+      input.value = String(i);
+      input.addEventListener("change", function () { voteBtn.disabled = false; });
+      var span = document.createElement("span");
+      span.textContent = opt;
+      label.appendChild(input);
+      label.appendChild(span);
+      optsEl.appendChild(label);
+    });
+    form.hidden = false;
+
+    form.onsubmit = function (e) {
+      e.preventDefault();
+      var sel = optsEl.querySelector("input:checked");
+      if (!sel) return;
+      var choice = parseInt(sel.value, 10);
+      voteBtn.disabled = true;
+      voteBtn.textContent = "送信中…";
+      PollNet.vote(id, voterId(), choice).then(function (r) {
+        if (r.ok || r.code === "already_voted") {
+          markVoted(id, choice);
+          statusEl.hidden = true;
+          load(true, r.ok ? "投票を受け付けました。" : "この端末からはすでに投票済みです。");
+        } else {
+          voteBtn.disabled = false;
+          voteBtn.textContent = "投票する";
+          showStatus(r.code === "network"
+            ? "通信に失敗しました。電波の良い場所でもう一度お試しください。"
+            : "投票を受け付けられませんでした。もう一度お試しください。");
+        }
+      });
+    };
+    document.getElementById("peek-link").onclick = function (e) {
+      e.preventDefault();
+      load(true, "投票せずに現在の結果を表示しています(このページを開き直すと投票できます)。");
+    };
+  }
+
+  var pollId = new URLSearchParams(location.search).get("id") || "";
+
+  function load(resultsOnly, note) {
+    PollNet.getResults(pollId).then(function (r) {
+      if (!r.ok) {
+        qTitle.textContent = "アンケートを表示できません";
+        showStatus(r.code === "not_found"
+          ? "このアンケートは見つかりませんでした。削除されたか、URLが間違っている可能性があります。"
+          : r.code === "network"
+            ? "通信に失敗しました。電波の良い場所で再読み込みしてください。"
+            : "読み込みに失敗しました。時間をおいて再読み込みしてください。");
+        return;
+      }
+      var poll = r.poll;
+      qTitle.textContent = poll.question;
+      document.title = poll.question + " | アンケートに投票する";
+      renderShare(poll.question);
+      var voted = votedMap()[pollId] !== undefined;
+      if (resultsOnly || voted) {
+        renderResults(poll, note || (voted ? "この端末からは投票済みです。" : ""));
+      } else {
+        renderVoteForm(poll, pollId);
+      }
+    });
+  }
+
+  if (!PollNet.ready()) {
+    qTitle.textContent = "アンケート機能は準備中です";
+    showStatus("このページはまだ利用できません。もうしばらくお待ちください。");
+  } else if (!PollCalc.isValidId(pollId)) {
+    qTitle.textContent = "アンケートを表示できません";
+    showStatus("URLが正しくありません。共有されたリンクをそのまま開いてください。");
+  } else {
+    load(false);
+  }
+})();
+</script>
+</body>
+</html>
