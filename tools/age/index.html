@@ -46,7 +46,7 @@
   </form>
 
   <details class="adv-box">
-    <summary><span class="plus">＋</span>詳細機能: 基準日を変えて計算・節目の年齢一覧</summary>
+    <summary><span class="plus">＋</span>詳細機能: 基準日を変えて計算・次の誕生日・節目の年齢一覧</summary>
     <div class="adv-inner">
       <h3 class="adv-h">基準日を変えて計算(その日時点の年齢)</h3>
       <p class="adv-note">「入社日時点」など、指定した日での満年齢を計算します(誕生日は上で選んだ日付を使います)。</p>
@@ -63,6 +63,10 @@
       </div>
       <div class="tool-result" id="adv-asof-result" hidden aria-live="polite"></div>
 
+      <h3 class="adv-h">次の誕生日と生まれてからの日数</h3>
+      <p class="adv-note">上で選んだ生年月日をもとに、次の誕生日までの日数と生まれてからの通算日数を表示します。</p>
+      <div class="tool-result" id="adv-nb-result" hidden aria-live="polite"></div>
+
       <h3 class="adv-h">節目の年齢を迎える日の一覧</h3>
       <p class="adv-note">成年(18歳)・還暦(60歳)・米寿(88歳)など、節目の年齢になる日付の一覧です。</p>
       <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
@@ -78,8 +82,8 @@
   <h2>使い方</h2>
   <ol class="steps">
     <li>上の3つのボックスで生年月日を選びます(最初は今日の日付が入っています)。</li>
-    <li>選んだ瞬間に、満年齢・干支・早生まれ判定・次の誕生日までの日数が表示されます。ボタンは不要です。</li>
-    <li>「入社日時点で何歳か」などは、詳細機能の基準日を変えると計算できます。</li>
+    <li>選んだ瞬間に、満年齢・干支・早生まれ判定が表示されます。ボタンは不要です。</li>
+    <li>「入社日時点で何歳か」や次の誕生日までの日数は、「＋詳細機能」で調べられます。</li>
   </ol>
 
   <h2>計算方法と根拠</h2>
@@ -162,6 +166,7 @@
 
   var box = document.getElementById("result");
   var asofBox = document.getElementById("adv-asof-result");
+  var nbBox = document.getElementById("adv-nb-result");
   var advBox = document.getElementById("adv-result");
 
   fillSelect(document.getElementById("birth-year"), 1868, today.getFullYear(), "年", today.getFullYear());
@@ -184,21 +189,31 @@
       box.innerHTML = '<p class="result-error">' +
         (r.code === "birth_after_asof" ? "生年月日が今日より後になっています。" : "生年月日を確認してください。") + "</p>";
     } else {
-      var nb = AgeCalc.nextBirthday(b, todayIso);
       box.innerHTML =
         '<div class="result-main">今日時点で 満 ' + r.age + " 歳</div>" +
         '<div class="table-scroll"><table class="data-table"><tbody>' +
         "<tr><td>干支</td><td><strong>" + r.eto + "</strong>年生まれ</td></tr>" +
         "<tr><td>早生まれ</td><td>" + (r.hayaumare ? "<strong>早生まれ</strong>(1月1日〜4月1日生まれ)" : "早生まれではありません") + "</td></tr>" +
-        (nb.ok ? "<tr><td>次の誕生日</td><td>" +
-          (nb.daysLeft === 0 ? "今日が誕生日です(満" + nb.turning + "歳)"
-            : jpDate(nb.date) + "(あと" + nb.daysLeft.toLocaleString() + "日で" + nb.turning + "歳)") + "</td></tr>" +
-          "<tr><td>生まれてから</td><td>通算 " + nb.daysOld.toLocaleString() + " 日</td></tr>" : "") +
         "</tbody></table></div>";
     }
     box.hidden = false;
     runAsof();
+    runNextBirthday();
     runMilestones();
+  }
+
+  // ---- 詳細機能: 次の誕生日・生まれてからの日数(即時) ----
+  function runNextBirthday() {
+    var nb = AgeCalc.nextBirthday(birthIso(), todayIso);
+    if (!nb.ok) { nbBox.hidden = true; return; }
+    nbBox.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>次の誕生日</td><td>" +
+      (nb.daysLeft === 0 ? "今日が誕生日です(満" + nb.turning + "歳)"
+        : jpDate(nb.date) + "(あと" + nb.daysLeft.toLocaleString() + "日で" + nb.turning + "歳)") + "</td></tr>" +
+      "<tr><td>生まれてから</td><td>通算 " + nb.daysOld.toLocaleString() + " 日</td></tr>" +
+      "</tbody></table></div>";
+    nbBox.hidden = false;
   }
 
   // ---- 詳細機能: 基準日時点の満年齢(即時) ----

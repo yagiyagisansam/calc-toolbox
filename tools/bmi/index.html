@@ -158,7 +158,7 @@
       box.innerHTML =
         '<div class="result-main">BMI ' + result.bmi.toFixed(1) + "(" + result.category + ")</div>" +
         "<p>あなたの適正体重(BMI22基準)は約 <strong>" + result.idealWeightKg.toFixed(1) + " kg</strong> です。</p>" +
-        '<p>同じ身長・体重で続けて計算: <a href="../bmr/">基礎代謝量</a> / <a href="../tdee/">1日の摂取カロリー目安</a></p>';
+        '<p><small>続けて計算: <a href="../bmr/">基礎代謝量</a> / <a href="../tdee/">1日の摂取カロリー目安</a></small></p>';
     } else {
       box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
     }
