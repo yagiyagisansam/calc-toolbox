@@ -621,6 +621,140 @@
     "ok": false,
     "code": "invalid_counts"
    }
+  },
+  {
+   "name": "集計(複数選択): 回答者4人で3票と2票 → 75%と50%",
+   "func": "results",
+   "args": [
+    [
+     "A",
+     "B"
+    ],
+    [
+     3,
+     2
+    ],
+    4
+   ],
+   "expect": {
+    "ok": true,
+    "total": 4,
+    "rows": [
+     {
+      "count": 3,
+      "pct": 75
+     },
+     {
+      "count": 2,
+      "pct": 50
+     }
+    ],
+    "top": [
+     0
+    ]
+   }
+  },
+  {
+   "name": "集計(複数選択): 回答者数が最大票数より少ないのはエラー",
+   "func": "results",
+   "args": [
+    [
+     "A",
+     "B"
+    ],
+    [
+     3,
+     2
+    ],
+    2
+   ],
+   "expect": {
+    "ok": false,
+    "code": "invalid_counts"
+   }
+  },
+  {
+   "name": "集計(複数選択): 回答者0人は割合0%",
+   "func": "results",
+   "args": [
+    [
+     "A",
+     "B"
+    ],
+    [
+     0,
+     0
+    ],
+    0
+   ],
+   "expect": {
+    "ok": true,
+    "total": 0,
+    "rows": [
+     {
+      "pct": 0
+     },
+     {
+      "pct": 0
+     }
+    ]
+   }
+  },
+  {
+   "name": "CSV: 基本形(質問・回答者数・選択肢の行)",
+   "func": "toCsv",
+   "args": [
+    "どっち派?",
+    [
+     "A",
+     "B"
+    ],
+    [
+     3,
+     1
+    ]
+   ],
+   "expect": {
+    "ok": true,
+    "csv": "質問,どっち派?\n回答者数,4\n選択肢,票数,割合(%)\nA,3,75\nB,1,25\n"
+   }
+  },
+  {
+   "name": "CSV: カンマや引用符を含む選択肢は引用符で囲む",
+   "func": "toCsv",
+   "args": [
+    "Q",
+    [
+     "A,1",
+     "B\"x\""
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   "expect": {
+    "ok": true,
+    "csv": "質問,Q\n回答者数,2\n選択肢,票数,割合(%)\n\"A,1\",1,50\n\"B\"\"x\"\"\",1,50\n"
+   }
+  },
+  {
+   "name": "CSV: 不正な票数はエラー",
+   "func": "toCsv",
+   "args": [
+    "Q",
+    [
+     "A",
+     "B"
+    ],
+    [
+     1
+    ]
+   ],
+   "expect": {
+    "ok": false,
+    "code": "invalid_counts"
+   }
   }
  ]
 }

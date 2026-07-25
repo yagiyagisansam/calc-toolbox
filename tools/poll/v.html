@@ -31,9 +31,10 @@
 <main>
   <div class="pb-card" id="main-card">
     <h1 class="pb-q" id="q-title">アンケートを読み込んでいます…</h1>
+    <p class="pb-deadline" id="deadline" hidden></p>
     <p class="pb-status" id="status" hidden></p>
     <form id="vote-form" hidden>
-      <p class="pb-meta">1人1回・タップして投票</p>
+      <p class="pb-meta" id="vote-note">1人1回・タップして投票</p>
       <div class="pb-opts" id="opts"></div>
       <button type="submit" class="pb-btn" id="vote-btn" disabled>この選択で投票する</button>
       <p class="pb-center" style="margin-top:12px"><a class="pb-sub-link" href="#" id="peek-link">投票せずに結果だけ見る</a></p>
@@ -44,6 +45,8 @@
   <div id="share-box" hidden>
     <div class="pb-sec"><b>このアンケートを広める</b></div>
     <div class="pb-share" id="share-row"></div>
+    <button type="button" class="pb-btn-sub" id="qr-btn">＋ QRコードを表示(印刷・掲示用)</button>
+    <div class="pb-qr" id="qr-box" hidden></div>
   </div>
 
   <p class="pb-center" style="margin-top:20px"><a class="pb-link" href="./new.html">自分もアンケートを作ってみる(無料・登録不要)</a></p>
@@ -63,6 +66,7 @@
 <script src="./config.js"></script>
 <script src="./calc.js"></script>
 <script src="./net.js"></script>
+<script src="./qr.js"></script>
 <script>
 (function () {
   "use strict";
@@ -108,6 +112,23 @@
   function showStatus(msg) {
     statusEl.textContent = msg;
     statusEl.hidden = false;
+  }
+
+  // 締切の表示(締切なしなら非表示)
+  function renderDeadline(poll) {
+    var el = document.getElementById("deadline");
+    if (!poll.closes_at) { el.hidden = true; return; }
+    var d = new Date(poll.closes_at);
+    var txt = (d.getMonth() + 1) + "/" + d.getDate() + " " +
+      d.getHours() + ":" + ("0" + d.getMinutes()).slice(-2);
+    if (poll.closed) {
+      el.textContent = "このアンケートは締め切られました(" + txt + ")";
+      el.classList.add("closed");
+    } else {
+      el.textContent = "締切: " + txt + " まで";
+      el.classList.remove("closed");
+    }
+    el.hidden = false;
   }
 
   function renderShare(question) {
@@ -281,7 +302,8 @@
 
   function renderResults(poll, note) {
     var counts = (poll.counts || []).map(Number);
-    var r = PollCalc.results(poll.options, counts);
+    var voters = typeof poll.total === "number" ? poll.total : undefined;
+    var r = PollCalc.results(poll.options, counts, poll.multi ? voters : undefined);
     resultEl.innerHTML = "";
     form.hidden = true;
     if (!r.ok) { showStatus("集計結果を表示できませんでした。"); return; }
@@ -309,30 +331,40 @@
       resultEl.appendChild(p);
     }
 
-    // 表示切替(棒グラフ/円グラフ)
-    var seg = document.createElement("div");
-    seg.className = "pb-seg";
-    seg.setAttribute("role", "tablist");
     var body = document.createElement("div");
-    function renderBody() {
-      body.innerHTML = "";
-      body.appendChild(getView() === "donut" ? renderDonut(r, order, counts) : renderBars(r, order));
-    }
-    [["bar", "棒グラフ"], ["donut", "円グラフ"]].forEach(function (v) {
-      var btn = document.createElement("button");
-      btn.type = "button";
-      btn.textContent = v[1];
-      btn.className = getView() === v[0] ? "on" : "";
-      btn.addEventListener("click", function () {
-        setView(v[0]);
-        [].forEach.call(seg.children, function (el, i) { el.classList.toggle("on", ["bar", "donut"][i] === v[0]); });
-        renderBody();
+    if (poll.multi) {
+      // 複数選択: 割合の分母が回答者数のため合計100%にならない。円グラフは誤解を招くので棒のみ
+      var mnote = document.createElement("p");
+      mnote.className = "pb-meta";
+      mnote.textContent = "複数選択のアンケートです。割合は回答者" + r.total.toLocaleString() + "人に対する割合のため、合計は100%になりません。";
+      resultEl.appendChild(mnote);
+      resultEl.appendChild(body);
+      body.appendChild(renderBars(r, order));
+    } else {
+      // 表示切替(棒グラフ/円グラフ)
+      var seg = document.createElement("div");
+      seg.className = "pb-seg";
+      seg.setAttribute("role", "tablist");
+      function renderBody() {
+        body.innerHTML = "";
+        body.appendChild(getView() === "donut" ? renderDonut(r, order, counts) : renderBars(r, order));
+      }
+      [["bar", "棒グラフ"], ["donut", "円グラフ"]].forEach(function (v) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = v[1];
+        btn.className = getView() === v[0] ? "on" : "";
+        btn.addEventListener("click", function () {
+          setView(v[0]);
+          [].forEach.call(seg.children, function (el, i) { el.classList.toggle("on", ["bar", "donut"][i] === v[0]); });
+          renderBody();
+        });
+        seg.appendChild(btn);
       });
-      seg.appendChild(btn);
-    });
-    resultEl.appendChild(seg);
-    resultEl.appendChild(body);
-    renderBody();
+      resultEl.appendChild(seg);
+      resultEl.appendChild(body);
+      renderBody();
+    }
 
     var refresh = document.createElement("button");
     refresh.type = "button";
@@ -340,46 +372,203 @@
     refresh.textContent = "最新の結果に更新";
     refresh.addEventListener("click", function () { load(true); });
     resultEl.appendChild(refresh);
+
+    // ＋書き出し(CSV・結果画像)
+    var exp = document.createElement("details");
+    exp.className = "pb-adv";
+    var sum = document.createElement("summary");
+    var plus = document.createElement("span");
+    plus.className = "plus";
+    plus.textContent = "＋";
+    sum.appendChild(plus);
+    sum.appendChild(document.createTextNode("書き出し(CSV・結果画像)"));
+    exp.appendChild(sum);
+    var inner = document.createElement("div");
+    inner.className = "pb-adv-inner";
+    var stamp = new Date();
+    var ymd = String(stamp.getFullYear()) + ("0" + (stamp.getMonth() + 1)).slice(-2) + ("0" + stamp.getDate()).slice(-2);
+
+    var csvBtn = document.createElement("button");
+    csvBtn.type = "button";
+    csvBtn.className = "pb-btn-sub";
+    csvBtn.style.marginTop = "0";
+    csvBtn.textContent = "CSVをダウンロード(Excel等で分析)";
+    csvBtn.addEventListener("click", function () {
+      var c = PollCalc.toCsv(poll.question, poll.options, counts, poll.multi ? voters : undefined);
+      if (!c.ok) return;
+      var a = document.createElement("a");
+      a.href = "data:text/csv;charset=utf-8," + encodeURIComponent("\uFEFF" + c.csv);
+      a.download = "anketo_" + ymd + ".csv";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+    inner.appendChild(csvBtn);
+
+    var imgBtn = document.createElement("button");
+    imgBtn.type = "button";
+    imgBtn.className = "pb-btn-sub";
+    imgBtn.style.marginTop = "0";
+    imgBtn.textContent = "結果を画像で保存(SNS投稿・スライド用)";
+    imgBtn.addEventListener("click", function () {
+      var dataUrl = drawResultImage(poll, r, order);
+      var a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = "anketo_" + ymd + ".png";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+    inner.appendChild(imgBtn);
+    exp.appendChild(inner);
+    resultEl.appendChild(exp);
     resultEl.hidden = false;
+  }
+
+  // 結果画像(PNG)を描画して data URL を返す
+  function drawResultImage(poll, r, order) {
+    var COLORS = ["#2f6fed", "#ef5da8", "#eda12f", "#23a55a", "#8b5cf6", "#0ea5b7", "#d94f2f", "#6b7280", "#a16207", "#475569"];
+    var W = 1080;
+    var PAD = 64;
+    var canvas = document.createElement("canvas");
+    var ctx = canvas.getContext("2d");
+    var FONT = '"Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif';
+
+    // 質問文の折り返し(実測で分割)
+    ctx.font = "bold 46px " + FONT;
+    var lines = [];
+    var cur = "";
+    for (var i = 0; i < poll.question.length; i++) {
+      var next = cur + poll.question.charAt(i);
+      if (ctx.measureText(next).width > W - PAD * 2 && cur !== "") {
+        lines.push(cur);
+        cur = poll.question.charAt(i);
+      } else {
+        cur = next;
+      }
+    }
+    if (cur) lines.push(cur);
+    if (lines.length > 3) { lines = lines.slice(0, 3); lines[2] = lines[2].slice(0, -1) + "…"; }
+
+    var rowH = 118;
+    var H = PAD + lines.length * 62 + 84 + order.length * rowH + 96;
+    canvas.width = W;
+    canvas.height = H;
+    ctx = canvas.getContext("2d");
+    if (!ctx.roundRect) { ctx.roundRect = function (x, yy, w, h) { this.rect(x, yy, w, h); }; }
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, W, H);
+
+    var y = PAD + 46;
+    ctx.fillStyle = "#1c1e22";
+    ctx.font = "bold 46px " + FONT;
+    lines.forEach(function (ln) { ctx.fillText(ln, PAD, y); y += 62; });
+
+    ctx.font = "bold 40px " + FONT;
+    ctx.fillStyle = "#1c1e22";
+    var totalText = r.total.toLocaleString() + "票";
+    ctx.fillText(totalText, PAD, y + 24);
+    if (poll.multi) {
+      ctx.font = "26px " + FONT;
+      ctx.fillStyle = "#8a8f96";
+      ctx.fillText("(複数選択・割合は回答者に対する割合)", PAD + ctx.measureText(totalText).width + 80, y + 24);
+    }
+    y += 84;
+
+    order.forEach(function (origIndex, pos) {
+      var row = r.rows[origIndex];
+      ctx.font = (pos === 0 ? "bold " : "") + "30px " + FONT;
+      ctx.fillStyle = "#1c1e22";
+      var name = (pos + 1) + ". " + row.label;
+      if (ctx.measureText(name).width > W - PAD * 2 - 260) {
+        while (name.length > 1 && ctx.measureText(name + "…").width > W - PAD * 2 - 260) name = name.slice(0, -1);
+        name += "…";
+      }
+      ctx.fillText(name, PAD, y + 30);
+      var pctText = row.pct + "%(" + row.count.toLocaleString() + "票)";
+      ctx.font = (pos === 0 ? "bold " : "") + "28px " + FONT;
+      ctx.fillStyle = pos === 0 ? "#1c1e22" : "#8a8f96";
+      ctx.fillText(pctText, W - PAD - ctx.measureText(pctText).width, y + 30);
+      // 棒
+      var barY = y + 48;
+      var barW = W - PAD * 2;
+      ctx.fillStyle = "#eef0f3";
+      ctx.beginPath();
+      ctx.roundRect(PAD, barY, barW, 26, 13);
+      ctx.fill();
+      if (row.pct > 0) {
+        ctx.fillStyle = COLORS[origIndex % 10];
+        ctx.beginPath();
+        ctx.roundRect(PAD, barY, Math.max(26, barW * Math.min(row.pct, 100) / 100), 26, 13);
+        ctx.fill();
+      }
+      y += rowH;
+    });
+
+    ctx.font = "26px " + FONT;
+    ctx.fillStyle = "#8a8f96";
+    ctx.fillText("みんなの投票 | " + location.origin + location.pathname + "?id=" + poll.id, PAD, H - 44);
+    return canvas.toDataURL("image/png");
   }
 
   function renderVoteForm(poll, id) {
     optsEl.innerHTML = "";
-    poll.options.forEach(function (opt, i) {
+    // シャッフル表示(順序バイアス対策)。送信する番号は元の並びのまま
+    var order = poll.options.map(function (_, i) { return i; });
+    if (poll.shuffle) {
+      for (var s = order.length - 1; s > 0; s--) {
+        var t = Math.floor(Math.random() * (s + 1));
+        var tmp = order[s]; order[s] = order[t]; order[t] = tmp;
+      }
+    }
+    document.getElementById("vote-note").textContent = poll.multi
+      ? "1人1回・あてはまるものを全部選んで投票"
+      : "1人1回・タップして投票";
+    order.forEach(function (origIndex) {
       var label = document.createElement("label");
       label.className = "pb-opt";
       var input = document.createElement("input");
-      input.type = "radio";
+      input.type = poll.multi ? "checkbox" : "radio";
       input.name = "choice";
-      input.value = String(i);
+      input.value = String(origIndex);
       input.addEventListener("change", function () {
-        voteBtn.disabled = false;
-        [].forEach.call(optsEl.children, function (el) { el.classList.remove("sel"); });
-        label.classList.add("sel");
+        if (!poll.multi) {
+          [].forEach.call(optsEl.children, function (el) { el.classList.remove("sel"); });
+        }
+        label.classList.toggle("sel", input.checked);
+        voteBtn.disabled = optsEl.querySelectorAll("input:checked").length === 0;
       });
       var rd = document.createElement("span");
       rd.className = "rd";
       var span = document.createElement("span");
-      span.textContent = opt;
+      span.textContent = poll.options[origIndex];
       label.appendChild(input);
       label.appendChild(rd);
       label.appendChild(span);
       optsEl.appendChild(label);
     });
+    voteBtn.disabled = true;
+    voteBtn.textContent = "この選択で投票する";
+    // 「結果非表示」のアンケートでは投票前に結果を覗けない
+    document.getElementById("peek-link").parentElement.hidden = !!poll.hidden;
     form.hidden = false;
 
     form.onsubmit = function (e) {
       e.preventDefault();
-      var sel = optsEl.querySelector("input:checked");
-      if (!sel) return;
-      var choice = parseInt(sel.value, 10);
+      var choices = [].map.call(optsEl.querySelectorAll("input:checked"), function (el) {
+        return parseInt(el.value, 10);
+      });
+      if (choices.length === 0) return;
       voteBtn.disabled = true;
       voteBtn.textContent = "送信中…";
-      PollNet.vote(id, voterId(), choice).then(function (r) {
+      PollNet.vote(id, voterId(), choices).then(function (r) {
         if (r.ok || r.code === "already_voted") {
-          markVoted(id, choice);
+          markVoted(id, choices);
           statusEl.hidden = true;
           load(true, r.ok ? "投票を受け付けました。" : "この端末からはすでに投票済みです。");
+        } else if (r.code === "closed") {
+          statusEl.hidden = true;
+          load(true, "締め切られたため、この投票は受け付けられませんでした。");
         } else {
           voteBtn.disabled = false;
           voteBtn.textContent = "この選択で投票する";
@@ -398,7 +587,7 @@
   var pollId = new URLSearchParams(location.search).get("id") || "";
 
   function load(resultsOnly, note) {
-    PollNet.getResults(pollId).then(function (r) {
+    PollNet.getResults(pollId, voterId()).then(function (r) {
       if (!r.ok) {
         qTitle.textContent = "アンケートを表示できません";
         showStatus(r.code === "not_found"
@@ -411,9 +600,21 @@
       var poll = r.poll;
       qTitle.textContent = poll.question;
       document.title = poll.question + " | みんなの投票";
+      renderDeadline(poll);
       renderShare(poll.question);
       document.getElementById("report-btn").hidden = false;
       var voted = votedMap()[pollId] !== undefined;
+      if (poll.closed) {
+        // 締切済み: 投票不可・最終結果のみ
+        renderResults(poll, note || "締め切り済みのアンケートです。最終結果を表示しています。");
+        return;
+      }
+      if (poll.hidden) {
+        // 結果非表示: サーバー側が「この端末は未投票」と判定。投票フォームのみ表示
+        renderVoteForm(poll, pollId);
+        showStatus("このアンケートの結果は、投票すると表示されます。");
+        return;
+      }
       if (resultsOnly || voted) {
         renderResults(poll, note || (voted ? "この端末からは投票済みです。" : ""));
       } else {
@@ -421,6 +622,24 @@
       }
     });
   }
+
+  // QRコード表示(印刷・掲示用)
+  document.getElementById("qr-btn").addEventListener("click", function () {
+    var box = document.getElementById("qr-box");
+    if (!box.hidden) { box.hidden = true; return; }
+    box.innerHTML = "";
+    var qr = qrcode(0, "M");
+    qr.addData(location.origin + location.pathname + "?id=" + pollId);
+    qr.make();
+    var img = document.createElement("img");
+    img.src = qr.createDataURL(6, 0);
+    img.alt = "このアンケートのQRコード";
+    box.appendChild(img);
+    var p = document.createElement("p");
+    p.textContent = "画像を長押しで保存できます。ポスターや黒板・スライドの掲示に。";
+    box.appendChild(p);
+    box.hidden = false;
+  });
 
   document.getElementById("report-btn").addEventListener("click", function () {
     var btn = this;

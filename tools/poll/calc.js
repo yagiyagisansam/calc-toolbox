@@ -42,33 +42,71 @@
    * 選択肢ごとの票数から集計結果を計算する。
    * @param {string[]} options 選択肢
    * @param {number[]} counts 選択肢ごとの票数(optionsと同じ長さ・0以上の整数)
+   * @param {number} [voters] 回答者数。複数選択のとき指定する(割合の分母になる)。
+   *                          省略時は票数の合計を分母にする(単一選択)。
    * @returns {{ok:true, total:number, rows:{label:string,count:number,pct:number}[], top:number[]}|{ok:false, code:string}}
    */
-  function results(options, counts) {
+  function results(options, counts, voters) {
     if (!Array.isArray(options) || !Array.isArray(counts) || options.length !== counts.length ||
         options.length < MIN_OPTIONS || options.length > MAX_OPTIONS) {
       return { ok: false, code: "invalid_counts" };
     }
-    var total = 0;
+    var sum = 0;
+    var max = 0;
     for (var i = 0; i < counts.length; i++) {
       var c = counts[i];
       if (typeof c !== "number" || !isFinite(c) || c < 0 || Math.floor(c) !== c) {
         return { ok: false, code: "invalid_counts" };
       }
-      total += c;
+      sum += c;
+      if (c > max) max = c;
     }
-    var max = 0;
+    var total;
+    if (voters === undefined || voters === null) {
+      total = sum;
+    } else {
+      if (typeof voters !== "number" || !isFinite(voters) || voters < 0 || Math.floor(voters) !== voters || voters < max) {
+        return { ok: false, code: "invalid_counts" };
+      }
+      total = voters;
+    }
     var rows = [];
     for (var j = 0; j < counts.length; j++) {
       var pct = total === 0 ? 0 : Math.round((counts[j] / total) * 1000) / 10;
       rows.push({ label: options[j], count: counts[j], pct: pct });
-      if (counts[j] > max) max = counts[j];
     }
     var top = [];
-    if (total > 0) {
+    if (sum > 0) {
       for (var k = 0; k < counts.length; k++) if (counts[k] === max) top.push(k);
     }
     return { ok: true, total: total, rows: rows, top: top };
+  }
+
+  /**
+   * 集計結果をCSV文字列にする(カンマ・引用符・改行を含むセルは引用符で囲む)。
+   * @param {string} question 質問
+   * @param {string[]} options 選択肢
+   * @param {number[]} counts 票数
+   * @param {number} [voters] 回答者数(複数選択のとき)
+   * @returns {{ok:true, csv:string}|{ok:false, code:string}}
+   */
+  function toCsv(question, options, counts, voters) {
+    var r = results(options, counts, voters);
+    if (!r.ok) return r;
+    if (typeof question !== "string") return { ok: false, code: "invalid_question" };
+    function esc(v) {
+      var s = String(v);
+      if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+      return s;
+    }
+    var lines = [];
+    lines.push("質問," + esc(question));
+    lines.push("回答者数," + r.total);
+    lines.push("選択肢,票数,割合(%)");
+    for (var i = 0; i < r.rows.length; i++) {
+      lines.push(esc(r.rows[i].label) + "," + r.rows[i].count + "," + r.rows[i].pct);
+    }
+    return { ok: true, csv: lines.join("\n") + "\n" };
   }
 
   /**
@@ -138,7 +176,7 @@
     return typeof s === "string" && /^[a-z0-9]{10}$/.test(s);
   }
 
-  var api = { validatePoll: validatePoll, results: results, displayOrder: displayOrder, arcs: arcs, makeId: makeId, isValidId: isValidId, MAX_OPTIONS: MAX_OPTIONS };
+  var api = { validatePoll: validatePoll, results: results, toCsv: toCsv, displayOrder: displayOrder, arcs: arcs, makeId: makeId, isValidId: isValidId, MAX_OPTIONS: MAX_OPTIONS };
   if (typeof module !== "undefined" && module.exports) { module.exports = api; }
   else { global.PollCalc = api; }
 })(typeof window !== "undefined" ? window : globalThis);

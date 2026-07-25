@@ -44,6 +44,33 @@
         <input type="checkbox" id="is-public" checked>
         <span>みんなのアンケート一覧に載せる<small>オフにすると、リンクを知っている人だけが開ける非公開アンケートになります。</small></span>
       </label>
+      <details class="pb-adv">
+        <summary><span class="plus">＋</span>詳細設定(複数選択・締切・結果の見せ方)</summary>
+        <div class="pb-adv-inner">
+          <label class="pb-toggle">
+            <input type="checkbox" id="opt-multi">
+            <span>複数選択を許可<small>「あてはまるもの全部」を選べるようになります(日程調整・持ち寄り決めなどに)。</small></span>
+          </label>
+          <label>投票の締切<span class="pb-note">締切後は投票できず、結果のみ表示されます</span>
+            <select id="opt-deadline">
+              <option value="" selected>なし(無期限)</option>
+              <option value="1">1時間後</option>
+              <option value="6">6時間後</option>
+              <option value="24">24時間後</option>
+              <option value="72">3日後</option>
+              <option value="168">7日後</option>
+            </select>
+          </label>
+          <label class="pb-toggle">
+            <input type="checkbox" id="opt-hide">
+            <span>投票するまで結果を見せない<small>先に結果が見えて回答が偏るのを防ぎます(締切後は誰でも見られます)。授業・社内調査に。</small></span>
+          </label>
+          <label class="pb-toggle">
+            <input type="checkbox" id="opt-shuffle">
+            <span>選択肢をシャッフル表示<small>表示順による有利・不利(順序バイアス)を減らします。</small></span>
+          </label>
+        </div>
+      </details>
       <button type="submit" class="pb-btn" id="create-btn">投票ページを作成する</button>
       <p class="pb-error" id="form-error" hidden></p>
     </form>
@@ -57,6 +84,8 @@
       <button type="button" id="copy-btn">コピー</button>
     </div>
     <div class="pb-share" id="share-row"></div>
+    <button type="button" class="pb-btn-sub" id="qr-btn">＋ QRコードを表示(印刷・掲示用)</button>
+    <div class="pb-qr" id="qr-box" hidden></div>
     <p class="pb-center" style="margin-top:16px"><a class="pb-link" id="open-link" href="#">投票ページを開く(結果もここで見られます)</a></p>
   </div>
 
@@ -76,6 +105,7 @@
 <script src="./config.js"></script>
 <script src="./calc.js"></script>
 <script src="./net.js"></script>
+<script src="./qr.js"></script>
 <script>
 (function () {
   "use strict";
@@ -140,6 +170,8 @@
 
   function showCreated(id, question) {
     var url = voteUrl(id);
+    document.getElementById("qr-box").hidden = true;
+    document.getElementById("qr-box").innerHTML = "";
     document.getElementById("done-url").value = url;
     document.getElementById("open-link").href = "./v.html?id=" + id;
     var row = document.getElementById("share-row");
@@ -178,6 +210,26 @@
     document.getElementById("setup-note").hidden = false;
   }
 
+  // QRコード表示(印刷・掲示用)
+  document.getElementById("qr-btn").addEventListener("click", function () {
+    var box = document.getElementById("qr-box");
+    if (!box.hidden) { box.hidden = true; return; }
+    var url = document.getElementById("done-url").value;
+    if (!url) return;
+    box.innerHTML = "";
+    var qr = qrcode(0, "M");
+    qr.addData(url);
+    qr.make();
+    var img = document.createElement("img");
+    img.src = qr.createDataURL(6, 0);
+    img.alt = "投票ページのQRコード";
+    box.appendChild(img);
+    var p = document.createElement("p");
+    p.textContent = "画像を長押しで保存できます。ポスターや黒板・スライドの掲示に。";
+    box.appendChild(p);
+    box.hidden = false;
+  });
+
   var creating = false;
   document.getElementById("poll-form").addEventListener("submit", function (e) {
     e.preventDefault();
@@ -192,7 +244,14 @@
     creating = true;
     btn.disabled = true;
     btn.textContent = "作成中…";
-    var isPublic = document.getElementById("is-public").checked;
+    var hours = parseFloat(document.getElementById("opt-deadline").value);
+    var opts = {
+      isPublic: document.getElementById("is-public").checked,
+      multi: document.getElementById("opt-multi").checked,
+      hideResults: document.getElementById("opt-hide").checked,
+      shuffle: document.getElementById("opt-shuffle").checked,
+      closesAt: isFinite(hours) && hours > 0 ? new Date(Date.now() + hours * 3600 * 1000).toISOString() : null
+    };
 
     function finish() {
       creating = false;
@@ -203,7 +262,7 @@
       var bytes = new Uint8Array(10);
       crypto.getRandomValues(bytes);
       var idRes = PollCalc.makeId(bytes);
-      PollNet.createPoll(idRes.id, v.question, v.options, isPublic).then(function (r) {
+      PollNet.createPoll(idRes.id, v.question, v.options, opts).then(function (r) {
         if (r.ok) {
           var mine = loadMine();
           mine.unshift({ id: idRes.id, q: v.question, t: new Date().toISOString().slice(0, 10) });

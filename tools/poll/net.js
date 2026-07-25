@@ -28,14 +28,24 @@
   function base() { return conf().url.replace(/\/+$/, ""); }
 
   // アンケートを保存する。IDが既に使われていたら {ok:false, code:"conflict"}
-  // isPublic=true ならホームの公開一覧に載る
-  function createPoll(id, question, options, isPublic) {
+  // opts: { isPublic, multi, hideResults, shuffle, closesAt(ISO文字列|null) }
+  function createPoll(id, question, options, opts) {
+    var o = opts || {};
     var h = headers();
     h["Prefer"] = "return=minimal";
     return fetch(base() + "/rest/v1/polls", {
       method: "POST",
       headers: h,
-      body: JSON.stringify({ id: id, question: question, options: options, is_public: !!isPublic })
+      body: JSON.stringify({
+        id: id,
+        question: question,
+        options: options,
+        is_public: !!o.isPublic,
+        multi: !!o.multi,
+        hide_results: !!o.hideResults,
+        shuffle: !!o.shuffle,
+        closes_at: o.closesAt || null
+      })
     }).then(function (r) {
       if (r.ok) return { ok: true };
       if (r.status === 409) return { ok: false, code: "conflict" };
@@ -44,11 +54,12 @@
   }
 
   // 質問・選択肢・現在の票数を取得する。存在しないIDなら {ok:false, code:"not_found"}
-  function getResults(id) {
+  // voter: 端末識別子(「結果非表示」アンケートで投票済み判定に使う)
+  function getResults(id, voter) {
     return fetch(base() + "/rest/v1/rpc/poll_results", {
       method: "POST",
       headers: headers(),
-      body: JSON.stringify({ p_id: id })
+      body: JSON.stringify({ p_id: id, p_voter: voter || null })
     }).then(function (r) {
       if (!r.ok) return { ok: false, code: "rejected" };
       return r.json().then(function (data) {
@@ -58,18 +69,25 @@
     }).catch(function () { return { ok: false, code: "network" }; });
   }
 
-  // 1票入れる。同じ端末(voter)からの2票目は {ok:false, code:"already_voted"}
-  function vote(id, voter, choice) {
+  // 投票する(choicesは選んだ選択肢番号の配列。単一選択は要素1つ)。
+  // 同じ端末(voter)からの2票目は {ok:false, code:"already_voted"}
+  // 締切後は {ok:false, code:"closed"}
+  function vote(id, voter, choices) {
     var h = headers();
     h["Prefer"] = "return=minimal";
     return fetch(base() + "/rest/v1/votes", {
       method: "POST",
       headers: h,
-      body: JSON.stringify({ poll_id: id, voter: voter, choice: choice })
+      body: JSON.stringify({ poll_id: id, voter: voter, choices: choices })
     }).then(function (r) {
       if (r.ok) return { ok: true };
       if (r.status === 409) return { ok: false, code: "already_voted" };
-      return { ok: false, code: "rejected" };
+      return r.json().then(function (body) {
+        if (body && typeof body.message === "string" && body.message.indexOf("closed") !== -1) {
+          return { ok: false, code: "closed" };
+        }
+        return { ok: false, code: "rejected" };
+      }, function () { return { ok: false, code: "rejected" }; });
     }).catch(function () { return { ok: false, code: "network" }; });
   }
 
