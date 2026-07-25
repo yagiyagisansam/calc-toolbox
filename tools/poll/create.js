@@ -37,6 +37,27 @@ if (window.top !== window.self) {
     try { s.setItem(MINE_KEY, JSON.stringify(list.slice(0, 30))); } catch (e) { /* 保存不可は無視 */ }
   }
 
+  // 「選べる数の上限」を現在の選択肢の数に合わせて作り直す
+  // n択で意味のある上限は2〜n-1個(n個=全部選べる=制限なしと同じ)。2択では制限なしのみ
+  var maxSelEl = document.getElementById("opt-max");
+  function updateMaxChoices() {
+    var n = optsBox.children.length;
+    var cur = maxSelEl.value;
+    maxSelEl.replaceChildren();
+    var none = document.createElement("option");
+    none.value = "";
+    none.textContent = "制限なし(全部選べる)";
+    maxSelEl.appendChild(none);
+    for (var k = 2; k <= n - 1; k++) {
+      var o = document.createElement("option");
+      o.value = String(k);
+      o.textContent = k + "個まで";
+      maxSelEl.appendChild(o);
+    }
+    maxSelEl.value = [].some.call(maxSelEl.options, function (o) { return o.value === cur; }) ? cur : "";
+    maxSelEl.disabled = n <= 2;
+  }
+
   // 行番号・例文・削除ボタンの表示を現在の行数に合わせて更新する
   function renumberOptions() {
     var rows = optsBox.children;
@@ -48,6 +69,7 @@ if (window.top !== window.self) {
       row.querySelector(".pb-opt-del").hidden = rows.length <= 2;
     });
     addBtn.hidden = rows.length >= PollCalc.MAX_OPTIONS;
+    updateMaxChoices();
   }
 
   function addOptionField(focus) {
@@ -82,7 +104,8 @@ if (window.top !== window.self) {
   addOptionField(false);
   addBtn.addEventListener("click", function () { addOptionField(true); });
 
-  // 締切カレンダーの選択範囲: 今日〜2ヶ月先まで
+  // 締切の選択肢: 「無期限」+今日〜2ヶ月先までの日付リスト
+  // (範囲外の日付はそもそも選べない)
   function ymd(d) {
     return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2);
   }
@@ -92,8 +115,27 @@ if (window.top !== window.self) {
     return mx;
   }
   var deadlineEl = document.getElementById("opt-deadline");
-  deadlineEl.min = ymd(new Date());
-  deadlineEl.max = ymd(deadlineMax());
+  (function buildDeadlineOptions() {
+    var YOUBI = ["日", "月", "火", "水", "木", "金", "土"];
+    var none = document.createElement("option");
+    none.value = "";
+    none.textContent = "無期限(締切なし)";
+    none.selected = true;
+    deadlineEl.appendChild(none);
+    var max = deadlineMax();
+    var d = new Date();
+    var today = ymd(new Date());
+    var tomorrow = ymd(new Date(Date.now() + 24 * 3600 * 1000));
+    while (d.getTime() <= max.getTime()) {
+      var o = document.createElement("option");
+      var v = ymd(d);
+      o.value = v;
+      var prefix = v === today ? "今日 " : v === tomorrow ? "明日 " : "";
+      o.textContent = prefix + (d.getMonth() + 1) + "/" + d.getDate() + "(" + YOUBI[d.getDay()] + ") 23:59まで";
+      deadlineEl.appendChild(o);
+      d.setDate(d.getDate() + 1);
+    }
+  })();
 
   function showError(code) {
     errEl.textContent = MSG[code] || MSG.rejected;
@@ -196,11 +238,12 @@ if (window.top !== window.self) {
         closesAt = end.toISOString();
       }
     }
-    var maxSel = parseInt(document.getElementById("opt-max").value, 10);
+    // 上限は「実際に有効な選択肢の数」より小さいときだけ意味を持つ
+    var maxSel = parseInt(maxSelEl.value, 10);
     var opts = {
       isPublic: document.getElementById("is-public").checked,
       multi: document.getElementById("opt-multi").checked,
-      maxChoices: isFinite(maxSel) && maxSel >= 2 ? maxSel : null,
+      maxChoices: isFinite(maxSel) && maxSel >= 2 && maxSel < v.options.length ? maxSel : null,
       hideResults: document.getElementById("opt-hide").checked,
       shuffle: document.getElementById("opt-shuffle").checked,
       closesAt: closesAt
