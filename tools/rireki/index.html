@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>入学・卒業年 早見計算機(履歴書用・早生まれ対応) | 計算ツールボックス</title>
   <meta name="description" content="生年月日から小学校〜大学の入学・卒業年を自動計算。履歴書・職務経歴書の学歴欄に。早生まれ(1/1〜4/1)や浪人・留年の調整にも対応した無料ツール。">
   <link rel="stylesheet" href="../../shared/style.css">
@@ -253,9 +255,10 @@
     lastAdv = "text";
     var r = advCalc();
     if (!r.ok) { advFail(r.code); return; }
-    var jhs = document.getElementById("adv-jhs-name").value || "◯◯中学校";
-    var hs = document.getElementById("adv-hs-name").value || "◯◯高等学校";
-    var uni = document.getElementById("adv-uni-name").value || "◯◯大学◯◯学部";
+    function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+    var jhs = esc(document.getElementById("adv-jhs-name").value) || "◯◯中学校";
+    var hs = esc(document.getElementById("adv-hs-name").value) || "◯◯高等学校";
+    var uni = esc(document.getElementById("adv-uni-name").value) || "◯◯大学◯◯学部";
     var lines = [
       advYm(r.jhsOut, 3) + " " + jhs + " 卒業",
       advYm(r.hsIn, 4) + " " + hs + " 入学",
