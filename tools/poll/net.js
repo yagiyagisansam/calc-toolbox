@@ -92,12 +92,14 @@
     }).catch(function () { return { ok: false, code: "network" }; });
   }
 
-  // 公開アンケート一覧(sort: "popular" | "new")
-  function listPublic(sort, limit) {
+  // 公開アンケート一覧(sort: "popular" | "new"、days: 期間内の票だけ数える。null=全期間)
+  function listPublic(sort, limit, days) {
+    var body = { p_sort: sort || "new", p_limit: limit || 20 };
+    if (days !== undefined && days !== null) body.p_days = days;
     return fetch(base() + "/rest/v1/rpc/public_polls", {
       method: "POST",
       headers: headers(),
-      body: JSON.stringify({ p_sort: sort || "new", p_limit: limit || 20 })
+      body: JSON.stringify(body)
     }).then(function (r) {
       if (!r.ok) return { ok: false, code: "rejected" };
       return r.json().then(function (data) {

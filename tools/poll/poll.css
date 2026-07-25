@@ -264,6 +264,12 @@ body {
 .pb-deadline.closed { color: #d43c3c; }
 @media (prefers-color-scheme: dark) { .pb-deadline.closed { color: #ff8a80; } }
 
+/* 確認ダイアログ */
+.pb-modal-bg { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 50; }
+.pb-modal { background: var(--card); border: 1px solid var(--card-border); border-radius: 20px; padding: 22px 18px; max-width: 340px; width: 100%; box-shadow: var(--card-shadow); }
+.pb-modal .pb-btn { margin-top: 18px; }
+.pb-modal .pb-btn-sub { display: block; width: 100%; margin-top: 10px; text-align: center; }
+
 /* ユーティリティ(CSP強化でstyle属性を廃止したため) */
 .mt12 { margin-top: 12px; }
 .mt14 { margin-top: 14px; }

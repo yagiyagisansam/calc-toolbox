@@ -216,6 +216,10 @@ if (window.top !== window.self) {
   });
 
   var creating = false;
+  var pendingCreate = null;
+  var confirmBg = document.getElementById("confirm-bg");
+
+  // 作成ボタン → 入力を検証してから確認ダイアログを表示
   document.getElementById("poll-form").addEventListener("submit", function (e) {
     e.preventDefault();
     if (creating) return;
@@ -225,10 +229,6 @@ if (window.top !== window.self) {
     if (!v.ok) { showError(v.code); return; }
     if (!PollNet.ready()) { showError("not_configured"); return; }
 
-    var btn = document.getElementById("create-btn");
-    creating = true;
-    btn.disabled = true;
-    btn.textContent = "作成中…";
     // 締切: 選んだ日の23:59:59。今日〜2ヶ月先の範囲外は無期限として扱う
     var closesAt = null;
     if (deadlineEl.value) {
@@ -242,14 +242,38 @@ if (window.top !== window.self) {
     }
     // 上限は「実際に有効な選択肢の数」より小さいときだけ意味を持つ
     var maxSel = parseInt(maxSelEl.value, 10);
-    var opts = {
-      isPublic: document.getElementById("is-public").checked,
-      multi: document.getElementById("opt-multi").checked,
-      maxChoices: isFinite(maxSel) && maxSel >= 2 && maxSel < v.options.length ? maxSel : null,
-      hideResults: document.getElementById("opt-hide").checked,
-      shuffle: document.getElementById("opt-shuffle").checked,
-      closesAt: closesAt
+    pendingCreate = {
+      v: v,
+      opts: {
+        isPublic: document.getElementById("is-public").checked,
+        multi: document.getElementById("opt-multi").checked,
+        maxChoices: isFinite(maxSel) && maxSel >= 2 && maxSel < v.options.length ? maxSel : null,
+        hideResults: document.getElementById("opt-hide").checked,
+        shuffle: document.getElementById("opt-shuffle").checked,
+        closesAt: closesAt
+      }
     };
+    confirmBg.hidden = false;
+  });
+
+  document.getElementById("confirm-no").addEventListener("click", function () {
+    confirmBg.hidden = true;
+    pendingCreate = null;
+  });
+
+  document.getElementById("confirm-yes").addEventListener("click", function () {
+    if (!pendingCreate || creating) return;
+    var job = pendingCreate;
+    pendingCreate = null;
+    confirmBg.hidden = true;
+    doCreate(job.v, job.opts);
+  });
+
+  function doCreate(v, opts) {
+    var btn = document.getElementById("create-btn");
+    creating = true;
+    btn.disabled = true;
+    btn.textContent = "作成中…";
 
     function finish() {
       creating = false;
@@ -276,5 +300,5 @@ if (window.top !== window.self) {
       });
     }
     attempt(3);
-  });
+  }
 })();
