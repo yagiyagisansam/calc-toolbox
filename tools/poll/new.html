@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://ssxskriqlaiohdutxprn.supabase.co; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'; require-trusted-types-for 'script'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>アンケートを作る | みんなの投票</title>
+  <meta name="description" content="質問と選択肢(最大10個)を入れるだけで、SNSで共有できる投票ページのリンクを無料で発行。回答はリアルタイムで集計されます。登録不要。">
+  <link rel="stylesheet" href="./poll.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/poll/new.html">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Crect%20width='100'%20height='100'%20rx='22'%20fill='%23ff5a70'/%3E%3Cpath%20d='M28%2072V44M50%2072V28M72%2072V54'%20stroke='%23fff'%20stroke-width='10'%20stroke-linecap='round'/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#ff5a70">
+  <meta property="og:site_name" content="みんなの投票">
+  <meta property="og:title" content="アンケートを作る | みんなの投票">
+  <meta property="og:description" content="質問と選択肢(最大10個)を入れるだけで、SNSで共有できる投票ページのリンクを無料で発行。回答はリアルタイムで集計されます。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/poll/new.html">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <!-- @meta end -->
+</head>
+<body>
+<header class="pb-header">
+  <a href="./">
+    <span class="pb-mark"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></span>
+    <span class="pb-name">みんなの投票</span>
+  </a>
+  <span class="pb-tag">アンケート作成</span>
+</header>
+<main>
+  <div class="pb-status" id="setup-note" hidden>現在準備中のため、アンケートは作成できません。もうしばらくお待ちください。</div>
+
+  <div class="pb-card">
+    <h1 class="pb-q pb-q-sm">アンケートを作る</h1>
+    <form class="pb-form mt14" id="poll-form">
+      <label>質問(聞きたいこと)<span class="pb-note">120文字まで</span>
+        <input type="text" id="question" maxlength="120" required placeholder="例: きのこの山とたけのこの里、どっち派?">
+      </label>
+      <div id="options-box"></div>
+      <button type="button" class="pb-add" id="add-opt">＋ 選択肢を追加(最大10個)</button>
+      <label class="pb-toggle">
+        <input type="checkbox" id="is-public" checked>
+        <span>みんなのアンケート一覧に載せる<small>オフにすると、リンクを知っている人だけが開ける非公開アンケートになります。</small></span>
+      </label>
+      <details class="pb-adv">
+        <summary><span class="plus">＋</span>詳細設定(複数選択・締切・結果の見せ方)</summary>
+        <div class="pb-adv-inner">
+          <label class="pb-toggle">
+            <input type="checkbox" id="opt-multi">
+            <span>複数選択を許可<small>「あてはまるもの全部」を選べるようになります(日程調整・持ち寄り決めなどに)。</small></span>
+          </label>
+          <label id="max-row" hidden>選べる数の上限<span class="pb-note">複数選択のときに、1人が選べる個数を制限できます</span>
+            <select id="opt-max">
+              <option value="" selected>制限なし(全部選べる)</option>
+              <option value="2">2個まで</option>
+              <option value="3">3個まで</option>
+              <option value="4">4個まで</option>
+              <option value="5">5個まで</option>
+              <option value="6">6個まで</option>
+              <option value="7">7個まで</option>
+              <option value="8">8個まで</option>
+              <option value="9">9個まで</option>
+            </select>
+          </label>
+          <label>投票の締切<span class="pb-note">締切後は投票できず、結果のみ表示されます</span>
+            <select id="opt-deadline">
+              <option value="" selected>なし(無期限)</option>
+              <option value="1">1時間後</option>
+              <option value="6">6時間後</option>
+              <option value="24">24時間後</option>
+              <option value="72">3日後</option>
+              <option value="168">7日後</option>
+            </select>
+          </label>
+          <label class="pb-toggle">
+            <input type="checkbox" id="opt-hide">
+            <span>投票するまで結果を見せない<small>先に結果が見えて回答が偏るのを防ぎます(締切後は誰でも見られます)。授業・社内調査に。</small></span>
+          </label>
+          <label class="pb-toggle">
+            <input type="checkbox" id="opt-shuffle">
+            <span>選択肢をシャッフル表示<small>表示順による有利・不利(順序バイアス)を減らします。</small></span>
+          </label>
+        </div>
+      </details>
+      <button type="submit" class="pb-btn" id="create-btn">投票ページを作成する</button>
+      <p class="pb-error" id="form-error" hidden></p>
+    </form>
+  </div>
+
+  <div class="pb-card" id="done-card" hidden>
+    <p class="pb-q pb-q-sm">投票ページができました</p>
+    <p class="pb-meta">このリンクをSNSやグループチャットに貼ると、開いた人が投票できます。</p>
+    <div class="pb-url">
+      <input type="text" id="done-url" readonly>
+      <button type="button" id="copy-btn">コピー</button>
+    </div>
+    <div class="pb-share" id="share-row"></div>
+    <button type="button" class="pb-btn-sub" id="qr-btn">＋ QRコードを表示(印刷・掲示用)</button>
+    <div class="pb-qr" id="qr-box" hidden></div>
+    <p class="pb-center mt16"><a class="pb-link" id="open-link" href="#">投票ページを開く(結果もここで見られます)</a></p>
+  </div>
+
+  <p class="pb-center"><a class="pb-sub-link" href="./">← みんなの投票トップへ</a></p>
+</main>
+<footer class="pb-footer">
+  <p>作成された質問・選択肢・投票データは、集計のため外部データベースに保存されます(個人を特定する情報は収集しません)。詳しくは<a href="../../privacy.html">プライバシーポリシー</a>をご覧ください。</p>
+  <nav>
+    <a href="./">みんなの投票</a>
+    <a href="../../">計算ツールボックス</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>© 2026 みんなの投票(quick-calc.site)</p>
+</footer>
+<script src="./config.js"></script>
+<script src="./calc.js"></script>
+<script src="./net.js"></script>
+<script src="./qr.js"></script>
+<script src="./create.js"></script>
+</body>
+</html>

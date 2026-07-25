@@ -61,7 +61,8 @@ const ICON_PATHS = {
  byte: '<ellipse cx="12" cy="5.6" rx="7" ry="2.6"/><path d="M5 5.6v12.8c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V5.6"/><path d="M5 12c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6"/>',
  roman: '<path d="M5 8l5.5 8M10.5 8L5 16"/><path d="M14.2 8v8M18.2 8v8"/><path d="M13.2 8h2M13.2 16h2M17.2 8h2M17.2 16h2"/>',
  seiza: '<path d="M12 3.6l2.5 5.3 5.8.7-4.3 4 1.1 5.8L12 16.6l-5.1 2.8 1.1-5.8-4.3-4 5.8-.7z"/>',
- petage: '<path d="M12 12.6c3.4 0 5.4 2.1 5.4 4.2 0 1.9-1.6 3-3.2 2.5-1-.3-1.6-.5-2.2-.5s-1.2.2-2.2.5c-1.6.5-3.2-.6-3.2-2.5 0-2.1 2-4.2 5.4-4.2z"/><circle cx="6.3" cy="9.2" r="1.8"/><circle cx="10" cy="6.6" r="1.8"/><circle cx="14" cy="6.6" r="1.8"/><circle cx="17.7" cy="9.2" r="1.8"/>'
+ petage: '<path d="M12 12.6c3.4 0 5.4 2.1 5.4 4.2 0 1.9-1.6 3-3.2 2.5-1-.3-1.6-.5-2.2-.5s-1.2.2-2.2.5c-1.6.5-3.2-.6-3.2-2.5 0-2.1 2-4.2 5.4-4.2z"/><circle cx="6.3" cy="9.2" r="1.8"/><circle cx="10" cy="6.6" r="1.8"/><circle cx="14" cy="6.6" r="1.8"/><circle cx="17.7" cy="9.2" r="1.8"/>',
+ poll: '<rect x="4" y="4.2" width="12.5" height="3.4" rx="1.7"/><rect x="4" y="10.3" width="16" height="3.4" rx="1.7"/><rect x="4" y="16.4" width="7.5" height="3.4" rx="1.7"/>',
 };
 function icoSvg(slug, cls) {
   return '<svg class="' + (cls || "ico-svg") + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICON_PATHS[slug] || ICON_PATHS.percent) + "</svg>";

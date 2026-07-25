@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://ssxskriqlaiohdutxprn.supabase.co; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'; require-trusted-types-for 'script'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>アンケートに投票する | みんなの投票</title>
+  <meta name="description" content="共有されたアンケートに投票して、みんなの回答のリアルタイム集計を見られるページです。登録不要・無料。">
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="./poll.css">
+  <!-- @meta start -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Crect%20width='100'%20height='100'%20rx='22'%20fill='%23ff5a70'/%3E%3Cpath%20d='M28%2072V44M50%2072V28M72%2072V54'%20stroke='%23fff'%20stroke-width='10'%20stroke-linecap='round'/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#ff5a70">
+  <meta property="og:site_name" content="みんなの投票">
+  <meta property="og:title" content="アンケートに投票する | みんなの投票">
+  <meta property="og:description" content="共有されたアンケートに投票して、みんなの回答のリアルタイム集計を見られるページです。登録不要・無料。">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <!-- @meta end -->
+</head>
+<body>
+<header class="pb-header">
+  <a href="./">
+    <span class="pb-mark"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></span>
+    <span class="pb-name">みんなの投票</span>
+  </a>
+  <a class="pb-cta" href="./new.html">アンケートを作る</a>
+</header>
+<main>
+  <div class="pb-card" id="main-card">
+    <h1 class="pb-q" id="q-title">アンケートを読み込んでいます…</h1>
+    <p class="pb-deadline" id="deadline" hidden></p>
+    <p class="pb-status" id="status" hidden></p>
+    <form id="vote-form" hidden>
+      <p class="pb-meta" id="vote-note">1人1回・タップして投票</p>
+      <div class="pb-opts" id="opts"></div>
+      <button type="submit" class="pb-btn" id="vote-btn" disabled>この選択で投票する</button>
+      <p class="pb-center mt12"><a class="pb-sub-link" href="#" id="peek-link">投票せずに結果だけ見る</a></p>
+    </form>
+    <div id="result" hidden aria-live="polite"></div>
+  </div>
+
+  <div id="share-box" hidden>
+    <div class="pb-sec"><b>このアンケートを広める</b></div>
+    <div class="pb-share" id="share-row"></div>
+    <button type="button" class="pb-btn-sub" id="qr-btn">＋ QRコードを表示(印刷・掲示用)</button>
+    <div class="pb-qr" id="qr-box" hidden></div>
+  </div>
+
+  <p class="pb-center mt20"><a class="pb-link" href="./new.html">自分もアンケートを作ってみる(無料・登録不要)</a></p>
+  <button type="button" class="pb-report" id="report-btn" hidden>問題のあるアンケートを報告する</button>
+</main>
+<footer class="pb-footer">
+  <p>このページの投票データ(選んだ選択肢)は、集計のため外部データベースに保存されます(個人を特定する情報は収集しません)。詳しくは<a href="../../privacy.html">プライバシーポリシー</a>をご覧ください。</p>
+  <nav>
+    <a href="./">みんなの投票</a>
+    <a href="../../">計算ツールボックス</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html">お問い合わせ</a>
+  </nav>
+  <p>© 2026 みんなの投票(quick-calc.site)</p>
+</footer>
+<script src="./config.js"></script>
+<script src="./calc.js"></script>
+<script src="./net.js"></script>
+<script src="./qr.js"></script>
+<script src="./vote.js"></script>
+</body>
+</html>

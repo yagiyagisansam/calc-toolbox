@@ -1,5 +1,5 @@
 // 案Lデザインの本番トップページを生成する
-// - 61タイルを静的HTMLで出力(SEO/非JS環境用に説明つき一覧も同梱)
+// - 全ツールのタイルを静的HTMLで出力(SEO/非JS環境用に説明つき一覧も同梱。個数はdata.jsから自動集計)
 // - 人気セクションは全ユーザー利用データ基準のRANK配列(週次更新)で表示
 import { readFileSync, writeFileSync } from "node:fs";
 
@@ -41,7 +41,7 @@ const html = `<!DOCTYPE html>
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>計算ツールボックス | 暮らしに役立つ無料計算ツール集</title>
-  <meta name="description" content="健康・お金・日付・暮らしの疑問をその場で計算できる無料Webツール集(61個)。登録不要・スマホ対応。すべてのツールに計算根拠と一次情報の出典を明記しています。">
+  <meta name="description" content="健康・お金・日付・暮らしの疑問をその場で計算できる無料Webツール集(${sorted.length}個)。登録不要・スマホ対応。すべてのツールに計算根拠と一次情報の出典を明記しています。">
   <link rel="stylesheet" href="./shared/style.css">
   <!-- @meta start -->
   <link rel="canonical" href="https://quick-calc.site/">
@@ -49,7 +49,7 @@ const html = `<!DOCTYPE html>
   <meta name="theme-color" content="#0b6e4f">
   <meta property="og:site_name" content="計算ツールボックス">
   <meta property="og:title" content="計算ツールボックス | 暮らしに役立つ無料計算ツール集">
-  <meta property="og:description" content="健康・お金・日付・暮らしの疑問をその場で計算できる無料Webツール集(61個)。登録不要・スマホ対応。すべてのツールに計算根拠と一次情報の出典を明記しています。">
+  <meta property="og:description" content="健康・お金・日付・暮らしの疑問をその場で計算できる無料Webツール集(${sorted.length}個)。登録不要・スマホ対応。すべてのツールに計算根拠と一次情報の出典を明記しています。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://quick-calc.site/">
   <meta property="og:locale" content="ja_JP">
@@ -116,7 +116,7 @@ const html = `<!DOCTYPE html>
     <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg></span>
     <div>
       <h1>計算ツールボックス</h1>
-      <p class="tg">暮らしの計算61ツール・登録不要・ぜんぶ無料</p>
+      <p class="tg">暮らしの計算${sorted.length}ツール・登録不要・ぜんぶ無料</p>
     </div>
   </div>
 
@@ -128,14 +128,14 @@ const html = `<!DOCTYPE html>
     <div class="tp-grid" id="popular"></div>
   </div>
 
-  <div class="tp-sec" id="genre-title"><b>すべて</b><span>61個</span></div>
+  <div class="tp-sec" id="genre-title"><b>すべて</b><span>${sorted.length}個</span></div>
   <p class="no-hit" id="no-hit" hidden>該当するツールがありません。別のことばでお試しください(例: 家賃、割引、カロリー)</p>
   <div class="tp-grid" id="grid">
 ${tilesHtml}
   </div>
 
   <details class="seo-list">
-    <summary>61ツールの説明つき一覧を開く</summary>
+    <summary>${sorted.length}ツールの説明つき一覧を開く</summary>
 ${seoList}
   </details>
 
