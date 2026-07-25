@@ -96,11 +96,23 @@ body {
 .pb-form label { display: block; font-weight: 700; font-size: 0.9rem; margin-top: 14px; }
 .pb-form label:first-child { margin-top: 0; }
 .pb-note { font-weight: 400; color: var(--muted); font-size: 0.78rem; margin-left: 6px; }
-.pb-form input[type="text"] {
+.pb-form input[type="text"],
+.pb-form input[type="date"] {
   width: 100%; margin-top: 6px; padding: 13px 14px; font-size: 1rem; color: var(--ink);
   background: var(--soft); border: 2px solid var(--line); border-radius: 14px; outline: none;
+  -webkit-appearance: none; appearance: none; min-height: 50px;
 }
-.pb-form input[type="text"]:focus { border-color: var(--accent); }
+.pb-form input[type="text"]:focus,
+.pb-form input[type="date"]:focus { border-color: var(--accent); }
+
+/* 選択肢の入力行(削除ボタン付き) */
+.pb-opt-input-row { display: flex; gap: 8px; align-items: center; }
+.pb-opt-input-row input { flex: 1 1 auto; min-width: 0; }
+.pb-opt-del {
+  flex: 0 0 auto; width: 44px; height: 44px; margin-top: 6px; border-radius: 12px;
+  border: 2px solid var(--chip-border); background: var(--chip-bg); color: var(--muted);
+  font-size: 1.25rem; font-weight: 700; line-height: 1; cursor: pointer;
+}
 .pb-add {
   width: 100%; margin-top: 12px; padding: 12px; font-size: 0.92rem; font-weight: 800;
   color: var(--accent); background: none; border: 2px dashed var(--chip-border); border-radius: 14px; cursor: pointer;

@@ -37,24 +37,63 @@ if (window.top !== window.self) {
     try { s.setItem(MINE_KEY, JSON.stringify(list.slice(0, 30))); } catch (e) { /* 保存不可は無視 */ }
   }
 
+  // 行番号・例文・削除ボタンの表示を現在の行数に合わせて更新する
+  function renumberOptions() {
+    var rows = optsBox.children;
+    [].forEach.call(rows, function (row, i) {
+      row.querySelector(".opt-title").textContent = "選択肢" + (i + 1);
+      var input = row.querySelector(".opt-input");
+      input.placeholder = i === 0 ? "例: きのこの山" : i === 1 ? "例: たけのこの里" : "";
+      // 最低2個は必要なので、2個以下のときは削除ボタンを出さない
+      row.querySelector(".pb-opt-del").hidden = rows.length <= 2;
+    });
+    addBtn.hidden = rows.length >= PollCalc.MAX_OPTIONS;
+  }
+
   function addOptionField(focus) {
-    var n = optsBox.children.length;
-    if (n >= PollCalc.MAX_OPTIONS) return;
+    if (optsBox.children.length >= PollCalc.MAX_OPTIONS) return;
     var label = document.createElement("label");
-    label.appendChild(document.createTextNode("選択肢" + (n + 1)));
+    var title = document.createElement("span");
+    title.className = "opt-title";
+    var rowDiv = document.createElement("div");
+    rowDiv.className = "pb-opt-input-row";
     var input = document.createElement("input");
     input.type = "text";
     input.maxLength = 60;
     input.className = "opt-input";
-    input.placeholder = n === 0 ? "例: きのこの山" : n === 1 ? "例: たけのこの里" : "";
-    label.appendChild(input);
+    var del = document.createElement("button");
+    del.type = "button";
+    del.className = "pb-opt-del";
+    del.textContent = "×";
+    del.setAttribute("aria-label", "この選択肢を削除");
+    del.addEventListener("click", function () {
+      label.remove();
+      renumberOptions();
+    });
+    rowDiv.appendChild(input);
+    rowDiv.appendChild(del);
+    label.appendChild(title);
+    label.appendChild(rowDiv);
     optsBox.appendChild(label);
-    addBtn.hidden = optsBox.children.length >= PollCalc.MAX_OPTIONS;
+    renumberOptions();
     if (focus) input.focus();
   }
   addOptionField(false);
   addOptionField(false);
   addBtn.addEventListener("click", function () { addOptionField(true); });
+
+  // 締切カレンダーの選択範囲: 今日〜2ヶ月先まで
+  function ymd(d) {
+    return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2);
+  }
+  function deadlineMax() {
+    var mx = new Date();
+    mx.setMonth(mx.getMonth() + 2);
+    return mx;
+  }
+  var deadlineEl = document.getElementById("opt-deadline");
+  deadlineEl.min = ymd(new Date());
+  deadlineEl.max = ymd(deadlineMax());
 
   function showError(code) {
     errEl.textContent = MSG[code] || MSG.rejected;
@@ -146,7 +185,17 @@ if (window.top !== window.self) {
     creating = true;
     btn.disabled = true;
     btn.textContent = "作成中…";
-    var hours = parseFloat(document.getElementById("opt-deadline").value);
+    // 締切: 選んだ日の23:59:59。今日〜2ヶ月先の範囲外は無期限として扱う
+    var closesAt = null;
+    if (deadlineEl.value) {
+      var parts = deadlineEl.value.split("-");
+      var end = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10), 23, 59, 59);
+      var mx = deadlineMax();
+      mx.setHours(23, 59, 59, 999);
+      if (end.getTime() > Date.now() && end.getTime() <= mx.getTime()) {
+        closesAt = end.toISOString();
+      }
+    }
     var maxSel = parseInt(document.getElementById("opt-max").value, 10);
     var opts = {
       isPublic: document.getElementById("is-public").checked,
@@ -154,7 +203,7 @@ if (window.top !== window.self) {
       maxChoices: isFinite(maxSel) && maxSel >= 2 ? maxSel : null,
       hideResults: document.getElementById("opt-hide").checked,
       shuffle: document.getElementById("opt-shuffle").checked,
-      closesAt: isFinite(hours) && hours > 0 ? new Date(Date.now() + hours * 3600 * 1000).toISOString() : null
+      closesAt: closesAt
     };
 
     function finish() {

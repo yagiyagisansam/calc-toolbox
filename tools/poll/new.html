@@ -64,23 +64,16 @@
               <option value="9">9個まで</option>
             </select>
           </label>
-          <label>投票の締切<span class="pb-note">締切後は投票できず、結果のみ表示されます</span>
-            <select id="opt-deadline">
-              <option value="" selected>なし(無期限)</option>
-              <option value="1">1時間後</option>
-              <option value="6">6時間後</option>
-              <option value="24">24時間後</option>
-              <option value="72">3日後</option>
-              <option value="168">7日後</option>
-            </select>
+          <label>投票の締切<span class="pb-note">カレンダーから選択(その日の23:59まで)。未設定なら無期限。設定できるのは2ヶ月先まで、それ以上先にしたい場合は無期限のままにしてください</span>
+            <input type="date" id="opt-deadline">
           </label>
           <label class="pb-toggle">
             <input type="checkbox" id="opt-hide">
             <span>投票するまで結果を見せない<small>先に結果が見えて回答が偏るのを防ぎます(締切後は誰でも見られます)。授業・社内調査に。</small></span>
           </label>
           <label class="pb-toggle">
-            <input type="checkbox" id="opt-shuffle">
-            <span>選択肢をシャッフル表示<small>表示順による有利・不利(順序バイアス)を減らします。</small></span>
+            <input type="checkbox" id="opt-shuffle" checked>
+            <span>選択肢をシャッフル表示<small>表示順による有利・不利(順序バイアス)を減らします(推奨のため最初からオン)。</small></span>
           </label>
         </div>
       </details>
