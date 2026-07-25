@@ -48,7 +48,7 @@
       }
       if (ok) pass++;
       var tr = document.createElement("tr");
-      tr.innerHTML = "<td>" + (ok ? "✅" : "❌") + "</td><td></td><td></td>";
+      tr.innerHTML = "<td>" + (ok ? "OK" : "NG") + "</td><td></td><td></td>";
       tr.children[1].textContent = c.name;
       tr.children[2].textContent = ok ? "" : "期待: " + JSON.stringify(c.expect) + " / 実際: " + JSON.stringify(actual);
       rows.appendChild(tr);

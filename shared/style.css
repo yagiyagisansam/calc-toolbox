@@ -76,6 +76,15 @@ a { color: var(--color-accent); }
   text-decoration: none;
   color: var(--color-text);
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.site-brand-mark {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  color: var(--color-accent);
 }
 .site-search-link {
   font-size: 0.85rem;
@@ -85,6 +94,14 @@ a { color: var(--color-accent); }
   border-radius: 999px;
   padding: 5px 12px;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.site-search-ic {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
 }
 .site-search-link:hover { color: var(--color-accent); border-color: var(--color-accent); }
 
@@ -121,15 +138,6 @@ a { color: var(--color-accent); }
   outline: none;
   border-color: var(--color-accent);
   background: var(--color-bg);
-}
-.tool-search::before {
-  content: "🔍";
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1rem;
-  pointer-events: none;
 }
 .search-status { font-size: 0.85rem; color: var(--color-muted); margin: -10px 0 14px; }
 
@@ -240,7 +248,7 @@ a { color: var(--color-accent); }
   .tool-list { grid-template-columns: 1fr 1fr; }
 }
 
-/* ➕詳細機能(こだわり派向けの折りたたみ) */
+/* ＋詳細機能(こだわり派向けの折りたたみ) */
 .adv-box {
   border: 1.5px dashed var(--color-border);
   border-radius: 12px;
@@ -450,3 +458,16 @@ ul.related li a:hover { border-color: var(--color-accent); color: var(--color-ac
 .field-row { display: flex; gap: 8px; }
 .field-row label { flex: 1 1 0; min-width: 0; margin: 0; }
 .field-row label.grow-2 { flex: 2 1 0; }
+
+/* 結果表の「推奨」バッジ(絵文字を使わない目印) */
+.mark-rec {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.5;
+  color: #fff;
+  background: var(--color-accent);
+  border-radius: 999px;
+  padding: 0 7px;
+  vertical-align: middle;
+}

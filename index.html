@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="./shared/style.css">
   <!-- @meta start -->
   <link rel="canonical" href="https://quick-calc.site/">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
   <meta name="theme-color" content="#0b6e4f">
   <meta property="og:site_name" content="計算ツールボックス">
   <meta property="og:title" content="計算ツールボックス | 暮らしに役立つ無料計算ツール集">
@@ -38,6 +38,7 @@
     .brand .tg { font-size: 0.72rem; color: var(--tp-muted); margin: 1px 0 0; }
     .tp-search { display: flex; align-items: center; gap: 9px; background: var(--tp-tile); border-radius: 16px; padding: 13px 16px; color: var(--tp-muted); box-shadow: var(--tp-shadow); margin: 14px 0 0; }
     .tp-search input { border: none; outline: none; background: none; font-size: 1rem; width: 100%; color: var(--tp-ink); }
+    .tp-search .site-search-ic { width: 18px; height: 18px; }
     .tp-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 16px 0 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
     .tp-tabs::-webkit-scrollbar { display: none; }
     .tp-tab { flex: 0 0 auto; padding: 8px 16px; border-radius: 999px; border: none; background: rgba(120,124,130,0.1); color: var(--tp-ink); font-size: 0.88rem; cursor: pointer; white-space: nowrap; font-weight: 500; }
@@ -85,7 +86,7 @@
     </div>
   </div>
 
-  <div class="tp-search" id="search">🔍 <input type="search" id="search-input" placeholder="検索(例: 家賃、文字数、営業日)" aria-label="ツールを検索" autocomplete="off"></div>
+  <div class="tp-search" id="search"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input type="search" id="search-input" placeholder="検索(例: 家賃、文字数、営業日)" aria-label="ツールを検索" autocomplete="off"></div>
   <div class="tp-tabs" id="tabs" role="tablist"></div>
 
   <div id="pop-sec">
