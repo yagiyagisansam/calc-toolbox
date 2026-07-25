@@ -47,11 +47,37 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 割り勘・通勤ガソリン代</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">みんなで割り勘(高速代も込み)</h3>
+      <p class="adv-note">距離・燃費・単価は上のフォームの値を使います。人数と高速代を足すと、1人あたりの負担額が出ます。</p>
+      <label>人数(運転する人も含めて)
+        <input type="number" id="adv-people" inputmode="numeric" step="1" min="1" max="20" placeholder="4">
+      </label>
+      <label>高速道路などの料金(円・なければ0)
+        <input type="number" id="adv-toll" inputmode="numeric" step="1" min="0" max="200000" value="0">
+      </label>
+      <button type="button" id="adv-split-run">1人あたりを計算</button>
+      <div class="tool-result" id="adv-result-split" hidden aria-live="polite"></div>
+      <h3 class="adv-h">通勤のガソリン代(月・年)</h3>
+      <p class="adv-note">片道の距離と出勤日数から、毎月・毎年のガソリン代を出します。燃費と単価は上のフォームの値を使います。</p>
+      <label>片道の通勤距離(km)
+        <input type="number" id="adv-oneway" inputmode="decimal" step="any" min="0.1" max="500" placeholder="12">
+      </label>
+      <label>月の出勤日数(日)
+        <input type="number" id="adv-days" inputmode="numeric" step="1" min="1" max="31" placeholder="20">
+      </label>
+      <button type="button" id="adv-commute-run">月・年の通勤コストを計算</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
   <div class="note-box">
     このツールの計算結果は<strong>概算</strong>です。実際の燃費は道路状況・エアコン使用・積載量などで変わり、カタログ燃費より悪くなるのが一般的です。
   </div>
 
-  <p>走行距離・燃費・ガソリン単価を入力すると、<strong>かかるガソリン代と使用燃料(L)</strong>を計算します。旅行・帰省の費用見積もりや、通勤コストの把握に。</p>
+  <p>走る距離と車の燃費を入れると、<strong>ガソリン代がいくらかかるか</strong>がわかるツールです。高速代を足した1人あたりの割り勘や、通勤で月にいくらかかるかも出せます。旅行・帰省の費用の見積もりにどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -130,6 +156,58 @@
       box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "入力値を確認してください。") + "</p>";
     }
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var splitBox = document.getElementById("adv-result-split");
+  var ADV_ERRORS = {
+    invalid_distance: "距離を正しく入力してください(上のフォームまたは片道距離)。",
+    invalid_efficiency: "燃費(上のフォーム)は 1〜60km/L の範囲で入力してください。",
+    invalid_price: "ガソリン単価(上のフォーム)は 50〜500円/L の範囲で入力してください。",
+    invalid_people: "人数は 1〜20人 の整数で入力してください。",
+    invalid_toll: "高速代は 0〜200,000円 の範囲で入力してください。",
+    invalid_days: "出勤日数は 1〜31日 の整数で入力してください。"
+  };
+  function advError(box, code) {
+    box.innerHTML = '<p class="result-error">' + (ADV_ERRORS[code] || "入力値を確認してください。") + "</p>";
+    box.hidden = false;
+  }
+  function mainInputs() {
+    return {
+      distance: parseFloat(document.getElementById("distance").value),
+      efficiency: parseFloat(document.getElementById("efficiency").value),
+      price: parseFloat(document.getElementById("price").value)
+    };
+  }
+  document.getElementById("adv-split-run").addEventListener("click", function () {
+    var m = mainInputs();
+    var people = parseFloat(document.getElementById("adv-people").value);
+    var toll = parseFloat(document.getElementById("adv-toll").value);
+    if (isNaN(toll)) toll = 0;
+    var r = FuelCalc.splitCost(m.distance, m.efficiency, m.price, people, toll);
+    if (!r.ok) { advError(splitBox, r.code); return; }
+    splitBox.innerHTML =
+      '<div class="result-main">1人あたり 約' + r.perPersonYen.toLocaleString() + ' 円</div>' +
+      '<p>ガソリン代 ' + r.fuelYen.toLocaleString() + ' 円 + 高速代 ' + r.tollYen.toLocaleString() +
+      ' 円 = 合計 <strong>' + r.totalYen.toLocaleString() + ' 円</strong></p>';
+    splitBox.hidden = false;
+  });
+  document.getElementById("adv-commute-run").addEventListener("click", function () {
+    var m = mainInputs();
+    var oneWay = parseFloat(document.getElementById("adv-oneway").value);
+    var days = parseFloat(document.getElementById("adv-days").value);
+    var r = FuelCalc.commuteCost(oneWay, days, m.efficiency, m.price);
+    if (!r.ok) { advError(advBox, r.code); return; }
+    advBox.innerHTML =
+      '<div class="result-main">通勤ガソリン代 約' + r.costPerMonth.toLocaleString() + ' 円/月</div>' +
+      '<p>1年: <strong>約' + r.costPerYear.toLocaleString() + ' 円</strong><br>' +
+      '月の走行距離 ' + r.monthlyKm.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' km / 使用燃料 約' +
+      r.fuelLPerMonth.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' L</p>';
+    advBox.hidden = false;
   });
 })();
 </script>

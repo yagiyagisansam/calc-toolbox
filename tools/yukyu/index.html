@@ -55,11 +55,26 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 入社日から次の付与日を予測</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">次はいつ・何日もらえる?</h3>
+      <p class="adv-note">入社日を入れると、次に有給がもらえる日と日数を予測します。働き方は上のフォームで選んだものを使います(8割以上出勤している前提)。</p>
+      <label>入社日
+        <input type="date" id="adv-hire" min="1900-01-01" max="2200-12-31">
+      </label>
+      <button type="button" id="adv-run">付与日を予測する</button>
+      <h3 class="adv-h">これまでの付与履歴</h3>
+      <p class="adv-note">同じ入社日から、これまでに付与されたはずの日付と日数も一覧にします(結果に表示)。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
   <div class="note-box">
     付与には「雇入れから6ヶ月継続勤務」かつ「全労働日の<strong>8割以上出勤</strong>」が必要です。表示は法律上の最低日数で、会社がこれより多く付与している場合もあります。
   </div>
 
-  <p>勤続年数と働き方を選ぶと、労働基準法に基づく<strong>年次有給休暇の付与日数</strong>を表示します。パート・アルバイト(週4日以下)の比例付与にも対応。</p>
+  <p>働き方と勤続年数を選ぶだけで、<strong>有給休暇が何日もらえるか</strong>がわかるツールです。週4日以下のパート・アルバイトにも対応しています。自分の有給の日数を確かめたい時にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -147,6 +162,53 @@
       box.innerHTML = '<p class="result-error">入力値を確認してください。</p>';
     }
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function fmtJa(iso) {
+    return iso.slice(0, 4) + "年" + parseInt(iso.slice(5, 7), 10) + "月" + parseInt(iso.slice(8, 10), 10) + "日";
+  }
+  document.getElementById("adv-run").addEventListener("click", function () {
+    var hire = document.getElementById("adv-hire").value;
+    var type = document.getElementById("worker-type").value;
+    if (!hire) {
+      advBox.innerHTML = '<p class="result-error">入社日を入力してください。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var now = new Date();
+    var todayIso = now.getFullYear() + "-" +
+      String(now.getMonth() + 1).padStart(2, "0") + "-" +
+      String(now.getDate()).padStart(2, "0");
+    var r = YukyuCalc.nextGrant(hire, type, todayIso);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">入社日を正しく入力してください。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var html =
+      '<div class="result-main">次回付与: ' + fmtJa(r.nextDate) + ' に ' + r.days + ' 日</div>' +
+      '<p>勤続 ' + r.serviceLabel + ' の区分(法律上の最低日数)。' +
+      (r.obligation5days ? '付与日数が10日以上なので、付与から1年以内に<strong>5日は取得させる義務</strong>が会社にあります。' : '') + '</p>';
+    if (r.history.length > 0) {
+      var rows = r.history.slice(-5);
+      html += '<div class="table-scroll"><table class="data-table"><thead>' +
+        '<tr><th>付与日</th><th>勤続</th><th>付与日数</th></tr></thead><tbody>';
+      for (var i = 0; i < rows.length; i++) {
+        html += '<tr><td>' + fmtJa(rows[i].date) + '</td><td>' + rows[i].label + '</td><td>' + rows[i].days + ' 日</td></tr>';
+      }
+      html += '</tbody></table></div>';
+      if (r.history.length > 5) {
+        html += '<p class="adv-note">直近5回分を表示しています(付与は計 ' + r.history.length + ' 回)。</p>';
+      }
+      html += '<p class="adv-note">有給の繰り越しは付与から2年で時効になります。実際の残日数は取得状況によるため、勤務先の記録でご確認ください。</p>';
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
   });
 })();
 </script>

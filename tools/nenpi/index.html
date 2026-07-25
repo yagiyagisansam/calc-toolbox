@@ -47,7 +47,42 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>前回の給油から走った距離と今回の給油量を入れるだけで、<strong>実燃費(km/L)</strong>を計算します。ガソリン単価を入れると給油代と1kmあたりの燃料費も表示。カタログ燃費との比較や車の調子チェックに。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: カタログ燃費との比較・2台の年間比較</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">カタログ燃費の何%出ている?</h3>
+      <p class="adv-note">計算した実燃費と、カタログに書いてある燃費(WLTCモードなど)をくらべます。7〜8割程度出ていれば一般的な範囲です。</p>
+      <label>実燃費(km/L)
+        <span class="field-note">上のフォームを計算済みなら自動で入ります</span>
+        <input type="number" id="adv-actual" inputmode="decimal" step="any" min="1" max="60" placeholder="15.2">
+      </label>
+      <label>カタログ燃費(km/L)
+        <input type="number" id="adv-catalog" inputmode="decimal" step="any" min="1" max="60" placeholder="20.4">
+      </label>
+      <button type="button" id="adv-ratio-run">達成率を計算</button>
+      <div class="tool-result" id="adv-result-ratio" hidden aria-live="polite"></div>
+      <h3 class="adv-h">2台くらべ: 年間ガソリン代の差(買い替えの目安)</h3>
+      <p class="adv-note">今の車(実燃費)と、乗り換え候補の燃費・年間走行距離から、1年でガソリン代がいくら変わるかを出します。</p>
+      <label>今の車の燃費(km/L)
+        <input type="number" id="adv-car-a" inputmode="decimal" step="any" min="1" max="60" placeholder="12">
+      </label>
+      <label>乗り換え候補の車の燃費(km/L)
+        <input type="number" id="adv-car-b" inputmode="decimal" step="any" min="1" max="60" placeholder="22">
+      </label>
+      <label>年間走行距離(km)
+        <span class="field-note">通勤や買い物中心なら 5,000〜10,000km が目安</span>
+        <input type="number" id="adv-annual" inputmode="numeric" step="any" min="100" max="100000" placeholder="8000">
+      </label>
+      <label>ガソリン単価(円/L)
+        <span class="field-note">上のフォームに入力済みなら省略できます</span>
+        <input type="number" id="adv-price2" inputmode="decimal" step="any" min="1" max="1000" placeholder="170">
+      </label>
+      <button type="button" id="adv-cmp-run">年間の差額を計算</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>前回の給油から走った距離と、今回入れたガソリンの量だけで、<strong>実際の燃費(km/L)</strong>がわかるツールです。単価を入れると給油代と1kmあたりの燃料費も表示します。車の調子チェックや燃費の記録にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -138,6 +173,81 @@
       '<div class="table-scroll"><table class="data-table"><thead><tr><th>項目</th><th>値</th></tr></thead><tbody>' +
       rows + "</tbody></table></div>";
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var ratioBox = document.getElementById("adv-result-ratio");
+  var ADV_ERRORS = {
+    invalid_actual: "実燃費は 1〜60km/L の範囲で入力してください。",
+    invalid_catalog: "カタログ燃費は 1〜60km/L の範囲で入力してください。",
+    invalid_efficiency_a: "今の車の燃費は 1〜60km/L の範囲で入力してください。",
+    invalid_efficiency_b: "候補の車の燃費は 1〜60km/L の範囲で入力してください。",
+    invalid_distance: "年間走行距離は 100〜100,000km の範囲で入力してください。",
+    invalid_price: "ガソリン単価は 1〜1,000円/L の範囲で入力してください。"
+  };
+  function advError(box, code) {
+    box.innerHTML = '<p class="result-error">' + (ADV_ERRORS[code] || "入力値を確認してください。") + "</p>";
+    box.hidden = false;
+  }
+  function prefillActual() {
+    var d = parseFloat(document.getElementById("distance").value);
+    var l = parseFloat(document.getElementById("liters").value);
+    var input = document.getElementById("adv-actual");
+    if (input.value === "" && !isNaN(d) && !isNaN(l)) {
+      var r = NenpiCalc.calc(d, l);
+      if (r.ok) input.value = r.kmPerL;
+    }
+  }
+  document.querySelector(".adv-box").addEventListener("toggle", prefillActual);
+  document.getElementById("adv-ratio-run").addEventListener("click", function () {
+    prefillActual();
+    var actual = parseFloat(document.getElementById("adv-actual").value);
+    var catalog = parseFloat(document.getElementById("adv-catalog").value);
+    var r = NenpiCalc.catalogRatio(actual, catalog);
+    if (!r.ok) { advError(ratioBox, r.code); return; }
+    var note;
+    if (r.percent >= 100) {
+      note = "カタログ値を上回っています。とても良い燃費です。";
+    } else if (r.percent >= 70) {
+      note = "一般的な範囲(目安7〜8割)です。";
+    } else {
+      note = "目安(7〜8割)より低めです。タイヤ空気圧・急加速・短距離の繰り返しなどが影響しているかもしれません。";
+    }
+    ratioBox.innerHTML =
+      '<div class="result-main">カタログ燃費の ' + r.percent.toLocaleString(undefined, { maximumFractionDigits: 1 }) + '%</div>' +
+      '<p>' + note + '</p>';
+    ratioBox.hidden = false;
+  });
+  document.getElementById("adv-cmp-run").addEventListener("click", function () {
+    var a = parseFloat(document.getElementById("adv-car-a").value);
+    var b = parseFloat(document.getElementById("adv-car-b").value);
+    var annual = parseFloat(document.getElementById("adv-annual").value);
+    var price = parseFloat(document.getElementById("adv-price2").value);
+    if (isNaN(price)) price = parseFloat(document.getElementById("price").value);
+    var r = NenpiCalc.compareCars(a, b, annual, price);
+    if (!r.ok) { advError(advBox, r.code); return; }
+    var head;
+    if (r.diffYen > 0) {
+      head = '乗り換えると年 約' + r.diffYen.toLocaleString() + ' 円お得';
+    } else if (r.diffYen < 0) {
+      head = '乗り換えると年 約' + Math.abs(r.diffYen).toLocaleString() + ' 円高くつく';
+    } else {
+      head = '年間のガソリン代はほぼ同じ';
+    }
+    advBox.innerHTML =
+      '<div class="result-main">' + head + '</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead>' +
+      '<tr><th></th><th>今の車</th><th>候補の車</th></tr></thead><tbody>' +
+      '<tr><td>燃費</td><td>' + a.toLocaleString() + ' km/L</td><td>' + b.toLocaleString() + ' km/L</td></tr>' +
+      '<tr><td>年間使用燃料</td><td>' + r.fuelLA.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' L</td><td>' + r.fuelLB.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' L</td></tr>' +
+      '<tr><td>年間ガソリン代</td><td>' + r.costA.toLocaleString() + ' 円</td><td><strong>' + r.costB.toLocaleString() + ' 円</strong></td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">車両価格・税金・保険などの差は含みません。「差額 × 乗る年数」が買い替え費用に見合うかの目安にどうぞ。</p>';
+    advBox.hidden = false;
   });
 })();
 </script>

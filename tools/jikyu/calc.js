@@ -67,7 +67,47 @@
     return { ok: true, hourlyYen: Math.round(monthlyYen / (hoursPerDay * daysPerMonth)) };
   }
 
+  var COMMUTE_MIN = 0;
+  var COMMUTE_MAX = 300;
+
+  /**
+   * 通勤時間も労働とみなした場合の「実質時給」を計算する。
+   * 実質時給 = (時給 × 労働時間 × 日数) ÷ ((労働時間 + 往復通勤時間) × 日数)
+   * 通勤に賃金は出ないため、同じ月収を「家を出てから帰るまでの拘束時間」で
+   * 割り直した値。円未満は四捨五入、月の通勤時間は小数第1位まで。
+   * @param {number} hourlyYen 時給(円・100〜100,000)
+   * @param {number} hoursPerDay 1日の労働時間(0.5〜24)
+   * @param {number} daysPerMonth 月の勤務日数(1〜31・整数)
+   * @param {number} commuteOneWayMin 片道の通勤時間(分・0〜300)
+   * @returns {{ok: true, effectiveHourlyYen: number, monthlyYen: number,
+   *            commuteHoursPerMonth: number, dropYen: number}
+   *          |{ok: false, code: string}}
+   *   dropYen: 額面時給との差(実質いくら目減りしているか)
+   *   code: "invalid_hourly" | "invalid_hours" | "invalid_days" | "invalid_commute"
+   */
+  function effectiveHourly(hourlyYen, hoursPerDay, daysPerMonth, commuteOneWayMin) {
+    if (!isFiniteNumber(hourlyYen) || hourlyYen < HOURLY_MIN_YEN || hourlyYen > HOURLY_MAX_YEN) {
+      return { ok: false, code: "invalid_hourly" };
+    }
+    var workError = validateWork(hoursPerDay, daysPerMonth);
+    if (workError) return { ok: false, code: workError };
+    if (!isFiniteNumber(commuteOneWayMin) || commuteOneWayMin < COMMUTE_MIN || commuteOneWayMin > COMMUTE_MAX) {
+      return { ok: false, code: "invalid_commute" };
+    }
+    var monthlyRaw = hourlyYen * hoursPerDay * daysPerMonth;
+    var commuteHoursPerDay = commuteOneWayMin * 2 / 60;
+    var effRaw = monthlyRaw / ((hoursPerDay + commuteHoursPerDay) * daysPerMonth);
+    return {
+      ok: true,
+      effectiveHourlyYen: Math.round(effRaw),
+      monthlyYen: Math.round(monthlyRaw),
+      commuteHoursPerMonth: Math.round(commuteHoursPerDay * daysPerMonth * 10) / 10,
+      dropYen: Math.round(hourlyYen - effRaw)
+    };
+  }
+
   var api = {
+    effectiveHourly: effectiveHourly,
     toMonthly: toMonthly,
     toHourly: toHourly,
     HOURLY_MIN_YEN: HOURLY_MIN_YEN,

@@ -48,7 +48,49 @@
     return { ok: true, go: Math.round(grams / RICE_G * 100) / 100 };
   }
 
-  var api = { fromGo: fromGo, fromGram: fromGram, RICE_G: RICE_G, WATER_ML: WATER_ML };
+  function round2(x) { return Math.round(x * 100) / 100; }
+
+  /**
+   * 炊き上がりご飯の量(g)から、必要な合数と水の量を逆算する。
+   * 炊き上がりは米の重さの約2.2倍(1合150g → 約330g)、水は1合あたり約200ml。
+   * 合数は小数第2位、米は小数第1位、水はml単位で四捨五入。
+   * @param {number} cookedG 炊き上がりご飯の量(g・1〜6,600 = 20合分まで)
+   * @returns {{ok: true, go: number, riceG: number, waterMl: number}
+   *          |{ok: false, code: string}}  code: "invalid_cooked"
+   */
+  function fromCooked(cookedG) {
+    if (typeof cookedG !== "number" || !isFinite(cookedG) || cookedG <= 0 || cookedG > 6600) {
+      return { ok: false, code: "invalid_cooked" };
+    }
+    var goRaw = cookedG / (RICE_G * COOKED_RATE);
+    return {
+      ok: true,
+      go: round2(goRaw),
+      riceG: round1(cookedG / COOKED_RATE),
+      waterMl: Math.round(goRaw * WATER_ML)
+    };
+  }
+
+  /**
+   * お茶碗の杯数から、必要な合数と水の量を逆算する。
+   * お茶碗1杯 ≒ ごはん150g の目安で炊き上がり量に直してから fromCooked と同じ計算をする。
+   * @param {number} bowls 杯数(0.5〜40)
+   * @returns {{ok: true, cookedG: number, go: number, riceG: number, waterMl: number}
+   *          |{ok: false, code: string}}  code: "invalid_bowls"
+   */
+  function fromBowls(bowls) {
+    if (typeof bowls !== "number" || !isFinite(bowls) || bowls <= 0 || bowls > 40) {
+      return { ok: false, code: "invalid_bowls" };
+    }
+    var cooked = bowls * BOWL_G;
+    var r = fromCooked(cooked);
+    if (!r.ok) return r;
+    return { ok: true, cookedG: Math.round(cooked), go: r.go, riceG: r.riceG, waterMl: r.waterMl };
+  }
+
+  var api = {
+    fromBowls: fromBowls,
+    fromCooked: fromCooked, fromGo: fromGo, fromGram: fromGram, RICE_G: RICE_G, WATER_ML: WATER_ML };
   if (typeof module !== "undefined" && module.exports) { module.exports = api; }
   else { global.KomeCalc = api; }
 })(typeof window !== "undefined" ? window : globalThis);

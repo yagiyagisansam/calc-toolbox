@@ -113,6 +113,68 @@
         "ok": false,
         "code": "invalid_gram"
       }
+    },
+    {
+      "name": "逆算: 炊き上がり330g → 1合・米150g・水200ml",
+      "func": "fromCooked",
+      "args": [
+        330
+      ],
+      "expect": {
+        "ok": true,
+        "go": 1,
+        "riceG": 150,
+        "waterMl": 200
+      }
+    },
+    {
+      "name": "逆算: 炊き上がり660g → 2合・米300g・水400ml",
+      "func": "fromCooked",
+      "args": [
+        660
+      ],
+      "expect": {
+        "ok": true,
+        "go": 2,
+        "riceG": 300,
+        "waterMl": 400
+      }
+    },
+    {
+      "name": "逆算: お茶碗3杯(450g)→ 約1.36合・米204.5g・水273ml",
+      "func": "fromBowls",
+      "args": [
+        3
+      ],
+      "expect": {
+        "ok": true,
+        "cookedG": 450,
+        "go": 1.36,
+        "riceG": 204.5,
+        "waterMl": 273
+      }
+    },
+    {
+      "name": "逆算: 炊き上がり0gはエラー",
+      "func": "fromCooked",
+      "args": [
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_cooked"
+      }
+    },
+    {
+      "name": "逆算: 杯数41杯(上限超)はエラー",
+      "func": "fromBowls",
+      "args": [
+        41
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_bowls"
+      }
     }
   ]
 }

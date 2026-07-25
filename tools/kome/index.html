@@ -44,7 +44,31 @@
 
   <div class="tool-result" id="result" hidden aria-live="polite"></div>
 
-  <p>「お米1合って何グラム?」「2合炊くときの水は?」——合数を入れるだけで、<strong>お米の重さ・水加減の目安・炊き上がりの量・お茶碗何杯分か</strong>をまとめて計算します。無洗米を袋からグラムで量るときの逆算にも対応。</p>
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 食べたい量から逆算する</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">炊き上がりの量から逆算</h3>
+      <p class="adv-note">「カレーでごはん600g使いたい」など、炊き上がりの量が決まっている時に。必要な合数と水の量を逆算します。</p>
+      <label>炊き上がりご飯の量(g)
+        <input type="number" id="adv-cooked" inputmode="numeric" step="any" min="1" max="6600" placeholder="600">
+      </label>
+      <button type="button" id="adv-cooked-run">合数と水を逆算</button>
+      <div class="tool-result" id="adv-result-cooked" hidden aria-live="polite"></div>
+      <h3 class="adv-h">人数から「何合炊けばいい?」</h3>
+      <p class="adv-note">お茶碗1杯 ≒ ごはん150g として、人数と1人あたりの杯数から必要な合数を出します。</p>
+      <label>食べる人数(人)
+        <input type="number" id="adv-people" inputmode="numeric" step="1" min="1" max="20" placeholder="4">
+      </label>
+      <label>1人あたりの杯数(杯)
+        <span class="field-note">普通盛り=1杯、大盛り=1.5杯 が目安</span>
+        <input type="number" id="adv-bowls-each" inputmode="decimal" step="any" min="0.5" max="5" value="1">
+      </label>
+      <button type="button" id="adv-people-run">必要な合数を計算</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <p>お米の合数を入れるだけで、<strong>お米の重さ・水の量・炊き上がりの量</strong>がわかるツールです。「ごはんを500g食べたい」「4人分炊きたい」からの逆算もできます。炊飯の水加減に迷った時にどうぞ。</p>
 
   <h2>使い方</h2>
   <ol>
@@ -134,6 +158,54 @@
       box.innerHTML = '<div class="result-main">約 ' + r2.go.toLocaleString() + " 合</div><p>1合=約150gとして計算しています。</p>";
     }
     box.hidden = false;
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var cookedBox = document.getElementById("adv-result-cooked");
+  function goSuggest(go) {
+    var s = Math.ceil(go * 2) / 2;
+    return s.toLocaleString(undefined, { maximumFractionDigits: 1 });
+  }
+  function renderResult(box, r, headNote) {
+    box.innerHTML =
+      '<div class="result-main">' + headNote + 'お米 約' + r.go.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' 合</div>' +
+      '<p>切りよく炊くなら <strong>' + goSuggest(r.go) + ' 合</strong> がおすすめ。</p>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>お米の重さ</td><td>約 ' + r.riceG.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' g</td></tr>' +
+      '<tr><td>水の量</td><td>約 ' + r.waterMl.toLocaleString() + ' ml</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">水の量は白米の目安(1合あたり約200ml)です。炊飯器の目盛りがあればそちらを優先してください。</p>';
+    box.hidden = false;
+  }
+  document.getElementById("adv-cooked-run").addEventListener("click", function () {
+    var cooked = parseFloat(document.getElementById("adv-cooked").value);
+    var r = KomeCalc.fromCooked(cooked);
+    if (!r.ok) {
+      cookedBox.innerHTML = '<p class="result-error">炊き上がりの量は 1〜6,600g(20合分まで)の範囲で入力してください。</p>';
+      cookedBox.hidden = false;
+      return;
+    }
+    renderResult(cookedBox, r, "");
+  });
+  document.getElementById("adv-people-run").addEventListener("click", function () {
+    var people = parseFloat(document.getElementById("adv-people").value);
+    var each = parseFloat(document.getElementById("adv-bowls-each").value);
+    if (isNaN(people) || people !== Math.floor(people) || people < 1 || people > 20 || isNaN(each)) {
+      advBox.innerHTML = '<p class="result-error">人数は 1〜20人 の整数、杯数は 0.5〜5杯 で入力してください。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var r = KomeCalc.fromBowls(people * each);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">合計の杯数が多すぎます(40杯まで)。杯数を確認してください。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    renderResult(advBox, r, 'ごはん 約' + r.cookedG.toLocaleString() + ' g = ');
   });
 })();
 </script>

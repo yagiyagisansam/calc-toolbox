@@ -6,62 +6,255 @@
     {
       "name": "400km・25L: 16km/L・6.25L/100km",
       "func": "calc",
-      "args": [400, 25],
-      "expect": { "ok": true, "kmPerL": 16, "lPer100km": 6.25 }
+      "args": [
+        400,
+        25
+      ],
+      "expect": {
+        "ok": true,
+        "kmPerL": 16,
+        "lPer100km": 6.25
+      }
     },
     {
       "name": "単価170円/Lを追加: 給油代4,250円・1kmあたり10.63円",
       "func": "calc",
-      "args": [400, 25, 170],
-      "expect": { "ok": true, "kmPerL": 16, "fuelCost": 4250, "costPerKm": 10.63 }
+      "args": [
+        400,
+        25,
+        170
+      ],
+      "expect": {
+        "ok": true,
+        "kmPerL": 16,
+        "fuelCost": 4250,
+        "costPerKm": 10.63
+      }
     },
     {
       "name": "小数入力: 653.2km・40.11L → 16.29km/L・6.14L/100km",
       "func": "calc",
-      "args": [653.2, 40.11],
-      "expect": { "ok": true, "kmPerL": 16.29, "lPer100km": 6.14 }
+      "args": [
+        653.2,
+        40.11
+      ],
+      "expect": {
+        "ok": true,
+        "kmPerL": 16.29,
+        "lPer100km": 6.14
+      }
     },
     {
       "name": "軽自動車の例: 350km・15L → 23.33km/L",
       "func": "calc",
-      "args": [350, 15],
-      "expect": { "ok": true, "kmPerL": 23.33, "lPer100km": 4.29 }
+      "args": [
+        350,
+        15
+      ],
+      "expect": {
+        "ok": true,
+        "kmPerL": 23.33,
+        "lPer100km": 4.29
+      }
     },
     {
       "name": "異常入力: 距離0はエラー",
       "func": "calc",
-      "args": [0, 25],
-      "expect": { "ok": false, "code": "invalid_distance" }
+      "args": [
+        0,
+        25
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_distance"
+      }
     },
     {
       "name": "異常入力: 距離が負はエラー",
       "func": "calc",
-      "args": [-100, 25],
-      "expect": { "ok": false, "code": "invalid_distance" }
+      "args": [
+        -100,
+        25
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_distance"
+      }
     },
     {
       "name": "異常入力: 給油量0はエラー",
       "func": "calc",
-      "args": [400, 0],
-      "expect": { "ok": false, "code": "invalid_liters" }
+      "args": [
+        400,
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_liters"
+      }
     },
     {
       "name": "異常入力: 給油量500L超はエラー",
       "func": "calc",
-      "args": [400, 600],
-      "expect": { "ok": false, "code": "invalid_liters" }
+      "args": [
+        400,
+        600
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_liters"
+      }
     },
     {
       "name": "異常入力: 単価0はエラー",
       "func": "calc",
-      "args": [400, 25, 0],
-      "expect": { "ok": false, "code": "invalid_price" }
+      "args": [
+        400,
+        25,
+        0
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_price"
+      }
     },
     {
       "name": "異常入力: 数値以外はエラー",
       "func": "calc",
-      "args": ["400", 25],
-      "expect": { "ok": false, "code": "invalid_distance" }
+      "args": [
+        "400",
+        25
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_distance"
+      }
+    },
+    {
+      "name": "カタログ比: 実燃費15/カタログ20 → 75%",
+      "func": "catalogRatio",
+      "args": [
+        15,
+        20
+      ],
+      "expect": {
+        "ok": true,
+        "percent": 75
+      }
+    },
+    {
+      "name": "カタログ比: 実燃費16.8/カタログ21 → 80%",
+      "func": "catalogRatio",
+      "args": [
+        16.8,
+        21
+      ],
+      "expect": {
+        "ok": true,
+        "percent": 80
+      }
+    },
+    {
+      "name": "カタログ比: 実燃費がカタログ超え(25/20)→ 125%",
+      "func": "catalogRatio",
+      "args": [
+        25,
+        20
+      ],
+      "expect": {
+        "ok": true,
+        "percent": 125
+      }
+    },
+    {
+      "name": "カタログ比: 実燃費0はエラー",
+      "func": "catalogRatio",
+      "args": [
+        0,
+        20
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_actual"
+      }
+    },
+    {
+      "name": "2台比較: 10km/L→20km/L・年1万km・160円 → 年8万円の差",
+      "func": "compareCars",
+      "args": [
+        10,
+        20,
+        10000,
+        160
+      ],
+      "expect": {
+        "ok": true,
+        "costA": 160000,
+        "costB": 80000,
+        "diffYen": 80000,
+        "fuelLA": 1000,
+        "fuelLB": 500
+      }
+    },
+    {
+      "name": "2台比較: 15→25km/L・年8,000km・175円 → 差37,333円",
+      "func": "compareCars",
+      "args": [
+        15,
+        25,
+        8000,
+        175
+      ],
+      "expect": {
+        "ok": true,
+        "costA": 93333,
+        "costB": 56000,
+        "diffYen": 37333
+      }
+    },
+    {
+      "name": "2台比較: 同じ燃費なら差0円",
+      "func": "compareCars",
+      "args": [
+        18,
+        18,
+        10000,
+        170
+      ],
+      "expect": {
+        "ok": true,
+        "costA": 94444,
+        "costB": 94444,
+        "diffYen": 0
+      }
+    },
+    {
+      "name": "2台比較: 候補の燃費61km/L(上限超)はエラー",
+      "func": "compareCars",
+      "args": [
+        10,
+        61,
+        10000,
+        160
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_efficiency_b"
+      }
+    },
+    {
+      "name": "2台比較: 年間走行距離が短すぎる(10km)はエラー",
+      "func": "compareCars",
+      "args": [
+        10,
+        20,
+        10,
+        160
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_distance"
+      }
     }
   ]
 }
