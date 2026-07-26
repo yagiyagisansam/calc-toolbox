@@ -1,6 +1,7 @@
 -- =============================================================
 -- みんなの投票(tools/poll/)用 Supabase セットアップSQL(全機能版)
 -- 新しいSupabaseプロジェクトの SQL Editor に全文を貼り付けて Run する(1回だけ)
+-- ※このあと migrate_ops.sql(不具合報告・公開停止・点検RPC)も続けて実行すること
 -- ※既にsetup済みのDBには、migrate_portal.sql / migrate_features.sql を順に使うこと
 --
 -- 設計方針:

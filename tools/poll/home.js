@@ -92,12 +92,37 @@ if (window.top !== window.self) {
   }
 
   // この端末で作ったアンケート(localStorage)
+  // 作成時に保存した削除キー(m.k)があるものは、この端末から自分で削除できる
+  var MINE_KEY = "pollMine";
   var mine = [];
-  try { mine = JSON.parse(window.localStorage.getItem("pollMine")) || []; } catch (e) { mine = []; }
-  if (mine.length) {
-    document.getElementById("mine-sec").hidden = false;
-    var mineEl = document.getElementById("mine");
+  try { mine = JSON.parse(window.localStorage.getItem(MINE_KEY)) || []; } catch (e) { mine = []; }
+
+  function saveMine(list) {
+    try { window.localStorage.setItem(MINE_KEY, JSON.stringify(list)); } catch (e) { /* 保存不可は無視 */ }
+  }
+
+  var mineSec = document.getElementById("mine-sec");
+  var mineEl = document.getElementById("mine");
+  var confirmBg = document.getElementById("del-confirm-bg");
+  var confirmQ = document.getElementById("del-confirm-q");
+  var pendingDelete = null;
+
+  var delError = document.getElementById("del-error");
+
+  function closeConfirm() {
+    confirmBg.hidden = true;
+    delError.hidden = true;
+    pendingDelete = null;
+  }
+
+  function renderMine() {
+    mineEl.replaceChildren();
+    if (!mine.length) { mineSec.hidden = true; return; }
+    mineSec.hidden = false;
     mine.slice(0, 10).forEach(function (m) {
+      var row = document.createElement("div");
+      row.className = "pb-item-row";
+
       var a = document.createElement("a");
       a.className = "pb-item";
       a.href = "./v.html?id=" + encodeURIComponent(m.id);
@@ -105,7 +130,54 @@ if (window.top !== window.self) {
       q.className = "qq";
       q.textContent = m.q;
       a.appendChild(q);
-      mineEl.appendChild(a);
+      row.appendChild(a);
+
+      if (m.k) {
+        var del = document.createElement("button");
+        del.type = "button";
+        del.className = "pb-item-del";
+        del.textContent = "削除";
+        del.setAttribute("aria-label", m.q + " を削除する");
+        del.addEventListener("click", function () {
+          pendingDelete = m;
+          confirmQ.textContent = m.q;
+          delError.hidden = true;
+          confirmBg.hidden = false;
+          document.getElementById("del-no").focus();
+        });
+        row.appendChild(del);
+      }
+      mineEl.appendChild(row);
     });
   }
+
+  document.getElementById("del-no").addEventListener("click", closeConfirm);
+  confirmBg.addEventListener("click", function (e) { if (e.target === confirmBg) closeConfirm(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !confirmBg.hidden) closeConfirm();
+  });
+
+  document.getElementById("del-yes").addEventListener("click", function () {
+    if (!pendingDelete) return;
+    var target = pendingDelete;
+    var btn = this;
+    btn.disabled = true;
+    btn.textContent = "削除中…";
+    PollNet.deletePoll(target.id, target.k).then(function (r) {
+      btn.disabled = false;
+      btn.textContent = "はい、削除する";
+      if (r.ok || r.code === "not_owner") {
+        // 削除できた場合と、既に消えている場合はこの端末の一覧からも消す
+        closeConfirm();
+        mine = mine.filter(function (x) { return x.id !== target.id; });
+        saveMine(mine);
+        renderMine();
+      } else {
+        delError.textContent = "削除できませんでした。通信状況を確認して、もう一度お試しください。";
+        delError.hidden = false;
+      }
+    });
+  });
+
+  renderMine();
 })();

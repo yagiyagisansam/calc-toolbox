@@ -6,15 +6,15 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>計算ツールボックス | 暮らしに役立つ無料計算ツール集</title>
-  <meta name="description" content="健康・お金・日付・暮らしの疑問をその場で計算できる無料Webツール集(62個)。登録不要・スマホ対応。すべてのツールに計算根拠と一次情報の出典を明記しています。">
+  <meta name="description" content="健康・お金・日付・暮らしの疑問をその場で計算できる無料Webツール集(61個)。登録不要・スマホ対応。すべてのツールに計算根拠と一次情報の出典を明記しています。">
   <link rel="stylesheet" href="./shared/style.css">
   <!-- @meta start -->
   <link rel="canonical" href="https://quick-calc.site/">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
   <meta name="theme-color" content="#0b6e4f">
   <meta property="og:site_name" content="計算ツールボックス">
   <meta property="og:title" content="計算ツールボックス | 暮らしに役立つ無料計算ツール集">
-  <meta property="og:description" content="健康・お金・日付・暮らしの疑問をその場で計算できる無料Webツール集(62個)。登録不要・スマホ対応。すべてのツールに計算根拠と一次情報の出典を明記しています。">
+  <meta property="og:description" content="健康・お金・日付・暮らしの疑問をその場で計算できる無料Webツール集(61個)。登録不要・スマホ対応。すべてのツールに計算根拠と一次情報の出典を明記しています。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://quick-calc.site/">
   <meta property="og:locale" content="ja_JP">
@@ -38,6 +38,7 @@
     .brand .tg { font-size: 0.72rem; color: var(--tp-muted); margin: 1px 0 0; }
     .tp-search { display: flex; align-items: center; gap: 9px; background: var(--tp-tile); border-radius: 16px; padding: 13px 16px; color: var(--tp-muted); box-shadow: var(--tp-shadow); margin: 14px 0 0; }
     .tp-search input { border: none; outline: none; background: none; font-size: 1rem; width: 100%; color: var(--tp-ink); }
+    .tp-search .site-search-ic { width: 18px; height: 18px; }
     .tp-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 16px 0 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
     .tp-tabs::-webkit-scrollbar { display: none; }
     .tp-tab { flex: 0 0 auto; padding: 8px 16px; border-radius: 999px; border: none; background: rgba(120,124,130,0.1); color: var(--tp-ink); font-size: 0.88rem; cursor: pointer; white-space: nowrap; font-weight: 500; }
@@ -67,6 +68,12 @@
       .g3 { background: #2e2740; color: #a98ce0; }
     }
     .no-hit { color: var(--tp-muted); font-size: 0.88rem; margin: 8px 2px; }
+    .poll-card { display: flex; align-items: center; gap: 14px; background: var(--tp-tile); border-radius: 20px; padding: 16px; text-decoration: none; color: var(--tp-ink); box-shadow: var(--tp-shadow); }
+    .poll-card .pic { width: 52px; height: 52px; flex: 0 0 auto; border-radius: 17px; background: #fde8ec; color: #d64560; display: flex; align-items: center; justify-content: center; }
+    .poll-card .pic svg { width: 26px; height: 26px; }
+    .poll-card .pt b { display: block; font-size: 0.98rem; font-weight: 800; }
+    .poll-card .pt small { display: block; font-size: 0.76rem; color: var(--tp-muted); margin-top: 2px; line-height: 1.5; }
+    @media (prefers-color-scheme: dark) { .poll-card .pic { background: #3a2229; color: #ff8798; } }
     .seo-list { margin-top: 34px; font-size: 0.85rem; }
     .seo-list summary { cursor: pointer; color: var(--tp-muted); font-weight: 600; }
     .seo-list h3 { font-size: 0.95rem; margin: 14px 0 4px; }
@@ -81,11 +88,11 @@
     <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg></span>
     <div>
       <h1>計算ツールボックス</h1>
-      <p class="tg">暮らしの計算62ツール・登録不要・ぜんぶ無料</p>
+      <p class="tg">暮らしの計算61ツール・登録不要・ぜんぶ無料</p>
     </div>
   </div>
 
-  <div class="tp-search" id="search">🔍 <input type="search" id="search-input" placeholder="検索(例: 家賃、文字数、営業日)" aria-label="ツールを検索" autocomplete="off"></div>
+  <div class="tp-search" id="search"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input type="search" id="search-input" placeholder="検索(例: 家賃、文字数、営業日)" aria-label="ツールを検索" autocomplete="off"></div>
   <div class="tp-tabs" id="tabs" role="tablist"></div>
 
   <div id="pop-sec">
@@ -93,7 +100,7 @@
     <div class="tp-grid" id="popular"></div>
   </div>
 
-  <div class="tp-sec" id="genre-title"><b>すべて</b><span>62個</span></div>
+  <div class="tp-sec" id="genre-title"><b>すべて</b><span>61個</span></div>
   <p class="no-hit" id="no-hit" hidden>該当するツールがありません。別のことばでお試しください(例: 家賃、割引、カロリー)</p>
   <div class="tp-grid" id="grid">
       <a class="tile" href="./tools/bmi/" data-slug="bmi" data-cat="健康" data-kw="BMI・適正体重 計算機 身長と体重からBMIと適正体重を計算し、日本肥満学会の基準で判定します。 BMI 肥満度 適正体重 標準体重 やせ ダイエット 身長 体重 たいじゅう しんちょう ひまん" title="BMI・適正体重 計算機 — 身長と体重からBMIと適正体重を計算し、日本肥満学会の基準で判定します。">
@@ -279,13 +286,18 @@
       <a class="tile" href="./tools/petage/" data-slug="petage" data-cat="変換" data-kw="犬・猫の年齢換算 計算機 うちの子は人間だと何歳?猫と小型・中型犬の年齢を目安式で換算します。 犬 猫 年齢 換算 人間 何歳 ペット いぬ ねこ" title="犬・猫の年齢換算 計算機 — うちの子は人間だと何歳?猫と小型・中型犬の年齢を目安式で換算します。">
         <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12.6c3.4 0 5.4 2.1 5.4 4.2 0 1.9-1.6 3-3.2 2.5-1-.3-1.6-.5-2.2-.5s-1.2.2-2.2.5c-1.6.5-3.2-.6-3.2-2.5 0-2.1 2-4.2 5.4-4.2z"/><circle cx="6.3" cy="9.2" r="1.8"/><circle cx="10" cy="6.6" r="1.8"/><circle cx="14" cy="6.6" r="1.8"/><circle cx="17.7" cy="9.2" r="1.8"/></svg></span><span class="nm">犬猫の年齢</span>
       </a>
-      <a class="tile" href="./tools/poll/" data-slug="poll" data-cat="変換" data-kw="みんなの投票(アンケート作成・リアルタイム集計) 質問と選択肢(最大10個)で投票ページのリンクを作成し、SNSで共有してみんなの回答をリアルタイム集計します。 アンケート 投票 集計 統計 多数決 調査 SNS シェア あんけーと とうひょう しゅうけい たすうけつ" title="みんなの投票(アンケート作成・リアルタイム集計) — 質問と選択肢(最大10個)で投票ページのリンクを作成し、SNSで共有してみんなの回答をリアルタイム集計します。">
-        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4.2" width="12.5" height="3.4" rx="1.7"/><rect x="4" y="10.3" width="16" height="3.4" rx="1.7"/><rect x="4" y="16.4" width="7.5" height="3.4" rx="1.7"/></svg></span><span class="nm">アンケート</span>
-      </a>
+  </div>
+
+  <div id="poll-sec">
+    <div class="tp-sec"><b>統計ツール</b><span>計算ツールとは別のツールです</span></div>
+    <a class="poll-card" id="poll-card" href="./tools/poll/" data-kw="みんなの投票(アンケート作成・リアルタイム集計) 質問と選択肢(最大10個)で投票ページのリンクを作成し、SNSで共有してみんなの回答をリアルタイム集計します。 アンケート 投票 集計 統計 多数決 調査 SNS シェア あんけーと とうひょう しゅうけい たすうけつ">
+      <span class="pic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4.2" width="12.5" height="3.4" rx="1.7"/><rect x="4" y="10.3" width="16" height="3.4" rx="1.7"/><rect x="4" y="16.4" width="7.5" height="3.4" rx="1.7"/></svg></span>
+      <span class="pt"><b>みんなの投票</b><small>アンケートを作ってシェア・リアルタイム集計(登録不要)</small></span>
+    </a>
   </div>
 
   <details class="seo-list">
-    <summary>62ツールの説明つき一覧を開く</summary>
+    <summary>61ツールの説明つき一覧を開く</summary>
       <h3>健康</h3>
       <ul>
         <li><a href="./tools/bmi/">BMI・適正体重 計算機</a> — 身長と体重からBMIと適正体重を計算し、日本肥満学会の基準で判定します。</li>
@@ -358,6 +370,9 @@
         <li><a href="./tools/roman/">ローマ数字 変換</a> — アラビア数字とローマ数字(I・V・X・L・C・D・M)を相互変換。2026=MMXXVI。</li>
         <li><a href="./tools/seiza/">星座・誕生石 早見計算機</a> — 誕生日から12星座と誕生石をすぐ表示。境目の日付もわかります。</li>
         <li><a href="./tools/petage/">犬・猫の年齢換算 計算機</a> — うちの子は人間だと何歳?猫と小型・中型犬の年齢を目安式で換算します。</li>
+      </ul>
+      <h3>統計ツール</h3>
+      <ul>
         <li><a href="./tools/poll/">みんなの投票(アンケート作成・リアルタイム集計)</a> — 質問と選択肢(最大10個)で投票ページのリンクを作成し、SNSで共有してみんなの回答をリアルタイム集計します。</li>
       </ul>
   </details>
@@ -399,6 +414,8 @@
     });
   }
   var index = tiles.map(function (t) { return norm(t.dataset.kw + " " + t.textContent); });
+  var pollCard = document.getElementById("poll-card");
+  var pollIndex = norm(pollCard.dataset.kw + " " + pollCard.textContent);
 
   // 人気: 全ユーザーの利用データに基づくランキング(RANK。週次で更新される)
   function renderPopular() {
@@ -447,6 +464,9 @@
       if (hit) shown++;
     });
     document.getElementById("pop-sec").style.display = (terms.length || current !== "all") ? "none" : "";
+    var pollHit = terms.length ? terms.every(function (w) { return pollIndex.indexOf(w) !== -1; }) : current === "all";
+    document.getElementById("poll-sec").style.display = pollHit ? "" : "none";
+    if (pollHit && terms.length) shown++;
     var label = terms.length ? "検索結果" : (current === "all" ? "すべて" : CATS.filter(function (c) { return c[0] === current; })[0][1]);
     document.getElementById("genre-title").innerHTML = "<b>" + label + "</b><span>" + shown + "個</span>";
     document.getElementById("no-hit").hidden = shown > 0;

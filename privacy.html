@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="./shared/style.css">
   <!-- @meta start -->
   <link rel="canonical" href="https://quick-calc.site/privacy.html">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
   <meta name="theme-color" content="#0b6e4f">
   <meta property="og:site_name" content="計算ツールボックス">
   <meta property="og:title" content="プライバシーポリシー | 計算ツールボックス">
@@ -24,8 +24,8 @@
 <body>
 <!-- @partial:header start -->
 <header class="site-header">
-  <a class="site-brand" href="./">🧮 計算ツールボックス</a>
-  <a class="site-search-link" href="./#search">🔍 ツールを探す</a>
+  <a class="site-brand" href="./"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="./#search"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>ツールを探す</a>
 </header>
 <!-- @partial:header end -->
 <main>
@@ -36,9 +36,9 @@
   <p>当サイトの各計算ツールは、入力された値をすべて<strong>ブラウザ内(お使いの端末上)だけで処理</strong>します。入力値が当サイトのサーバーへ送信・保存されることはありません(次項のアンケート作成ツールを除く)。</p>
 
   <h2>アンケート作成ツールで扱うデータ</h2>
-  <p>例外として、<a href="./tools/poll/">アンケート作成ツール</a>では、作成された質問・選択肢と、投票内容(どの選択肢が選ばれたか)を、集計のために当サイトが利用する外部データベースサービス(Supabase)に保存します。氏名・メールアドレスなど個人を特定する情報は収集しません。</p>
+  <p>例外として、<a href="./tools/poll/">アンケート作成ツール</a>では、作成された質問・選択肢と、投票内容(どの選択肢が選ばれたか)を、集計のために当サイトが利用する外部データベースに保存します。氏名・メールアドレスなど個人を特定する情報は収集しません。</p>
   <p>また、同じ端末からの重複投票を防ぐため、無作為に生成した識別子をお使いのブラウザ内(localStorage)に保存し、投票時にこの識別子を送信します。この識別子から個人を特定することはできません。</p>
-  <p>作成したアンケートの削除を希望される場合は、投票ページのURLを添えて<a href="./contact.html">お問い合わせ</a>からご連絡ください。</p>
+  <p>作成したアンケートは、作成した端末から作成者ご本人がいつでも削除できます(「みんなの投票」のトップにある「この端末で作ったアンケート」、または投票ページの削除ボタン)。削除すると、集まった投票データも一緒に消えます。</p>
 
   <h2>アクセス解析ツールについて</h2>
   <p>当サイトでは、サイトの改善のためにアクセス解析ツール(Google Analytics)を利用する場合があります。アクセス解析ツールはトラフィックデータの収集のためにCookieを使用しますが、このデータは匿名で収集されており、個人を特定するものではありません。</p>
@@ -46,8 +46,10 @@
 
   <!-- 広告配信(AdSense等)に関する条項は、広告導入時(M4)にここへ追記する。導入前に記載しない方針 -->
 
-  <h2>お問い合わせで取得する情報</h2>
-  <p>お問い合わせの際にご提供いただいた情報(お名前・メールアドレス・お問い合わせ内容)は、お問い合わせへの対応のみに利用し、それ以外の目的では利用しません。</p>
+  <h2>お問い合わせ・通報で取得する情報</h2>
+  <p>当サイトはメールでのお問い合わせを受け付けておらず、お名前・メールアドレス・電話番号などの個人情報を取得することはありません。</p>
+  <p><a href="./contact.html">お問い合わせ</a>では、選ばれた種別とご記入いただいた本文を、外部データベースに保存します。連投を防ぐため、無作為に生成した識別子をお使いのブラウザ内(localStorage)に保存し、送信時にあわせて送信します。この識別子から個人を特定することはできません。</p>
+  <p>アンケートの通報でも、対象のアンケートと同様の識別子のみを保存します。いずれの情報も、お問い合わせへの対応と不適切な投稿への対応のためだけに利用します。</p>
 
   <h2>免責事項</h2>
   <p>当サイトの計算結果・掲載情報の利用に関する免責事項は<a href="./disclaimer.html">免責事項</a>のページをご覧ください。</p>

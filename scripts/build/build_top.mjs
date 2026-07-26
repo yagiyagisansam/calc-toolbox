@@ -14,15 +14,19 @@ for (const m of iconsSrc.matchAll(/^ ([a-z]+): '(.*)',$/gm)) ICON_PATHS[m[1]] = 
 
 const GCLS = { "健康": "g0", "お金": "g1", "日付": "g2", "変換": "g3" };
 const CAT_ORDER = ["健康", "お金", "日付", "変換"];
+// 「みんなの投票」は計算ツールに含めず、一覧下部に別のツールとして載せる(Hiroさん指示・2026-07-26)
+const POLL = TOOLS.find((t) => t.slug === "poll");
+const CALC = TOOLS.filter((t) => t.slug !== "poll");
 // 人気ランキング(全ユーザーの利用データ基準)。週次運用でSearch Console/Analyticsの
 // 実データから並びを更新して再生成する。端末ごとの個人履歴は使わない(Hiroさん指示)
+// 注意: poll は計算ツールの枠に出さないため、RANKに入れないこと
 const RANK = ["moji", "password", "waribiki", "days", "bmi", "wareki", "eigyobi", "kinenbi", "jikan", "tax", "fudosan", "heikin"];
 
 function svg(slug) {
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICON_PATHS[slug] + "</svg>";
 }
 
-const sorted = CAT_ORDER.flatMap((c) => TOOLS.filter((t) => t.cat === c));
+const sorted = CAT_ORDER.flatMap((c) => CALC.filter((t) => t.cat === c));
 const tilesHtml = sorted.map((t) =>
   `      <a class="tile" href="./tools/${t.slug}/" data-slug="${t.slug}" data-cat="${t.cat}" data-kw="${(t.name + " " + t.desc + " " + t.kw).replace(/"/g, "")}" title="${t.name} — ${t.desc}">
         <span class="ic ${GCLS[t.cat]}">${svg(t.slug)}</span><span class="nm">${t.g}</span>
@@ -30,8 +34,9 @@ const tilesHtml = sorted.map((t) =>
 
 const seoList = CAT_ORDER.map((c) =>
   `      <h3>${c === "日付" ? "日付・時間" : c === "変換" ? "暮らし・変換" : c}</h3>\n      <ul>\n` +
-  TOOLS.filter((t) => t.cat === c).map((t) => `        <li><a href="./tools/${t.slug}/">${t.name}</a> — ${t.desc}</li>`).join("\n") +
-  "\n      </ul>").join("\n");
+  CALC.filter((t) => t.cat === c).map((t) => `        <li><a href="./tools/${t.slug}/">${t.name}</a> — ${t.desc}</li>`).join("\n") +
+  "\n      </ul>").join("\n") +
+  `\n      <h3>統計ツール</h3>\n      <ul>\n        <li><a href="./tools/${POLL.slug}/">${POLL.name}</a> — ${POLL.desc}</li>\n      </ul>`;
 
 const html = `<!DOCTYPE html>
 <html lang="ja">
@@ -45,7 +50,7 @@ const html = `<!DOCTYPE html>
   <link rel="stylesheet" href="./shared/style.css">
   <!-- @meta start -->
   <link rel="canonical" href="https://quick-calc.site/">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ctext%20y%3D'.9em'%20font-size%3D'90'%3E%F0%9F%A7%AE%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
   <meta name="theme-color" content="#0b6e4f">
   <meta property="og:site_name" content="計算ツールボックス">
   <meta property="og:title" content="計算ツールボックス | 暮らしに役立つ無料計算ツール集">
@@ -73,6 +78,7 @@ const html = `<!DOCTYPE html>
     .brand .tg { font-size: 0.72rem; color: var(--tp-muted); margin: 1px 0 0; }
     .tp-search { display: flex; align-items: center; gap: 9px; background: var(--tp-tile); border-radius: 16px; padding: 13px 16px; color: var(--tp-muted); box-shadow: var(--tp-shadow); margin: 14px 0 0; }
     .tp-search input { border: none; outline: none; background: none; font-size: 1rem; width: 100%; color: var(--tp-ink); }
+    .tp-search .site-search-ic { width: 18px; height: 18px; }
     .tp-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 16px 0 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
     .tp-tabs::-webkit-scrollbar { display: none; }
     .tp-tab { flex: 0 0 auto; padding: 8px 16px; border-radius: 999px; border: none; background: rgba(120,124,130,0.1); color: var(--tp-ink); font-size: 0.88rem; cursor: pointer; white-space: nowrap; font-weight: 500; }
@@ -102,6 +108,12 @@ const html = `<!DOCTYPE html>
       .g3 { background: #2e2740; color: #a98ce0; }
     }
     .no-hit { color: var(--tp-muted); font-size: 0.88rem; margin: 8px 2px; }
+    .poll-card { display: flex; align-items: center; gap: 14px; background: var(--tp-tile); border-radius: 20px; padding: 16px; text-decoration: none; color: var(--tp-ink); box-shadow: var(--tp-shadow); }
+    .poll-card .pic { width: 52px; height: 52px; flex: 0 0 auto; border-radius: 17px; background: #fde8ec; color: #d64560; display: flex; align-items: center; justify-content: center; }
+    .poll-card .pic svg { width: 26px; height: 26px; }
+    .poll-card .pt b { display: block; font-size: 0.98rem; font-weight: 800; }
+    .poll-card .pt small { display: block; font-size: 0.76rem; color: var(--tp-muted); margin-top: 2px; line-height: 1.5; }
+    @media (prefers-color-scheme: dark) { .poll-card .pic { background: #3a2229; color: #ff8798; } }
     .seo-list { margin-top: 34px; font-size: 0.85rem; }
     .seo-list summary { cursor: pointer; color: var(--tp-muted); font-weight: 600; }
     .seo-list h3 { font-size: 0.95rem; margin: 14px 0 4px; }
@@ -120,7 +132,7 @@ const html = `<!DOCTYPE html>
     </div>
   </div>
 
-  <div class="tp-search" id="search">🔍 <input type="search" id="search-input" placeholder="検索(例: 家賃、文字数、営業日)" aria-label="ツールを検索" autocomplete="off"></div>
+  <div class="tp-search" id="search"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input type="search" id="search-input" placeholder="検索(例: 家賃、文字数、営業日)" aria-label="ツールを検索" autocomplete="off"></div>
   <div class="tp-tabs" id="tabs" role="tablist"></div>
 
   <div id="pop-sec">
@@ -132,6 +144,14 @@ const html = `<!DOCTYPE html>
   <p class="no-hit" id="no-hit" hidden>該当するツールがありません。別のことばでお試しください(例: 家賃、割引、カロリー)</p>
   <div class="tp-grid" id="grid">
 ${tilesHtml}
+  </div>
+
+  <div id="poll-sec">
+    <div class="tp-sec"><b>統計ツール</b><span>計算ツールとは別のツールです</span></div>
+    <a class="poll-card" id="poll-card" href="./tools/${POLL.slug}/" data-kw="${(POLL.name + " " + POLL.desc + " " + POLL.kw).replace(/"/g, "")}">
+      <span class="pic">${svg("poll")}</span>
+      <span class="pt"><b>みんなの投票</b><small>アンケートを作ってシェア・リアルタイム集計(登録不要)</small></span>
+    </a>
   </div>
 
   <details class="seo-list">
@@ -176,6 +196,8 @@ ${seoList}
     });
   }
   var index = tiles.map(function (t) { return norm(t.dataset.kw + " " + t.textContent); });
+  var pollCard = document.getElementById("poll-card");
+  var pollIndex = norm(pollCard.dataset.kw + " " + pollCard.textContent);
 
   // 人気: 全ユーザーの利用データに基づくランキング(RANK。週次で更新される)
   function renderPopular() {
@@ -224,6 +246,9 @@ ${seoList}
       if (hit) shown++;
     });
     document.getElementById("pop-sec").style.display = (terms.length || current !== "all") ? "none" : "";
+    var pollHit = terms.length ? terms.every(function (w) { return pollIndex.indexOf(w) !== -1; }) : current === "all";
+    document.getElementById("poll-sec").style.display = pollHit ? "" : "none";
+    if (pollHit && terms.length) shown++;
     var label = terms.length ? "検索結果" : (current === "all" ? "すべて" : CATS.filter(function (c) { return c[0] === current; })[0][1]);
     document.getElementById("genre-title").innerHTML = "<b>" + label + "</b><span>" + shown + "個</span>";
     document.getElementById("no-hit").hidden = shown > 0;

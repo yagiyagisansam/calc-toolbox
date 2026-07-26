@@ -306,8 +306,18 @@ if (window.top !== window.self) {
     refresh.type = "button";
     refresh.className = "pb-btn-sub";
     refresh.textContent = "最新の結果に更新";
-    refresh.addEventListener("click", function () { load(true); });
+    refresh.addEventListener("click", function () {
+      refresh.disabled = true;
+      refresh.textContent = "更新中…";
+      load(true);
+    });
     resultEl.appendChild(refresh);
+
+    // 何時時点の集計かを出す。更新するとこの時刻が変わるので、反映されたことが目で分かる
+    var stamp = document.createElement("p");
+    stamp.className = "pb-meta pb-stamp";
+    stamp.textContent = formatStamp(new Date()) + "時点の結果です";
+    resultEl.appendChild(stamp);
 
     // ＋書き出し(CSV・結果画像)
     var exp = document.createElement("details");
@@ -541,13 +551,23 @@ if (window.top !== window.self) {
     };
   }
 
+  // 「7月26日 10:23:41」の形。集計時点の表示に使う。
+  // 秒まで出すのは、同じ分のうちに更新しても時刻が変わり、更新できたと分かるようにするため
+  function formatStamp(d) {
+    function two(n) { return (n < 10 ? "0" : "") + n; }
+    return (d.getMonth() + 1) + "月" + d.getDate() + "日 " +
+      two(d.getHours()) + ":" + two(d.getMinutes()) + ":" + two(d.getSeconds()) + " ";
+  }
+
   var pollId = new URLSearchParams(location.search).get("id") || "";
 
   function load(resultsOnly, note) {
     PollNet.getResults(pollId, voterId()).then(function (r) {
       if (!r.ok) {
         qTitle.textContent = "アンケートを表示できません";
-        showStatus(r.code === "not_found"
+        showStatus(r.code === "blocked"
+          ? "このアンケートは通報を受けて公開を停止しました。"
+          : r.code === "not_found"
           ? "このアンケートは見つかりませんでした。削除されたか、URLが間違っている可能性があります。"
           : r.code === "network"
             ? "通信に失敗しました。電波の良い場所で再読み込みしてください。"
@@ -560,6 +580,7 @@ if (window.top !== window.self) {
       renderDeadline(poll);
       renderShare(poll.question);
       document.getElementById("report-btn").hidden = false;
+      setupOwnerDelete();
       var voted = votedMap()[pollId] !== undefined;
       if (poll.closed) {
         // 締切済み: 投票不可・最終結果のみ
@@ -598,13 +619,99 @@ if (window.top !== window.self) {
     box.hidden = false;
   });
 
-  document.getElementById("report-btn").addEventListener("click", function () {
-    var btn = this;
-    if (!window.confirm("このアンケートを不適切な内容として報告しますか?")) return;
-    btn.disabled = true;
+  // 作成者本人のときだけ削除ボタンを出す
+  // 判定は作成時にこの端末へ保存した削除キー。キーが無い端末には出さない
+  function myDeleteKey(id) {
+    var mine;
+    try { mine = JSON.parse(window.localStorage.getItem("pollMine")) || []; } catch (e) { return null; }
+    for (var i = 0; i < mine.length; i++) {
+      if (mine[i] && mine[i].id === id && mine[i].k) return mine[i].k;
+    }
+    return null;
+  }
+
+  function forgetMine(id) {
+    try {
+      var mine = JSON.parse(window.localStorage.getItem("pollMine")) || [];
+      window.localStorage.setItem("pollMine", JSON.stringify(mine.filter(function (m) { return m && m.id !== id; })));
+    } catch (e) { /* 保存不可は無視 */ }
+  }
+
+  function setupOwnerDelete() {
+    var key = myDeleteKey(pollId);
+    if (!key) return;
+    var delBtn = document.getElementById("owner-del-btn");
+    var delBg = document.getElementById("del-confirm-bg");
+    var delError = document.getElementById("del-error");
+    delBtn.hidden = false;
+
+    function close() { delBg.hidden = true; delError.hidden = true; }
+
+    delBtn.addEventListener("click", function () {
+      delError.hidden = true;
+      delBg.hidden = false;
+      document.getElementById("del-no").focus();
+    });
+    document.getElementById("del-no").addEventListener("click", function () { close(); delBtn.focus(); });
+    delBg.addEventListener("click", function (e) { if (e.target === delBg) { close(); delBtn.focus(); } });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !delBg.hidden) { close(); delBtn.focus(); }
+    });
+
+    document.getElementById("del-yes").addEventListener("click", function () {
+      var yes = this;
+      yes.disabled = true;
+      yes.textContent = "削除中…";
+      PollNet.deletePoll(pollId, key).then(function (r) {
+        yes.disabled = false;
+        yes.textContent = "はい、削除する";
+        if (r.ok || r.code === "not_owner") {
+          forgetMine(pollId);
+          close();
+          delBtn.hidden = true;
+          document.getElementById("report-btn").hidden = true;
+          qTitle.textContent = "このアンケートは削除されました";
+          showStatus("削除が完了しました。集まった票も一緒に消えています。");
+          document.getElementById("vote-form").hidden = true;
+          document.getElementById("result").hidden = true;
+          document.getElementById("share-box").hidden = true;
+          document.getElementById("deadline").hidden = true;
+        } else {
+          delError.textContent = "削除できませんでした。通信状況を確認して、もう一度お試しください。";
+          delError.hidden = false;
+        }
+      });
+    });
+  }
+
+  // 通報は誤タップを防ぐため、サイト内の確認ダイアログを挟んでから送信する
+  var reportBtn = document.getElementById("report-btn");
+  var reportBg = document.getElementById("report-confirm-bg");
+
+  reportBtn.addEventListener("click", function () {
+    reportBg.hidden = false;
+    document.getElementById("report-no").focus();
+  });
+
+  document.getElementById("report-no").addEventListener("click", function () {
+    reportBg.hidden = true;
+    reportBtn.focus();
+  });
+
+  reportBg.addEventListener("click", function (e) {
+    if (e.target === reportBg) { reportBg.hidden = true; reportBtn.focus(); }
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !reportBg.hidden) { reportBg.hidden = true; reportBtn.focus(); }
+  });
+
+  document.getElementById("report-yes").addEventListener("click", function () {
+    reportBg.hidden = true;
+    reportBtn.disabled = true;
     PollNet.report(pollId, voterId()).then(function (r) {
-      btn.textContent = r.ok ? "報告を受け付けました。ご協力ありがとうございます。" : "報告を送信できませんでした。時間をおいてお試しください。";
-      if (!r.ok) btn.disabled = false;
+      reportBtn.textContent = r.ok ? "報告を受け付けました。ご協力ありがとうございます。" : "報告を送信できませんでした。時間をおいてお試しください。";
+      if (!r.ok) reportBtn.disabled = false;
     });
   });
 
