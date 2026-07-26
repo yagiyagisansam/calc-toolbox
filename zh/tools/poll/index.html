@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://ssxskriqlaiohdutxprn.supabase.co; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'; require-trusted-types-for 'script'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>大家的投票 | 免费问卷制作·实时统计(最多10个选项)</title>
+  <meta name="description" content="只需输入问题和选项(最多10个),就能生成投票页面链接的免费问卷工具。分享到X(原Twitter)、LINE、Instagram等社交平台,实时统计大家的回答。也可以当场给热门问卷投票。无需注册、支持手机。">
+  <link rel="stylesheet" href="../../../tools/poll/poll.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/poll/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Crect%20width='100'%20height='100'%20rx='22'%20fill='%23ff5a70'/%3E%3Cpath%20d='M28%2072V44M50%2072V28M72%2072V54'%20stroke='%23fff'%20stroke-width='10'%20stroke-linecap='round'/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#ff5a70">
+  <meta property="og:site_name" content="大家的投票">
+  <meta property="og:title" content="大家的投票 | 免费问卷制作·实时统计">
+  <meta property="og:description" content="输入问题和选项(最多10个)即可生成投票链接,分享到社交平台就能实时统计的免费问卷工具。无需注册、支持手机。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/poll/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"大家的投票","url":"https://quick-calc.site/zh/tools/poll/","inLanguage":"zh-CN"}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/poll/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/poll/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/poll/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/poll/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/poll/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @langsw start -->
+<div class="lang-bar">
+  <nav class="lang-switch" aria-label="语言"><span class="lang-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 2.6 15 0 18M12 3c-2.6 2.6-2.6 15 0 18"/></svg>Language</span><a href="/tools/poll/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/poll/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/poll/" lang="ko" hreflang="ko">한국어</a></nav>
+</div>
+<!-- @langsw end -->
+<header class="pb-header">
+  <a href="/zh/tools/poll/">
+    <span class="pb-mark"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></span>
+    <span class="pb-name">大家的投票</span>
+  </a>
+  <span class="pb-tag">创建、分享、统计</span>
+</header>
+<main>
+  <div class="pb-status" id="setup-note" hidden>功能正在准备中。请再稍等一段时间。</div>
+
+  <div class="pb-card">
+    <h1 class="pb-q">想问的事情,来问问大家吧。</h1>
+    <p class="pb-meta">只需输入问题和选项(最多10个),投票链接就完成了。分享到社交平台或群聊,就能实时统计收到的回答。免费、无需注册。</p>
+    <a class="pb-btn" href="/zh/tools/poll/new.html">创建问卷</a>
+  </div>
+
+  <div class="pb-sec"><b>热门问卷</b><span id="pop-note">按投票数从多到少排序</span></div>
+  <div class="pb-seg" id="pop-period">
+    <button type="button" class="on" data-days="">不限期</button>
+    <button type="button" data-days="7">1周</button>
+    <button type="button" data-days="31">1个月</button>
+    <button type="button" data-days="62">2个月</button>
+  </div>
+  <div class="pb-list mt12" id="popular"><p class="pb-empty">加载中…</p></div>
+
+  <div class="pb-sec"><b>最新问卷</b></div>
+  <div class="pb-list" id="recent"><p class="pb-empty">加载中…</p></div>
+
+  <div id="mine-sec" hidden>
+    <div class="pb-sec"><b>在此设备上创建的问卷</b></div>
+    <div class="pb-list" id="mine"></div>
+  </div>
+
+  <div class="pb-modal-bg" id="del-confirm-bg" hidden>
+    <div class="pb-modal" role="dialog" aria-modal="true" aria-labelledby="del-confirm-title">
+      <p class="pb-q pb-q-sm" id="del-confirm-title">要删除这份问卷吗?</p>
+      <p class="pb-meta" id="del-confirm-q"></p>
+      <p class="pb-meta">已收集的票数也会一并消失。删除后无法恢复。</p>
+      <p class="pb-error" id="del-error" hidden></p>
+      <button type="button" class="pb-btn" id="del-yes">是,删除</button>
+      <button type="button" class="pb-btn-sub" id="del-no">否,取消</button>
+    </div>
+  </div>
+
+  <div class="pb-doc">
+    <h2>使用方法</h2>
+    <ol>
+      <li>点击「创建问卷」,输入问题和选项(2〜10个)。</li>
+      <li>把生成的投票链接分享到X(原Twitter)、LINE、Instagram等平台。</li>
+      <li>打开链接的人可以当场投票,结果会以百分比(%)和票数实时统计。</li>
+    </ol>
+    <h2>统计方式</h2>
+    <ul>
+      <li>每人(每台设备)限投1次、选择1项。百分比(%)=该选项的票数÷总票数×100(保留到小数点后1位)。</li>
+      <li>回答者是收到分享链接的人。如果设置为显示在列表中,从本页面进来的人也会加入(设为非公开的问卷不会出现在列表中)。两者都与随机抽样的统计调查不同,仅供参考。</li>
+      <li>问题、选项和票数会为了统计而保存在外部数据库中。</li>
+    </ul>
+    <h2>注意事项</h2>
+    <ul>
+      <li>请不要在问题或选项中写入个人信息(姓名、住址、电话号码等)。</li>
+      <li>诽谤中伤、歧视等内容不当的问卷,会因举报或运营方的判断而被无预告删除。</li>
+      <li>虽然同一台设备无法重复投票,但无法阻止从其他设备投票。不适合用于严谨的调查用途。</li>
+    </ul>
+    <h2>常见问题</h2>
+    <p class="pb-faq-q">需要付费或注册会员吗?</p>
+    <p class="pb-faq-a">免费、无需注册。无论是创建的一方还是回答的一方,只要打开链接就能使用。</p>
+    <p class="pb-faq-q">最多可以设置多少个选项?</p>
+    <p class="pb-faq-a">最多10个。</p>
+    <p class="pb-faq-q">不想让创建的问卷显示在列表中时怎么办?</p>
+    <p class="pb-faq-a">创建时把「显示在列表中」关闭,就会变成只有知道链接的人才能打开的非公开问卷。</p>
+    <p class="pb-faq-q">想删除已创建的问卷时怎么办?</p>
+    <p class="pb-faq-a">用创建时的设备打开本页面,问卷会列在「在此设备上创建的问卷」里。从那里的「删除」可以随时自行删除(已收集的票数也会一并消失)。能够删除的只有创建者本人和运营方。</p>
+  </div>
+</main>
+<footer class="pb-footer">
+  <p>创建的问题、选项和投票数据会为了统计而保存在外部数据库中(不收集可识别个人的信息)。详情请参阅<a href="../../privacy.html">隐私政策</a>。</p>
+  <nav>
+    <a href="/zh/tools/poll/">大家的投票</a>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html">联系我们</a>
+  </nav>
+  <p>© 2026 大家的投票(quick-calc.site)</p>
+</footer>
+<script src="../../../tools/poll/i18n/zh.js"></script>
+<script src="../../../tools/poll/i18n.js"></script>
+<script src="../../../tools/poll/config.js"></script>
+<script src="../../../tools/poll/calc.js"></script>
+<script src="../../../tools/poll/net.js"></script>
+<script src="../../../tools/poll/home.js"></script>
+</body>
+</html>

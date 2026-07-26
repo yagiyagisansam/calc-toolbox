@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://ssxskriqlaiohdutxprn.supabase.co; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'; require-trusted-types-for 'script'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>설문 만들기 | 모두의 투표</title>
+  <meta name="description" content="질문과 선택지(최대 10개)만 입력하면 SNS로 공유할 수 있는 투표 페이지 링크를 무료로 발급합니다. 답변은 실시간으로 집계됩니다. 가입 불필요.">
+  <link rel="stylesheet" href="../../../tools/poll/poll.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/poll/new.html">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Crect%20width='100'%20height='100'%20rx='22'%20fill='%23ff5a70'/%3E%3Cpath%20d='M28%2072V44M50%2072V28M72%2072V54'%20stroke='%23fff'%20stroke-width='10'%20stroke-linecap='round'/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#ff5a70">
+  <meta property="og:site_name" content="모두의 투표">
+  <meta property="og:title" content="설문 만들기 | 모두의 투표">
+  <meta property="og:description" content="질문과 선택지(최대 10개)만 입력하면 SNS로 공유할 수 있는 투표 페이지 링크를 무료로 발급합니다. 답변은 실시간으로 집계됩니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/poll/new.html">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/poll/new.html">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/poll/new.html">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/poll/new.html">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/poll/new.html">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/poll/new.html">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @langsw start -->
+<div class="lang-bar">
+  <nav class="lang-switch" aria-label="언어"><span class="lang-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 2.6 15 0 18M12 3c-2.6 2.6-2.6 15 0 18"/></svg>Language</span><a href="/tools/poll/new.html" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/poll/new.html" lang="en" hreflang="en">English</a><a href="/zh/tools/poll/new.html" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+</div>
+<!-- @langsw end -->
+<header class="pb-header">
+  <a href="/ko/tools/poll/">
+    <span class="pb-mark"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></span>
+    <span class="pb-name">모두의 투표</span>
+  </a>
+  <span class="pb-tag">설문 만들기</span>
+</header>
+<main>
+  <div class="pb-status" id="setup-note" hidden>현재 준비 중이라 설문을 만들 수 없습니다. 조금만 기다려 주세요.</div>
+
+  <div class="pb-card">
+    <h1 class="pb-q pb-q-sm">설문 만들기</h1>
+    <form class="pb-form mt14" id="poll-form">
+      <label>질문(묻고 싶은 것)<span class="pb-note">120자까지</span>
+        <input type="text" id="question" maxlength="120" required placeholder="예: 탕수육은 부먹? 찍먹?">
+      </label>
+      <div id="options-box"></div>
+      <button type="button" class="pb-add" id="add-opt">＋ 선택지 추가(최대 10개)</button>
+      <label class="pb-toggle">
+        <input type="checkbox" id="is-public" checked>
+        <span>모두의 설문 목록에 싣기<small>끄면 링크를 아는 사람만 열 수 있는 비공개 설문이 됩니다.</small></span>
+      </label>
+      <details class="pb-adv">
+        <summary><span class="plus">＋</span>상세 설정(복수 선택·마감·결과 공개 방식)</summary>
+        <div class="pb-adv-inner">
+          <label class="pb-toggle">
+            <input type="checkbox" id="opt-multi">
+            <span>복수 선택 허용<small>「해당하는 항목 전부」를 고를 수 있게 됩니다(일정 조율·준비물 정하기 등에).</small></span>
+          </label>
+          <label id="max-row" hidden>선택 가능 개수 상한<span class="pb-note">1명이 고를 수 있는 개수 제한. 선택지 수에 따라 고를 수 있는 값이 달라집니다</span>
+            <select id="opt-max"></select>
+          </label>
+          <label>투표 마감<span class="pb-note">선택한 날의 23:59에 마감(기본값은 1주일 후). 2개월 뒤까지 선택할 수 있으며, 그보다 더 뒤로 하고 싶으면 「무기한」을 선택해 주세요</span>
+            <select id="opt-deadline"></select>
+          </label>
+          <label class="pb-toggle">
+            <input type="checkbox" id="opt-hide" checked>
+            <span>투표하기 전에는 결과를 보여주지 않기<small>결과가 먼저 보여서 답변이 쏠리는 것을 막습니다(마감 후에는 누구나 볼 수 있습니다). 권장 설정이라 처음부터 켜져 있습니다.</small></span>
+          </label>
+          <label class="pb-toggle">
+            <input type="checkbox" id="opt-shuffle" checked>
+            <span>선택지 순서 섞어서 표시<small>표시 순서에 따른 유불리(순서 편향)를 줄여줍니다(권장 설정이라 처음부터 켜져 있습니다).</small></span>
+          </label>
+        </div>
+      </details>
+      <button type="submit" class="pb-btn" id="create-btn">투표 페이지 만들기</button>
+      <p class="pb-error" id="form-error" hidden></p>
+    </form>
+  </div>
+
+  <div class="pb-card" id="done-card" hidden>
+    <p class="pb-q pb-q-sm">투표 페이지가 완성되었습니다</p>
+    <p class="pb-meta">이 링크를 SNS나 단체 대화방에 올리면 링크를 연 사람이 투표할 수 있습니다.</p>
+    <div class="pb-url">
+      <input type="text" id="done-url" readonly>
+      <button type="button" id="copy-btn">복사</button>
+    </div>
+    <div class="pb-share" id="share-row"></div>
+    <button type="button" class="pb-btn-sub" id="qr-btn">＋ QR 코드 표시(인쇄·게시용)</button>
+    <div class="pb-qr" id="qr-box" hidden></div>
+    <p class="pb-center mt16"><a class="pb-link" id="open-link" href="#">투표 페이지 열기(결과도 여기에서 볼 수 있습니다)</a></p>
+  </div>
+
+  <p class="pb-center"><a class="pb-sub-link" href="/ko/tools/poll/">← 모두의 투표 첫 화면으로</a></p>
+
+  <div class="pb-modal-bg" id="confirm-bg" hidden>
+    <div class="pb-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      <p class="pb-q pb-q-sm" id="confirm-title">이 내용으로 공개할까요?</p>
+      <p class="pb-meta">설문은 공개한 뒤에는 수정할 수 없습니다. 질문·선택지·설정을 한 번 더 확인해 주세요.</p>
+      <button type="button" class="pb-btn" id="confirm-yes">네, 공개합니다</button>
+      <button type="button" class="pb-btn-sub" id="confirm-no">아니요, 돌아가서 수정할게요</button>
+    </div>
+  </div>
+</main>
+<footer class="pb-footer">
+  <p>작성된 질문·선택지·투표 데이터는 집계를 위해 외부 데이터베이스에 저장됩니다(개인을 특정하는 정보는 수집하지 않습니다). 자세한 내용은 <a href="../../privacy.html">개인정보 처리방침</a>을 확인해 주세요.</p>
+  <nav>
+    <a href="/ko/tools/poll/">모두의 투표</a>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html">문의하기</a>
+  </nav>
+  <p>© 2026 모두의 투표(quick-calc.site)</p>
+</footer>
+<script src="../../../tools/poll/i18n/ko.js"></script>
+<script src="../../../tools/poll/i18n.js"></script>
+<script src="../../../tools/poll/config.js"></script>
+<script src="../../../tools/poll/calc.js"></script>
+<script src="../../../tools/poll/net.js"></script>
+<script src="../../../tools/poll/qr.js"></script>
+<script src="../../../tools/poll/create.js"></script>
+</body>
+</html>

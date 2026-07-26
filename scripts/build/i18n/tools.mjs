@@ -27,7 +27,7 @@ export const TOP = {
     pollTitle: "Poll tool",
     pollNote: "A separate tool from the calculators",
     pollName: "Everyone's Poll",
-    pollDesc: "Create a poll, share it and see the results in real time (no sign-up). Japanese only.",
+    pollDesc: "Create a poll, share it and see the results in real time. No sign-up needed.",
     about: "Free web calculators for the small questions that come up in daily life in Japan — health, money, dates and everyday conversions. Every tool states <strong>how it is calculated and the primary sources</strong> it is based on. Results are approximations based on what you enter; see the <a href=\"./disclaimer.html\">Disclaimer</a> for details."
   },
   zh: {
@@ -46,7 +46,7 @@ export const TOP = {
     pollTitle: "统计工具",
     pollNote: "与计算工具不同的另一种工具",
     pollName: "大家的投票",
-    pollDesc: "创建问卷并分享,实时统计结果(无需注册)。仅日文。",
+    pollDesc: "创建问卷并分享,实时统计结果。无需注册。",
     about: "这里汇集了健康·金钱·日期·日常生活中随手就想算一下的免费在线工具。每个工具都注明<strong>计算方法和依据(一次信息出处)</strong>。计算结果是基于所输入数值的约值,详情请见<a href=\"./disclaimer.html\">免责声明</a>。"
   },
   ko: {
@@ -65,7 +65,7 @@ export const TOP = {
     pollTitle: "통계 도구",
     pollNote: "계산 도구와는 다른 별도의 도구입니다",
     pollName: "모두의 투표",
-    pollDesc: "설문을 만들어 공유하고 결과를 실시간으로 집계합니다(가입 불필요). 일본어만 지원합니다.",
+    pollDesc: "설문을 만들어 공유하고 결과를 실시간으로 집계합니다. 가입이 필요 없습니다.",
     about: "일본에서 생활하며 문득 계산해 보고 싶어지는 건강·돈·날짜·생활 속 물음을 그 자리에서 계산할 수 있는 무료 웹 도구 모음입니다. 모든 도구에 <strong>계산 방법과 근거(1차 정보 출처)</strong>를 명시하고 있습니다. 계산 결과는 입력값에 따른 대략적인 값이며, 자세한 내용은 <a href=\"./disclaimer.html\">면책사항</a>을 확인해 주세요."
   }
 };

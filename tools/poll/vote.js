@@ -58,10 +58,10 @@ if (window.top !== window.self) {
     var txt = (d.getMonth() + 1) + "/" + d.getDate() + " " +
       d.getHours() + ":" + ("0" + d.getMinutes()).slice(-2);
     if (poll.closed) {
-      el.textContent = "このアンケートは締め切られました(" + txt + ")";
+      el.textContent = T("このアンケートは締め切られました({date})", { date: txt });
       el.classList.add("closed");
     } else {
-      el.textContent = "締切: " + txt + " まで";
+      el.textContent = T("締切: {date} まで", { date: txt });
       el.classList.remove("closed");
     }
     el.hidden = false;
@@ -71,23 +71,23 @@ if (window.top !== window.self) {
     var row = document.getElementById("share-row");
     row.replaceChildren();
     var url = location.href;
-    var text = question + " | みんなに聞いてみた(投票はこちら)";
+    var text = T("{question} | みんなに聞いてみた(投票はこちら)", { question: question });
     var copyBtn = document.createElement("button");
     copyBtn.type = "button";
-    copyBtn.textContent = "リンクをコピー";
+    copyBtn.textContent = T("リンクをコピー");
     copyBtn.addEventListener("click", function () {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(url).then(function () {
-          copyBtn.textContent = "コピー済み";
-          setTimeout(function () { copyBtn.textContent = "リンクをコピー"; }, 1500);
+          copyBtn.textContent = T("コピー済み");
+          setTimeout(function () { copyBtn.textContent = T("リンクをコピー"); }, 1500);
         });
       }
     });
     row.appendChild(copyBtn);
     [
-      ["Xでシェア", "https://twitter.com/intent/tweet?text=" + encodeURIComponent(text) + "&url=" + encodeURIComponent(url)],
-      ["LINEで送る", "https://line.me/R/share?text=" + encodeURIComponent(text + " " + url)],
-      ["Facebookでシェア", "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(url)]
+      [T("Xでシェア"), "https://twitter.com/intent/tweet?text=" + encodeURIComponent(text) + "&url=" + encodeURIComponent(url)],
+      [T("LINEで送る"), "https://line.me/R/share?text=" + encodeURIComponent(text + " " + url)],
+      [T("Facebookでシェア"), "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(url)]
     ].forEach(function (it) {
       var a = document.createElement("a");
       a.href = it[1];
@@ -120,7 +120,7 @@ if (window.top !== window.self) {
     if (isWin && hasVotes) {
       var chip = document.createElement("span");
       chip.className = "pb-chip-win";
-      chip.textContent = "1位";
+      chip.textContent = T("1位");
       label.appendChild(chip);
     }
     return label;
@@ -148,7 +148,7 @@ if (window.top !== window.self) {
       while (inner.firstChild) label.appendChild(inner.firstChild);
       var num = document.createElement("span");
       num.className = "pc";
-      num.textContent = row.pct + "%・" + row.count.toLocaleString() + "票";
+      num.textContent = T("{pct}%・{votes}票", { pct: row.pct, votes: row.count.toLocaleString() });
       top.appendChild(label);
       top.appendChild(num);
       var bar = document.createElement("div");
@@ -212,7 +212,7 @@ if (window.top !== window.self) {
     var cb = document.createElement("b");
     cb.textContent = r.total.toLocaleString();
     var cs = document.createElement("span");
-    cs.textContent = "票";
+    cs.textContent = T("単位:票");
     center.appendChild(cb);
     center.appendChild(cs);
     donut.appendChild(center);
@@ -228,7 +228,7 @@ if (window.top !== window.self) {
       lg.appendChild(nameLabel(row, isWin, r.total > 0, origIndex));
       var pc = document.createElement("span");
       pc.className = "pc";
-      pc.textContent = row.pct + "%・" + row.count.toLocaleString() + "票";
+      pc.textContent = T("{pct}%・{votes}票", { pct: row.pct, votes: row.count.toLocaleString() });
       lg.appendChild(pc);
       legend.appendChild(lg);
     });
@@ -242,7 +242,7 @@ if (window.top !== window.self) {
     var r = PollCalc.results(poll.options, counts, poll.multi ? voters : undefined);
     resultEl.replaceChildren();
     form.hidden = true;
-    if (!r.ok) { showStatus("集計結果を表示できませんでした。"); return; }
+    if (!r.ok) { showStatus(T("集計結果を表示できませんでした。")); return; }
     var ord = PollCalc.displayOrder(counts);
     var order = ord.ok ? ord.order : counts.map(function (_, i) { return i; });
 
@@ -251,11 +251,11 @@ if (window.top !== window.self) {
     var b = document.createElement("b");
     b.textContent = r.total.toLocaleString();
     var sp = document.createElement("span");
-    sp.textContent = "票";
+    sp.textContent = T("単位:票");
     var live = document.createElement("span");
     live.className = "pb-live";
     live.appendChild(document.createElement("i"));
-    live.appendChild(document.createTextNode("LIVE集計中"));
+    live.appendChild(document.createTextNode(T("LIVE集計中")));
     total.appendChild(b);
     total.appendChild(sp);
     total.appendChild(live);
@@ -272,7 +272,7 @@ if (window.top !== window.self) {
       // 複数選択: 割合の分母が回答者数のため合計100%にならない。円グラフは誤解を招くので棒のみ
       var mnote = document.createElement("p");
       mnote.className = "pb-meta";
-      mnote.textContent = "複数選択のアンケートです。割合は回答者" + r.total.toLocaleString() + "人に対する割合のため、合計は100%になりません。";
+      mnote.textContent = T("複数選択のアンケートです。割合は回答者{n}人に対する割合のため、合計は100%になりません。", { n: r.total.toLocaleString() });
       resultEl.appendChild(mnote);
       resultEl.appendChild(body);
       body.appendChild(renderBars(r, order));
@@ -285,7 +285,7 @@ if (window.top !== window.self) {
         body.replaceChildren();
         body.appendChild(getView() === "donut" ? renderDonut(r, order, counts) : renderBars(r, order));
       }
-      [["bar", "棒グラフ"], ["donut", "円グラフ"]].forEach(function (v) {
+      [["bar", T("棒グラフ")], ["donut", T("円グラフ")]].forEach(function (v) {
         var btn = document.createElement("button");
         btn.type = "button";
         btn.textContent = v[1];
@@ -305,10 +305,10 @@ if (window.top !== window.self) {
     var refresh = document.createElement("button");
     refresh.type = "button";
     refresh.className = "pb-btn-sub";
-    refresh.textContent = "最新の結果に更新";
+    refresh.textContent = T("最新の結果に更新");
     refresh.addEventListener("click", function () {
       refresh.disabled = true;
-      refresh.textContent = "更新中…";
+      refresh.textContent = T("更新中…");
       load(true);
     });
     resultEl.appendChild(refresh);
@@ -316,7 +316,7 @@ if (window.top !== window.self) {
     // 何時時点の集計かを出す。更新するとこの時刻が変わるので、反映されたことが目で分かる
     var stamp = document.createElement("p");
     stamp.className = "pb-meta pb-stamp";
-    stamp.textContent = formatStamp(new Date()) + "時点の結果です";
+    stamp.textContent = T("{stamp}時点の結果です", { stamp: formatStamp(new Date()) });
     resultEl.appendChild(stamp);
 
     // ＋書き出し(CSV・結果画像)
@@ -327,7 +327,7 @@ if (window.top !== window.self) {
     plus.className = "plus";
     plus.textContent = "＋";
     sum.appendChild(plus);
-    sum.appendChild(document.createTextNode("書き出し(CSV・結果画像)"));
+    sum.appendChild(document.createTextNode(T("書き出し(CSV・結果画像)")));
     exp.appendChild(sum);
     var inner = document.createElement("div");
     inner.className = "pb-adv-inner";
@@ -338,7 +338,7 @@ if (window.top !== window.self) {
     csvBtn.type = "button";
     csvBtn.className = "pb-btn-sub";
     csvBtn.style.marginTop = "0";
-    csvBtn.textContent = "CSVをダウンロード(Excel等で分析)";
+    csvBtn.textContent = T("CSVをダウンロード(Excel等で分析)");
     csvBtn.addEventListener("click", function () {
       var c = PollCalc.toCsv(poll.question, poll.options, counts, poll.multi ? voters : undefined);
       if (!c.ok) return;
@@ -355,7 +355,7 @@ if (window.top !== window.self) {
     imgBtn.type = "button";
     imgBtn.className = "pb-btn-sub";
     imgBtn.style.marginTop = "0";
-    imgBtn.textContent = "結果を画像で保存(SNS投稿・スライド用)";
+    imgBtn.textContent = T("結果を画像で保存(SNS投稿・スライド用)");
     imgBtn.addEventListener("click", function () {
       var dataUrl = drawResultImage(poll, r, order);
       var a = document.createElement("a");
@@ -412,12 +412,12 @@ if (window.top !== window.self) {
 
     ctx.font = "bold 40px " + FONT;
     ctx.fillStyle = "#1c1e22";
-    var totalText = r.total.toLocaleString() + "票";
+    var totalText = T("{n}票", { n: r.total.toLocaleString() });
     ctx.fillText(totalText, PAD, y + 24);
     if (poll.multi) {
       ctx.font = "26px " + FONT;
       ctx.fillStyle = "#8a8f96";
-      ctx.fillText("(複数選択・割合は回答者に対する割合)", PAD + ctx.measureText(totalText).width + 80, y + 24);
+      ctx.fillText(T("(複数選択・割合は回答者に対する割合)"), PAD + ctx.measureText(totalText).width + 80, y + 24);
     }
     y += 84;
 
@@ -431,7 +431,7 @@ if (window.top !== window.self) {
         name += "…";
       }
       ctx.fillText(name, PAD, y + 30);
-      var pctText = row.pct + "%(" + row.count.toLocaleString() + "票)";
+      var pctText = T("{pct}%({votes}票)", { pct: row.pct, votes: row.count.toLocaleString() });
       ctx.font = (pos === 0 ? "bold " : "") + "28px " + FONT;
       ctx.fillStyle = pos === 0 ? "#1c1e22" : "#8a8f96";
       ctx.fillText(pctText, W - PAD - ctx.measureText(pctText).width, y + 30);
@@ -453,7 +453,7 @@ if (window.top !== window.self) {
 
     ctx.font = "26px " + FONT;
     ctx.fillStyle = "#8a8f96";
-    ctx.fillText("みんなの投票 | " + location.origin + location.pathname + "?id=" + poll.id, PAD, H - 44);
+    ctx.fillText(T("みんなの投票 | {url}", { url: location.origin + location.pathname + "?id=" + poll.id }), PAD, H - 44);
     return canvas.toDataURL("image/png");
   }
 
@@ -477,9 +477,9 @@ if (window.top !== window.self) {
     var limit = (poll.multi && poll.max_choices) ? Math.min(poll.max_choices, poll.options.length) : poll.options.length;
     document.getElementById("vote-note").textContent = poll.multi
       ? (poll.max_choices
-        ? "1人1回・あてはまるものを最大" + limit + "個まで選んで投票"
-        : "1人1回・あてはまるものを全部選んで投票")
-      : "1人1回・タップして投票";
+        ? T("1人1回・あてはまるものを最大{n}個まで選んで投票", { n: limit })
+        : T("1人1回・あてはまるものを全部選んで投票"))
+      : T("1人1回・タップして投票");
     function updateLimit() {
       var checkedCount = optsEl.querySelectorAll("input:checked").length;
       voteBtn.disabled = checkedCount === 0;
@@ -515,7 +515,7 @@ if (window.top !== window.self) {
       optsEl.appendChild(label);
     });
     voteBtn.disabled = true;
-    voteBtn.textContent = "この選択で投票する";
+    voteBtn.textContent = T("この選択で投票する");
     // 「結果非表示」のアンケートでは投票前に結果を覗けない
     document.getElementById("peek-link").parentElement.hidden = !!poll.hidden;
     form.hidden = false;
@@ -527,27 +527,27 @@ if (window.top !== window.self) {
       });
       if (choices.length === 0) return;
       voteBtn.disabled = true;
-      voteBtn.textContent = "送信中…";
+      voteBtn.textContent = T("送信中…");
       PollNet.vote(id, voterId(), choices).then(function (r) {
         if (r.ok || r.code === "already_voted") {
           markVoted(id, choices);
           statusEl.hidden = true;
-          load(true, r.ok ? "投票を受け付けました。" : "この端末からはすでに投票済みです。");
+          load(true, r.ok ? T("投票を受け付けました。") : T("この端末からはすでに投票済みです。"));
         } else if (r.code === "closed") {
           statusEl.hidden = true;
-          load(true, "締め切られたため、この投票は受け付けられませんでした。");
+          load(true, T("締め切られたため、この投票は受け付けられませんでした。"));
         } else {
           voteBtn.disabled = false;
-          voteBtn.textContent = "この選択で投票する";
+          voteBtn.textContent = T("この選択で投票する");
           showStatus(r.code === "network"
-            ? "通信に失敗しました。電波の良い場所でもう一度お試しください。"
-            : "投票を受け付けられませんでした。もう一度お試しください。");
+            ? T("通信に失敗しました。電波の良い場所でもう一度お試しください。")
+            : T("投票を受け付けられませんでした。もう一度お試しください。"));
         }
       });
     };
     document.getElementById("peek-link").onclick = function (e) {
       e.preventDefault();
-      load(true, "投票せずに現在の結果を表示しています(このページを開き直すと投票できます)。");
+      load(true, T("投票せずに現在の結果を表示しています(このページを開き直すと投票できます)。"));
     };
   }
 
@@ -555,8 +555,10 @@ if (window.top !== window.self) {
   // 秒まで出すのは、同じ分のうちに更新しても時刻が変わり、更新できたと分かるようにするため
   function formatStamp(d) {
     function two(n) { return (n < 10 ? "0" : "") + n; }
-    return (d.getMonth() + 1) + "月" + d.getDate() + "日 " +
-      two(d.getHours()) + ":" + two(d.getMinutes()) + ":" + two(d.getSeconds()) + " ";
+    return T("{month}月{day}日 {hh}:{mm}:{ss} ", {
+      month: d.getMonth() + 1, day: d.getDate(),
+      hh: two(d.getHours()), mm: two(d.getMinutes()), ss: two(d.getSeconds())
+    });
   }
 
   var pollId = new URLSearchParams(location.search).get("id") || "";
@@ -564,19 +566,19 @@ if (window.top !== window.self) {
   function load(resultsOnly, note) {
     PollNet.getResults(pollId, voterId()).then(function (r) {
       if (!r.ok) {
-        qTitle.textContent = "アンケートを表示できません";
+        qTitle.textContent = T("アンケートを表示できません");
         showStatus(r.code === "blocked"
-          ? "このアンケートは通報を受けて公開を停止しました。"
+          ? T("このアンケートは通報を受けて公開を停止しました。")
           : r.code === "not_found"
-          ? "このアンケートは見つかりませんでした。削除されたか、URLが間違っている可能性があります。"
+          ? T("このアンケートは見つかりませんでした。削除されたか、URLが間違っている可能性があります。")
           : r.code === "network"
-            ? "通信に失敗しました。電波の良い場所で再読み込みしてください。"
-            : "読み込みに失敗しました。時間をおいて再読み込みしてください。");
+            ? T("通信に失敗しました。電波の良い場所で再読み込みしてください。")
+            : T("読み込みに失敗しました。時間をおいて再読み込みしてください。"));
         return;
       }
       var poll = r.poll;
       qTitle.textContent = poll.question;
-      document.title = poll.question + " | みんなの投票";
+      document.title = T("{question} | みんなの投票", { question: poll.question });
       renderDeadline(poll);
       renderShare(poll.question);
       document.getElementById("report-btn").hidden = false;
@@ -584,17 +586,17 @@ if (window.top !== window.self) {
       var voted = votedMap()[pollId] !== undefined;
       if (poll.closed) {
         // 締切済み: 投票不可・最終結果のみ
-        renderResults(poll, note || "締め切り済みのアンケートです。最終結果を表示しています。");
+        renderResults(poll, note || T("締め切り済みのアンケートです。最終結果を表示しています。"));
         return;
       }
       if (poll.hidden) {
         // 結果非表示: サーバー側が「この端末は未投票」と判定。投票フォームのみ表示
         renderVoteForm(poll, pollId);
-        showStatus("このアンケートの結果は、投票すると表示されます。");
+        showStatus(T("このアンケートの結果は、投票すると表示されます。"));
         return;
       }
       if (resultsOnly || voted) {
-        renderResults(poll, note || (voted ? "この端末からは投票済みです。" : ""));
+        renderResults(poll, note || (voted ? T("この端末からは投票済みです。") : ""));
       } else {
         renderVoteForm(poll, pollId);
       }
@@ -611,10 +613,10 @@ if (window.top !== window.self) {
     qr.make();
     var img = document.createElement("img");
     img.src = qr.createDataURL(6, 0);
-    img.alt = "このアンケートのQRコード";
+    img.alt = T("このアンケートのQRコード");
     box.appendChild(img);
     var p = document.createElement("p");
-    p.textContent = "画像を長押しで保存できます。ポスターや黒板・スライドの掲示に。";
+    p.textContent = T("画像を長押しで保存できます。ポスターや黒板・スライドの掲示に。");
     box.appendChild(p);
     box.hidden = false;
   });
@@ -661,23 +663,23 @@ if (window.top !== window.self) {
     document.getElementById("del-yes").addEventListener("click", function () {
       var yes = this;
       yes.disabled = true;
-      yes.textContent = "削除中…";
+      yes.textContent = T("削除中…");
       PollNet.deletePoll(pollId, key).then(function (r) {
         yes.disabled = false;
-        yes.textContent = "はい、削除する";
+        yes.textContent = T("はい、削除する");
         if (r.ok || r.code === "not_owner") {
           forgetMine(pollId);
           close();
           delBtn.hidden = true;
           document.getElementById("report-btn").hidden = true;
-          qTitle.textContent = "このアンケートは削除されました";
-          showStatus("削除が完了しました。集まった票も一緒に消えています。");
+          qTitle.textContent = T("このアンケートは削除されました");
+          showStatus(T("削除が完了しました。集まった票も一緒に消えています。"));
           document.getElementById("vote-form").hidden = true;
           document.getElementById("result").hidden = true;
           document.getElementById("share-box").hidden = true;
           document.getElementById("deadline").hidden = true;
         } else {
-          delError.textContent = "削除できませんでした。通信状況を確認して、もう一度お試しください。";
+          delError.textContent = T("削除できませんでした。通信状況を確認して、もう一度お試しください。");
           delError.hidden = false;
         }
       });
@@ -710,17 +712,17 @@ if (window.top !== window.self) {
     reportBg.hidden = true;
     reportBtn.disabled = true;
     PollNet.report(pollId, voterId()).then(function (r) {
-      reportBtn.textContent = r.ok ? "報告を受け付けました。ご協力ありがとうございます。" : "報告を送信できませんでした。時間をおいてお試しください。";
+      reportBtn.textContent = r.ok ? T("報告を受け付けました。ご協力ありがとうございます。") : T("報告を送信できませんでした。時間をおいてお試しください。");
       if (!r.ok) reportBtn.disabled = false;
     });
   });
 
   if (!PollNet.ready()) {
-    qTitle.textContent = "アンケート機能は準備中です";
-    showStatus("このページはまだ利用できません。もうしばらくお待ちください。");
+    qTitle.textContent = T("アンケート機能は準備中です");
+    showStatus(T("このページはまだ利用できません。もうしばらくお待ちください。"));
   } else if (!PollCalc.isValidId(pollId)) {
-    qTitle.textContent = "アンケートを表示できません";
-    showStatus("URLが正しくありません。共有されたリンクをそのまま開いてください。");
+    qTitle.textContent = T("アンケートを表示できません");
+    showStatus(T("URLが正しくありません。共有されたリンクをそのまま開いてください。"));
   } else {
     load(false);
   }

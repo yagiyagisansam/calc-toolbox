@@ -1,784 +1,787 @@
 {
- "tool": "poll",
- "module": "calc.js",
- "global": "PollCalc",
- "cases": [
-  {
-   "name": "検証: 質問+選択肢2個の基本形が通る",
-   "func": "validatePoll",
-   "args": [
-    "きのこの山とたけのこの里、どっち派?",
-    [
-     "きのこの山",
-     "たけのこの里"
-    ]
-   ],
-   "expect": {
-    "ok": true,
-    "question": "きのこの山とたけのこの里、どっち派?",
-    "options": [
-     "きのこの山",
-     "たけのこの里"
-    ]
-   }
-  },
-  {
-   "name": "検証: 前後の空白は除去され、空の選択肢は無視される",
-   "func": "validatePoll",
-   "args": [
-    "  好きな季節は?  ",
-    [
-     " 春 ",
-     "",
-     "夏",
-     "   "
-    ]
-   ],
-   "expect": {
-    "ok": true,
-    "question": "好きな季節は?",
-    "options": [
-     "春",
-     "夏"
-    ]
-   }
-  },
-  {
-   "name": "検証: 質問が空はエラー",
-   "func": "validatePoll",
-   "args": [
-    "",
-    [
-     "A",
-     "B"
-    ]
-   ],
-   "expect": {
-    "ok": false,
-    "code": "invalid_question"
-   }
-  },
-  {
-   "name": "検証: 質問が空白のみはエラー",
-   "func": "validatePoll",
-   "args": [
-    "   ",
-    [
-     "A",
-     "B"
-    ]
-   ],
-   "expect": {
-    "ok": false,
-    "code": "invalid_question"
-   }
-  },
-  {
-   "name": "検証: 質問121文字はエラー",
-   "func": "validatePoll",
-   "args": [
-    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    [
-     "A",
-     "B"
-    ]
-   ],
-   "expect": {
-    "ok": false,
-    "code": "question_too_long"
-   }
-  },
-  {
-   "name": "検証: 質問120文字ちょうどは通る",
-   "func": "validatePoll",
-   "args": [
-    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    [
-     "A",
-     "B"
-    ]
-   ],
-   "expect": {
-    "ok": true
-   }
-  },
-  {
-   "name": "検証: 選択肢1個はエラー",
-   "func": "validatePoll",
-   "args": [
-    "Q",
-    [
-     "A"
-    ]
-   ],
-   "expect": {
-    "ok": false,
-    "code": "too_few_options"
-   }
-  },
-  {
-   "name": "検証: 選択肢11個はエラー",
-   "func": "validatePoll",
-   "args": [
-    "Q",
-    [
-     "1",
-     "2",
-     "3",
-     "4",
-     "5",
-     "6",
-     "7",
-     "8",
-     "9",
-     "10",
-     "11"
-    ]
-   ],
-   "expect": {
-    "ok": false,
-    "code": "too_many_options"
-   }
-  },
-  {
-   "name": "検証: 選択肢10個ちょうどは通る",
-   "func": "validatePoll",
-   "args": [
-    "Q",
-    [
-     "1",
-     "2",
-     "3",
-     "4",
-     "5",
-     "6",
-     "7",
-     "8",
-     "9",
-     "10"
-    ]
-   ],
-   "expect": {
-    "ok": true
-   }
-  },
-  {
-   "name": "検証: 選択肢61文字はエラー",
-   "func": "validatePoll",
-   "args": [
-    "Q",
-    [
-     "a",
-     "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-    ]
-   ],
-   "expect": {
-    "ok": false,
-    "code": "option_too_long"
-   }
-  },
-  {
-   "name": "検証: 選択肢の重複はエラー",
-   "func": "validatePoll",
-   "args": [
-    "Q",
-    [
-     "ねこ",
-     "いぬ",
-     "ねこ"
-    ]
-   ],
-   "expect": {
-    "ok": false,
-    "code": "duplicate_options"
-   }
-  },
-  {
-   "name": "検証: 選択肢が配列でない場合はエラー",
-   "func": "validatePoll",
-   "args": [
-    "Q",
-    null
-   ],
-   "expect": {
-    "ok": false,
-    "code": "too_few_options"
-   }
-  },
-  {
-   "name": "集計: 3票と1票 → 75%と25%、最多は0番",
-   "func": "results",
-   "args": [
-    [
-     "A",
-     "B"
-    ],
-    [
-     3,
-     1
-    ]
-   ],
-   "expect": {
-    "ok": true,
-    "total": 4,
-    "rows": [
-     {
-      "label": "A",
-      "count": 3,
-      "pct": 75
-     },
-     {
-      "label": "B",
-      "count": 1,
-      "pct": 25
-     }
-    ],
-    "top": [
-     0
-    ]
-   }
-  },
-  {
-   "name": "集計: 0票なら割合0%で最多なし",
-   "func": "results",
-   "args": [
-    [
-     "A",
-     "B"
-    ],
-    [
-     0,
-     0
-    ]
-   ],
-   "expect": {
-    "ok": true,
-    "total": 0,
-    "rows": [
-     {
-      "label": "A",
-      "count": 0,
-      "pct": 0
-     },
-     {
-      "label": "B",
-      "count": 0,
-      "pct": 0
-     }
-    ],
-    "top": []
-   }
-  },
-  {
-   "name": "集計: 同数は最多が複数",
-   "func": "results",
-   "args": [
-    [
-     "A",
-     "B",
-     "C"
-    ],
-    [
-     2,
-     2,
-     0
-    ]
-   ],
-   "expect": {
-    "ok": true,
-    "total": 4,
-    "top": [
-     0,
-     1
-    ]
-   }
-  },
-  {
-   "name": "集計: 1票と2票 → 33.3%と66.7%(小数第1位)",
-   "func": "results",
-   "args": [
-    [
-     "A",
-     "B"
-    ],
-    [
-     1,
-     2
-    ]
-   ],
-   "expect": {
-    "ok": true,
-    "rows": [
-     {
-      "pct": 33.3
-     },
-     {
-      "pct": 66.7
-     }
-    ]
-   }
-  },
-  {
-   "name": "集計: 票数の個数が選択肢と合わなければエラー",
-   "func": "results",
-   "args": [
-    [
-     "A",
-     "B"
-    ],
-    [
-     1
-    ]
-   ],
-   "expect": {
-    "ok": false,
-    "code": "invalid_counts"
-   }
-  },
-  {
-   "name": "集計: 負の票数はエラー",
-   "func": "results",
-   "args": [
-    [
-     "A",
-     "B"
-    ],
-    [
-     1,
-     -1
-    ]
-   ],
-   "expect": {
-    "ok": false,
-    "code": "invalid_counts"
-   }
-  },
-  {
-   "name": "集計: 小数の票数はエラー",
-   "func": "results",
-   "args": [
-    [
-     "A",
-     "B"
-    ],
-    [
-     1,
-     1.5
-    ]
-   ],
-   "expect": {
-    "ok": false,
-    "code": "invalid_counts"
-   }
-  },
-  {
-   "name": "集計: 選択肢1個はエラー",
-   "func": "results",
-   "args": [
-    [
-     "A"
-    ],
-    [
-     1
-    ]
-   ],
-   "expect": {
-    "ok": false,
-    "code": "invalid_counts"
-   }
-  },
-  {
-   "name": "ID生成: バイト0〜9 → abcdefghij",
-   "func": "makeId",
-   "args": [
-    [
-     0,
-     1,
-     2,
-     3,
-     4,
-     5,
-     6,
-     7,
-     8,
-     9
-    ]
-   ],
-   "expect": {
-    "ok": true,
-    "id": "abcdefghij"
-   }
-  },
-  {
-   "name": "ID生成: 255は36で割った余り3 → 全部d",
-   "func": "makeId",
-   "args": [
-    [
-     255,
-     255,
-     255,
-     255,
-     255,
-     255,
-     255,
-     255,
-     255,
-     255
-    ]
-   ],
-   "expect": {
-    "ok": true,
-    "id": "dddddddddd"
-   }
-  },
-  {
-   "name": "ID生成: バイト不足はエラー",
-   "func": "makeId",
-   "args": [
-    [
-     1,
-     2,
-     3
-    ]
-   ],
-   "expect": {
-    "ok": false,
-    "code": "invalid_bytes"
-   }
-  },
-  {
-   "name": "ID生成: nullはエラー",
-   "func": "makeId",
-   "args": [
-    null
-   ],
-   "expect": {
-    "ok": false,
-    "code": "invalid_bytes"
-   }
-  },
-  {
-   "name": "ID形式: 英小文字+数字10桁はtrue",
-   "func": "isValidId",
-   "args": [
-    "abc123def4"
-   ],
-   "expect": true
-  },
-  {
-   "name": "ID形式: 大文字を含むとfalse",
-   "func": "isValidId",
-   "args": [
-    "ABC123DEF4"
-   ],
-   "expect": false
-  },
-  {
-   "name": "ID形式: 9桁はfalse",
-   "func": "isValidId",
-   "args": [
-    "abc123def"
-   ],
-   "expect": false
-  },
-  {
-   "name": "ID形式: 11桁はfalse",
-   "func": "isValidId",
-   "args": [
-    "abc123def45"
-   ],
-   "expect": false
-  },
-  {
-   "name": "並び順: 票数の多い順(3,1,2 → 0,2,1)",
-   "func": "displayOrder",
-   "args": [
-    [
-     3,
-     1,
-     2
-    ]
-   ],
-   "expect": {
-    "ok": true,
-    "order": [
-     0,
-     2,
-     1
-    ]
-   }
-  },
-  {
-   "name": "並び順: 同数は元の順(2,2,1 → 0,1,2)",
-   "func": "displayOrder",
-   "args": [
-    [
-     2,
-     2,
-     1
-    ]
-   ],
-   "expect": {
-    "ok": true,
-    "order": [
-     0,
-     1,
-     2
-    ]
-   }
-  },
-  {
-   "name": "並び順: 全て0票は元の順",
-   "func": "displayOrder",
-   "args": [
-    [
-     0,
-     0,
-     0
-    ]
-   ],
-   "expect": {
-    "ok": true,
-    "order": [
-     0,
-     1,
-     2
-    ]
-   }
-  },
-  {
-   "name": "並び順: 配列以外はエラー",
-   "func": "displayOrder",
-   "args": [
-    null
-   ],
-   "expect": {
-    "ok": false,
-    "code": "invalid_counts"
-   }
-  },
-  {
-   "name": "円グラフ: 1,1,2 → 0-0.25, 0.25-0.5, 0.5-1",
-   "func": "arcs",
-   "args": [
-    [
-     1,
-     1,
-     2
-    ]
-   ],
-   "expect": {
-    "ok": true,
-    "arcs": [
-     {
-      "from": 0,
-      "to": 0.25
-     },
-     {
-      "from": 0.25,
-      "to": 0.5
-     },
-     {
-      "from": 0.5,
-      "to": 1
-     }
-    ]
-   }
-  },
-  {
-   "name": "円グラフ: 0票は全区間ゼロ幅",
-   "func": "arcs",
-   "args": [
-    [
-     0,
-     0
-    ]
-   ],
-   "expect": {
-    "ok": true,
-    "arcs": [
-     {
-      "from": 0,
-      "to": 0
-     },
-     {
-      "from": 0,
-      "to": 0
-     }
-    ]
-   }
-  },
-  {
-   "name": "円グラフ: 負の票数はエラー",
-   "func": "arcs",
-   "args": [
-    [
-     1,
-     -1
-    ]
-   ],
-   "expect": {
-    "ok": false,
-    "code": "invalid_counts"
-   }
-  },
-  {
-   "name": "集計(複数選択): 回答者4人で3票と2票 → 75%と50%",
-   "func": "results",
-   "args": [
-    [
-     "A",
-     "B"
-    ],
-    [
-     3,
-     2
-    ],
-    4
-   ],
-   "expect": {
-    "ok": true,
-    "total": 4,
-    "rows": [
-     {
-      "count": 3,
-      "pct": 75
-     },
-     {
-      "count": 2,
-      "pct": 50
-     }
-    ],
-    "top": [
-     0
-    ]
-   }
-  },
-  {
-   "name": "集計(複数選択): 回答者数が最大票数より少ないのはエラー",
-   "func": "results",
-   "args": [
-    [
-     "A",
-     "B"
-    ],
-    [
-     3,
-     2
-    ],
-    2
-   ],
-   "expect": {
-    "ok": false,
-    "code": "invalid_counts"
-   }
-  },
-  {
-   "name": "集計(複数選択): 回答者0人は割合0%",
-   "func": "results",
-   "args": [
-    [
-     "A",
-     "B"
-    ],
-    [
-     0,
-     0
-    ],
-    0
-   ],
-   "expect": {
-    "ok": true,
-    "total": 0,
-    "rows": [
-     {
-      "pct": 0
-     },
-     {
-      "pct": 0
-     }
-    ]
-   }
-  },
-  {
-   "name": "CSV: 基本形(質問・回答者数・選択肢の行)",
-   "func": "toCsv",
-   "args": [
-    "どっち派?",
-    [
-     "A",
-     "B"
-    ],
-    [
-     3,
-     1
-    ]
-   ],
-   "expect": {
-    "ok": true,
-    "csv": "質問,どっち派?\n回答者数,4\n選択肢,票数,割合(%)\nA,3,75\nB,1,25\n"
-   }
-  },
-  {
-   "name": "CSV: カンマや引用符を含む選択肢は引用符で囲む",
-   "func": "toCsv",
-   "args": [
-    "Q",
-    [
-     "A,1",
-     "B\"x\""
-    ],
-    [
-     1,
-     1
-    ]
-   ],
-   "expect": {
-    "ok": true,
-    "csv": "質問,Q\n回答者数,2\n選択肢,票数,割合(%)\n\"A,1\",1,50\n\"B\"\"x\"\"\",1,50\n"
-   }
-  },
-  {
-   "name": "CSV: 不正な票数はエラー",
-   "func": "toCsv",
-   "args": [
-    "Q",
-    [
-     "A",
-     "B"
-    ],
-    [
-     1
-    ]
-   ],
-   "expect": {
-    "ok": false,
-    "code": "invalid_counts"
-   }
-  },
-  {
-   "name": "シャッフル: nが整数でないのはエラー",
-   "func": "shuffleOrder",
-   "args": [
-    2.5,
-    null
-   ],
-   "expect": {
-    "ok": false,
-    "code": "invalid_counts"
-   }
-  },
-  {
-   "name": "シャッフル: 乱数関数がないのはエラー",
-   "func": "shuffleOrder",
-   "args": [
-    3,
-    null
-   ],
-   "expect": {
-    "ok": false,
-    "code": "invalid_rand"
-   }
-  }
- ]
+  "tool": "poll",
+  "module": "calc.js",
+  "global": "PollCalc",
+  "cases": [
+    {
+      "name": "検証: 質問+選択肢2個の基本形が通る",
+      "func": "validatePoll",
+      "args": [
+        "きのこの山とたけのこの里、どっち派?",
+        [
+          "きのこの山",
+          "たけのこの里"
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "question": "きのこの山とたけのこの里、どっち派?",
+        "options": [
+          "きのこの山",
+          "たけのこの里"
+        ]
+      }
+    },
+    {
+      "name": "検証: 前後の空白は除去され、空の選択肢は無視される",
+      "func": "validatePoll",
+      "args": [
+        "  好きな季節は?  ",
+        [
+          " 春 ",
+          "",
+          "夏",
+          "   "
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "question": "好きな季節は?",
+        "options": [
+          "春",
+          "夏"
+        ]
+      }
+    },
+    {
+      "name": "検証: 質問が空はエラー",
+      "func": "validatePoll",
+      "args": [
+        "",
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_question"
+      }
+    },
+    {
+      "name": "検証: 質問が空白のみはエラー",
+      "func": "validatePoll",
+      "args": [
+        "   ",
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_question"
+      }
+    },
+    {
+      "name": "検証: 質問121文字はエラー",
+      "func": "validatePoll",
+      "args": [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "question_too_long"
+      }
+    },
+    {
+      "name": "検証: 質問120文字ちょうどは通る",
+      "func": "validatePoll",
+      "args": [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "name": "検証: 選択肢1個はエラー",
+      "func": "validatePoll",
+      "args": [
+        "Q",
+        [
+          "A"
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "too_few_options"
+      }
+    },
+    {
+      "name": "検証: 選択肢11個はエラー",
+      "func": "validatePoll",
+      "args": [
+        "Q",
+        [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11"
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "too_many_options"
+      }
+    },
+    {
+      "name": "検証: 選択肢10個ちょうどは通る",
+      "func": "validatePoll",
+      "args": [
+        "Q",
+        [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ]
+      ],
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "name": "検証: 選択肢61文字はエラー",
+      "func": "validatePoll",
+      "args": [
+        "Q",
+        [
+          "a",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "option_too_long"
+      }
+    },
+    {
+      "name": "検証: 選択肢の重複はエラー",
+      "func": "validatePoll",
+      "args": [
+        "Q",
+        [
+          "ねこ",
+          "いぬ",
+          "ねこ"
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "duplicate_options"
+      }
+    },
+    {
+      "name": "検証: 選択肢が配列でない場合はエラー",
+      "func": "validatePoll",
+      "args": [
+        "Q",
+        null
+      ],
+      "expect": {
+        "ok": false,
+        "code": "too_few_options"
+      }
+    },
+    {
+      "name": "集計: 3票と1票 → 75%と25%、最多は0番",
+      "func": "results",
+      "args": [
+        [
+          "A",
+          "B"
+        ],
+        [
+          3,
+          1
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "total": 4,
+        "rows": [
+          {
+            "label": "A",
+            "count": 3,
+            "pct": 75
+          },
+          {
+            "label": "B",
+            "count": 1,
+            "pct": 25
+          }
+        ],
+        "top": [
+          0
+        ]
+      }
+    },
+    {
+      "name": "集計: 0票なら割合0%で最多なし",
+      "func": "results",
+      "args": [
+        [
+          "A",
+          "B"
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "total": 0,
+        "rows": [
+          {
+            "label": "A",
+            "count": 0,
+            "pct": 0
+          },
+          {
+            "label": "B",
+            "count": 0,
+            "pct": 0
+          }
+        ],
+        "top": []
+      }
+    },
+    {
+      "name": "集計: 同数は最多が複数",
+      "func": "results",
+      "args": [
+        [
+          "A",
+          "B",
+          "C"
+        ],
+        [
+          2,
+          2,
+          0
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "total": 4,
+        "top": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "name": "集計: 1票と2票 → 33.3%と66.7%(小数第1位)",
+      "func": "results",
+      "args": [
+        [
+          "A",
+          "B"
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "rows": [
+          {
+            "pct": 33.3
+          },
+          {
+            "pct": 66.7
+          }
+        ]
+      }
+    },
+    {
+      "name": "集計: 票数の個数が選択肢と合わなければエラー",
+      "func": "results",
+      "args": [
+        [
+          "A",
+          "B"
+        ],
+        [
+          1
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_counts"
+      }
+    },
+    {
+      "name": "集計: 負の票数はエラー",
+      "func": "results",
+      "args": [
+        [
+          "A",
+          "B"
+        ],
+        [
+          1,
+          -1
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_counts"
+      }
+    },
+    {
+      "name": "集計: 小数の票数はエラー",
+      "func": "results",
+      "args": [
+        [
+          "A",
+          "B"
+        ],
+        [
+          1,
+          1.5
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_counts"
+      }
+    },
+    {
+      "name": "集計: 選択肢1個はエラー",
+      "func": "results",
+      "args": [
+        [
+          "A"
+        ],
+        [
+          1
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_counts"
+      }
+    },
+    {
+      "name": "ID生成: バイト0〜9 → abcdefghij",
+      "func": "makeId",
+      "args": [
+        [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "id": "abcdefghij"
+      }
+    },
+    {
+      "name": "ID生成: 255は36で割った余り3 → 全部d",
+      "func": "makeId",
+      "args": [
+        [
+          255,
+          255,
+          255,
+          255,
+          255,
+          255,
+          255,
+          255,
+          255,
+          255
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "id": "dddddddddd"
+      }
+    },
+    {
+      "name": "ID生成: バイト不足はエラー",
+      "func": "makeId",
+      "args": [
+        [
+          1,
+          2,
+          3
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_bytes"
+      }
+    },
+    {
+      "name": "ID生成: nullはエラー",
+      "func": "makeId",
+      "args": [
+        null
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_bytes"
+      }
+    },
+    {
+      "name": "ID形式: 英小文字+数字10桁はtrue",
+      "func": "isValidId",
+      "args": [
+        "abc123def4"
+      ],
+      "expect": true
+    },
+    {
+      "name": "ID形式: 大文字を含むとfalse",
+      "func": "isValidId",
+      "args": [
+        "ABC123DEF4"
+      ],
+      "expect": false
+    },
+    {
+      "name": "ID形式: 9桁はfalse",
+      "func": "isValidId",
+      "args": [
+        "abc123def"
+      ],
+      "expect": false
+    },
+    {
+      "name": "ID形式: 11桁はfalse",
+      "func": "isValidId",
+      "args": [
+        "abc123def45"
+      ],
+      "expect": false
+    },
+    {
+      "name": "並び順: 票数の多い順(3,1,2 → 0,2,1)",
+      "func": "displayOrder",
+      "args": [
+        [
+          3,
+          1,
+          2
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "order": [
+          0,
+          2,
+          1
+        ]
+      }
+    },
+    {
+      "name": "並び順: 同数は元の順(2,2,1 → 0,1,2)",
+      "func": "displayOrder",
+      "args": [
+        [
+          2,
+          2,
+          1
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "order": [
+          0,
+          1,
+          2
+        ]
+      }
+    },
+    {
+      "name": "並び順: 全て0票は元の順",
+      "func": "displayOrder",
+      "args": [
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "order": [
+          0,
+          1,
+          2
+        ]
+      }
+    },
+    {
+      "name": "並び順: 配列以外はエラー",
+      "func": "displayOrder",
+      "args": [
+        null
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_counts"
+      }
+    },
+    {
+      "name": "円グラフ: 1,1,2 → 0-0.25, 0.25-0.5, 0.5-1",
+      "func": "arcs",
+      "args": [
+        [
+          1,
+          1,
+          2
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "arcs": [
+          {
+            "from": 0,
+            "to": 0.25
+          },
+          {
+            "from": 0.25,
+            "to": 0.5
+          },
+          {
+            "from": 0.5,
+            "to": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "円グラフ: 0票は全区間ゼロ幅",
+      "func": "arcs",
+      "args": [
+        [
+          0,
+          0
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "arcs": [
+          {
+            "from": 0,
+            "to": 0
+          },
+          {
+            "from": 0,
+            "to": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "円グラフ: 負の票数はエラー",
+      "func": "arcs",
+      "args": [
+        [
+          1,
+          -1
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_counts"
+      }
+    },
+    {
+      "name": "集計(複数選択): 回答者4人で3票と2票 → 75%と50%",
+      "func": "results",
+      "args": [
+        [
+          "A",
+          "B"
+        ],
+        [
+          3,
+          2
+        ],
+        4
+      ],
+      "expect": {
+        "ok": true,
+        "total": 4,
+        "rows": [
+          {
+            "count": 3,
+            "pct": 75
+          },
+          {
+            "count": 2,
+            "pct": 50
+          }
+        ],
+        "top": [
+          0
+        ]
+      }
+    },
+    {
+      "name": "集計(複数選択): 回答者数が最大票数より少ないのはエラー",
+      "func": "results",
+      "args": [
+        [
+          "A",
+          "B"
+        ],
+        [
+          3,
+          2
+        ],
+        2
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_counts"
+      }
+    },
+    {
+      "name": "集計(複数選択): 回答者0人は割合0%",
+      "func": "results",
+      "args": [
+        [
+          "A",
+          "B"
+        ],
+        [
+          0,
+          0
+        ],
+        0
+      ],
+      "expect": {
+        "ok": true,
+        "total": 0,
+        "rows": [
+          {
+            "pct": 0
+          },
+          {
+            "pct": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "CSV: 基本形(質問・回答者数・選択肢の行)",
+      "func": "toCsv",
+      "args": [
+        "どっち派?",
+        [
+          "A",
+          "B"
+        ],
+        [
+          3,
+          1
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "csv": "質問,どっち派?\n回答者数,4\n選択肢,票数,割合(%)\nA,3,75\nB,1,25\n"
+      },
+      "langDependent": true
+    },
+    {
+      "name": "CSV: カンマや引用符を含む選択肢は引用符で囲む",
+      "func": "toCsv",
+      "args": [
+        "Q",
+        [
+          "A,1",
+          "B\"x\""
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "expect": {
+        "ok": true,
+        "csv": "質問,Q\n回答者数,2\n選択肢,票数,割合(%)\n\"A,1\",1,50\n\"B\"\"x\"\"\",1,50\n"
+      },
+      "langDependent": true
+    },
+    {
+      "name": "CSV: 不正な票数はエラー",
+      "func": "toCsv",
+      "args": [
+        "Q",
+        [
+          "A",
+          "B"
+        ],
+        [
+          1
+        ]
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_counts"
+      },
+      "langDependent": true
+    },
+    {
+      "name": "シャッフル: nが整数でないのはエラー",
+      "func": "shuffleOrder",
+      "args": [
+        2.5,
+        null
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_counts"
+      }
+    },
+    {
+      "name": "シャッフル: 乱数関数がないのはエラー",
+      "func": "shuffleOrder",
+      "args": [
+        3,
+        null
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_rand"
+      }
+    }
+  ]
 }

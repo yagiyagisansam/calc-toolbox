@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://ssxskriqlaiohdutxprn.supabase.co; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'; require-trusted-types-for 'script'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Everyone's Poll | Free poll maker with real-time results (up to 10 options)</title>
+  <meta name="description" content="A free poll tool: just enter a question and up to 10 options to get a link to your voting page. Share it on X (formerly Twitter), LINE, Instagram and other apps, and see everyone's answers tallied in real time. You can also vote on popular polls right here. No sign-up, works on phones.">
+  <link rel="stylesheet" href="../../../tools/poll/poll.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/poll/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Crect%20width='100'%20height='100'%20rx='22'%20fill='%23ff5a70'/%3E%3Cpath%20d='M28%2072V44M50%2072V28M72%2072V54'%20stroke='%23fff'%20stroke-width='10'%20stroke-linecap='round'/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#ff5a70">
+  <meta property="og:site_name" content="Everyone's Poll">
+  <meta property="og:title" content="Everyone's Poll | Free poll maker with real-time results">
+  <meta property="og:description" content="A free poll tool: enter a question and up to 10 options to get a voting link, share it on social media and watch the results tally in real time. No sign-up, works on phones.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/poll/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Everyone's Poll","url":"https://quick-calc.site/en/tools/poll/","inLanguage":"en"}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/poll/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/poll/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/poll/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/poll/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/poll/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @langsw start -->
+<div class="lang-bar">
+  <nav class="lang-switch" aria-label="Language"><span class="lang-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 2.6 15 0 18M12 3c-2.6 2.6-2.6 15 0 18"/></svg>Language</span><a href="/tools/poll/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/poll/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/poll/" lang="ko" hreflang="ko">한국어</a></nav>
+</div>
+<!-- @langsw end -->
+<header class="pb-header">
+  <a href="index.html">
+    <span class="pb-mark"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></span>
+    <span class="pb-name">Everyone's Poll</span>
+  </a>
+  <span class="pb-tag">Create, share, tally</span>
+</header>
+<main>
+  <div class="pb-status" id="setup-note" hidden>This feature is still being set up. Please check back soon.</div>
+
+  <div class="pb-card">
+    <h1 class="pb-q">Got a question? Ask everyone.</h1>
+    <p class="pb-meta">Just enter a question and up to 10 options, and your voting link is ready. Share it on social media or in a group chat, and the answers are tallied in real time. Free, no sign-up.</p>
+    <a class="pb-btn" href="new.html">Create a poll</a>
+  </div>
+
+  <div class="pb-sec"><b>Popular polls</b><span id="pop-note">Sorted by most votes</span></div>
+  <div class="pb-seg" id="pop-period">
+    <button type="button" class="on" data-days="">All time</button>
+    <button type="button" data-days="7">1 week</button>
+    <button type="button" data-days="31">1 month</button>
+    <button type="button" data-days="62">2 months</button>
+  </div>
+  <div class="pb-list mt12" id="popular"><p class="pb-empty">Loading…</p></div>
+
+  <div class="pb-sec"><b>New polls</b></div>
+  <div class="pb-list" id="recent"><p class="pb-empty">Loading…</p></div>
+
+  <div id="mine-sec" hidden>
+    <div class="pb-sec"><b>Polls created on this device</b></div>
+    <div class="pb-list" id="mine"></div>
+  </div>
+
+  <div class="pb-modal-bg" id="del-confirm-bg" hidden>
+    <div class="pb-modal" role="dialog" aria-modal="true" aria-labelledby="del-confirm-title">
+      <p class="pb-q pb-q-sm" id="del-confirm-title">Delete this poll?</p>
+      <p class="pb-meta" id="del-confirm-q"></p>
+      <p class="pb-meta">The votes it collected will be deleted too. This cannot be undone.</p>
+      <p class="pb-error" id="del-error" hidden></p>
+      <button type="button" class="pb-btn" id="del-yes">Yes, delete</button>
+      <button type="button" class="pb-btn-sub" id="del-no">No, cancel</button>
+    </div>
+  </div>
+
+  <div class="pb-doc">
+    <h2>How to use it</h2>
+    <ol>
+      <li>Tap "Create a poll" and enter your question and 2 to 10 options.</li>
+      <li>Share the voting link you get on X (formerly Twitter), LINE, Instagram and so on.</li>
+      <li>Anyone who opens the link can vote on the spot, and the results are tallied in real time as percentages and vote counts.</li>
+    </ol>
+    <h2>How the tally works</h2>
+    <ul>
+      <li>One vote per person (per device), one option each. Percentage (%) = that option's votes divided by all votes, times 100 (to one decimal place).</li>
+      <li>Respondents are the people the link was shared with. If you list the poll publicly, people who arrive from this page join in too (private polls are not listed). Either way, the figures are a rough guide, not a randomly sampled statistical survey.</li>
+      <li>Questions, options and vote counts are stored in an external database so the results can be tallied.</li>
+    </ul>
+    <h2>Please note</h2>
+    <ul>
+      <li>Do not put personal information (names, addresses, phone numbers and the like) in your question or options.</li>
+      <li>Polls that are abusive, discriminatory or otherwise inappropriate are deleted without notice, based on reports or on our own judgment.</li>
+      <li>Voting twice from the same device is blocked, but voting from a different device cannot be prevented. This tool is not suited to rigorous research.</li>
+    </ul>
+    <h2>Frequently asked questions</h2>
+    <p class="pb-faq-q">Does it cost anything, or do I need an account?</p>
+    <p class="pb-faq-a">It is free and needs no sign-up. Whether you are creating a poll or answering one, you just open a link.</p>
+    <p class="pb-faq-q">How many options can I add?</p>
+    <p class="pb-faq-a">Up to 10.</p>
+    <p class="pb-faq-q">What if I do not want my poll listed publicly?</p>
+    <p class="pb-faq-a">Turn off "List this poll publicly" when you create it, and it becomes a private poll that only people who know the link can open.</p>
+    <p class="pb-faq-q">How do I delete a poll I made?</p>
+    <p class="pb-faq-a">Open this page on the device you created it from and it appears under "Polls created on this device". Use "Delete" there to remove it yourself at any time (the votes it collected go with it). Only the creator and the site operator can delete a poll.</p>
+  </div>
+</main>
+<footer class="pb-footer">
+  <p>The questions, options and voting data that are created here are stored in an external database so the results can be tallied (no personally identifying information is collected). See our <a href="../../privacy.html">Privacy Policy</a> for details.</p>
+  <nav>
+    <a href="index.html">Everyone's Poll</a>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html">Contact</a>
+  </nav>
+  <p>© 2026 Everyone's Poll (quick-calc.site)</p>
+</footer>
+<script src="../../../tools/poll/i18n/en.js"></script>
+<script src="../../../tools/poll/i18n.js"></script>
+<script src="../../../tools/poll/config.js"></script>
+<script src="../../../tools/poll/calc.js"></script>
+<script src="../../../tools/poll/net.js"></script>
+<script src="../../../tools/poll/home.js"></script>
+</body>
+</html>

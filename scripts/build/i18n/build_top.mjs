@@ -83,9 +83,10 @@ for (const lang of LANGS.filter((l) => l.code !== "ja")) {
     for (const slug of readdirSync(toolsDir).sort()) {
       const file = join(toolsDir, slug, "index.html");
       if (!existsSync(file)) continue;
+      // みんなの投票は計算ツールと別デザイン(h1を持たない)。存在だけ見て別枠に回す
+      if (slug === "poll") { poll = { slug }; continue; }
       const page = readPage(file);
       if (!page) { console.error(`skip(h1/descriptionなし): ${lang.dir}/tools/${slug}`); continue; }
-      if (slug === "poll") { poll = { slug, ...page }; continue; }
       const cat = CAT_OF[slug];
       if (!cat) { console.error(`skip(data.jsに未登録): ${slug}`); continue; }
       tools.push({ slug, cat, short: shortName(page.name, lang.code), ...page });

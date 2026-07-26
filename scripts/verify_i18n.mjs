@@ -70,11 +70,13 @@ for (const lang of LANGS) {
           let pass = 0;
           const bad = [];
           for (const c of s.cases) {
+            // 出力そのものが翻訳される項目(CSVの見出しなど)は日本語版の期待値と一致しないので飛ばす
+            if (c.langDependent) continue;
             let ok = false;
             try { ok = matches(c.expect, api[c.func].apply(null, c.args)); } catch (e) { ok = false; }
             if (ok) pass++; else bad.push(c.name);
           }
-          return { loaded: true, pass, total: s.cases.length, bad: bad.slice(0, 2) };
+          return { loaded: true, pass, total: s.cases.filter((c) => !c.langDependent).length, bad: bad.slice(0, 2) };
         }, spec);
         if (!out.loaded) throw new Error(`共有calc.js未読込(window.${spec.global}が無い): src相対パスを確認`);
         if (out.pass !== out.total) throw new Error(`計算テスト ${out.pass}/${out.total}: ${out.bad.join(" / ")}`);

@@ -5,6 +5,15 @@
 (function (global) {
   "use strict";
 
+  // 表示・出力する文言は i18n.js の T() を通す。
+  // Node(テスト実行)では i18n.js を読み込まないため、その場合はキーをそのまま返す。
+  function T(key, vars) {
+    if (typeof global.T === "function") return global.T(key, vars);
+    return String(key).replace(/\{(\w+)\}/g, function (whole, name) {
+      return (vars && Object.prototype.hasOwnProperty.call(vars, name)) ? String(vars[name]) : whole;
+    });
+  }
+
   var ID_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789";
   var ID_LEN = 10;
   var MIN_OPTIONS = 2;
@@ -100,9 +109,9 @@
       return s;
     }
     var lines = [];
-    lines.push("質問," + esc(question));
-    lines.push("回答者数," + r.total);
-    lines.push("選択肢,票数,割合(%)");
+    lines.push(T("質問") + "," + esc(question));
+    lines.push(T("回答者数") + "," + r.total);
+    lines.push(T("選択肢,票数,割合(%)"));
     for (var i = 0; i < r.rows.length; i++) {
       lines.push(esc(r.rows[i].label) + "," + r.rows[i].count + "," + r.rows[i].pct);
     }

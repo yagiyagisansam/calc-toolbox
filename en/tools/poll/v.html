@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://ssxskriqlaiohdutxprn.supabase.co; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'; require-trusted-types-for 'script'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Vote in a poll | Everyone's Poll</title>
+  <meta name="description" content="The page where you vote in a poll that was shared with you and watch everyone's answers tallied in real time. Free, no sign-up.">
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="../../../tools/poll/poll.css">
+  <!-- @meta start -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Crect%20width='100'%20height='100'%20rx='22'%20fill='%23ff5a70'/%3E%3Cpath%20d='M28%2072V44M50%2072V28M72%2072V54'%20stroke='%23fff'%20stroke-width='10'%20stroke-linecap='round'/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#ff5a70">
+  <meta property="og:site_name" content="Everyone's Poll">
+  <meta property="og:title" content="Vote in a poll | Everyone's Poll">
+  <meta property="og:description" content="The page where you vote in a poll that was shared with you and watch everyone's answers tallied in real time. Free, no sign-up.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @langsw start -->
+<div class="lang-bar">
+  <nav class="lang-switch" aria-label="Language"><span class="lang-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 2.6 15 0 18M12 3c-2.6 2.6-2.6 15 0 18"/></svg>Language</span><a href="/tools/poll/v.html" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/poll/v.html" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/poll/v.html" lang="ko" hreflang="ko">한국어</a></nav>
+  <script src="../../../shared/lang-query.js"></script>
+</div>
+<!-- @langsw end -->
+<header class="pb-header">
+  <a href="index.html">
+    <span class="pb-mark"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></span>
+    <span class="pb-name">Everyone's Poll</span>
+  </a>
+  <a class="pb-cta" href="new.html">Create a poll</a>
+</header>
+<main>
+  <div class="pb-card" id="main-card">
+    <h1 class="pb-q" id="q-title">Loading the poll…</h1>
+    <p class="pb-deadline" id="deadline" hidden></p>
+    <p class="pb-status" id="status" hidden></p>
+    <form id="vote-form" hidden>
+      <p class="pb-meta" id="vote-note">One vote per person. Tap an option to vote.</p>
+      <div class="pb-opts" id="opts"></div>
+      <button type="submit" class="pb-btn" id="vote-btn" disabled>Vote with this choice</button>
+      <p class="pb-center mt12"><a class="pb-sub-link" href="#" id="peek-link">Just see the results without voting</a></p>
+    </form>
+    <div id="result" hidden aria-live="polite"></div>
+  </div>
+
+  <div id="share-box" hidden>
+    <div class="pb-sec"><b>Spread the word about this poll</b></div>
+    <div class="pb-share" id="share-row"></div>
+    <button type="button" class="pb-btn-sub" id="qr-btn">＋ Show a QR code (to print or display)</button>
+    <div class="pb-qr" id="qr-box" hidden></div>
+  </div>
+
+  <p class="pb-center mt20"><a class="pb-link" href="new.html">Create a poll of your own (free, no sign-up)</a></p>
+  <button type="button" class="pb-report" id="owner-del-btn" hidden>Delete this poll (creator only)</button>
+  <button type="button" class="pb-report" id="report-btn" hidden>Report a problem with this poll</button>
+
+  <div class="pb-modal-bg" id="del-confirm-bg" hidden>
+    <div class="pb-modal" role="dialog" aria-modal="true" aria-labelledby="del-confirm-title">
+      <p class="pb-q pb-q-sm" id="del-confirm-title">Delete this poll?</p>
+      <p class="pb-meta">The votes it collected will be deleted too. This cannot be undone.</p>
+      <p class="pb-error" id="del-error" hidden></p>
+      <button type="button" class="pb-btn" id="del-yes">Yes, delete</button>
+      <button type="button" class="pb-btn-sub" id="del-no">No, cancel</button>
+    </div>
+  </div>
+
+  <div class="pb-modal-bg" id="report-confirm-bg" hidden>
+    <div class="pb-modal" role="dialog" aria-modal="true" aria-labelledby="report-confirm-title">
+      <p class="pb-q pb-q-sm" id="report-confirm-title">Report this poll?</p>
+      <p class="pb-meta">Please report content that is a problem, such as abuse, obscenity or advertising. A report cannot be withdrawn.</p>
+      <button type="button" class="pb-btn" id="report-yes">Yes, report it</button>
+      <button type="button" class="pb-btn-sub" id="report-no">No, cancel</button>
+    </div>
+  </div>
+</main>
+<footer class="pb-footer">
+  <p>The voting data on this page (the option you chose) is stored in an external database so the results can be tallied (no personally identifying information is collected). See our <a href="../../privacy.html">Privacy Policy</a> for details.</p>
+  <nav>
+    <a href="index.html">Everyone's Poll</a>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html">Contact</a>
+  </nav>
+  <p>© 2026 Everyone's Poll (quick-calc.site)</p>
+</footer>
+<script src="../../../tools/poll/i18n/en.js"></script>
+<script src="../../../tools/poll/i18n.js"></script>
+<script src="../../../tools/poll/config.js"></script>
+<script src="../../../tools/poll/calc.js"></script>
+<script src="../../../tools/poll/net.js"></script>
+<script src="../../../tools/poll/qr.js"></script>
+<script src="../../../tools/poll/vote.js"></script>
+</body>
+</html>

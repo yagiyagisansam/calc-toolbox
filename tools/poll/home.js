@@ -12,7 +12,7 @@ if (window.top !== window.self) {
     if (!items.length) {
       var p = document.createElement("p");
       p.className = "pb-empty";
-      p.textContent = emptyMsg || "まだ公開アンケートがありません。最初の1件を作ってみましょう。";
+      p.textContent = emptyMsg || T("まだ公開アンケートがありません。最初の1件を作ってみましょう。");
       el.appendChild(p);
       return;
     }
@@ -31,7 +31,7 @@ if (window.top !== window.self) {
       q.textContent = it.question;
       var t = document.createElement("span");
       t.className = "tt";
-      t.textContent = Number(it.total).toLocaleString() + "票";
+      t.textContent = T("{n}票", { n: Number(it.total).toLocaleString() });
       a.appendChild(q);
       a.appendChild(t);
       el.appendChild(a);
@@ -42,7 +42,7 @@ if (window.top !== window.self) {
     el.replaceChildren();
     var p = document.createElement("p");
     p.className = "pb-empty";
-    p.textContent = "読み込みに失敗しました。再読み込みしてください。";
+    p.textContent = T("読み込みに失敗しました。再読み込みしてください。");
     el.appendChild(p);
   }
 
@@ -58,14 +58,14 @@ if (window.top !== window.self) {
     popEl.replaceChildren();
     var loading = document.createElement("p");
     loading.className = "pb-empty";
-    loading.textContent = "読み込み中…";
+    loading.textContent = T("読み込み中…");
     popEl.appendChild(loading);
-    popNote.textContent = days === null ? "投票数の多い順" : "直近" + label + "の投票数順";
+    popNote.textContent = days === null ? T("投票数の多い順") : T("直近{period}の投票数順", { period: label });
     PollNet.listPublic("popular", 5, days).then(function (r) {
       if (req !== popRequest) return; // 古いリクエストの結果は捨てる
       if (r.ok) {
         renderList(popEl, r.items.filter(function (it) { return days === null || it.total > 0; }), true,
-          days === null ? null : "この期間に投票されたアンケートはまだありません。");
+          days === null ? null : T("この期間に投票されたアンケートはまだありません。"));
       } else {
         fail(popEl);
       }
@@ -136,8 +136,8 @@ if (window.top !== window.self) {
         var del = document.createElement("button");
         del.type = "button";
         del.className = "pb-item-del";
-        del.textContent = "削除";
-        del.setAttribute("aria-label", m.q + " を削除する");
+        del.textContent = T("削除");
+        del.setAttribute("aria-label", T("{q} を削除する", { q: m.q }));
         del.addEventListener("click", function () {
           pendingDelete = m;
           confirmQ.textContent = m.q;
@@ -162,10 +162,10 @@ if (window.top !== window.self) {
     var target = pendingDelete;
     var btn = this;
     btn.disabled = true;
-    btn.textContent = "削除中…";
+    btn.textContent = T("削除中…");
     PollNet.deletePoll(target.id, target.k).then(function (r) {
       btn.disabled = false;
-      btn.textContent = "はい、削除する";
+      btn.textContent = T("はい、削除する");
       if (r.ok || r.code === "not_owner") {
         // 削除できた場合と、既に消えている場合はこの端末の一覧からも消す
         closeConfirm();
@@ -173,7 +173,7 @@ if (window.top !== window.self) {
         saveMine(mine);
         renderMine();
       } else {
-        delError.textContent = "削除できませんでした。通信状況を確認して、もう一度お試しください。";
+        delError.textContent = T("削除できませんでした。通信状況を確認して、もう一度お試しください。");
         delError.hidden = false;
       }
     });

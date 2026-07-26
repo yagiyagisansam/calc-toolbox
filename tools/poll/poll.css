@@ -291,3 +291,36 @@ body {
 .pb-footer { margin-top: 36px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.78rem; }
 .pb-footer nav { display: flex; flex-wrap: wrap; gap: 14px; margin: 10px 0; }
 .pb-footer a { color: var(--muted); }
+
+/* 言語切替(ページ最上部)。inject_links.mjs が全ページに入れる帯の見た目。
+   計算ツール側は shared/style.css に同じものがある(投票ツールは専用CSSのためここにも置く) */
+.lang-bar {
+  /* body に左右16pxの余白があるため、負のマージンで帯を端まで伸ばす */
+  margin: 0 -16px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+.lang-switch {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  padding: 7px 0;
+  font-size: 0.82rem;
+}
+.lang-switch .lang-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+  font-weight: 600;
+}
+.lang-switch .lang-label svg { width: 15px; height: 15px; }
+.lang-switch a { color: var(--muted); text-decoration: none; }
+.lang-switch a:hover { text-decoration: underline; }
+.lang-switch .lang-current {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--accent);
+}

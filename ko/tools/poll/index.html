@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://ssxskriqlaiohdutxprn.supabase.co; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'; require-trusted-types-for 'script'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>모두의 투표 | 무료 설문 만들기·실시간 집계(선택지 10개까지)</title>
+  <meta name="description" content="질문과 선택지(최대 10개)만 입력하면 투표 페이지 링크를 발급할 수 있는 무료 설문 도구. X(구 트위터)·LINE·인스타그램 등 SNS로 공유해 모두의 답변을 실시간으로 집계하세요. 인기 설문에 바로 투표할 수도 있습니다. 가입 불필요·모바일 지원.">
+  <link rel="stylesheet" href="../../../tools/poll/poll.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/poll/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Crect%20width='100'%20height='100'%20rx='22'%20fill='%23ff5a70'/%3E%3Cpath%20d='M28%2072V44M50%2072V28M72%2072V54'%20stroke='%23fff'%20stroke-width='10'%20stroke-linecap='round'/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#ff5a70">
+  <meta property="og:site_name" content="모두의 투표">
+  <meta property="og:title" content="모두의 투표 | 무료 설문 만들기·실시간 집계">
+  <meta property="og:description" content="질문과 선택지(최대 10개)로 투표 링크를 발급하고, SNS로 공유해 실시간으로 집계할 수 있는 무료 설문 도구. 가입 불필요·모바일 지원.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/poll/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"모두의 투표","url":"https://quick-calc.site/ko/tools/poll/","inLanguage":"ko"}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/poll/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/poll/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/poll/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/poll/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/poll/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @langsw start -->
+<div class="lang-bar">
+  <nav class="lang-switch" aria-label="언어"><span class="lang-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 2.6 15 0 18M12 3c-2.6 2.6-2.6 15 0 18"/></svg>Language</span><a href="/tools/poll/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/poll/" lang="en" hreflang="en">English</a><a href="/zh/tools/poll/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+</div>
+<!-- @langsw end -->
+<header class="pb-header">
+  <a href="/ko/tools/poll/">
+    <span class="pb-mark"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></span>
+    <span class="pb-name">모두의 투표</span>
+  </a>
+  <span class="pb-tag">만들고, 공유하고, 집계하고</span>
+</header>
+<main>
+  <div class="pb-status" id="setup-note" hidden>현재 준비 중입니다. 조금만 기다려 주세요.</div>
+
+  <div class="pb-card">
+    <h1 class="pb-q">궁금한 것, 모두에게 물어보세요.</h1>
+    <p class="pb-meta">질문과 선택지(최대 10개)만 입력하면 투표 링크가 완성됩니다. SNS나 단체 대화방에 공유하면 답변을 실시간으로 집계할 수 있습니다. 무료·가입 불필요.</p>
+    <a class="pb-btn" href="/ko/tools/poll/new.html">설문 만들기</a>
+  </div>
+
+  <div class="pb-sec"><b>인기 설문</b><span id="pop-note">투표수가 많은 순</span></div>
+  <div class="pb-seg" id="pop-period">
+    <button type="button" class="on" data-days="">전체 기간</button>
+    <button type="button" data-days="7">1주일</button>
+    <button type="button" data-days="31">1개월</button>
+    <button type="button" data-days="62">2개월</button>
+  </div>
+  <div class="pb-list mt12" id="popular"><p class="pb-empty">불러오는 중…</p></div>
+
+  <div class="pb-sec"><b>새로 올라온 설문</b></div>
+  <div class="pb-list" id="recent"><p class="pb-empty">불러오는 중…</p></div>
+
+  <div id="mine-sec" hidden>
+    <div class="pb-sec"><b>이 기기에서 만든 설문</b></div>
+    <div class="pb-list" id="mine"></div>
+  </div>
+
+  <div class="pb-modal-bg" id="del-confirm-bg" hidden>
+    <div class="pb-modal" role="dialog" aria-modal="true" aria-labelledby="del-confirm-title">
+      <p class="pb-q pb-q-sm" id="del-confirm-title">이 설문을 삭제할까요?</p>
+      <p class="pb-meta" id="del-confirm-q"></p>
+      <p class="pb-meta">모인 표도 함께 사라집니다. 삭제하면 되돌릴 수 없습니다.</p>
+      <p class="pb-error" id="del-error" hidden></p>
+      <button type="button" class="pb-btn" id="del-yes">네, 삭제합니다</button>
+      <button type="button" class="pb-btn-sub" id="del-no">아니요, 그만둘게요</button>
+    </div>
+  </div>
+
+  <div class="pb-doc">
+    <h2>사용 방법</h2>
+    <ol>
+      <li>「설문 만들기」에서 질문과 선택지(2~10개)를 입력합니다.</li>
+      <li>완성된 투표 링크를 X(구 트위터)·LINE·인스타그램 등에 공유합니다.</li>
+      <li>링크를 연 사람이 그 자리에서 투표할 수 있고, 결과는 비율(%)과 표수로 실시간 집계됩니다.</li>
+    </ol>
+    <h2>집계 방식</h2>
+    <ul>
+      <li>투표는 1명(1기기)당 1회·1개 선택입니다. 비율(%) = 해당 선택지의 표수 ÷ 전체 표수 × 100(소수점 첫째 자리까지).</li>
+      <li>응답자는 링크를 공유받은 사람입니다. 목록에 싣는 설정으로 만든 경우에는 이 페이지를 통해 들어온 사람도 포함됩니다(비공개로 만든 설문은 목록에 실리지 않습니다). 어느 쪽이든 무작위 추출 통계 조사와는 다른 참고값입니다.</li>
+      <li>질문·선택지·표수는 집계를 위해 외부 데이터베이스에 저장됩니다.</li>
+    </ul>
+    <h2>주의</h2>
+    <ul>
+      <li>개인정보(이름·주소·전화번호 등)를 질문이나 선택지에 넣지 마세요.</li>
+      <li>비방·차별적인 내용 등 부적절한 설문은 신고나 운영진의 판단에 따라 예고 없이 삭제됩니다.</li>
+      <li>같은 기기에서 다시 투표할 수는 없지만, 다른 기기에서의 투표까지 막지는 못합니다. 엄밀한 조사 용도에는 적합하지 않습니다.</li>
+    </ul>
+    <h2>자주 묻는 질문</h2>
+    <p class="pb-faq-q">비용이나 회원 가입이 필요한가요?</p>
+    <p class="pb-faq-a">무료이며 가입도 필요 없습니다. 만드는 쪽도 답하는 쪽도 링크만 열면 바로 사용할 수 있습니다.</p>
+    <p class="pb-faq-q">선택지는 몇 개까지 만들 수 있나요?</p>
+    <p class="pb-faq-a">최대 10개입니다.</p>
+    <p class="pb-faq-q">만든 설문을 목록에 싣고 싶지 않을 때는요?</p>
+    <p class="pb-faq-a">만들 때 「목록에 싣기」를 끄면 링크를 아는 사람만 열 수 있는 비공개 설문이 됩니다.</p>
+    <p class="pb-faq-q">만든 설문을 삭제하고 싶을 때는요?</p>
+    <p class="pb-faq-a">만든 기기에서 이 페이지를 열면 「이 기기에서 만든 설문」에 표시됩니다. 그 「삭제」에서 언제든지 직접 삭제할 수 있습니다(모인 표도 함께 사라집니다). 삭제할 수 있는 사람은 작성자 본인과 운영진뿐입니다.</p>
+  </div>
+</main>
+<footer class="pb-footer">
+  <p>작성된 질문·선택지·투표 데이터는 집계를 위해 외부 데이터베이스에 저장됩니다(개인을 특정하는 정보는 수집하지 않습니다). 자세한 내용은 <a href="../../privacy.html">개인정보 처리방침</a>을 확인해 주세요.</p>
+  <nav>
+    <a href="/ko/tools/poll/">모두의 투표</a>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html">문의하기</a>
+  </nav>
+  <p>© 2026 모두의 투표(quick-calc.site)</p>
+</footer>
+<script src="../../../tools/poll/i18n/ko.js"></script>
+<script src="../../../tools/poll/i18n.js"></script>
+<script src="../../../tools/poll/config.js"></script>
+<script src="../../../tools/poll/calc.js"></script>
+<script src="../../../tools/poll/net.js"></script>
+<script src="../../../tools/poll/home.js"></script>
+</body>
+</html>

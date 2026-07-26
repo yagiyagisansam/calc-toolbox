@@ -11,16 +11,16 @@ if (window.top !== window.self) {
   var errEl = document.getElementById("form-error");
   var MINE_KEY = "pollMine";
   var MSG = {
-    invalid_question: "質問を入力してください。",
-    question_too_long: "質問は120文字以内で入力してください。",
-    option_too_long: "選択肢は1個60文字以内で入力してください。",
-    too_few_options: "選択肢を2個以上入力してください。",
-    too_many_options: "選択肢は10個までです。",
-    duplicate_options: "同じ内容の選択肢があります。",
-    not_configured: "現在準備中のため作成できません。もうしばらくお待ちください。",
-    network: "通信に失敗しました。電波の良い場所でもう一度お試しください。",
-    rejected: "作成に失敗しました。内容を確認してもう一度お試しください。",
-    conflict: "作成に失敗しました。もう一度お試しください。"
+    invalid_question: T("質問を入力してください。"),
+    question_too_long: T("質問は120文字以内で入力してください。"),
+    option_too_long: T("選択肢は1個60文字以内で入力してください。"),
+    too_few_options: T("選択肢を2個以上入力してください。"),
+    too_many_options: T("選択肢は10個までです。"),
+    duplicate_options: T("同じ内容の選択肢があります。"),
+    not_configured: T("現在準備中のため作成できません。もうしばらくお待ちください。"),
+    network: T("通信に失敗しました。電波の良い場所でもう一度お試しください。"),
+    rejected: T("作成に失敗しました。内容を確認してもう一度お試しください。"),
+    conflict: T("作成に失敗しました。もう一度お試しください。")
   };
 
   function store() {
@@ -46,12 +46,12 @@ if (window.top !== window.self) {
     maxSelEl.replaceChildren();
     var none = document.createElement("option");
     none.value = "";
-    none.textContent = "制限なし(全部選べる)";
+    none.textContent = T("制限なし(全部選べる)");
     maxSelEl.appendChild(none);
     for (var k = 2; k <= n - 1; k++) {
       var o = document.createElement("option");
       o.value = String(k);
-      o.textContent = k + "個まで";
+      o.textContent = T("{n}個まで", { n: k });
       maxSelEl.appendChild(o);
     }
     maxSelEl.value = [].some.call(maxSelEl.options, function (o) { return o.value === cur; }) ? cur : "";
@@ -62,9 +62,9 @@ if (window.top !== window.self) {
   function renumberOptions() {
     var rows = optsBox.children;
     [].forEach.call(rows, function (row, i) {
-      row.querySelector(".opt-title").textContent = "選択肢" + (i + 1);
+      row.querySelector(".opt-title").textContent = T("選択肢{n}", { n: i + 1 });
       var input = row.querySelector(".opt-input");
-      input.placeholder = i === 0 ? "例: きのこの山" : i === 1 ? "例: たけのこの里" : "";
+      input.placeholder = i === 0 ? T("例: きのこの山") : i === 1 ? T("例: たけのこの里") : "";
       // 最低2個は必要なので、2個以下のときは削除ボタンを出さない
       row.querySelector(".pb-opt-del").hidden = rows.length <= 2;
     });
@@ -87,7 +87,7 @@ if (window.top !== window.self) {
     del.type = "button";
     del.className = "pb-opt-del";
     del.textContent = "×";
-    del.setAttribute("aria-label", "この選択肢を削除");
+    del.setAttribute("aria-label", T("この選択肢を削除"));
     del.addEventListener("click", function () {
       label.remove();
       renumberOptions();
@@ -116,10 +116,10 @@ if (window.top !== window.self) {
   }
   var deadlineEl = document.getElementById("opt-deadline");
   (function buildDeadlineOptions() {
-    var YOUBI = ["日", "月", "火", "水", "木", "金", "土"];
+    var YOUBI = [T("曜日:日"), T("曜日:月"), T("曜日:火"), T("曜日:水"), T("曜日:木"), T("曜日:金"), T("曜日:土")];
     var none = document.createElement("option");
     none.value = "";
-    none.textContent = "無期限(締切なし)";
+    none.textContent = T("無期限(締切なし)");
     deadlineEl.appendChild(none);
     var max = deadlineMax();
     var d = new Date();
@@ -130,8 +130,11 @@ if (window.top !== window.self) {
       var o = document.createElement("option");
       var v = ymd(d);
       o.value = v;
-      var prefix = v === today ? "今日 " : v === tomorrow ? "明日 " : v === oneWeek ? "1週間後 " : "";
-      o.textContent = prefix + (d.getMonth() + 1) + "/" + d.getDate() + "(" + YOUBI[d.getDay()] + ") 23:59まで";
+      var dv = { month: d.getMonth() + 1, day: d.getDate(), youbi: YOUBI[d.getDay()] };
+      o.textContent = v === today ? T("今日 {month}/{day}({youbi}) 23:59まで", dv)
+        : v === tomorrow ? T("明日 {month}/{day}({youbi}) 23:59まで", dv)
+        : v === oneWeek ? T("1週間後 {month}/{day}({youbi}) 23:59まで", dv)
+        : T("{month}/{day}({youbi}) 23:59まで", dv);
       // デフォルトは1週間後
       if (v === oneWeek) o.selected = true;
       deadlineEl.appendChild(o);
@@ -156,11 +159,11 @@ if (window.top !== window.self) {
     document.getElementById("open-link").href = "./v.html?id=" + id;
     var row = document.getElementById("share-row");
     row.replaceChildren();
-    var text = question + " | みんなに聞いてみた(投票はこちら)";
+    var text = T("{question} | みんなに聞いてみた(投票はこちら)", { question: question });
     [
-      ["Xでシェア", "https://twitter.com/intent/tweet?text=" + encodeURIComponent(text) + "&url=" + encodeURIComponent(url)],
-      ["LINEで送る", "https://line.me/R/share?text=" + encodeURIComponent(text + " " + url)],
-      ["Facebookでシェア", "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(url)]
+      [T("Xでシェア"), "https://twitter.com/intent/tweet?text=" + encodeURIComponent(text) + "&url=" + encodeURIComponent(url)],
+      [T("LINEで送る"), "https://line.me/R/share?text=" + encodeURIComponent(text + " " + url)],
+      [T("Facebookでシェア"), "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(url)]
     ].forEach(function (it) {
       var a = document.createElement("a");
       a.href = it[1];
@@ -176,7 +179,7 @@ if (window.top !== window.self) {
   document.getElementById("copy-btn").addEventListener("click", function () {
     var input = document.getElementById("done-url");
     var btn = this;
-    var done = function () { btn.textContent = "コピー済み"; setTimeout(function () { btn.textContent = "コピー"; }, 1500); };
+    var done = function () { btn.textContent = T("コピー済み"); setTimeout(function () { btn.textContent = T("コピー"); }, 1500); };
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(input.value).then(done, function () { input.select(); });
     } else {
@@ -207,10 +210,10 @@ if (window.top !== window.self) {
     qr.make();
     var img = document.createElement("img");
     img.src = qr.createDataURL(6, 0);
-    img.alt = "投票ページのQRコード";
+    img.alt = T("投票ページのQRコード");
     box.appendChild(img);
     var p = document.createElement("p");
-    p.textContent = "画像を長押しで保存できます。ポスターや黒板・スライドの掲示に。";
+    p.textContent = T("画像を長押しで保存できます。ポスターや黒板・スライドの掲示に。");
     box.appendChild(p);
     box.hidden = false;
   });
@@ -273,12 +276,12 @@ if (window.top !== window.self) {
     var btn = document.getElementById("create-btn");
     creating = true;
     btn.disabled = true;
-    btn.textContent = "作成中…";
+    btn.textContent = T("作成中…");
 
     function finish() {
       creating = false;
       btn.disabled = false;
-      btn.textContent = "投票ページを作成する";
+      btn.textContent = T("投票ページを作成する");
     }
     // 削除キー: 作成者本人であることの証明。この端末にだけ残し、サーバーからは読み出せない
     function makeDeleteKey() {

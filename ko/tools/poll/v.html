@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://ssxskriqlaiohdutxprn.supabase.co; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'; require-trusted-types-for 'script'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>설문에 투표하기 | 모두의 투표</title>
+  <meta name="description" content="공유받은 설문에 투표하고, 모두의 답변을 실시간 집계로 확인할 수 있는 페이지입니다. 가입 불필요·무료.">
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="../../../tools/poll/poll.css">
+  <!-- @meta start -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Crect%20width='100'%20height='100'%20rx='22'%20fill='%23ff5a70'/%3E%3Cpath%20d='M28%2072V44M50%2072V28M72%2072V54'%20stroke='%23fff'%20stroke-width='10'%20stroke-linecap='round'/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#ff5a70">
+  <meta property="og:site_name" content="모두의 투표">
+  <meta property="og:title" content="설문에 투표하기 | 모두의 투표">
+  <meta property="og:description" content="공유받은 설문에 투표하고, 모두의 답변을 실시간 집계로 확인할 수 있는 페이지입니다. 가입 불필요·무료.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @langsw start -->
+<div class="lang-bar">
+  <nav class="lang-switch" aria-label="언어"><span class="lang-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 2.6 15 0 18M12 3c-2.6 2.6-2.6 15 0 18"/></svg>Language</span><a href="/tools/poll/v.html" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/poll/v.html" lang="en" hreflang="en">English</a><a href="/zh/tools/poll/v.html" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+  <script src="../../../shared/lang-query.js"></script>
+</div>
+<!-- @langsw end -->
+<header class="pb-header">
+  <a href="/ko/tools/poll/">
+    <span class="pb-mark"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></span>
+    <span class="pb-name">모두의 투표</span>
+  </a>
+  <a class="pb-cta" href="/ko/tools/poll/new.html">설문 만들기</a>
+</header>
+<main>
+  <div class="pb-card" id="main-card">
+    <h1 class="pb-q" id="q-title">설문을 불러오는 중…</h1>
+    <p class="pb-deadline" id="deadline" hidden></p>
+    <p class="pb-status" id="status" hidden></p>
+    <form id="vote-form" hidden>
+      <p class="pb-meta" id="vote-note">1인 1회 · 탭해서 투표</p>
+      <div class="pb-opts" id="opts"></div>
+      <button type="submit" class="pb-btn" id="vote-btn" disabled>이 선택으로 투표하기</button>
+      <p class="pb-center mt12"><a class="pb-sub-link" href="#" id="peek-link">투표하지 않고 결과만 보기</a></p>
+    </form>
+    <div id="result" hidden aria-live="polite"></div>
+  </div>
+
+  <div id="share-box" hidden>
+    <div class="pb-sec"><b>이 설문 널리 알리기</b></div>
+    <div class="pb-share" id="share-row"></div>
+    <button type="button" class="pb-btn-sub" id="qr-btn">＋ QR 코드 표시(인쇄·게시용)</button>
+    <div class="pb-qr" id="qr-box" hidden></div>
+  </div>
+
+  <p class="pb-center mt20"><a class="pb-link" href="/ko/tools/poll/new.html">나도 설문 만들어 보기(무료·가입 불필요)</a></p>
+  <button type="button" class="pb-report" id="owner-del-btn" hidden>이 설문 삭제하기(작성자만)</button>
+  <button type="button" class="pb-report" id="report-btn" hidden>문제가 있는 설문 신고하기</button>
+
+  <div class="pb-modal-bg" id="del-confirm-bg" hidden>
+    <div class="pb-modal" role="dialog" aria-modal="true" aria-labelledby="del-confirm-title">
+      <p class="pb-q pb-q-sm" id="del-confirm-title">이 설문을 삭제할까요?</p>
+      <p class="pb-meta">모인 표도 함께 사라집니다. 삭제하면 되돌릴 수 없습니다.</p>
+      <p class="pb-error" id="del-error" hidden></p>
+      <button type="button" class="pb-btn" id="del-yes">네, 삭제합니다</button>
+      <button type="button" class="pb-btn-sub" id="del-no">아니요, 그만둘게요</button>
+    </div>
+  </div>
+
+  <div class="pb-modal-bg" id="report-confirm-bg" hidden>
+    <div class="pb-modal" role="dialog" aria-modal="true" aria-labelledby="report-confirm-title">
+      <p class="pb-q pb-q-sm" id="report-confirm-title">이 설문을 신고할까요?</p>
+      <p class="pb-meta">비방·음란·광고 등 문제가 있는 내용일 때 신고해 주세요. 신고는 취소할 수 없습니다.</p>
+      <button type="button" class="pb-btn" id="report-yes">네, 신고합니다</button>
+      <button type="button" class="pb-btn-sub" id="report-no">아니요, 그만둘게요</button>
+    </div>
+  </div>
+</main>
+<footer class="pb-footer">
+  <p>이 페이지의 투표 데이터(선택한 항목)는 집계를 위해 외부 데이터베이스에 저장됩니다(개인을 특정하는 정보는 수집하지 않습니다). 자세한 내용은 <a href="../../privacy.html">개인정보 처리방침</a>을 확인해 주세요.</p>
+  <nav>
+    <a href="/ko/tools/poll/">모두의 투표</a>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html">문의하기</a>
+  </nav>
+  <p>© 2026 모두의 투표(quick-calc.site)</p>
+</footer>
+<script src="../../../tools/poll/i18n/ko.js"></script>
+<script src="../../../tools/poll/i18n.js"></script>
+<script src="../../../tools/poll/config.js"></script>
+<script src="../../../tools/poll/calc.js"></script>
+<script src="../../../tools/poll/net.js"></script>
+<script src="../../../tools/poll/qr.js"></script>
+<script src="../../../tools/poll/vote.js"></script>
+</body>
+</html>

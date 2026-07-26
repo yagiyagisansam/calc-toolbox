@@ -70,14 +70,21 @@ for (const [rel, langSet] of [...groups.entries()].sort()) {
     const file = join(ROOT, lang.dir, rel);
     let html = readFileSync(file, "utf8");
 
-    // hreflang(相互リンク+x-default=ja)
-    const links = versions.map(
-      (l) => `  <link rel="alternate" hreflang="${l.code}" href="${ORIGIN}${urlPath(l.dir, rel)}">`
-    );
-    if (jaExists) links.push(`  <link rel="alternate" hreflang="x-default" href="${ORIGIN}${urlPath("", rel)}">`);
-    const hreflangBlock = `  <!-- @hreflang start -->\n${links.join("\n")}\n  <!-- @hreflang end -->\n`;
-    let next = replaceBlock(html, "hreflang", hreflangBlock, /<!-- @meta end -->\n/);
-    if (next === null) { console.error(`skip(hreflangの挿入位置なし): ${file}`); continue; }
+    // 検索結果に出さないページ(投票ページなど)は hreflang を付けない。
+    // 中身がクエリ文字列で決まるため、URL単位の言語対応として宣言する意味がないため
+    const noindex = /<meta[^>]+name="robots"[^>]+noindex/i.test(html);
+
+    let next = html;
+    if (!noindex) {
+      // hreflang(相互リンク+x-default=ja)
+      const links = versions.map(
+        (l) => `  <link rel="alternate" hreflang="${l.code}" href="${ORIGIN}${urlPath(l.dir, rel)}">`
+      );
+      if (jaExists) links.push(`  <link rel="alternate" hreflang="x-default" href="${ORIGIN}${urlPath("", rel)}">`);
+      const hreflangBlock = `  <!-- @hreflang start -->\n${links.join("\n")}\n  <!-- @hreflang end -->\n`;
+      next = replaceBlock(html, "hreflang", hreflangBlock, /<!-- @meta end -->\n/);
+      if (next === null) { console.error(`skip(hreflangの挿入位置なし): ${file}`); continue; }
+    }
 
     // 言語スイッチャ(ページ最上部・現在言語はリンクにしない)
     const items = versions.map((l) =>
@@ -86,9 +93,13 @@ for (const [rel, langSet] of [...groups.entries()].sort()) {
         : `<a href="${urlPath(l.dir, rel)}" lang="${l.htmlLang}" hreflang="${l.code}">${l.label}</a>`
     );
     const globe = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 2.6 15 0 18M12 3c-2.6 2.6-2.6 15 0 18"/></svg>';
+    // noindexページはクエリ文字列(?id=…)を引き継ぐ必要があるため、専用スクリプトを併せて読み込む
+    const depth = rel.split("/").length - 1 + (lang.dir ? 1 : 0);
+    const upToRoot = depth === 0 ? "./" : "../".repeat(depth);
+    const keepQuery = noindex ? `\n  <script src="${upToRoot}shared/lang-query.js"></script>` : "";
     const swBlock = `<!-- @langsw start -->
 <div class="lang-bar">
-  <nav class="lang-switch" aria-label="${SWITCH_LABEL[lang.code]}"><span class="lang-label">${globe}Language</span>${items.join("")}</nav>
+  <nav class="lang-switch" aria-label="${SWITCH_LABEL[lang.code]}"><span class="lang-label">${globe}Language</span>${items.join("")}</nav>${keepQuery}
 </div>
 <!-- @langsw end -->
 `;
