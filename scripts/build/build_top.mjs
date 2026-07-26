@@ -1,6 +1,7 @@
 // 案Lデザインの本番トップページを生成する
 // - 全ツールのタイルを静的HTMLで出力(SEO/非JS環境用に説明つき一覧も同梱。個数はdata.jsから自動集計)
 // - 人気セクションは全ユーザー利用データ基準のRANK配列(週次更新)で表示
+// - 実行後は node scripts/build/i18n/inject_links.mjs を必ず再実行する(hreflang・言語スイッチャを再注入)
 import { readFileSync, writeFileSync } from "node:fs";
 
 import { fileURLToPath } from "node:url";
