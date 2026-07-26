@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>加班费计算器(日本·法定加算率) | Quick Calc</title>
+  <meta name="description" content="输入基础时薪和加班时间,免费算出日本法律规定的加班费(加算工资)。支持时间外25%、每月超60小时50%、法定休息日35%、深夜+25%的法定加算率,也能从月薪换算出基础时薪。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/zangyo/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="加班费计算器(日本·法定加算率) | Quick Calc">
+  <meta property="og:description" content="输入基础时薪和加班时间,免费算出日本法律规定的加班费(加算工资)。支持时间外25%、每月超60小时50%、法定休息日35%、深夜+25%的法定加算率,也能从月薪换算出基础时薪。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/zangyo/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"加班费计算器(日本)","item":"https://quick-calc.site/zh/tools/zangyo/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/zangyo/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/zangyo/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/zangyo/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/zangyo/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/zangyo/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>加班费计算器(日本)</h1>
+  <form class="tool-form" id="hourly-form">
+    <label>从月薪算出基础时薪(已知时薪的请看下面的表单)
+      <span class="field-note">这里的月薪是作为加算基础的金额(基本工资+职务津贴等。家属津贴、通勤津贴、住房津贴等除外)</span>
+    </label>
+    <label>月薪(日元)
+      <input type="number" id="monthly" inputmode="numeric" step="1" min="50000" max="10000000" placeholder="300000">
+    </label>
+    <label>每月平均的规定工作时间
+      <span class="field-note">例: 160。可用(365天−全年休息日)×每天的规定工作时间÷12 算出</span>
+      <input type="number" id="avg-hours" inputmode="decimal" step="any" min="100" max="200" placeholder="160">
+    </label>
+    <button type="submit">换算成时薪</button>
+    <div class="tool-result" id="result-hourly" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="zangyo-form">
+    <label>基础时薪(日元)
+      <input type="number" id="hourly" inputmode="decimal" step="any" min="500" max="50000" placeholder="1875" required>
+    </label>
+    <label>时间外劳动(每月60小时以内的部分·小时)
+      <input type="number" id="ot" inputmode="decimal" step="any" min="0" max="200" value="0">
+    </label>
+    <label>时间外劳动中超过每月60小时的部分(小时)
+      <input type="number" id="ot60" inputmode="decimal" step="any" min="0" max="200" value="0">
+    </label>
+    <label>法定休息日劳动(小时)
+      <span class="field-note">在每周1天的法定休息日工作的时间</span>
+      <input type="number" id="holiday" inputmode="decimal" step="any" min="0" max="200" value="0">
+    </label>
+    <label>深夜劳动(22点〜5点·小时)
+      <span class="field-note">计算加算部分(+25%)。与时间外或休息日重叠的时间也可以填入</span>
+      <input type="number" id="night" inputmode="decimal" step="any" min="0" max="200" value="0">
+    </label>
+    <button type="submit">计算加班费</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>详细功能: 按月合计自动计算·未付检查</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">只用加班的合计时间做详细计算</h3>
+      <p class="adv-note">只要输入当月时间外劳动的合计,就会自动把超过60小时的部分(加算50%)分开计算(基础时薪取自上面的表单)。</p>
+      <label>当月时间外劳动的合计(小时)
+        <span class="field-note">60小时以内按25%,超过的部分自动按50%计算</span>
+        <input type="number" id="adv-ot-total" inputmode="decimal" step="any" min="0" max="200" placeholder="70">
+      </label>
+      <label>法定休息日劳动(小时·没有则填0)
+        <input type="number" id="adv-holiday" inputmode="decimal" step="any" min="0" max="200" value="0">
+      </label>
+      <label>深夜劳动(22点〜5点·小时·没有则填0)
+        <input type="number" id="adv-night" inputmode="decimal" step="any" min="0" max="200" value="0">
+      </label>
+      <h3 class="adv-h">未付检查(可选)</h3>
+      <p class="adv-note">输入工资条上的加班费,会显示与法定最低金额的差额(不足的大致数值)。</p>
+      <label>实际支付的加班费(日元)
+        <input type="number" id="adv-paid" inputmode="numeric" step="1" min="0" max="10000000" placeholder="50000">
+      </label>
+      <button type="button" id="adv-run">进行详细计算</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    本工具是按<strong>法定的最低加算率</strong>做的约算。如果公司的就业规则规定了更高的加算率,或适用变形工时制、固定加班费(视同加班)、管理监督者的处理等,实际金额会有所不同。怀疑存在未付时,请咨询劳动基准监督署或专业人士。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>输入加班的时间,就能知道<strong>本该拿到的加班费</strong>是多少。深夜(22点〜5点)和休息日工作的加算部分,也按<strong>日本《劳动基准法》</strong>规定的最低加算率计算。核对工资条(給与明細)上的加班费金额时,用它很方便。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>不知道时薪时,输入月薪和每月平均的规定工作时间,基础时薪会自动算出并填入下面的栏位。</li>
+    <li>把加班的明细(时间外、超60小时、法定休息日、深夜)按小时输入。</li>
+    <li>每次输入都会自动更新带明细的金额(也可以用按钮计算)。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <p>按日本《劳动基准法》规定的最低加算率计算。</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>法定的加算工资率</caption>
+      <thead><tr><th>种类</th><th>加算率</th><th>计算</th></tr></thead>
+      <tbody>
+        <tr><td>时间外劳动(超过法定的每天8小时/每周40小时)</td><td>25%以上</td><td>时薪×1.25×小时</td></tr>
+        <tr><td>时间外劳动(超过每月60小时的部分)</td><td>50%以上</td><td>时薪×1.5×小时</td></tr>
+        <tr><td>法定休息日劳动</td><td>35%以上</td><td>时薪×1.35×小时</td></tr>
+        <tr><td>深夜劳动(22点〜5点)</td><td>加算25%以上</td><td>时薪×0.25×小时(加算部分)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>计算示例: 时薪1,500日元、时间外20小时 → 1,500×1.25×20 = <strong>37,500日元</strong></p>
+
+  <h3>出处(一次信息)</h3>
+  <ul class="sources">
+    <li>日本《劳动基准法》第37条(时间外25%·每月超60小时50%·深夜的加算)(日文)<br>
+      <a href="https://laws.e-gov.go.jp/law/322AC0000000049" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/322AC0000000049</a>(2026年7月18日查阅)</li>
+    <li>《关于劳动基准法第37条第1项加算工资率最低限度的政令》(法定休息日35%)(日文)<br>
+      <a href="https://laws.e-gov.go.jp/law/406CO0000000005" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/406CO0000000005</a>(2026年7月18日查阅)</li>
+  </ul>
+
+  <h2>前提与注意</h2>
+  <ul class="cautions">
+    <li>「基础时薪」是计算加算工资的基础。家属津贴、通勤津贴、分居津贴、子女教育津贴、住房津贴、临时性工资和奖金不计入这个基础。</li>
+    <li>深夜部分只显示「+25%的加算部分」(深夜劳动的基本工资部分已包含在通常的工资中)。既是时间外又是深夜时,在时间外栏和深夜栏填入相同的时间,合计就相当于1.5倍。</li>
+    <li>规定工作时间短于法定(8小时)时产生的「法定内加班」不需要加算,因此与本计算不同。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">有固定加班费(视同加班)时怎么办?</h3>
+  <p class="faq-a">请先确认固定加班费相当于「多少小时」,实际加班超出的部分需要额外支付。可以用本工具算出实际加班的金额,再和固定加班费比较。</p>
+  <h3 class="faq-q">周六上班算35%的休息日劳动吗?</h3>
+  <p class="faq-a">只有在每周1天的「法定休息日」工作才按35%。每周休两天时,通常其中一天是法定休息日,另一天是公司规定的休息日(这种情况一般按时间外的25%处理)。哪天是法定休息日,请查看公司的就业规则。</p>
+  <h3 class="faq-q">打工·兼职也有加班费吗?</h3>
+  <p class="faq-a">有。无论雇用形式如何,只要超过法定工作时间(每天8小时·每周40小时),就属于加算工资的对象。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/zangyo/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/zangyo/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/zangyo/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=zangyo">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/zangyo/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var hourlyBox = document.getElementById("result-hourly");
+  var ERROR_MESSAGES = {
+    invalid_hourly: "基础时薪请输入 500〜50,000日元 范围内的数值。",
+    invalid_hours: "时间请输入 0〜200小时 范围内的数值。",
+    invalid_monthly: "月薪请输入 50,000〜10,000,000日元 范围内的数值。",
+    invalid_avg_hours: "每月平均的规定工作时间请输入 100〜200 范围内的数值。"
+  };
+  function raw(id) { return document.getElementById(id).value; }
+  function showError(target, code) {
+    target.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "请检查输入的数值。") + "</p>";
+    target.hidden = false;
+  }
+  function runZangyo() {
+    if (raw("hourly") === "") { box.hidden = true; return; }
+    var num = function (id) { return parseFloat(raw(id) || "0"); };
+    var r = ZangyoCalc.calculate(num("hourly"), num("ot"), num("ot60"), num("holiday"), num("night"));
+    if (!r.ok) { showError(box, r.code); return; }
+    box.innerHTML =
+      '<div class="result-main">加班费 约' + r.totalPay.toLocaleString() + " 日元/月</div>" +
+      "<p>明细 — 时间外(×1.25): <strong>" + r.overtimePay.toLocaleString() + "日元</strong>" +
+      (r.overtime60Pay ? " / 超60小时(×1.5): <strong>" + r.overtime60Pay.toLocaleString() + "日元</strong>" : "") +
+      (r.holidayPay ? " / 法定休息日(×1.35): <strong>" + r.holidayPay.toLocaleString() + "日元</strong>" : "") +
+      (r.lateNightExtra ? " / 深夜加算(+0.25): <strong>" + r.lateNightExtra.toLocaleString() + "日元</strong>" : "") + "</p>";
+    box.hidden = false;
+  }
+  function runHourlyFromMonthly() {
+    if (raw("monthly") === "" || raw("avg-hours") === "") { hourlyBox.hidden = true; return; }
+    var r = ZangyoCalc.hourlyFromMonthly(parseFloat(raw("monthly")), parseFloat(raw("avg-hours")));
+    if (!r.ok) { showError(hourlyBox, r.code); return; }
+    var hourlyInput = document.getElementById("hourly");
+    hourlyInput.value = r.hourlyYen;
+    hourlyBox.innerHTML = '<div class="result-main">基础时薪 约' + r.hourlyYen.toLocaleString() + " 日元</div><p>已自动填入下面的加班费计算栏。</p>";
+    hourlyBox.hidden = false;
+    hourlyInput.dispatchEvent(new Event("input"));
+  }
+  ["monthly", "avg-hours"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runHourlyFromMonthly);
+  });
+  ["hourly", "ot", "ot60", "holiday", "night"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runZangyo);
+  });
+  document.getElementById("hourly-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (raw("monthly") === "" || raw("avg-hours") === "") {
+      showError(hourlyBox, raw("monthly") === "" ? "invalid_monthly" : "invalid_avg_hours");
+      return;
+    }
+    runHourlyFromMonthly();
+  });
+  document.getElementById("zangyo-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (raw("hourly") === "") { showError(box, "invalid_hourly"); return; }
+    runZangyo();
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var ADV_ERRORS = {
+    invalid_hourly: "基础时薪(上面的表单)请输入 500〜50,000日元 范围内的数值。",
+    invalid_hours: "时间请输入 0〜200小时 范围内的数值。",
+    invalid_paid: "已支付的加班费请输入 0〜10,000,000日元 范围内的数值。"
+  };
+  function runAdv() {
+    var hourly = parseFloat(document.getElementById("hourly").value);
+    var otTotal = parseFloat(document.getElementById("adv-ot-total").value);
+    if (isNaN(otTotal)) otTotal = 0;
+    var holiday = parseFloat(document.getElementById("adv-holiday").value);
+    if (isNaN(holiday)) holiday = 0;
+    var night = parseFloat(document.getElementById("adv-night").value);
+    if (isNaN(night)) night = 0;
+    var paidStr = document.getElementById("adv-paid").value;
+    var paid = paidStr === "" ? undefined : parseFloat(paidStr);
+    var r = ZangyoCalc.calculateDetailed(hourly, otTotal, holiday, night, paid);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + (ADV_ERRORS[r.code] || "请检查输入的数值。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    var html =
+      '<div class="result-main">加班费(法定最低金额) 约' + r.totalPay.toLocaleString() + ' 日元</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead>' +
+      '<tr><th>明细</th><th>时间</th><th>加算率</th><th>金额</th></tr></thead><tbody>' +
+      '<tr><td>时间外(60小时以内)</td><td>' + r.within60Hours.toLocaleString() + ' h</td><td>25%</td><td>' + r.overtimePay.toLocaleString() + ' 日元</td></tr>' +
+      '<tr><td>时间外(超过60小时)</td><td>' + r.over60Hours.toLocaleString() + ' h</td><td>50%</td><td>' + r.overtime60Pay.toLocaleString() + ' 日元</td></tr>' +
+      '<tr><td>法定休息日</td><td>' + holiday.toLocaleString() + ' h</td><td>35%</td><td>' + r.holidayPay.toLocaleString() + ' 日元</td></tr>' +
+      '<tr><td>深夜(22点〜5点)的加算</td><td>' + night.toLocaleString() + ' h</td><td>+25%</td><td>' + r.lateNightExtra.toLocaleString() + ' 日元</td></tr>' +
+      '</tbody></table></div>';
+    if (r.shortfallYen !== undefined) {
+      if (r.shortfallYen > 0) {
+        html += '<p>与已支付金额的差额: <strong>约' + r.shortfallYen.toLocaleString() + ' 日元 不足的大致数值</strong>。这会因就业规则的加算率和津贴的处理方式而变化,如有疑问请咨询劳动基准监督署或专业人士。</p>';
+      } else {
+        html += '<p>已支付的金额比法定最低金额<strong>多出 ' + Math.abs(r.shortfallYen).toLocaleString() + ' 日元</strong>(在此明细范围内没有不足)。</p>';
+      }
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", runAdv);
+  function autoAdv() {
+    if (document.getElementById("hourly").value !== "" && document.getElementById("adv-ot-total").value !== "") {
+      runAdv();
+    } else {
+      advBox.hidden = true;
+    }
+  }
+  ["adv-ot-total", "adv-holiday", "adv-night", "adv-paid", "hourly"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoAdv);
+  });
+})();
+</script>
+</body>
+</html>

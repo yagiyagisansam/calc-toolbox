@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>단가 비교 계산기(어느 쪽이 쌀까? 100g당·1개당) | Quick Calc</title>
+  <meta name="description" content="가격과 용량만 입력하면 「100g당」「1개당」 단가를 나란히 비교합니다. 대용량과 소용량 중 어느 쪽이 실제로 싼지 한눈에 알 수 있는 무료 장보기 계산기로, 최대 3개 상품까지 비교할 수 있습니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/tanka/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="단가 비교 계산기(어느 쪽이 쌀까? 100g당·1개당) | Quick Calc">
+  <meta property="og:description" content="가격과 용량만 입력하면 「100g당」「1개당」 단가를 나란히 비교합니다. 대용량과 소용량 중 어느 쪽이 실제로 싼지 한눈에 알 수 있는 무료 장보기 계산기로, 최대 3개 상품까지 비교할 수 있습니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/tanka/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"단가 비교 계산기","item":"https://quick-calc.site/ko/tools/tanka/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/tanka/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/tanka/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/tanka/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/tanka/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/tanka/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>단가 비교 계산기(어느 쪽이 쌀까?)</h1>
+  <form class="tool-form" id="tanka-form">
+    <label>단가 기준
+      <select id="per">
+        <option value="100" selected>100당(g·ml)</option>
+        <option value="1">1당(개·장·회)</option>
+      </select>
+    </label>
+    <label>상품A
+      <span style="display:flex;gap:.5em;">
+        <input type="number" id="price-0" inputmode="decimal" min="0" step="any" required placeholder="가격(엔)" aria-label="상품A의 가격">
+        <input type="number" id="qty-0" inputmode="decimal" min="0" step="any" required placeholder="용량" aria-label="상품A의 용량">
+      </span>
+    </label>
+    <label>상품B
+      <span style="display:flex;gap:.5em;">
+        <input type="number" id="price-1" inputmode="decimal" min="0" step="any" required placeholder="가격(엔)" aria-label="상품B의 가격">
+        <input type="number" id="qty-1" inputmode="decimal" min="0" step="any" required placeholder="용량" aria-label="상품B의 용량">
+      </span>
+    </label>
+    <label>상품C(선택)
+      <span style="display:flex;gap:.5em;">
+        <input type="number" id="price-2" inputmode="decimal" min="0" step="any" placeholder="가격(엔)" aria-label="상품C의 가격">
+        <input type="number" id="qty-2" inputmode="decimal" min="0" step="any" placeholder="용량" aria-label="상품C의 용량">
+      </span>
+    </label>
+    <span class="field-note">2개 상품의 가격과 용량이 채워지면 자동으로 판정됩니다</span>
+    <button type="submit">단가 비교하기</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 배송비 포함 실질 단가와 무료배송 기준 판정</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">배송비 포함으로 비교(온라인 쇼핑용)</h3>
+      <p class="adv-note">상품 가격에 배송비를 더한 「실질 단가」로 비교합니다(배송비가 없으면 0 그대로 두면 됩니다).</p>
+      <label>단가 기준
+        <select id="adv-sper">
+          <option value="100" selected>100당(g·ml)</option>
+          <option value="1">1당(개·장·회)</option>
+        </select>
+      </label>
+      <label>상품A
+        <span style="display:flex;gap:.5em;">
+          <input type="number" id="adv-sprice-0" inputmode="decimal" min="0" step="any" placeholder="가격(엔)" aria-label="상품A의 가격">
+          <input type="number" id="adv-sqty-0" inputmode="decimal" min="0" step="any" placeholder="용량" aria-label="상품A의 용량">
+          <input type="number" id="adv-sship-0" inputmode="decimal" min="0" step="any" value="0" aria-label="상품A의 배송비">
+        </span>
+        <span class="field-note">왼쪽부터 가격(엔)·용량·배송비(엔)</span>
+      </label>
+      <label>상품B
+        <span style="display:flex;gap:.5em;">
+          <input type="number" id="adv-sprice-1" inputmode="decimal" min="0" step="any" placeholder="가격(엔)" aria-label="상품B의 가격">
+          <input type="number" id="adv-sqty-1" inputmode="decimal" min="0" step="any" placeholder="용량" aria-label="상품B의 용량">
+          <input type="number" id="adv-sship-1" inputmode="decimal" min="0" step="any" value="0" aria-label="상품B의 배송비">
+        </span>
+      </label>
+      <label>상품C(선택)
+        <span style="display:flex;gap:.5em;">
+          <input type="number" id="adv-sprice-2" inputmode="decimal" min="0" step="any" placeholder="가격(엔)" aria-label="상품C의 가격">
+          <input type="number" id="adv-sqty-2" inputmode="decimal" min="0" step="any" placeholder="용량" aria-label="상품C의 용량">
+          <input type="number" id="adv-sship-2" inputmode="decimal" min="0" step="any" placeholder="배송비(엔)" aria-label="상품C의 배송비">
+        </span>
+      </label>
+      <button type="button" id="adv-ship-run">배송비 포함으로 비교</button>
+      <div class="tool-result" id="adv-ship-result" hidden aria-live="polite"></div>
+      <h3 class="adv-h">조금만 더 하면 무료배송. 더 담아야 할까?</h3>
+      <p class="adv-note">「무료배송까지 ○엔」일 때, 더 담는 쪽과 배송비를 내는 쪽 중 어느 쪽이 실제 지출이 적은지 판정합니다.</p>
+      <label>장바구니 합계(엔)
+        <input type="number" id="adv-cart" inputmode="numeric" step="any" min="1" placeholder="4500">
+      </label>
+      <label>무료배송 기준 금액(엔)
+        <input type="number" id="adv-threshold" inputmode="numeric" step="any" min="1" placeholder="5000">
+      </label>
+      <label>배송비(엔)
+        <input type="number" id="adv-ship" inputmode="numeric" step="any" min="1" placeholder="600">
+      </label>
+      <button type="button" id="adv-free-run">더 담아야 할지 판정</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>가격과 용량(g·ml·개수)만 입력하면 <strong>어느 상품이 가장 싼지</strong>를 단가로 비교할 수 있습니다. 가장 싼 상품과, 나머지가 몇 % 비싼지도 한눈에 알 수 있습니다. 일본 슈퍼에서 대용량과 소용량을 비교하거나, 온라인 쇼핑의 가격을 비교할 때 활용하세요. 금액 단위는 엔입니다.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>기준을 선택합니다. 무게·용량으로 비교하려면 「100당」, 달걀이나 티슈처럼 개수로 비교하려면 「1당」을 고르세요.</li>
+    <li>각 상품의 가격과 용량을 입력합니다(2개만 입력해도 되고, C는 비워 둬도 됩니다).</li>
+    <li>2개 상품이 채워지는 순간 단가 목록과 가장 싼 상품이 표시됩니다(버튼을 누를 필요는 없습니다).</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>단가 = 가격 ÷ 용량 × 기준량</strong>(100g당이면 기준량은 100)</li>
+    <li>계산 예: 세제A 298엔/400g → 298 ÷ 400 × 100 = <strong>100g당 74.5엔</strong>. 세제B 198엔/250g → 100g당 79.2엔. → A가 약 6% 쌉니다.</li>
+    <li>「몇 % 비싼가」는 가장 싼 단가를 기준으로 계산합니다.</li>
+  </ul>
+
+  <h3>출처·전제 명시</h3>
+  <ul class="sources">
+    <li>가격과 용량에 근거한 산술 계산입니다.</li>
+  </ul>
+
+  <h2>계산의 전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>비교하는 상품끼리는 같은 단위(g은 g끼리, ml은 ml끼리, 개는 개끼리)로 입력해 주세요. g과 ml을 섞으면 올바르게 비교할 수 없습니다.</li>
+    <li>가격도 세금 포함이면 모두 세금 포함, 세금 제외면 모두 세금 제외로 통일해 주세요.</li>
+    <li>단가가 싸도 다 쓰지 못하고 버리면 손해입니다. 유통기한이 있는 상품은 다 쓸 수 있는 양인지도 고려하세요.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">대용량 팩이 반드시 더 싼가요?</h3>
+  <p class="faq-a">대체로 싸지만, 특가나 쿠폰 때문에 작은 사이즈의 단가가 더 싸지는 「역전」도 드물지 않습니다. 그래서 그 자리에서 단가를 계산해 비교하는 것이 확실합니다.</p>
+  <h3 class="faq-q">g당 단가가 얼마면 싼 건가요?</h3>
+  <p class="faq-a">상품 카테고리마다 시세가 달라 일률적으로 말하기 어렵습니다. 같은 매대의 상품끼리 비교하는 것이 기본입니다. 가격표에 「100g당 ○엔」 같은 단가(유닛 프라이스)가 표시돼 있다면 그것도 참고가 됩니다.</p>
+  <h3 class="faq-q">리필용과 본품 중 어느 쪽이 이득인지 비교할 수 있나요?</h3>
+  <p class="faq-a">비교할 수 있습니다. 리필용과 본품 각각의 가격과 용량(ml)을 입력하세요. 보통은 리필용의 단가가 싸지만, 증량 행사 중인 본품이 역전하는 경우도 있습니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/tanka/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/tanka/" lang="en" hreflang="en">English</a><a href="/zh/tools/tanka/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=tanka">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/tanka/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var NAMES = ["상품A", "상품B", "상품C"];
+  var ERROR_MESSAGES = {
+    invalid_items: "상품을 2개 이상 입력해 주세요.",
+    invalid_item: "가격과 용량은 0보다 큰 값으로 입력해 주세요.",
+    invalid_per: "단가 기준을 선택해 주세요."
+  };
+  function runMain(fromSubmit) {
+    var per = parseFloat(document.getElementById("per").value);
+    var items = [];
+    var labels = [];
+    for (var i = 0; i < 3; i++) {
+      var p = document.getElementById("price-" + i).value;
+      var q = document.getElementById("qty-" + i).value;
+      if (p === "" && q === "") continue;
+      if (!fromSubmit && (p === "" || q === "")) continue;
+      items.push({ price: parseFloat(p), qty: parseFloat(q) });
+      labels.push(NAMES[i]);
+    }
+    if (!fromSubmit && items.length < 2) { box.hidden = true; return; }
+    var r = TankaCalc.compare(items, per);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "입력값을 확인해 주세요.") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var unitLabel = per === 1 ? "1당" : per + "당";
+    var rows = r.rows.map(function (row, i) {
+      var mark = i === r.cheapest ? "<strong>최저가</strong>" : "+" + row.diffPct.toLocaleString() + "%";
+      return "<tr><td>" + labels[i] + "</td><td>" + row.unitPrice.toLocaleString() + "엔</td><td>" + mark + "</td></tr>";
+    }).join("");
+    box.innerHTML =
+      '<div class="result-main">' + labels[r.cheapest] + "가 가장 쌉니다</div>" +
+      "<p>" + unitLabel + " " + r.rows[r.cheapest].unitPrice.toLocaleString() + "엔</p>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>상품</th><th>' + unitLabel + " 단가</th><th>최저가와의 차이</th></tr></thead><tbody>" +
+      rows + "</tbody></table></div>";
+    box.hidden = false;
+  }
+  document.getElementById("tanka-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain(true);
+  });
+  for (var i = 0; i < 3; i++) {
+    document.getElementById("price-" + i).addEventListener("input", function () { runMain(false); });
+    document.getElementById("qty-" + i).addEventListener("input", function () { runMain(false); });
+  }
+  document.getElementById("per").addEventListener("change", function () { runMain(false); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var shipBox = document.getElementById("adv-ship-result");
+  var advBox = document.getElementById("adv-result");
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
+  }
+  var ADV_NAMES = ["상품A", "상품B", "상품C"];
+  function runShip(fromButton) {
+    var items = [];
+    var names = [];
+    for (var i = 0; i < 3; i++) {
+      var p = document.getElementById("adv-sprice-" + i).value;
+      var q = document.getElementById("adv-sqty-" + i).value;
+      if (p === "" && q === "") continue;
+      if (!fromButton && (p === "" || q === "")) continue;
+      var s = document.getElementById("adv-sship-" + i).value;
+      items.push({
+        price: parseFloat(p),
+        qty: parseFloat(q),
+        ship: s === "" ? 0 : parseFloat(s)
+      });
+      names.push(ADV_NAMES[i]);
+    }
+    if (items.length < 2) {
+      if (fromButton) { showError(shipBox, "2개 이상 상품의 가격과 용량을 입력해 주세요."); } else { shipBox.hidden = true; }
+      return;
+    }
+    for (var k = 0; k < items.length; k++) {
+      if (isNaN(items[k].price) || isNaN(items[k].qty) || isNaN(items[k].ship)) {
+        showError(shipBox, names[k] + "의 가격·용량·배송비를 확인해 주세요.");
+        return;
+      }
+    }
+    var per = parseFloat(document.getElementById("adv-sper").value);
+    var r = TankaCalc.compareWithShipping(items, per);
+    if (!r.ok) { showError(shipBox, "가격과 용량은 0보다 큰 값, 배송비는 0엔 이상으로 입력해 주세요."); return; }
+    var perLabel = per === 1 ? "1당" : per + "당";
+    var html = '<div class="result-main">' + names[r.cheapest] + "가 가장 쌉니다</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>상품</th><th>배송비 포함 총액</th><th>' + perLabel + "</th><th>최저가와의 차이</th></tr></thead><tbody>";
+    for (var j = 0; j < r.rows.length; j++) {
+      var row = r.rows[j];
+      html += "<tr><td>" + names[j] + (j === r.cheapest ? "(최저가)" : "") + "</td>" +
+        "<td>" + row.total.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " 엔</td>" +
+        "<td>" + row.unitPrice.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " 엔</td>" +
+        "<td>" + (j === r.cheapest ? "-" : "+" + row.diffPct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%") + "</td></tr>";
+    }
+    html += "</tbody></table></div>";
+    shipBox.innerHTML = html;
+    shipBox.hidden = false;
+  }
+  function runFree() {
+    var cart = parseFloat(document.getElementById("adv-cart").value);
+    var threshold = parseFloat(document.getElementById("adv-threshold").value);
+    var ship = parseFloat(document.getElementById("adv-ship").value);
+    if (isNaN(cart) || isNaN(threshold) || isNaN(ship)) {
+      showError(advBox, "장바구니 합계·무료배송 기준 금액·배송비를 입력해 주세요.");
+      return;
+    }
+    var r = TankaCalc.freeShipCheck(cart, threshold, ship);
+    if (!r.ok) { showError(advBox, "모두 0보다 큰 금액으로 입력해 주세요."); return; }
+    if (r.free) {
+      advBox.innerHTML = '<div class="result-main">이미 무료배송 기준을 넘었습니다</div>';
+    } else if (r.worth) {
+      advBox.innerHTML =
+        '<div class="result-main">' + r.shortfall.toLocaleString(undefined, { maximumFractionDigits: 2 }) + "엔어치 더 담는 편이 이득(일 수 있음)</div>" +
+        '<p class="adv-note">부족액 ' + r.shortfall.toLocaleString(undefined, { maximumFractionDigits: 2 }) + "엔 ≦ 배송비 " + ship.toLocaleString() + "엔 이므로, 그만큼 상품이 늘고 실제 지출도 줄어듭니다. 다만 필요 없는 물건을 사면 손해입니다.</p>";
+    } else {
+      advBox.innerHTML =
+        '<div class="result-main">배송비 ' + ship.toLocaleString() + "엔을 내는 편이 쌉니다</div>" +
+        '<p class="adv-note">무료배송까지 ' + r.shortfall.toLocaleString(undefined, { maximumFractionDigits: 2 }) + "엔 남았는데, 배송비보다 비쌉니다. 무리해서 더 담을 필요는 없습니다.</p>";
+    }
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-ship-run").addEventListener("click", function () { runShip(true); });
+  document.getElementById("adv-free-run").addEventListener("click", runFree);
+  for (var i = 0; i < 3; i++) {
+    ["adv-sprice-", "adv-sqty-", "adv-sship-"].forEach(function (prefix) {
+      document.getElementById(prefix + i).addEventListener("input", function () { runShip(false); });
+    });
+  }
+  document.getElementById("adv-sper").addEventListener("change", function () { runShip(false); });
+  ["adv-cart", "adv-threshold", "adv-ship"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-cart").value !== "" &&
+          document.getElementById("adv-threshold").value !== "" &&
+          document.getElementById("adv-ship").value !== "") runFree();
+    });
+  });
+})();
+</script>
+</body>
+</html>

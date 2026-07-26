@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>单价比较 计算器(哪个更便宜? 每100g·每1个) | Quick Calc</title>
+  <meta name="description" content="只要输入价格和容量,就能并排比较「每100g」「每1个」的单价。大包装和小包装到底哪个划算一目了然,最多可比较3件商品的免费购物计算器。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/tanka/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="单价比较 计算器(哪个更便宜? 每100g·每1个) | Quick Calc">
+  <meta property="og:description" content="只要输入价格和容量,就能并排比较「每100g」「每1个」的单价。大包装和小包装到底哪个划算一目了然,最多可比较3件商品的免费购物计算器。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/tanka/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"单价比较 计算器","item":"https://quick-calc.site/zh/tools/tanka/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/tanka/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/tanka/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/tanka/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/tanka/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/tanka/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>单价比较 计算器(哪个更便宜?)</h1>
+  <form class="tool-form" id="tanka-form">
+    <label>单价基准
+      <select id="per">
+        <option value="100" selected>每100(g·ml)</option>
+        <option value="1">每1(个·张·次)</option>
+      </select>
+    </label>
+    <label>商品A
+      <span style="display:flex;gap:.5em;">
+        <input type="number" id="price-0" inputmode="decimal" min="0" step="any" required placeholder="价格(日元)" aria-label="商品A的价格">
+        <input type="number" id="qty-0" inputmode="decimal" min="0" step="any" required placeholder="容量" aria-label="商品A的容量">
+      </span>
+    </label>
+    <label>商品B
+      <span style="display:flex;gap:.5em;">
+        <input type="number" id="price-1" inputmode="decimal" min="0" step="any" required placeholder="价格(日元)" aria-label="商品B的价格">
+        <input type="number" id="qty-1" inputmode="decimal" min="0" step="any" required placeholder="容量" aria-label="商品B的容量">
+      </span>
+    </label>
+    <label>商品C(可选)
+      <span style="display:flex;gap:.5em;">
+        <input type="number" id="price-2" inputmode="decimal" min="0" step="any" placeholder="价格(日元)" aria-label="商品C的价格">
+        <input type="number" id="qty-2" inputmode="decimal" min="0" step="any" placeholder="容量" aria-label="商品C的容量">
+      </span>
+    </label>
+    <span class="field-note">输入2件商品的价格和容量后自动判定</span>
+    <button type="submit">比较单价</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 含运费的实际单价与包邮门槛判定</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">含运费比较(适合网购)</h3>
+      <p class="adv-note">在商品价格上加上运费,按「实际单价」比较(没有运费就保持0)。</p>
+      <label>单价基准
+        <select id="adv-sper">
+          <option value="100" selected>每100(g·ml)</option>
+          <option value="1">每1(个·张·次)</option>
+        </select>
+      </label>
+      <label>商品A
+        <span style="display:flex;gap:.5em;">
+          <input type="number" id="adv-sprice-0" inputmode="decimal" min="0" step="any" placeholder="价格(日元)" aria-label="商品A的价格">
+          <input type="number" id="adv-sqty-0" inputmode="decimal" min="0" step="any" placeholder="容量" aria-label="商品A的容量">
+          <input type="number" id="adv-sship-0" inputmode="decimal" min="0" step="any" value="0" aria-label="商品A的运费">
+        </span>
+        <span class="field-note">从左到右: 价格(日元)·容量·运费(日元)</span>
+      </label>
+      <label>商品B
+        <span style="display:flex;gap:.5em;">
+          <input type="number" id="adv-sprice-1" inputmode="decimal" min="0" step="any" placeholder="价格(日元)" aria-label="商品B的价格">
+          <input type="number" id="adv-sqty-1" inputmode="decimal" min="0" step="any" placeholder="容量" aria-label="商品B的容量">
+          <input type="number" id="adv-sship-1" inputmode="decimal" min="0" step="any" value="0" aria-label="商品B的运费">
+        </span>
+      </label>
+      <label>商品C(可选)
+        <span style="display:flex;gap:.5em;">
+          <input type="number" id="adv-sprice-2" inputmode="decimal" min="0" step="any" placeholder="价格(日元)" aria-label="商品C的价格">
+          <input type="number" id="adv-sqty-2" inputmode="decimal" min="0" step="any" placeholder="容量" aria-label="商品C的容量">
+          <input type="number" id="adv-sship-2" inputmode="decimal" min="0" step="any" placeholder="运费(日元)" aria-label="商品C的运费">
+        </span>
+      </label>
+      <button type="button" id="adv-ship-run">含运费比较</button>
+      <div class="tool-result" id="adv-ship-result" hidden aria-live="polite"></div>
+      <h3 class="adv-h">差一点就包邮,该凑单吗?</h3>
+      <p class="adv-note">「还差○日元包邮」时,判断凑单和付运费哪一边的实际支出更少。</p>
+      <label>购物车合计(日元)
+        <input type="number" id="adv-cart" inputmode="numeric" step="any" min="1" placeholder="4500">
+      </label>
+      <label>包邮门槛(日元)
+        <input type="number" id="adv-threshold" inputmode="numeric" step="any" min="1" placeholder="5000">
+      </label>
+      <label>运费(日元)
+        <input type="number" id="adv-ship" inputmode="numeric" step="any" min="1" placeholder="600">
+      </label>
+      <button type="button" id="adv-free-run">判断是否该凑单</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>只要输入价格和内容量(g·ml·个数),就能用单价比较出<strong>哪件商品最便宜</strong>。还能看到最便宜的商品,以及其他商品贵了百分之几。适合在日本超市比较大包装和小包装,或比较网购价格。金额单位为日元。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>选择基准。按重量·容量比较就选「每100」,像鸡蛋、纸巾那样按个数比较就选「每1」。</li>
+    <li>输入各商品的价格和内容量(只填2件也可以,C可以留空)。</li>
+    <li>填满2件商品的同时,就会显示单价一览和最便宜的商品(无需点击按钮)。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>单价 = 价格 ÷ 内容量 × 基准量</strong>(每100g时基准量为100)</li>
+    <li>计算例: 洗衣液A 298日元/400g → 298 ÷ 400 × 100 = <strong>74.5日元/100g</strong>。洗衣液B 198日元/250g → 79.2日元/100g。→ A便宜约6%。</li>
+    <li>「贵百分之几」是以最便宜的单价为基准计算的。</li>
+  </ul>
+
+  <h3>出处·前提说明</h3>
+  <ul class="sources">
+    <li>基于价格和内容量的算术计算。</li>
+  </ul>
+
+  <h2>计算的前提与注意</h2>
+  <ul class="cautions">
+    <li>比较的商品之间请使用相同单位(g与g、ml与ml、个与个)。把g和ml混在一起就无法正确比较。</li>
+    <li>价格也请统一: 要么全部用含税价,要么全部用不含税价。</li>
+    <li>单价再便宜,用不完扔掉反而亏。有保质期的商品还要考虑能否用完。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">大容量装一定更便宜吗?</h3>
+  <p class="faq-a">多数情况下更便宜,但遇到特卖或优惠券时,小规格单价更低的「反转」也并不少见。所以当场算一算单价再比较最可靠。</p>
+  <h3 class="faq-q">克单价多少算便宜?</h3>
+  <p class="faq-a">不同品类的行情不同,无法一概而论。基本做法是在同一货架的商品之间比较。如果店里的价签上标有「每100g○日元」的单价(unit price),也可以作为参考。</p>
+  <h3 class="faq-q">补充装和瓶装哪个更划算,能比较吗?</h3>
+  <p class="faq-a">可以。分别输入补充装和瓶装的价格与内容量(ml)即可。补充装的单价通常更低,但遇到加量促销时瓶装也可能反超。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/tanka/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/tanka/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/tanka/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=tanka">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/tanka/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var NAMES = ["商品A", "商品B", "商品C"];
+  var ERROR_MESSAGES = {
+    invalid_items: "请输入2件以上商品。",
+    invalid_item: "价格和内容量请输入大于0的数值。",
+    invalid_per: "请选择单价基准。"
+  };
+  function runMain(fromSubmit) {
+    var per = parseFloat(document.getElementById("per").value);
+    var items = [];
+    var labels = [];
+    for (var i = 0; i < 3; i++) {
+      var p = document.getElementById("price-" + i).value;
+      var q = document.getElementById("qty-" + i).value;
+      if (p === "" && q === "") continue;
+      if (!fromSubmit && (p === "" || q === "")) continue;
+      items.push({ price: parseFloat(p), qty: parseFloat(q) });
+      labels.push(NAMES[i]);
+    }
+    if (!fromSubmit && items.length < 2) { box.hidden = true; return; }
+    var r = TankaCalc.compare(items, per);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "请确认输入值。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var unitLabel = per === 1 ? "每1" : "每" + per;
+    var rows = r.rows.map(function (row, i) {
+      var mark = i === r.cheapest ? "<strong>最便宜</strong>" : "+" + row.diffPct.toLocaleString() + "%";
+      return "<tr><td>" + labels[i] + "</td><td>" + row.unitPrice.toLocaleString() + "日元</td><td>" + mark + "</td></tr>";
+    }).join("");
+    box.innerHTML =
+      '<div class="result-main">' + labels[r.cheapest] + " 最便宜</div>" +
+      "<p>" + unitLabel + " " + r.rows[r.cheapest].unitPrice.toLocaleString() + "日元</p>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>商品</th><th>' + unitLabel + "的单价</th><th>与最便宜的差</th></tr></thead><tbody>" +
+      rows + "</tbody></table></div>";
+    box.hidden = false;
+  }
+  document.getElementById("tanka-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain(true);
+  });
+  for (var i = 0; i < 3; i++) {
+    document.getElementById("price-" + i).addEventListener("input", function () { runMain(false); });
+    document.getElementById("qty-" + i).addEventListener("input", function () { runMain(false); });
+  }
+  document.getElementById("per").addEventListener("change", function () { runMain(false); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var shipBox = document.getElementById("adv-ship-result");
+  var advBox = document.getElementById("adv-result");
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
+  }
+  var ADV_NAMES = ["商品A", "商品B", "商品C"];
+  function runShip(fromButton) {
+    var items = [];
+    var names = [];
+    for (var i = 0; i < 3; i++) {
+      var p = document.getElementById("adv-sprice-" + i).value;
+      var q = document.getElementById("adv-sqty-" + i).value;
+      if (p === "" && q === "") continue;
+      if (!fromButton && (p === "" || q === "")) continue;
+      var s = document.getElementById("adv-sship-" + i).value;
+      items.push({
+        price: parseFloat(p),
+        qty: parseFloat(q),
+        ship: s === "" ? 0 : parseFloat(s)
+      });
+      names.push(ADV_NAMES[i]);
+    }
+    if (items.length < 2) {
+      if (fromButton) { showError(shipBox, "请输入2件以上商品的价格和内容量。"); } else { shipBox.hidden = true; }
+      return;
+    }
+    for (var k = 0; k < items.length; k++) {
+      if (isNaN(items[k].price) || isNaN(items[k].qty) || isNaN(items[k].ship)) {
+        showError(shipBox, "请确认 " + names[k] + " 的价格·内容量·运费。");
+        return;
+      }
+    }
+    var per = parseFloat(document.getElementById("adv-sper").value);
+    var r = TankaCalc.compareWithShipping(items, per);
+    if (!r.ok) { showError(shipBox, "价格和内容量请输入大于0的值,运费请输入0日元以上。"); return; }
+    var perLabel = per === 1 ? "每1" : "每" + per;
+    var html = '<div class="result-main">' + names[r.cheapest] + " 最便宜</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>商品</th><th>含运费总额</th><th>' + perLabel + "</th><th>与最便宜的差</th></tr></thead><tbody>";
+    for (var j = 0; j < r.rows.length; j++) {
+      var row = r.rows[j];
+      html += "<tr><td>" + names[j] + (j === r.cheapest ? "(最便宜)" : "") + "</td>" +
+        "<td>" + row.total.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " 日元</td>" +
+        "<td>" + row.unitPrice.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " 日元</td>" +
+        "<td>" + (j === r.cheapest ? "-" : "+" + row.diffPct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%") + "</td></tr>";
+    }
+    html += "</tbody></table></div>";
+    shipBox.innerHTML = html;
+    shipBox.hidden = false;
+  }
+  function runFree() {
+    var cart = parseFloat(document.getElementById("adv-cart").value);
+    var threshold = parseFloat(document.getElementById("adv-threshold").value);
+    var ship = parseFloat(document.getElementById("adv-ship").value);
+    if (isNaN(cart) || isNaN(threshold) || isNaN(ship)) {
+      showError(advBox, "请输入购物车合计·包邮门槛·运费。");
+      return;
+    }
+    var r = TankaCalc.freeShipCheck(cart, threshold, ship);
+    if (!r.ok) { showError(advBox, "三项均请输入大于0的金额。"); return; }
+    if (r.free) {
+      advBox.innerHTML = '<div class="result-main">已经超过包邮门槛</div>';
+    } else if (r.worth) {
+      advBox.innerHTML =
+        '<div class="result-main">再买 ' + r.shortfall.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " 日元 可能更划算</div>" +
+        '<p class="adv-note">不足额 ' + r.shortfall.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " 日元 ≦ 运费 " + ship.toLocaleString() + " 日元,凑单能多拿到商品,实际支出也更少。但买不需要的东西反而亏。</p>";
+    } else {
+      advBox.innerHTML =
+        '<div class="result-main">支付运费 ' + ship.toLocaleString() + " 日元 更便宜</div>" +
+        '<p class="adv-note">距离包邮还差 ' + r.shortfall.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " 日元,比运费还贵。没必要勉强凑单。</p>";
+    }
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-ship-run").addEventListener("click", function () { runShip(true); });
+  document.getElementById("adv-free-run").addEventListener("click", runFree);
+  for (var i = 0; i < 3; i++) {
+    ["adv-sprice-", "adv-sqty-", "adv-sship-"].forEach(function (prefix) {
+      document.getElementById(prefix + i).addEventListener("input", function () { runShip(false); });
+    });
+  }
+  document.getElementById("adv-sper").addEventListener("change", function () { runShip(false); });
+  ["adv-cart", "adv-threshold", "adv-ship"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-cart").value !== "" &&
+          document.getElementById("adv-threshold").value !== "" &&
+          document.getElementById("adv-ship").value !== "") runFree();
+    });
+  });
+})();
+</script>
+</body>
+</html>

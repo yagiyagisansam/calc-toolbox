@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>잔업수당 계산기(일본·법정 가산율) | Quick Calc</title>
+  <meta name="description" content="기초시급과 잔업시간을 입력하면 일본 법률이 정한 잔업수당(가산임금)을 무료로 계산합니다. 시간외 25%·월 60시간 초과 50%·법정휴일 35%·야간 +25%의 법정 가산율에 대응하며, 월급에서 기초시급을 환산할 수도 있습니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/zangyo/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="잔업수당 계산기(일본·법정 가산율) | Quick Calc">
+  <meta property="og:description" content="기초시급과 잔업시간을 입력하면 일본 법률이 정한 잔업수당(가산임금)을 무료로 계산합니다. 시간외 25%·월 60시간 초과 50%·법정휴일 35%·야간 +25%의 법정 가산율에 대응하며, 월급에서 기초시급을 환산할 수도 있습니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/zangyo/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"잔업수당 계산기(일본)","item":"https://quick-calc.site/ko/tools/zangyo/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/zangyo/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/zangyo/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/zangyo/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/zangyo/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/zangyo/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>잔업수당 계산기(일본)</h1>
+  <form class="tool-form" id="hourly-form">
+    <label>월급에서 기초시급 구하기(시급을 아는 분은 아래 폼으로)
+      <span class="field-note">여기서의 월급은 가산의 기초가 되는 금액(기본급+직책수당 등. 가족수당·통근수당·주택수당 등은 제외)</span>
+    </label>
+    <label>월급(엔)
+      <input type="number" id="monthly" inputmode="numeric" step="1" min="50000" max="10000000" placeholder="300000">
+    </label>
+    <label>월평균 소정근로시간
+      <span class="field-note">예: 160. (365일−연간 휴일)×하루 소정근로시간÷12 로 계산할 수 있습니다</span>
+      <input type="number" id="avg-hours" inputmode="decimal" step="any" min="100" max="200" placeholder="160">
+    </label>
+    <button type="submit">시급으로 환산</button>
+    <div class="tool-result" id="result-hourly" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="zangyo-form">
+    <label>기초시급(엔)
+      <input type="number" id="hourly" inputmode="decimal" step="any" min="500" max="50000" placeholder="1875" required>
+    </label>
+    <label>시간외 근로(월 60시간 이내인 몫·시간)
+      <input type="number" id="ot" inputmode="decimal" step="any" min="0" max="200" value="0">
+    </label>
+    <label>시간외 근로 중 월 60시간을 초과하는 몫(시간)
+      <input type="number" id="ot60" inputmode="decimal" step="any" min="0" max="200" value="0">
+    </label>
+    <label>법정휴일 근로(시간)
+      <span class="field-note">주 1일의 법정휴일에 일한 시간</span>
+      <input type="number" id="holiday" inputmode="decimal" step="any" min="0" max="200" value="0">
+    </label>
+    <label>야간근로(22시〜5시·시간)
+      <span class="field-note">가산분(+25%)을 계산합니다. 시간외나 휴일과 겹치는 시간도 입력해도 됩니다</span>
+      <input type="number" id="night" inputmode="decimal" step="any" min="0" max="200" value="0">
+    </label>
+    <button type="submit">잔업수당 계산</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 월 합계에서 자동 계산·미지급 체크</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">잔업 합계 시간만으로 상세 계산</h3>
+      <p class="adv-note">그 달의 시간외 근로 합계만 넣으면 60시간을 넘은 몫(가산 50%)을 자동으로 나누어 계산합니다(기초시급은 위 폼의 값).</p>
+      <label>그 달의 시간외 근로 합계(시간)
+        <span class="field-note">60시간 이내는 25%, 초과분은 자동으로 50%로 계산합니다</span>
+        <input type="number" id="adv-ot-total" inputmode="decimal" step="any" min="0" max="200" placeholder="70">
+      </label>
+      <label>법정휴일 근로(시간·없으면 0)
+        <input type="number" id="adv-holiday" inputmode="decimal" step="any" min="0" max="200" value="0">
+      </label>
+      <label>야간근로(22시〜5시·시간·없으면 0)
+        <input type="number" id="adv-night" inputmode="decimal" step="any" min="0" max="200" value="0">
+      </label>
+      <h3 class="adv-h">미지급 체크(선택)</h3>
+      <p class="adv-note">급여명세서의 잔업수당을 입력하면 법정 최저액과의 차액(부족분의 기준)을 표시합니다.</p>
+      <label>실제로 지급된 잔업수당(엔)
+        <input type="number" id="adv-paid" inputmode="numeric" step="1" min="0" max="10000000" placeholder="50000">
+      </label>
+      <button type="button" id="adv-run">상세 계산하기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    이 도구는 <strong>법정 최저 가산율</strong>에 따른 대략적인 계산입니다. 회사의 취업규칙이 이보다 높은 가산율을 정하고 있는 경우나, 변형근로시간제·고정 잔업수당(간주 잔업)·관리감독자의 취급 등에 따라 실제 금액은 달라집니다. 미지급이 의심되는 경우에는 노동기준감독서나 전문가에게 상담하세요.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>잔업한 시간을 입력하면 <strong>받아야 할 잔업수당</strong>이 얼마인지 알 수 있습니다. 야간(22시〜5시)이나 휴일에 일한 몫의 가산도 <strong>일본 노동기준법</strong>이 정한 최저 가산율로 계산합니다. 급여명세서(給与明細)의 잔업수당 항목을 확인할 때 활용하세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>시급을 모르는 경우, 월급과 월평균 소정근로시간을 넣으면 기초시급이 자동 계산되어 아래 칸에 입력됩니다.</li>
+    <li>잔업의 내역(시간외·60시간 초과·법정휴일·야간)을 시간 단위로 입력합니다.</li>
+    <li>입력할 때마다 내역이 포함된 금액이 자동으로 갱신됩니다(버튼으로도 계산할 수 있습니다).</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <p>일본 노동기준법이 정한 최저 가산율로 계산합니다.</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>법정 가산임금률</caption>
+      <thead><tr><th>종류</th><th>가산율</th><th>계산</th></tr></thead>
+      <tbody>
+        <tr><td>시간외 근로(법정 1일 8시간/주 40시간 초과)</td><td>25% 이상</td><td>시급×1.25×시간</td></tr>
+        <tr><td>시간외 근로(월 60시간을 초과하는 몫)</td><td>50% 이상</td><td>시급×1.5×시간</td></tr>
+        <tr><td>법정휴일 근로</td><td>35% 이상</td><td>시급×1.35×시간</td></tr>
+        <tr><td>야간근로(22시〜5시)</td><td>25% 이상을 가산</td><td>시급×0.25×시간(가산분)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>계산 예: 시급 1,500엔으로 시간외 20시간 → 1,500×1.25×20 = <strong>37,500엔</strong></p>
+
+  <h3>출처(1차 정보)</h3>
+  <ul class="sources">
+    <li>일본 노동기준법 제37조(시간외 25%·월 60시간 초과 50%·야간 가산)(일본어)<br>
+      <a href="https://laws.e-gov.go.jp/law/322AC0000000049" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/322AC0000000049</a>(2026년 7월 18일 열람)</li>
+    <li>노동기준법 제37조 제1항의 가산임금에 관한 율의 최저한도를 정하는 정령(법정휴일 35%)(일본어)<br>
+      <a href="https://laws.e-gov.go.jp/law/406CO0000000005" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/406CO0000000005</a>(2026년 7월 18일 열람)</li>
+  </ul>
+
+  <h2>전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>「기초시급」은 가산임금의 산정 기초입니다. 가족수당·통근수당·별거수당·자녀교육수당·주택수당·임시로 지급되는 임금·상여금은 기초에서 제외됩니다.</li>
+    <li>야간분은 「+25%의 가산분만」 표시하고 있습니다(야간근로의 기본 부분 임금은 통상의 급여에 포함되기 때문). 시간외이면서 야간인 경우, 시간외 칸과 야간 칸에 같은 시간을 넣으면 합계가 1.5배에 해당하게 됩니다.</li>
+    <li>소정근로시간이 법정(8시간)보다 짧은 경우의 「법정내 잔업」은 가산이 필요 없으므로 이 계산과는 다릅니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">고정 잔업수당(간주 잔업)이 있는 경우에는?</h3>
+  <p class="faq-a">고정 잔업수당이 「몇 시간분」인지 확인하고, 실제 잔업이 그것을 넘은 몫에는 추가 지급이 필요합니다. 이 도구로 실제 잔업의 금액을 계산해 고정 잔업수당과 비교해 보세요.</p>
+  <h3 class="faq-q">토요일 출근은 35%의 휴일근로인가요?</h3>
+  <p class="faq-a">35%가 되는 것은 주 1일의 「법정휴일」 근로뿐입니다. 주 5일제(주휴 2일)인 경우 대개 한쪽이 법정휴일이고 다른 한쪽은 소정휴일입니다(이 경우에는 시간외의 25%로 처리하는 것이 일반적). 어느 쪽이 법정휴일인지는 회사의 취업규칙에서 확인해 주세요.</p>
+  <h3 class="faq-q">아르바이트에도 잔업수당이 붙나요?</h3>
+  <p class="faq-a">붙습니다. 고용 형태와 관계없이 법정 근로시간(1일 8시간·주 40시간)을 넘으면 가산임금의 대상입니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/zangyo/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/zangyo/" lang="en" hreflang="en">English</a><a href="/zh/tools/zangyo/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=zangyo">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/zangyo/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var hourlyBox = document.getElementById("result-hourly");
+  var ERROR_MESSAGES = {
+    invalid_hourly: "기초시급은 500〜50,000엔 범위로 입력해 주세요.",
+    invalid_hours: "시간은 0〜200시간 범위로 입력해 주세요.",
+    invalid_monthly: "월급은 50,000〜10,000,000엔 범위로 입력해 주세요.",
+    invalid_avg_hours: "월평균 소정근로시간은 100〜200 범위로 입력해 주세요."
+  };
+  function raw(id) { return document.getElementById(id).value; }
+  function showError(target, code) {
+    target.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "입력값을 확인해 주세요.") + "</p>";
+    target.hidden = false;
+  }
+  function runZangyo() {
+    if (raw("hourly") === "") { box.hidden = true; return; }
+    var num = function (id) { return parseFloat(raw(id) || "0"); };
+    var r = ZangyoCalc.calculate(num("hourly"), num("ot"), num("ot60"), num("holiday"), num("night"));
+    if (!r.ok) { showError(box, r.code); return; }
+    box.innerHTML =
+      '<div class="result-main">잔업수당 약 ' + r.totalPay.toLocaleString() + " 엔/월</div>" +
+      "<p>내역 — 시간외(×1.25): <strong>" + r.overtimePay.toLocaleString() + "엔</strong>" +
+      (r.overtime60Pay ? " / 60시간 초과(×1.5): <strong>" + r.overtime60Pay.toLocaleString() + "엔</strong>" : "") +
+      (r.holidayPay ? " / 법정휴일(×1.35): <strong>" + r.holidayPay.toLocaleString() + "엔</strong>" : "") +
+      (r.lateNightExtra ? " / 야간 가산(+0.25): <strong>" + r.lateNightExtra.toLocaleString() + "엔</strong>" : "") + "</p>";
+    box.hidden = false;
+  }
+  function runHourlyFromMonthly() {
+    if (raw("monthly") === "" || raw("avg-hours") === "") { hourlyBox.hidden = true; return; }
+    var r = ZangyoCalc.hourlyFromMonthly(parseFloat(raw("monthly")), parseFloat(raw("avg-hours")));
+    if (!r.ok) { showError(hourlyBox, r.code); return; }
+    var hourlyInput = document.getElementById("hourly");
+    hourlyInput.value = r.hourlyYen;
+    hourlyBox.innerHTML = '<div class="result-main">기초시급 약 ' + r.hourlyYen.toLocaleString() + " 엔</div><p>아래 잔업수당 계산 칸에 자동으로 입력했습니다.</p>";
+    hourlyBox.hidden = false;
+    hourlyInput.dispatchEvent(new Event("input"));
+  }
+  ["monthly", "avg-hours"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runHourlyFromMonthly);
+  });
+  ["hourly", "ot", "ot60", "holiday", "night"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runZangyo);
+  });
+  document.getElementById("hourly-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (raw("monthly") === "" || raw("avg-hours") === "") {
+      showError(hourlyBox, raw("monthly") === "" ? "invalid_monthly" : "invalid_avg_hours");
+      return;
+    }
+    runHourlyFromMonthly();
+  });
+  document.getElementById("zangyo-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (raw("hourly") === "") { showError(box, "invalid_hourly"); return; }
+    runZangyo();
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var ADV_ERRORS = {
+    invalid_hourly: "기초시급(위 폼)은 500〜50,000엔 범위로 입력해 주세요.",
+    invalid_hours: "시간은 0〜200시간 범위로 입력해 주세요.",
+    invalid_paid: "지급된 잔업수당은 0〜10,000,000엔 범위로 입력해 주세요."
+  };
+  function runAdv() {
+    var hourly = parseFloat(document.getElementById("hourly").value);
+    var otTotal = parseFloat(document.getElementById("adv-ot-total").value);
+    if (isNaN(otTotal)) otTotal = 0;
+    var holiday = parseFloat(document.getElementById("adv-holiday").value);
+    if (isNaN(holiday)) holiday = 0;
+    var night = parseFloat(document.getElementById("adv-night").value);
+    if (isNaN(night)) night = 0;
+    var paidStr = document.getElementById("adv-paid").value;
+    var paid = paidStr === "" ? undefined : parseFloat(paidStr);
+    var r = ZangyoCalc.calculateDetailed(hourly, otTotal, holiday, night, paid);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + (ADV_ERRORS[r.code] || "입력값을 확인해 주세요.") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    var html =
+      '<div class="result-main">잔업수당(법정 최저액) 약 ' + r.totalPay.toLocaleString() + ' 엔</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead>' +
+      '<tr><th>내역</th><th>시간</th><th>가산율</th><th>금액</th></tr></thead><tbody>' +
+      '<tr><td>시간외(60시간 이내)</td><td>' + r.within60Hours.toLocaleString() + ' h</td><td>25%</td><td>' + r.overtimePay.toLocaleString() + ' 엔</td></tr>' +
+      '<tr><td>시간외(60시간 초과)</td><td>' + r.over60Hours.toLocaleString() + ' h</td><td>50%</td><td>' + r.overtime60Pay.toLocaleString() + ' 엔</td></tr>' +
+      '<tr><td>법정휴일</td><td>' + holiday.toLocaleString() + ' h</td><td>35%</td><td>' + r.holidayPay.toLocaleString() + ' 엔</td></tr>' +
+      '<tr><td>야간(22시〜5시)의 가산</td><td>' + night.toLocaleString() + ' h</td><td>+25%</td><td>' + r.lateNightExtra.toLocaleString() + ' 엔</td></tr>' +
+      '</tbody></table></div>';
+    if (r.shortfallYen !== undefined) {
+      if (r.shortfallYen > 0) {
+        html += '<p>지급된 금액과의 차이: <strong>약 ' + r.shortfallYen.toLocaleString() + ' 엔 부족분의 기준</strong>. 취업규칙의 가산율이나 수당의 취급에 따라 달라지므로, 신경이 쓰이는 경우에는 노동기준감독서·전문가에게 상담하세요.</p>';
+      } else {
+        html += '<p>지급된 금액은 법정 최저액을 <strong>' + Math.abs(r.shortfallYen).toLocaleString() + ' 엔 넘고 있습니다</strong>(이 내역의 범위에서는 부족 없음).</p>';
+      }
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", runAdv);
+  function autoAdv() {
+    if (document.getElementById("hourly").value !== "" && document.getElementById("adv-ot-total").value !== "") {
+      runAdv();
+    } else {
+      advBox.hidden = true;
+    }
+  }
+  ["adv-ot-total", "adv-holiday", "adv-night", "adv-paid", "hourly"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoAdv);
+  });
+})();
+</script>
+</body>
+</html>

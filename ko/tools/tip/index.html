@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>팁 계산기(해외여행·15%/18%/20%와 더치페이) | Quick Calc</title>
+  <meta name="description" content="금액과 팁 비율(15%·18%·20%)을 넣으면 팁 금액, 팁을 포함한 합계, 더치페이 시 1인당 금액까지 한 번에 계산합니다. 팁 문화가 없는 일본에서 미국·하와이로 여행 갈 때 계산서 앞에서 당황하지 않도록 도와줍니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/tip/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="팁 계산기(해외여행·15%/18%/20%와 더치페이) | Quick Calc">
+  <meta property="og:description" content="금액과 팁 비율(15%·18%·20%)을 넣으면 팁 금액, 팁을 포함한 합계, 더치페이 시 1인당 금액까지 한 번에 계산합니다. 팁 문화가 없는 일본에서 미국·하와이로 여행 갈 때 계산서 앞에서 당황하지 않도록 도와줍니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/tip/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"팁 계산기(해외여행·15%/18%/20%와 더치페이)","item":"https://quick-calc.site/ko/tools/tip/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/tip/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/tip/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/tip/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/tip/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/tip/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>팁 계산기(해외여행용)</h1>
+  <form class="tool-form" id="tip-form">
+    <label>금액(세금 별도의 식대 등)
+      <span class="field-note">입력하면 자동으로 계산됩니다</span>
+      <input type="number" id="amount" inputmode="decimal" min="0" step="any" required placeholder="예: 85.50">
+    </label>
+    <label>팁 비율(%)
+      <select id="pct">
+        <option value="15">15%(표준·캐주얼한 가게)</option>
+        <option value="18" selected>18%(표준〜조금 좋은 편)</option>
+        <option value="20">20%(좋은 서비스)</option>
+        <option value="22">22%(고급 레스토랑·특별한 서비스)</option>
+        <option value="10">10%(배달 등)</option>
+        <option value="0">0%(서비스료 포함)</option>
+      </select>
+    </label>
+    <label>더치페이 인원수
+      <input type="number" id="people" inputmode="numeric" min="1" max="50" step="1" value="1">
+    </label>
+    <button type="submit">팁과 합계 계산하기</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 팁 비율 역산과 서비스료 포함 시 판단</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">결국 팁을 몇 % 냈을까?(역산)</h3>
+      <p class="adv-note">카드 명세서나 영수증의 결제 총액에서 실제로 낸 팁 비율을 역산합니다.</p>
+      <label>실제로 결제한 총액
+        <input type="number" id="adv-paid" inputmode="decimal" step="any" min="0.01" placeholder="예: 118.00">
+      </label>
+      <label>원래 금액(팁을 곱하기 전의 식대)
+        <input type="number" id="adv-base" inputmode="decimal" step="any" min="0.01" placeholder="예: 100.00">
+      </label>
+      <button type="button" id="adv-rev-run">팁 비율 역산</button>
+      <div class="tool-result" id="adv-rev-result" hidden aria-live="polite"></div>
+      <h3 class="adv-h">서비스료가 붙어 있을 때 팁이 필요할까?</h3>
+      <p class="adv-note">영수증에 「Service Charge」나 「Gratuity」가 이미 들어 있을 때, 추가 팁이 필요한지와 대략적인 금액을 판단합니다.</p>
+      <label>금액(서비스료를 곱하기 전의 식대)
+        <input type="number" id="adv-sbase" inputmode="decimal" step="any" min="0.01" placeholder="예: 100.00">
+      </label>
+      <label>서비스료율(%)
+        <input type="number" id="adv-spct" inputmode="decimal" step="any" min="0" max="50" placeholder="예: 18">
+      </label>
+      <button type="button" id="adv-svc-run">추가 여부 판단하기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>금액을 넣고 비율만 고르면 해외 레스토랑에서 <strong>팁을 얼마 내야 하는지</strong> 바로 알 수 있습니다. 팁을 포함한 합계와 더치페이 시 1인당 금액도 함께 표시합니다. 팁을 낼 일이 거의 없는 일본에 살다가 미국·하와이로 여행 갈 때 계산할 때 유용합니다.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>영수증의 금액을 입력합니다(미국에서는 세금 별도의 식대에 대해 계산하는 것이 일반적입니다).</li>
+    <li>팁 비율을 고릅니다(고민되면 18%).</li>
+    <li>더치페이라면 인원수도 넣으면 1인당 금액까지 자동으로 표시됩니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>팁 = 금액 × 팁 비율 ÷ 100</strong> / <strong>합계 = 금액 + 팁</strong> / <strong>1인당 = 합계 ÷ 인원수</strong></li>
+    <li>계산 예: $85.50의 18% → 팁 <strong>$15.39</strong>, 합계 $100.89</li>
+    <li>미국 레스토랑의 시세는 대체로 15〜20%(최근에는 18〜20%가 주류)입니다. 서비스료(Service Charge/Gratuity)가 이미 포함되어 있으면 추가로 낼 필요가 없습니다.</li>
+  </ul>
+
+  <h3>출처(1차 정보)</h3>
+  <ul class="sources">
+    <li>산술 계산입니다. 팁의 시세와 관습은 나라·도시·업종에 따라 다릅니다(현지 관광청이나 가이드북의 안내를 확인해 주세요).</li>
+  </ul>
+
+  <h2>전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>영수증에 「Gratuity Included」나 「Service Charge」라고 적혀 있으면 팁이 이미 포함된 것입니다. 이중으로 내지 않도록 주의하세요.</li>
+    <li>팁 문화는 나라마다 크게 다릅니다(일본·중국·한국은 기본적으로 불필요, 유럽은 5〜10%나 잔돈을 올림하는 정도가 많습니다).</li>
+    <li>카드로 결제할 때는 영수증의 Tip 칸에 금액을 적고 Total을 직접 기입합니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">팁은 세금 포함과 세금 별도 중 어느 금액에 대해 계산하나요?</h3>
+  <p class="faq-a">미국에서는 세금 별도의 식대(Subtotal)에 대해 계산하는 것이 본래의 관습입니다. 다만 세금 포함(Total) 기준으로 계산해도 차이는 작고, 조금 더 내는 것은 문제가 되지 않습니다.</p>
+  <h3 class="faq-q">패스트푸드나 카페에서도 팁이 필요한가요?</h3>
+  <p class="faq-a">카운터에서 주문하는 가게에서는 기본적으로 필요 없습니다(태블릿에 팁 화면이 떠도 「No Tip」을 선택할 수 있습니다). 테이블에서 서빙을 받는 레스토랑에서는 필요합니다.</p>
+  <h3 class="faq-q">호텔이나 택시의 시세는 어느 정도인가요?</h3>
+  <p class="faq-a">기준으로는 호텔 벨보이가 짐 1개당 $1〜2, 하우스키핑이 1박당 $2〜5, 택시는 요금의 15% 전후입니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/tip/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/tip/" lang="en" hreflang="en">English</a><a href="/zh/tools/tip/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=tip">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/tip/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var MSG = {
+    invalid_amount: "금액은 0보다 큰 값으로 입력해 주세요.",
+    invalid_pct: "팁 비율은 0〜50% 범위에서 선택해 주세요.",
+    invalid_people: "인원수는 1〜50의 정수로 입력해 주세요."
+  };
+  function runMain() {
+    if (document.getElementById("amount").value === "" ||
+        document.getElementById("people").value === "") { box.hidden = true; return; }
+    var people = parseInt(document.getElementById("people").value, 10);
+    var r = TipCalc.calc(
+      parseFloat(document.getElementById("amount").value),
+      parseFloat(document.getElementById("pct").value),
+      people
+    );
+    if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "입력값을 확인해 주세요.") + "</p>"; box.hidden = false; return; }
+    box.innerHTML =
+      '<div class="result-main">팁 ' + r.tip.toLocaleString() + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>합계(금액+팁)</td><td><strong>" + r.total.toLocaleString() + "</strong></td></tr>" +
+      (people > 1 ? "<tr><td>1인당(" + people + "명)</td><td><strong>" + r.perPerson.toLocaleString() + "</strong></td></tr>" : "") +
+      "</tbody></table></div><p>통화 단위는 입력한 그대로 표시합니다(달러를 넣으면 달러).</p>";
+    box.hidden = false;
+  }
+  document.getElementById("tip-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
+  });
+  ["amount", "people"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runMain);
+  });
+  document.getElementById("pct").addEventListener("change", runMain);
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var revBox = document.getElementById("adv-rev-result");
+  var advBox = document.getElementById("adv-result");
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
+  }
+  function fmt(x) {
+    return x.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  }
+  function runReverse() {
+    var paid = parseFloat(document.getElementById("adv-paid").value);
+    var base = parseFloat(document.getElementById("adv-base").value);
+    if (isNaN(paid) || isNaN(base)) { showError(revBox, "결제 총액과 원래 금액을 입력해 주세요."); return; }
+    var r = TipCalc.reverse(paid, base);
+    if (!r.ok) {
+      showError(revBox, r.code === "invalid_paid"
+        ? "결제 총액은 원래 금액 이상(200만까지)으로 입력해 주세요."
+        : "원래 금액은 0보다 큰 값(100만까지)으로 입력해 주세요.");
+      return;
+    }
+    var msg = r.verdict === "enough"
+      ? "미국의 표준(15〜20%)을 충족합니다."
+      : r.verdict === "low"
+        ? "미국의 표준(15〜20%)보다는 적은 편입니다."
+        : "팁을 내지 않았습니다(서비스료가 포함된 가게라면 문제없습니다).";
+    revBox.innerHTML =
+      '<div class="result-main">팁 비율 ' + r.pct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " %</div>" +
+      "<p>팁으로 낸 금액: <strong>" + fmt(r.tip) + "</strong></p>" +
+      '<p class="adv-note">' + msg + "</p>";
+    revBox.hidden = false;
+  }
+  function runService() {
+    var base = parseFloat(document.getElementById("adv-sbase").value);
+    var pct = parseFloat(document.getElementById("adv-spct").value);
+    if (isNaN(base) || isNaN(pct)) { showError(advBox, "금액과 서비스료율을 입력해 주세요."); return; }
+    var r = TipCalc.serviceAdvice(base, pct);
+    if (!r.ok) { showError(advBox, "금액은 0보다 큰 값, 서비스료율은 0〜50%로 입력해 주세요."); return; }
+    if (!r.need) {
+      advBox.innerHTML =
+        '<div class="result-main">추가 팁은 필요 없습니다</div>' +
+        '<p class="adv-note">서비스료 ' + pct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%가 이미 표준적인 팁(15% 이상)에 해당합니다. 특별히 좋은 서비스를 받았을 때만 소액을 더하면 충분합니다.</p>";
+    } else {
+      advBox.innerHTML =
+        '<div class="result-main">추가 금액의 기준 ' + fmt(r.add15) + " 〜 " + fmt(r.add18) + "</div>" +
+        '<p class="adv-note">서비스료 ' + pct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%만으로는 표준(15〜18%)에 미치지 못합니다. 합계로 15%를 맞추려면 +" + fmt(r.add15) + ", 18%로 하려면 +" + fmt(r.add18) + " 가 기준입니다.</p>";
+    }
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-rev-run").addEventListener("click", runReverse);
+  document.getElementById("adv-svc-run").addEventListener("click", runService);
+  ["adv-paid", "adv-base"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-paid").value !== "" &&
+          document.getElementById("adv-base").value !== "") runReverse();
+    });
+  });
+  ["adv-sbase", "adv-spct"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-sbase").value !== "" &&
+          document.getElementById("adv-spct").value !== "") runService();
+    });
+  });
+})();
+</script>
+</body>
+</html>

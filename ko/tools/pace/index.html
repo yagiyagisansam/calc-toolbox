@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>러닝 페이스 계산기(마라톤·조깅) | Quick Calc</title>
+  <meta name="description" content="거리와 목표 시간으로 1km당 페이스와 시속을 무료로 계산합니다. 반대로 페이스에서 풀코스·하프의 완주 시간 예측도 가능. 5km/10km/하프/풀 프리셋 제공.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/pace/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="러닝 페이스 계산기(마라톤·조깅) | Quick Calc">
+  <meta property="og:description" content="거리와 목표 시간으로 1km당 페이스와 시속을 무료로 계산합니다. 반대로 페이스에서 풀코스·하프의 완주 시간 예측도 가능. 5km/10km/하프/풀 프리셋 제공.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/pace/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"러닝 페이스 계산기(마라톤·조깅)","item":"https://quick-calc.site/ko/tools/pace/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/pace/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/pace/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/pace/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/pace/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/pace/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>러닝 페이스 계산기</h1>
+  <form class="tool-form" id="pace-form">
+    <span class="field-note">거리와 목표 시간을 입력하면 바로 아래에 페이스가 표시됩니다</span>
+    <label>거리
+      <select id="distance-preset">
+        <option value="42.195">풀코스 마라톤(42.195km)</option>
+        <option value="21.0975">하프 마라톤(21.0975km)</option>
+        <option value="10" selected>10km</option>
+        <option value="5">5km</option>
+        <option value="custom">거리 직접 입력</option>
+      </select>
+      <input type="number" id="distance" inputmode="decimal" step="any" min="0.1" max="1000" placeholder="10" hidden>
+    </label>
+    <div class="field-row">
+      <label>목표 시간(시간)
+        <input type="number" id="t-h" inputmode="numeric" step="1" min="0" max="99" placeholder="0">
+      </label>
+      <label>분
+        <input type="number" id="t-m" inputmode="numeric" step="1" min="0" max="59" placeholder="50">
+      </label>
+      <label>초
+        <input type="number" id="t-s" inputmode="numeric" step="1" min="0" max="59" placeholder="0">
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="time-form">
+    <label>페이스로 완주 시간 예측하기(분·초/km)
+      <span class="field-note">위에서 선택한 거리를 사용합니다</span>
+    </label>
+    <div class="field-row">
+      <label>페이스(분/km)
+        <input type="number" id="p-m" inputmode="numeric" step="1" min="1" max="60" placeholder="5">
+      </label>
+      <label>초
+        <input type="number" id="p-s" inputmode="numeric" step="1" min="0" max="59" placeholder="30">
+      </label>
+    </div>
+    <div class="tool-result" id="result-b" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 5km마다의 구간 기록과 대표 목표 조견표</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">목표 시간으로 5km마다의 구간 기록 산출</h3>
+      <p class="adv-note">종목과 목표 시간을 입력하면 필요한 1km 페이스와 5km마다의 구간 기록표를 만듭니다.</p>
+      <label>종목
+        <select id="adv-race">
+          <option value="42.195" selected>풀코스 마라톤(42.195km)</option>
+          <option value="21.0975">하프 마라톤(21.0975km)</option>
+          <option value="10">10km</option>
+          <option value="5">5km</option>
+        </select>
+      </label>
+      <label>목표 시간(시·분·초)</label>
+      <div style="display:flex; gap:8px;">
+        <input type="number" id="adv-th" inputmode="numeric" step="1" min="0" max="99" value="4" aria-label="시간">
+        <input type="number" id="adv-tm" inputmode="numeric" step="1" min="0" max="59" value="0" aria-label="분">
+        <input type="number" id="adv-ts" inputmode="numeric" step="1" min="0" max="59" value="0" aria-label="초">
+      </div>
+      <button type="button" id="adv-split-run">구간 기록표 만들기</button>
+      <h3 class="adv-h">대표 목표에 필요한 페이스 조견표</h3>
+      <p class="adv-note">「서브4」처럼 종목별 대표 목표에 필요한 1km 페이스를 한눈에 보여줍니다(종목은 위에서 선택한 것을 사용).</p>
+      <button type="button" id="adv-goal-run">조견표 보기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    일정한 페이스로 달렸을 때의 <strong>대략적인 값</strong>입니다. 실제 대회에서는 코스의 오르내림·급수·혼잡 등으로 페이스가 변동합니다.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>달릴 거리와 목표 시간만 입력하면 <strong>1km를 몇 분 몇 초에 달려야 하는지</strong>를 바로 알 수 있습니다. 반대로 평소 페이스에서 완주 시간을 예측할 수도 있습니다. 마라톤 대회 목표 설정이나 조깅의 페이스 배분에 활용해 보세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>거리를 선택합니다(프리셋에 없는 거리는 「거리 직접 입력」).</li>
+    <li>목표 시간을 입력하면 동시에 1km당 페이스와 시속이 바로 아래에 표시됩니다. 버튼은 누를 필요 없습니다.</li>
+    <li>반대로 평소 페이스(예: 5분 30초/km)를 넣어 완주 시간을 예측할 수도 있습니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>페이스(초/km) = 총 시간(초) ÷ 거리(km)</strong>(초 단위로 반올림)</li>
+    <li><strong>시속(km/h) = 거리 ÷ 시간</strong></li>
+    <li>계산 예: 풀코스 마라톤 4시간 → 5분 41초/km(시속 10.55km) / 5분 00초/km로 풀코스를 달리면 3시간 30분 59초</li>
+  </ul>
+
+  <h3>출처·전제 명시</h3>
+  <ul class="sources">
+    <li>거리·시간·속도의 정의에 따른 산술 계산입니다. 풀코스는 42.195km, 하프는 21.0975km로 계산합니다.</li>
+  </ul>
+
+  <h2>계산의 전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>GPS 워치의 거리 표시는 코스 실측값과 몇 % 차이가 날 수 있습니다. 대회에서는 코스의 거리 표시판을 기준으로 해 주세요.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">서브4(풀코스 4시간 이내)에 필요한 페이스는?</h3>
+  <p class="faq-a">단순 계산으로는 5분 41초/km입니다. 다만 급수나 화장실에서 잃는 시간을 감안해 실제로는 5분 30초/km 전후를 목표로 하는 러너가 많습니다. 이 도구로 자신의 여유를 계산해 보세요.</p>
+  <h3 class="faq-q">「페이스」와 「스피드」의 차이는?</h3>
+  <p class="faq-a">페이스는 「1km에 몇 분 걸리는가」(작을수록 빠름), 스피드는 「1시간에 몇 km 나아가는가」(클수록 빠름)입니다. 이 도구는 둘 다 표시합니다.</p>
+  <h3 class="faq-q">트레드밀의 시속 설정에 쓸 수 있나요?</h3>
+  <p class="faq-a">쓸 수 있습니다. 목표 페이스를 넣고 표시되는 시속을 그대로 설정해 주세요(예: 6분 00초/km = 시속 10km).</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/pace/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/pace/" lang="en" hreflang="en">English</a><a href="/zh/tools/pace/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=pace">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/pace/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var boxB = document.getElementById("result-b");
+  var preset = document.getElementById("distance-preset");
+  var custom = document.getElementById("distance");
+  preset.addEventListener("change", function () {
+    custom.hidden = preset.value !== "custom";
+    runPace(false);
+    runTime(false);
+  });
+  custom.addEventListener("input", function () {
+    runPace(false);
+    runTime(false);
+  });
+  function currentDistance() {
+    return preset.value === "custom" ? parseFloat(custom.value) : parseFloat(preset.value);
+  }
+  function fmtTime(sec) {
+    var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    return (h > 0 ? h + "시간 " : "") + m + "분 " + s + "초";
+  }
+  function fmtPace(sec) {
+    return Math.floor(sec / 60) + "분 " + String(sec % 60).padStart(2, "0") + "초/km";
+  }
+  var ERROR_MESSAGES = {
+    invalid_distance: "거리는 0.1〜1000km 범위로 입력해 주세요.",
+    invalid_time: "시간은 1분〜100시간 범위로 입력해 주세요.",
+    invalid_pace: "페이스는 1분 00초〜60분 00초/km 범위로 입력해 주세요."
+  };
+  function showError(el, code) {
+    el.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "입력값을 확인해 주세요.") + "</p>";
+    el.hidden = false;
+  }
+  function runPace(fromSubmit) {
+    var hRaw = document.getElementById("t-h").value;
+    var mRaw = document.getElementById("t-m").value;
+    var sRaw = document.getElementById("t-s").value;
+    if (!fromSubmit && hRaw === "" && mRaw === "") { box.hidden = true; return; }
+    if (!fromSubmit && preset.value === "custom" && custom.value === "") { box.hidden = true; return; }
+    var t = (parseInt(hRaw || "0", 10)) * 3600 +
+            (parseInt(mRaw || "0", 10)) * 60 +
+            (parseInt(sRaw || "0", 10));
+    var r = PaceCalc.paceFor(currentDistance(), t);
+    if (!r.ok) { showError(box, r.code); return; }
+    box.innerHTML = '<div class="result-main">' + fmtPace(r.paceSecPerKm) + "</div>" +
+      "<p>시속: <strong>" + r.speedKmh.toLocaleString() + " km/h</strong></p>";
+    box.hidden = false;
+  }
+  function runTime(fromSubmit) {
+    var mRaw = document.getElementById("p-m").value;
+    var sRaw = document.getElementById("p-s").value;
+    if (!fromSubmit && mRaw === "") { boxB.hidden = true; return; }
+    if (!fromSubmit && preset.value === "custom" && custom.value === "") { boxB.hidden = true; return; }
+    var p = (parseInt(mRaw || "0", 10)) * 60 +
+            (parseInt(sRaw || "0", 10));
+    var r = PaceCalc.timeFor(currentDistance(), p);
+    if (!r.ok) { showError(boxB, r.code); return; }
+    boxB.innerHTML = '<div class="result-main">' + fmtTime(r.totalSeconds) + "</div>" +
+      "<p>거리 " + currentDistance() + " km를 " + fmtPace(p) + "로 달린 경우</p>";
+    boxB.hidden = false;
+  }
+  document.getElementById("pace-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runPace(true);
+  });
+  document.getElementById("time-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runTime(true);
+  });
+  ["t-h", "t-m", "t-s"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runPace(false); });
+  });
+  ["p-m", "p-s"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runTime(false); });
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advFmtTime(sec) {
+    var h = Math.floor(sec / 3600);
+    var m = Math.floor((sec % 3600) / 60);
+    var s = sec % 60;
+    function p(n) { return (n < 10 ? "0" : "") + n; }
+    return h > 0 ? h + ":" + p(m) + ":" + p(s) : m + ":" + p(s);
+  }
+  function advFmtPace(sec) {
+    return Math.floor(sec / 60) + "분 " + ("0" + (sec % 60)).slice(-2) + "초/km";
+  }
+  function advFail(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function runSplits(fromButton) {
+    if (!fromButton &&
+        document.getElementById("adv-th").value === "" &&
+        document.getElementById("adv-tm").value === "") { return; }
+    var d = parseFloat(document.getElementById("adv-race").value);
+    var h = parseInt(document.getElementById("adv-th").value, 10) || 0;
+    var m = parseInt(document.getElementById("adv-tm").value, 10) || 0;
+    var s = parseInt(document.getElementById("adv-ts").value, 10) || 0;
+    var total = h * 3600 + m * 60 + s;
+    var r = PaceCalc.raceSplits(d, total);
+    if (!r.ok) { advFail("목표 시간을 1분〜100시간 범위로 입력해 주세요."); return; }
+    var html = '<div class="result-main">필요 페이스 ' + advFmtPace(r.paceSecPerKm) + '</div>' +
+      "<p>시속으로 바꾸면 약 " + r.speedKmh.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " km/h입니다.</p>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>구간 지점</th><th>통과 기록</th></tr></thead><tbody>';
+    for (var i = 0; i < r.rows.length; i++) {
+      var row = r.rows[i];
+      html += "<tr><td>" + (row.goal ? "결승점(" + row.km.toLocaleString() + "km)" : row.km + "km") +
+        "</td><td>" + advFmtTime(row.sec) + "</td></tr>";
+    }
+    html += "</tbody></table></div>" +
+      '<p class="adv-note">일정한 페이스로 달렸을 때의 계산입니다.</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-split-run").addEventListener("click", function () { runSplits(true); });
+  ["adv-th", "adv-tm", "adv-ts"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runSplits(false); });
+  });
+  document.getElementById("adv-race").addEventListener("change", function () { runSplits(false); });
+  var ADV_GOALS = {
+    "42.195": [["서브3", 10800], ["서브3.5", 12600], ["서브4", 14400], ["서브4.5", 16200], ["서브5", 18000]],
+    "21.0975": [["1시간 30분", 5400], ["1시간 45분", 6300], ["2시간", 7200], ["2시간 30분", 9000]],
+    "10": [["40분", 2400], ["50분", 3000], ["60분", 3600]],
+    "5": [["20분", 1200], ["25분", 1500], ["30분", 1800]]
+  };
+  document.getElementById("adv-goal-run").addEventListener("click", function () {
+    var key = document.getElementById("adv-race").value;
+    var d = parseFloat(key);
+    var goals = ADV_GOALS[key];
+    var html = '<div class="result-main">대표 목표와 필요 페이스</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>목표</th><th>필요한 1km 페이스</th></tr></thead><tbody>';
+    for (var i = 0; i < goals.length; i++) {
+      var r = PaceCalc.paceFor(d, goals[i][1]);
+      if (!r.ok) continue;
+      html += "<tr><td>" + goals[i][0] + "</td><td>" + advFmtPace(r.paceSecPerKm) + "</td></tr>";
+    }
+    html += "</tbody></table></div>";
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

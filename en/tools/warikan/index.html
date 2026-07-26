@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Bill Splitting Calculator (Warikan, Rounded Up) | Quick Calc</title>
+  <meta name="description" content="Enter the total bill and the number of people to get what each person pays, free. Round up to the nearest 100 or 500 yen so the cash is easy to collect — handy if you are organising a dinner or drinks in Japan.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/warikan/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Bill Splitting Calculator (Warikan, Rounded Up) | Quick Calc">
+  <meta property="og:description" content="Enter the total bill and the number of people to get what each person pays, free. Round up to the nearest 100 or 500 yen so the cash is easy to collect — handy if you are organising a dinner or drinks in Japan.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/warikan/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Bill Splitting Calculator (Warikan)","item":"https://quick-calc.site/en/tools/warikan/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/warikan/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/warikan/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/warikan/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/warikan/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/warikan/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Bill Splitting Calculator (Warikan)</h1>
+  <form class="tool-form" id="warikan-form">
+    <label>Total bill (yen)
+      <input type="number" id="total" inputmode="numeric" step="1" min="1" max="10000000" placeholder="28460" required>
+    </label>
+    <label>Number of people
+      <input type="number" id="people" inputmode="numeric" step="1" min="2" max="100" placeholder="7" required>
+    </label>
+    <label>Round up to
+      <select id="unit">
+        <option value="100" selected>The nearest 100 yen</option>
+        <option value="1">1 yen (exact split)</option>
+        <option value="10">The nearest 10 yen</option>
+        <option value="500">The nearest 500 yen</option>
+        <option value="1000">The nearest 1,000 yen</option>
+      </select>
+    </label>
+    <span class="field-note">The result is calculated automatically once you enter the amount and the number of people</span>
+    <button type="submit">Calculate</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: weighted split and a collection check</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">A split where some people pay more (weighted)</h3>
+      <p class="adv-note">A weighted split for the “the boss pays a bit more” custom. The rounding is absorbed by the people paying more (if the total is left blank, the value from the form above is used).</p>
+      <label>Total bill (yen — blank uses the value from the form above)
+        <input type="number" id="adv-wtotal" inputmode="numeric" step="1" min="1" max="10000000" placeholder="Blank uses the value above">
+      </label>
+      <label>How many people pay more
+        <input type="number" id="adv-heavy" inputmode="numeric" step="1" min="1" max="99" value="1">
+      </label>
+      <label>Multiple (how many times a standard share they pay)
+        <input type="number" id="adv-mult" inputmode="decimal" step="any" min="1" max="10" value="1.5">
+      </label>
+      <label>How many people pay a standard share
+        <input type="number" id="adv-normal" inputmode="numeric" step="1" min="1" max="99" placeholder="3">
+      </label>
+      <button type="button" id="adv-weight-run">Calculate the weighted split</button>
+      <div class="tool-result" id="adv-weight-result" hidden aria-live="polite"></div>
+      <h3 class="adv-h">Is “X yen per person” enough?</h3>
+      <p class="adv-note">Checks how much is left over or missing if you collect a round amount from each person (the total and the number of people come from the form above).</p>
+      <label>Amount collected per person (yen)
+        <input type="number" id="adv-per" inputmode="numeric" step="1" min="1" placeholder="4000">
+      </label>
+      <button type="button" id="adv-collect-run">Check the difference</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    Because amounts are rounded up, the money collected can come to more than the bill (leaving a surplus). Agreeing in advance on what happens to the surplus — covering the organiser or carrying it over to next time — keeps things smooth.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Enter the total and the number of people and you instantly see <strong>how much each person should pay</strong>. You can round up to easy-to-collect amounts such as 100 or 500 yen, which helps when one person pays the restaurant and collects cash from everyone afterwards — the usual way a bill is split in Japan.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter the total on the receipt and the number of people.</li>
+    <li>Choose a unit that is easy to collect (100 yen, 500 yen and so on). If everyone can hand over small change, choose “1 yen” for an exact split.</li>
+    <li>The amount per person, the total collected and the surplus appear as you type — no button needed.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Per person = total ÷ number of people</strong>, rounded up to the unit you chose</li>
+    <li>Surplus = (per person × number of people) − total</li>
+    <li>Example: 28,460 yen among 7 people (100 yen unit) → 4,100 yen each, 240 yen left over</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>Plain arithmetic: division followed by rounding up.</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>This is an even split where everyone pays the same. It does not handle individual adjustments for people who did not drink or arrived late (for those, subtract the individual amounts from the total first, then split the rest).</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">What if the organiser wants to pay more (or less)?</h3>
+  <p class="faq-a">Subtract the organiser's share from the total first, then divide the rest by the remaining number of people. For example, if the bill is 30,000 yen and the organiser covers 5,000 yen, split 25,000 yen among the others.</p>
+  <h3 class="faq-q">What should I do with the surplus?</h3>
+  <p class="faq-a">Rounding up usually leaves a surplus of tens to hundreds of yen. It is commonly used to reimburse the person who paid up front, offset card points, or go towards the next gathering. For an exact split, choose the “1 yen” unit.</p>
+  <h3 class="faq-q">I want senior and junior colleagues to pay different amounts.</h3>
+  <p class="faq-a">The main form is for even splits only. For a weighted split, the simplest approach is two steps: decide what the senior members will cover, subtract it from the total, then split the rest evenly. The “＋More features” section also has a weighted split.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/warikan/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/warikan/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/warikan/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=warikan">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/warikan/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_total: "Enter the total as a whole number between 1 and 10,000,000 yen.",
+    invalid_people: "Enter the number of people as a whole number between 2 and 100.",
+    invalid_unit: "Choose a rounding unit."
+  };
+  var box = document.getElementById("result");
+  function runMain() {
+    if (document.getElementById("total").value === "" ||
+        document.getElementById("people").value === "") { box.hidden = true; return; }
+    var result = WarikanCalc.split(
+      parseFloat(document.getElementById("total").value),
+      parseFloat(document.getElementById("people").value),
+      parseInt(document.getElementById("unit").value, 10));
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">' + result.perPerson.toLocaleString() + " yen each</div>" +
+        "<p>Total collected: <strong>" + result.collected.toLocaleString() + " yen</strong>" +
+        (result.surplus > 0 ? " / Left over: <strong>" + result.surplus.toLocaleString() + " yen</strong>" : " (exact)") + "</p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "Check the entered values.") + "</p>";
+    }
+    box.hidden = false;
+  }
+  document.getElementById("warikan-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
+  });
+  ["total", "people"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runMain);
+  });
+  document.getElementById("unit").addEventListener("change", runMain);
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var weightBox = document.getElementById("adv-weight-result");
+  var advBox = document.getElementById("adv-result");
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
+  }
+  function readTotal(advId) {
+    var v = parseInt(document.getElementById(advId).value, 10);
+    if (!isNaN(v)) return v;
+    var main = parseInt(document.getElementById("total").value, 10);
+    return isNaN(main) ? null : main;
+  }
+  function runWeighted() {
+    var total = readTotal("adv-wtotal");
+    var heavy = parseInt(document.getElementById("adv-heavy").value, 10);
+    var mult = parseFloat(document.getElementById("adv-mult").value);
+    var normal = parseInt(document.getElementById("adv-normal").value, 10);
+    if (total === null) { showError(weightBox, "Enter the total bill (the form above also works)."); return; }
+    if (isNaN(heavy) || isNaN(mult) || isNaN(normal)) { showError(weightBox, "Enter the numbers of people and the multiple."); return; }
+    var r = WarikanCalc.weightedSplit(total, heavy, mult, normal);
+    if (!r.ok) {
+      showError(weightBox, r.code === "invalid_mult" ? "Enter a multiple between 1 and 10." :
+        r.code === "invalid_people" ? "Enter 1–99 people in each group, and no more than 100 people in total." :
+        "Enter the total as a whole number between 1 and 10,000,000 yen.");
+      return;
+    }
+    weightBox.innerHTML =
+      '<div class="result-main">Paying more: ' + r.heavyPay.toLocaleString() + " yen / Standard share: " + r.normalPay.toLocaleString() + " yen</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>People paying more (" + heavy + ")</td><td>" + r.heavyPay.toLocaleString() + " yen each</td></tr>" +
+      "<tr><td>People paying a standard share (" + normal + ")</td><td>" + r.normalPay.toLocaleString() + " yen each</td></tr>" +
+      "<tr><td>Total collected</td><td>" + r.collected.toLocaleString() + " yen (surplus " + r.surplus.toLocaleString() + " yen)</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">The rounding is absorbed by the people paying more.</p>';
+    weightBox.hidden = false;
+  }
+  function runCollect() {
+    var total = parseInt(document.getElementById("total").value, 10);
+    var people = parseInt(document.getElementById("people").value, 10);
+    var per = parseInt(document.getElementById("adv-per").value, 10);
+    if (isNaN(total) || isNaN(people)) { showError(advBox, "First enter the total and the number of people in the form above."); return; }
+    if (isNaN(per)) { showError(advBox, "Enter the amount to collect from each person."); return; }
+    var r = WarikanCalc.collectCheck(total, people, per);
+    if (!r.ok) { showError(advBox, "Check the entered values (total 1–10,000,000 yen, 2–100 people, at least 1 yen per person)."); return; }
+    var verdict = r.diff >= 0
+      ? "Enough (" + r.diff.toLocaleString() + " yen left over)"
+      : "Not enough (" + Math.abs(r.diff).toLocaleString() + " yen short)";
+    advBox.innerHTML =
+      '<div class="result-main">' + verdict + "</div>" +
+      "<p>" + per.toLocaleString() + " yen × " + people + " people = <strong>" + r.collected.toLocaleString() + " yen</strong> collected (bill " + total.toLocaleString() + " yen)</p>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-weight-run").addEventListener("click", runWeighted);
+  document.getElementById("adv-collect-run").addEventListener("click", runCollect);
+  function maybeRunWeighted() {
+    if (readTotal("adv-wtotal") !== null &&
+        document.getElementById("adv-heavy").value !== "" &&
+        document.getElementById("adv-mult").value !== "" &&
+        document.getElementById("adv-normal").value !== "") runWeighted();
+  }
+  function maybeRunCollect() {
+    if (document.getElementById("adv-per").value !== "" &&
+        document.getElementById("total").value !== "" &&
+        document.getElementById("people").value !== "") runCollect();
+  }
+  ["adv-wtotal", "adv-heavy", "adv-mult", "adv-normal"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", maybeRunWeighted);
+  });
+  document.getElementById("adv-per").addEventListener("input", maybeRunCollect);
+  ["total", "people"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (!weightBox.hidden) maybeRunWeighted();
+      if (!advBox.hidden) maybeRunCollect();
+    });
+  });
+})();
+</script>
+</body>
+</html>

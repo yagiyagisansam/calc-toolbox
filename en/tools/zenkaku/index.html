@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Full-width ⇔ Half-width Converter (Letters, Digits, Symbols, Spaces) | Quick Calc</title>
+  <meta name="description" content="Convert full-width letters, digits, symbols and spaces to half-width in one go, and back again. For when a Japanese form tells you to “enter in half-width” (hankaku), or when you are tidying up a list of names and addresses. Just paste the text.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/zenkaku/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Full-width ⇔ Half-width Converter (Letters, Digits, Symbols, Spaces) | Quick Calc">
+  <meta property="og:description" content="Convert full-width letters, digits, symbols and spaces to half-width in one go, and back again. For when a Japanese form tells you to “enter in half-width” (hankaku), or when you are tidying up a list of names and addresses. Just paste the text.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/zenkaku/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Full-width ⇔ Half-width Converter (Letters, Digits, Symbols, Spaces)","item":"https://quick-calc.site/en/tools/zenkaku/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/zenkaku/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/zenkaku/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/zenkaku/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/zenkaku/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/zenkaku/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Full-width ⇔ Half-width Converter</h1>
+  <form class="tool-form" id="zenkaku-form">
+    <label>Direction
+      <select id="mode">
+        <option value="toHankaku" selected>Full-width → half-width (letters, digits, symbols, spaces)</option>
+        <option value="toZenkaku">Half-width → full-width</option>
+      </select>
+    </label>
+    <label>Text
+      <span class="field-note">Paste your text and the converted result appears right below</span>
+      <textarea id="text" rows="5" placeholder="e.g. TEL:03-1234-5678"></textarea>
+    </label>
+    <button type="submit">Convert</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: convert only selected character types, and check for stray full-width characters</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Choose which character types to convert</h3>
+      <p class="adv-note">Lets you convert only what you need, for example “digits only”. Selecting katakana also enables conversion to and from half-width katakana (ｱｲｳ).</p>
+      <label>Direction
+        <select id="adv-mode">
+          <option value="toHankaku" selected>Full-width → half-width</option>
+          <option value="toZenkaku">Half-width → full-width</option>
+        </select>
+      </label>
+      <fieldset style="border:1px solid var(--color-border);border-radius:8px;padding:8px 12px;">
+        <legend>Character types to convert</legend>
+        <label style="display:inline-block;margin-right:12px;"><input type="checkbox" id="adv-alnum" checked> Letters and digits</label>
+        <label style="display:inline-block;margin-right:12px;"><input type="checkbox" id="adv-kana"> Katakana</label>
+        <label style="display:inline-block;margin-right:12px;"><input type="checkbox" id="adv-symbol" checked> Symbols</label>
+        <label style="display:inline-block;"><input type="checkbox" id="adv-space" checked> Spaces</label>
+      </fieldset>
+      <label>Text
+        <textarea id="adv-text" rows="5" placeholder="e.g. Member No. Ａ１２３ (kana: ｽｽﾞｷ)"></textarea>
+      </label>
+      <button type="button" id="adv-run">Convert only the selected types</button>
+      <div class="tool-result" id="adv-sel-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">Check for stray full-width or half-width katakana characters</h3>
+      <p class="adv-note">Inspects the “Text” box above and lists where any full-width letters, digits, symbols and spaces, or half-width katakana, are hiding.</p>
+      <button type="button" id="adv-check-run">Inspect the text box above</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">What this tool does</span><p>Full-width (zenkaku) characters are the wide versions of letters, digits and symbols that Japanese input methods produce — ＡＢＣ１２３ instead of ABC123 — and although they look similar, a computer treats them as completely different characters from the ordinary half-width (hankaku) ones. Paste your text here and this tool <strong>converts full-width letters, digits, symbols and spaces to half-width</strong> (the reverse direction works too). Hiragana, katakana and kanji are left untouched. Use it for Japanese application forms that say “please enter in half-width”, or to make an address book or name list consistent.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Choose the direction (full-width → half-width, or half-width → full-width).</li>
+    <li>Paste your text and the converted result appears instantly. No button needed.</li>
+    <li>Use the “Copy” button on the result and paste it back where you need it.</li>
+  </ol>
+
+  <h2>How it works</h2>
+  <ul class="method">
+    <li>Full-width letters, digits and symbols (Ａ–／, ！–～) correspond to their half-width forms in a regular way in Unicode (a difference of 0xFEE0). The conversion follows that correspondence, character by character.</li>
+    <li>The full-width space (U+3000) and the half-width space (U+0020) are converted too.</li>
+    <li>Hiragana, katakana and kanji are left as they are (no conversion to so-called half-width katakana in the main form).</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>A purely mechanical conversion based on the Unicode correspondence between full-width and half-width forms (Halfwidth and Fullwidth Forms).</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>The main form does not convert half-width katakana (ｱｲｳ) into full-width katakana.</li>
+    <li>Some fields, such as addresses and names, are required to be in full-width by the organisation you are submitting to. Follow the instructions on the form.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">Why do Japanese forms tell me to “enter in half-width”?</h3>
+  <p class="faq-a">So that the system can process the value internally as a number or as Latin letters. Full-width “１２３” looks similar but consists of different characters, so it may not be treated as a number as it stands.</p>
+  <h3 class="faq-q">Can I turn katakana into half-width (ｶﾀｶﾅ) too?</h3>
+  <p class="faq-a">The main form does not do this. Half-width katakana is a common cause of garbled text, so it is generally avoided nowadays (except in special cases such as some banking forms). Tick “Katakana” under “＋More features” if you do need it.</p>
+  <h3 class="faq-q">Is the text I paste sent anywhere?</h3>
+  <p class="faq-a">No. All conversion happens inside your own device.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/zenkaku/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/zenkaku/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/zenkaku/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=zenkaku">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/zenkaku/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var textEl = document.getElementById("text");
+  function run() {
+    if (textEl.value === "") { box.hidden = true; return; }
+    var mode = document.getElementById("mode").value;
+    var r = ZenkakuCalc[mode](textEl.value);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">The text is too long (up to 100,000 characters).</p>';
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<p>Result (' + r.changed.toLocaleString() + ' characters converted):</p>' +
+      '<textarea id="out" rows="5" style="width:100%;font-size:1rem;padding:10px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-bg);color:var(--color-text);" readonly></textarea>' +
+      '<p><button type="button" id="copy-btn" style="font-size:0.95rem;padding:8px 16px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-bg);color:var(--color-text);cursor:pointer;">Copy</button> <span id="copy-done"></span></p>';
+    document.getElementById("out").value = r.text;
+    document.getElementById("copy-btn").addEventListener("click", function () {
+      navigator.clipboard.writeText(r.text).then(function () {
+        document.getElementById("copy-done").textContent = "Copied";
+      });
+    });
+    box.hidden = false;
+  }
+  textEl.addEventListener("input", run);
+  document.getElementById("mode").addEventListener("change", run);
+  document.getElementById("zenkaku-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var selBox = document.getElementById("adv-sel-result");
+  var TYPE_LABEL = { zen_alnum: "Full-width letter or digit", zen_symbol: "Full-width symbol", zen_space: "Full-width space", han_kana: "Half-width katakana" };
+  function runSel() {
+    if (document.getElementById("adv-text").value === "") { selBox.hidden = true; return; }
+    var targets = {
+      alnum: document.getElementById("adv-alnum").checked,
+      kana: document.getElementById("adv-kana").checked,
+      symbol: document.getElementById("adv-symbol").checked,
+      space: document.getElementById("adv-space").checked
+    };
+    var mode = document.getElementById("adv-mode").value;
+    var r = ZenkakuCalc.convertSelective(document.getElementById("adv-text").value, mode, targets);
+    if (!r.ok) {
+      selBox.innerHTML = '<p class="result-error">The text is too long (up to 100,000 characters).</p>';
+      selBox.hidden = false;
+      return;
+    }
+    selBox.innerHTML =
+      '<p>Result (' + r.changed.toLocaleString() + ' characters converted):</p>' +
+      '<textarea id="adv-out" rows="5" style="width:100%;font-size:1rem;padding:10px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-bg);color:var(--color-text);" readonly></textarea>' +
+      '<p><button type="button" id="adv-copy" style="font-size:0.95rem;padding:8px 16px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-bg);color:var(--color-text);cursor:pointer;">Copy</button> <span id="adv-copy-done"></span></p>';
+    document.getElementById("adv-out").value = r.text;
+    document.getElementById("adv-copy").addEventListener("click", function () {
+      navigator.clipboard.writeText(r.text).then(function () {
+        document.getElementById("adv-copy-done").textContent = "Copied";
+      });
+    });
+    selBox.hidden = false;
+  }
+  document.getElementById("adv-text").addEventListener("input", runSel);
+  document.getElementById("adv-mode").addEventListener("change", runSel);
+  ["adv-alnum", "adv-kana", "adv-symbol", "adv-space"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runSel);
+  });
+  document.getElementById("adv-run").addEventListener("click", runSel);
+  function runCheck() {
+    var r = ZenkakuCalc.findMixed(document.getElementById("text").value);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">The text is too long (up to 100,000 characters).</p>';
+      advBox.hidden = false;
+      return;
+    }
+    if (r.total === 0) {
+      advBox.innerHTML = '<div class="result-main">No full-width characters or half-width katakana found</div>';
+      advBox.hidden = false;
+      return;
+    }
+    var rows = r.items.map(function (it) {
+      return "<tr><td>character " + (it.index + 1).toLocaleString() + "</td><td>“" + it.ch + "”</td><td>" + TYPE_LABEL[it.type] + "</td></tr>";
+    }).join("");
+    advBox.innerHTML =
+      '<div class="result-main">' + r.total.toLocaleString() + ' characters found</div>' +
+      '<p>Breakdown: full-width letters and digits ' + r.counts.zen_alnum.toLocaleString() + ' / full-width symbols ' + r.counts.zen_symbol.toLocaleString() +
+      ' / full-width spaces ' + r.counts.zen_space.toLocaleString() + ' / half-width katakana ' + r.counts.han_kana.toLocaleString() + '</p>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Position</th><th>Character</th><th>Type</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      (r.total > 50 ? '<p class="adv-note">Only the first 50 are listed.</p>' : '');
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-check-run").addEventListener("click", runCheck);
+  document.getElementById("text").addEventListener("input", function () {
+    if (!advBox.hidden) runCheck();
+  });
+})();
+</script>
+</body>
+</html>

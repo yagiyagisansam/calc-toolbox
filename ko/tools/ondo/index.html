@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>온도 변환 계산기(섭씨⇔화씨⇔켈빈) | Quick Calc</title>
+  <meta name="description" content="섭씨(°C)·화씨(°F)·켈빈(K)을 한 번에 상호 변환합니다. 해외 레시피의 오븐 온도, 해외 일기예보, 과학 과제에 활용하세요. 정의식에 따른 정확한 변환입니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/ondo/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="온도 변환 계산기(섭씨⇔화씨⇔켈빈) | Quick Calc">
+  <meta property="og:description" content="섭씨(°C)·화씨(°F)·켈빈(K)을 한 번에 상호 변환합니다. 해외 레시피의 오븐 온도, 해외 일기예보, 과학 과제에 활용하세요. 정의식에 따른 정확한 변환입니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/ondo/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"온도 변환 계산기(섭씨⇔화씨⇔켈빈)","item":"https://quick-calc.site/ko/tools/ondo/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/ondo/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/ondo/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/ondo/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/ondo/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/ondo/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>온도 변환 계산기</h1>
+  <form class="tool-form" id="ondo-form">
+    <span class="field-note">숫자를 입력하면 바로 아래에 변환 결과가 표시됩니다</span>
+    <label>온도
+      <input type="number" id="value" inputmode="decimal" step="any" required placeholder="예: 350">
+    </label>
+    <label>입력한 값의 단위
+      <select id="unit">
+        <option value="c">섭씨(°C)</option>
+        <option value="f" selected>화씨(°F)</option>
+        <option value="k">켈빈(K)</option>
+      </select>
+    </label>
+    <button type="submit">변환하기</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 조견표와 오븐 설정 기준</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">섭씨⇔화씨 조견표 만들기</h3>
+      <p class="adv-note">시작·종료·간격을 정하면 대응표를 만들어 줍니다.</p>
+      <label>시작 온도
+        <input type="number" id="adv-start" inputmode="decimal" step="any" value="300" placeholder="예: 300">
+      </label>
+      <label>종료 온도
+        <input type="number" id="adv-end" inputmode="decimal" step="any" value="450" placeholder="예: 450">
+      </label>
+      <label>간격
+        <input type="number" id="adv-step" inputmode="decimal" step="any" min="0.01" value="25" placeholder="예: 25">
+      </label>
+      <label>입력한 값의 단위
+        <select id="adv-unit">
+          <option value="f" selected>화씨(°F)</option>
+          <option value="c">섭씨(°C)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-run">조견표 만들기</button>
+      <h3 class="adv-h">오븐은 몇 도로 설정하면 되나요?</h3>
+      <p class="adv-note">레시피의 화씨(°F)를 입력하면 일본 오븐에서 맞추기 쉬운 10°C 단위의 기준과, 영국 레시피의 가스마크 상당값을 표시합니다.</p>
+      <label>레시피의 오븐 온도(°F)
+        <input type="number" id="adv-oven-f" inputmode="decimal" min="100" max="600" step="any" value="350" placeholder="예: 350">
+      </label>
+      <button type="button" id="adv-oven-run">설정 온도 기준 보기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>온도 숫자만 입력하면 <strong>섭씨(°C)·화씨(°F)·켈빈(K) 세 가지 값</strong>을 바로 확인할 수 있습니다. 해외 레시피의 오븐 온도(°F)나 미국 일기예보를 일본에서 쓰는 섭씨로 바꾸고 싶을 때 활용해 보세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>온도 값을 입력합니다(소수도 가능).</li>
+    <li>입력한 값의 단위(°C·°F·K)를 선택합니다.</li>
+    <li>입력과 동시에 세 단위의 값이 모두 아래에 표시됩니다. 버튼은 누를 필요 없습니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>화씨(°F) = 섭씨(°C) × 1.8 + 32</strong></li>
+    <li><strong>켈빈(K) = 섭씨(°C) + 273.15</strong></li>
+    <li>계산 예: 오븐의 350°F는 (350 − 32) ÷ 1.8 = <strong>약 177°C</strong></li>
+    <li>절대영도(−273.15°C = −459.67°F = 0K)보다 낮은 온도는 존재하지 않으므로 오류가 표시됩니다.</li>
+  </ul>
+
+  <h3>출처·전제 명시</h3>
+  <ul class="sources">
+    <li>섭씨와 켈빈의 관계(t/°C = T/K − 273.15)는 국제단위계(SI)의 정의에 따릅니다: <a href="https://unit.aist.go.jp/nmij/info/SI_9th/" target="_blank" rel="noopener">일본 산업기술종합연구소 계량표준종합센터 「국제단위계(SI) 제9판」</a>(일본어)</li>
+    <li>화씨 변환식(°F = °C × 9/5 + 32)은 단위의 정의에 근거한 산술 계산입니다.</li>
+  </ul>
+
+  <h2>계산의 전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>표시값은 소수 둘째 자리에서 반올림합니다.</li>
+    <li>화씨는 주로 미국에서 쓰이는 단위입니다. 「화씨 100도」는 약 37.8°C로, 한여름 기온에 해당합니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">화씨 350도(오븐)는 섭씨로 몇 도인가요?</h3>
+  <p class="faq-a">약 177°C입니다. 해외 레시피에서 자주 보이는 온도는 325°F≒163°C, 350°F≒177°C, 375°F≒191°C, 400°F≒204°C입니다. 일본 오븐이라면 180°C 전후로 설정하는 레시피가 여기에 많이 해당합니다.</p>
+  <h3 class="faq-q">화씨와 섭씨가 같은 숫자가 되는 온도가 있나요?</h3>
+  <p class="faq-a">−40도입니다. −40°C = −40°F로 일치합니다. 변환식 F = 1.8C + 32에서 F = C로 두면 C = −40이 되기 때문입니다.</p>
+  <h3 class="faq-q">켈빈은 언제 쓰나요?</h3>
+  <p class="faq-a">물리·화학 계산(기체의 상태방정식 등)에서 쓰는 절대온도의 단위입니다. 0K(절대영도) = −273.15°C가 하한이라 음수 값은 없습니다. 눈금의 간격은 섭씨와 같습니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/ondo/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/ondo/" lang="en" hreflang="en">English</a><a href="/zh/tools/ondo/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=ondo">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/ondo/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var ERROR_MESSAGES = {
+    invalid_value: "온도를 숫자로 입력해 주세요.",
+    invalid_unit: "단위를 선택해 주세요.",
+    below_absolute_zero: "절대영도(−273.15°C / −459.67°F / 0K)보다 낮은 온도는 존재하지 않습니다."
+  };
+  function run(fromSubmit) {
+    var raw = document.getElementById("value").value;
+    if (raw === "") {
+      if (fromSubmit) {
+        box.innerHTML = '<p class="result-error">' + ERROR_MESSAGES.invalid_value + "</p>";
+        box.hidden = false;
+      } else {
+        box.hidden = true;
+      }
+      return;
+    }
+    var v = parseFloat(raw);
+    var r = OndoCalc.convert(v, document.getElementById("unit").value);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "입력값을 확인해 주세요.") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">' + r.c.toLocaleString() + " °C = " + r.f.toLocaleString() + " °F</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>단위</th><th>값</th></tr></thead><tbody>' +
+      "<tr><td>섭씨(°C)</td><td>" + r.c.toLocaleString() + "</td></tr>" +
+      "<tr><td>화씨(°F)</td><td>" + r.f.toLocaleString() + "</td></tr>" +
+      "<tr><td>켈빈(K)</td><td>" + r.k.toLocaleString() + "</td></tr>" +
+      "</tbody></table></div>";
+    box.hidden = false;
+  }
+  document.getElementById("ondo-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+  document.getElementById("value").addEventListener("input", function () { run(false); });
+  document.getElementById("unit").addEventListener("change", function () { run(false); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var ADV_ERRORS = {
+    invalid_value: "숫자를 입력해 주세요.",
+    invalid_unit: "단위를 선택해 주세요.",
+    invalid_range: "종료 온도는 시작 온도 이상으로 해 주세요.",
+    invalid_step: "간격은 0보다 큰 숫자로 해 주세요.",
+    too_many_rows: "행 수가 너무 많습니다(최대 101행). 간격을 더 크게 해 주세요.",
+    below_absolute_zero: "절대영도(−273.15°C / −459.67°F)보다 낮은 온도는 존재하지 않습니다.",
+    out_of_range: "오븐 온도는 100〜600°F 범위로 입력해 주세요."
+  };
+  function advError(code) {
+    advBox.innerHTML = '<p class="result-error">' + (ADV_ERRORS[code] || "입력값을 확인해 주세요.") + "</p>";
+    advBox.hidden = false;
+  }
+  function runTable(fromButton) {
+    if (!fromButton &&
+        (document.getElementById("adv-start").value === "" ||
+         document.getElementById("adv-end").value === "" ||
+         document.getElementById("adv-step").value === "")) { return; }
+    var start = parseFloat(document.getElementById("adv-start").value);
+    var end = parseFloat(document.getElementById("adv-end").value);
+    var step = parseFloat(document.getElementById("adv-step").value);
+    var unit = document.getElementById("adv-unit").value;
+    var r = OndoCalc.makeTable(start, end, step, unit);
+    if (!r.ok) { advError(r.code); return; }
+    var html = '<div class="result-main">조견표(' + r.count.toLocaleString() + '행)</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>섭씨(°C)</th><th>화씨(°F)</th></tr></thead><tbody>';
+    for (var i = 0; i < r.rows.length; i++) {
+      html += "<tr><td>" + r.rows[i].c.toLocaleString() + "</td><td>" + r.rows[i].f.toLocaleString() + "</td></tr>";
+    }
+    html += "</tbody></table></div>";
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  function runOven(fromButton) {
+    if (!fromButton && document.getElementById("adv-oven-f").value === "") { return; }
+    var f = parseFloat(document.getElementById("adv-oven-f").value);
+    var r = OndoCalc.ovenSetting(f);
+    if (!r.ok) { advError(r.code); return; }
+    var html = '<div class="result-main">' + f.toLocaleString() + '°F → 약 ' + r.cOven.toLocaleString() + '°C로 설정</div>' +
+      "<p>정확하게는 " + r.cExact.toLocaleString() + " °C입니다. 일본의 가정용 오븐은 10°C 단위인 기종이 많으므로 <strong>" +
+      r.cOven.toLocaleString() + " °C</strong>를 기준으로 해 주세요.</p>";
+    if (r.gasMark !== null) {
+      html += '<p class="adv-note">영국 레시피의 가스마크로는 Mark ' + r.gasMark + '에 해당합니다.</p>';
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", function () { runTable(true); });
+  document.getElementById("adv-oven-run").addEventListener("click", function () { runOven(true); });
+  ["adv-start", "adv-end", "adv-step"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runTable(false); });
+  });
+  document.getElementById("adv-unit").addEventListener("change", function () { runTable(false); });
+  document.getElementById("adv-oven-f").addEventListener("input", function () { runOven(false); });
+})();
+</script>
+</body>
+</html>

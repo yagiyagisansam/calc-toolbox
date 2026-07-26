@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Overtime Pay Calculator (Japan, Statutory Premium Rates) | Quick Calc</title>
+  <meta name="description" content="Calculate your overtime pay in Japan for free from your base hourly wage and overtime hours. Covers the statutory premium rates — 25% for overtime, 50% above 60 hours a month, 35% on a statutory holiday and +25% for late-night work — and converts a monthly salary into an hourly rate.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/zangyo/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Overtime Pay Calculator (Japan, Statutory Premium Rates) | Quick Calc">
+  <meta property="og:description" content="Calculate your overtime pay in Japan for free from your base hourly wage and overtime hours. Covers the statutory premium rates — 25% for overtime, 50% above 60 hours a month, 35% on a statutory holiday and +25% for late-night work — and converts a monthly salary into an hourly rate.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/zangyo/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Overtime Pay Calculator (Japan)","item":"https://quick-calc.site/en/tools/zangyo/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/zangyo/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/zangyo/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/zangyo/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/zangyo/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/zangyo/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Overtime Pay Calculator (Japan)</h1>
+  <form class="tool-form" id="hourly-form">
+    <label>Get your base hourly wage from a monthly salary (if you already know your hourly wage, skip to the next form)
+      <span class="field-note">The monthly salary here is the amount the premium is calculated on (base pay + position allowance and the like). Family, commuting and housing allowances and similar are excluded.</span>
+    </label>
+    <label>Monthly salary (yen)
+      <input type="number" id="monthly" inputmode="numeric" step="1" min="50000" max="10000000" placeholder="300000">
+    </label>
+    <label>Average scheduled working hours per month
+      <span class="field-note">e.g. 160. You can work it out as (365 − annual days off) × scheduled hours per day ÷ 12</span>
+      <input type="number" id="avg-hours" inputmode="decimal" step="any" min="100" max="200" placeholder="160">
+    </label>
+    <button type="submit">Convert to an hourly wage</button>
+    <div class="tool-result" id="result-hourly" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="zangyo-form">
+    <label>Base hourly wage (yen)
+      <input type="number" id="hourly" inputmode="decimal" step="any" min="500" max="50000" placeholder="1875" required>
+    </label>
+    <label>Overtime work (the part within 60 hours a month, in hours)
+      <input type="number" id="ot" inputmode="decimal" step="any" min="0" max="200" value="0">
+    </label>
+    <label>Overtime work above 60 hours a month (hours)
+      <input type="number" id="ot60" inputmode="decimal" step="any" min="0" max="200" value="0">
+    </label>
+    <label>Work on a statutory holiday (hours)
+      <span class="field-note">Hours worked on the one statutory day off per week</span>
+      <input type="number" id="holiday" inputmode="decimal" step="any" min="0" max="200" value="0">
+    </label>
+    <label>Late-night work (10 p.m.–5 a.m., hours)
+      <span class="field-note">This calculates the extra portion (+25%). Hours that overlap with overtime or holiday work can be entered here too</span>
+      <input type="number" id="night" inputmode="decimal" step="any" min="0" max="200" value="0">
+    </label>
+    <button type="submit">Calculate overtime pay</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: calculate from a monthly total, check for unpaid overtime</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Detailed calculation from your total overtime hours</h3>
+      <p class="adv-note">Just enter your total overtime for the month, and the part above 60 hours (premium 50%) is split out and calculated automatically (using the base hourly wage in the form above).</p>
+      <label>Total overtime hours for the month
+        <span class="field-note">Up to 60 hours is calculated at 25%, and anything above that automatically at 50%</span>
+        <input type="number" id="adv-ot-total" inputmode="decimal" step="any" min="0" max="200" placeholder="70">
+      </label>
+      <label>Work on a statutory holiday (hours; 0 if none)
+        <input type="number" id="adv-holiday" inputmode="decimal" step="any" min="0" max="200" value="0">
+      </label>
+      <label>Late-night work (10 p.m.–5 a.m., hours; 0 if none)
+        <input type="number" id="adv-night" inputmode="decimal" step="any" min="0" max="200" value="0">
+      </label>
+      <h3 class="adv-h">Unpaid overtime check (optional)</h3>
+      <p class="adv-note">Enter the overtime pay shown on your payslip and the difference from the statutory minimum (an estimate of any shortfall) is displayed.</p>
+      <label>Overtime pay actually paid (yen)
+        <input type="number" id="adv-paid" inputmode="numeric" step="1" min="0" max="10000000" placeholder="50000">
+      </label>
+      <button type="button" id="adv-run">Run the detailed calculation</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    This tool gives an approximation using the <strong>statutory minimum premium rates</strong>. If your company work rules set higher rates, or if a variable working hours system, a fixed overtime allowance (minashi zangyo) or the treatment of managerial staff applies, the actual amount will differ. If you suspect unpaid overtime, consult a Labour Standards Inspection Office or a professional.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Enter the overtime you worked and see <strong>how much overtime pay you should be getting</strong>. The extra for late-night hours (10 p.m.–5 a.m.) and for work on a holiday is included, calculated at the minimum premium rates laid down by <strong>Japan’s Labor Standards Act</strong>. Handy for checking the overtime line on your Japanese payslip (給与明細).</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>If you do not know your hourly wage, enter your monthly salary and average scheduled monthly hours — the base hourly wage is calculated automatically and filled into the field below.</li>
+    <li>Enter the breakdown of your overtime (overtime, above 60 hours, statutory holiday, late night) in hours.</li>
+    <li>The amount and its breakdown update automatically as you type (the button works as well).</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <p>The calculation uses the minimum premium rates set by the Labor Standards Act.</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>Statutory premium wage rates</caption>
+      <thead><tr><th>Type</th><th>Premium rate</th><th>Calculation</th></tr></thead>
+      <tbody>
+        <tr><td>Overtime work (beyond the statutory 8 hours a day / 40 hours a week)</td><td>25% or more</td><td>hourly wage × 1.25 × hours</td></tr>
+        <tr><td>Overtime work (the part above 60 hours a month)</td><td>50% or more</td><td>hourly wage × 1.5 × hours</td></tr>
+        <tr><td>Work on a statutory holiday</td><td>35% or more</td><td>hourly wage × 1.35 × hours</td></tr>
+        <tr><td>Late-night work (10 p.m.–5 a.m.)</td><td>25% or more, added on</td><td>hourly wage × 0.25 × hours (the extra portion)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Example: at 1,500 yen an hour with 20 hours of overtime → 1,500 × 1.25 × 20 = <strong>37,500 yen</strong></p>
+
+  <h3>Sources (primary information)</h3>
+  <ul class="sources">
+    <li>Labor Standards Act, Article 37 (25% for overtime, 50% above 60 hours a month, and the late-night premium) — in Japanese<br>
+      <a href="https://laws.e-gov.go.jp/law/322AC0000000049" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/322AC0000000049</a> (accessed July 18, 2026)</li>
+    <li>Cabinet Order Setting the Minimum Rates of Premium Wages under Article 37, Paragraph 1 of the Labor Standards Act (35% for statutory holidays) — in Japanese<br>
+      <a href="https://laws.e-gov.go.jp/law/406CO0000000005" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/406CO0000000005</a> (accessed July 18, 2026)</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>The “base hourly wage” is the basis on which premium wages are calculated. Family allowance, commuting allowance, separation allowance, child education allowance, housing allowance, temporary wages and bonuses are excluded from it.</li>
+    <li>For late-night work, only “the +25% extra portion” is shown (the basic wage for those hours is already included in your ordinary pay). If hours are both overtime and late night, entering the same hours in the overtime field and the late-night field gives a total equivalent to 1.5 times.</li>
+    <li>If your scheduled working hours are shorter than the statutory 8 hours, the resulting “within-statutory overtime” needs no premium, so it differs from this calculation.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">What if I have a fixed overtime allowance (minashi zangyo)?</h3>
+  <p class="faq-a">Check how many hours the fixed allowance is meant to cover; any overtime beyond that has to be paid on top. Calculate the amount for your actual overtime with this tool and compare it with the fixed allowance.</p>
+  <h3 class="faq-q">Is working on a Saturday holiday work at 35%?</h3>
+  <p class="faq-a">The 35% rate applies only to work on the one “statutory holiday” per week. With a two-day weekend, usually one day is the statutory holiday and the other is a company day off (in which case the 25% overtime rate normally applies). Check your company work rules to see which day is the statutory holiday.</p>
+  <h3 class="faq-q">Do part-time and casual workers get overtime pay too?</h3>
+  <p class="faq-a">Yes. Regardless of employment type, work beyond the statutory working hours (8 hours a day, 40 hours a week) is subject to premium wages.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/zangyo/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/zangyo/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/zangyo/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=zangyo">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/zangyo/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var hourlyBox = document.getElementById("result-hourly");
+  var ERROR_MESSAGES = {
+    invalid_hourly: "Enter a base hourly wage between 500 and 50,000 yen.",
+    invalid_hours: "Enter a number of hours between 0 and 200.",
+    invalid_monthly: "Enter a monthly salary between 50,000 and 10,000,000 yen.",
+    invalid_avg_hours: "Enter average scheduled monthly hours between 100 and 200."
+  };
+  function raw(id) { return document.getElementById(id).value; }
+  function showError(target, code) {
+    target.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "Check the entered values.") + "</p>";
+    target.hidden = false;
+  }
+  function runZangyo() {
+    if (raw("hourly") === "") { box.hidden = true; return; }
+    var num = function (id) { return parseFloat(raw(id) || "0"); };
+    var r = ZangyoCalc.calculate(num("hourly"), num("ot"), num("ot60"), num("holiday"), num("night"));
+    if (!r.ok) { showError(box, r.code); return; }
+    box.innerHTML =
+      '<div class="result-main">Overtime pay: about ' + r.totalPay.toLocaleString() + " yen a month</div>" +
+      "<p>Breakdown — Overtime (×1.25): <strong>" + r.overtimePay.toLocaleString() + " yen</strong>" +
+      (r.overtime60Pay ? " / Above 60 hours (×1.5): <strong>" + r.overtime60Pay.toLocaleString() + " yen</strong>" : "") +
+      (r.holidayPay ? " / Statutory holiday (×1.35): <strong>" + r.holidayPay.toLocaleString() + " yen</strong>" : "") +
+      (r.lateNightExtra ? " / Late-night extra (+0.25): <strong>" + r.lateNightExtra.toLocaleString() + " yen</strong>" : "") + "</p>";
+    box.hidden = false;
+  }
+  function runHourlyFromMonthly() {
+    if (raw("monthly") === "" || raw("avg-hours") === "") { hourlyBox.hidden = true; return; }
+    var r = ZangyoCalc.hourlyFromMonthly(parseFloat(raw("monthly")), parseFloat(raw("avg-hours")));
+    if (!r.ok) { showError(hourlyBox, r.code); return; }
+    var hourlyInput = document.getElementById("hourly");
+    hourlyInput.value = r.hourlyYen;
+    hourlyBox.innerHTML = '<div class="result-main">Base hourly wage: about ' + r.hourlyYen.toLocaleString() + " yen</div><p>It has been filled into the overtime calculation field below.</p>";
+    hourlyBox.hidden = false;
+    hourlyInput.dispatchEvent(new Event("input"));
+  }
+  ["monthly", "avg-hours"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runHourlyFromMonthly);
+  });
+  ["hourly", "ot", "ot60", "holiday", "night"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runZangyo);
+  });
+  document.getElementById("hourly-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (raw("monthly") === "" || raw("avg-hours") === "") {
+      showError(hourlyBox, raw("monthly") === "" ? "invalid_monthly" : "invalid_avg_hours");
+      return;
+    }
+    runHourlyFromMonthly();
+  });
+  document.getElementById("zangyo-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (raw("hourly") === "") { showError(box, "invalid_hourly"); return; }
+    runZangyo();
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var ADV_ERRORS = {
+    invalid_hourly: "Enter a base hourly wage between 500 and 50,000 yen (in the form above).",
+    invalid_hours: "Enter a number of hours between 0 and 200.",
+    invalid_paid: "Enter an amount of overtime pay between 0 and 10,000,000 yen."
+  };
+  function runAdv() {
+    var hourly = parseFloat(document.getElementById("hourly").value);
+    var otTotal = parseFloat(document.getElementById("adv-ot-total").value);
+    if (isNaN(otTotal)) otTotal = 0;
+    var holiday = parseFloat(document.getElementById("adv-holiday").value);
+    if (isNaN(holiday)) holiday = 0;
+    var night = parseFloat(document.getElementById("adv-night").value);
+    if (isNaN(night)) night = 0;
+    var paidStr = document.getElementById("adv-paid").value;
+    var paid = paidStr === "" ? undefined : parseFloat(paidStr);
+    var r = ZangyoCalc.calculateDetailed(hourly, otTotal, holiday, night, paid);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + (ADV_ERRORS[r.code] || "Check the entered values.") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    var html =
+      '<div class="result-main">Overtime pay (statutory minimum): about ' + r.totalPay.toLocaleString() + ' yen</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead>' +
+      '<tr><th>Breakdown</th><th>Hours</th><th>Premium rate</th><th>Amount</th></tr></thead><tbody>' +
+      '<tr><td>Overtime (within 60 hours)</td><td>' + r.within60Hours.toLocaleString() + ' h</td><td>25%</td><td>' + r.overtimePay.toLocaleString() + ' yen</td></tr>' +
+      '<tr><td>Overtime (above 60 hours)</td><td>' + r.over60Hours.toLocaleString() + ' h</td><td>50%</td><td>' + r.overtime60Pay.toLocaleString() + ' yen</td></tr>' +
+      '<tr><td>Statutory holiday</td><td>' + holiday.toLocaleString() + ' h</td><td>35%</td><td>' + r.holidayPay.toLocaleString() + ' yen</td></tr>' +
+      '<tr><td>Late-night extra (10 p.m.–5 a.m.)</td><td>' + night.toLocaleString() + ' h</td><td>+25%</td><td>' + r.lateNightExtra.toLocaleString() + ' yen</td></tr>' +
+      '</tbody></table></div>';
+    if (r.shortfallYen !== undefined) {
+      if (r.shortfallYen > 0) {
+        html += '<p>Difference from the amount paid: <strong>about ' + r.shortfallYen.toLocaleString() + ' yen short (estimate)</strong>. This changes with the premium rates in your work rules and how allowances are treated, so if you are concerned, consult a Labour Standards Inspection Office or a professional.</p>';
+      } else {
+        html += '<p>The amount paid is <strong>' + Math.abs(r.shortfallYen).toLocaleString() + ' yen above</strong> the statutory minimum (no shortfall within this breakdown).</p>';
+      }
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", runAdv);
+  function autoAdv() {
+    if (document.getElementById("hourly").value !== "" && document.getElementById("adv-ot-total").value !== "") {
+      runAdv();
+    } else {
+      advBox.hidden = true;
+    }
+  }
+  ["adv-ot-total", "adv-holiday", "adv-night", "adv-paid", "hourly"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoAdv);
+  });
+})();
+</script>
+</body>
+</html>

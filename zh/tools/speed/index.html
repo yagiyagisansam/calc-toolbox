@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>速度·时间·距离计算器(输入两个算出第三个) | Quick Calc</title>
+  <meta name="description" content="速度(km/h)·距离(km)·时间三者中输入两个,免费自动算出剩下的一个。「时速80km跑150km要几小时?」这类问题一键得出答案。还能计算到达时刻·出发时刻,以及时速换算分速·秒速。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/speed/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="速度·时间·距离计算器(输入两个算出第三个) | Quick Calc">
+  <meta property="og:description" content="速度(km/h)·距离(km)·时间三者中输入两个,免费自动算出剩下的一个。「时速80km跑150km要几小时?」这类问题一键得出答案。还能计算到达时刻·出发时刻,以及时速换算分速·秒速。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/speed/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"速度·时间·距离计算器","item":"https://quick-calc.site/zh/tools/speed/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/speed/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/speed/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/speed/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/speed/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/speed/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>速度·时间·距离计算器</h1>
+  <form class="tool-form" id="speed-form">
+    <p style="margin:0;font-size:0.88rem;color:var(--color-muted);">三者中输入<strong>两个</strong>,剩下的一个会立即自动计算并显示在下方</p>
+    <label>速度(km/h)
+      <input type="number" id="speed" inputmode="decimal" min="0" step="any" placeholder="例: 80">
+    </label>
+    <label>距离(km)
+      <input type="number" id="distance" inputmode="decimal" min="0" step="any" placeholder="例: 150">
+    </label>
+    <label>时间(分钟)
+      <span class="field-note">1小时30分请输入90</span>
+      <input type="number" id="time" inputmode="decimal" min="0" step="any" placeholder="例: 112">
+    </label>
+    <button type="submit">计算剩下的一个</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 到达时刻·出发时刻·分速/秒速</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">几点能到? 计算到达时刻</h3>
+      <p class="adv-note">根据出发时刻·距离·速度(平均时速),计算包含休息时间在内的预计到达时刻。</p>
+      <label>出发时刻
+        <input type="time" id="adv-dep-time" value="09:00">
+      </label>
+      <label>距离(km)
+        <input type="number" id="adv-dist" inputmode="decimal" min="0.1" max="100000" step="any" value="150" placeholder="例: 150">
+      </label>
+      <label>速度(平均时速 km/h)
+        <input type="number" id="adv-speed" inputmode="decimal" min="0.1" max="5000" step="any" value="80" placeholder="例: 80">
+      </label>
+      <label>休息时间合计(分钟)
+        <input type="number" id="adv-break" inputmode="numeric" min="0" max="100000" step="1" value="0" placeholder="例: 20">
+      </label>
+      <button type="button" id="adv-arr-run">计算到达时刻</button>
+      <h3 class="adv-h">几点出发才行? 反推</h3>
+      <p class="adv-note">从想到达的时刻反推应该出发的时刻(距离·速度·休息使用上面栏目的值)。</p>
+      <label>想到达的时刻
+        <input type="time" id="adv-arr-time" value="12:00">
+      </label>
+      <button type="button" id="adv-dep-run">反推出发时刻</button>
+      <h3 class="adv-h">把时速换成分速·秒速</h3>
+      <p class="adv-note">理科作业中常用的「时速→分速·秒速(m/s)」换算。</p>
+      <label>时速(km/h)
+        <input type="number" id="adv-kmh" inputmode="decimal" min="0.1" max="5000" step="any" placeholder="例: 60">
+      </label>
+      <button type="button" id="adv-unit-run">换成分速·秒速</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>速度·距离·时间三者中<strong>只要输入两个,剩下的一个</strong>就立即算出。像「时速80km到150km外要几小时?」这样的计算,直接套用学校学过的基本关系式。适合作业验算和自驾行程规划。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>输入已知的两个值(速度·距离·时间中的任意两个)。</li>
+    <li>剩下的一个保持空白。</li>
+    <li>输入第二个的瞬间,三个值全部显示在下方,无需点击按钮。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>距离 = 速度 × 时间</strong> / <strong>速度 = 距离 ÷ 时间</strong> / <strong>时间 = 距离 ÷ 速度</strong></li>
+    <li>计算例: 时速80km行驶150km → 150 ÷ 80 = 1.875小时 = <strong>约1小时53分</strong></li>
+    <li>时间的输入统一使用「分钟」(1小时30分=90分钟)。</li>
+  </ul>
+
+  <h3>出处与前提的说明</h3>
+  <ul class="sources">
+    <li>基于速度的定义(距离÷时间)进行的算术计算。</li>
+  </ul>
+
+  <h2>计算的前提与注意</h2>
+  <ul class="cautions">
+    <li>实际移动中有信号灯·休息·堵车,所以不会正好按计算的时间到达。规划自驾行程时,把平均时速估得保守一些(高速约80km/h、普通道路约30km/h)比较现实。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">日本说的「はじき」是什么?</h3>
+  <p class="faq-a">这是日本学校里用圆形图记忆速度(は)·时间(じ)·距离(き)三者关系的方法。只要记住「距离=速度×时间」这一个式子,剩下两个用除法就能得出。</p>
+  <h3 class="faq-q">怎么换成分速·秒速?</h3>
+  <p class="faq-a">时速除以60是分速,除以3600是秒速(以km为单位)。时速60km=分速1km=秒速约16.7m。</p>
+  <h3 class="faq-q">能计算跑步配速(每1km几分钟)吗?</h3>
+  <p class="faq-a">本工具以时速为基础。想从时速得出配速,用60除以时速即可: 时速12km时,配速为 60 ÷ 12 = 每公里5分钟。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/speed/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/speed/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/speed/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=speed">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/speed/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var MSG = {
+    invalid_input: "三者中请正好输入两个(剩下一个留空)。",
+    invalid_value: "请输入大于0的数值。"
+  };
+  function run(fromSubmit) {
+    var g = {};
+    var filled = 0;
+    var s = document.getElementById("speed").value;
+    var d = document.getElementById("distance").value;
+    var t = document.getElementById("time").value;
+    if (s !== "") { g.speedKmh = parseFloat(s); filled++; }
+    if (d !== "") { g.distanceKm = parseFloat(d); filled++; }
+    if (t !== "") { g.timeMin = parseFloat(t); filled++; }
+    if (!fromSubmit && filled < 2) { box.hidden = true; return; }
+    var r = SpeedCalc.solve(g);
+    if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "请检查输入的数值。") + "</p>"; box.hidden = false; return; }
+    box.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>速度</td><td><strong>" + r.speedKmh.toLocaleString() + " km/h</strong></td></tr>" +
+      "<tr><td>距离</td><td><strong>" + r.distanceKm.toLocaleString() + " km</strong></td></tr>" +
+      "<tr><td>时间</td><td><strong>" + r.timeH + "小时" + r.timeM + "分</strong>(" + r.timeMin.toLocaleString() + "分钟)</td></tr>" +
+      "</tbody></table></div>";
+    box.hidden = false;
+  }
+  document.getElementById("speed-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+  ["speed", "distance", "time"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { run(false); });
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advReadCommon() {
+    var d = parseFloat(document.getElementById("adv-dist").value);
+    var s = parseFloat(document.getElementById("adv-speed").value);
+    var b = parseFloat(document.getElementById("adv-break").value);
+    if (isNaN(b)) b = 0;
+    return { d: d, s: s, b: b };
+  }
+  function advParseTime(id) {
+    var v = document.getElementById(id).value;
+    var m = v.match(/^(\d{1,2}):(\d{2})$/);
+    if (!m) return null;
+    return { h: parseInt(m[1], 10), m: parseInt(m[2], 10) };
+  }
+  function advPad(n) { return (n < 10 ? "0" : "") + n; }
+  function advDur(min) {
+    var h = Math.floor(min / 60);
+    var m = min % 60;
+    return (h > 0 ? h + "小时" : "") + (m > 0 || h === 0 ? m + "分" : "");
+  }
+  function advFail(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function runArrival(fromButton) {
+    var t = advParseTime("adv-dep-time");
+    if (!t) { if (fromButton) { advFail("请输入出发时刻。"); } return; }
+    var c = advReadCommon();
+    if (!fromButton && (isNaN(c.d) || isNaN(c.s))) { return; }
+    var r = SpeedCalc.arrival(t.h, t.m, c.d, c.s, c.b);
+    if (!r.ok) { advFail("请正确输入距离·速度·休息时间。"); return; }
+    advBox.innerHTML =
+      '<div class="result-main">' + (r.daysLater > 0 ? "次日 " : "") + r.arriveH + ":" + advPad(r.arriveM) + ' 预计到达</div>' +
+      "<p>移动 " + advDur(r.travelMin) + (c.b > 0 ? " + 休息 " + advDur(Math.round(c.b)) : "") +
+      " = 合计需要 <strong>" + advDur(r.totalMin) + "</strong>。" +
+      (r.daysLater > 1 ? "(" + r.daysLater + "天后到达)" : "") + "</p>" +
+      '<p class="adv-note">这是不含信号灯和堵车的粗略估算。</p>';
+    advBox.hidden = false;
+  }
+  function runDeparture(fromButton) {
+    var t = advParseTime("adv-arr-time");
+    if (!t) { if (fromButton) { advFail("请输入想到达的时刻。"); } return; }
+    var c = advReadCommon();
+    if (!fromButton && (isNaN(c.d) || isNaN(c.s))) { return; }
+    var r = SpeedCalc.departure(t.h, t.m, c.d, c.s, c.b);
+    if (!r.ok) { advFail("请正确输入距离·速度·休息时间。"); return; }
+    advBox.innerHTML =
+      '<div class="result-main">' + (r.prevDay ? "前一天 " : "") + r.depH + ":" + advPad(r.depM) + ' 出发</div>' +
+      "<p>所需时间合计 <strong>" + advDur(r.totalMin) + "</strong>(移动 " + advDur(r.travelMin) +
+      (c.b > 0 ? " + 休息 " + advDur(Math.round(c.b)) : "") + ")。</p>";
+    advBox.hidden = false;
+  }
+  function runUnits(fromButton) {
+    if (!fromButton && document.getElementById("adv-kmh").value === "") { return; }
+    var kmh = parseFloat(document.getElementById("adv-kmh").value);
+    var r = SpeedCalc.speedUnits(kmh);
+    if (!r.ok) { advFail("时速请输入大于0的数值。"); return; }
+    advBox.innerHTML =
+      '<div class="result-main">时速' + kmh.toLocaleString() + "km = 秒速" +
+      r.mPerSec.toLocaleString(undefined, { maximumFractionDigits: 2 }) + "m</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>分速</td><td>" + r.mPerMin.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " m/分</td></tr>" +
+      "<tr><td>秒速</td><td>" + r.mPerSec.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " m/s</td></tr>" +
+      "</tbody></table></div>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-arr-run").addEventListener("click", function () { runArrival(true); });
+  document.getElementById("adv-dep-run").addEventListener("click", function () { runDeparture(true); });
+  document.getElementById("adv-unit-run").addEventListener("click", function () { runUnits(true); });
+  document.getElementById("adv-dep-time").addEventListener("change", function () { runArrival(false); });
+  ["adv-dist", "adv-speed", "adv-break"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runArrival(false); });
+  });
+  document.getElementById("adv-arr-time").addEventListener("change", function () { runDeparture(false); });
+  document.getElementById("adv-kmh").addEventListener("input", function () { runUnits(false); });
+})();
+</script>
+</body>
+</html>

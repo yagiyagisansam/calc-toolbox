@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Japanese School Grade Calculator — Grade from Date of Birth | Quick Calc</title>
+  <meta name="description" content="Enter a date of birth and see which grade a child is in at a Japanese school right now, from elementary Grade 1 to high school Grade 3. Free tool that also shows the entrance and graduation years, whether the birthday is an early-birthday (hayaumare) case, and which birth dates belong to each grade.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/gakunen/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Japanese School Grade Calculator — Grade from Date of Birth | Quick Calc">
+  <meta property="og:description" content="Enter a date of birth and see which grade a child is in at a Japanese school right now, from elementary Grade 1 to high school Grade 3. Free tool that also shows the entrance and graduation years, whether the birthday is an early-birthday (hayaumare) case, and which birth dates belong to each grade.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/gakunen/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Japanese School Grade Calculator","item":"https://quick-calc.site/en/tools/gakunen/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/gakunen/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/gakunen/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/gakunen/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/gakunen/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/gakunen/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Japanese School Grade Calculator</h1>
+  <form class="tool-form" id="gakunen-form">
+    <span class="field-note">Pick a date of birth and the current grade appears just below</span>
+    <div class="field-row">
+      <label>Year of birth
+        <select id="b-year"></select>
+      </label>
+      <label>Month
+        <select id="b-month"></select>
+      </label>
+      <label>Day
+        <select id="b-day"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: birth dates for a grade, and a full list for that school year</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Find the birth dates from a grade</h3>
+      <p class="adv-note">Shows which children are in, for example, Grade 1 of elementary school. Useful when a notice from the school gives only the grade.</p>
+      <div class="field-row">
+        <label>School year (starts in April)
+          <select id="r-year"></select>
+        </label>
+        <label>Grade
+          <select id="r-grade"></select>
+        </label>
+      </div>
+      <div class="tool-result" id="adv-reverse" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">All grades and birth dates for that school year</h3>
+      <p class="adv-note">A table from elementary Grade 1 to high school Grade 3 for the school year selected above.</p>
+      <div class="tool-result" id="adv-table" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    This is the grade for a child who has moved up one grade per year in the standard way. Repeating a year, skipping a grade or transferring from a school abroad can make the actual grade different. <strong>For anything about school enrolment, check with the board of education of the city, ward, town or village where you live.</strong>
+  </div>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Enter a date of birth and see <strong>which grade the child would be in at a Japanese school today</strong>. This is based on the Japanese school system: the school year starts in April, and <strong>children born from April 2 to April 1 of the following year</strong> are all in the same grade (children born from January 1 to April 1 are called <em>hayaumare</em> and go into the grade above). Handy for school procedures and for writing a grade on a form.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Choose the year, month and day of birth. The current grade appears immediately below.</li>
+    <li>The entrance and graduation years for that school stage, and whether the birthday is a <em>hayaumare</em> one, are shown as well.</li>
+    <li>To go the other way and find the birth dates for a grade, open “＋More features”.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Where the grades are divided</strong>: The school year begins on April 1 and ends on March 31 of the following year (Regulation for Enforcement of the School Education Act, Article 59). A child starts elementary school at the beginning of the first school year that comes on or after the day following the day they turn 6 (School Education Act, Article 17).</li>
+    <li><strong>Why children born on April 1 go into the higher grade</strong>: Age increases at the end of the day before the birthday (Act on Calculation of Age; Civil Code, Article 143), so a child born on April 1 turns 6 on March 31 and starts school in April of that year.</li>
+    <li><strong>Children in the same grade</strong>: born from April 2 to April 1 of the following year.</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>School stages and grades (with standard progression)</caption>
+      <thead><tr><th>Stage</th><th>Grades</th><th>Age at entry</th></tr></thead>
+      <tbody>
+        <tr><td>Elementary school</td><td>Grade 1 to Grade 6</td><td>6</td></tr>
+        <tr><td>Junior high school</td><td>Grade 1 to Grade 3</td><td>12</td></tr>
+        <tr><td>High school</td><td>Grade 1 to Grade 3</td><td>15</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Sources (primary information)</h3>
+  <ul class="sources">
+    <li>School Education Act (Act No. 26 of 1947), Article 17 (obligation to send a child to school) — official text, in Japanese<br>
+      <a href="https://laws.e-gov.go.jp/law/322AC0000000026" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/322AC0000000026</a> (accessed July 26, 2026)</li>
+    <li>Regulation for Enforcement of the School Education Act (Ministry of Education Ordinance No. 11 of 1947), Article 59 (the school year begins on April 1 and ends on March 31 of the following year) — official text, in Japanese<br>
+      <a href="https://laws.e-gov.go.jp/law/322M40000080011" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/322M40000080011</a> (accessed July 26, 2026)</li>
+    <li>Act on Calculation of Age (Act No. 50 of 1902) — official text, in Japanese<br>
+      <a href="https://laws.e-gov.go.jp/law/135AC0000000050" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/135AC0000000050</a> (accessed July 26, 2026)</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>The grade assumes standard progression. It differs if the child repeats a year, skips a grade or takes a leave of absence.</li>
+    <li>Compulsory education is nine years: six years of elementary school and three years of junior high school. High school is not compulsory education.</li>
+    <li>When a child transfers from a school abroad, a Japanese school does not necessarily place them in the grade that matches their age. It is decided in consultation with the school and the board of education, taking things such as their level of Japanese into account.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">What does “hayaumare” mean?</h3>
+  <p class="faq-a">It means being born between January 1 and April 1. Such children are one grade above children born on or after April 2 of the same calendar year, so they are the youngest ones within their grade.</p>
+  <h3 class="faq-q">Why does the Japanese school year start in April?</h3>
+  <p class="faq-a">Because the law (the Regulation for Enforcement of the School Education Act) sets the school year as beginning on April 1 and ending on March 31 of the following year. If you come from a country where the year starts in September, there is a six-month gap, so you need to discuss the timing of the transfer.</p>
+  <h3 class="faq-q">Can children of foreign nationality attend Japanese schools?</h3>
+  <p class="faq-a">Yes. Children of foreign nationality are not under the obligation to attend school, but if they wish to, they are accepted free of charge at public elementary and junior high schools (policy of the Ministry of Education, Culture, Sports, Science and Technology). The board of education of the city, ward, town or village where you live handles the procedure.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/gakunen/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/gakunen/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/gakunen/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=gakunen">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/gakunen/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var today = new Date();
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  var TODAY_ISO = today.getFullYear() + "-" + pad(today.getMonth() + 1) + "-" + pad(today.getDate());
+  var THIS_SY = today.getMonth() + 1 >= 4 ? today.getFullYear() : today.getFullYear() - 1;
+
+  var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  var STAGE_EN = { elementary: "Elementary School", juniorhigh: "Junior High School", highschool: "High School" };
+
+  // Build the grade label from the stage and the grade within that stage
+  function stageNameOf(overall) {
+    return overall <= 6 ? STAGE_EN.elementary : (overall <= 9 ? STAGE_EN.juniorhigh : STAGE_EN.highschool);
+  }
+  function gradeLabelOf(overall) {
+    if (overall <= 6) return STAGE_EN.elementary + " Grade " + overall;
+    if (overall <= 9) return STAGE_EN.juniorhigh + " Grade " + (overall - 6);
+    return STAGE_EN.highschool + " Grade " + (overall - 9);
+  }
+  function resultLabel(r) {
+    if (r.stage === "preschool") return "Not yet in school";
+    if (r.stage === "graduated") return "After high school";
+    return gradeLabelOf(r.overallGrade);
+  }
+
+  function fillSelect(el, from, to, selected, texts) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + (texts ? texts[v - from] : v) + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+
+  // ---- Basic: date of birth -> current grade ----
+  var box = document.getElementById("result");
+  fillSelect(document.getElementById("b-year"), 1950, today.getFullYear(), today.getFullYear() - 10);
+  fillSelect(document.getElementById("b-month"), 1, 12, 4, MONTHS);
+  fillSelect(document.getElementById("b-day"), 1, 31, 1);
+
+  function run() {
+    var y = val("b-year"), m = val("b-month");
+    var keep = val("b-day");
+    var max = daysInMonth(y, m);
+    fillSelect(document.getElementById("b-day"), 1, max, Math.min(keep, max));
+    var d = val("b-day");
+    var birth = y + "-" + pad(m) + "-" + pad(d);
+    var r = GakunenCalc.gradeOn(birth, TODAY_ISO);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' +
+        (r.code === "invalid_order" ? "That date has not arrived yet." : "Please check the date.") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var html = '<div class="result-main">School year ' + r.schoolYear + ": " + resultLabel(r) + "</div>";
+    if (r.stage === "preschool") {
+      var c = (m > 4 || (m === 4 && d >= 2)) ? y : y - 1;
+      html += "<p>Elementary school is expected to start in <strong>April " + (c + 7) + "</strong>.</p>";
+    } else if (r.stage === "graduated") {
+      html += "<p>This is past high-school age. To see which birth dates belong to each grade, open “＋More features” above.</p>";
+    } else {
+      var t = GakunenCalc.stageTerm(r.schoolYear, r.overallGrade);
+      html += "<p>" + stageNameOf(r.overallGrade) + ": <strong>entrance in April " + t.entryYear +
+        ", graduation in March " + t.gradYear + "</strong> (expected).</p>";
+    }
+    html += "<p>" + (r.hayaumare ? "This date of birth is <strong>hayaumare</strong> (born between January 1 and April 1)." :
+      "This is not hayaumare (born between April 2 and December 31).") + "</p>";
+    box.innerHTML = html;
+    box.hidden = false;
+  }
+  ["b-year", "b-month", "b-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", run);
+  });
+  document.getElementById("gakunen-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+
+  // ---- More features: reverse lookup + list ----
+  var revBox = document.getElementById("adv-reverse");
+  var tblBox = document.getElementById("adv-table");
+  fillSelect(document.getElementById("r-year"), THIS_SY - 10, THIS_SY + 10, THIS_SY);
+  var gHtml = "";
+  for (var g = 1; g <= 12; g++) {
+    gHtml += '<option value="' + g + '"' + (g === 1 ? " selected" : "") + ">" + gradeLabelOf(g) + "</option>";
+  }
+  document.getElementById("r-grade").innerHTML = gHtml;
+
+  function fmtIso(iso) {
+    return MONTHS[parseInt(iso.slice(5, 7), 10) - 1] + " " + parseInt(iso.slice(8, 10), 10) + ", " + iso.slice(0, 4);
+  }
+  function runAdv() {
+    var sy = val("r-year"), g = val("r-grade");
+    var r = GakunenCalc.birthRangeOf(sy, g);
+    if (!r.ok) { revBox.hidden = true; tblBox.hidden = true; return; }
+    var t = GakunenCalc.stageTerm(sy, g);
+    revBox.innerHTML =
+      '<div class="result-main">School year ' + sy + ": " + gradeLabelOf(g) + "</div>" +
+      "<p>Children born from <strong>" + fmtIso(r.from) + "</strong> to <strong>" + fmtIso(r.to) + "</strong>.</p>" +
+      "<p>" + stageNameOf(g) + ": entrance in April " + t.entryYear + ", graduation in March " + t.gradYear + " (expected).</p>";
+    revBox.hidden = false;
+
+    var rows = "";
+    for (var i = 1; i <= 12; i++) {
+      var x = GakunenCalc.birthRangeOf(sy, i);
+      rows += "<tr" + (i === g ? ' style="font-weight:600"' : "") + "><td>" + gradeLabelOf(i) +
+        "</td><td>" + fmtIso(x.from) + " – " + fmtIso(x.to) + "</td></tr>";
+    }
+    tblBox.innerHTML =
+      '<div class="result-main">Grades and birth dates in school year ' + sy + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Grade</th><th>Date of birth</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+    tblBox.hidden = false;
+  }
+  ["r-year", "r-grade"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runAdv);
+  });
+
+  run();
+  runAdv();
+})();
+</script>
+</body>
+</html>

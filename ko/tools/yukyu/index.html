@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>연차 유급휴가 부여일수 계산기(일본·비례부여 대응) | Quick Calc</title>
+  <meta name="description" content="근속연수와 근무 형태(주당 근무일수)로 일본에서 받을 수 있는 연차 유급휴가 일수를 무료로 계산합니다. 아르바이트·파트타임의 비례부여에도 대응하며, 일본 노동기준법에 따른 일수와 연 5일 사용 의무도 함께 표시합니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/yukyu/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="연차 유급휴가 부여일수 계산기(일본·비례부여 대응) | Quick Calc">
+  <meta property="og:description" content="근속연수와 근무 형태(주당 근무일수)로 일본에서 받을 수 있는 연차 유급휴가 일수를 무료로 계산합니다. 아르바이트·파트타임의 비례부여에도 대응하며, 일본 노동기준법에 따른 일수와 연 5일 사용 의무도 함께 표시합니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/yukyu/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"연차 유급휴가 부여일수 계산기","item":"https://quick-calc.site/ko/tools/yukyu/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/yukyu/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/yukyu/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/yukyu/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/yukyu/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/yukyu/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>연차 유급휴가 부여일수 계산기</h1>
+  <form class="tool-form" id="yukyu-form">
+    <label>근무 형태
+      <select id="worker-type">
+        <option value="full">주 5일 이상 또는 주 30시간 이상(정사원·풀타임 등)</option>
+        <option value="d4">주 4일(그리고 주 30시간 미만)</option>
+        <option value="d3">주 3일(그리고 주 30시간 미만)</option>
+        <option value="d2">주 2일(그리고 주 30시간 미만)</option>
+        <option value="d1">주 1일(그리고 주 30시간 미만)</option>
+      </select>
+    </label>
+    <label>근속연수
+      <select id="service">
+        <option value="0">6개월</option>
+        <option value="1">1년 6개월</option>
+        <option value="2">2년 6개월</option>
+        <option value="3">3년 6개월</option>
+        <option value="4">4년 6개월</option>
+        <option value="5">5년 6개월</option>
+        <option value="6">6년 6개월 이상</option>
+      </select>
+    </label>
+    <span class="field-note">선택하는 즉시 부여일수가 아래에 표시됩니다</span>
+    <button type="submit">부여일수 확인</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 입사일로 다음 부여일 예측</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">다음은 언제·며칠 받을까?</h3>
+      <p class="adv-note">입사일을 고르면 다음 부여일·일수와 지금까지의 부여 이력을 예측합니다(근무 형태는 위 폼의 선택, 8할 이상 출근을 전제).</p>
+      <div class="field-row">
+        <label>입사일(년)
+          <select id="hire-year"></select>
+        </label>
+        <label>월
+          <select id="hire-month"></select>
+        </label>
+        <label>일
+          <select id="hire-day"></select>
+        </label>
+      </div>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    부여에는 「채용일로부터 6개월 계속근무」와 「전체 근로일의 <strong>8할 이상 출근</strong>」이 필요합니다. 표시되는 것은 법률상 최저 일수이며, 회사가 이보다 많이 부여하는 경우도 있습니다.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>근무 형태와 근속연수를 고르기만 하면 <strong>유급휴가를 며칠 받을 수 있는지</strong> 알 수 있습니다. 주 4일 이하의 아르바이트·파트타임도 대응합니다. 표시되는 일수는 <strong>일본 노동기준법</strong>이 정한 최저 일수이므로, 내 유급휴가(有給休暇)가 며칠인지 확인하고 싶을 때 활용하세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>근무 형태(주 소정근로일수)를 고릅니다. 주 30시간 이상 일하는 경우에는 일수와 관계없이 「주 5일 이상 또는 주 30시간 이상」을 선택해 주세요.</li>
+    <li>근속연수를 고르면 그 자리에서 부여일수가 표시됩니다(버튼을 누르지 않아도 됩니다).</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <p>일본 노동기준법 제39조와 동법 시행규칙의 부여일수표에 따릅니다.</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>연차 유급휴가의 부여일수(법정)</caption>
+      <thead><tr><th>근무 형태\근속</th><th>0.5년</th><th>1.5년</th><th>2.5년</th><th>3.5년</th><th>4.5년</th><th>5.5년</th><th>6.5년〜</th></tr></thead>
+      <tbody>
+        <tr><td>주 5일〜/30h〜</td><td>10</td><td>11</td><td>12</td><td>14</td><td>16</td><td>18</td><td>20</td></tr>
+        <tr><td>주 4일</td><td>7</td><td>8</td><td>9</td><td>10</td><td>12</td><td>13</td><td>15</td></tr>
+        <tr><td>주 3일</td><td>5</td><td>6</td><td>6</td><td>8</td><td>9</td><td>10</td><td>11</td></tr>
+        <tr><td>주 2일</td><td>3</td><td>4</td><td>4</td><td>5</td><td>6</td><td>6</td><td>7</td></tr>
+        <tr><td>주 1일</td><td>1</td><td>2</td><td>2</td><td>2</td><td>3</td><td>3</td><td>3</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>출처(1차 정보)</h3>
+  <ul class="sources">
+    <li>일본 노동기준법 제39조(연차 유급휴가)(일본어)<br>
+      <a href="https://laws.e-gov.go.jp/law/322AC0000000049" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/322AC0000000049</a>(2026년 7월 18일 열람)</li>
+    <li>노동기준법 시행규칙 제24조의3(비례부여 일수)(일본어)<br>
+      <a href="https://laws.e-gov.go.jp/law/322M40000100023" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/322M40000100023</a>(2026년 7월 18일 열람)</li>
+    <li>일본 후생노동성 에히메노동국 「연차 유급휴가에 관한 Q&amp;A」(부여일수표)(일본어)<br>
+      <a href="https://jsite.mhlw.go.jp/ehime-roudoukyoku/yokuaru_goshitsumon/shurouchu/2040202.html" rel="noopener" target="_blank">https://jsite.mhlw.go.jp/ehime-roudoukyoku/yokuaru_goshitsumon/shurouchu/2040202.html</a>(2026년 7월 18일 열람)</li>
+  </ul>
+
+  <h2>전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>유급휴가의 시효는 2년입니다(전년의 잔여분과 합쳐 최대 40일까지 보유할 수 있습니다).</li>
+    <li>부여일수가 10일 이상인 해에는 회사에 「연 5일을 사용하게 할 의무」가 있습니다(아르바이트라도 근속이 길어 10일 이상 부여되면 대상).</li>
+    <li>「계속근무」는 재직 기간으로 셉니다. 계약 갱신을 반복하는 아르바이트·파트타임도 합산됩니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">아르바이트도 유급휴가를 받을 수 있나요?</h3>
+  <p class="faq-a">받을 수 있습니다. 주 1일 근무라도 6개월 계속근무와 8할 출근 조건을 충족하면 법률상 반드시 부여됩니다(위 표의 비례부여).</p>
+  <h3 class="faq-q">유급휴가를 쓴 날의 급여는 얼마인가요?</h3>
+  <p class="faq-a">①통상의 임금 ②평균임금 ③표준보수일액(노사협정이 필요) 중 하나로, 회사의 취업규칙에 정해져 있습니다. 많은 회사는 ①통상의 임금입니다.</p>
+  <h3 class="faq-q">회사가 유급휴가를 주지 않는 경우에는?</h3>
+  <p class="faq-a">연차 유급휴가는 법률상의 권리이며 회사의 승인은 필요 없습니다(회사가 할 수 있는 것은 시기 변경뿐입니다). 부여되지 않거나 쓰게 해주지 않는 경우에는 노동기준감독서에 상담할 수 있습니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/yukyu/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/yukyu/" lang="en" hreflang="en">English</a><a href="/zh/tools/yukyu/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=yukyu">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/yukyu/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var SERVICE_KO = {
+    "6ヶ月": "6개월",
+    "1年6ヶ月": "1년 6개월",
+    "2年6ヶ月": "2년 6개월",
+    "3年6ヶ月": "3년 6개월",
+    "4年6ヶ月": "4년 6개월",
+    "5年6ヶ月": "5년 6개월",
+    "6年6ヶ月以上": "6년 6개월 이상"
+  };
+  var box = document.getElementById("result");
+  function run() {
+    var r = YukyuCalc.grantedDays(
+      document.getElementById("worker-type").value,
+      parseInt(document.getElementById("service").value, 10));
+    if (r.ok) {
+      box.innerHTML =
+        '<div class="result-main">' + r.days + " 일</div>" +
+        "<p>근속 " + (SERVICE_KO[r.serviceLabel] || r.serviceLabel) + "에 부여되는 법정 일수입니다." +
+        (r.obligation5days ? "<br><strong>연 5일 사용 의무의 대상</strong>(회사는 연 5일을 사용하게 할 의무가 있습니다)." : "") + "</p>";
+    } else {
+      box.innerHTML = '<p class="result-error">입력값을 확인해 주세요.</p>';
+    }
+    box.hidden = false;
+  }
+  ["worker-type", "service"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", run);
+  });
+  document.getElementById("yukyu-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run();
+  });
+  run();
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var SERVICE_KO = {
+    "6ヶ月": "6개월",
+    "1年6ヶ月": "1년 6개월",
+    "2年6ヶ月": "2년 6개월",
+    "3年6ヶ月": "3년 6개월",
+    "4年6ヶ月": "4년 6개월",
+    "5年6ヶ月": "5년 6개월",
+    "6年6ヶ月以上": "6년 6개월 이상"
+  };
+  var advBox = document.getElementById("adv-result");
+  var today = new Date();
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, "일", Math.min(keep, max));
+  }
+  fillSelect(document.getElementById("hire-year"), 1960, today.getFullYear(), "년", today.getFullYear());
+  fillSelect(document.getElementById("hire-month"), 1, 12, "월", today.getMonth() + 1);
+  fillSelect(document.getElementById("hire-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), "일", today.getDate());
+  function fmtKo(iso) {
+    return iso.slice(0, 4) + "년 " + parseInt(iso.slice(5, 7), 10) + "월 " + parseInt(iso.slice(8, 10), 10) + "일";
+  }
+  function pad2(n) { return String(n).padStart(2, "0"); }
+  function runAdv() {
+    adjustDays("hire-year", "hire-month", "hire-day");
+    var hire = val("hire-year") + "-" + pad2(val("hire-month")) + "-" + pad2(val("hire-day"));
+    var type = document.getElementById("worker-type").value;
+    var todayIso = today.getFullYear() + "-" + pad2(today.getMonth() + 1) + "-" + pad2(today.getDate());
+    var r = YukyuCalc.nextGrant(hire, type, todayIso);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">입사일을 올바르게 입력해 주세요.</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var html =
+      '<div class="result-main">다음 부여: ' + fmtKo(r.nextDate) + '에 ' + r.days + '일</div>' +
+      '<p>근속 ' + (SERVICE_KO[r.serviceLabel] || r.serviceLabel) + ' 구분(법률상 최저 일수). ' +
+      (r.obligation5days ? '부여일수가 10일 이상이므로, 부여일로부터 1년 이내에 <strong>5일은 사용하게 할 의무</strong>가 회사에 있습니다.' : '') + '</p>';
+    if (r.history.length > 0) {
+      var rows = r.history.slice(-5);
+      html += '<div class="table-scroll"><table class="data-table"><thead>' +
+        '<tr><th>부여일</th><th>근속</th><th>부여일수</th></tr></thead><tbody>';
+      for (var i = 0; i < rows.length; i++) {
+        html += '<tr><td>' + fmtKo(rows[i].date) + '</td><td>' + (SERVICE_KO[rows[i].label] || rows[i].label) + '</td><td>' + rows[i].days + ' 일</td></tr>';
+      }
+      html += '</tbody></table></div>';
+      if (r.history.length > 5) {
+        html += '<p class="adv-note">최근 5회분을 표시하고 있습니다(부여는 총 ' + r.history.length + '회).</p>';
+      }
+      html += '<p class="adv-note">유급휴가의 이월은 부여일로부터 2년이면 시효로 소멸합니다. 실제 잔여일수는 사용 상황에 따라 달라지므로 근무처의 기록에서 확인해 주세요.</p>';
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  ["hire-year", "hire-month", "hire-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runAdv);
+  });
+  document.getElementById("worker-type").addEventListener("change", function () {
+    if (!advBox.hidden) runAdv();
+  });
+  runAdv();
+})();
+</script>
+</body>
+</html>

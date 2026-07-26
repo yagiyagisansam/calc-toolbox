@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>일본 학년 계산기 — 생년월일로 지금 몇 학년인지 확인 | Quick Calc</title>
+  <meta name="description" content="생년월일만 넣으면 일본 학교에서 지금 몇 학년인지(초등학교 1학년〜고등학교 3학년) 바로 알 수 있는 무료 도구입니다. 해당 학교급의 입학·졸업 연도, 「早生まれ」(1월 1일〜4월 1일 출생) 여부, 학년으로 생년월일 범위를 역으로 찾는 기능도 지원합니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/gakunen/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="일본 학년 계산기 — 생년월일로 지금 몇 학년인지 확인 | Quick Calc">
+  <meta property="og:description" content="생년월일만 넣으면 일본 학교에서 지금 몇 학년인지(초등학교 1학년〜고등학교 3학년) 바로 알 수 있는 무료 도구입니다. 해당 학교급의 입학·졸업 연도, 「早生まれ」(1월 1일〜4월 1일 출생) 여부, 학년으로 생년월일 범위를 역으로 찾는 기능도 지원합니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/gakunen/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"일본 학년 계산기","item":"https://quick-calc.site/ko/tools/gakunen/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/gakunen/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/gakunen/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/gakunen/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/gakunen/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/gakunen/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>일본 학년 계산기</h1>
+  <form class="tool-form" id="gakunen-form">
+    <span class="field-note">생년월일을 고르면 지금의 학년이 바로 아래에 표시됩니다</span>
+    <div class="field-row">
+      <label>출생 연도(서기)
+        <select id="b-year"></select>
+      </label>
+      <label>월
+        <select id="b-month"></select>
+      </label>
+      <label>일
+        <select id="b-day"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 학년으로 생년월일 역산, 해당 학년도의 전체 학년 목록</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">학년으로 생년월일 역산</h3>
+      <p class="adv-note">「초등학교 1학년인 아이는 언제 태어난 아이인가」를 확인합니다. 학교에서 온 안내문에 학년만 적혀 있을 때 유용합니다.</p>
+      <div class="field-row">
+        <label>학년도(4월 시작)
+          <select id="r-year"></select>
+        </label>
+        <label>학년
+          <select id="r-grade"></select>
+        </label>
+      </div>
+      <div class="tool-result" id="adv-reverse" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">해당 학년도의 학년과 생년월일 목록</h3>
+      <p class="adv-note">위에서 고른 학년도의 초등학교 1학년부터 고등학교 3학년까지의 대조표입니다.</p>
+      <div class="tool-result" id="adv-table" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    표준적으로 매년 한 학년씩 진급한 경우의 학년입니다. 유급·월반·해외에서의 편입 등으로 실제 학년이 다를 수 있습니다. <strong>취학에 관한 사항은 거주하시는 시구정촌(市区町村)의 교육위원회에 확인해 주세요.</strong>
+  </div>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>생년월일만 넣으면 <strong>일본 학교에서 지금 몇 학년인지</strong>를 알 수 있습니다. 일본의 학제 기준입니다. 일본의 학년은 4월에 시작하며, <strong>4월 2일생〜다음 해 4월 1일생</strong>이 같은 학년이 됩니다(1월 1일〜4월 1일생은 「早生まれ」라고 하여 한 학년 위가 됩니다). 학교 절차를 밟을 때나 서류에 학년을 적을 때 활용하세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>생년월일을 연·월·일로 고릅니다. 지금의 학년이 바로 아래에 표시됩니다.</li>
+    <li>함께 해당 학교급의 입학 연도·졸업 연도와 「早生まれ」 여부도 표시됩니다.</li>
+    <li>학년에서 생년월일을 거꾸로 찾고 싶을 때는 「＋상세 기능」을 열어 주세요.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>학년을 나누는 기준</strong>: 학년은 4월 1일에 시작해 다음 해 3월 31일에 끝납니다(학교교육법 시행규칙 제59조). 만 6세가 된 날의 다음 날 이후 최초의 학년이 시작될 때부터 초등학교에 취학합니다(학교교육법 제17조).</li>
+    <li><strong>4월 1일생이 한 학년 위가 되는 이유</strong>: 나이는 생일 전날이 끝나는 시점에 올라가므로(연령계산에 관한 법률·민법 제143조), 4월 1일생은 3월 31일에 만 6세가 되어 그해 4월에 입학합니다.</li>
+    <li><strong>같은 학년이 되는 범위</strong>: 4월 2일생〜다음 해 4월 1일생.</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>학교급과 학년(표준적으로 진급한 경우)</caption>
+      <thead><tr><th>학교급</th><th>학년</th><th>입학 시 나이</th></tr></thead>
+      <tbody>
+        <tr><td>초등학교</td><td>1학년〜6학년</td><td>만 6세</td></tr>
+        <tr><td>중학교</td><td>1학년〜3학년</td><td>만 12세</td></tr>
+        <tr><td>고등학교</td><td>1학년〜3학년</td><td>만 15세</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>출처(1차 정보)</h3>
+  <ul class="sources">
+    <li>학교교육법(1947년 법률 제26호) 제17조(취학 의무) — 일본 공식 법령 원문(일본어)<br>
+      <a href="https://laws.e-gov.go.jp/law/322AC0000000026" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/322AC0000000026</a>(2026년 7월 26일 열람)</li>
+    <li>학교교육법 시행규칙(1947년 문부성령 제11호) 제59조(학년은 4월 1일에 시작해 다음 해 3월 31일에 끝난다) — 일본 공식 법령 원문(일본어)<br>
+      <a href="https://laws.e-gov.go.jp/law/322M40000080011" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/322M40000080011</a>(2026년 7월 26일 열람)</li>
+    <li>연령계산에 관한 법률(1902년 법률 제50호) — 일본 공식 법령 원문(일본어)<br>
+      <a href="https://laws.e-gov.go.jp/law/135AC0000000050" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/135AC0000000050</a>(2026년 7월 26일 열람)</li>
+  </ul>
+
+  <h2>계산의 전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>표준적으로 진급한 경우의 학년입니다. 유급·월반·휴학이 있으면 달라집니다.</li>
+    <li>의무교육은 초등학교 6년과 중학교 3년, 총 9년입니다. 고등학교는 의무교육이 아닙니다.</li>
+    <li>해외에서 편입하는 경우, 일본 학교가 반드시 나이에 맞는 학년에 넣어 주는 것은 아닙니다. 일본어 습득 정도 등을 고려해 학교·교육위원회와 상담해 결정됩니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">「早生まれ」란 무엇인가요?</h3>
+  <p class="faq-a">1월 1일〜4월 1일에 태어난 것을 말합니다. 같은 해 4월 2일 이후에 태어난 아이보다 한 학년 위가 되기 때문에, 같은 학년 안에서는 가장 늦게 태어난 쪽이 됩니다.</p>
+  <h3 class="faq-q">일본 학교는 왜 4월에 시작하나요?</h3>
+  <p class="faq-a">학년이 4월 1일에 시작해 다음 해 3월 31일에 끝난다고 법령(학교교육법 시행규칙)에 정해져 있기 때문입니다. 9월에 학년이 시작되는 나라에서 오면 반년이 어긋나므로 편입 시기에 대한 상담이 필요합니다.</p>
+  <h3 class="faq-q">외국 국적 아이도 일본 학교에 다닐 수 있나요?</h3>
+  <p class="faq-a">다닐 수 있습니다. 외국 국적 아이에게 취학 의무는 없지만, 희망하면 공립 초·중학교에 무상으로 받아들여집니다(문부과학성의 방침). 절차는 거주하시는 시구정촌 교육위원회가 창구입니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/gakunen/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/gakunen/" lang="en" hreflang="en">English</a><a href="/zh/tools/gakunen/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=gakunen">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/gakunen/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var today = new Date();
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  var TODAY_ISO = today.getFullYear() + "-" + pad(today.getMonth() + 1) + "-" + pad(today.getDate());
+  var THIS_SY = today.getMonth() + 1 >= 4 ? today.getFullYear() : today.getFullYear() - 1;
+
+  var STAGE_KO = { elementary: "초등학교", juniorhigh: "중학교", highschool: "고등학교" };
+
+  // 학교급과 학교급 내 학년으로 표시용 라벨을 조립
+  function stageNameOf(overall) {
+    return overall <= 6 ? STAGE_KO.elementary : (overall <= 9 ? STAGE_KO.juniorhigh : STAGE_KO.highschool);
+  }
+  function gradeLabelOf(overall) {
+    if (overall <= 6) return STAGE_KO.elementary + " " + overall + "학년";
+    if (overall <= 9) return STAGE_KO.juniorhigh + " " + (overall - 6) + "학년";
+    return STAGE_KO.highschool + " " + (overall - 9) + "학년";
+  }
+  function resultLabel(r) {
+    if (r.stage === "preschool") return "취학 전";
+    if (r.stage === "graduated") return "고등학교 졸업 후";
+    return gradeLabelOf(r.overallGrade);
+  }
+
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+
+  // ---- 기본: 생년월일 → 지금의 학년 ----
+  var box = document.getElementById("result");
+  fillSelect(document.getElementById("b-year"), 1950, today.getFullYear(), "년", today.getFullYear() - 10);
+  fillSelect(document.getElementById("b-month"), 1, 12, "월", 4);
+  fillSelect(document.getElementById("b-day"), 1, 31, "일", 1);
+
+  function run() {
+    var y = val("b-year"), m = val("b-month");
+    var keep = val("b-day");
+    var max = daysInMonth(y, m);
+    fillSelect(document.getElementById("b-day"), 1, max, "일", Math.min(keep, max));
+    var d = val("b-day");
+    var birth = y + "-" + pad(m) + "-" + pad(d);
+    var r = GakunenCalc.gradeOn(birth, TODAY_ISO);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' +
+        (r.code === "invalid_order" ? "아직 오지 않은 날짜입니다." : "날짜를 확인해 주세요.") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var html = '<div class="result-main">' + r.schoolYear + "학년도: " + resultLabel(r) + "</div>";
+    if (r.stage === "preschool") {
+      var c = (m > 4 || (m === 4 && d >= 2)) ? y : y - 1;
+      html += "<p>초등학교 입학은 <strong>" + (c + 7) + "년 4월</strong>로 예상됩니다.</p>";
+    } else if (r.stage === "graduated") {
+      html += "<p>고등학교 연령대를 지났습니다. 학년별 생년월일을 보려면 위의 「＋상세 기능」을 열어 주세요.</p>";
+    } else {
+      var t = GakunenCalc.stageTerm(r.schoolYear, r.overallGrade);
+      html += "<p>" + stageNameOf(r.overallGrade) + "는 <strong>" + t.entryYear + "년 4월 입학·" + t.gradYear + "년 3월 졸업</strong> 예정입니다.</p>";
+    }
+    html += "<p>" + (r.hayaumare ? "이 생년월일은 <strong>「早生まれ」</strong>(1월 1일〜4월 1일 출생)입니다." :
+      "「早生まれ」가 아닙니다(4월 2일〜12월 31일 출생).") + "</p>";
+    box.innerHTML = html;
+    box.hidden = false;
+  }
+  ["b-year", "b-month", "b-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", run);
+  });
+  document.getElementById("gakunen-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+
+  // ---- 상세 기능: 역산 + 목록 ----
+  var revBox = document.getElementById("adv-reverse");
+  var tblBox = document.getElementById("adv-table");
+  fillSelect(document.getElementById("r-year"), THIS_SY - 10, THIS_SY + 10, "학년도", THIS_SY);
+  var gHtml = "";
+  for (var g = 1; g <= 12; g++) {
+    gHtml += '<option value="' + g + '"' + (g === 1 ? " selected" : "") + ">" + gradeLabelOf(g) + "</option>";
+  }
+  document.getElementById("r-grade").innerHTML = gHtml;
+
+  function fmtIso(iso) {
+    return iso.slice(0, 4) + "년 " + parseInt(iso.slice(5, 7), 10) + "월 " + parseInt(iso.slice(8, 10), 10) + "일";
+  }
+  function runAdv() {
+    var sy = val("r-year"), g = val("r-grade");
+    var r = GakunenCalc.birthRangeOf(sy, g);
+    if (!r.ok) { revBox.hidden = true; tblBox.hidden = true; return; }
+    var t = GakunenCalc.stageTerm(sy, g);
+    revBox.innerHTML =
+      '<div class="result-main">' + sy + "학년도의 " + gradeLabelOf(g) + "</div>" +
+      "<p>생년월일이 <strong>" + fmtIso(r.from) + "〜" + fmtIso(r.to) + "</strong>인 사람입니다.</p>" +
+      "<p>" + stageNameOf(g) + "는 " + t.entryYear + "년 4월 입학·" + t.gradYear + "년 3월 졸업 예정입니다.</p>";
+    revBox.hidden = false;
+
+    var rows = "";
+    for (var i = 1; i <= 12; i++) {
+      var x = GakunenCalc.birthRangeOf(sy, i);
+      rows += "<tr" + (i === g ? ' style="font-weight:600"' : "") + "><td>" + gradeLabelOf(i) +
+        "</td><td>" + fmtIso(x.from) + "〜" + fmtIso(x.to) + "</td></tr>";
+    }
+    tblBox.innerHTML =
+      '<div class="result-main">' + sy + "학년도의 학년과 생년월일</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>학년</th><th>생년월일</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+    tblBox.hidden = false;
+  }
+  ["r-year", "r-grade"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runAdv);
+  });
+
+  run();
+  runAdv();
+})();
+</script>
+</body>
+</html>

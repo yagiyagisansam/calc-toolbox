@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>贷款还款计算器(等额本息·每月还款额) | Quick Calc</title>
+  <meta name="description" content="输入贷款金额·利率·还款期限,免费计算每月还款额·总还款额·利息总额(等额本息)。适合估算日本的房贷·车贷。附计算公式。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/loan/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="贷款还款计算器(等额本息·每月还款额) | Quick Calc">
+  <meta property="og:description" content="输入贷款金额·利率·还款期限,免费计算每月还款额·总还款额·利息总额(等额本息)。适合估算日本的房贷·车贷。附计算公式。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/loan/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"贷款还款计算器(等额本息·每月还款额)","item":"https://quick-calc.site/zh/tools/loan/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/loan/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/loan/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/loan/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/loan/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/loan/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>贷款还款计算器(等额本息)</h1>
+  <form class="tool-form" id="loan-form">
+    <label>贷款金额(万日元)
+      <span class="field-note">例: 3000(=3,000万日元)。支持范围: 10〜50,000万日元。1万日元=10,000日元</span>
+      <input type="number" id="principal" inputmode="numeric" step="1" min="10" max="50000" placeholder="3000" required>
+    </label>
+    <label>年利率(%)
+      <span class="field-note">例: 1.5(支持范围: 0〜20%)</span>
+      <input type="number" id="rate" inputmode="decimal" step="0.01" min="0" max="20" value="1.5" required>
+    </label>
+    <label>还款期限(年)
+      <span class="field-note">支持范围: 1〜50年(整数)</span>
+      <input type="number" id="years" inputmode="numeric" step="1" min="1" max="50" value="35" required>
+    </label>
+    <span class="field-note">输入后自动计算</span>
+    <button type="submit">开始计算</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 提前还款和还款方式的比较</summary>
+    <div class="adv-inner">
+      <p class="adv-note">两项都直接使用上方表单的贷款条件(贷款金额·年利率·还款期限)。</p>
+      <h3 class="adv-h">提前还款模拟(缩短期限型)</h3>
+      <p class="adv-note">保持每月还款额不变,计算在○年后一次性还入一笔钱、提前结清时能节省多少利息。</p>
+      <label>提前还款的时点(○年后)
+        <input type="number" id="adv-after" inputmode="numeric" step="1" min="1" max="49" placeholder="5">
+      </label>
+      <label>提前还款金额(万日元)
+        <input type="number" id="adv-prepay" inputmode="numeric" step="any" min="1" placeholder="100">
+      </label>
+      <button type="button" id="adv-prepay-run">计算利息的节省额</button>
+      <div class="tool-result" id="adv-prepay-result" hidden aria-live="polite"></div>
+      <h3 class="adv-h">如果改用等额本金</h3>
+      <p class="adv-note">与「等额本金」方式比较: 初期还款额较大,但利息总额较少。</p>
+      <button type="button" id="adv-gankin-run">按等额本金计算并比较</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    本工具的计算结果为<strong>约值</strong>。日本的实际贷款还有担保费·事务手续费·团体信用生命保险费·利率变动·尾数调整等,准确的还款额请以金融机构的试算为准。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">这个工具能算什么</span><p>只需输入贷款金额·利率·期限,就能立即知道在日本贷款买房或买车时<strong>每月要还多少钱</strong>。同时显示总还款额和利息合计。采用日本金融机构最常用的等额本息(元利均等返済)方式,适合借款前确认「每月负担有多重」。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>以万日元为单位输入贷款金额(3,000万日元就输入「3000」)。</li>
+    <li>输入年利率(%)和还款期限(年)。</li>
+    <li>输入的同时会显示每月还款额·总还款额·利息总额(无需点击按钮)。</li>
+  </ol>
+
+  <h2>计算方法和依据</h2>
+  <p>采用等额本息(每月还款额固定,日本最常见的还款方式)的标准计算公式。</p>
+  <ul class="method">
+    <li><strong>每月还款额 = 贷款金额 × r × (1+r)ⁿ ÷ ((1+r)ⁿ − 1)</strong><br>
+      r = 年利率 ÷ 12(月利率),n = 还款期限 × 12(还款次数)。利率为0%时是 贷款金额 ÷ n。</li>
+    <li>总还款额 = 每月还款额 × 还款次数 / 利息总额 = 总还款额 − 贷款金额</li>
+    <li>计算例: 3,000万日元·年利率1.5%·35年 → 每月还款额 约91,855日元,总还款额 约3,858万日元</li>
+  </ul>
+
+  <h3>出处·前提说明</h3>
+  <ul class="sources">
+    <li>以上是按等额本息的一般数学定义进行的计算(每月还款额不足1日元四舍五入,总还款额为该每月还款额×次数)。</li>
+    <li>还款方式(等额本息·等额本金)的区别等贷款基础知识,请参阅金融机构·公共机构的说明。</li>
+  </ul>
+
+  <h2>计算前提和注意事项</h2>
+  <ul class="cautions">
+    <li>前提为固定利率·无奖金月还款·无提前还款。若为浮动利率,将来的还款额会变化。</li>
+    <li>选择等额本金(每月本金固定)时,首期还款额会大于本计算结果,之后逐渐减少。</li>
+    <li>可贷额度和审查事宜请咨询金融机构。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">等额本息和等额本金有什么区别?</h3>
+  <p class="faq-a">等额本息(本工具)每月还款额固定,便于家庭收支管理。等额本金则每月本金固定,初期还款额较大,但利息总额较少。</p>
+  <h3 class="faq-q">利率差0.1%会有多大影响?</h3>
+  <p class="faq-a">例如3,000万日元·35年,年1.5%(每月91,855日元)与年1.6%(每月93,332日元)相比,每月约差1,500日元,总还款额约差62万日元。可以用本工具分别计算比较。</p>
+  <h3 class="faq-q">能计算奖金月还款或提前还款吗?</h3>
+  <p class="faq-a">不支持奖金月还款。奖金并用·提前还款·浮动利率的模拟,请使用金融机构的试算工具。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/loan/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/loan/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/loan/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=loan">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/loan/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_principal: "贷款金额请输入 10〜50,000万日元 的范围。",
+    invalid_rate: "年利率请输入 " + LoanCalc.RATE_MIN + "〜" + LoanCalc.RATE_MAX + " % 的范围。",
+    invalid_years: "还款期限请输入 " + LoanCalc.YEARS_MIN + "〜" + LoanCalc.YEARS_MAX + " 年的整数。"
+  };
+  var box = document.getElementById("result");
+  function runMain() {
+    var pv = document.getElementById("principal").value;
+    var rv = document.getElementById("rate").value;
+    var yv = document.getElementById("years").value;
+    if (pv === "" || rv === "" || yv === "") { box.hidden = true; return; }
+    var years = parseFloat(yv);
+    var result = LoanCalc.calculate(parseFloat(pv) * 10000, parseFloat(rv), years);
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">每月 ' + result.monthlyPayment.toLocaleString() + " 日元</div>" +
+        "<p>总还款额: <strong>" + result.totalPayment.toLocaleString() + " 日元</strong><br>" +
+        "其中利息: <strong>" + result.totalInterest.toLocaleString() + " 日元</strong>(" + (years * 12) + "期)</p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "请确认输入值。") + "</p>";
+    }
+    box.hidden = false;
+  }
+  document.getElementById("loan-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
+  });
+  ["principal", "rate", "years"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runMain);
+  });
+  runMain();
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var prepayBox = document.getElementById("adv-prepay-result");
+  var advBox = document.getElementById("adv-result");
+  var MAN = 10000;
+  function readBase() {
+    var p = parseFloat(document.getElementById("principal").value);
+    var r = parseFloat(document.getElementById("rate").value);
+    var y = parseFloat(document.getElementById("years").value);
+    if (isNaN(p) || isNaN(r) || isNaN(y)) return null;
+    return { principal: p * MAN, rate: r, years: y };
+  }
+  function fmtMonths(m) {
+    var y = Math.floor(m / 12);
+    var mm = m % 12;
+    if (y > 0 && mm > 0) return y + "年" + mm + "个月";
+    if (y > 0) return y + "年";
+    return mm + "个月";
+  }
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
+  }
+  var ADV_MSG = {
+    invalid_principal: "上方表单的贷款金额请输入 10〜50,000万日元 的范围。",
+    invalid_rate: "上方表单的年利率请输入 0〜20% 的范围。",
+    invalid_years: "上方表单的还款期限请输入 1〜50年 的整数。",
+    invalid_after: "提前还款的时点请输入 1年后〜(还款期限−1)年后 的整数。",
+    invalid_prepay: "提前还款金额请输入 1万日元以上·不超过贷款金额。",
+    prepay_too_large: "提前还款金额超过了该时点的贷款余额。请减少金额。"
+  };
+  function runPrepay() {
+    var base = readBase();
+    if (!base) { showError(prepayBox, "请先在上方表单输入贷款金额·年利率·还款期限。"); return; }
+    var after = parseFloat(document.getElementById("adv-after").value);
+    var prepayMan = parseFloat(document.getElementById("adv-prepay").value);
+    if (isNaN(after) || isNaN(prepayMan)) { showError(prepayBox, "请输入提前还款的时点(○年后)和金额(万日元)。"); return; }
+    var r = LoanCalc.prepayment(base.principal, base.rate, base.years, after, prepayMan * MAN);
+    if (!r.ok) { showError(prepayBox, ADV_MSG[r.code] || "请确认输入值。"); return; }
+    prepayBox.innerHTML =
+      '<div class="result-main">利息减少约 ' + r.interestSaved.toLocaleString() + " 日元</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>缩短的期限</td><td>" + fmtMonths(r.shortenedMonths) + "(" + r.shortenedMonths + "期)</td></tr>" +
+      "<tr><td>还清所需期限</td><td>" + fmtMonths(r.baseMonths) + " → " + fmtMonths(r.newMonths) + "</td></tr>" +
+      "<tr><td>利息合计</td><td>" + r.baseInterest.toLocaleString() + " 日元 → " + r.newInterest.toLocaleString() + " 日元</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">这是以每月 ' + r.monthlyPayment.toLocaleString() + " 日元的还款额不变为前提的约值,不含提前还款手续费。</p>";
+    prepayBox.hidden = false;
+  }
+  function maybeRunPrepay() {
+    if (document.getElementById("adv-after").value === "" ||
+        document.getElementById("adv-prepay").value === "") { prepayBox.hidden = true; return; }
+    runPrepay();
+  }
+  document.getElementById("adv-prepay-run").addEventListener("click", runPrepay);
+  ["adv-after", "adv-prepay"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", maybeRunPrepay);
+  });
+  var gankinShown = false;
+  function runGankin() {
+    var base = readBase();
+    if (!base) { showError(advBox, "请先在上方表单输入贷款金额·年利率·还款期限。"); return; }
+    gankinShown = true;
+    var r = LoanCalc.gankinKinto(base.principal, base.rate, base.years);
+    if (!r.ok) { showError(advBox, ADV_MSG[r.code] || "请确认输入值。"); return; }
+    var ganri = LoanCalc.calculate(base.principal, base.rate, base.years);
+    advBox.innerHTML =
+      '<div class="result-main">等额本金的利息为 ' + r.totalInterest.toLocaleString() + " 日元</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>首期还款额</td><td>" + r.firstPayment.toLocaleString() + " 日元(之后逐渐减少)</td></tr>" +
+      "<tr><td>最后一期还款额</td><td>" + r.lastPayment.toLocaleString() + " 日元</td></tr>" +
+      "<tr><td>等额本息的每月还款额</td><td>" + ganri.monthlyPayment.toLocaleString() + " 日元(固定)</td></tr>" +
+      "<tr><td>利息的差额</td><td>等额本金少 " + r.interestDiff.toLocaleString() + " 日元</td></tr>" +
+      "</tbody></table></div>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-gankin-run").addEventListener("click", runGankin);
+  ["principal", "rate", "years"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      maybeRunPrepay();
+      if (gankinShown) runGankin();
+    });
+  });
+})();
+</script>
+</body>
+</html>

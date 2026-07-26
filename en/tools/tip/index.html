@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Tip Calculator (15% / 18% / 20% and Splitting the Bill) | Quick Calc</title>
+  <meta name="description" content="Work out the tip, the total and the amount per person in one go, from the bill and a tip rate of 15%, 18% or 20%. Built for travelling abroad from Japan, where tipping is not customary, so you are not caught out at the table in the United States or Hawaii.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/tip/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Tip Calculator (15% / 18% / 20% and Splitting the Bill) | Quick Calc">
+  <meta property="og:description" content="Work out the tip, the total and the amount per person in one go, from the bill and a tip rate of 15%, 18% or 20%. Built for travelling abroad from Japan, where tipping is not customary, so you are not caught out at the table in the United States or Hawaii.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/tip/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Tip Calculator (15% / 18% / 20% and Splitting the Bill)","item":"https://quick-calc.site/en/tools/tip/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/tip/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/tip/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/tip/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/tip/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/tip/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Tip Calculator for Travel Abroad</h1>
+  <form class="tool-form" id="tip-form">
+    <label>Amount (the bill before tax, for example)
+      <span class="field-note">The result is calculated as you type</span>
+      <input type="number" id="amount" inputmode="decimal" min="0" step="any" required placeholder="e.g. 85.50">
+    </label>
+    <label>Tip rate (%)
+      <select id="pct">
+        <option value="15">15% (standard, casual places)</option>
+        <option value="18" selected>18% (standard to slightly better)</option>
+        <option value="20">20% (good service)</option>
+        <option value="22">22% (fine dining, special service)</option>
+        <option value="10">10% (delivery and similar)</option>
+        <option value="0">0% (service charge already included)</option>
+      </select>
+    </label>
+    <label>Number of people splitting the bill
+      <input type="number" id="people" inputmode="numeric" min="1" max="50" step="1" value="1">
+    </label>
+    <button type="submit">Calculate the tip and total</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: work the tip rate backwards, and check whether a service charge is enough</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">What tip rate did I actually pay? (reverse calculation)</h3>
+      <p class="adv-note">Works out the tip rate you really paid, from the total on your card statement or receipt.</p>
+      <label>Total actually paid
+        <input type="number" id="adv-paid" inputmode="decimal" step="any" min="0.01" placeholder="e.g. 118.00">
+      </label>
+      <label>Original amount (the bill the tip was applied to)
+        <input type="number" id="adv-base" inputmode="decimal" step="any" min="0.01" placeholder="e.g. 100.00">
+      </label>
+      <button type="button" id="adv-rev-run">Work out the tip rate</button>
+      <div class="tool-result" id="adv-rev-result" hidden aria-live="polite"></div>
+      <h3 class="adv-h">There is a service charge — do I still need to tip?</h3>
+      <p class="adv-note">If the receipt already includes “Service Charge” or “Gratuity”, this tells you whether to add anything and roughly how much.</p>
+      <label>Amount (the bill before the service charge)
+        <input type="number" id="adv-sbase" inputmode="decimal" step="any" min="0.01" placeholder="e.g. 100.00">
+      </label>
+      <label>Service charge rate (%)
+        <input type="number" id="adv-spct" inputmode="decimal" step="any" min="0" max="50" placeholder="e.g. 18">
+      </label>
+      <button type="button" id="adv-svc-run">Check whether to add more</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Enter the amount, pick a rate, and instantly see <strong>how much to tip</strong> at a restaurant abroad, along with the total including the tip and the amount per person. Handy if you live in Japan, where tipping is not customary and there is nothing to practise on, and you are heading to the United States or Hawaii.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter the amount on the receipt (in the United States it is usual to calculate on the pre-tax food and drink total).</li>
+    <li>Pick the tip rate (18% if you are unsure).</li>
+    <li>If you are splitting the bill, enter the number of people and the amount per person appears automatically.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Tip = amount × tip rate ÷ 100</strong> / <strong>Total = amount + tip</strong> / <strong>Per person = total ÷ number of people</strong></li>
+    <li>Example: 18% of $85.50 → a tip of <strong>$15.39</strong> and a total of $100.89</li>
+    <li>At restaurants in the United States the usual range is roughly 15–20% (in recent years 18–20% has become the norm). If a service charge or gratuity is already included, no extra tip is needed.</li>
+  </ul>
+
+  <h3>Sources (primary information)</h3>
+  <ul class="sources">
+    <li>This is plain arithmetic. Tipping rates and customs differ by country, city and type of business — check the guidance of the local tourist board or a guidebook.</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>If the receipt says “Gratuity Included” or “Service Charge”, the tip is already in there. Be careful not to pay twice.</li>
+    <li>Tipping culture varies enormously between countries. In Japan, China and South Korea it is basically not expected; in Europe around 5–10% or rounding up the bill is common.</li>
+    <li>If you pay by card, write the amount in the Tip line of the receipt and fill in the Total yourself.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">Do I calculate the tip on the amount before or after tax?</h3>
+  <p class="faq-a">In the United States the original custom is to calculate on the pre-tax subtotal. Calculating on the tax-inclusive total makes only a small difference, and there is no problem with paying a little more.</p>
+  <h3 class="faq-q">Do I need to tip at fast food places and cafés?</h3>
+  <p class="faq-a">At places where you order at the counter, generally no — even if a tablet shows you a tip screen, you can choose “No Tip”. At restaurants where you are served at your table, yes.</p>
+  <h3 class="faq-q">What is usual at hotels and in taxis?</h3>
+  <p class="faq-a">As a rough guide, $1–2 per bag for a hotel bellhop, $2–5 per night for housekeeping, and around 15% of the fare for a taxi.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/tip/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/tip/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/tip/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=tip">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/tip/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var MSG = {
+    invalid_amount: "Enter an amount greater than 0.",
+    invalid_pct: "Choose a tip rate between 0 and 50%.",
+    invalid_people: "Enter the number of people as a whole number from 1 to 50."
+  };
+  function runMain() {
+    if (document.getElementById("amount").value === "" ||
+        document.getElementById("people").value === "") { box.hidden = true; return; }
+    var people = parseInt(document.getElementById("people").value, 10);
+    var r = TipCalc.calc(
+      parseFloat(document.getElementById("amount").value),
+      parseFloat(document.getElementById("pct").value),
+      people
+    );
+    if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "Check the entered values.") + "</p>"; box.hidden = false; return; }
+    box.innerHTML =
+      '<div class="result-main">Tip ' + r.tip.toLocaleString() + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>Total (amount + tip)</td><td><strong>" + r.total.toLocaleString() + "</strong></td></tr>" +
+      (people > 1 ? "<tr><td>Per person (" + people + " people)</td><td><strong>" + r.perPerson.toLocaleString() + "</strong></td></tr>" : "") +
+      "</tbody></table></div><p>Amounts are shown in whatever currency you entered (dollars in, dollars out).</p>";
+    box.hidden = false;
+  }
+  document.getElementById("tip-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
+  });
+  ["amount", "people"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runMain);
+  });
+  document.getElementById("pct").addEventListener("change", runMain);
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var revBox = document.getElementById("adv-rev-result");
+  var advBox = document.getElementById("adv-result");
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
+  }
+  function fmt(x) {
+    return x.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  }
+  function runReverse() {
+    var paid = parseFloat(document.getElementById("adv-paid").value);
+    var base = parseFloat(document.getElementById("adv-base").value);
+    if (isNaN(paid) || isNaN(base)) { showError(revBox, "Enter both the total paid and the original amount."); return; }
+    var r = TipCalc.reverse(paid, base);
+    if (!r.ok) {
+      showError(revBox, r.code === "invalid_paid"
+        ? "The total paid must be at least the original amount (up to 2,000,000)."
+        : "The original amount must be greater than 0 (up to 1,000,000).");
+      return;
+    }
+    var msg = r.verdict === "enough"
+      ? "That meets the usual range in the United States (15–20%)."
+      : r.verdict === "low"
+        ? "That is below the usual range in the United States (15–20%)."
+        : "No tip was paid (which is fine if the place includes a service charge).";
+    revBox.innerHTML =
+      '<div class="result-main">Tip rate ' + r.pct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " %</div>" +
+      "<p>Amount paid as a tip: <strong>" + fmt(r.tip) + "</strong></p>" +
+      '<p class="adv-note">' + msg + "</p>";
+    revBox.hidden = false;
+  }
+  function runService() {
+    var base = parseFloat(document.getElementById("adv-sbase").value);
+    var pct = parseFloat(document.getElementById("adv-spct").value);
+    if (isNaN(base) || isNaN(pct)) { showError(advBox, "Enter both the amount and the service charge rate."); return; }
+    var r = TipCalc.serviceAdvice(base, pct);
+    if (!r.ok) { showError(advBox, "Enter an amount greater than 0 and a service charge rate between 0 and 50%."); return; }
+    if (!r.need) {
+      advBox.innerHTML =
+        '<div class="result-main">No extra tip is needed</div>' +
+        '<p class="adv-note">A service charge of ' + pct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "% already matches a standard tip (15% or more). Only add a little extra if the service was especially good.</p>";
+    } else {
+      advBox.innerHTML =
+        '<div class="result-main">Suggested top-up: ' + fmt(r.add15) + " – " + fmt(r.add18) + "</div>" +
+        '<p class="adv-note">A service charge of ' + pct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "% alone does not reach the usual 15–18%. To bring the total to 15% add +" + fmt(r.add15) + ", and to reach 18% add +" + fmt(r.add18) + ".</p>";
+    }
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-rev-run").addEventListener("click", runReverse);
+  document.getElementById("adv-svc-run").addEventListener("click", runService);
+  ["adv-paid", "adv-base"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-paid").value !== "" &&
+          document.getElementById("adv-base").value !== "") runReverse();
+    });
+  });
+  ["adv-sbase", "adv-spct"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-sbase").value !== "" &&
+          document.getElementById("adv-spct").value !== "") runService();
+    });
+  });
+})();
+</script>
+</body>
+</html>

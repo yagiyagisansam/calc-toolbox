@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Speed, Time and Distance Calculator (enter any two) | Quick Calc</title>
+  <meta name="description" content="Enter any two of speed (km/h), distance (km) and time, and the third is calculated for you, free and instantly. Answers questions like “how long does 150 km at 80 km/h take?” Also works out arrival and departure times, and converts km/h to metres per minute and per second.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/speed/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Speed, Time and Distance Calculator (enter any two) | Quick Calc">
+  <meta property="og:description" content="Enter any two of speed (km/h), distance (km) and time, and the third is calculated for you, free and instantly. Answers questions like “how long does 150 km at 80 km/h take?” Also works out arrival and departure times, and converts km/h to metres per minute and per second.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/speed/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Speed, Time and Distance Calculator","item":"https://quick-calc.site/en/tools/speed/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/speed/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/speed/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/speed/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/speed/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/speed/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Speed, Time and Distance Calculator</h1>
+  <form class="tool-form" id="speed-form">
+    <p style="margin:0;font-size:0.88rem;color:var(--color-muted);">Enter <strong>two</strong> of the three and the remaining one is calculated right below</p>
+    <label>Speed (km/h)
+      <input type="number" id="speed" inputmode="decimal" min="0" step="any" placeholder="e.g. 80">
+    </label>
+    <label>Distance (km)
+      <input type="number" id="distance" inputmode="decimal" min="0" step="any" placeholder="e.g. 150">
+    </label>
+    <label>Time (minutes)
+      <span class="field-note">For 1 hour 30 minutes, enter 90</span>
+      <input type="number" id="time" inputmode="decimal" min="0" step="any" placeholder="e.g. 112">
+    </label>
+    <button type="submit">Calculate the missing one</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: arrival time, departure time, metres per minute and per second</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">What time will I arrive?</h3>
+      <p class="adv-note">Calculates the expected arrival time from the departure time, distance and average speed, including break time.</p>
+      <label>Departure time
+        <input type="time" id="adv-dep-time" value="09:00">
+      </label>
+      <label>Distance (km)
+        <input type="number" id="adv-dist" inputmode="decimal" min="0.1" max="100000" step="any" value="150" placeholder="e.g. 150">
+      </label>
+      <label>Speed (average, km/h)
+        <input type="number" id="adv-speed" inputmode="decimal" min="0.1" max="5000" step="any" value="80" placeholder="e.g. 80">
+      </label>
+      <label>Total break time (minutes)
+        <input type="number" id="adv-break" inputmode="numeric" min="0" max="100000" step="1" value="0" placeholder="e.g. 20">
+      </label>
+      <button type="button" id="adv-arr-run">Calculate the arrival time</button>
+      <h3 class="adv-h">What time should I leave? Working backwards</h3>
+      <p class="adv-note">Works backwards from the time you want to arrive to the time you should leave (distance, speed and breaks are taken from the fields above).</p>
+      <label>Time you want to arrive
+        <input type="time" id="adv-arr-time" value="12:00">
+      </label>
+      <button type="button" id="adv-dep-run">Work out the departure time</button>
+      <h3 class="adv-h">Convert km/h to metres per minute and per second</h3>
+      <p class="adv-note">The “km/h to m/min and m/s” conversion often needed for science homework.</p>
+      <label>Speed (km/h)
+        <input type="number" id="adv-kmh" inputmode="decimal" min="0.1" max="5000" step="any" placeholder="e.g. 60">
+      </label>
+      <button type="button" id="adv-unit-run">Convert to m/min and m/s</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Enter <strong>two of speed, distance and time, and the third one</strong> appears straight away. It answers questions such as “how many hours is 150 km at 80 km/h?” using the basic relationship taught at school. Useful for checking homework or planning a drive.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter the two values you know (any two of speed, distance and time).</li>
+    <li>Leave the remaining one blank.</li>
+    <li>The moment you enter the second value, all three values appear below — no button needed.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Distance = speed × time</strong> / <strong>Speed = distance ÷ time</strong> / <strong>Time = distance ÷ speed</strong></li>
+    <li>Example: 150 km at 80 km/h → 150 ÷ 80 = 1.875 hours = <strong>about 1 hour 53 minutes</strong></li>
+    <li>Time is always entered in minutes (1 hour 30 minutes = 90 minutes).</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>This is arithmetic based on the definition of speed (distance ÷ time).</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>On a real journey there are traffic lights, breaks and congestion, so you will not arrive in exactly the calculated time. When planning a drive it is realistic to assume a conservative average speed (roughly 80 km/h on expressways and 30 km/h on ordinary roads).</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">What is the “hajiki” circle?</h3>
+  <p class="faq-a">It is the way the relationship is memorised in Japanese schools, using a circle divided into speed (は, hayasa), time (じ, jikan) and distance (き, kyori). If you remember the single formula distance = speed × time, division gives you the other two.</p>
+  <h3 class="faq-q">How do I convert to metres per minute or per second?</h3>
+  <p class="faq-a">Divide the speed in km/h by 60 for kilometres per minute and by 3600 for kilometres per second. So 60 km/h is 1 km per minute, or about 16.7 metres per second.</p>
+  <h3 class="faq-q">Can it calculate a running pace (minutes per km)?</h3>
+  <p class="faq-a">This tool is built around speed in km/h. To get a pace from it, divide 60 by the speed in km/h: at 12 km/h the pace is 60 ÷ 12 = 5 minutes per km.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/speed/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/speed/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/speed/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=speed">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/speed/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var MSG = {
+    invalid_input: "Enter exactly two of the three values (leave the remaining one blank).",
+    invalid_value: "Enter a number greater than 0."
+  };
+  function run(fromSubmit) {
+    var g = {};
+    var filled = 0;
+    var s = document.getElementById("speed").value;
+    var d = document.getElementById("distance").value;
+    var t = document.getElementById("time").value;
+    if (s !== "") { g.speedKmh = parseFloat(s); filled++; }
+    if (d !== "") { g.distanceKm = parseFloat(d); filled++; }
+    if (t !== "") { g.timeMin = parseFloat(t); filled++; }
+    if (!fromSubmit && filled < 2) { box.hidden = true; return; }
+    var r = SpeedCalc.solve(g);
+    if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "Check the entered values.") + "</p>"; box.hidden = false; return; }
+    box.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>Speed</td><td><strong>" + r.speedKmh.toLocaleString() + " km/h</strong></td></tr>" +
+      "<tr><td>Distance</td><td><strong>" + r.distanceKm.toLocaleString() + " km</strong></td></tr>" +
+      "<tr><td>Time</td><td><strong>" + r.timeH + " h " + r.timeM + " min</strong> (" + r.timeMin.toLocaleString() + " min)</td></tr>" +
+      "</tbody></table></div>";
+    box.hidden = false;
+  }
+  document.getElementById("speed-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+  ["speed", "distance", "time"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { run(false); });
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advReadCommon() {
+    var d = parseFloat(document.getElementById("adv-dist").value);
+    var s = parseFloat(document.getElementById("adv-speed").value);
+    var b = parseFloat(document.getElementById("adv-break").value);
+    if (isNaN(b)) b = 0;
+    return { d: d, s: s, b: b };
+  }
+  function advParseTime(id) {
+    var v = document.getElementById(id).value;
+    var m = v.match(/^(\d{1,2}):(\d{2})$/);
+    if (!m) return null;
+    return { h: parseInt(m[1], 10), m: parseInt(m[2], 10) };
+  }
+  function advPad(n) { return (n < 10 ? "0" : "") + n; }
+  function advDur(min) {
+    var h = Math.floor(min / 60);
+    var m = min % 60;
+    if (h > 0 && (m > 0)) return h + " h " + m + " min";
+    if (h > 0) return h + " h";
+    return m + " min";
+  }
+  function advFail(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function runArrival(fromButton) {
+    var t = advParseTime("adv-dep-time");
+    if (!t) { if (fromButton) { advFail("Enter a departure time."); } return; }
+    var c = advReadCommon();
+    if (!fromButton && (isNaN(c.d) || isNaN(c.s))) { return; }
+    var r = SpeedCalc.arrival(t.h, t.m, c.d, c.s, c.b);
+    if (!r.ok) { advFail("Check the distance, speed and break time."); return; }
+    advBox.innerHTML =
+      '<div class="result-main">Expected arrival: ' + (r.daysLater > 0 ? "next day " : "") + r.arriveH + ":" + advPad(r.arriveM) + '</div>' +
+      "<p>Travel " + advDur(r.travelMin) + (c.b > 0 ? " + breaks " + advDur(Math.round(c.b)) : "") +
+      " = <strong>" + advDur(r.totalMin) + "</strong> in total." +
+      (r.daysLater > 1 ? " (arriving " + r.daysLater + " days later)" : "") + "</p>" +
+      '<p class="adv-note">A rough figure that does not include traffic lights or congestion.</p>';
+    advBox.hidden = false;
+  }
+  function runDeparture(fromButton) {
+    var t = advParseTime("adv-arr-time");
+    if (!t) { if (fromButton) { advFail("Enter the time you want to arrive."); } return; }
+    var c = advReadCommon();
+    if (!fromButton && (isNaN(c.d) || isNaN(c.s))) { return; }
+    var r = SpeedCalc.departure(t.h, t.m, c.d, c.s, c.b);
+    if (!r.ok) { advFail("Check the distance, speed and break time."); return; }
+    advBox.innerHTML =
+      '<div class="result-main">Leave at ' + (r.prevDay ? "previous day " : "") + r.depH + ":" + advPad(r.depM) + '</div>' +
+      "<p>The journey takes <strong>" + advDur(r.totalMin) + "</strong> in total (travel " + advDur(r.travelMin) +
+      (c.b > 0 ? " + breaks " + advDur(Math.round(c.b)) : "") + ").</p>";
+    advBox.hidden = false;
+  }
+  function runUnits(fromButton) {
+    if (!fromButton && document.getElementById("adv-kmh").value === "") { return; }
+    var kmh = parseFloat(document.getElementById("adv-kmh").value);
+    var r = SpeedCalc.speedUnits(kmh);
+    if (!r.ok) { advFail("Enter a speed greater than 0 km/h."); return; }
+    advBox.innerHTML =
+      '<div class="result-main">' + kmh.toLocaleString() + " km/h = " +
+      r.mPerSec.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " m/s</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>Per minute</td><td>" + r.mPerMin.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " m/min</td></tr>" +
+      "<tr><td>Per second</td><td>" + r.mPerSec.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " m/s</td></tr>" +
+      "</tbody></table></div>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-arr-run").addEventListener("click", function () { runArrival(true); });
+  document.getElementById("adv-dep-run").addEventListener("click", function () { runDeparture(true); });
+  document.getElementById("adv-unit-run").addEventListener("click", function () { runUnits(true); });
+  document.getElementById("adv-dep-time").addEventListener("change", function () { runArrival(false); });
+  ["adv-dist", "adv-speed", "adv-break"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runArrival(false); });
+  });
+  document.getElementById("adv-arr-time").addEventListener("change", function () { runDeparture(false); });
+  document.getElementById("adv-kmh").addEventListener("input", function () { runUnits(false); });
+})();
+</script>
+</body>
+</html>
