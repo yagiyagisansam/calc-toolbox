@@ -223,6 +223,14 @@ body {
 .pb-item:nth-child(2) .pb-rank { background: #9aa2ab; color: #fff; }
 .pb-item:nth-child(3) .pb-rank { background: #b0795a; color: #fff; }
 .pb-empty { color: var(--muted); font-size: 0.88rem; padding: 6px 2px; }
+/* 自分で作ったアンケートの行(本体+削除ボタン) */
+.pb-item-row { display: flex; align-items: stretch; gap: 8px; }
+.pb-item-row .pb-item { flex: 1 1 auto; min-width: 0; }
+.pb-item-del {
+  flex: 0 0 auto; border: 1px solid var(--card-border); background: var(--card); color: var(--muted);
+  border-radius: 16px; padding: 0 14px; font-size: 0.84rem; font-weight: 700; cursor: pointer;
+}
+.pb-item-del:active { background: var(--track); }
 
 /* 補助 */
 .pb-status { color: var(--muted); font-size: 0.9rem; margin: 10px 2px; }

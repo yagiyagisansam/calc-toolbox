@@ -56,6 +56,17 @@
     <div class="pb-list" id="mine"></div>
   </div>
 
+  <div class="pb-modal-bg" id="del-confirm-bg" hidden>
+    <div class="pb-modal" role="dialog" aria-modal="true" aria-labelledby="del-confirm-title">
+      <p class="pb-q pb-q-sm" id="del-confirm-title">このアンケートを削除しますか?</p>
+      <p class="pb-meta" id="del-confirm-q"></p>
+      <p class="pb-meta">集まった票も一緒に消えます。削除すると元に戻せません。</p>
+      <p class="pb-error" id="del-error" hidden></p>
+      <button type="button" class="pb-btn" id="del-yes">はい、削除する</button>
+      <button type="button" class="pb-btn-sub" id="del-no">いいえ、やめる</button>
+    </div>
+  </div>
+
   <div class="pb-doc">
     <h2>使い方</h2>
     <ol>
@@ -66,8 +77,8 @@
     <h2>集計の仕組み</h2>
     <ul>
       <li>投票は1人(1端末)につき1回・1つ選択。割合(%)=その選択肢の票数÷全票数×100(小数第1位まで)。</li>
-      <li>回答者はリンクを知っている人と、このページの一覧から参加した人です。無作為抽出の統計調査とは異なる参考値です。</li>
-      <li>質問・選択肢・票数は集計のため外部データベース(Supabase)に保存されます。</li>
+      <li>回答者は、リンクを共有された人です。一覧に載せる設定にした場合は、このページから来た人も加わります(非公開にしたアンケートは一覧に載りません)。いずれも無作為抽出の統計調査とは異なる参考値です。</li>
+      <li>質問・選択肢・票数は集計のため外部データベースに保存されます。</li>
     </ul>
     <h2>注意</h2>
     <ul>
@@ -79,11 +90,11 @@
     <p class="pb-faq-q">お金や会員登録は必要ですか?</p>
     <p class="pb-faq-a">無料・登録不要です。作る側も答える側も、リンクを開くだけで使えます。</p>
     <p class="pb-faq-q">選択肢はいくつまで作れますか?</p>
-    <p class="pb-faq-a">最大10個です。X(旧Twitter)のアンケート(4個まで)より多くの選択肢で調査できます。</p>
+    <p class="pb-faq-a">最大10個です。</p>
     <p class="pb-faq-q">作ったアンケートを一覧に載せたくない場合は?</p>
     <p class="pb-faq-a">作成時に「一覧に載せる」をオフにすると、リンクを知っている人だけが開ける非公開アンケートになります。</p>
     <p class="pb-faq-q">作ったアンケートを削除したいときは?</p>
-    <p class="pb-faq-a"><a class="pb-link" href="../../contact.html">お問い合わせ</a>から投票ページのURLを添えてご連絡ください。確認のうえ削除します。</p>
+    <p class="pb-faq-a">作った端末でこのページを開くと「この端末で作ったアンケート」に並びます。その「削除」から、いつでもご自分で削除できます(集まった票も一緒に消えます)。削除できるのは作成者ご本人と運営だけです。</p>
   </div>
 </main>
 <footer class="pb-footer">

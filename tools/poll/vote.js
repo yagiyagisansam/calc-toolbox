@@ -562,6 +562,7 @@ if (window.top !== window.self) {
       renderDeadline(poll);
       renderShare(poll.question);
       document.getElementById("report-btn").hidden = false;
+      setupOwnerDelete();
       var voted = votedMap()[pollId] !== undefined;
       if (poll.closed) {
         // 締切済み: 投票不可・最終結果のみ
@@ -599,6 +600,71 @@ if (window.top !== window.self) {
     box.appendChild(p);
     box.hidden = false;
   });
+
+  // 作成者本人のときだけ削除ボタンを出す
+  // 判定は作成時にこの端末へ保存した削除キー。キーが無い端末には出さない
+  function myDeleteKey(id) {
+    var mine;
+    try { mine = JSON.parse(window.localStorage.getItem("pollMine")) || []; } catch (e) { return null; }
+    for (var i = 0; i < mine.length; i++) {
+      if (mine[i] && mine[i].id === id && mine[i].k) return mine[i].k;
+    }
+    return null;
+  }
+
+  function forgetMine(id) {
+    try {
+      var mine = JSON.parse(window.localStorage.getItem("pollMine")) || [];
+      window.localStorage.setItem("pollMine", JSON.stringify(mine.filter(function (m) { return m && m.id !== id; })));
+    } catch (e) { /* 保存不可は無視 */ }
+  }
+
+  function setupOwnerDelete() {
+    var key = myDeleteKey(pollId);
+    if (!key) return;
+    var delBtn = document.getElementById("owner-del-btn");
+    var delBg = document.getElementById("del-confirm-bg");
+    var delError = document.getElementById("del-error");
+    delBtn.hidden = false;
+
+    function close() { delBg.hidden = true; delError.hidden = true; }
+
+    delBtn.addEventListener("click", function () {
+      delError.hidden = true;
+      delBg.hidden = false;
+      document.getElementById("del-no").focus();
+    });
+    document.getElementById("del-no").addEventListener("click", function () { close(); delBtn.focus(); });
+    delBg.addEventListener("click", function (e) { if (e.target === delBg) { close(); delBtn.focus(); } });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !delBg.hidden) { close(); delBtn.focus(); }
+    });
+
+    document.getElementById("del-yes").addEventListener("click", function () {
+      var yes = this;
+      yes.disabled = true;
+      yes.textContent = "削除中…";
+      PollNet.deletePoll(pollId, key).then(function (r) {
+        yes.disabled = false;
+        yes.textContent = "はい、削除する";
+        if (r.ok || r.code === "not_owner") {
+          forgetMine(pollId);
+          close();
+          delBtn.hidden = true;
+          document.getElementById("report-btn").hidden = true;
+          qTitle.textContent = "このアンケートは削除されました";
+          showStatus("削除が完了しました。集まった票も一緒に消えています。");
+          document.getElementById("vote-form").hidden = true;
+          document.getElementById("result").hidden = true;
+          document.getElementById("share-box").hidden = true;
+          document.getElementById("deadline").hidden = true;
+        } else {
+          delError.textContent = "削除できませんでした。通信状況を確認して、もう一度お試しください。";
+          delError.hidden = false;
+        }
+      });
+    });
+  }
 
   // 通報は誤タップを防ぐため、サイト内の確認ダイアログを挟んでから送信する
   var reportBtn = document.getElementById("report-btn");

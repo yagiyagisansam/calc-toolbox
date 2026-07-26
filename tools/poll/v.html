@@ -50,7 +50,18 @@
   </div>
 
   <p class="pb-center mt20"><a class="pb-link" href="./new.html">自分もアンケートを作ってみる(無料・登録不要)</a></p>
+  <button type="button" class="pb-report" id="owner-del-btn" hidden>このアンケートを削除する(作成者のみ)</button>
   <button type="button" class="pb-report" id="report-btn" hidden>問題のあるアンケートを報告する</button>
+
+  <div class="pb-modal-bg" id="del-confirm-bg" hidden>
+    <div class="pb-modal" role="dialog" aria-modal="true" aria-labelledby="del-confirm-title">
+      <p class="pb-q pb-q-sm" id="del-confirm-title">このアンケートを削除しますか?</p>
+      <p class="pb-meta">集まった票も一緒に消えます。削除すると元に戻せません。</p>
+      <p class="pb-error" id="del-error" hidden></p>
+      <button type="button" class="pb-btn" id="del-yes">はい、削除する</button>
+      <button type="button" class="pb-btn-sub" id="del-no">いいえ、やめる</button>
+    </div>
+  </div>
 
   <div class="pb-modal-bg" id="report-confirm-bg" hidden>
     <div class="pb-modal" role="dialog" aria-modal="true" aria-labelledby="report-confirm-title">

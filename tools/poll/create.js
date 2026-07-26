@@ -280,14 +280,25 @@ if (window.top !== window.self) {
       btn.disabled = false;
       btn.textContent = "投票ページを作成する";
     }
+    // 削除キー: 作成者本人であることの証明。この端末にだけ残し、サーバーからは読み出せない
+    function makeDeleteKey() {
+      var buf = new Uint8Array(16);
+      crypto.getRandomValues(buf);
+      return Array.prototype.map.call(buf, function (b) {
+        return ("0" + b.toString(16)).slice(-2);
+      }).join("");
+    }
+
     function attempt(triesLeft) {
       var bytes = new Uint8Array(10);
       crypto.getRandomValues(bytes);
       var idRes = PollCalc.makeId(bytes);
+      var delKey = makeDeleteKey();
+      opts.deleteKey = delKey;
       PollNet.createPoll(idRes.id, v.question, v.options, opts).then(function (r) {
         if (r.ok) {
           var mine = loadMine();
-          mine.unshift({ id: idRes.id, q: v.question, t: new Date().toISOString().slice(0, 10) });
+          mine.unshift({ id: idRes.id, q: v.question, t: new Date().toISOString().slice(0, 10), k: delKey });
           saveMine(mine);
           showCreated(idRes.id, v.question);
           finish();

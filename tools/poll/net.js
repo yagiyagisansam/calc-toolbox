@@ -28,7 +28,8 @@
   function base() { return conf().url.replace(/\/+$/, ""); }
 
   // アンケートを保存する。IDが既に使われていたら {ok:false, code:"conflict"}
-  // opts: { isPublic, multi, maxChoices(2〜10|null), hideResults, shuffle, closesAt(ISO文字列|null) }
+  // opts: { isPublic, multi, maxChoices(2〜10|null), hideResults, shuffle, closesAt(ISO文字列|null),
+  //         deleteKey(作成者本人だけが持つ削除キー) }
   function createPoll(id, question, options, opts) {
     var o = opts || {};
     var h = headers();
@@ -45,7 +46,8 @@
         max_choices: (o.multi && o.maxChoices) ? o.maxChoices : null,
         hide_results: !!o.hideResults,
         shuffle: !!o.shuffle,
-        closes_at: o.closesAt || null
+        closes_at: o.closesAt || null,
+        delete_key: o.deleteKey || null
       })
     }).then(function (r) {
       if (r.ok) return { ok: true };
@@ -124,5 +126,20 @@
     }).catch(function () { return { ok: false, code: "network" }; });
   }
 
-  global.PollNet = { ready: ready, createPoll: createPoll, getResults: getResults, vote: vote, listPublic: listPublic, report: report };
+  // 作成者本人によるアンケートの削除(削除キーが一致したときだけ消える)
+  // 投票・通報もデータベース側で一緒に削除される
+  function deletePoll(pollId, deleteKey) {
+    return fetch(base() + "/rest/v1/rpc/delete_poll", {
+      method: "POST",
+      headers: headers(),
+      body: JSON.stringify({ p_id: pollId, p_key: deleteKey || "" })
+    }).then(function (r) {
+      if (!r.ok) return { ok: false, code: "rejected" };
+      return r.json().then(function (data) {
+        return (data && data.ok) ? { ok: true } : { ok: false, code: "not_owner" };
+      });
+    }).catch(function () { return { ok: false, code: "network" }; });
+  }
+
+  global.PollNet = { ready: ready, createPoll: createPoll, getResults: getResults, vote: vote, listPublic: listPublic, report: report, deletePoll: deletePoll };
 })(window);
