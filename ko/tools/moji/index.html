@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>글자 수 세기(공백 포함/제외·원고지 환산) | Quick Calc</title>
+  <meta name="description" content="텍스트를 붙여넣기만 하면 글자 수를 즉시 세어 줍니다(공백 포함/제외 동시 표시). 줄 수와 일본식 400자 원고지 환산 매수도 함께 보여 주어, 일본의 입사지원서(엔트리시트)·리포트·SNS 글자 수 제한 확인에 편리합니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/moji/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="글자 수 세기(공백 포함/제외·원고지 환산) | Quick Calc">
+  <meta property="og:description" content="텍스트를 붙여넣기만 하면 글자 수를 즉시 세어 줍니다(공백 포함/제외 동시 표시). 줄 수와 일본식 400자 원고지 환산 매수도 함께 보여 주어, 일본의 입사지원서(엔트리시트)·리포트·SNS 글자 수 제한 확인에 편리합니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/moji/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"글자 수 세기(공백 포함/제외·원고지 환산)","item":"https://quick-calc.site/ko/tools/moji/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>글자 수 세기</h1>
+  <form class="tool-form" id="moji-form">
+    <label>텍스트
+      <span class="field-note">붙여넣기만 하면 자동으로 세어 줍니다</span>
+      <textarea id="text" rows="6" placeholder="여기에 글을 입력하거나 붙여넣으세요"></textarea>
+    </label>
+    <button type="submit">글자 수 세기</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능(목표 글자 수 확인·단어 수·HTML 제거 후 세기)</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">목표 글자 수 확인</h3>
+      <p class="adv-note">위 텍스트 칸의 내용이 「N자 이내」에 들어가는지, 앞으로 몇 자를 더 쓸 수 있는지 알려 줍니다.</p>
+      <label>목표 글자 수
+        <input type="number" id="adv-limit" inputmode="numeric" min="1" step="1" placeholder="예: 400">
+      </label>
+      <label>세는 방식
+        <select id="adv-basis">
+          <option value="chars">공백 포함</option>
+          <option value="noSpace">공백 제외</option>
+        </select>
+      </label>
+      <div class="tool-result" id="adv-target-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">HTML을 제외한 본문만 세기</h3>
+      <p class="adv-note">HTML 소스를 붙여넣으면 태그와 &lt;script&gt;를 제거한 「본문만」의 글자 수를 셉니다.</p>
+      <label>HTML 소스
+        <textarea id="adv-html" rows="6" placeholder="&lt;p&gt;안녕하세요&lt;/p&gt; 같은 HTML을 붙여넣기"></textarea>
+      </label>
+      <button type="button" id="adv-run">본문만 세기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>글을 붙여넣기만 하면 <strong>몇 자인지</strong> 바로 알 수 있는 도구입니다. 공백을 뺀 글자 수, 줄 수, 원고지 매수도 함께 표시합니다. 일본의 입사지원서(엔트리시트)나 리포트에서 자주 요구하는 「N자 이내」 확인에 사용해 보세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>텍스트 칸에 글을 입력하거나, 복사한 글을 붙여넣습니다.</li>
+    <li>입력과 동시에 글자 수가 자동으로 표시됩니다(버튼을 눌러도 됩니다).</li>
+    <li>글자 수 제한이 빡빡할 때는 「공백 제외」 결과를 확인하세요.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li>글자 수는 <strong>줄바꿈을 뺀 문자 수</strong>입니다. 「공백 제외」는 여기에서 반각 공백·전각 공백(일본어 입력기에서 나오는 넓은 공백)·탭을 더 뺍니다.</li>
+    <li>이모지 등 특수 문자도 1자로 셉니다(유니코드 코드포인트 단위).</li>
+    <li>원고지 환산은 글자 수 ÷ 400을 올림한 값입니다. 원고지(原稿用紙)는 일본의 학교와 출판에서 쓰는 칸 종이로, 한 장에 400칸(한 칸에 한 글자)이 있어 일본에서는 과제 분량을 「N매」로 정하는 경우가 많습니다.</li>
+  </ul>
+
+  <h3>출처·전제</h3>
+  <ul class="sources">
+    <li>유니코드 코드포인트 단위의 문자 세기 방식에 따른 기계적인 집계입니다.</li>
+  </ul>
+
+  <h2>계산의 전제와 주의</h2>
+  <ul class="cautions">
+    <li>기관이나 서비스에 따라 줄바꿈과 공백도 1자로 세는 경우가 있습니다. 제출처의 규정을 확인해 주세요.</li>
+    <li>「👨‍👩‍👧」와 같은 결합 이모지는 보기에는 1자라도 여러 자로 계산될 수 있습니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">Word의 글자 수와 다른 이유는 무엇인가요?</h3>
+  <p class="faq-a">Word의 「글자 수」도 기본적으로 공백을 포함한 문자 수를 표시하지만, 줄바꿈 처리 방식의 차이나 「단어 수」와의 혼동으로 값이 달라질 수 있습니다. 이 도구는 줄바꿈을 빼고 공백 포함·제외를 모두 표시하므로, 요구 조건에 맞는 쪽을 사용하세요.</p>
+  <h3 class="faq-q">X(옛 트위터)의 140자 제한에도 쓸 수 있나요?</h3>
+  <p class="faq-a">참고용으로는 가능합니다. 다만 X는 반각 영숫자를 0.5자로 세는 등 자체 규칙이 있으므로, 정확한 수치는 작성 화면의 카운터에서 확인해 주세요.</p>
+  <h3 class="faq-q">입력한 글이 외부로 전송되지는 않나요?</h3>
+  <p class="faq-a">전송되지 않습니다. 계산은 모두 사용 중인 기기(브라우저) 안에서 이루어지며, 텍스트는 어디에도 전송되지 않습니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=moji">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/moji/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var input = document.getElementById("text");
+  function run() {
+    var r = MojiCalc.count(input.value);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">텍스트가 너무 깁니다(100만 자까지).</p>';
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">' + r.chars.toLocaleString() + " 자</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>공백 제외</td><td>" + r.charsNoSpace.toLocaleString() + " 자</td></tr>" +
+      "<tr><td>줄 수</td><td>" + r.lines.toLocaleString() + " 줄</td></tr>" +
+      "<tr><td>원고지(400자)</td><td>약 " + r.genkoyoshi.toLocaleString() + " 매</td></tr>" +
+      "</tbody></table></div>";
+    box.hidden = false;
+  }
+  input.addEventListener("input", run);
+  document.getElementById("moji-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var advIn = document.getElementById("adv-html");
+  function runAdv() {
+    if (advIn.value === "") { advBox.hidden = true; return; }
+    var r = MojiCalc.countHtmlStripped(advIn.value);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">텍스트가 너무 깁니다(100만 자까지).</p>';
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">본문 ' + r.chars.toLocaleString() + ' 자</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>공백 제외</td><td>' + r.charsNoSpace.toLocaleString() + ' 자</td></tr>' +
+      '<tr><td>원고지(400자)</td><td>약 ' + r.genkoyoshi.toLocaleString() + ' 매</td></tr>' +
+      '</tbody></table></div>';
+    var head = r.stripped.replace(/\s+/g, " ").trim().slice(0, 80);
+    if (head) {
+      var pv = document.createElement("p");
+      pv.className = "adv-note";
+      pv.textContent = "본문 첫 부분: " + head + (r.stripped.trim().length > 80 ? "…" : "");
+      advBox.appendChild(pv);
+    }
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", runAdv);
+  advIn.addEventListener("input", runAdv);
+
+  // 목표 글자 수 확인(메인 텍스트 칸이 대상)
+  var mainText = document.getElementById("text");
+  var limitIn = document.getElementById("adv-limit");
+  var basisIn = document.getElementById("adv-basis");
+  var targetBox = document.getElementById("adv-target-result");
+  function runTarget() {
+    var limit = parseInt(limitIn.value, 10);
+    if (!limitIn.value || isNaN(limit)) { targetBox.hidden = true; return; }
+    var r = MojiCalc.checkTarget(mainText.value, limit, basisIn.value);
+    if (!r.ok) {
+      targetBox.innerHTML = '<p class="result-error">목표 글자 수는 1 이상의 정수로 입력해 주세요.</p>';
+      targetBox.hidden = false;
+      return;
+    }
+    var w = MojiCalc.wordCount(mainText.value);
+    targetBox.innerHTML =
+      '<div class="result-main">' +
+      (r.within
+        ? "제한 안에 들어갑니다(" + r.remaining.toLocaleString() + " 자 더 쓸 수 있습니다)"
+        : r.over.toLocaleString() + " 자 초과") +
+      "</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>현재</td><td>" + r.count.toLocaleString() + " / " + r.limit.toLocaleString() + " 자</td></tr>" +
+      (w.ok && w.words > 0 ? "<tr><td>영어 단어 수(참고)</td><td>" + w.words.toLocaleString() + " 단어</td></tr>" : "") +
+      "</tbody></table></div>";
+    targetBox.hidden = false;
+  }
+  limitIn.addEventListener("input", runTarget);
+  basisIn.addEventListener("change", runTarget);
+  mainText.addEventListener("input", runTarget);
+})();
+</script>
+</body>
+</html>

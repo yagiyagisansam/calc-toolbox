@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Add Months Calculator (Date N Months Later &amp; Months Between Dates) | Quick Calc</title>
+  <meta name="description" content="Find the date N months after (or before) any date and the full-month difference between two dates, with automatic end-of-month adjustment — free. For contract periods, payment cycles, anniversaries and a baby's age in months.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/tsukisu/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Add Months Calculator (Date N Months Later &amp; Months Between Dates) | Quick Calc">
+  <meta property="og:description" content="Find the date N months after (or before) any date and the full-month difference between two dates, with automatic end-of-month adjustment — free. For contract periods, payment cycles, anniversaries and a baby's age in months.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/tsukisu/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Add Months &amp; Month Difference Calculator","item":"https://quick-calc.site/en/tools/tsukisu/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Add Months &amp; Month Difference Calculator</h1>
+  <form class="tool-form" id="tsukisu-form">
+    <label>Type of calculation
+      <select id="mode">
+        <option value="add" selected>Date N months later (or earlier)</option>
+        <option value="between">Months between two dates</option>
+      </select>
+    </label>
+    <span class="field-note">Pick the base date (initially today) — the result appears right below</span>
+    <div class="field-row">
+      <label>Base date (year)
+        <select id="start-year"></select>
+      </label>
+      <label>Month
+        <select id="start-month"></select>
+      </label>
+      <label>Day
+        <select id="start-day"></select>
+      </label>
+    </div>
+    <label id="n-label">How many months later?
+      <span class="field-note">Use a negative number for “N months earlier”</span>
+      <input type="number" id="n" inputmode="numeric" min="-1200" max="1200" step="1" value="3">
+    </label>
+    <label id="end-label" hidden>End date
+      <input type="date" id="end" min="1900-01-01" max="2200-12-31">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: contract renewal dates and a baby age-in-months list</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Build a list of contract renewal dates</h3>
+      <p class="adv-note">Uses the “base date” above as the contract start date and lists the renewal dates and cancellation-notice deadlines (end of month adjusted automatically).</p>
+      <label>Renewal interval (months)
+        <input type="number" id="adv-interval" inputmode="numeric" min="1" max="120" step="1" value="12" placeholder="e.g. 12">
+      </label>
+      <label>Number of renewals
+        <input type="number" id="adv-count" inputmode="numeric" min="1" max="48" step="1" value="5" placeholder="e.g. 5">
+      </label>
+      <label>Notice period in months (optional)
+        <span class="field-note">The N in “give notice at least N months before renewal”. Enter 0 if not needed</span>
+        <input type="number" id="adv-notice" inputmode="numeric" min="0" max="12" step="1" value="0">
+      </label>
+      <button type="button" id="adv-renew-run">List the renewal dates</button>
+      <h3 class="adv-h">Baby age-in-months date list (monthly calendar)</h3>
+      <p class="adv-note">Uses the “base date” above as the birth date and lists the dates at 1 month old, 2 months old, and so on.</p>
+      <label>How many months to show?
+        <select id="adv-baby-count">
+          <option value="12" selected>12 months</option>
+          <option value="24">24 months</option>
+        </select>
+      </label>
+      <button type="button" id="adv-baby-run">List the monthly dates</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Just enter a date to instantly get <strong>the date N months later</strong> or <strong>how many months apart two dates are</strong>. End-of-month cases are adjusted automatically — one month after January 31 is February 28. Useful for checking contract periods and for a baby's age in months.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Choose “Date N months later” or “Months between two dates”.</li>
+    <li>Enter the base date and the number of months (or the end date). Use a negative number for months earlier.</li>
+    <li>The result appears right below as you type — no button needed.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>N months later</strong>: the month is shifted and the day is kept. If the target month has no such day, the date is adjusted to the end of the month (January 31 + 1 month → February 28, or February 29 in a leap year).</li>
+    <li><strong>Months between</strong>: counted as full months. If the day of the month has not yet been reached, one month is subtracted, and the remainder is shown in days (the same way a baby's age in months is counted).</li>
+    <li>Example: January 15 to July 24 → <strong>6 full months and 9 days</strong></li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>Arithmetic based on the Gregorian calendar. The end-of-month adjustment follows the same idea as period calculation under the Japanese Civil Code (when there is no corresponding day, the period ends on the last day of the month).</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>Some contracts count months differently (for example, including the first day). For important deadlines, check the contract clauses.</li>
+    <li>The result differs from prorated calculations that treat one month as 30 days.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">What is the date one month after January 31?</h3>
+  <p class="faq-a">February has no 31st, so it becomes the end of the month: February 28 (or 29 in a leap year). Period calculation under the Japanese Civil Code treats it the same way.</p>
+  <h3 class="faq-q">How is a baby's age in months counted?</h3>
+  <p class="faq-a">It is counted in full months from the date of birth. A baby born on May 10 turns 1 month old on June 10. Enter the birthday and today in this tool's “months between” mode to find it.</p>
+  <h3 class="faq-q">Is “3 months later” the same as “90 days later”?</h3>
+  <p class="faq-a">No. Because months have different lengths, 3 months later is 89–92 days later. For day-based calculations, use a day counter instead.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=tsukisu">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/tsukisu/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var nLabel = document.getElementById("n-label");
+  var endLabel = document.getElementById("end-label");
+  var today = new Date();
+  var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  var MSG = {
+    invalid_date: "Enter a valid date.",
+    invalid_n: "Enter a whole number of months between -1200 and 1200.",
+    out_of_range: "The result is outside the supported range (years 1900–2200).",
+    date_order: "The end date must be on or after the start date."
+  };
+
+  function fillSelect(el, from, to, selected, texts) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + (texts ? texts[v - from] : v) + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, Math.min(keep, max));
+  }
+  fillSelect(document.getElementById("start-year"), 1900, 2200, today.getFullYear());
+  fillSelect(document.getElementById("start-month"), 1, 12, today.getMonth() + 1, MONTHS);
+  fillSelect(document.getElementById("start-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), today.getDate());
+  function pad2(n) { return (n < 10 ? "0" : "") + n; }
+  window.__tsukisuStartISO = function () {
+    adjustDays("start-year", "start-month", "start-day");
+    return val("start-year") + "-" + pad2(val("start-month")) + "-" + pad2(val("start-day"));
+  };
+  window.__tsukisuFmtDate = function (iso) {
+    var p = iso.split("-");
+    return MONTHS[parseInt(p[1], 10) - 1] + " " + parseInt(p[2], 10) + ", " + parseInt(p[0], 10);
+  };
+
+  mode.addEventListener("change", function () {
+    var isAdd = mode.value === "add";
+    nLabel.hidden = !isAdd;
+    endLabel.hidden = isAdd;
+    run(false);
+  });
+  function plural(n, word) { return n + " " + word + (n === 1 ? "" : "s"); }
+  function run(fromSubmit) {
+    var start = window.__tsukisuStartISO();
+    if (mode.value === "add") {
+      var nRaw = document.getElementById("n").value;
+      if (!fromSubmit && nRaw === "") { box.hidden = true; return; }
+      var n = parseInt(nRaw, 10);
+      var r = TsukisuCalc.addMonths(start, n);
+      if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "Check the entered values.") + "</p>"; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">' + window.__tsukisuFmtDate(r.date) + "</div>" +
+        "<p>" + plural(Math.abs(n), "month") + (n >= 0 ? " later" : " earlier") + (r.clamped ? " (adjusted to the end of the month because the same day does not exist)" : "") + "</p>";
+    } else {
+      var endRaw = document.getElementById("end").value;
+      if (!fromSubmit && endRaw === "") { box.hidden = true; return; }
+      var r2 = TsukisuCalc.monthsBetween(start, endRaw);
+      if (!r2.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r2.code] || "Check the entered values.") + "</p>"; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">' + plural(r2.months, "full month") + " and " + plural(r2.extraDays, "day") + "</div>";
+    }
+    box.hidden = false;
+    if (window.__tsukisuAdvRefresh) { window.__tsukisuAdvRefresh(); }
+  }
+  document.getElementById("tsukisu-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+  ["start-year", "start-month", "start-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", function () { run(false); });
+  });
+  document.getElementById("n").addEventListener("input", function () { run(false); });
+  document.getElementById("end").addEventListener("change", function () { run(false); });
+  run(false);
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advFail(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function ordinal(n) {
+    var v = n % 100;
+    if (v >= 11 && v <= 13) return n + "th";
+    return n + (["th", "st", "nd", "rd"][n % 10] || "th");
+  }
+  var lastAdv = "";
+  function runRenew(fromButton) {
+    lastAdv = "renew";
+    if (!fromButton &&
+        (document.getElementById("adv-interval").value === "" ||
+         document.getElementById("adv-count").value === "")) { return; }
+    var start = window.__tsukisuStartISO();
+    var interval = parseInt(document.getElementById("adv-interval").value, 10);
+    var count = parseInt(document.getElementById("adv-count").value, 10);
+    var notice = parseInt(document.getElementById("adv-notice").value, 10);
+    if (isNaN(notice)) notice = 0;
+    var r = TsukisuCalc.renewalDates(start, interval, count, notice);
+    if (!r.ok) {
+      advFail(r.code === "invalid_date" ? "First pick the base date (contract start date) in the form above."
+        : "Enter whole numbers: interval (1–120), renewals (1–48), notice months (0–12).");
+      return;
+    }
+    var hasNotice = notice > 0;
+    var html = '<div class="result-main">Renewal dates (every ' + interval + ' months)</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Renewal</th><th>Renewal date</th>' +
+      (hasNotice ? "<th>Notice deadline</th>" : "") + "</tr></thead><tbody>";
+    for (var i = 0; i < r.rows.length; i++) {
+      var row = r.rows[i];
+      html += "<tr><td>" + ordinal(row.n) + "</td><td>" + window.__tsukisuFmtDate(row.date) + (row.clamped ? " (end-of-month adjusted)" : "") + "</td>" +
+        (hasNotice ? "<td>by " + window.__tsukisuFmtDate(row.notice) + "</td>" : "") + "</tr>";
+    }
+    html += "</tbody></table></div>" +
+      '<p class="adv-note">The actual start day and deadlines are governed by your contract, so always check the contract terms.</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  function runBaby() {
+    lastAdv = "baby";
+    var start = window.__tsukisuStartISO();
+    var count = parseInt(document.getElementById("adv-baby-count").value, 10);
+    var r = TsukisuCalc.renewalDates(start, 1, count, 0);
+    if (!r.ok) {
+      advFail("First pick the base date (birth date) in the form above.");
+      return;
+    }
+    var html = '<div class="result-main">Age-in-months date list</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Age</th><th>Date</th></tr></thead><tbody>';
+    for (var i = 0; i < r.rows.length; i++) {
+      var row = r.rows[i];
+      html += "<tr><td>" + row.months + (row.months === 1 ? " month" : " months") + " old</td><td>" + window.__tsukisuFmtDate(row.date) +
+        (row.clamped ? " (end-of-month adjusted)" : "") + "</td></tr>";
+    }
+    html += "</tbody></table></div>";
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-renew-run").addEventListener("click", function () { runRenew(true); });
+  document.getElementById("adv-baby-run").addEventListener("click", runBaby);
+  ["adv-interval", "adv-count", "adv-notice"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runRenew(false); });
+  });
+  document.getElementById("adv-baby-count").addEventListener("change", runBaby);
+  window.__tsukisuAdvRefresh = function () {
+    if (advBox.hidden) { return; }
+    if (lastAdv === "renew") { runRenew(false); }
+    else if (lastAdv === "baby") { runBaby(); }
+  };
+})();
+</script>
+</body>
+</html>

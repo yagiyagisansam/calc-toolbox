@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>복리·적립투자 시뮬레이션 계산기 | Quick Calc</title>
+  <meta name="description" content="매달 적립액과 예상 수익률을 넣으면 장래에 얼마가 되는지 무료로 시뮬레이션합니다. 목돈을 한 번에 넣는 복리 계산도 지원. 계산식과 전제(세전·수수료 미포함의 대략적인 값)를 명시했습니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/compound/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="복리·적립투자 시뮬레이션 계산기 | Quick Calc">
+  <meta property="og:description" content="매달 적립액과 예상 수익률을 넣으면 장래에 얼마가 되는지 무료로 시뮬레이션합니다. 목돈을 한 번에 넣는 복리 계산도 지원. 계산식과 전제(세전·수수료 미포함의 대략적인 값)를 명시했습니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/compound/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"복리·적립투자 시뮬레이션 계산기","item":"https://quick-calc.site/ko/tools/compound/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>복리·적립투자 시뮬레이션</h1>
+  <form class="tool-form" id="monthly-form">
+    <label>매달 적립액(엔)
+      <span class="field-note">예: 30000(지원 범위: 1,000〜10,000,000엔)</span>
+      <input type="number" id="m-amount" inputmode="numeric" step="1" min="1000" max="10000000" placeholder="30000" required>
+    </label>
+    <label>예상 수익률(연 %)
+      <span class="field-note">예: 3〜5(지원 범위: 0〜30%)</span>
+      <input type="number" id="m-rate" inputmode="decimal" step="any" min="0" max="30" placeholder="5" required>
+    </label>
+    <label>적립 기간(년)
+      <input type="number" id="m-years" inputmode="numeric" step="1" min="1" max="50" placeholder="20" required>
+    </label>
+    <span class="field-note">세 항목을 입력하면 자동으로 계산됩니다</span>
+    <button type="submit">적립 계산하기</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="lump-form">
+    <label>일시 투자금액(엔)
+      <span class="field-note">지원 범위: 1만〜10억 엔</span>
+      <input type="number" id="l-amount" inputmode="numeric" step="1" min="10000" max="1000000000" placeholder="1000000">
+    </label>
+    <label>예상 수익률(연 %)
+      <input type="number" id="l-rate" inputmode="decimal" step="any" min="0" max="30" placeholder="5">
+    </label>
+    <label>운용 기간(년)
+      <input type="number" id="l-years" inputmode="numeric" step="1" min="1" max="50" placeholder="10">
+    </label>
+    <button type="submit">일시 투자 계산하기</button>
+    <div class="tool-result" id="result-lump" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 목표 금액에서 역산하기</summary>
+    <div class="adv-inner">
+      <p class="adv-note">「노후까지 2,000만 엔」처럼 목표를 먼저 정하고 역산합니다(목표 금액과 예상 수익률은 아래 두 계산에서 공통으로 사용).</p>
+      <label>목표 금액(만 엔)
+        <span class="field-note">1만 엔=10,000엔이므로 1000을 넣으면 1,000만 엔입니다</span>
+        <input type="number" id="adv-target" inputmode="numeric" step="any" min="10" max="1000000" placeholder="1000">
+      </label>
+      <label>예상 수익률(연 %)
+        <input type="number" id="adv-rate" inputmode="decimal" step="any" min="0" max="30" placeholder="3">
+      </label>
+      <h3 class="adv-h">매달 얼마씩 적립하면 될까?</h3>
+      <label>적립 기간(년)
+        <input type="number" id="adv-years" inputmode="numeric" step="1" min="1" max="50" placeholder="10">
+      </label>
+      <button type="button" id="adv-monthly-run">필요한 월 적립액 계산</button>
+      <div class="tool-result" id="adv-monthly-result" hidden aria-live="polite"></div>
+      <h3 class="adv-h">목표 금액에 도달하는 시점은?</h3>
+      <label>매달 적립액(엔)
+        <input type="number" id="adv-monthly" inputmode="numeric" step="1" min="1000" max="10000000" placeholder="30000">
+      </label>
+      <button type="button" id="adv-when-run">목표 도달까지의 연수 계산</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    이 도구는 <strong>수익률이 일정하다고 가정한 대략적인 값</strong>입니다. 실제 운용 성과는 변동하며 <strong>원금 손실 가능성</strong>도 있습니다. 운용 수익에 대한 세금·수수료는 반영하지 않았습니다. 특정 금융상품을 권유하거나 추천하는 것이 아닙니다.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>매달 적립액과 예상 수익률만 넣으면 <strong>장래에 얼마가 되는지</strong> 알 수 있는 도구입니다. 목돈을 한 번에 운용하는 경우도 계산할 수 있습니다. 금액 단위는 엔이므로 일본에서 NISA 등 적립 투자 계획을 세울 때 그대로 쓸 수 있습니다.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>매달 적립액·예상 수익률·기간을 넣으면 그 자리에서 장래 금액이 표시됩니다.</li>
+    <li>목돈의 복리 계산은 아래 「일시 투자」 칸을 사용하세요.</li>
+    <li>예상 수익률을 바꿔 여러 번 계산해 폭을 두고 보는 것을 권합니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>매달 적립(월 복리·월말 납입)</strong>: 장래 가치 = 매달 금액 × ((1+i)ⁿ − 1) ÷ i(i=연 수익률÷12, n=연수×12)</li>
+    <li><strong>일시 투자(연 복리)</strong>: 장래 가치 = 원금 × (1+연 수익률)^연수</li>
+    <li>계산 예: 매달 3만 엔·연 5%·20년 → 원금 720만 엔이 <strong>약 1,233만 엔</strong>(운용 수익 약 513만 엔)</li>
+  </ul>
+
+  <h3>출처·전제 명시</h3>
+  <ul class="sources">
+    <li>복리의 표준적인 수학 공식(장래 가치·연금 종가)에 따른 계산입니다(1엔 미만 반올림).</li>
+    <li>적립은 「매달 말에 납입·월 복리」를 전제로 합니다. 납입 시점 가정이 다르면 다른 시뮬레이터와 몇 % 이내의 차이가 납니다.</li>
+  </ul>
+
+  <h2>계산의 전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>과거의 수익률이 장래를 보장하지 않습니다. 보수적인 수익률로도 확인해 보세요.</li>
+    <li>투자 판단은 본인 책임입니다. NISA 등 제도나 상품의 자세한 내용은 금융기관·공공기관의 정보를 확인해 주세요.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">예상 수익률은 어느 정도로 잡아야 하나요?</h3>
+  <p class="faq-a">장래 수익률은 아무도 알 수 없습니다. 낙관·비관 등 여러 패턴(예: 1%·3%·5%)으로 계산해 폭으로 파악하는 것이 현실적입니다.</p>
+  <h3 class="faq-q">세금은 빠지지 않나요?</h3>
+  <p class="faq-a">이 도구는 세전 기준의 대략적인 값입니다. 일본의 과세 계좌에서는 운용 수익에 약 20%의 세금이 붙습니다(비과세 제도 이용 여부에 따라 달라집니다).</p>
+  <h3 class="faq-q">복리와 단리는 무엇이 다른가요?</h3>
+  <p class="faq-a">단리는 원금에만 이자가 붙고, 복리는 「이자에도 이자가 붙는」 방식입니다. 기간이 길수록 복리의 차이가 커집니다(이 도구는 복리로 계산).</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=compound">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/compound/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var boxM = document.getElementById("result");
+  var boxL = document.getElementById("result-lump");
+  var ERROR_MESSAGES = {
+    invalid_principal: "일시 투자금액은 1만〜10억 엔 범위로 입력해 주세요.",
+    invalid_monthly: "적립액은 1,000〜10,000,000엔 범위로 입력해 주세요.",
+    invalid_rate: "수익률은 0〜30% 범위로 입력해 주세요.",
+    invalid_years: "기간은 1〜50년의 정수로 입력해 주세요."
+  };
+  function showError(boxEl, code) {
+    boxEl.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "입력값을 확인해 주세요.") + "</p>";
+    boxEl.hidden = false;
+  }
+  function runMonthly() {
+    if (document.getElementById("m-amount").value === "" ||
+        document.getElementById("m-rate").value === "" ||
+        document.getElementById("m-years").value === "") { boxM.hidden = true; return; }
+    var r = CompoundCalc.monthlySaving(
+      parseFloat(document.getElementById("m-amount").value),
+      parseFloat(document.getElementById("m-rate").value),
+      parseFloat(document.getElementById("m-years").value));
+    if (!r.ok) { showError(boxM, r.code); return; }
+    boxM.innerHTML =
+      '<div class="result-main">약 ' + r.futureValue.toLocaleString() + " 엔</div>" +
+      "<p>적립 원금: <strong>" + r.totalDeposit.toLocaleString() + " 엔</strong> / 운용 수익(세전): <strong>" + r.profit.toLocaleString() + " 엔</strong></p>";
+    boxM.hidden = false;
+  }
+  function runLump() {
+    if (document.getElementById("l-amount").value === "" ||
+        document.getElementById("l-rate").value === "" ||
+        document.getElementById("l-years").value === "") { boxL.hidden = true; return; }
+    var r = CompoundCalc.lumpSum(
+      parseFloat(document.getElementById("l-amount").value),
+      parseFloat(document.getElementById("l-rate").value),
+      parseFloat(document.getElementById("l-years").value));
+    if (!r.ok) { showError(boxL, r.code); return; }
+    boxL.innerHTML =
+      '<div class="result-main">약 ' + r.futureValue.toLocaleString() + " 엔</div>" +
+      "<p>운용 수익(세전): <strong>" + r.profit.toLocaleString() + " 엔</strong></p>";
+    boxL.hidden = false;
+  }
+  document.getElementById("monthly-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMonthly();
+  });
+  document.getElementById("lump-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runLump();
+  });
+  ["m-amount", "m-rate", "m-years"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runMonthly);
+  });
+  ["l-amount", "l-rate", "l-years"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runLump);
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var monthlyBox = document.getElementById("adv-monthly-result");
+  var advBox = document.getElementById("adv-result");
+  var MAN = 10000;
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
+  }
+  function readCommon() {
+    var target = parseFloat(document.getElementById("adv-target").value);
+    var rate = parseFloat(document.getElementById("adv-rate").value);
+    if (isNaN(target) || isNaN(rate)) return null;
+    return { target: target * MAN, rate: rate };
+  }
+  var ADV_MSG = {
+    invalid_target: "목표 금액은 10만 엔〜100억 엔 범위로 입력해 주세요.",
+    invalid_rate: "예상 수익률은 0〜30% 범위로 입력해 주세요.",
+    invalid_years: "적립 기간은 1〜50년의 정수로 입력해 주세요.",
+    invalid_monthly: "매달 적립액은 1,000〜10,000,000엔 범위로 입력해 주세요.",
+    too_long: "그 조건으로는 50년이 지나도 목표에 도달하지 않습니다. 적립액이나 수익률을 다시 확인해 주세요."
+  };
+  function runRequired() {
+    var c = readCommon();
+    var years = parseFloat(document.getElementById("adv-years").value);
+    if (!c || isNaN(years)) { showError(monthlyBox, "목표 금액·예상 수익률·적립 기간을 입력해 주세요."); return; }
+    var r = CompoundCalc.requiredMonthly(c.target, c.rate, years);
+    if (!r.ok) { showError(monthlyBox, ADV_MSG[r.code] || "입력값을 확인해 주세요."); return; }
+    monthlyBox.innerHTML =
+      '<div class="result-main">매달 ' + r.monthly.toLocaleString() + " 엔</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>적립 원금 합계</td><td>" + r.totalDeposit.toLocaleString() + " 엔</td></tr>" +
+      "<tr><td>운용 수익(목표액과의 차이)</td><td>" + r.profit.toLocaleString() + " 엔</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">수익률이 일정하게 이어질 경우의 세전·수수료 미포함 대략적인 값입니다.</p>';
+    monthlyBox.hidden = false;
+  }
+  function runWhen() {
+    var c = readCommon();
+    var monthly = parseFloat(document.getElementById("adv-monthly").value);
+    if (!c || isNaN(monthly)) { showError(advBox, "목표 금액·예상 수익률·매달 적립액을 입력해 주세요."); return; }
+    var r = CompoundCalc.yearsToTarget(monthly, c.rate, c.target);
+    if (!r.ok) { showError(advBox, ADV_MSG[r.code] || "입력값을 확인해 주세요."); return; }
+    var label = r.years > 0 ? r.years + "년" + (r.remMonths > 0 ? " " + r.remMonths + "개월" : "") : r.remMonths + "개월";
+    advBox.innerHTML =
+      '<div class="result-main">약 ' + label + " 만에 도달</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>적립 횟수</td><td>" + r.months.toLocaleString() + " 회</td></tr>" +
+      "<tr><td>그 시점의 평가액</td><td>약 " + r.futureValue.toLocaleString() + " 엔</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">수익률이 일정하게 이어질 경우의 세전·수수료 미포함 대략적인 값입니다.</p>';
+    advBox.hidden = false;
+  }
+  function maybeRunRequired() {
+    if (readCommon() && document.getElementById("adv-years").value !== "") runRequired();
+  }
+  function maybeRunWhen() {
+    if (readCommon() && document.getElementById("adv-monthly").value !== "") runWhen();
+  }
+  document.getElementById("adv-monthly-run").addEventListener("click", runRequired);
+  document.getElementById("adv-when-run").addEventListener("click", runWhen);
+  ["adv-target", "adv-rate"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      maybeRunRequired();
+      maybeRunWhen();
+    });
+  });
+  document.getElementById("adv-years").addEventListener("input", maybeRunRequired);
+  document.getElementById("adv-monthly").addEventListener("input", maybeRunWhen);
+})();
+</script>
+</body>
+</html>

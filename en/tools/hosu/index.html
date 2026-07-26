@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Steps to Distance &amp; Calorie Converter (How Many km Is 10,000 Steps?) | Quick Calc</title>
+  <meta name="description" content="Convert your step count and height into walking distance (km), time and estimated calories burned. Stride is estimated as height × 0.45. See instantly how far today's 8,000 steps took you. Great for step challenges and diet logs.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/hosu/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Steps to Distance &amp; Calorie Converter (How Many km Is 10,000 Steps?) | Quick Calc">
+  <meta property="og:description" content="Convert your step count and height into walking distance (km), time and estimated calories burned. Stride is estimated as height × 0.45. See instantly how far today's 8,000 steps took you. Great for step challenges and diet logs.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/hosu/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Steps to Distance &amp; Calorie Converter (How Many km Is 10,000 Steps?)","item":"https://quick-calc.site/en/tools/hosu/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Steps → Distance &amp; Calorie Converter</h1>
+  <form class="tool-form" id="hosu-form">
+    <span class="field-note">Enter your steps and height — the result appears right below</span>
+    <label>Steps
+      <input type="number" id="steps" inputmode="numeric" min="1" max="200000" step="1" required placeholder="e.g. 10000">
+    </label>
+    <label>Height (cm)
+      <span class="field-note">Used to estimate your stride</span>
+      <input type="number" id="height" inputmode="decimal" min="100" max="250" step="0.1" required placeholder="e.g. 170">
+    </label>
+    <label>Weight (kg, optional)
+      <span class="field-note">Add it to also get the calories burned</span>
+      <input type="number" id="weight" inputmode="decimal" min="20" max="300" step="0.1" placeholder="e.g. 60">
+    </label>
+    <button type="submit">Calculate distance and calories</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: steps left to your goal, calculate with your measured stride</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">How many steps to your goal?</h3>
+      <p class="adv-note">Enter your goal and current steps, and the remainder is converted into km, minutes and kcal (using the height and weight above).</p>
+      <label>Goal steps
+        <input type="number" id="adv-goal" inputmode="numeric" step="1" min="1" max="200000" value="10000">
+      </label>
+      <label>Current steps
+        <input type="number" id="adv-current" inputmode="numeric" step="1" min="0" max="200000" placeholder="e.g. 6500">
+      </label>
+      <button type="button" id="adv-goal-run">Calculate the remainder</button>
+
+      <h3 class="adv-h">Calculate precisely with your own stride</h3>
+      <p class="adv-note">Enter your actual stride (distance of 10 steps ÷ 10) to recalculate the distance with it.</p>
+      <label>Stride (cm)
+        <input type="number" id="adv-stride" inputmode="decimal" step="any" min="20" max="150" placeholder="e.g. 65">
+      </label>
+      <button type="button" id="adv-stride-run">Calculate with measured stride</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Just enter your step count and height to see <strong>how far you walked today</strong>. Add your weight to also get an estimate of the calories you burned. Perfect for turning the number in your pedometer app into a real sense of “how many km and kcal”.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter the step count from your phone or pedometer.</li>
+    <li>As soon as you enter your height, the distance appears right below (stride estimated as height × 0.45).</li>
+    <li>Add your weight to also see an estimate of the calories burned.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Estimated stride = height × 0.45</strong> (a common rule of thumb for walking at a normal pace; about 77 cm for 170 cm tall)</li>
+    <li><strong>Distance = steps × stride</strong> / estimated time = distance ÷ 4 km/h (a normal walking speed)</li>
+    <li><strong>Calories burned = 1.05 × 3.0 METs × time × weight</strong> (the METs value for walking and the formula from the exercise guidelines of Japan's Ministry of Health, Labour and Welfare)</li>
+    <li>Example: 10,000 steps, 170 cm, 60 kg → about 7.7 km, about 115 minutes, <strong>about 360 kcal</strong></li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>Walking (4 km/h) = 3.0 METs is from the <a href="https://www.nibiohn.go.jp/eiken/programs/2011mets.pdf" target="_blank" rel="noopener">National Institute of Health and Nutrition (Japan), “METs table of physical activities”</a> (in Japanese), and the calorie formula is from the exercise guidelines of Japan's Ministry of Health, Labour and Welfare. Stride = height × 0.45 is a common rule of thumb.</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>Stride varies with walking speed and leg length (about height × 0.5 for a fast walk). For accuracy, walk 10 steps, measure the distance and divide by 10.</li>
+    <li>Phone step counters themselves have errors (around ±10% depending on pocket position and so on).</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">Should I walk 10,000 steps a day?</h3>
+  <p class="faq-a">Japan's national health plan, Health Japan 21 (third phase), gives 8,000 steps a day as a guide for adults. Adding just 1,000 steps (about 10 minutes) to your current count is said to bring health benefits, so starting with a goal you can keep up is recommended.</p>
+  <h3 class="faq-q">How much weight can I lose with 10,000 steps?</h3>
+  <p class="faq-a">For a 60 kg person it is about 360 kcal, or roughly 50 g of body fat. Kept up daily, that adds up to about 1.5 kg worth of calories in a month, but actual weight change depends heavily on your diet.</p>
+  <h3 class="faq-q">The distance differs from what my phone shows.</h3>
+  <p class="faq-a">Phones estimate distance on their own from GPS and motion sensors. This tool is a simple “steps × estimated stride” calculation, so it differs by however much your stride differs from the estimate. Using your measured stride makes it more accurate.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=hosu">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/hosu/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var MSG = {
+    invalid_steps: "Enter a step count between 1 and 200,000.",
+    invalid_height: "Enter a height between 100 and 250 cm.",
+    invalid_weight: "Enter a weight between 20 and 300 kg."
+  };
+  var stepsEl = document.getElementById("steps");
+  var heightEl = document.getElementById("height");
+  var weightEl = document.getElementById("weight");
+  function run() {
+    if (stepsEl.value === "" || heightEl.value === "") { box.hidden = true; return; }
+    var w = weightEl.value;
+    var r = HosuCalc.calc(
+      parseFloat(stepsEl.value),
+      parseFloat(heightEl.value),
+      w === "" ? undefined : parseFloat(w)
+    );
+    if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "Check the entered values.") + "</p>"; box.hidden = false; return; }
+    box.innerHTML =
+      '<div class="result-main">About ' + r.distanceKm.toLocaleString() + " km</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>Estimated stride</td><td>" + r.strideCm.toLocaleString() + " cm (height × 0.45)</td></tr>" +
+      "<tr><td>Estimated walking time</td><td>about " + r.timeMin.toLocaleString() + " min</td></tr>" +
+      (r.kcal !== undefined ? "<tr><td>Estimated calories burned</td><td>about " + r.kcal.toLocaleString() + " kcal</td></tr>" : "") +
+      "</tbody></table></div>";
+    box.hidden = false;
+  }
+  stepsEl.addEventListener("input", run);
+  heightEl.addEventListener("input", run);
+  weightEl.addEventListener("input", run);
+  document.getElementById("hosu-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function optWeight() {
+    var v = document.getElementById("weight").value;
+    return v === "" ? undefined : parseFloat(v);
+  }
+  var lastAdv = null;
+  function runGoal(fromButton) {
+    var h = parseFloat(document.getElementById("height").value);
+    if (!isFinite(h)) { if (fromButton) advErr("First enter your height in the form above."); return; }
+    var curEl = document.getElementById("adv-current");
+    if (curEl.value === "") { if (fromButton) advErr("Enter your current step count."); return; }
+    if (document.getElementById("adv-goal").value === "") { if (fromButton) advErr("Enter your goal step count."); return; }
+    var r = HosuCalc.remainingToGoal(
+      parseFloat(document.getElementById("adv-goal").value),
+      parseFloat(curEl.value),
+      h,
+      optWeight()
+    );
+    if (!r.ok) {
+      var msg = r.code === "invalid_goal" ? "Enter a goal between 1 and 200,000 steps."
+        : r.code === "invalid_steps" ? "Enter a current step count between 0 and 200,000."
+        : r.code === "invalid_weight" ? "Enter a weight between 20 and 300 kg."
+        : "Enter a height between 100 and 250 cm.";
+      advErr(msg);
+      return;
+    }
+    lastAdv = runGoal;
+    if (r.achieved) {
+      advBox.innerHTML =
+        '<div class="result-main">Goal achieved</div>' +
+        "<p>You have reached today's step goal. Well done.</p>";
+      advBox.hidden = false;
+      return;
+    }
+    var html =
+      '<div class="result-main">' + r.remainingSteps.toLocaleString() + " steps to go</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>As distance</td><td>about " + r.distanceKm.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " km</td></tr>" +
+      "<tr><td>As time</td><td>about " + r.timeMin.toLocaleString() + " min (at 4 km/h)</td></tr>" +
+      (r.kcal !== undefined ? "<tr><td>Calories burned</td><td>about " + r.kcal.toLocaleString() + " kcal</td></tr>" : "") +
+      "</tbody></table></div>";
+    if (r.kcal === undefined) {
+      html += '<p class="adv-note">Add your weight in the form above to also see the calories for the remaining steps.</p>';
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  function runStride(fromButton) {
+    var steps = parseFloat(document.getElementById("steps").value);
+    if (!isFinite(steps)) { if (fromButton) advErr("First enter your step count in the form above."); return; }
+    var strideEl = document.getElementById("adv-stride");
+    if (strideEl.value === "") { if (fromButton) advErr("Enter your stride."); return; }
+    var r = HosuCalc.calcWithStride(steps, parseFloat(strideEl.value), optWeight());
+    if (!r.ok) {
+      var msg = r.code === "invalid_stride" ? "Enter a stride between 20 and 150 cm."
+        : r.code === "invalid_weight" ? "Enter a weight between 20 and 300 kg."
+        : "Enter a step count between 1 and 200,000.";
+      advErr(msg);
+      return;
+    }
+    lastAdv = runStride;
+    advBox.innerHTML =
+      '<div class="result-main">About ' + r.distanceKm.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " km</div>" +
+      "<p>Distance with your measured stride. As time, about <strong>" + r.timeMin.toLocaleString() + " min</strong>" +
+      (r.kcal !== undefined ? ", with about <strong>" + r.kcal.toLocaleString() + " kcal</strong> burned" : "") +
+      " (guide values at 4 km/h, 3.0 METs).</p>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-goal-run").addEventListener("click", function () { runGoal(true); });
+  document.getElementById("adv-stride-run").addEventListener("click", function () { runStride(true); });
+  ["adv-goal", "adv-current"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runGoal(false); });
+  });
+  document.getElementById("adv-stride").addEventListener("input", function () { runStride(false); });
+  ["steps", "height", "weight"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { if (lastAdv) lastAdv(false); });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,22 +1,53 @@
 // 言語別トップページ(/en/ /zh/ /ko/)を生成する
-// - 翻訳済みツール(tools.mjs)だけを載せる。ツール追加時は tools.mjs に追記して再実行
-// - 現段階はリスト型のシンプル構成(タイルグリッド化は全ツール翻訳後に実施)
+// - 一覧は <lang>/tools/ を走査して自動生成(名前=各ページの <h1>、説明=meta descriptionの1文目)
+//   → ツールを翻訳したらこのスクリプトを再実行するだけで載る。カタログの二重管理をしない
+// - カテゴリは日本語版の scripts/build/data.js の cat を使う
 // 使い方: node scripts/build/i18n/build_top.mjs
-import { writeFileSync, mkdirSync } from "node:fs";
+//   ※実行後は node scripts/build/i18n/inject_links.mjs も再実行すること
+import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { ORIGIN, LANGS, SITE } from "./langs.mjs";
-import { CATS, TOP, TOOLS } from "./tools.mjs";
+import { CATS, TOP } from "./tools.mjs";
 
 const ROOT = dirname(dirname(dirname(dirname(fileURLToPath(import.meta.url)))));
 const CAT_ORDER = ["健康", "お金", "日付", "変換"];
 const FAVICON = "data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E";
 
+const dataSrc = readFileSync(join(ROOT, "scripts/build/data.js"), "utf8");
+const JA_TOOLS = JSON.parse(dataSrc.slice(dataSrc.indexOf("= ") + 2).replace(/;\s*$/, ""));
+const CAT_OF = Object.fromEntries(JA_TOOLS.map((t) => [t.slug, t.cat]));
+
+// meta description の1文目(日本語・中国語の。/英語の. にも対応)
+function firstSentence(s) {
+  const m = s.match(/^[\s\S]*?[。．.!?！?](?=\s|$)/);
+  return (m ? m[0] : s).trim();
+}
+
+function readPage(file) {
+  const html = readFileSync(file, "utf8");
+  const h1 = html.match(/<h1>([\s\S]*?)<\/h1>/);
+  const desc = html.match(/<meta name="description" content="([^"]*)"/);
+  if (!h1 || !desc) return null;
+  return { name: h1[1].replace(/<[^>]*>/g, "").trim(), desc: firstSentence(desc[1]) };
+}
+
 for (const lang of LANGS.filter((l) => l.code !== "ja")) {
   const t = TOP[lang.code];
   const s = SITE[lang.code];
-  const tools = TOOLS[lang.code];
-  const url = `${ORIGIN}/${lang.dir}/`;
+  const toolsDir = join(ROOT, lang.dir, "tools");
+  const tools = [];
+  if (existsSync(toolsDir)) {
+    for (const slug of readdirSync(toolsDir).sort()) {
+      const file = join(toolsDir, slug, "index.html");
+      if (!existsSync(file)) continue;
+      const page = readPage(file);
+      if (!page) { console.error(`skip(h1/descriptionなし): ${lang.dir}/tools/${slug}`); continue; }
+      const cat = CAT_OF[slug];
+      if (!cat) { console.error(`skip(data.jsに未登録): ${slug}`); continue; }
+      tools.push({ slug, cat, ...page });
+    }
+  }
 
   const sections = CAT_ORDER.filter((c) => tools.some((x) => x.cat === c)).map((c) =>
     `  <h2>${CATS[lang.code][c]}</h2>\n  <ul class="related">\n` +
@@ -25,6 +56,7 @@ for (const lang of LANGS.filter((l) => l.code !== "ja")) {
     "\n  </ul>"
   ).join("\n");
 
+  const url = `${ORIGIN}/${lang.dir}/`;
   const html = `<!DOCTYPE html>
 <html lang="${lang.htmlLang}">
 <head>

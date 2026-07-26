@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Age Calculator — Exact Age, Chinese Zodiac, Hayaumare | Quick Calc</title>
+  <meta name="description" content="Enter your birth date to get your age today or on any reference date, your Chinese zodiac animal, and whether you are “hayaumare” (early-born) under Japan’s school-year system. Free, instant, leap-day birthdays supported.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/age/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Age Calculator — Exact Age, Chinese Zodiac, Hayaumare | Quick Calc">
+  <meta property="og:description" content="Enter your birth date to get your age today or on any reference date, your Chinese zodiac animal, and whether you are “hayaumare” (early-born) under Japan’s school-year system. Free, instant, leap-day birthdays supported.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/age/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Age Calculator (Age, Chinese Zodiac, Hayaumare)","item":"https://quick-calc.site/en/tools/age/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Age Calculator (Age, Chinese Zodiac, Hayaumare)</h1>
+  <form class="tool-form" id="age-form">
+    <span class="field-note">Pick your birth date — your age as of today appears right below</span>
+    <div class="field-row">
+      <label>Birth year
+        <select id="birth-year"></select>
+      </label>
+      <label>Month
+        <select id="birth-month"></select>
+      </label>
+      <label>Day
+        <select id="birth-day"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: age on any reference date, next birthday, milestone ages</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Age on a reference date you choose</h3>
+      <p class="adv-note">Calculates your age on a specific date — for example, the day you joined a company (the birth date selected above is used).</p>
+      <div class="field-row">
+        <label>Reference year
+          <select id="asof-year"></select>
+        </label>
+        <label>Month
+          <select id="asof-month"></select>
+        </label>
+        <label>Day
+          <select id="asof-day"></select>
+        </label>
+      </div>
+      <div class="tool-result" id="adv-asof-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">Next birthday and days since birth</h3>
+      <p class="adv-note">Based on the birth date selected above, this shows the days until your next birthday and the total days since you were born.</p>
+      <div class="tool-result" id="adv-nb-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">Dates when you reach milestone ages</h3>
+      <p class="adv-note">A list of the dates when you reach milestone ages in Japan, such as adulthood (18), kanreki (60) and beiju (88).</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    This tool uses the everyday rule of <strong>adding one year on the birthday itself</strong>, so the result is an <strong>approximation</strong>. Under Japanese law, your age increases at the <strong>end of the day before your birthday</strong>, so at the boundary — for example, with the reference date set to the day before a birthday — the legal age can differ by one year.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Just enter your birth date to instantly see <strong>how old you are today (or were on any date you choose)</strong>. It also shows your Chinese zodiac animal and whether you are “hayaumare” — born between January 1 and April 1, which places you in the earlier school year in Japan. Handy when writing your age on a Japanese resume or application form, or checking how old you were on a given date.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Pick your birth date in the three boxes above (today’s date is preselected).</li>
+    <li>The moment you pick it, your age, Chinese zodiac animal and hayaumare status appear. No button needed.</li>
+    <li>For “how old was I on my start date?” or the days until your next birthday, open “＋More features”.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Age</strong>: if the reference date is on or after the birthday (month and day), age = reference year − birth year; if it is before the birthday, subtract 1.</li>
+    <li><strong>Hayaumare (early-born)</strong>: born January 1 – April 1. Japanese school years group children born April 2 to April 1 of the following year, so early-born children are the youngest in their school year and join the year above children born later in the same calendar year. April 1 birthdays count as hayaumare because, under Japanese law, you legally get older at the end of the day before your birthday (March 31).</li>
+    <li><strong>Chinese zodiac (the 12 animals)</strong>: derived from the Western birth year on the 12-year cycle Rat, Ox, Tiger, Rabbit, Dragon, Snake, Horse, Goat, Monkey, Rooster, Dog and Boar (in Japan the twelfth sign 亥 is the boar).</li>
+    <li><strong>Born on February 29</strong>: in common years the year is added on March 1.</li>
+  </ul>
+
+  <h3>Sources (primary information)</h3>
+  <ul class="sources">
+    <li>Act on the Calculation of Age (Act No. 50 of 1902) — how legal age is counted, in Japanese<br>
+      <a href="https://laws.e-gov.go.jp/law/135AC1000000050" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/135AC1000000050</a> (accessed July 18, 2026)</li>
+    <li>School Education Act (Act No. 26 of 1947), Article 17 — the basis of the school-year cutoff, in Japanese<br>
+      <a href="https://laws.e-gov.go.jp/law/322AC0000000026" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/322AC0000000026</a> (accessed July 18, 2026)</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>If you need the legally exact age for a contract or an administrative procedure in Japan, check it under the legal rule that age increases on the day before the birthday.</li>
+    <li>The zodiac animal is assigned per calendar year (switching on January 1 of the Western year). Traditions that switch at Lunar New Year or setsubun may give a different animal for people born early in the year.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">Is this different from “kazoedoshi”?</h3>
+  <p class="faq-a">Yes. Kazoedoshi is the traditional East Asian count in which you are 1 at birth and gain a year every New Year. This tool uses the standard modern count (age reached on the birthday), which is what Japanese forms normally ask for.</p>
+  <h3 class="faq-q">Why do April 1 birthdays go into the earlier school year?</h3>
+  <p class="faq-a">Under Japanese law, age is added at the end of the day before the birthday, so a person born on April 1 turns a year older on March 31. Since school years are grouped by the age held as of April 1, they fall into the earlier year.</p>
+  <h3 class="faq-q">Which date should my age refer to on a resume?</h3>
+  <p class="faq-a">Normally the age as of the submission date. Set the reference date in “＋More features” to the submission date to get that age.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=age">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/age/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var today = new Date();
+  var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  var ETO_EN = { "子": "Rat", "丑": "Ox", "寅": "Tiger", "卯": "Rabbit", "辰": "Dragon", "巳": "Snake", "午": "Horse", "未": "Goat", "申": "Monkey", "酉": "Rooster", "戌": "Dog", "亥": "Boar" };
+  var MILESTONE_EN = {
+    "成年(成人年齢)": "Adulthood (age of majority in Japan)",
+    "20歳(飲酒・喫煙が可能に)": "Age 20 (drinking and smoking become legal in Japan)",
+    "還暦・定年の目安": "Kanreki (60th) — typical retirement age",
+    "年金受給開始の目安": "Typical pension start age in Japan",
+    "古希": "Koki (70th, longevity celebration)",
+    "喜寿": "Kiju (77th, longevity celebration)",
+    "傘寿": "Sanju (80th, longevity celebration)",
+    "米寿": "Beiju (88th, longevity celebration)",
+    "卒寿": "Sotsuju (90th, longevity celebration)",
+    "百寿": "Hyakuju (100th, longevity celebration)"
+  };
+
+  function fillSelect(el, from, to, selected, texts) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + (texts ? texts[v - from] : v) + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, Math.min(keep, max));
+  }
+  function iso(y, m, d) {
+    return y + "-" + String(m).padStart(2, "0") + "-" + String(d).padStart(2, "0");
+  }
+  function fmtDate(isoStr) {
+    var p = isoStr.split("-");
+    return MONTHS[parseInt(p[1], 10) - 1] + " " + parseInt(p[2], 10) + ", " + parseInt(p[0], 10);
+  }
+  var todayIso = iso(today.getFullYear(), today.getMonth() + 1, today.getDate());
+
+  var box = document.getElementById("result");
+  var asofBox = document.getElementById("adv-asof-result");
+  var nbBox = document.getElementById("adv-nb-result");
+  var advBox = document.getElementById("adv-result");
+
+  fillSelect(document.getElementById("birth-year"), 1868, today.getFullYear(), today.getFullYear());
+  fillSelect(document.getElementById("birth-month"), 1, 12, today.getMonth() + 1, MONTHS);
+  fillSelect(document.getElementById("birth-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), today.getDate());
+  fillSelect(document.getElementById("asof-year"), 1868, 2100, today.getFullYear());
+  fillSelect(document.getElementById("asof-month"), 1, 12, today.getMonth() + 1, MONTHS);
+  fillSelect(document.getElementById("asof-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), today.getDate());
+
+  function birthIso() {
+    return iso(val("birth-year"), val("birth-month"), val("birth-day"));
+  }
+
+  // ---- Main: age as of today (instant) ----
+  function runMain() {
+    adjustDays("birth-year", "birth-month", "birth-day");
+    var b = birthIso();
+    var r = AgeCalc.calculate(b, todayIso);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' +
+        (r.code === "birth_after_asof" ? "The birth date is after today." : "Check the birth date.") + "</p>";
+    } else {
+      box.innerHTML =
+        '<div class="result-main">Age today: ' + r.age + "</div>" +
+        '<div class="table-scroll"><table class="data-table"><tbody>' +
+        "<tr><td>Chinese zodiac</td><td>Year of the <strong>" + (ETO_EN[r.eto] || r.eto) + " (" + r.eto + ")</strong></td></tr>" +
+        "<tr><td>Hayaumare</td><td>" + (r.hayaumare ? "<strong>Hayaumare</strong> (born January 1 – April 1, the earlier school year in Japan)" : "Not hayaumare") + "</td></tr>" +
+        "</tbody></table></div>";
+    }
+    box.hidden = false;
+    runAsof();
+    runNextBirthday();
+    runMilestones();
+  }
+
+  // ---- More features: next birthday and days since birth (instant) ----
+  function runNextBirthday() {
+    var nb = AgeCalc.nextBirthday(birthIso(), todayIso);
+    if (!nb.ok) { nbBox.hidden = true; return; }
+    nbBox.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>Next birthday</td><td>" +
+      (nb.daysLeft === 0 ? "Today is your birthday (turning " + nb.turning + ")"
+        : fmtDate(nb.date) + " (" + nb.daysLeft.toLocaleString() + " days to go, turning " + nb.turning + ")") + "</td></tr>" +
+      "<tr><td>Days since birth</td><td>" + nb.daysOld.toLocaleString() + " days in total</td></tr>" +
+      "</tbody></table></div>";
+    nbBox.hidden = false;
+  }
+
+  // ---- More features: age on the reference date (instant) ----
+  function runAsof() {
+    adjustDays("asof-year", "asof-month", "asof-day");
+    var a = iso(val("asof-year"), val("asof-month"), val("asof-day"));
+    var r = AgeCalc.calculate(birthIso(), a);
+    if (!r.ok) {
+      asofBox.innerHTML = '<p class="result-error">' +
+        (r.code === "birth_after_asof" ? "The reference date is earlier than the birth date (selected above)." : "Check the dates.") + "</p>";
+    } else {
+      asofBox.innerHTML =
+        '<div class="result-main">Age on the reference date: ' + r.age + "</div>" +
+        "<p>Reference date: " + fmtDate(a) + "</p>";
+    }
+    asofBox.hidden = false;
+  }
+
+  // ---- More features: milestone ages (instant) ----
+  function runMilestones() {
+    var r = AgeCalc.milestoneAges(birthIso());
+    if (!r.ok) { advBox.hidden = true; return; }
+    var rows = "";
+    for (var i = 0; i < r.rows.length; i++) {
+      var m = r.rows[i];
+      rows += "<tr><td>" + m.age + "</td><td>" + (MILESTONE_EN[m.label] || m.label) + "</td><td>" + fmtDate(m.date) + "</td></tr>";
+    }
+    advBox.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Age</th><th>Milestone</th><th>Date</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>" +
+      '<p class="adv-note">Dates use the everyday rule of adding a year on the birthday itself, so on paperwork they can be one day off from the legal Japanese rule (age added the day before the birthday).</p>';
+    advBox.hidden = false;
+  }
+
+  ["birth-year", "birth-month", "birth-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runMain);
+  });
+  ["asof-year", "asof-month", "asof-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runAsof);
+  });
+  document.getElementById("age-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
+  });
+
+  runMain();
+})();
+</script>
+</body>
+</html>

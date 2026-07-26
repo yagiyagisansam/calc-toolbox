@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>순수 알코올량 계산기(음주 적정량 체크) | Quick Calc</title>
+  <meta name="description" content="술의 양과 도수만 입력하면 순수 알코올량(g)과 드링크 수를 무료로 계산. 일본 후생노동성 가이드라인에 따라 생활습관병 위험을 높이는 음주량인지 남녀별로 판정합니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/alcohol/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="순수 알코올량 계산기(음주 적정량 체크) | Quick Calc">
+  <meta property="og:description" content="술의 양과 도수만 입력하면 순수 알코올량(g)과 드링크 수를 무료로 계산. 일본 후생노동성 가이드라인에 따라 생활습관병 위험을 높이는 음주량인지 남녀별로 판정합니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/alcohol/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"순수 알코올량 계산기(음주 적정량 체크)","item":"https://quick-calc.site/ko/tools/alcohol/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>순수 알코올량 계산기</h1>
+  <form class="tool-form" id="alcohol-form">
+    <span class="field-note">양과 도수를 입력하면 바로 아래에 결과가 표시됩니다</span>
+    <label>마신 양(mL)
+      <span class="field-note">예: 맥주 중간병·롱캔=500, 니혼슈(사케) 1홉(合)=180, 와인 1잔=약 125</span>
+      <input type="number" id="volume" inputmode="decimal" step="1" min="1" max="10000" placeholder="500" required>
+    </label>
+    <label>알코올 도수(%)
+      <span class="field-note">예: 맥주=5, 니혼슈=15, 와인=12, 캔 츄하이=3〜9</span>
+      <input type="number" id="abv" inputmode="decimal" step="0.1" min="0.1" max="96" placeholder="5" required>
+    </label>
+    <label>성별(위험 판정에 사용)
+      <select id="sex">
+        <option value="male">남성</option>
+        <option value="female">여성</option>
+      </select>
+    </label>
+    <button type="submit">계산하기</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 여러 잔의 합계, 분해에 걸리는 시간</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">술자리 전체를 한꺼번에 합산</h3>
+      <p class="adv-note">여러 종류의 술을 마셨을 때는 술 종류를 선택(또는 양과 도수를 직접 입력)하기만 하면 최대 5건까지 즉시 합산합니다.</p>
+      <div id="adv-drink-rows"></div>
+      <button type="button" id="adv-total-run">합계 계산하기</button>
+
+      <h3 class="adv-h">분해가 끝날 때까지 얼마나 걸릴까?</h3>
+      <p class="adv-note">분해 속도 「체중×0.1g/시간」의 기준치로 「다 마신 후 약 몇 시간인지」를 계산합니다(양이 빈칸이면 위의 계산 결과를 사용).</p>
+      <label>체중(kg)
+        <input type="number" id="adv-weight" inputmode="decimal" step="any" min="20" max="300" placeholder="예: 60">
+      </label>
+      <label>순수 알코올량(g)
+        <input type="number" id="adv-grams" inputmode="decimal" step="any" min="1" max="500" placeholder="빈칸이면 위의 합계를 사용">
+      </label>
+      <label>다 마신 시각(선택)
+        <input type="time" id="adv-end-time">
+      </label>
+      <button type="button" id="adv-time-run">분해 시간 계산하기</button>
+      <p class="adv-note">분해 속도는 개인차·컨디션 차가 큰 기준치로, <strong>「계산상 0이 됐으니 운전해도 된다」는 판단에는 쓸 수 없습니다</strong>.</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    이 도구의 계산 결과는 <strong>대략적인 값</strong>입니다. 알코올의 영향에는 큰 개인차가 있으며, 체질적으로 술에 약한 분·임신 중인 분·약을 복용 중인 분 등은 이 수치와 관계없이 음주를 삼가야 합니다.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>술의 양과 도수만 입력하면 <strong>몸에 들어가는 순수 알코올의 양</strong>을 알 수 있습니다. 일본 후생노동성 국가 가이드라인의 「위험을 높이는 양」(일본에서 쓰이는 기준)에 도달했는지도 판정합니다. 평소 마시는 양을 점검하고 싶을 때 활용해 보세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>마신(또는 마실 예정인) 술의 양을 mL 단위로 입력합니다.</li>
+    <li>술의 알코올 도수(%)를 입력합니다(캔이나 병 라벨에 표기되어 있습니다).</li>
+    <li>입력과 동시에 순수 알코올량과 판정이 바로 아래에 표시됩니다. 버튼은 필요 없습니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>순수 알코올량(g)</strong> = 양(mL) × 도수(%) ÷ 100 × 0.8(알코올의 비중)<br>
+      예: 맥주 500mL(5%)= 500 × 0.05 × 0.8 = <strong>20g</strong></li>
+    <li><strong>드링크 수</strong> = 순수 알코올량 ÷ 10(국제적으로 쓰이는 1드링크=순수 알코올 10g)</li>
+  </ul>
+  <p>판정 기준은 일본 후생노동성 「건강에 유의한 음주에 관한 가이드라인」이 제시하는 <strong>생활습관병 위험을 높이는 음주량</strong>(하루당 순수 알코올량)입니다.</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>하루당 순수 알코올량의 기준(일본 후생노동성)</caption>
+      <thead><tr><th>구분</th><th>순수 알코올량</th></tr></thead>
+      <tbody>
+        <tr><td>생활습관병 위험을 높이는 양(남성)</td><td>40g 이상</td></tr>
+        <tr><td>생활습관병 위험을 높이는 양(여성)</td><td>20g 이상</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>출처(1차 정보)</h3>
+  <ul class="sources">
+    <li>일본 후생노동성 e-헬스넷 「음주량의 단위」 — 계산식·드링크 환산(일본어)<br>
+      <a href="https://kennet.mhlw.go.jp/information/information/alcohol/a-02-001.html" rel="noopener" target="_blank">https://kennet.mhlw.go.jp/information/information/alcohol/a-02-001.html</a>(2026년 7월 18일 열람)</li>
+    <li>일본 후생노동성 「건강에 유의한 음주에 관한 가이드라인」 — 위험 판정의 기준(일본어)<br>
+      <a href="https://www.mhlw.go.jp/stf/newpage_38541.html" rel="noopener" target="_blank">https://www.mhlw.go.jp/stf/newpage_38541.html</a>(2026년 7월 18일 열람)</li>
+  </ul>
+
+  <h2>계산의 전제와 주의</h2>
+  <ul class="cautions">
+    <li>「위험을 높이는 양」은 질병 발생 위험에 관한 통계적 기준치이며, 이보다 적으면 안전하다는 뜻이 아닙니다. 소량의 음주로도 위험이 올라가는 질병(고혈압 등)도 있습니다.</li>
+    <li>알코올 분해 속도에는 개인차가 커서, 같은 양이라도 영향은 사람마다 다릅니다.</li>
+    <li>일본에서는 20세 미만의 음주와 음주운전이 법률로 금지되어 있습니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">술이 센 체질이면 많이 마셔도 괜찮나요?</h3>
+  <p class="faq-a">「잘 취하지 않는 것」과 「건강 영향이 적은 것」은 별개입니다. 생활습관병 위험은 순수 알코올량에 좌우되므로, 술이 센 체질이라도 양 관리는 필요합니다.</p>
+  <h3 class="faq-q">마신 술은 몇 시간이면 몸에서 빠지나요?</h3>
+  <p class="faq-a">알코올 분해 속도는 체격·체질에 따른 개인차가 매우 커서 이 도구에서는 판정하지 않습니다. 「계산상으로는 빠졌을 것」이라는 이유로 운전하는 일은 절대 하지 마세요.</p>
+  <h3 class="faq-q">캔 츄하이 1개로도 위험량에 해당하는 건 왜인가요?</h3>
+  <p class="faq-a">고알코올 캔 츄하이(9%·500mL)는 순수 알코올 36g으로, 맥주 중간병 약 1.8병에 해당합니다. 도수와 양 모두로 결정되므로 도수가 높은 음료는 적은 양이라도 많아집니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=alcohol">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/alcohol/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_volume: "양은 " + AlcoholCalc.VOLUME_MIN_ML + "〜" + AlcoholCalc.VOLUME_MAX_ML + " mL 범위로 입력해 주세요.",
+    invalid_abv: "도수는 " + AlcoholCalc.ABV_MIN + "〜" + AlcoholCalc.ABV_MAX + " % 범위로 입력해 주세요.",
+    invalid_sex: "성별을 선택해 주세요."
+  };
+  var box = document.getElementById("result");
+  var volumeEl = document.getElementById("volume");
+  var abvEl = document.getElementById("abv");
+  function run() {
+    if (volumeEl.value === "" || abvEl.value === "") { box.hidden = true; return; }
+    var result = AlcoholCalc.calculate(
+      parseFloat(volumeEl.value),
+      parseFloat(abvEl.value),
+      document.getElementById("sex").value
+    );
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">순수 알코올량 ' + result.grams.toFixed(1) + " g</div>" +
+        "<p>약 <strong>" + result.drinks.toFixed(1) + " 드링크</strong>(1드링크=10g)</p>" +
+        (result.exceedsRisk
+          ? "<p><strong>생활습관병 위험을 높이는 양(하루 기준)에 도달했습니다.</strong> 음주량을 다시 살펴보는 것을 권합니다.</p>"
+          : "<p>생활습관병 위험을 높이는 양(하루 기준)에는 도달하지 않았습니다.</p>");
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "입력값을 확인해 주세요.") + "</p>";
+    }
+    box.hidden = false;
+  }
+  volumeEl.addEventListener("input", run);
+  abvEl.addEventListener("input", run);
+  document.getElementById("sex").addEventListener("change", run);
+  document.getElementById("alcohol-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  var lastTotalG = null;
+  var advDrinkRows = document.getElementById("adv-drink-rows");
+  var PRESETS = [
+    { label: "맥주 중간병·롱캔", ml: 500, abv: 5 },
+    { label: "맥주 일반 캔", ml: 350, abv: 5 },
+    { label: "캔 츄하이", ml: 350, abv: 5 },
+    { label: "스트롱계 츄하이", ml: 500, abv: 9 },
+    { label: "하이볼", ml: 350, abv: 7 },
+    { label: "니혼슈(사케) 1홉", ml: 180, abv: 15 },
+    { label: "와인 1잔", ml: 125, abv: 12 },
+    { label: "소주(쇼추) 물/온수 희석 1잔", ml: 90, abv: 25 },
+    { label: "위스키 싱글", ml: 30, abv: 43 }
+  ];
+  (function buildRows() {
+    function makeRow(i) {
+      var div = document.createElement("div");
+      div.className = "adv-drink-row";
+      div.style.cssText = "display:flex;flex-wrap:wrap;gap:.5em;margin-bottom:8px;";
+      var sel = document.createElement("select");
+      sel.add(new Option("(술을 선택하면 자동 입력)", ""));
+      PRESETS.forEach(function (p, idx) {
+        sel.add(new Option(p.label + "(" + p.ml + "ml·" + p.abv + "%)", String(idx)));
+      });
+      sel.setAttribute("aria-label", (i + 1) + "잔째 술의 종류");
+      var ml = document.createElement("input");
+      ml.type = "number"; ml.min = "1"; ml.max = "10000"; ml.step = "1";
+      ml.setAttribute("inputmode", "decimal");
+      ml.placeholder = "양(mL)";
+      ml.setAttribute("aria-label", (i + 1) + "잔째의 양(mL)");
+      ml.style.width = "6.5em";
+      var abv = document.createElement("input");
+      abv.type = "number"; abv.min = "0.1"; abv.max = "96"; abv.step = "any";
+      abv.setAttribute("inputmode", "decimal");
+      abv.placeholder = "도수(%)";
+      abv.setAttribute("aria-label", (i + 1) + "잔째의 도수(%)");
+      abv.style.width = "6.5em";
+      sel.addEventListener("change", function () {
+        if (sel.value === "") return;
+        var p = PRESETS[parseInt(sel.value, 10)];
+        ml.value = p.ml;
+        abv.value = p.abv;
+        runTotal(false);
+      });
+      ml.addEventListener("input", function () { runTotal(false); });
+      abv.addEventListener("input", function () { runTotal(false); });
+      div.appendChild(sel);
+      div.appendChild(ml);
+      div.appendChild(abv);
+      advDrinkRows.appendChild(div);
+    }
+    for (var i = 0; i < 5; i++) makeRow(i);
+  })();
+  function runTotal(fromButton) {
+    var items = [];
+    var rowEls = advDrinkRows.querySelectorAll(".adv-drink-row");
+    for (var i = 0; i < rowEls.length; i++) {
+      var inputs = rowEls[i].querySelectorAll("input");
+      var ml = parseFloat(inputs[0].value);
+      var abv = parseFloat(inputs[1].value);
+      if (!isFinite(ml) && !isFinite(abv)) continue;
+      if (!isFinite(ml) || !isFinite(abv)) {
+        if (fromButton) advErr((i + 1) + "번째 행은 양과 도수를 모두 입력해 주세요.");
+        return;
+      }
+      items.push({ ml: ml, abv: abv });
+    }
+    if (items.length === 0) { if (fromButton) advErr("술의 양(mL)과 도수(%)를 1건 이상 입력해 주세요."); return; }
+    var r = AlcoholCalc.totalDrinks(items);
+    if (!r.ok) {
+      advErr(r.code === "invalid_volume" ? "양은 1〜10,000mL 범위로 입력해 주세요."
+        : "도수는 0.1〜96% 범위로 입력해 주세요.");
+      return;
+    }
+    lastTotalG = r.grams;
+    advBox.innerHTML =
+      '<div class="result-main">합계 순수 알코올 약 ' +
+      r.grams.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " g</div>" +
+      "<p>" + items.length + "잔의 합계로, <strong>약 " +
+      r.drinks.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      " 드링크</strong>(1드링크=순수 알코올 10g)입니다. 생활습관병 위험을 높이는 양의 기준은 하루당 남성 40g·여성 20g 이상입니다.</p>" +
+      '<p class="adv-note">이 값은 아래의 「분해가 끝날 때까지 얼마나 걸릴까?」에 자동으로 이어집니다.</p>';
+    advBox.hidden = false;
+  }
+  function mainFormGrams() {
+    var v = parseFloat(document.getElementById("volume").value);
+    var a = parseFloat(document.getElementById("abv").value);
+    if (!isFinite(v) || !isFinite(a)) return null;
+    var r = AlcoholCalc.calculate(v, a, document.getElementById("sex").value);
+    return r.ok ? r.grams : null;
+  }
+  function runTime(fromButton) {
+    var wEl = document.getElementById("adv-weight");
+    if (wEl.value === "") { if (fromButton) advErr("체중을 입력해 주세요."); return; }
+    var gEl = document.getElementById("adv-grams");
+    var grams;
+    if (gEl.value === "") {
+      grams = lastTotalG !== null ? lastTotalG : mainFormGrams();
+      if (grams === null) {
+        if (fromButton) advErr("순수 알코올량을 입력하거나, 먼저 위의 폼이나 합계란에서 계산해 주세요.");
+        return;
+      }
+    } else {
+      grams = parseFloat(gEl.value);
+    }
+    var r = AlcoholCalc.breakdownTime(parseFloat(wEl.value), grams, document.getElementById("adv-end-time").value);
+    if (!r.ok) {
+      var msg = r.code === "invalid_weight" ? "체중은 20〜300kg 범위로 입력해 주세요."
+        : r.code === "invalid_grams" ? "순수 알코올량은 1〜500g 범위로 입력해 주세요."
+        : "다 마신 시각을 확인해 주세요.";
+      advErr(msg);
+      return;
+    }
+    var html =
+      '<div class="result-main">다 마신 후 약 ' +
+      r.hours.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " 시간</div>" +
+      "<p>순수 알코올 " + grams.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      " g을 분해 속도 약 " + r.rateGPerHour.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      " g/시간(체중×0.1g)으로 분해할 경우의 기준치입니다.</p>";
+    if (r.finishTime !== undefined) {
+      html += "<p>분해가 끝나는 것은 <strong>" + (r.nextDay ? "다음 날 " : "") + r.finishTime + " 무렵</strong>이라는 계산입니다.</p>";
+    }
+    html += '<p class="adv-note">개인차·컨디션 차가 큰 대략적인 값입니다. 운전 가능 여부를 이 결과로 판단하지 마세요.</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-total-run").addEventListener("click", function () { runTotal(true); });
+  document.getElementById("adv-time-run").addEventListener("click", function () { runTime(true); });
+  ["adv-weight", "adv-grams", "adv-end-time"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runTime(false); });
+  });
+})();
+</script>
+</body>
+</html>

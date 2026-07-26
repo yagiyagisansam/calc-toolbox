@@ -1,0 +1,201 @@
+{
+  "tool": "shukujitsu",
+  "module": "calc.js",
+  "global": "ShukujitsuCalc",
+  "cases": [
+    {
+      "name": "2026年の祝日は18日",
+      "func": "listHolidays",
+      "args": [
+        2026
+      ],
+      "expect": {
+        "ok": true,
+        "holidays": {
+          "length": 18
+        }
+      }
+    },
+    {
+      "name": "2027年の祝日は17日",
+      "func": "listHolidays",
+      "args": [
+        2027
+      ],
+      "expect": {
+        "ok": true,
+        "holidays": {
+          "length": 17
+        }
+      }
+    },
+    {
+      "name": "2026年の1件目は元日(木)",
+      "func": "listHolidays",
+      "args": [
+        2026
+      ],
+      "expect": {
+        "ok": true,
+        "holidays": {
+          "0": {
+            "date": "2026-01-01",
+            "name": "元日",
+            "youbi": "木"
+          }
+        }
+      }
+    },
+    {
+      "name": "2026-05-06は振替休日(水)",
+      "func": "listHolidays",
+      "args": [
+        2026
+      ],
+      "expect": {
+        "ok": true,
+        "holidays": {
+          "9": {
+            "date": "2026-05-06",
+            "name": "振替休日",
+            "youbi": "水"
+          }
+        }
+      }
+    },
+    {
+      "name": "2026-09-22は国民の休日(火)",
+      "func": "listHolidays",
+      "args": [
+        2026
+      ],
+      "expect": {
+        "ok": true,
+        "holidays": {
+          "13": {
+            "date": "2026-09-22",
+            "name": "国民の休日",
+            "youbi": "火"
+          }
+        }
+      }
+    },
+    {
+      "name": "対応範囲外の年はエラー",
+      "func": "listHolidays",
+      "args": [
+        2025
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_year"
+      }
+    },
+    {
+      "name": "次の祝日: 元日当日は当日を返す(残り0日)",
+      "func": "nextHoliday",
+      "args": [
+        "2026-01-01"
+      ],
+      "expect": {
+        "ok": true,
+        "date": "2026-01-01",
+        "name": "元日",
+        "daysUntil": 0
+      }
+    },
+    {
+      "name": "次の祝日: 1月2日→成人の日まで10日",
+      "func": "nextHoliday",
+      "args": [
+        "2026-01-02"
+      ],
+      "expect": {
+        "ok": true,
+        "date": "2026-01-12",
+        "name": "成人の日",
+        "daysUntil": 10
+      }
+    },
+    {
+      "name": "次の祝日: 年をまたいで元日",
+      "func": "nextHoliday",
+      "args": [
+        "2026-12-01"
+      ],
+      "expect": {
+        "ok": true,
+        "date": "2027-01-01",
+        "name": "元日",
+        "daysUntil": 31
+      }
+    },
+    {
+      "name": "次の祝日: 日付が不正ならエラー",
+      "func": "nextHoliday",
+      "args": [
+        "2026-02-30"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_date"
+      }
+    },
+    {
+      "name": "次の祝日: データ範囲を過ぎたらエラー",
+      "func": "nextHoliday",
+      "args": [
+        "2027-12-01"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "out_of_range"
+      }
+    },
+    {
+      "name": "連休: 2026年のゴールデンウィークは5/2〜5/6の5連休",
+      "func": "longWeekends",
+      "args": [
+        2026
+      ],
+      "expect": {
+        "ok": true,
+        "runs": {
+          "3": {
+            "start": "2026-05-02",
+            "end": "2026-05-06",
+            "days": 5
+          }
+        }
+      }
+    },
+    {
+      "name": "連休: 2026年のシルバーウィークは9/19〜9/23の5連休",
+      "func": "longWeekends",
+      "args": [
+        2026
+      ],
+      "expect": {
+        "ok": true,
+        "runs": {
+          "5": {
+            "start": "2026-09-19",
+            "end": "2026-09-23",
+            "days": 5
+          }
+        }
+      }
+    },
+    {
+      "name": "連休: 対応範囲外の年はエラー",
+      "func": "longWeekends",
+      "args": [
+        2028
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_year"
+      }
+    }
+  ]
+}

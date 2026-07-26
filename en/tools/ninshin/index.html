@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Due Date &amp; Pregnancy Week Calculator (from Last Period, Cycle Adjustment) | Quick Calc</title>
+  <meta name="description" content="Calculate your due date and current pregnancy week (X weeks Y days) from the first day of your last period, free. Supports adjustment for cycles other than 28 days and shows your trimester.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/ninshin/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Due Date &amp; Pregnancy Week Calculator (from Last Period, Cycle Adjustment) | Quick Calc">
+  <meta property="og:description" content="Calculate your due date and current pregnancy week (X weeks Y days) from the first day of your last period, free. Supports adjustment for cycles other than 28 days and shows your trimester.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/ninshin/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Due Date &amp; Pregnancy Week Calculator","item":"https://quick-calc.site/en/tools/ninshin/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Due Date &amp; Pregnancy Week Calculator</h1>
+  <form class="tool-form" id="ninshin-form">
+    <span class="field-note">Pick the first day of your last period and the due date and week appear right below</span>
+    <div class="field-row">
+      <label>First day of last period (year)
+        <select id="lmp-year"></select>
+      </label>
+      <label>Month
+        <select id="lmp-month"></select>
+      </label>
+      <label>Day
+        <select id="lmp-day"></select>
+      </label>
+    </div>
+    <label>Cycle length (days)
+      <span class="field-note">If you are not sure, leave it at 28</span>
+      <input type="number" id="cycle" inputmode="numeric" min="20" max="45" step="1" value="28" required>
+    </label>
+    <label>Reference date (calculate as of this day)
+      <span class="field-note">Defaults to today</span>
+      <input type="date" id="asof" min="1900-01-01" max="2200-12-31" required>
+    </label>
+    <div class="tool-result" id="result" aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: weeks and milestones from your due date</summary>
+    <div class="adv-inner">
+      <p class="adv-note">Even if you do not know your last period, you can work backward from the due date (40 weeks 0 days) your clinic gave you.</p>
+      <div class="field-row">
+        <label>Due date (year)
+          <select id="due-year"></select>
+        </label>
+        <label>Month
+          <select id="due-month"></select>
+        </label>
+        <label>Day
+          <select id="due-day"></select>
+        </label>
+      </div>
+
+      <h3 class="adv-h">How many weeks and days today?</h3>
+      <label>Reference date (defaults to today)
+        <input type="date" id="adv-asof">
+      </label>
+      <div class="tool-result" id="adv-week-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">Milestone dates</h3>
+      <p class="adv-note">A list of dates such as the second trimester, the start of prenatal maternity leave in Japan, the start of full term and the end of postnatal maternity leave.</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    The result is an <strong>approximation based on your menstrual cycle</strong>. The actual due date is <strong>the one determined by a doctor</strong>, based on the early-pregnancy ultrasound (the baby's size). For diagnosis of pregnancy and health care, always see an obstetrician.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Just enter the first day of your last period to find <strong>your due date and how many weeks and days pregnant you are now</strong>. It can also adjust for cycles other than 28 days. Weeks are counted from the last period, the standard method used by obstetricians in Japan — handy as a self-check before your clinic visit and before receiving the Maternal and Child Health Handbook (boshi techo) at your city office in Japan, or when thinking about when to tell your family.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Pick the day your last period (the most recent one) started.</li>
+    <li>Enter your cycle length if you know it (if it is not 28 days, the due date is adjusted).</li>
+    <li>The due date, current week and trimester appear the moment you choose — no button needed.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Due date = first day of last period + 280 days</strong> (40 weeks 0 days of pregnancy). Counting pregnancy weeks from the first day of the last period is the standard obstetric method (Naegele's rule).</li>
+    <li>If the cycle is not 28 days, <strong>(cycle − 28) days</strong> are added or subtracted to correct for the shifted ovulation (for example, a 35-day cycle moves the due date 7 days later).</li>
+    <li>Pregnancy week = days elapsed from the starting point ÷ 7 (rounded down). The remainder is the “days” part.</li>
+    <li>Trimesters: up to 13 weeks = first / 14–27 weeks = second / from 28 weeks = third</li>
+    <li>Example: last period started January 1 (28-day cycle) → due date is October 8. As of July 24 you are 29 weeks 1 day pregnant (third trimester).</li>
+  </ul>
+
+  <h3>Sources (primary information)</h3>
+  <ul class="sources">
+    <li>How pregnancy is counted (the due date is 40 weeks 0 days from the first day of the last period): <a href="https://www.jsog.or.jp/citizen/5713/" target="_blank" rel="noopener">Japan Society of Obstetrics and Gynecology, glossary on pregnancy and childbirth</a> (in Japanese)</li>
+    <li>The cycle adjustment is a common correction based on Naegele's rule.</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>If your cycle is irregular, this calculation can be off by more. The final due date is confirmed by a doctor using ultrasound.</li>
+    <li>Only some babies arrive exactly on the due date; birth anywhere in the full-term range (37 weeks 0 days to 41 weeks 6 days) is common.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">Will the baby be born on the due date?</h3>
+  <p class="faq-a">The due date is only the “40 weeks 0 days” reference day. Births from 37 weeks 0 days to 41 weeks 6 days are called full term, and most births fall in this range. It helps to allow about two weeks either side of the due date.</p>
+  <h3 class="faq-q">The due date my clinic gave me differs from this tool. Why?</h3>
+  <p class="faq-a">Obstetricians often adjust the due date after measuring the baby's size (crown-rump length) in an early-pregnancy ultrasound. <strong>The doctor's due date is the correct one</strong> — use this tool as a rough guide before your visit.</p>
+  <h3 class="faq-q">How do the weeks relate to “month X of pregnancy” used in Japan?</h3>
+  <p class="faq-a">In Japan, pregnancy is counted in months of 4 weeks: month 1 = weeks 0–3, month 2 = weeks 4–7, and so on. For example, 12 weeks is month 4 and 20 weeks is month 6.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=ninshin">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/ninshin/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var today = new Date();
+
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, "", Math.min(keep, max));
+  }
+  function isoOf(prefix) {
+    adjustDays(prefix + "-year", prefix + "-month", prefix + "-day");
+    return val(prefix + "-year") + "-" +
+      String(val(prefix + "-month")).padStart(2, "0") + "-" +
+      String(val(prefix + "-day")).padStart(2, "0");
+  }
+  function initDate(prefix, yFrom, yTo) {
+    fillSelect(document.getElementById(prefix + "-year"), yFrom, yTo, "", today.getFullYear());
+    fillSelect(document.getElementById(prefix + "-month"), 1, 12, "", today.getMonth() + 1);
+    fillSelect(document.getElementById(prefix + "-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), "", today.getDate());
+  }
+  window.NinshinUi = { isoOf: isoOf, initDate: initDate };
+
+  initDate("lmp", today.getFullYear() - 2, today.getFullYear());
+
+  var box = document.getElementById("result");
+  var asofInput = document.getElementById("asof");
+  asofInput.value = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + String(today.getDate()).padStart(2, "0");
+
+  var TRIMESTER_EN = { "初期": "first trimester", "中期": "second trimester", "後期": "third trimester" };
+  var ERROR_MESSAGES = {
+    invalid_asof: "Enter a valid reference date.",
+    invalid_cycle: "Enter a cycle length as a whole number of days from 20 to 45.",
+    lmp_after_asof: "The first day of the last period is after the reference date."
+  };
+  function run() {
+    var lmp = isoOf("lmp");
+    var cycle = document.getElementById("cycle").value;
+    if (cycle === "" || asofInput.value === "") { box.hidden = true; return; }
+    var r = NinshinCalc.dueDate(lmp, asofInput.value, parseInt(cycle, 10));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "Check the entered values.") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var over = r.week >= 42 ? '<p class="result-error">This works out to more than 42 weeks. Check the dates you entered.</p>' : "";
+    box.innerHTML =
+      '<div class="result-main">Due date: ' + r.due + "</div>" +
+      "<p>As of the reference date: <strong>" + r.week + " weeks " + r.day + " days</strong> pregnant (" + (TRIMESTER_EN[r.trimester] || r.trimester) + ")</p>" + over +
+      "<p>Note: the due date determined by your doctor takes priority.</p>";
+    box.hidden = false;
+  }
+  ["lmp-year", "lmp-month", "lmp-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", run);
+  });
+  document.getElementById("cycle").addEventListener("input", run);
+  asofInput.addEventListener("change", run);
+  asofInput.addEventListener("input", run);
+  document.getElementById("ninshin-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var isoOf = window.NinshinUi.isoOf;
+  var today = new Date();
+  window.NinshinUi.initDate("due", today.getFullYear() - 1, today.getFullYear() + 1);
+
+  var weekBox = document.getElementById("adv-week-result");
+  var msBox = document.getElementById("adv-result");
+  var advAsof = document.getElementById("adv-asof");
+  advAsof.value = today.getFullYear() + "-" +
+    ("0" + (today.getMonth() + 1)).slice(-2) + "-" + ("0" + today.getDate()).slice(-2);
+
+  var MONTHS_EN = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  var TRIMESTER_EN = { "初期": "first trimester", "中期": "second trimester", "後期": "third trimester" };
+  var MILESTONE_LABEL_EN = {
+    "妊娠中期の開始": "Start of the second trimester",
+    "安定期の目安(16週)": "Guide for the “stable period” (16 weeks)",
+    "妊娠後期の開始": "Start of the third trimester",
+    "産前休業の開始(予定日の6週間前)": "Start of prenatal maternity leave in Japan (6 weeks before the due date)",
+    "正期産の開始": "Start of full term",
+    "出産予定日": "Due date",
+    "産後休業の終了(出産の8週間後)": "End of postnatal maternity leave in Japan (8 weeks after birth)"
+  };
+  var MILESTONE_WEEKS_EN = {
+    "14週0日": "14 weeks 0 days",
+    "16週0日": "16 weeks 0 days",
+    "28週0日": "28 weeks 0 days",
+    "34週0日": "34 weeks 0 days",
+    "37週0日": "37 weeks 0 days",
+    "40週0日": "40 weeks 0 days",
+    "出産の8週間後": "8 weeks after birth"
+  };
+
+  function enDate(iso) {
+    var p = iso.split("-");
+    return MONTHS_EN[parseInt(p[1], 10) - 1] + " " + parseInt(p[2], 10) + ", " + parseInt(p[0], 10);
+  }
+
+  // ---- weeks from due date (instant) ----
+  function runWeek() {
+    if (advAsof.value === "") { weekBox.hidden = true; return; }
+    var r = NinshinCalc.weeksFromDue(isoOf("due"), advAsof.value);
+    if (!r.ok) {
+      var msg = r.code === "too_early" ? "The reference date is too early (before week 0 of pregnancy). Check the due date and the reference date."
+        : r.code === "out_of_range" ? "The reference date is too far from the due date (43 weeks or later). Check the due date and the reference date."
+        : "Enter valid dates.";
+      weekBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+      weekBox.hidden = false;
+      return;
+    }
+    weekBox.innerHTML =
+      '<div class="result-main">' + r.week + ' weeks ' + r.day + ' days pregnant</div>' +
+      "<p>Trimester: " + (TRIMESTER_EN[r.trimester] || r.trimester) + " (day " + r.elapsedDays.toLocaleString() + " of pregnancy)</p>" +
+      '<p class="adv-note">This is an approximation that treats the due date as 40 weeks 0 days — ask your doctor for the official week count.</p>';
+    weekBox.hidden = false;
+  }
+
+  // ---- milestone dates (instant) ----
+  function runMilestones() {
+    var r = NinshinCalc.milestones(isoOf("due"));
+    if (!r.ok) { msBox.hidden = true; return; }
+    var rows = "";
+    for (var i = 0; i < r.rows.length; i++) {
+      var m = r.rows[i];
+      rows += "<tr><td>" + (MILESTONE_LABEL_EN[m.label] || m.label) + "</td><td>" + (MILESTONE_WEEKS_EN[m.weeks] || m.weeks) + "</td><td>" + enDate(m.date) + "</td></tr>";
+    }
+    msBox.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Milestone</th><th>Weeks</th><th>Date</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>" +
+      '<p class="adv-note">The maternity-leave dates are week-based approximations using the periods in Japan\'s Labor Standards Act (6 weeks before the due date and 8 weeks after birth; 14 weeks before for a multiple pregnancy). For medical decisions, always consult your doctor.</p>';
+    msBox.hidden = false;
+  }
+
+  function runAdv() { runWeek(); runMilestones(); }
+  ["due-year", "due-month", "due-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runAdv);
+  });
+  advAsof.addEventListener("change", runWeek);
+  advAsof.addEventListener("input", runWeek);
+  runAdv();
+})();
+</script>
+</body>
+</html>

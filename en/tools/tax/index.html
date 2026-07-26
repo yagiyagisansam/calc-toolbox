@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Japanese Consumption Tax Calculator (10% and Reduced 8%) | Quick Calc</title>
+  <meta name="description" content="Add or remove Japan's consumption tax in one step, free. Supports the standard 10% rate and the reduced 8% rate for food and drink, shows the tax breakdown, and cites the National Tax Agency.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/tax/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Japanese Consumption Tax Calculator (10% and Reduced 8%) | Quick Calc">
+  <meta property="og:description" content="Add or remove Japan's consumption tax in one step, free. Supports the standard 10% rate and the reduced 8% rate for food and drink, shows the tax breakdown, and cites the National Tax Agency.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/tax/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Japanese Consumption Tax Calculator (10% and Reduced 8%)","item":"https://quick-calc.site/en/tools/tax/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Japanese Consumption Tax Calculator</h1>
+  <form class="tool-form" id="tax-form">
+    <label>Amount (yen, whole number)
+      <span class="field-note">The result appears as you type</span>
+      <input type="number" id="price" inputmode="numeric" step="1" min="1" max="999999999" placeholder="1000" required>
+    </label>
+    <label>Direction
+      <select id="direction">
+        <option value="add">Tax-excluded → tax-included (add tax)</option>
+        <option value="remove">Tax-included → tax-excluded (remove tax)</option>
+      </select>
+    </label>
+    <label>Tax rate
+      <select id="rate">
+        <option value="10">10% (standard rate)</option>
+        <option value="8">8% (reduced rate: food, drink and subscription newspapers)</option>
+      </select>
+    </label>
+    <button type="submit">Calculate</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: total of multiple items, and withholding tax</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Total of multiple items (mixing 10% and 8% is fine)</h3>
+      <p class="adv-note">Enter the tax-excluded amounts line by line. The tax is charged once on the subtotal for each rate — the usual method on Japanese invoices and receipts.</p>
+      <span style="display:flex;gap:.5em;"><input type="number" id="adv-p0" inputmode="numeric" step="1" min="1" placeholder="Amount (excl. tax, yen)" aria-label="Amount for line 1"><select id="adv-r0" aria-label="Tax rate for line 1"><option value="10">10%</option><option value="8">8%</option></select></span>
+      <span style="display:flex;gap:.5em;"><input type="number" id="adv-p1" inputmode="numeric" step="1" min="1" placeholder="Amount (excl. tax, yen)" aria-label="Amount for line 2"><select id="adv-r1" aria-label="Tax rate for line 2"><option value="10">10%</option><option value="8">8%</option></select></span>
+      <span style="display:flex;gap:.5em;"><input type="number" id="adv-p2" inputmode="numeric" step="1" min="1" placeholder="Amount (excl. tax, yen)" aria-label="Amount for line 3"><select id="adv-r2" aria-label="Tax rate for line 3"><option value="10">10%</option><option value="8">8%</option></select></span>
+      <span style="display:flex;gap:.5em;"><input type="number" id="adv-p3" inputmode="numeric" step="1" min="1" placeholder="Amount (excl. tax, yen)" aria-label="Amount for line 4"><select id="adv-r3" aria-label="Tax rate for line 4"><option value="10">10%</option><option value="8">8%</option></select></span>
+      <span style="display:flex;gap:.5em;"><input type="number" id="adv-p4" inputmode="numeric" step="1" min="1" placeholder="Amount (excl. tax, yen)" aria-label="Amount for line 5"><select id="adv-r4" aria-label="Tax rate for line 5"><option value="10">10%</option><option value="8">8%</option></select></span>
+      <span style="display:flex;gap:.5em;"><input type="number" id="adv-p5" inputmode="numeric" step="1" min="1" placeholder="Amount (excl. tax, yen)" aria-label="Amount for line 6"><select id="adv-r5" aria-label="Tax rate for line 6"><option value="10">10%</option><option value="8">8%</option></select></span>
+      <span style="display:flex;gap:.5em;"><input type="number" id="adv-p6" inputmode="numeric" step="1" min="1" placeholder="Amount (excl. tax, yen)" aria-label="Amount for line 7"><select id="adv-r6" aria-label="Tax rate for line 7"><option value="10">10%</option><option value="8">8%</option></select></span>
+      <span style="display:flex;gap:.5em;"><input type="number" id="adv-p7" inputmode="numeric" step="1" min="1" placeholder="Amount (excl. tax, yen)" aria-label="Amount for line 8"><select id="adv-r7" aria-label="Tax rate for line 8"><option value="10">10%</option><option value="8">8%</option></select></span>
+      <label>Rounding of fractions below 1 yen
+        <select id="adv-round">
+          <option value="floor">Round down (most common in practice)</option>
+          <option value="round">Round to the nearest yen</option>
+          <option value="ceil">Round up</option>
+        </select>
+      </label>
+      <button type="button" id="adv-items-run">Calculate the total</button>
+      <div class="tool-result" id="adv-items-result" hidden aria-live="polite"></div>
+      <h3 class="adv-h">Withholding tax (freelance invoices in Japan)</h3>
+      <p class="adv-note">Calculates the Japanese withholding tax deducted from fees paid to individuals — writing, lecture, design fees and so on (10.21%, and 20.42% on the portion over 1,000,000 yen) — together with the take-home amount.</p>
+      <label>Fee amount (yen; if the invoice lists a tax-excluded fee, enter that amount)
+        <input type="number" id="adv-gross" inputmode="numeric" step="1" min="1" placeholder="100000">
+      </label>
+      <button type="button" id="adv-wh-run">Calculate withholding tax</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    The results are <strong>approximations</strong>. Fractions below 1 yen are rounded to the nearest yen here, but the actual rounding method (down, up or nearest) differs from business to business, so store receipts may differ by a yen or so.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Enter an amount and instantly see <strong>the tax-included and tax-excluded prices</strong> under Japan's consumption tax. It supports both the standard 10% rate and the reduced 8% rate that applies to food and drink. Handy for checking prices while shopping in Japan or preparing an invoice.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter the amount in yen as a whole number.</li>
+    <li>Choose the direction: “tax-excluded → tax-included” or “tax-included → tax-excluded”.</li>
+    <li>Pick the tax rate (10% or 8%) and the result appears immediately with the tax breakdown — no button needed.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Tax-excluded → tax-included</strong>: tax amount = tax-excluded price × tax rate; tax-included price = tax-excluded price + tax amount</li>
+    <li><strong>Tax-included → tax-excluded</strong>: tax-excluded price = tax-included price ÷ (1 + tax rate); tax amount = tax-included price − tax-excluded price</li>
+    <li>The rates are Japan's <strong>standard consumption tax rate of 10%</strong> and the <strong>reduced rate of 8%</strong> (food and drink excluding alcohol and eating out, plus newspapers published at least twice a week under subscription), in force since October 1, 2019.</li>
+    <li>Examples: 1,980 yen excl. tax (reduced 8%) → tax 158 yen, 2,138 yen incl. tax / 1,980 yen incl. tax (10%) → 1,800 yen excl. tax, tax 180 yen</li>
+  </ul>
+
+  <h3>Sources (primary information)</h3>
+  <ul class="sources">
+    <li>National Tax Agency (Japan), “About the reduced consumption tax rate system” — rates and items eligible for the reduced rate, in Japanese<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/zeimokubetsu/shohi/keigenzeiritsu/index.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/zeimokubetsu/shohi/keigenzeiritsu/index.htm</a> (accessed July 18, 2026)</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>Whether the reduced 8% rate applies is decided in detail by item and how it is served (for example, takeout food is 8% while eating in is 10%). Check the National Tax Agency materials for the exact classification.</li>
+    <li>If the tax rates change, the rates on this page are those in force at the time of the reference date shown above.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">What does the reduced 8% rate apply to?</h3>
+  <p class="faq-a">Food and drink (excluding alcohol and eating out) and newspapers published at least twice a week under a subscription. The same item can be 8% as takeout but 10% when eaten in the shop.</p>
+  <h3 class="faq-q">My result differs from the receipt by 1 yen.</h3>
+  <p class="faq-a">Rounding of fractions below 1 yen (down, up or to the nearest yen) differs by business. This tool consistently rounds to the nearest yen.</p>
+  <h3 class="faq-q">What do 内税 (uchizei) and 外税 (sotozei) on Japanese price tags mean?</h3>
+  <p class="faq-a">内税 means the displayed price already includes the tax; 外税 means the price is shown without tax and the tax is added at the register. For consumer prices in Japan, showing the total tax-included price is the general rule.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=tax">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/tax/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_price: "Enter an amount as a whole number from 1 to 999,999,999 yen.",
+    invalid_rate: "Choose a tax rate.",
+    invalid_direction: "Choose the direction of the calculation."
+  };
+  var box = document.getElementById("result");
+  function runMain() {
+    if (document.getElementById("price").value === "") { box.hidden = true; return; }
+    var price = parseFloat(document.getElementById("price").value);
+    var rate = parseInt(document.getElementById("rate").value, 10);
+    var direction = document.getElementById("direction").value;
+    var result = TaxCalc.calculate(price, rate, direction);
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">Incl. tax: ' + result.taxIncluded.toLocaleString() + " yen</div>" +
+        "<p>Excl. tax: <strong>" + result.taxExcluded.toLocaleString() + " yen</strong> / " +
+        "Consumption tax (" + rate + "%): <strong>" + result.taxAmount.toLocaleString() + " yen</strong></p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "Check the entered values.") + "</p>";
+    }
+    box.hidden = false;
+  }
+  document.getElementById("tax-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
+  });
+  document.getElementById("price").addEventListener("input", runMain);
+  document.getElementById("direction").addEventListener("change", runMain);
+  document.getElementById("rate").addEventListener("change", runMain);
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var itemsBox = document.getElementById("adv-items-result");
+  var advBox = document.getElementById("adv-result");
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
+  }
+  function runItems(fromButton) {
+    var items = [];
+    for (var i = 0; i < 8; i++) {
+      var v = document.getElementById("adv-p" + i).value;
+      if (v === "") continue;
+      items.push({
+        price: parseInt(v, 10),
+        rate: parseInt(document.getElementById("adv-r" + i).value, 10)
+      });
+    }
+    if (items.length === 0) {
+      if (fromButton) { showError(itemsBox, "Enter an amount on at least one line."); } else { itemsBox.hidden = true; }
+      return;
+    }
+    var mode = document.getElementById("adv-round").value;
+    var r = TaxCalc.itemsTotal(items, mode);
+    if (!r.ok) { showError(itemsBox, "Enter amounts as whole numbers from 1 to 999,999,999 yen."); return; }
+    var html = '<div class="result-main">Total incl. tax: ' + r.total.toLocaleString() + " yen</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Category</th><th>Excl. tax</th><th>Tax</th><th>Incl. tax</th></tr></thead><tbody>';
+    if (r.base10 > 0) {
+      html += "<tr><td>10% items</td><td>" + r.base10.toLocaleString() + " yen</td><td>" + r.tax10.toLocaleString() + " yen</td><td>" + r.total10.toLocaleString() + " yen</td></tr>";
+    }
+    if (r.base8 > 0) {
+      html += "<tr><td>8% items</td><td>" + r.base8.toLocaleString() + " yen</td><td>" + r.tax8.toLocaleString() + " yen</td><td>" + r.total8.toLocaleString() + " yen</td></tr>";
+    }
+    html += "<tr><td>Total</td><td>" + r.base.toLocaleString() + " yen</td><td>" + r.tax.toLocaleString() + " yen</td><td>" + r.total.toLocaleString() + " yen</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">The consumption tax is calculated only once on the subtotal for each rate, with fractions below 1 yen rounded ' +
+      (mode === "floor" ? "down" : mode === "ceil" ? "up" : "to the nearest yen") +
+      ".</p>";
+    itemsBox.innerHTML = html;
+    itemsBox.hidden = false;
+  }
+  function runWithholding(fromButton) {
+    var raw = document.getElementById("adv-gross").value;
+    if (raw === "") {
+      if (fromButton) { showError(advBox, "Enter the fee amount."); } else { advBox.hidden = true; }
+      return;
+    }
+    var gross = parseInt(raw, 10);
+    if (isNaN(gross)) { showError(advBox, "Enter the fee amount."); return; }
+    var r = TaxCalc.withholding(gross);
+    if (!r.ok) { showError(advBox, "Enter the fee amount as a whole number from 1 to 999,999,999 yen."); return; }
+    advBox.innerHTML =
+      '<div class="result-main">Take-home: ' + r.net.toLocaleString() + " yen</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>Fee amount</td><td>" + gross.toLocaleString() + " yen</td></tr>" +
+      "<tr><td>Withholding tax</td><td>" + r.tax.toLocaleString() + " yen</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">An approximation using 10.21% on amounts up to 1,000,000 yen and 20.42% on the portion above (including the special income tax for reconstruction; fractions below 1 yen rounded down).</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-items-run").addEventListener("click", function () { runItems(true); });
+  document.getElementById("adv-wh-run").addEventListener("click", function () { runWithholding(true); });
+  for (var i = 0; i < 8; i++) {
+    document.getElementById("adv-p" + i).addEventListener("input", function () { runItems(false); });
+    document.getElementById("adv-r" + i).addEventListener("change", function () { runItems(false); });
+  }
+  document.getElementById("adv-round").addEventListener("change", function () { runItems(false); });
+  document.getElementById("adv-gross").addEventListener("input", function () { runWithholding(false); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Percentage Calculator (What %, % of a Number, % Change) | Quick Calc</title>
+  <meta name="description" content="Free percentage calculator: what percent A is of B, X% of a value, and the percent increase or decrease from A to B — all in one place. Handy for discounts, achievement rates and year-on-year changes.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/percent/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Percentage Calculator (What %, % of a Number, % Change) | Quick Calc">
+  <meta property="og:description" content="Free percentage calculator: what percent A is of B, X% of a value, and the percent increase or decrease from A to B — all in one place. Handy for discounts, achievement rates and year-on-year changes.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/percent/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Percentage Calculator (What %, % of a Number, % Change)","item":"https://quick-calc.site/en/tools/percent/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Percentage Calculator</h1>
+  <form class="tool-form" id="what-form">
+    <label>① What percent of B is A?</label>
+    <span class="field-note">The result appears right below as soon as both numbers are entered</span>
+    <label>A (part)
+      <input type="number" id="w-part" inputmode="decimal" step="any" min="0" placeholder="30" required>
+    </label>
+    <label>B (whole)
+      <input type="number" id="w-whole" inputmode="decimal" step="any" min="0.000001" placeholder="200" required>
+    </label>
+    <div class="tool-result" id="result-what" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="of-form">
+    <label>② What is X% of A?</label>
+    <label>A (base value)
+      <input type="number" id="o-value" inputmode="decimal" step="any" min="0.000001" placeholder="4980" required>
+    </label>
+    <label>X%
+      <input type="number" id="o-percent" inputmode="decimal" step="any" min="0" max="10000" placeholder="20" required>
+    </label>
+    <div class="tool-result" id="result-of" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="rate-form">
+    <label>③ What is the change rate from A to B?</label>
+    <label>A (original value)
+      <input type="number" id="r-from" inputmode="decimal" step="any" min="0.000001" placeholder="500" required>
+    </label>
+    <label>B (new value)
+      <input type="number" id="r-to" inputmode="decimal" step="any" min="0" placeholder="650" required>
+    </label>
+    <div class="tool-result" id="result-rate" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: chained changes, canceling a change, reverse-calculating the original value</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">After several changes in a row, what is the total % change?</h3>
+      <p class="adv-note">Enter successive change rates such as “+10% then −10%” (negative for decreases), separated by commas or line breaks, and this multiplies them into one total change rate.</p>
+      <label>Change rates (%) in order (up to 10, e.g. 10, -10)
+        <textarea id="adv-chain" rows="2" placeholder="e.g. 10, -10"></textarea>
+      </label>
+      <label>Original value (optional; if entered, the final value is also shown)
+        <input type="number" id="adv-chain-start" inputmode="decimal" step="any" min="0.000001" placeholder="e.g. 1000">
+      </label>
+      <button type="button" id="adv-chain-run">Calculate the total change</button>
+      <div class="tool-result" id="adv-chain-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">What % cancels out a change of X%?</h3>
+      <p class="adv-note">A 25% markup is not undone by a 25% discount, so this calculates the reverse % needed to get back to the original value.</p>
+      <label>Applied change rate (%; negative for a decrease)
+        <input type="number" id="adv-cancel-rate" inputmode="decimal" step="any" placeholder="e.g. 25">
+      </label>
+      <button type="button" id="adv-cancel-run">Calculate the canceling %</button>
+      <div class="tool-result" id="adv-cancel-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">Reverse-calculate the original value from the changed value</h3>
+      <p class="adv-note">Find the original value from the value after the change and the % that was applied — for example “it rose 5% to ¥1,050,000; what was it before?” or “it was ¥8,000 after 20% off; what was the list price?”.</p>
+      <label>Value after the change
+        <input type="number" id="adv-after" inputmode="decimal" step="any" min="0.000001" placeholder="e.g. 8000">
+      </label>
+      <label>Applied change rate (%; negative for a decrease)
+        <input type="number" id="adv-after-rate" inputmode="decimal" step="any" placeholder="e.g. -20">
+      </label>
+      <button type="button" id="adv-before-run">Calculate the original value</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    Results are <strong>approximations</strong> rounded to two decimal places. Where money must be rounded by rule (billing, discounts and so on), rounding down or up can shift the result by the smallest currency unit (for example one yen).
+  </div>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>“What percent of B is A?” “How much is 20% off?” — this tool does everyday <strong>percentage calculations</strong> the moment you type the numbers. Use it for shopping discounts, test achievement rates and year-on-year changes.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter numbers in the calculation you need (① to ③). The moment both fields are filled, the result appears right below that form.</li>
+    <li>Examples: “30 points out of 200 — what percent?” → ① / “How much is the discount on ¥4,980 at 20% off?” → ② / “Sales went from 500 to 650 — what % increase?” → ③.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>① What percent of B is A</strong> = A ÷ B × 100 (e.g. 30 ÷ 200 × 100 = 15%)</li>
+    <li><strong>② X% of A</strong> = A × X ÷ 100 (e.g. 4,980 × 20 ÷ 100 = 996)</li>
+    <li><strong>③ Change rate</strong> = (B − A) ÷ A × 100 (e.g. (650 − 500) ÷ 500 × 100 = +30%; decreases are negative)</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>Simple arithmetic based on the definition of percentages (results rounded to two decimal places).</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>The change rate uses the original value A as the base. Note that 500 → 650 (+30%) and 650 → 500 (−23.08%) give different rates.</li>
+    <li>The price after an X% discount is “original value − (result of ②)”.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">Can I get the price after 20% off directly?</h3>
+  <p class="faq-a">The quickest way is to calculate 80% of the original value in ② (20% off = 80% of the price). Example: ¥4,980 at 20% off is 80% of 4,980 = ¥3,984.</p>
+  <h3 class="faq-q">What is the difference from percentage points (pt)?</h3>
+  <p class="faq-a">Going from 10% to 15% is an increase of 5 percentage points, but as a change rate it is (15 − 10) ÷ 10 × 100 = a 50% increase. The two expressions are easily confused when comparing rates, so take care.</p>
+  <h3 class="faq-q">Can I enter more than 100%?</h3>
+  <p class="faq-a">Yes. X% in ② accepts up to 10,000% (e.g. 150% of 200 = 300).</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=percent">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/percent/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_part: "Enter A (part) as a number of 0 or more.",
+    invalid_whole: "Enter B (whole) as a number greater than 0.",
+    invalid_value: "Enter A (base value) as a number greater than 0.",
+    invalid_percent: "Enter a % between 0 and 10,000.",
+    invalid_from: "Enter A (original value) as a number greater than 0.",
+    invalid_to: "Enter B (new value) as a number of 0 or more."
+  };
+  function show(box, html) { box.innerHTML = html; box.hidden = false; }
+  function showError(box, code) {
+    show(box, '<p class="result-error">' + (ERROR_MESSAGES[code] || "Check the entered values.") + "</p>");
+  }
+  function bind(formId, boxId, inputIds, compute) {
+    var box = document.getElementById(boxId);
+    function run() {
+      var empty = inputIds.some(function (id) { return document.getElementById(id).value.trim() === ""; });
+      if (empty) { box.hidden = true; return; }
+      compute(box);
+    }
+    inputIds.forEach(function (id) {
+      document.getElementById(id).addEventListener("input", run);
+    });
+    document.getElementById(formId).addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  }
+  bind("what-form", "result-what", ["w-part", "w-whole"], function (box) {
+    var r = PercentCalc.whatPercent(parseFloat(document.getElementById("w-part").value), parseFloat(document.getElementById("w-whole").value));
+    if (!r.ok) { showError(box, r.code); return; }
+    show(box, '<div class="result-main">' + r.percent.toLocaleString() + " %</div>");
+  });
+  bind("of-form", "result-of", ["o-value", "o-percent"], function (box) {
+    var r = PercentCalc.percentOf(parseFloat(document.getElementById("o-value").value), parseFloat(document.getElementById("o-percent").value));
+    if (!r.ok) { showError(box, r.code); return; }
+    show(box, '<div class="result-main">' + r.value.toLocaleString() + "</div>");
+  });
+  bind("rate-form", "result-rate", ["r-from", "r-to"], function (box) {
+    var r = PercentCalc.changeRate(parseFloat(document.getElementById("r-from").value), parseFloat(document.getElementById("r-to").value));
+    if (!r.ok) { showError(box, r.code); return; }
+    show(box, '<div class="result-main">' + (r.rate > 0 ? "+" : "") + r.rate.toLocaleString() + " %</div>" +
+      "<p>" + (r.rate > 0 ? "Increase" : r.rate < 0 ? "Decrease" : "No change") + "</p>");
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var chainBox = document.getElementById("adv-chain-result");
+  var cancelBox = document.getElementById("adv-cancel-result");
+  function runChain() {
+    if (document.getElementById("adv-chain").value.trim() === "") { chainBox.hidden = true; return; }
+    var parts = document.getElementById("adv-chain").value.split(/[\n,、]+/)
+      .map(function (p) { return p.trim(); })
+      .filter(function (p) { return p !== ""; });
+    var rates = parts.map(function (p) { return parseFloat(p); });
+    var startRaw = document.getElementById("adv-chain-start").value;
+    var start = startRaw === "" ? undefined : parseFloat(startRaw);
+    var r = PercentCalc.chainRates(rates, start);
+    if (!r.ok || rates.some(function (x) { return isNaN(x); })) {
+      var msg = r.code === "too_many" ? "Enter at most 10 change rates."
+        : r.code === "invalid_value" ? "Enter the original value as a number greater than 0."
+        : "Enter the change rates as numbers (e.g. 10, -10; each greater than −100).";
+      chainBox.innerHTML = '<p class="result-error">' + msg + '</p>';
+      chainBox.hidden = false;
+      return;
+    }
+    var sign = r.totalRate > 0 ? "+" : "";
+    var html = '<div class="result-main">Total ' + sign + r.totalRate.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '%</div>';
+    if (r.finalValue !== undefined) {
+      html += '<p>' + start.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' → <strong>' +
+        r.finalValue.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '</strong></p>';
+    }
+    chainBox.innerHTML = html;
+    chainBox.hidden = false;
+  }
+  document.getElementById("adv-chain").addEventListener("input", runChain);
+  document.getElementById("adv-chain-start").addEventListener("input", runChain);
+  document.getElementById("adv-chain-run").addEventListener("click", runChain);
+  function runCancel() {
+    if (document.getElementById("adv-cancel-rate").value.trim() === "") { cancelBox.hidden = true; return; }
+    var p = parseFloat(document.getElementById("adv-cancel-rate").value);
+    var r = PercentCalc.cancelRate(p);
+    if (!r.ok) {
+      cancelBox.innerHTML = '<p class="result-error">Enter a change rate greater than −100.</p>';
+      cancelBox.hidden = false;
+      return;
+    }
+    var dir1 = p >= 0 ? "increase (markup)" : "decrease (markdown)";
+    var dir2 = r.cancel >= 0 ? "% increase" : "% decrease";
+    cancelBox.innerHTML =
+      '<div class="result-main">' + Math.abs(r.cancel).toLocaleString(undefined, { maximumFractionDigits: 2 }) + dir2 + '</div>' +
+      '<p>This is the change needed to cancel a ' + Math.abs(p).toLocaleString(undefined, { maximumFractionDigits: 2 }) + '% ' + dir1 + ' and return to the original value.</p>';
+    cancelBox.hidden = false;
+  }
+  document.getElementById("adv-cancel-rate").addEventListener("input", runCancel);
+  document.getElementById("adv-cancel-run").addEventListener("click", runCancel);
+  function runBefore() {
+    if (document.getElementById("adv-after").value.trim() === "" ||
+        document.getElementById("adv-after-rate").value.trim() === "") { advBox.hidden = true; return; }
+    var after = parseFloat(document.getElementById("adv-after").value);
+    var rate = parseFloat(document.getElementById("adv-after-rate").value);
+    var r = PercentCalc.beforeChange(after, rate);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">Enter the changed value as a number greater than 0, and the change rate as a number greater than −100.</p>';
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">Original value: ' + r.value.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '</div>' +
+      '<p>Applying a change of ' + rate.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '% to the original value gives ' +
+      after.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '.</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-after").addEventListener("input", runBefore);
+  document.getElementById("adv-after-rate").addEventListener("input", runBefore);
+  document.getElementById("adv-before-run").addEventListener("click", runBefore);
+})();
+</script>
+</body>
+</html>

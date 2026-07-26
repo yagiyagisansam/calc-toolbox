@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>百分比计算器(占百分之几·某数的○%·增减率) | Quick Calc</title>
+  <meta name="description" content="免费一键计算「A是B的百分之几」「A的○%是多少」「从A到B增减了百分之几」三种百分比。算折扣、达成率、同比增减都很方便。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/percent/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="百分比计算器(占百分之几·某数的○%·增减率) | Quick Calc">
+  <meta property="og:description" content="免费一键计算「A是B的百分之几」「A的○%是多少」「从A到B增减了百分之几」三种百分比。算折扣、达成率、同比增减都很方便。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/percent/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"百分比计算器(占百分之几·某数的○%·增减率)","item":"https://quick-calc.site/zh/tools/percent/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>百分比计算器</h1>
+  <form class="tool-form" id="what-form">
+    <label>① A是B的百分之几?</label>
+    <span class="field-note">两个数值都填好后,结果立即显示在下方</span>
+    <label>A(部分)
+      <input type="number" id="w-part" inputmode="decimal" step="any" min="0" placeholder="30" required>
+    </label>
+    <label>B(整体)
+      <input type="number" id="w-whole" inputmode="decimal" step="any" min="0.000001" placeholder="200" required>
+    </label>
+    <div class="tool-result" id="result-what" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="of-form">
+    <label>② A的○%是多少?</label>
+    <label>A(基准值)
+      <input type="number" id="o-value" inputmode="decimal" step="any" min="0.000001" placeholder="4980" required>
+    </label>
+    <label>○%
+      <input type="number" id="o-percent" inputmode="decimal" step="any" min="0" max="10000" placeholder="20" required>
+    </label>
+    <div class="tool-result" id="result-of" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="rate-form">
+    <label>③ 从A到B的增减率是?</label>
+    <label>A(原值)
+      <input type="number" id="r-from" inputmode="decimal" step="any" min="0.000001" placeholder="500" required>
+    </label>
+    <label>B(变化后的值)
+      <input type="number" id="r-to" inputmode="decimal" step="any" min="0" placeholder="650" required>
+    </label>
+    <div class="tool-result" id="result-rate" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 连续增减·抵消变化·反推原值</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">连续增减后总共变化了百分之几?</h3>
+      <p class="adv-note">用逗号或换行分隔输入连续的变化率(减少用负数),如「先+10%再−10%」,即可计算相乘后的总变化率。</p>
+      <label>变化率(%)按顺序输入(最多10个。例: 10, -10)
+        <textarea id="adv-chain" rows="2" placeholder="例: 10, -10"></textarea>
+      </label>
+      <label>原值(可选。填写后同时显示最终值)
+        <input type="number" id="adv-chain-start" inputmode="decimal" step="any" min="0.000001" placeholder="例: 1000">
+      </label>
+      <button type="button" id="adv-chain-run">计算总变化率</button>
+      <div class="tool-result" id="adv-chain-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">要抵消○%的变化需要多少%?</h3>
+      <p class="adv-note">「涨价25%后再降价25%并不能回到原价」,因此这里计算抵消所需的反向百分比。</p>
+      <label>已应用的变化率(%。减少用负数)
+        <input type="number" id="adv-cancel-rate" inputmode="decimal" step="any" placeholder="例: 25">
+      </label>
+      <button type="button" id="adv-cancel-run">计算抵消所需的%</button>
+      <div class="tool-result" id="adv-cancel-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">由变化后的值反推原值</h3>
+      <p class="adv-note">如「涨了5%后是105万日元,原来是多少?」「降价20%后是8,000日元,定价是多少?」,由变化后的值和%求出原值。</p>
+      <label>变化后的值
+        <input type="number" id="adv-after" inputmode="decimal" step="any" min="0.000001" placeholder="例: 8000">
+      </label>
+      <label>已应用的变化率(%。减少用负数)
+        <input type="number" id="adv-after-rate" inputmode="decimal" step="any" placeholder="例: -20">
+      </label>
+      <button type="button" id="adv-before-run">计算原值</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    结果为保留到小数点后2位的<strong>约值</strong>(四舍五入)。在需要按规定处理金额尾数的场合(开票、折扣等),因舍去或进位规则不同,结果可能相差最小货币单位(如1日元)。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>「A是B的百分之几?」「减价20%后是多少钱?」——这类<strong>百分比计算</strong>,只要输入数字就能立即完成。购物折扣、考试达成率、同比增减都能算。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>在需要的计算(①〜③)栏中输入数值。两个数都填好的瞬间,结果就显示在该栏的正下方。</li>
+    <li>例: 「考试200分中得了30分,占多少?」→① / 「4,980日元减价20%能便宜多少?」→② / 「销售额从500到650涨了百分之几?」→③。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>① A是B的百分之几</strong> = A ÷ B × 100(例: 30÷200×100 = 15%)</li>
+    <li><strong>② A的○%</strong> = A × ○ ÷ 100(例: 4,980×20÷100 = 996)</li>
+    <li><strong>③ 增减率</strong> =(B − A)÷ A × 100(例: (650−500)÷500×100 = +30%。减少为负数)</li>
+  </ul>
+
+  <h3>出处与前提</h3>
+  <ul class="sources">
+    <li>基于百分率(百分比)定义的算术计算(结果四舍五入到小数点后2位)。</li>
+  </ul>
+
+  <h2>前提与注意</h2>
+  <ul class="cautions">
+    <li>增减率以「原值A」为基准。500→650(+30%)和650→500(−23.08%)的比率不同,请注意。</li>
+    <li>「减价○%后的价格」=「原值 −(②的结果)」。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">能直接算出「减价20%后的价格」吗?</h3>
+  <p class="faq-a">最快的方法是在②中计算「原值的80%」(减价20% = 按80%的价格)。例: 4,980日元减价20%后为4,980的80% = 3,984日元。</p>
+  <h3 class="faq-q">和百分点(pt)有什么区别?</h3>
+  <p class="faq-a">从10%到15%的变化是「增加5个百分点」,但按增减率计算是(15−10)÷10×100 = 增加50%。比较比率时这两种说法容易混淆,请注意。</p>
+  <h3 class="faq-q">可以输入超过100%的数值吗?</h3>
+  <p class="faq-a">可以。②的○%最多可输入10,000%(例: 200的150% = 300)。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=percent">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/percent/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_part: "A(部分)请输入0以上的数值。",
+    invalid_whole: "B(整体)请输入大于0的数值。",
+    invalid_value: "A(基准值)请输入大于0的数值。",
+    invalid_percent: "%请在 0〜10,000 范围内输入。",
+    invalid_from: "A(原值)请输入大于0的数值。",
+    invalid_to: "B(变化后的值)请输入0以上的数值。"
+  };
+  function show(box, html) { box.innerHTML = html; box.hidden = false; }
+  function showError(box, code) {
+    show(box, '<p class="result-error">' + (ERROR_MESSAGES[code] || "请检查输入的数值。") + "</p>");
+  }
+  function bind(formId, boxId, inputIds, compute) {
+    var box = document.getElementById(boxId);
+    function run() {
+      var empty = inputIds.some(function (id) { return document.getElementById(id).value.trim() === ""; });
+      if (empty) { box.hidden = true; return; }
+      compute(box);
+    }
+    inputIds.forEach(function (id) {
+      document.getElementById(id).addEventListener("input", run);
+    });
+    document.getElementById(formId).addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  }
+  bind("what-form", "result-what", ["w-part", "w-whole"], function (box) {
+    var r = PercentCalc.whatPercent(parseFloat(document.getElementById("w-part").value), parseFloat(document.getElementById("w-whole").value));
+    if (!r.ok) { showError(box, r.code); return; }
+    show(box, '<div class="result-main">' + r.percent.toLocaleString() + " %</div>");
+  });
+  bind("of-form", "result-of", ["o-value", "o-percent"], function (box) {
+    var r = PercentCalc.percentOf(parseFloat(document.getElementById("o-value").value), parseFloat(document.getElementById("o-percent").value));
+    if (!r.ok) { showError(box, r.code); return; }
+    show(box, '<div class="result-main">' + r.value.toLocaleString() + "</div>");
+  });
+  bind("rate-form", "result-rate", ["r-from", "r-to"], function (box) {
+    var r = PercentCalc.changeRate(parseFloat(document.getElementById("r-from").value), parseFloat(document.getElementById("r-to").value));
+    if (!r.ok) { showError(box, r.code); return; }
+    show(box, '<div class="result-main">' + (r.rate > 0 ? "+" : "") + r.rate.toLocaleString() + " %</div>" +
+      "<p>" + (r.rate > 0 ? "增加" : r.rate < 0 ? "减少" : "无变化") + "</p>");
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var chainBox = document.getElementById("adv-chain-result");
+  var cancelBox = document.getElementById("adv-cancel-result");
+  function runChain() {
+    if (document.getElementById("adv-chain").value.trim() === "") { chainBox.hidden = true; return; }
+    var parts = document.getElementById("adv-chain").value.split(/[\n,、]+/)
+      .map(function (p) { return p.trim(); })
+      .filter(function (p) { return p !== ""; });
+    var rates = parts.map(function (p) { return parseFloat(p); });
+    var startRaw = document.getElementById("adv-chain-start").value;
+    var start = startRaw === "" ? undefined : parseFloat(startRaw);
+    var r = PercentCalc.chainRates(rates, start);
+    if (!r.ok || rates.some(function (x) { return isNaN(x); })) {
+      var msg = r.code === "too_many" ? "变化率最多10个。"
+        : r.code === "invalid_value" ? "原值请输入大于0的数值。"
+        : "请以数值输入变化率(例: 10, -10。需大于-100)。";
+      chainBox.innerHTML = '<p class="result-error">' + msg + '</p>';
+      chainBox.hidden = false;
+      return;
+    }
+    var sign = r.totalRate > 0 ? "+" : "";
+    var html = '<div class="result-main">合计 ' + sign + r.totalRate.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '%</div>';
+    if (r.finalValue !== undefined) {
+      html += '<p>' + start.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' → <strong>' +
+        r.finalValue.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '</strong></p>';
+    }
+    chainBox.innerHTML = html;
+    chainBox.hidden = false;
+  }
+  document.getElementById("adv-chain").addEventListener("input", runChain);
+  document.getElementById("adv-chain-start").addEventListener("input", runChain);
+  document.getElementById("adv-chain-run").addEventListener("click", runChain);
+  function runCancel() {
+    if (document.getElementById("adv-cancel-rate").value.trim() === "") { cancelBox.hidden = true; return; }
+    var p = parseFloat(document.getElementById("adv-cancel-rate").value);
+    var r = PercentCalc.cancelRate(p);
+    if (!r.ok) {
+      cancelBox.innerHTML = '<p class="result-error">变化率请输入大于-100的数值。</p>';
+      cancelBox.hidden = false;
+      return;
+    }
+    var dir1 = p >= 0 ? "的上涨(涨价)" : "的下降(降价)";
+    var dir2 = r.cancel >= 0 ? "% 的增加" : "% 的减少";
+    cancelBox.innerHTML =
+      '<div class="result-main">' + Math.abs(r.cancel).toLocaleString(undefined, { maximumFractionDigits: 2 }) + dir2 + '</div>' +
+      '<p>这是抵消 ' + Math.abs(p).toLocaleString(undefined, { maximumFractionDigits: 2 }) + '%' + dir1 + '、回到原值所需的变化。</p>';
+    cancelBox.hidden = false;
+  }
+  document.getElementById("adv-cancel-rate").addEventListener("input", runCancel);
+  document.getElementById("adv-cancel-run").addEventListener("click", runCancel);
+  function runBefore() {
+    if (document.getElementById("adv-after").value.trim() === "" ||
+        document.getElementById("adv-after-rate").value.trim() === "") { advBox.hidden = true; return; }
+    var after = parseFloat(document.getElementById("adv-after").value);
+    var rate = parseFloat(document.getElementById("adv-after-rate").value);
+    var r = PercentCalc.beforeChange(after, rate);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">变化后的值请输入大于0的数值,变化率请输入大于-100的数值。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">原值: ' + r.value.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '</div>' +
+      '<p>对原值应用 ' + rate.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '% 的变化后即为 ' +
+      after.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '。</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-after").addEventListener("input", runBefore);
+  document.getElementById("adv-after-rate").addEventListener("input", runBefore);
+  document.getElementById("adv-before-run").addEventListener("click", runBefore);
+})();
+</script>
+</body>
+</html>

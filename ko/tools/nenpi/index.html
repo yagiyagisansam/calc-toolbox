@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>연비 계산기(가득 주유법으로 km/L·주유비 계산) | Quick Calc</title>
+  <meta name="description" content="주행거리와 주유량으로 실연비(km/L)를 가득 주유법으로 계산합니다. 유럽식 L/100km 표기, 이번 주유비, 1km당 연료비도 함께 표시. 무료·가입 불필요.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/nenpi/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="연비 계산기(가득 주유법으로 km/L·주유비 계산) | Quick Calc">
+  <meta property="og:description" content="주행거리와 주유량으로 실연비(km/L)를 가득 주유법으로 계산합니다. 유럽식 L/100km 표기, 이번 주유비, 1km당 연료비도 함께 표시. 무료·가입 불필요.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/nenpi/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"연비 계산기(가득 주유법으로 km/L·주유비 계산)","item":"https://quick-calc.site/ko/tools/nenpi/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>연비 계산기(가득 주유법)</h1>
+  <form class="tool-form" id="nenpi-form">
+    <label>주행거리(km)
+      <span class="field-note">지난번 가득 주유 이후의 주행거리(트립 미터)</span>
+      <input type="number" id="distance" inputmode="decimal" min="0" max="10000" step="0.1" required placeholder="예: 400">
+    </label>
+    <label>주유량(L)
+      <span class="field-note">이번에 가득 채운 양(영수증에 적힌 값)</span>
+      <input type="number" id="liters" inputmode="decimal" min="0" max="500" step="0.01" required placeholder="예: 25.5">
+    </label>
+    <label>휘발유 단가(엔/L)
+      <span class="field-note">선택 입력. 넣으면 주유비와 1km당 비용도 계산합니다</span>
+      <input type="number" id="price" inputmode="decimal" min="0" max="1000" step="0.1" placeholder="예: 170">
+    </label>
+    <button type="submit">연비 계산하기</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 카탈로그 연비와 비교, 두 대의 연간 비교</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">카탈로그 연비의 몇 %가 나오고 있나요?</h3>
+      <p class="adv-note">실연비가 카탈로그 연비(WLTC 모드 등)의 몇 %인지 확인합니다(70〜80% 정도면 일반적인 범위).</p>
+      <label>실연비(km/L)
+        <span class="field-note">위 폼에서 계산했다면 자동으로 입력됩니다</span>
+        <input type="number" id="adv-actual" inputmode="decimal" step="any" min="1" max="60" placeholder="15.2">
+      </label>
+      <label>카탈로그 연비(km/L)
+        <input type="number" id="adv-catalog" inputmode="decimal" step="any" min="1" max="60" placeholder="20.4">
+      </label>
+      <button type="button" id="adv-ratio-run">달성률 계산하기</button>
+      <div class="tool-result" id="adv-result-ratio" hidden aria-live="polite"></div>
+      <h3 class="adv-h">두 대 비교: 연간 주유비 차이(차량 교체 판단용)</h3>
+      <p class="adv-note">지금 타는 차(실연비)와 교체 후보 차의 연비, 연간 주행거리로 1년간 주유비가 얼마나 달라지는지 계산합니다.</p>
+      <label>지금 타는 차의 연비(km/L)
+        <input type="number" id="adv-car-a" inputmode="decimal" step="any" min="1" max="60" placeholder="12">
+      </label>
+      <label>교체 후보 차의 연비(km/L)
+        <input type="number" id="adv-car-b" inputmode="decimal" step="any" min="1" max="60" placeholder="22">
+      </label>
+      <label>연간 주행거리(km)
+        <span class="field-note">출퇴근과 장보기 위주라면 5,000〜10,000km가 기준</span>
+        <input type="number" id="adv-annual" inputmode="numeric" step="any" min="100" max="100000" placeholder="8000">
+      </label>
+      <label>휘발유 단가(엔/L)
+        <span class="field-note">위 폼에 이미 입력했다면 생략할 수 있습니다</span>
+        <input type="number" id="adv-price2" inputmode="decimal" step="any" min="1" max="1000" placeholder="170">
+      </label>
+      <button type="button" id="adv-cmp-run">연간 차액 계산하기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>지난 주유 이후 달린 거리와 이번에 넣은 휘발유 양만 있으면 <strong>실연비(km/L)</strong>를 바로 알 수 있습니다. km/L은 일본의 자동차 카탈로그와 주유소에서 쓰는 단위입니다. 단가를 넣으면 주유비와 1km당 연료비도 표시됩니다. 차의 상태 점검이나 연비 기록에 활용해 보세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>주유할 때마다 가득 채우고 트립 미터를 리셋해 둡니다.</li>
+    <li>다음 주유 때 「달린 거리」와 「들어간 양」을 입력합니다.</li>
+    <li>두 항목을 입력하면 실연비가 바로 아래에 자동으로 표시됩니다. 단가를 넣으면 비용도 나옵니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>연비(km/L) = 주행거리(km) ÷ 주유량(L)</strong>(가득 주유법)</li>
+    <li>가득 주유법은 「가득 → 가득」 사이에 쓴 연료를 이번 주유량으로 보는 방식으로, 실연비를 가장 확실하게 측정하는 방법입니다.</li>
+    <li>유럽식 표기 <strong>L/100km = 100 ÷ 연비(km/L)</strong>(100km를 달리는 데 필요한 연료)도 함께 표시합니다.</li>
+    <li>계산 예: 400km를 달리고 25L 주유 → 400 ÷ 25 = <strong>16.0km/L</strong>(6.25L/100km). 단가가 170엔/L이면 주유비 4,250엔, 1km당 약 10.6엔.</li>
+  </ul>
+
+  <h3>출처·전제 명시</h3>
+  <ul class="sources">
+    <li>거리·용량·단가에 근거한 산술 계산입니다.</li>
+    <li>카탈로그 연비(WLTC 모드)의 측정 방법은 <a href="https://www.mlit.go.jp/jidosha/jidosha_fr10_000010.html" target="_blank" rel="noopener">일본 국토교통성 「자동차의 연비 성능에 대하여」</a>(일본어)를 참조해 주세요.</li>
+  </ul>
+
+  <h2>계산의 전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>가득 주유법은 주유 노즐이 멈추는 위치가 매번 달라 1회마다 오차가 생깁니다. 여러 번의 평균으로 보면 더 정확합니다.</li>
+    <li>실연비는 카탈로그 연비(WLTC 모드)보다 20〜30% 낮게 나오는 것이 일반적입니다. 에어컨 사용·정체·짧은 거리 주행에서 더 나빠집니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">실연비가 카탈로그 연비보다 훨씬 나쁜데 고장인가요?</h3>
+  <p class="faq-a">카탈로그 값(WLTC 모드)은 정해진 주행 패턴에서 측정한 값이라, 실제 도로에서는 20〜30% 낮게 나오는 것이 보통입니다. 다만 갑자기 연비가 나빠졌다면 타이어 공기압 부족이나 오일 열화 등을 점검해 보시길 권합니다.</p>
+  <h3 class="faq-q">L/100km란 무엇인가요?</h3>
+  <p class="faq-a">「100km를 달리는 데 몇 리터를 쓰는가」를 나타내는, 유럽에서 일반적인 연비 표기입니다. km/L와 반대로 숫자가 작을수록 연비가 좋습니다. 16km/L = 6.25L/100km입니다.</p>
+  <h3 class="faq-q">하이브리드차나 경차에도 쓸 수 있나요?</h3>
+  <p class="faq-a">쓸 수 있습니다. 휘발유로 달리는 차라면 차종에 관계없이 계산은 같습니다(전기로만 달리는 EV는 「전비(km/kWh)」라는 다른 지표를 씁니다).</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=nenpi">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/nenpi/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var ERROR_MESSAGES = {
+    invalid_distance: "주행거리는 0보다 큰 값으로 입력해 주세요(10,000km 이하).",
+    invalid_liters: "주유량은 0보다 큰 값으로 입력해 주세요(500L 이하).",
+    invalid_price: "휘발유 단가는 0보다 큰 값으로 입력해 주세요(1,000엔/L 이하)."
+  };
+  function run(showErrors) {
+    var distRaw = document.getElementById("distance").value;
+    var litersRaw = document.getElementById("liters").value;
+    if (distRaw === "" || litersRaw === "") {
+      if (showErrors) {
+        box.innerHTML = '<p class="result-error">' + ERROR_MESSAGES[distRaw === "" ? "invalid_distance" : "invalid_liters"] + "</p>";
+        box.hidden = false;
+      } else {
+        box.hidden = true;
+      }
+      return;
+    }
+    var d = parseFloat(distRaw);
+    var l = parseFloat(litersRaw);
+    var priceRaw = document.getElementById("price").value;
+    var r = priceRaw === "" ? NenpiCalc.calc(d, l) : NenpiCalc.calc(d, l, parseFloat(priceRaw));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "입력값을 확인해 주세요.") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var rows =
+      "<tr><td>연비</td><td>" + r.kmPerL.toLocaleString() + " km/L</td></tr>" +
+      "<tr><td>유럽식 표기</td><td>" + r.lPer100km.toLocaleString() + " L/100km</td></tr>";
+    if (r.fuelCost !== undefined) {
+      rows +=
+        "<tr><td>이번 주유비</td><td>" + r.fuelCost.toLocaleString() + " 엔</td></tr>" +
+        "<tr><td>1km당 연료비</td><td>" + r.costPerKm.toLocaleString() + " 엔</td></tr>";
+    }
+    box.innerHTML =
+      '<div class="result-main">실연비 ' + r.kmPerL.toLocaleString() + " km/L</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>항목</th><th>값</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+    box.hidden = false;
+  }
+  ["distance", "liters", "price"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { run(false); });
+  });
+  document.getElementById("nenpi-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var ratioBox = document.getElementById("adv-result-ratio");
+  var ADV_ERRORS = {
+    invalid_actual: "실연비는 1〜60km/L 범위로 입력해 주세요.",
+    invalid_catalog: "카탈로그 연비는 1〜60km/L 범위로 입력해 주세요.",
+    invalid_efficiency_a: "지금 타는 차의 연비는 1〜60km/L 범위로 입력해 주세요.",
+    invalid_efficiency_b: "후보 차의 연비는 1〜60km/L 범위로 입력해 주세요.",
+    invalid_distance: "연간 주행거리는 100〜100,000km 범위로 입력해 주세요.",
+    invalid_price: "휘발유 단가는 1〜1,000엔/L 범위로 입력해 주세요."
+  };
+  function advError(box, code) {
+    box.innerHTML = '<p class="result-error">' + (ADV_ERRORS[code] || "입력값을 확인해 주세요.") + "</p>";
+    box.hidden = false;
+  }
+  function prefillActual() {
+    var d = parseFloat(document.getElementById("distance").value);
+    var l = parseFloat(document.getElementById("liters").value);
+    var input = document.getElementById("adv-actual");
+    if (input.value === "" && !isNaN(d) && !isNaN(l)) {
+      var r = NenpiCalc.calc(d, l);
+      if (r.ok) input.value = r.kmPerL;
+    }
+  }
+  document.querySelector(".adv-box").addEventListener("toggle", prefillActual);
+  function runRatio() {
+    prefillActual();
+    var actual = parseFloat(document.getElementById("adv-actual").value);
+    var catalog = parseFloat(document.getElementById("adv-catalog").value);
+    var r = NenpiCalc.catalogRatio(actual, catalog);
+    if (!r.ok) { advError(ratioBox, r.code); return; }
+    var note;
+    if (r.percent >= 100) {
+      note = "카탈로그 값을 웃돌고 있습니다. 매우 좋은 연비입니다.";
+    } else if (r.percent >= 70) {
+      note = "일반적인 범위(기준 70〜80%)입니다.";
+    } else {
+      note = "기준(70〜80%)보다 낮습니다. 타이어 공기압·급가속·짧은 거리 반복 주행 등이 영향을 주고 있을 수 있습니다.";
+    }
+    ratioBox.innerHTML =
+      '<div class="result-main">카탈로그 연비의 ' + r.percent.toLocaleString(undefined, { maximumFractionDigits: 1 }) + '%</div>' +
+      '<p>' + note + '</p>';
+    ratioBox.hidden = false;
+  }
+  function runCmp() {
+    var a = parseFloat(document.getElementById("adv-car-a").value);
+    var b = parseFloat(document.getElementById("adv-car-b").value);
+    var annual = parseFloat(document.getElementById("adv-annual").value);
+    var price = parseFloat(document.getElementById("adv-price2").value);
+    if (isNaN(price)) price = parseFloat(document.getElementById("price").value);
+    var r = NenpiCalc.compareCars(a, b, annual, price);
+    if (!r.ok) { advError(advBox, r.code); return; }
+    var head;
+    if (r.diffYen > 0) {
+      head = '교체하면 연 약 ' + r.diffYen.toLocaleString() + ' 엔 절약';
+    } else if (r.diffYen < 0) {
+      head = '교체하면 연 약 ' + Math.abs(r.diffYen).toLocaleString() + ' 엔 더 듦';
+    } else {
+      head = '연간 주유비는 거의 같음';
+    }
+    advBox.innerHTML =
+      '<div class="result-main">' + head + '</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead>' +
+      '<tr><th></th><th>지금 타는 차</th><th>후보 차</th></tr></thead><tbody>' +
+      '<tr><td>연비</td><td>' + a.toLocaleString() + ' km/L</td><td>' + b.toLocaleString() + ' km/L</td></tr>' +
+      '<tr><td>연간 사용 연료</td><td>' + r.fuelLA.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' L</td><td>' + r.fuelLB.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' L</td></tr>' +
+      '<tr><td>연간 주유비</td><td>' + r.costA.toLocaleString() + ' 엔</td><td><strong>' + r.costB.toLocaleString() + ' 엔</strong></td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">차량 가격·세금·보험 등의 차이는 포함하지 않습니다. 「차액 × 탈 연수」가 교체 비용에 걸맞은지 판단하는 기준으로 활용해 보세요.</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-ratio-run").addEventListener("click", runRatio);
+  document.getElementById("adv-cmp-run").addEventListener("click", runCmp);
+  function filled(id) { return document.getElementById(id).value !== ""; }
+  function autoRatio() {
+    if (filled("adv-actual") && filled("adv-catalog")) { runRatio(); } else { ratioBox.hidden = true; }
+  }
+  function autoCmp() {
+    if (filled("adv-car-a") && filled("adv-car-b") && filled("adv-annual") &&
+        (filled("adv-price2") || filled("price"))) {
+      runCmp();
+    } else {
+      advBox.hidden = true;
+    }
+  }
+  ["adv-actual", "adv-catalog"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoRatio);
+  });
+  ["adv-car-a", "adv-car-b", "adv-annual", "adv-price2"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoCmp);
+  });
+  document.getElementById("price").addEventListener("input", function () {
+    if (!advBox.hidden) autoCmp();
+  });
+})();
+</script>
+</body>
+</html>

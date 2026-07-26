@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>预产期·孕周计算器(按末次月经·支持周期修正) | Quick Calc</title>
+  <meta name="description" content="根据末次月经的开始日免费计算预产期和当前孕周(〇周△天)。支持月经周期不是28天时的修正,并显示孕早期·中期·晚期的区分。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/ninshin/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="预产期·孕周计算器(按末次月经·支持周期修正) | Quick Calc">
+  <meta property="og:description" content="根据末次月经的开始日免费计算预产期和当前孕周(〇周△天)。支持月经周期不是28天时的修正,并显示孕早期·中期·晚期的区分。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/ninshin/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"预产期·孕周计算器","item":"https://quick-calc.site/zh/tools/ninshin/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>预产期·孕周计算器</h1>
+  <form class="tool-form" id="ninshin-form">
+    <span class="field-note">选择末次月经的开始日,预产期和孕周立即显示在下方</span>
+    <div class="field-row">
+      <label>末次月经开始日(年)
+        <select id="lmp-year"></select>
+      </label>
+      <label>月
+        <select id="lmp-month"></select>
+      </label>
+      <label>日
+        <select id="lmp-day"></select>
+      </label>
+    </div>
+    <label>月经周期(天)
+      <span class="field-note">不清楚就保持28即可</span>
+      <input type="number" id="cycle" inputmode="numeric" min="20" max="45" step="1" value="28" required>
+    </label>
+    <label>基准日(按这一天计算)
+      <span class="field-note">初始值为今天</span>
+      <input type="date" id="asof" min="1900-01-01" max="2200-12-31" required>
+    </label>
+    <div class="tool-result" id="result" aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 由预产期反查孕周和重要节点</summary>
+    <div class="adv-inner">
+      <p class="adv-note">即使不知道末次月经日,也可以由医院告知的预产期(孕40周0天)倒推。</p>
+      <div class="field-row">
+        <label>预产期(年)
+          <select id="due-year"></select>
+        </label>
+        <label>月
+          <select id="due-month"></select>
+        </label>
+        <label>日
+          <select id="due-day"></select>
+        </label>
+      </div>
+
+      <h3 class="adv-h">今天是孕几周几天?</h3>
+      <label>基准日(初始值为今天)
+        <input type="date" id="adv-asof">
+      </label>
+      <div class="tool-result" id="adv-week-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">重要节点日期一览</h3>
+      <p class="adv-note">列出稳定期的大致开始·产前休假(日本标准)的开始·足月妊娠的开始·产后休假的结束等日期。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    本工具的结果是<strong>根据月经周期得出的估算值</strong>。实际的预产期以孕早期超声检查(胎儿大小)为依据、<strong>由医生确定的日期为准</strong>。妊娠的判定和健康管理请务必到妇产科就诊。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>只需输入末次月经的开始日,就能知道<strong>预产期和现在是孕几周几天</strong>。月经周期不是28天时也可以修正。孕周从末次月经开始日起算,这也是日本产科的标准算法——适合在去医院前自查,或在日本领取母子健康手册(母子手帳)前、考虑何时告诉家人时使用。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>选择末次月经(最近一次月经)开始的日期。</li>
+    <li>知道月经周期就输入(不是28天时会自动修正预产期)。</li>
+    <li>选好后立即显示预产期·当前孕周·妊娠阶段,无需点击按钮。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>预产期 = 末次月经开始日 + 280天</strong>(孕40周0天)。孕周从末次月经开始日起算是产科的标准方法(内格勒法则)。</li>
+    <li>月经周期不是28天时,为修正排卵日的偏移,加减<strong>(周期 − 28)天</strong>(例: 周期35天则预产期推后7天)。</li>
+    <li>孕周 = 从起点起经过的天数 ÷ 7(向下取整),余数为「天」。</li>
+    <li>区分: 至孕13周=孕早期 / 14〜27周=孕中期 / 28周起=孕晚期</li>
+    <li>计算例: 末次月经1月1日(周期28天)→ 预产期为10月8日。到7月24日为孕29周1天(孕晚期)。</li>
+  </ul>
+
+  <h3>出处(一次信息)</h3>
+  <ul class="sources">
+    <li>妊娠期的计算方法(从末次月经首日起算,孕40周0天为预产期): <a href="https://www.jsog.or.jp/citizen/5713/" target="_blank" rel="noopener">日本妇产科学会「产科·妇科疾病: 妊娠·分娩相关用语解说」</a>(日文)</li>
+    <li>周期修正是基于内格勒法则的常用调整方法。</li>
+  </ul>
+
+  <h2>前提与注意</h2>
+  <ul class="cautions">
+    <li>月经周期不规律的人,此计算的误差会更大。最终的预产期由医生通过超声检查确定。</li>
+    <li>正好在预产期当天出生的只是一部分,一般在足月产(37周0天〜41周6天)范围内出生。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">会在预产期当天出生吗?</h3>
+  <p class="faq-a">预产期只是「孕40周0天」的参考日。37周0天〜41周6天之间的分娩称为足月产,大部分分娩都在这个范围内。把预产期前后2周都视为可能范围会更安心。</p>
+  <h3 class="faq-q">医院告知的预产期和这个工具的结果不一样,为什么?</h3>
+  <p class="faq-a">因为妇产科会在孕早期通过超声检查测量胎儿大小(头臀长)来修正预产期。<strong>以医生确定的预产期为准</strong>,本工具请作为就诊前的参考使用。</p>
+  <h3 class="faq-q">「妊娠〇个月」是怎么对应的?</h3>
+  <p class="faq-a">在日本,妊娠1个月=0〜3周、2个月=4〜7周,按4周算1个月。例如12周是妊娠4个月,20周是妊娠6个月。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=ninshin">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/ninshin/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var today = new Date();
+
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, "日", Math.min(keep, max));
+  }
+  function isoOf(prefix) {
+    adjustDays(prefix + "-year", prefix + "-month", prefix + "-day");
+    return val(prefix + "-year") + "-" +
+      String(val(prefix + "-month")).padStart(2, "0") + "-" +
+      String(val(prefix + "-day")).padStart(2, "0");
+  }
+  function initDate(prefix, yFrom, yTo) {
+    fillSelect(document.getElementById(prefix + "-year"), yFrom, yTo, "年", today.getFullYear());
+    fillSelect(document.getElementById(prefix + "-month"), 1, 12, "月", today.getMonth() + 1);
+    fillSelect(document.getElementById(prefix + "-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), "日", today.getDate());
+  }
+  window.NinshinUi = { isoOf: isoOf, initDate: initDate };
+
+  initDate("lmp", today.getFullYear() - 2, today.getFullYear());
+
+  var box = document.getElementById("result");
+  var asofInput = document.getElementById("asof");
+  asofInput.value = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + String(today.getDate()).padStart(2, "0");
+
+  var TRIMESTER_ZH = { "初期": "孕早期", "中期": "孕中期", "後期": "孕晚期" };
+  var ERROR_MESSAGES = {
+    invalid_asof: "请正确输入基准日。",
+    invalid_cycle: "月经周期请输入20〜45天的整数。",
+    lmp_after_asof: "末次月经的开始日晚于基准日。"
+  };
+  function run() {
+    var lmp = isoOf("lmp");
+    var cycle = document.getElementById("cycle").value;
+    if (cycle === "" || asofInput.value === "") { box.hidden = true; return; }
+    var r = NinshinCalc.dueDate(lmp, asofInput.value, parseInt(cycle, 10));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "请检查输入的数值。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var over = r.week >= 42 ? '<p class="result-error">计算结果超过42周。请确认输入的日期。</p>' : "";
+    box.innerHTML =
+      '<div class="result-main">预产期 ' + r.due + "</div>" +
+      "<p>截至基准日为 <strong>孕" + r.week + "周" + r.day + "天</strong>(" + (TRIMESTER_ZH[r.trimester] || r.trimester) + ")</p>" + over +
+      "<p>※以医生诊断的预产期为准。</p>";
+    box.hidden = false;
+  }
+  ["lmp-year", "lmp-month", "lmp-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", run);
+  });
+  document.getElementById("cycle").addEventListener("input", run);
+  asofInput.addEventListener("change", run);
+  asofInput.addEventListener("input", run);
+  document.getElementById("ninshin-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var isoOf = window.NinshinUi.isoOf;
+  var today = new Date();
+  window.NinshinUi.initDate("due", today.getFullYear() - 1, today.getFullYear() + 1);
+
+  var weekBox = document.getElementById("adv-week-result");
+  var msBox = document.getElementById("adv-result");
+  var advAsof = document.getElementById("adv-asof");
+  advAsof.value = today.getFullYear() + "-" +
+    ("0" + (today.getMonth() + 1)).slice(-2) + "-" + ("0" + today.getDate()).slice(-2);
+
+  var TRIMESTER_ZH = { "初期": "孕早期", "中期": "孕中期", "後期": "孕晚期" };
+  var MILESTONE_LABEL_ZH = {
+    "妊娠中期の開始": "孕中期开始",
+    "安定期の目安(16週)": "稳定期的大致开始(16周)",
+    "妊娠後期の開始": "孕晚期开始",
+    "産前休業の開始(予定日の6週間前)": "产前休假开始(日本标准·预产期前6周)",
+    "正期産の開始": "足月妊娠开始",
+    "出産予定日": "预产期",
+    "産後休業の終了(出産の8週間後)": "产后休假结束(日本标准·产后8周)"
+  };
+  var MILESTONE_WEEKS_ZH = {
+    "14週0日": "14周0天",
+    "16週0日": "16周0天",
+    "28週0日": "28周0天",
+    "34週0日": "34周0天",
+    "37週0日": "37周0天",
+    "40週0日": "40周0天",
+    "出産の8週間後": "产后8周"
+  };
+
+  function zhDate(iso) {
+    var p = iso.split("-");
+    return parseInt(p[0], 10) + "年" + parseInt(p[1], 10) + "月" + parseInt(p[2], 10) + "日";
+  }
+
+  // ---- 由预产期算孕周(即时) ----
+  function runWeek() {
+    if (advAsof.value === "") { weekBox.hidden = true; return; }
+    var r = NinshinCalc.weeksFromDue(isoOf("due"), advAsof.value);
+    if (!r.ok) {
+      var msg = r.code === "too_early" ? "基准日过早(早于孕0周)。请确认预产期和基准日。"
+        : r.code === "out_of_range" ? "基准日离预产期过远(43周以后)。请确认预产期和基准日。"
+        : "请正确输入日期。";
+      weekBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+      weekBox.hidden = false;
+      return;
+    }
+    weekBox.innerHTML =
+      '<div class="result-main">孕 ' + r.week + '周' + r.day + '天</div>' +
+      "<p>区分: " + (TRIMESTER_ZH[r.trimester] || r.trimester) + "(妊娠第" + r.elapsedDays.toLocaleString() + "天)</p>" +
+      '<p class="adv-note">此为把预产期视为孕40周0天的估算,孕周的正式判断请咨询医生。</p>';
+    weekBox.hidden = false;
+  }
+
+  // ---- 重要节点日期一览(即时) ----
+  function runMilestones() {
+    var r = NinshinCalc.milestones(isoOf("due"));
+    if (!r.ok) { msBox.hidden = true; return; }
+    var rows = "";
+    for (var i = 0; i < r.rows.length; i++) {
+      var m = r.rows[i];
+      rows += "<tr><td>" + (MILESTONE_LABEL_ZH[m.label] || m.label) + "</td><td>" + (MILESTONE_WEEKS_ZH[m.weeks] || m.weeks) + "</td><td>" + zhDate(m.date) + "</td></tr>";
+    }
+    msBox.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>节点</th><th>孕周</th><th>日期</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>" +
+      '<p class="adv-note">产前·产后休假按日本《劳动基准法》的天数(产前6周·产后8周,多胎妊娠为产前14周)以周为单位估算,医学上的判断请务必咨询医生。</p>';
+    msBox.hidden = false;
+  }
+
+  function runAdv() { runWeek(); runMilestones(); }
+  ["due-year", "due-month", "due-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runAdv);
+  });
+  advAsof.addEventListener("change", runWeek);
+  advAsof.addEventListener("input", runWeek);
+  runAdv();
+})();
+</script>
+</body>
+</html>

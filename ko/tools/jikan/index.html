@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>시간 계산기(시간 합계·시각 차이·10진수 환산) | Quick Calc</title>
+  <meta name="description" content="「1:30+0:45+8:00」 같은 시간 합계와 시작〜종료 시각의 경과 시간을 계산. 급여 계산에 편리한 10진수(1.75시간) 환산도 함께 표시합니다. 근무시간·잔업시간 집계에. 무료·즉시.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/jikan/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="시간 계산기(시간 합계·시각 차이·10진수 환산) | Quick Calc">
+  <meta property="og:description" content="「1:30+0:45+8:00」 같은 시간 합계와 시작〜종료 시각의 경과 시간을 계산. 급여 계산에 편리한 10진수(1.75시간) 환산도 함께 표시합니다. 근무시간·잔업시간 집계에. 무료·즉시.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/jikan/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"시간 계산기(합계·시각 차이)","item":"https://quick-calc.site/ko/tools/jikan/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>시간 계산기(합계·시각 차이)</h1>
+  <form class="tool-form" id="jikan-form">
+    <label>계산 종류
+      <select id="mode">
+        <option value="total" selected>시간 합계(1:30 + 0:45 + …)</option>
+        <option value="span">시각 차이(시작〜종료)</option>
+      </select>
+    </label>
+    <div id="total-fields">
+      <label>시간 목록(「시:분」을 줄바꿈·쉼표로 구분)
+        <textarea id="list" rows="4" placeholder="예:&#10;8:00&#10;7:30&#10;8:15"></textarea>
+      </label>
+    </div>
+    <div id="span-fields" hidden>
+      <label>시작 시각
+        <input type="time" id="start" value="09:00">
+      </label>
+      <label>종료 시각
+        <span class="field-note">시작보다 빠른 시각은 「다음 날」로 간주합니다</span>
+        <input type="time" id="end" value="17:30">
+      </label>
+    </div>
+    <button type="submit">시간 계산하기</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 타임카드 계산과 10진수 역변환</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">타임카드 계산(실근무 시간과 그날의 급여)</h3>
+      <p class="adv-note">퇴근이 출근보다 빠르면 야간 근무(날짜 넘김)로 처리하며, 시급을 넣으면 그날 급여의 대략적인 금액도 나옵니다.</p>
+      <label>출근 시각
+        <input type="time" id="adv-start" value="09:00">
+      </label>
+      <label>퇴근 시각
+        <input type="time" id="adv-end" value="18:00">
+      </label>
+      <label>휴게(분)
+        <input type="number" id="adv-break" inputmode="numeric" min="0" max="1440" step="1" value="60">
+      </label>
+      <label>시급(엔·비워두면 급여 계산 안 함)
+        <input type="number" id="adv-wage" inputmode="numeric" min="1" max="1000000" step="any" placeholder="예: 1200">
+      </label>
+      <div class="tool-result" id="adv-tc-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">10진수 시간을 「시:분」으로 되돌리기</h3>
+      <p class="adv-note">급여명세서나 Excel의 「7.75시간」이 몇 시간 몇 분인지 확인할 수 있습니다.</p>
+      <label>10진수 시간
+        <input type="number" id="adv-dec" inputmode="decimal" min="0" max="999" step="any" placeholder="예: 7.75">
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p><strong>1:30 + 0:45</strong> 같은 시간 덧셈과 시작〜종료의 <strong>경과 시간</strong>을 바로 알 수 있는 도구입니다. 일본 급여명세서에서 자주 쓰는 10진수 표기(7.75시간 등)도 동시에 표시합니다. 근무시간이나 아르바이트 시간 집계에 활용하세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>「시간 합계」와 「시각 차이」 중 하나를 선택합니다.</li>
+    <li>합계라면 「시:분」을 한 줄에 하나씩(또는 쉼표로 구분해) 입력하고, 차이라면 시작·종료 시각을 선택합니다.</li>
+    <li>입력과 동시에 합계 시간과 10진수 환산이 자동으로 표시됩니다(버튼을 눌러도 됩니다).</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li>모두 분으로 변환한 뒤 계산합니다(1:30 → 90분).</li>
+    <li><strong>10진수 환산 = 합계 분 ÷ 60</strong>(예: 8시간 30분 = 510분 ÷ 60 = 8.5시간)</li>
+    <li>시각 차이에서 종료가 시작보다 빠르면 날짜를 넘긴 근무(야간 근무 등)로 보고 +24시간으로 계산합니다.</li>
+  </ul>
+
+  <h3>출처·전제 명시</h3>
+  <ul class="sources">
+    <li>시간 단위 환산(1시간=60분)에 따른 산술 계산입니다.</li>
+  </ul>
+
+  <h2>계산 전제와 주의</h2>
+  <ul class="cautions">
+    <li>시각 차이는 휴게 시간을 빼지 않습니다. 노동시간을 계산할 때는 휴게분을 따로 빼 주세요.</li>
+    <li>급여 계산의 반올림 규칙(15분 단위 버림 등)은 근무처의 규정에 따릅니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">8시간 30분은 「8.3시간」이 아닌가요?</h3>
+  <p class="faq-a">아닙니다. 30분은 0.5시간이므로 8.5시간입니다. 「시:분」 표기와 10진수 표기의 혼동은 급여 계산에서 흔한 실수라서, 이 도구는 두 표기를 나란히 표시합니다.</p>
+  <h3 class="faq-q">휴게 1시간을 뺀 실근무 시간을 내려면?</h3>
+  <p class="faq-a">먼저 「시각 차이」로 총 구속 시간을 구한 뒤, 표시된 합계에서 1시간을 빼 주세요(목록에는 「-1:00」 같은 음수를 입력할 수 없습니다). 예: 9:00〜18:00=9시간 → 실근무 8시간.</p>
+  <h3 class="faq-q">한 달치 잔업시간 합계에도 쓸 수 있나요?</h3>
+  <p class="faq-a">쓸 수 있습니다. 매일의 잔업시간(0:45 등)을 줄바꿈으로 구분해 붙여넣으면 월 합계와 10진수 환산(급여명세서에서 자주 쓰는 형식)이 한 번에 나옵니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=jikan">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/jikan/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var totalFields = document.getElementById("total-fields");
+  var spanFields = document.getElementById("span-fields");
+  var MSG = {
+    invalid_list: "시간을 1건 이상 입력해 주세요(최대 100건).",
+    invalid_time: "「시:분」 형식으로 입력해 주세요(예: 1:30, 분은 00〜59).",
+    invalid_start: "시작 시각을 올바르게 입력해 주세요.",
+    invalid_end: "종료 시각을 올바르게 입력해 주세요."
+  };
+  function show(r, label) {
+    if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "입력값을 확인해 주세요.") + "</p>"; box.hidden = false; return; }
+    box.innerHTML =
+      '<div class="result-main">' + r.hours + "시간 " + r.minutes + "분</div>" +
+      "<p>" + label + " / 10진수 환산: <strong>" + r.decimal.toLocaleString() + "시간</strong>(" + r.totalMinutes.toLocaleString() + "분)</p>";
+    box.hidden = false;
+  }
+  function run() {
+    if (mode.value === "total") {
+      var raw = document.getElementById("list").value;
+      if (raw.trim() === "") { box.hidden = true; return; }
+      var parts = raw.split(/[\n,、\s]+/).filter(function (s) { return s !== ""; });
+      show(JikanCalc.total(parts), parts.length + "건 합계");
+    } else {
+      var start = document.getElementById("start").value;
+      var end = document.getElementById("end").value;
+      if (start === "" || end === "") { box.hidden = true; return; }
+      show(JikanCalc.span(start, end), "시각 차이");
+    }
+  }
+  mode.addEventListener("change", function () {
+    var isTotal = mode.value === "total";
+    totalFields.hidden = !isTotal;
+    spanFields.hidden = isTotal;
+    run();
+  });
+  document.getElementById("list").addEventListener("input", run);
+  document.getElementById("start").addEventListener("input", run);
+  document.getElementById("end").addEventListener("input", run);
+  document.getElementById("jikan-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run();
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var tcBox = document.getElementById("adv-tc-result");
+  var decBox = document.getElementById("adv-result");
+  function hm(min) {
+    return Math.floor(min / 60) + "시간 " + (min % 60) + "분";
+  }
+  var MSG2 = {
+    invalid_start: "출근 시각을 올바르게 입력해 주세요.",
+    invalid_end: "퇴근 시각을 올바르게 입력해 주세요.",
+    invalid_break: "휴게는 0〜1440분의 정수로 입력해 주세요.",
+    break_too_long: "휴게 시간이 근무 시간보다 깁니다.",
+    invalid_wage: "시급은 1〜1,000,000엔 범위로 입력해 주세요."
+  };
+  // ---- 타임카드 계산(즉시) ----
+  function runTimecard() {
+    var start = document.getElementById("adv-start").value;
+    var end = document.getElementById("adv-end").value;
+    var brkStr = document.getElementById("adv-break").value;
+    var wageStr = document.getElementById("adv-wage").value;
+    if (start === "" || end === "") { tcBox.hidden = true; return; }
+    var brk = brkStr === "" ? 0 : parseInt(brkStr, 10);
+    var wage = wageStr === "" ? null : parseFloat(wageStr);
+    var r = JikanCalc.timecard(start, end, brk, wage);
+    if (!r.ok) {
+      tcBox.innerHTML = '<p class="result-error">' + (MSG2[r.code] || "입력값을 확인해 주세요.") + "</p>";
+      tcBox.hidden = false;
+      return;
+    }
+    var html =
+      '<div class="result-main">실근무 ' + hm(r.totalMinutes) + "(" +
+      r.decimal.toLocaleString(undefined, { maximumFractionDigits: 2 }) + "시간)</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>구속 시간(출근〜퇴근)</td><td>" + hm(r.grossMinutes) + "</td></tr>" +
+      "<tr><td>휴게</td><td>" + brk.toLocaleString() + "분</td></tr>" +
+      "<tr><td>그중 심야 시간대(22시〜5시)</td><td>" + hm(r.nightMinutes) + "</td></tr>";
+    if (r.pay !== null) {
+      html += "<tr><td>그날 급여 예상액</td><td>" + r.pay.toLocaleString() + "엔</td></tr>";
+    }
+    html += "</tbody></table></div>" +
+      '<p class="adv-note">심야 시간대는 휴게를 빼기 전의 겹침이며, 급여액은 할증(일본 노동기준법 제37조)을 포함하지 않은 시급×실근무 시간의 어림값입니다.</p>';
+    tcBox.innerHTML = html;
+    tcBox.hidden = false;
+  }
+  ["adv-start", "adv-end", "adv-break", "adv-wage"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runTimecard);
+  });
+  runTimecard();
+
+  // ---- 10진수→시:분(즉시) ----
+  function runDec() {
+    var decStr = document.getElementById("adv-dec").value;
+    if (decStr === "") { decBox.hidden = true; return; }
+    var r = JikanCalc.dec2hm(parseFloat(decStr));
+    if (!r.ok) {
+      decBox.innerHTML = '<p class="result-error">0〜999 범위로 입력해 주세요.</p>';
+      decBox.hidden = false;
+      return;
+    }
+    decBox.innerHTML =
+      '<div class="result-main">' + hm(r.totalMinutes) + "</div>" +
+      "<p>" + decStr + "시간 = " + r.totalMinutes.toLocaleString() + "분(분은 반올림)</p>";
+    decBox.hidden = false;
+  }
+  document.getElementById("adv-dec").addEventListener("input", runDec);
+})();
+</script>
+</body>
+</html>

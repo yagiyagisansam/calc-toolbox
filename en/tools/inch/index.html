@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Inch to cm &amp; Pound to kg Converter | Quick Calc</title>
+  <meta name="description" content="Convert inches to centimeters and pounds to kilograms (and back) instantly, for free. Uses the exact defined values, so it is handy for checking TV and monitor sizes, buying clothes and shoes from overseas shops, and reading dumbbell weights.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/inch/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Inch to cm &amp; Pound to kg Converter | Quick Calc">
+  <meta property="og:description" content="Convert inches to centimeters and pounds to kilograms (and back) instantly, for free. Uses the exact defined values, so it is handy for checking TV and monitor sizes, buying clothes and shoes from overseas shops, and reading dumbbell weights.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/inch/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Inch to cm &amp; Pound to kg Converter","item":"https://quick-calc.site/en/tools/inch/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Inch to cm &amp; Pound to kg Converter</h1>
+  <form class="tool-form" id="length-form">
+    <label>Length (inch and cm)</label>
+    <span class="field-note">Type a number and the result appears right below</span>
+    <label>Value
+      <input type="number" id="l-value" inputmode="decimal" step="any" min="0.001" max="1000000" placeholder="65" required>
+    </label>
+    <label>Unit of the value you entered
+      <select id="l-unit">
+        <option value="in">Inches (in)</option>
+        <option value="cm">Centimeters (cm)</option>
+      </select>
+    </label>
+    <div class="tool-result" id="result-l" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="weight-form">
+    <label>Weight (pound and kg)</label>
+    <label>Value
+      <input type="number" id="w-value" inputmode="decimal" step="any" min="0.001" max="1000000" placeholder="10">
+    </label>
+    <label>Unit of the value you entered
+      <select id="w-unit">
+        <option value="lb">Pounds (lb)</option>
+        <option value="kg">Kilograms (kg)</option>
+      </select>
+    </label>
+    <div class="tool-result" id="result-w" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: real TV and monitor dimensions, viewing distance, size comparison</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Real dimensions and viewing distance for a TV or monitor</h3>
+      <p class="adv-note">From a screen size in inches (the length of the diagonal), this gives the actual width and height in cm and a comfortable viewing distance (Full HD: height × 3, 4K: height × 1.5).</p>
+      <label>Screen size (inches)
+        <input type="number" id="adv-inch" inputmode="decimal" step="any" min="0.001" max="1000" placeholder="e.g. 65">
+      </label>
+      <label>Aspect ratio (width:height)
+        <select id="adv-ratio">
+          <option value="16:9" selected>16:9 (TVs and most monitors)</option>
+          <option value="16:10">16:10 (some PC monitors)</option>
+          <option value="21:9">21:9 (ultrawide)</option>
+          <option value="4:3">4:3 (older TVs, iPad)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-screen-run">Calculate size and distance</button>
+      <div class="tool-result" id="adv-screen-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">Comparing the size before and after an upgrade</h3>
+      <p class="adv-note">Puts a number on “how much bigger is 27 inches than 24 inches?”, using the aspect ratio selected above.</p>
+      <label>Current size (inches)
+        <input type="number" id="adv-inch-a" inputmode="decimal" step="any" min="0.001" max="1000" placeholder="e.g. 24">
+      </label>
+      <label>Size you are considering (inches)
+        <input type="number" id="adv-inch-b" inputmode="decimal" step="any" min="0.001" max="1000" placeholder="e.g. 27">
+      </label>
+      <button type="button" id="adv-compare-run">Compare</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    The “inches” of a TV or monitor is <strong>the length of the diagonal</strong>, not the width. For example, 65 inches is a diagonal of about 165 cm, while the width is only about 144 cm.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Type a number and convert <strong>inches to cm (or cm to inches)</strong> straight away. It converts pounds and kilograms too. Japan uses the metric system in daily life, but TVs and monitors are still sold by the inch, so this is useful when you are buying an appliance here, ordering clothes from an overseas shop, or reading a weight given in pounds.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter the value you want to convert and choose the unit it is in.</li>
+    <li>Both units appear right below as you type — no button needed.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>1 inch = 2.54 cm</strong> (the defined value of the international inch — the conversion is exact)</li>
+    <li><strong>1 pound = 0.45359237 kg</strong> (the defined value of the international pound)</li>
+    <li>Both are the values defined by the international yard and pound agreement of 1959. Results are shown to two decimal places.</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>Quick reference for common conversions</caption>
+      <thead><tr><th>Inches</th><th>cm</th><th></th><th>Pounds</th><th>kg</th></tr></thead>
+      <tbody>
+        <tr><td>24</td><td>60.96</td><td></td><td>1</td><td>0.45</td></tr>
+        <tr><td>27</td><td>68.58</td><td></td><td>5</td><td>2.27</td></tr>
+        <tr><td>32</td><td>81.28</td><td></td><td>10</td><td>4.54</td></tr>
+        <tr><td>55</td><td>139.7</td><td></td><td>45</td><td>20.41</td></tr>
+        <tr><td>65</td><td>165.1</td><td></td><td>100</td><td>45.36</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Sources (primary information)</h3>
+  <ul class="sources">
+    <li>Measurement Act of Japan (Act No. 51 of 1992) — restricts the use of non-metric units for trade and certification in Japan, in Japanese<br>
+      <a href="https://laws.e-gov.go.jp/law/404AC0000000051" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/404AC0000000051</a> (accessed July 18, 2026)</li>
+    <li>The conversion factors are the values defined by the international agreement of 1959 (1 inch = 25.4 mm, 1 pound = 0.45359237 kg).</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>Clothing and shoe sizes (US, UK and so on) are national standards, not inches themselves. Check the maker’s size chart.</li>
+    <li>The troy ounce and troy pound used for precious metals are different units from the avoirdupois pound and are not covered here.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">How wide is a 65-inch TV in cm?</h3>
+  <p class="faq-a">65 inches is a diagonal of about 165.1 cm, which on a 16:9 screen means a width of about 144 cm and a height of about 81 cm (excluding the bezel). To check whether it fits your space, use the maker’s external dimensions.</p>
+  <h3 class="faq-q">Can I convert feet?</h3>
+  <p class="faq-a">Yes — 1 foot is 12 inches, so multiply the feet by 12 and enter the result as inches (for example, 6 feet = 72 inches = 182.88 cm).</p>
+  <h3 class="faq-q">How many kg is the “45 lb” plate at the gym?</h3>
+  <p class="faq-a">About 20.4 kg. Overseas plates are typically 45 lb (about 20.4 kg), which is slightly different from the 20 kg plates common in Japan.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=inch">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/inch/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_value: "Enter a value between 0.001 and 1,000,000.",
+    invalid_unit: "Select a unit."
+  };
+  function showError(box, code) {
+    box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "Check the entered value.") + "</p>";
+    box.hidden = false;
+  }
+  var lBox = document.getElementById("result-l");
+  var wBox = document.getElementById("result-w");
+  function runLength() {
+    if (document.getElementById("l-value").value.trim() === "") { lBox.hidden = true; return; }
+    var r = InchCalc.convertLength(parseFloat(document.getElementById("l-value").value), document.getElementById("l-unit").value);
+    if (!r.ok) { showError(lBox, r.code); return; }
+    lBox.innerHTML = '<div class="result-main">' + r.inch.toLocaleString() + " in = " + r.cm.toLocaleString() + " cm</div>";
+    lBox.hidden = false;
+  }
+  function runWeight() {
+    if (document.getElementById("w-value").value.trim() === "") { wBox.hidden = true; return; }
+    var r = InchCalc.convertWeight(parseFloat(document.getElementById("w-value").value), document.getElementById("w-unit").value);
+    if (!r.ok) { showError(wBox, r.code); return; }
+    wBox.innerHTML = '<div class="result-main">' + r.lb.toLocaleString() + " lb = " + r.kg.toLocaleString() + " kg</div>";
+    wBox.hidden = false;
+  }
+  document.getElementById("l-value").addEventListener("input", runLength);
+  document.getElementById("l-unit").addEventListener("change", runLength);
+  document.getElementById("length-form").addEventListener("submit", function (e) { e.preventDefault(); runLength(); });
+  document.getElementById("w-value").addEventListener("input", runWeight);
+  document.getElementById("w-unit").addEventListener("change", runWeight);
+  document.getElementById("weight-form").addEventListener("submit", function (e) { e.preventDefault(); runWeight(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function ratioParts() {
+    var v = document.getElementById("adv-ratio").value.split(":");
+    return [parseInt(v[0], 10), parseInt(v[1], 10)];
+  }
+  var screenBox = document.getElementById("adv-screen-result");
+  function runScreen(force) {
+    if (document.getElementById("adv-inch").value.trim() === "" && !force) { screenBox.hidden = true; return; }
+    var ratio = ratioParts();
+    var r = InchCalc.screenSize(parseFloat(document.getElementById("adv-inch").value), ratio[0], ratio[1]);
+    if (!r.ok) {
+      screenBox.innerHTML = '<p class="result-error">Enter a screen size greater than 0 (in inches).</p>';
+      screenBox.hidden = false;
+      return;
+    }
+    screenBox.innerHTML =
+      '<div class="result-main">Width ' + r.widthCm.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      ' cm × Height ' + r.heightCm.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>Diagonal</td><td>' + r.diagonalCm.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td></tr>' +
+      '<tr><td>Viewing distance (Full HD)</td><td>about ' + r.distFullHdCm.toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' cm (height × 3)</td></tr>' +
+      '<tr><td>Viewing distance (4K)</td><td>about ' + r.dist4kCm.toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' cm (height × 1.5)</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">These are the dimensions of the screen area only. An actual product is a little larger because of the bezel and the stand.</p>';
+    screenBox.hidden = false;
+  }
+  document.getElementById("adv-inch").addEventListener("input", function () { runScreen(false); });
+  document.getElementById("adv-ratio").addEventListener("change", function () { runScreen(false); });
+  document.getElementById("adv-screen-run").addEventListener("click", function () { runScreen(true); });
+  function runCompare(force) {
+    if ((document.getElementById("adv-inch-a").value.trim() === "" ||
+         document.getElementById("adv-inch-b").value.trim() === "") && !force) { advBox.hidden = true; return; }
+    var ratio = ratioParts();
+    var r = InchCalc.compareScreens(
+      parseFloat(document.getElementById("adv-inch-a").value),
+      parseFloat(document.getElementById("adv-inch-b").value),
+      ratio[0], ratio[1]
+    );
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">Enter both sizes as numbers greater than 0 (in inches).</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var up = r.areaRatePct >= 0 ? "larger" : "smaller";
+    advBox.innerHTML =
+      '<div class="result-main">The screen area becomes about ' + Math.abs(r.areaRatePct).toLocaleString(undefined, { maximumFractionDigits: 1 }) + '% ' + up + '</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th></th><th>Width</th><th>Height</th></tr></thead><tbody>' +
+      '<tr><td>Current</td><td>' + r.widthA.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td><td>' + r.heightA.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td></tr>' +
+      '<tr><td>Considering</td><td>' + r.widthB.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td><td>' + r.heightB.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td></tr>' +
+      '<tr><td>Difference</td><td>' + r.widthDiff.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td><td>' + r.heightDiff.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td></tr>' +
+      '</tbody></table></div>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-inch-a").addEventListener("input", function () { runCompare(false); });
+  document.getElementById("adv-inch-b").addEventListener("input", function () { runCompare(false); });
+  document.getElementById("adv-ratio").addEventListener("change", function () { runCompare(false); });
+  document.getElementById("adv-compare-run").addEventListener("click", function () { runCompare(true); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>단백질 섭취량 계산기(하루 필요량 기준) | Quick Calc</title>
+  <meta name="description" content="몸무게와 운동량으로 하루 단백질 섭취 기준량을 계산합니다. 식품 환산(닭가슴살·달걀·우유·낫토로 몇 그램 분량인지)도 표시. 근력 운동·다이어트·식사 관리에 활용하세요.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/protein/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="단백질 섭취량 계산기(하루 필요량 기준) | Quick Calc">
+  <meta property="og:description" content="몸무게와 운동량으로 하루 단백질 섭취 기준량을 계산합니다. 식품 환산(닭가슴살·달걀·우유·낫토로 몇 그램 분량인지)도 표시. 근력 운동·다이어트·식사 관리에 활용하세요.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/protein/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"단백질 섭취량 계산기(하루 필요량 기준)","item":"https://quick-calc.site/ko/tools/protein/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>단백질 섭취량 계산기</h1>
+  <form class="tool-form" id="protein-form">
+    <span class="field-note">몸무게를 입력하면 바로 아래에 결과가 표시됩니다</span>
+    <label>몸무게(kg)
+      <input type="number" id="weight" inputmode="decimal" min="20" max="300" step="0.1" required placeholder="예: 60">
+    </label>
+    <label>운동량
+      <select id="level">
+        <option value="normal" selected>보통 생활(책상 업무 중심)</option>
+        <option value="active">운동 습관 있음(주 2〜3회)</option>
+        <option value="training">근력 운동·스포츠 선수</option>
+      </select>
+    </label>
+    <button type="submit">필요량 계산하기</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 식품으로 환산, 오늘의 섭취량 체크</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">필요량을 친숙한 식품으로 환산</h3>
+      <p class="adv-note">단백질의 양(g)을 「그 식품만으로 채운다면」의 양으로 환산합니다(비워 두면 위에서 계산한 필요량을 사용).</p>
+      <label>단백질의 양(g)
+        <input type="number" id="adv-grams" inputmode="decimal" step="any" min="1" max="500" placeholder="비워 두면 위의 계산 결과를 사용">
+      </label>
+      <button type="button" id="adv-conv-run">식품으로 환산하기</button>
+
+      <h3 class="adv-h">오늘 얼마나 섭취했을까?(먹은 양으로 합계)</h3>
+      <p class="adv-note">오늘 먹은 양을 입력하면 단백질 합계와 필요량 대비 과부족을 계산합니다(안 쓰는 칸은 비워 두면 됩니다).</p>
+      <label>닭가슴살(g)
+        <input type="number" id="adv-f-chicken" inputmode="decimal" step="any" min="0" max="2000" placeholder="예: 100">
+      </label>
+      <label>달걀(개)
+        <input type="number" id="adv-f-egg" inputmode="decimal" step="any" min="0" max="30" placeholder="예: 2">
+      </label>
+      <label>낫토(팩)
+        <input type="number" id="adv-f-natto" inputmode="decimal" step="any" min="0" max="20" placeholder="예: 1">
+      </label>
+      <label>우유(ml)
+        <input type="number" id="adv-f-milk" inputmode="decimal" step="any" min="0" max="3000" placeholder="예: 200">
+      </label>
+      <label>프로틴(스쿱)
+        <input type="number" id="adv-f-powder" inputmode="decimal" step="any" min="0" max="10" placeholder="예: 1">
+      </label>
+      <button type="button" id="adv-intake-run">오늘의 합계 계산하기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>몸무게만 입력하면 <strong>하루에 섭취하면 좋은 단백질의 양</strong>을 알 수 있습니다. 일본 「식사섭취기준」의 사고방식과 스포츠 영양학의 일반적인 권장값에 근거하며, 닭가슴살이나 달걀 등 친숙한 음식으로 어느 정도인지도 보여줍니다. 근력 운동이나 다이어트 중 식사 체크에 활용해 보세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>몸무게를 입력합니다.</li>
+    <li>운동량(보통/운동 습관 있음/근력 운동)을 고릅니다.</li>
+    <li>입력과 동시에 하루 기준량과 식품 환산이 바로 아래에 표시됩니다. 버튼은 누를 필요 없습니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>보통 생활: 몸무게 × 0.9g/일</strong>(「일본인 식사섭취기준」에서 단백질 권장량 산정에 쓰이는 사고방식에 근거한 어림값. 일본 성인의 권장량은 남성 65g·여성 50g/일)</li>
+    <li><strong>운동 습관 있음: 몸무게 × 1.2g / 근력 운동·스포츠 선수: 몸무게 × 1.6g</strong>(스포츠 영양학에서 일반적으로 권장되는 1.2〜2.0g/kg 범위의 대표값)</li>
+    <li>계산 예: 60kg·보통 생활 → <strong>약 54g/일</strong>. 이는 닭가슴살(껍질 제외) 약 230g, 또는 달걀 9개 분량에 해당합니다.</li>
+  </ul>
+
+  <h3>출처와 전제</h3>
+  <ul class="sources">
+    <li>권장량의 기준: <a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/kenkou/eiyou/syokuji_kijyun.html" target="_blank" rel="noopener">일본 후생노동성 「일본인 식사섭취기준」</a>(일본어) / 식품의 단백질량: <a href="https://fooddb.mext.go.jp/" target="_blank" rel="noopener">일본 문부과학성 식품성분 데이터베이스</a>(일본어)(닭가슴살 껍질 제외 100g당 약 23g, 달걀 1개 약 6g, 우유 200ml 약 7g, 낫토 1팩 약 8g)</li>
+  </ul>
+
+  <h2>전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>신장 질환 등으로 단백질 제한을 받고 있는 분은 의사·영양사의 지시를 우선해 주세요.</li>
+    <li>한 번에 많이 섭취하기보다 세 끼에 나누어 섭취하는 편이 이용 효율이 좋다고 알려져 있습니다.</li>
+    <li>과잉 섭취(몸무게×2g을 크게 넘는 지속 섭취)의 이점은 확인되지 않았습니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">프로틴(보충제)은 꼭 필요한가요?</h3>
+  <p class="faq-a">식사로 기준량을 채우고 있다면 필수는 아닙니다. 하루 식사를 돌아보고 부족한 만큼(예: 20g)을 보충하는 사용법이 합리적입니다. 프로틴 1스쿱은 대략 15〜25g입니다.</p>
+  <h3 class="faq-q">단백질을 손쉽게 섭취할 수 있는 식품은?</h3>
+  <p class="faq-a">기준으로 닭가슴살 100g=약 23g, 달걀 1개=약 6g, 우유 한 컵=약 7g, 낫토 1팩=약 8g, 단단한 두부 반 모=약 10g, 고등어 통조림 1캔=약 26g입니다. 조합해서 하루 기준량에 가깝게 맞춰 보세요.</p>
+  <h3 class="faq-q">다이어트 중에도 단백질이 필요한가요?</h3>
+  <p class="faq-a">오히려 더 중요합니다. 섭취 칼로리를 줄이면 근육도 빠지기 쉬우므로, 단백질은 몸무게×1.2g 정도를 확보하면서 칼로리를 조절하는 것이 정석입니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=protein">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/protein/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var LEVEL_KO = {
+    "ふつうの生活": "보통 생활",
+    "運動習慣あり(週2〜3回)": "운동 습관 있음(주 2〜3회)",
+    "筋トレ・スポーツ選手": "근력 운동·스포츠 선수"
+  };
+  var FOODS = [
+    ["닭가슴살(껍질 제외)", 23, "g", 100],
+    ["달걀", 6.1, "개", 1],
+    ["우유(200ml)", 6.8, "잔", 1],
+    ["낫토(1팩)", 8.3, "팩", 1]
+  ];
+  var weightEl = document.getElementById("weight");
+  function run() {
+    if (weightEl.value === "") { box.hidden = true; return; }
+    var r = ProteinCalc.needs(parseFloat(weightEl.value), document.getElementById("level").value);
+    if (!r.ok) { box.innerHTML = '<p class="result-error">몸무게는 20〜300kg 범위로 입력해 주세요.</p>'; box.hidden = false; return; }
+    var rows = FOODS.map(function (f) {
+      var amount = f[0] === "닭가슴살(껍질 제외)" ? Math.round(r.grams / f[1] * f[3] / 10) * 10 + "g" : Math.round(r.grams / f[1] * 10) / 10 + f[2];
+      return "<tr><td>" + f[0] + "만 먹는다면</td><td>약 " + amount + "</td></tr>";
+    }).join("");
+    box.innerHTML =
+      '<div class="result-main">하루 약 ' + r.grams.toLocaleString() + " g</div>" +
+      "<p>" + (LEVEL_KO[r.label] || r.label) + "(몸무게×" + r.rate + "g)의 기준입니다.</p>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>식품 환산</th><th>양</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div><p>실제로는 여러 식품을 조합해서 섭취합니다.</p>";
+    box.hidden = false;
+  }
+  weightEl.addEventListener("input", run);
+  document.getElementById("level").addEventListener("change", run);
+  document.getElementById("protein-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var LEVEL_KO = {
+    "ふつうの生活": "보통 생활",
+    "運動習慣あり(週2〜3回)": "운동 습관 있음(주 2〜3회)",
+    "筋トレ・スポーツ選手": "근력 운동·스포츠 선수"
+  };
+  var advBox = document.getElementById("adv-result");
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function currentNeeds() {
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(w)) return null;
+    var r = ProteinCalc.needs(w, document.getElementById("level").value);
+    return r.ok ? r : null;
+  }
+  var lastAdv = null;
+  function runConv(fromButton) {
+    var gEl = document.getElementById("adv-grams");
+    var grams;
+    if (gEl.value === "") {
+      var n = currentNeeds();
+      if (!n) { if (fromButton) advErr("그램 수를 입력하거나 위 폼에 몸무게를 입력해 주세요."); return; }
+      grams = n.grams;
+    } else {
+      grams = parseFloat(gEl.value);
+    }
+    var r = ProteinCalc.foodEquivalents(grams);
+    if (!r.ok) { advErr("단백질의 양은 1〜500g 범위로 입력해 주세요."); return; }
+    var fmt1 = function (v) { return v.toLocaleString(undefined, { maximumFractionDigits: 1 }); };
+    advBox.innerHTML =
+      '<div class="result-main">단백질 ' + fmt1(r.grams) + " g은…</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>그 식품만 먹는다면</th><th>양</th></tr></thead><tbody>' +
+      "<tr><td>닭가슴살(100g≒22g)</td><td>약 " + r.chickenG.toLocaleString() + " g</td></tr>" +
+      "<tr><td>달걀(1개≒6g)</td><td>약 " + fmt1(r.eggs) + " 개</td></tr>" +
+      "<tr><td>낫토(1팩≒8g)</td><td>약 " + fmt1(r.natto) + " 팩</td></tr>" +
+      "<tr><td>우유(200ml≒7g)</td><td>약 " + fmt1(r.milkCups) + " 잔(200ml)</td></tr>" +
+      "<tr><td>프로틴(1스쿱≒20g)</td><td>약 " + fmt1(r.scoops) + " 스쿱</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">단백질량은 모두 기준치입니다. 실제로는 다양한 식품을 조합해서 섭취합니다.</p>';
+    lastAdv = runConv;
+    advBox.hidden = false;
+  }
+  function runIntake(fromButton) {
+    function val(id) {
+      var v = document.getElementById(id).value;
+      return v === "" ? undefined : parseFloat(v);
+    }
+    var r = ProteinCalc.intakeFromFoods({
+      chickenG: val("adv-f-chicken"),
+      eggs: val("adv-f-egg"),
+      natto: val("adv-f-natto"),
+      milkMl: val("adv-f-milk"),
+      scoops: val("adv-f-powder")
+    });
+    if (!r.ok) {
+      if (fromButton || r.code !== "invalid_foods") {
+        advErr(r.code === "invalid_foods" ? "식품 중 하나 이상의 양을 입력해 주세요."
+          : "각 입력란 범위 내의 값을 입력해 주세요.");
+      }
+      return;
+    }
+    lastAdv = runIntake;
+    var html = '<div class="result-main">오늘의 합계 약 ' +
+      r.totalG.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " g</div>";
+    var n = currentNeeds();
+    if (n) {
+      var diff = Math.round((n.grams - r.totalG) * 10) / 10;
+      if (diff > 0) {
+        html += "<p>하루 필요량(약 " + n.grams.toLocaleString() + " g·" + (LEVEL_KO[n.label] || n.label) +
+          ")까지 앞으로 <strong>약 " + diff.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " g</strong>입니다.</p>";
+      } else {
+        html += "<p><strong>하루 필요량(약 " + n.grams.toLocaleString() + " g)에 도달했습니다.</strong></p>";
+      }
+    } else {
+      html += '<p class="adv-note">위 폼에 몸무게를 입력하면 하루 필요량과의 차이도 표시합니다.</p>';
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-conv-run").addEventListener("click", function () { runConv(true); });
+  document.getElementById("adv-intake-run").addEventListener("click", function () { runIntake(true); });
+  document.getElementById("adv-grams").addEventListener("input", function () { runConv(false); });
+  ["adv-f-chicken", "adv-f-egg", "adv-f-natto", "adv-f-milk", "adv-f-powder"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runIntake(false); });
+  });
+  document.getElementById("weight").addEventListener("input", function () { if (lastAdv) lastAdv(false); });
+  document.getElementById("level").addEventListener("change", function () { if (lastAdv) lastAdv(false); });
+})();
+</script>
+</body>
+</html>

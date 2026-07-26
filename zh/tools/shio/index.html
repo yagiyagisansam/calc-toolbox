@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>盐分计算器(钠⇔食盐相当量换算) | Quick Calc</title>
+  <meta name="description" content="把食品标签上的钠(mg)一键换算成食盐相当量(g),免费使用。同时显示占日本每日目标量(男性7.5g·女性6.5g未满)的比例。换算系数依据日本食品表示基准,适合减盐·健康管理。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/shio/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="盐分计算器(钠⇔食盐相当量换算) | Quick Calc">
+  <meta property="og:description" content="把食品标签上的钠(mg)一键换算成食盐相当量(g),免费使用。同时显示占日本每日目标量(男性7.5g·女性6.5g未满)的比例。换算系数依据日本食品表示基准,适合减盐·健康管理。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/shio/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"盐分计算器(钠⇔食盐相当量换算)","item":"https://quick-calc.site/zh/tools/shio/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>盐分计算器(钠⇔食盐相当量)</h1>
+  <form class="tool-form" id="shio-form">
+    <label>换算方向
+      <select id="mode">
+        <option value="toSalt" selected>钠(mg)→ 食盐相当量(g)</option>
+        <option value="toSodium">食盐相当量(g)→ 钠(mg)</option>
+      </select>
+    </label>
+    <label id="value-label">钠含量(mg)
+      <span class="field-note">输入数值,结果立即显示在下方</span>
+      <input type="number" id="value" inputmode="decimal" min="0" step="any" required placeholder="例: 1200">
+    </label>
+    <button type="submit">换算</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 实际食用量的盐分·一天的合计管理</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">由「每100g」标示计算实际吃下的盐分</h3>
+      <p class="adv-note">营养成分标示为「每100g」的食品,计算实际食用量中含有的食盐相当量。</p>
+      <label>每100g的食盐相当量(g)
+        <input type="number" id="adv-per100" inputmode="decimal" min="0.01" max="100" step="any" placeholder="例: 1.4">
+      </label>
+      <label>实际食用量(g)
+        <input type="number" id="adv-grams" inputmode="decimal" min="1" max="5000" step="any" placeholder="例: 250">
+      </label>
+      <button type="button" id="adv-portion-run">计算食用量的盐分</button>
+      <h3 class="adv-h">管理一天的盐分合计</h3>
+      <p class="adv-note">输入今天吃过的食品(最多6项)的食盐相当量(g),计算合计以及距离每日目标量还剩多少。</p>
+      <div id="adv-rows">
+        <label>食品1 <span style="display:flex;gap:.5em;align-items:center;">
+          <input type="text" id="adv-name-1" placeholder="例: 味噌汤" style="flex:1;">
+          <input type="number" inputmode="decimal" id="adv-salt-1" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食盐相当量(g)"> g
+        </span></label>
+        <label>食品2 <span style="display:flex;gap:.5em;align-items:center;">
+          <input type="text" id="adv-name-2" placeholder="例: 盐渍三文鱼" style="flex:1;">
+          <input type="number" inputmode="decimal" id="adv-salt-2" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食盐相当量(g)"> g
+        </span></label>
+        <label>食品3 <span style="display:flex;gap:.5em;align-items:center;">
+          <input type="text" id="adv-name-3" style="flex:1;">
+          <input type="number" inputmode="decimal" id="adv-salt-3" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食盐相当量(g)"> g
+        </span></label>
+        <label>食品4 <span style="display:flex;gap:.5em;align-items:center;">
+          <input type="text" id="adv-name-4" style="flex:1;">
+          <input type="number" inputmode="decimal" id="adv-salt-4" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食盐相当量(g)"> g
+        </span></label>
+        <label>食品5 <span style="display:flex;gap:.5em;align-items:center;">
+          <input type="text" id="adv-name-5" style="flex:1;">
+          <input type="number" inputmode="decimal" id="adv-salt-5" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食盐相当量(g)"> g
+        </span></label>
+        <label>食品6 <span style="display:flex;gap:.5em;align-items:center;">
+          <input type="text" id="adv-name-6" style="flex:1;">
+          <input type="number" inputmode="decimal" id="adv-salt-6" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="食盐相当量(g)"> g
+        </span></label>
+      </div>
+      <label>性别(目标量的区分)
+        <select id="adv-sex">
+          <option value="male">男性(未满7.5g)</option>
+          <option value="female">女性(未满6.5g)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-run">计算合计</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>食品包装上写的「钠〇mg」<strong>相当于多少克食盐</strong>,马上就能算出来。同时显示占日本每日目标量(男性未满7.5g·女性未满6.5g)的百分比。换算系数和目标量均为<strong>日本食品标签和健康指导使用的日本标准</strong>,看懂在日本购买的食品标签、减盐选购时很方便。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>在食品包装的营养成分标示中找到「钠」的含量(mg)。</li>
+    <li>输入数值的同时,食盐相当量(g)和占每日目标量的比例就会显示在下方,无需点击按钮。</li>
+    <li>「食盐相当量→钠」的反向换算也可以在下拉菜单中选择。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>食盐相当量(g)= 钠(mg)× 2.54 ÷ 1000</strong></li>
+    <li>系数2.54是食盐(NaCl)的分子量58.5除以钠的原子量23得到的值,由日本食品表示基准规定。</li>
+    <li>计算示例: 钠1,200mg → 1,200 × 2.54 ÷ 1000 = <strong>约3.0g</strong>(食盐相当量)</li>
+    <li>日本的每日目标量(食盐相当量)为成年男性未满7.5g、成年女性未满6.5g。</li>
+  </ul>
+
+  <h3>出处(一次信息)</h3>
+  <ul class="sources">
+    <li>换算系数(2.54): <a href="https://elaws.e-gov.go.jp/document?lawid=427M60000002010" target="_blank" rel="noopener">食品表示基准(平成27年内阁府令第10号)</a>(日文)</li>
+    <li>每日目标量: <a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/kenkou/eiyou/syokuji_kijyun.html" target="_blank" rel="noopener">日本厚生劳动省「日本人的膳食摄取基准」</a>(日文)(成人食盐相当量目标量: 男性每日未满7.5g·女性每日未满6.5g)</li>
+  </ul>
+
+  <h2>前提与注意</h2>
+  <ul class="cautions">
+    <li>日本现行的营养成分标示原则上直接标注「食盐相当量」,但旧标签和进口食品上仍可能只标「钠」。</li>
+    <li>因高血压·肾病等被医生要求限盐的人,请以医生指示的数值为准。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">钠和食盐是同一种东西吗?</h3>
+  <p class="faq-a">不是。食盐(氯化钠)是钠和氯的化合物,按重量算钠只占食盐的约4成。因此钠的数值看起来比食盐相当量小,「钠400mg」约等于食盐1g。</p>
+  <h3 class="faq-q">一碗杯面会摄入一天多少盐分?</h3>
+  <p class="faq-a">因产品而异,但连汤喝完的话,很多产品的食盐相当量在5g左右,可能接近成年女性每日目标量(未满6.5g)的8成。不喝汤可以减少2〜3成。</p>
+  <h3 class="faq-q">和WHO的建议量不一样吗?</h3>
+  <p class="faq-a">WHO(世界卫生组织)建议成人每日未满5g,比日本的目标量(男性未满7.5g·女性未满6.5g)更严格。日本的目标量是考虑到现有饮食习惯的可实现性而设定的。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=shio">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/shio/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var label = document.getElementById("value-label");
+  var input = document.getElementById("value");
+  mode.addEventListener("change", function () {
+    var toSalt = mode.value === "toSalt";
+    label.childNodes[0].textContent = toSalt ? "钠含量(mg)" : "食盐相当量(g)";
+    input.placeholder = toSalt ? "例: 1200" : "例: 3";
+    run(false);
+  });
+  function run(fromSubmit) {
+    if (input.value === "") {
+      if (!fromSubmit) { box.hidden = true; return; }
+      box.innerHTML = '<p class="result-error">请输入数值。</p>';
+      box.hidden = false;
+      return;
+    }
+    var v = parseFloat(input.value);
+    if (mode.value === "toSalt") {
+      var r = ShioCalc.toSalt(v);
+      if (!r.ok) {
+        box.innerHTML = '<p class="result-error">钠含量请输入大于0的数值。</p>';
+        box.hidden = false;
+        return;
+      }
+      box.innerHTML =
+        '<div class="result-main">食盐相当量 约' + r.saltG.toLocaleString() + " g</div>" +
+        "<p>占每日目标量: 成年男性(未满7.5g)的 <strong>" + r.pctMale + "%</strong> / 成年女性(未满6.5g)的 <strong>" + r.pctFemale + "%</strong></p>";
+    } else {
+      var r2 = ShioCalc.toSodium(v);
+      if (!r2.ok) {
+        box.innerHTML = '<p class="result-error">食盐相当量请输入大于0的数值(100g以下)。</p>';
+        box.hidden = false;
+        return;
+      }
+      box.innerHTML = '<div class="result-main">钠 约' + r2.sodiumMg.toLocaleString() + " mg</div>";
+    }
+    box.hidden = false;
+  }
+  document.getElementById("shio-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+  input.addEventListener("input", function () { run(false); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function runPortion(fromButton) {
+    if (!fromButton &&
+        (document.getElementById("adv-per100").value === "" ||
+         document.getElementById("adv-grams").value === "")) { return; }
+    var per = parseFloat(document.getElementById("adv-per100").value);
+    var g = parseFloat(document.getElementById("adv-grams").value);
+    var r = ShioCalc.portionSalt(per, g);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">请以数值输入每100g的食盐相当量(0〜100g)和实际食用量(1〜5000g)。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">食盐相当量 ' + r.saltG.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' g</div>' +
+      "<p>吃 " + g.toLocaleString() + "g 摄入的食盐相当量为 <strong>" +
+      r.saltG.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " g</strong>。" +
+      "占每日目标量: 男性(未满7.5g)的 " + r.pctMale.toLocaleString() + "% / 女性(未满6.5g)的 " +
+      r.pctFemale.toLocaleString() + "%。</p>";
+    advBox.hidden = false;
+  }
+  function runAdvTotal(fromButton) {
+    var items = [];
+    for (var i = 1; i <= 6; i++) {
+      var raw = document.getElementById("adv-salt-" + i).value;
+      if (raw === "") continue;
+      var g = parseFloat(raw);
+      var name = document.getElementById("adv-name-" + i).value || ("食品" + i);
+      items.push({ name: name, salt: g });
+    }
+    if (items.length === 0) {
+      if (!fromButton) { return; }
+      advBox.innerHTML = '<p class="result-error">请至少输入1项食盐相当量(g)。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var sex = document.getElementById("adv-sex").value;
+    var r = ShioCalc.dailyTotal(items, sex);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">食盐相当量请输入0〜100g的数值。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var html = '<div class="result-main">合计 ' +
+      r.totalG.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' g(目标量的' + r.pct.toLocaleString() + '%)</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>食品</th><th>食盐相当量</th></tr></thead><tbody>';
+    for (var j = 0; j < items.length; j++) {
+      html += "<tr><td>" + items[j].name.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") +
+        "</td><td>" + items[j].salt.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " g</td></tr>";
+    }
+    html += "</tbody></table></div>";
+    if (r.over) {
+      html += '<p class="result-error">已超出目标量(未满' + r.targetG + 'g) ' +
+        Math.abs(r.remainingG).toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' g。</p>';
+    } else {
+      html += "<p>距离目标量(未满" + r.targetG + "g)还剩 <strong>" +
+        r.remainingG.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " g</strong>。</p>";
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-portion-run").addEventListener("click", function () { runPortion(true); });
+  document.getElementById("adv-run").addEventListener("click", function () { runAdvTotal(true); });
+  ["adv-per100", "adv-grams"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runPortion(false); });
+  });
+  for (var i = 1; i <= 6; i++) {
+    document.getElementById("adv-salt-" + i).addEventListener("input", function () { runAdvTotal(false); });
+    document.getElementById("adv-name-" + i).addEventListener("input", function () { runAdvTotal(false); });
+  }
+  document.getElementById("adv-sex").addEventListener("change", function () { runAdvTotal(false); });
+})();
+</script>
+</body>
+</html>

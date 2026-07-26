@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>电费计算器(日本电价·按功率和使用时间计算) | Quick Calc</title>
+  <meta name="description" content="输入家电的功率(W)和使用时间,免费计算1天·1个月·1年的电费(日元)。单价默认采用日本官方参考单价31日元/kWh,也可改成自己合约的单价。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/denki/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="电费计算器(日本电价·按功率和使用时间计算) | Quick Calc">
+  <meta property="og:description" content="输入家电的功率(W)和使用时间,免费计算1天·1个月·1年的电费(日元)。单价默认采用日本官方参考单价31日元/kWh,也可改成自己合约的单价。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/denki/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"电费计算器","item":"https://quick-calc.site/zh/tools/denki/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>电费计算器</h1>
+  <form class="tool-form" id="denki-form">
+    <label>功率(W)
+      <span class="field-note">例: 空调=500左右、吹风机=1200、冰箱=60左右(产品标签或说明书上有记载)</span>
+      <input type="number" id="watts" inputmode="decimal" step="any" min="0.1" max="20000" placeholder="500" required>
+    </label>
+    <label>每天使用时间(小时)
+      <span class="field-note">对应范围: 0.1〜24小时</span>
+      <input type="number" id="hours" inputmode="decimal" step="0.1" min="0.1" max="24" placeholder="8" required>
+    </label>
+    <label>电费单价(日元/kWh)
+      <span class="field-note">默认值31日元是日本的官方参考单价。若知道自己合约的单价请自行修改</span>
+      <input type="number" id="price" inputmode="decimal" step="0.1" min="1" max="100" value="31" required>
+    </label>
+    <button type="submit">计算</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 多个家电一起计算</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">全家一共多少? 最多可同时计算6个</h3>
+      <p class="adv-note">把常用的家电一起填进去,就能看到合计电费以及「哪一个最费电」的占比(单价使用上方表单的值,名称可留空)。</p>
+      <div class="adv-rows" id="adv-rows">
+        <label>家电1 名称 / 功率(W) / 每天使用时间(h)
+          <input type="text" id="adv-name-1" placeholder="空调" maxlength="20">
+          <input type="number" id="adv-watts-1" inputmode="decimal" step="any" min="0.1" max="20000" placeholder="500">
+          <input type="number" id="adv-hours-1" inputmode="decimal" step="any" min="0.1" max="24" placeholder="8">
+        </label>
+        <label>家电2
+          <input type="text" id="adv-name-2" placeholder="冰箱" maxlength="20">
+          <input type="number" id="adv-watts-2" inputmode="decimal" step="any" min="0.1" max="20000" placeholder="60">
+          <input type="number" id="adv-hours-2" inputmode="decimal" step="any" min="0.1" max="24" placeholder="24">
+        </label>
+        <label>家电3
+          <input type="text" id="adv-name-3" maxlength="20">
+          <input type="number" id="adv-watts-3" inputmode="decimal" step="any" min="0.1" max="20000">
+          <input type="number" id="adv-hours-3" inputmode="decimal" step="any" min="0.1" max="24">
+        </label>
+        <label>家电4
+          <input type="text" id="adv-name-4" maxlength="20">
+          <input type="number" id="adv-watts-4" inputmode="decimal" step="any" min="0.1" max="20000">
+          <input type="number" id="adv-hours-4" inputmode="decimal" step="any" min="0.1" max="24">
+        </label>
+        <label>家电5
+          <input type="text" id="adv-name-5" maxlength="20">
+          <input type="number" id="adv-watts-5" inputmode="decimal" step="any" min="0.1" max="20000">
+          <input type="number" id="adv-hours-5" inputmode="decimal" step="any" min="0.1" max="24">
+        </label>
+        <label>家电6
+          <input type="text" id="adv-name-6" maxlength="20">
+          <input type="number" id="adv-watts-6" inputmode="decimal" step="any" min="0.1" max="20000">
+          <input type="number" id="adv-hours-6" inputmode="decimal" step="any" min="0.1" max="24">
+        </label>
+      </div>
+      <button type="button" id="adv-run">计算合计</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    本工具的计算结果为<strong>约值</strong>。实际电费取决于您与日本电力公司签订的合约(基本费·阶梯电价·燃料费调整额·可再生能源附加费等)。此外,空调和冰箱的实际耗电量会随设定温度和室温而大幅变动。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>输入家电的瓦数和每天使用的时间,就能知道<strong>1天·1个月·1年的电费各是多少</strong>。金额以日元计算,单价默认采用<strong>日本电力收费体系中的官方参考单价</strong>,适合在日本签约用电的情况。想知道空调、暖桌「一直开着要花多少钱」时很好用。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>输入家电的功率(W)。可在产品本体的标签、说明书或厂商网站上确认。</li>
+    <li>输入每天使用的时间。</li>
+    <li>输入后电费会自动显示在下方。单价可以改成自己合约的数值。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>耗电量(kWh) = 功率(W) × 使用时间(h) ÷ 1000</strong></li>
+    <li><strong>电费 = 耗电量(kWh) × 电费单价(日元/kWh)</strong>(1个月按30天、1年按365天换算)</li>
+    <li>单价默认值<strong>31日元/kWh(含税)</strong>是日本的公益社团法人 全国家庭电气产品公正交易协议会(全国家庭電気製品公正取引協議会)制定的「电力费用参考单价」(2022年7月修订)。这也是日本家电产品目录上标示电费时所使用的官方参考值。</li>
+    <li>计算示例: 500W的空调每天用8小时 → 4kWh × 31日元 = 约124日元/天(约3,720日元/月)</li>
+  </ul>
+
+  <h3>出处(一次信息)</h3>
+  <ul class="sources">
+    <li>公益社团法人 全国家庭电气产品公正交易协议会(全国家庭電気製品公正取引協議会)「电力费用参考单价」(常见问题)(日文)<br>
+      <a href="https://www.eftc.or.jp/qa/" rel="noopener" target="_blank">https://www.eftc.or.jp/qa/</a>(2026年7月18日查阅)</li>
+  </ul>
+
+  <h2>计算的前提与注意</h2>
+  <ul class="cautions">
+    <li>「功率(W)」为额定值。变频控制的设备(空调·冰箱)实际耗电会随运转状态而变化。年度参考值也可参照各产品标示的「年间耗电量(kWh/年)」。</li>
+    <li>不含待机功耗。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">只知道电流(A)时怎么办?</h3>
+  <p class="faq-a">日本家用插座为100V,可按「功率(W) ≒ 100 × 电流(A)」粗略估算(实际耗电会因设备种类而有出入)。</p>
+  <h3 class="faq-q">产品目录上的「年间耗电量」与本计算有何不同?</h3>
+  <p class="faq-a">年间耗电量(kWh/年)是厂商按实际使用场景假定后测得的数值。空调、冰箱这类输出会变动的设备,用「年间耗电量×单价」更贴近实际。</p>
+  <h3 class="faq-q">一直开着和勤关,哪个更省?</h3>
+  <p class="faq-a">因设备而异。有些设备启动时耗电很大,不能一概而论,但长时间不用的话关掉确实能减少耗电量。可用本工具按不同时间进行比较。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=denki">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/denki/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_watts: "功率请在 " + DenkiCalc.WATTS_MIN + "〜" + DenkiCalc.WATTS_MAX + " W 的范围内输入。",
+    invalid_hours: "使用时间请在 " + DenkiCalc.HOURS_MIN + "〜" + DenkiCalc.HOURS_MAX + " 小时的范围内输入。",
+    invalid_price: "单价请在 " + DenkiCalc.PRICE_MIN + "〜" + DenkiCalc.PRICE_MAX + " 日元/kWh 的范围内输入。"
+  };
+  var box = document.getElementById("result");
+  function raw(id) { return document.getElementById(id).value; }
+  function run(showErrors) {
+    if (raw("watts") === "" || raw("hours") === "" || raw("price") === "") {
+      if (showErrors) {
+        var code = raw("watts") === "" ? "invalid_watts" : raw("hours") === "" ? "invalid_hours" : "invalid_price";
+        box.innerHTML = '<p class="result-error">' + ERROR_MESSAGES[code] + "</p>";
+        box.hidden = false;
+      } else {
+        box.hidden = true;
+      }
+      return;
+    }
+    var result = DenkiCalc.calculate(parseFloat(raw("watts")), parseFloat(raw("hours")), parseFloat(raw("price")));
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">约 ' + result.costPerMonth.toLocaleString() + " 日元/月</div>" +
+        "<p>1天: <strong>" + result.costPerDay.toLocaleString() + " 日元</strong>(" + result.kwhPerDay.toLocaleString() + " kWh)<br>" +
+        "1年: <strong>" + result.costPerYear.toLocaleString() + " 日元</strong></p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "请确认输入的数值。") + "</p>";
+    }
+    box.hidden = false;
+  }
+  ["watts", "hours", "price"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { run(false); });
+  });
+  document.getElementById("denki-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var ADV_ERRORS = {
+    invalid_items: "请至少输入1个家电(最多6个)。功率和时间两项都需要填写。",
+    invalid_watts: "功率请在 0.1〜20,000W 的范围内输入。",
+    invalid_hours: "使用时间请在 0.1〜24小时 的范围内输入。",
+    invalid_price: "单价(上方表单)请在 1〜100日元/kWh 的范围内输入。"
+  };
+  function runAdv(skipIncomplete) {
+    var price = parseFloat(document.getElementById("price").value);
+    var items = [];
+    var names = [];
+    for (var i = 1; i <= 6; i++) {
+      var w = document.getElementById("adv-watts-" + i).value;
+      var h = document.getElementById("adv-hours-" + i).value;
+      if (w === "" && h === "") continue;
+      if (skipIncomplete && (w === "" || h === "")) continue;
+      items.push({ watts: parseFloat(w), hours: parseFloat(h) });
+      var n = document.getElementById("adv-name-" + i).value.trim();
+      names.push(n || "家电" + i);
+    }
+    var r = DenkiCalc.calculateMulti(items, price);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + (ADV_ERRORS[r.code] || "请确认输入的数值。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    var html =
+      '<div class="result-main">合计 约' + r.total.costPerMonth.toLocaleString() + ' 日元/月</div>' +
+      '<p>1天: <strong>' + r.total.costPerDay.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' 日元</strong>(' +
+      r.total.kwhPerDay.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' kWh) / 1年: <strong>' +
+      r.total.costPerYear.toLocaleString() + ' 日元</strong></p>' +
+      '<div class="table-scroll"><table class="data-table"><thead>' +
+      '<tr><th>家电</th><th>1个月</th><th>1年</th><th>占比</th></tr></thead><tbody>';
+    var maxIdx = 0;
+    for (var j = 0; j < r.items.length; j++) {
+      if (r.items[j].sharePercent > r.items[maxIdx].sharePercent) maxIdx = j;
+      html += '<tr><td>' + names[j].replace(/&/g, "&amp;").replace(/</g, "&lt;") + '</td>' +
+        '<td>' + r.items[j].costPerMonth.toLocaleString() + ' 日元</td>' +
+        '<td>' + r.items[j].costPerYear.toLocaleString() + ' 日元</td>' +
+        '<td>' + r.items[j].sharePercent.toLocaleString(undefined, { maximumFractionDigits: 1 }) + '%</td></tr>';
+    }
+    html += '</tbody></table></div>';
+    if (r.items.length > 1) {
+      html += '<p class="adv-note">最费电的是「' + names[maxIdx].replace(/&/g, "&amp;").replace(/</g, "&lt;") + '」。' +
+        '每天少用1小时,每月约可节省 ' + r.items[maxIdx].savePerHourMonth.toLocaleString() + ' 日元。</p>';
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", function () { runAdv(false); });
+  function autoAdv() {
+    var hasComplete = false;
+    for (var i = 1; i <= 6; i++) {
+      if (document.getElementById("adv-watts-" + i).value !== "" &&
+          document.getElementById("adv-hours-" + i).value !== "") hasComplete = true;
+    }
+    if (hasComplete && document.getElementById("price").value !== "") {
+      runAdv(true);
+    } else {
+      advBox.hidden = true;
+    }
+  }
+  for (var i = 1; i <= 6; i++) {
+    document.getElementById("adv-watts-" + i).addEventListener("input", autoAdv);
+    document.getElementById("adv-hours-" + i).addEventListener("input", autoAdv);
+    document.getElementById("adv-name-" + i).addEventListener("input", function () {
+      if (!advBox.hidden) autoAdv();
+    });
+  }
+  document.getElementById("price").addEventListener("input", function () {
+    if (!advBox.hidden) autoAdv();
+  });
+})();
+</script>
+</body>
+</html>

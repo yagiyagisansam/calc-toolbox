@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>이익률·원가율 계산기(마진과 가격 역산) | Quick Calc</title>
+  <meta name="description" content="판매가와 원가를 입력하면 마진·이익률·원가율을 바로 계산합니다. 「이익률 30%로 하려면 얼마에 팔아야 하나」의 판매가 역산도 지원해, 일본에서의 가게 가격 책정·핸드메이드 판매·중고 거래에 유용합니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/genka/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="이익률·원가율 계산기(마진과 가격 역산) | Quick Calc">
+  <meta property="og:description" content="판매가와 원가를 입력하면 마진·이익률·원가율을 바로 계산합니다. 「이익률 30%로 하려면 얼마에 팔아야 하나」의 판매가 역산도 지원해, 일본에서의 가게 가격 책정·핸드메이드 판매·중고 거래에 유용합니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/genka/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"이익률·원가율 계산기","item":"https://quick-calc.site/ko/tools/genka/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>이익률·원가율 계산기</h1>
+  <form class="tool-form" id="genka-form">
+    <label>계산 종류
+      <select id="mode">
+        <option value="analyze" selected>판매가와 원가로 이익률 계산</option>
+        <option value="priceFor">목표 이익률에서 판매가 역산</option>
+      </select>
+    </label>
+    <label id="first-label">판매가(엔)
+      <input type="number" id="first" inputmode="decimal" min="0" step="any" required placeholder="예: 1000">
+    </label>
+    <label id="second-label">원가(엔)
+      <input type="number" id="second" inputmode="decimal" min="0" step="any" required placeholder="예: 600">
+    </label>
+    <span class="field-note">두 항목을 입력하면 자동으로 계산됩니다</span>
+    <button type="submit">계산하기</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 손익분기점과 실수령 이익</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">손익분기점(몇 개 팔아야 흑자?)</h3>
+      <p class="adv-note">고정비와 1개당 비용으로, 적자가 되지 않는 최소 판매 수량(목표 이익을 넣으면 그 달성에 필요한 수량)을 계산합니다.</p>
+      <label>고정비(엔)
+        <span class="field-note">임대료·인건비·출점료 등 팔리지 않아도 드는 비용의 합계</span>
+        <input type="number" id="adv-fixed" inputmode="numeric" step="any" min="0" placeholder="100000">
+      </label>
+      <label>1개당 변동비(엔)
+        <span class="field-note">재료비·매입 등 1개 팔 때마다 드는 비용</span>
+        <input type="number" id="adv-var" inputmode="numeric" step="any" min="0" placeholder="300">
+      </label>
+      <label>판매 단가(엔)
+        <input type="number" id="adv-price" inputmode="numeric" step="any" min="0.01" placeholder="800">
+      </label>
+      <label>목표 이익(엔·비워두면 0)
+        <input type="number" id="adv-target" inputmode="numeric" step="any" min="0" placeholder="50000">
+      </label>
+      <button type="button" id="adv-be-run">필요한 판매 수량 계산</button>
+      <div class="tool-result" id="adv-be-result" hidden aria-live="polite"></div>
+      <h3 class="adv-h">중고 거래·온라인 판매의 실수령액</h3>
+      <p class="adv-note">메루카리(メルカリ) 등의 판매 수수료와 배송비를 빼고 「실제로 손에 남는 이익」을 계산합니다.</p>
+      <label>판매가(엔)
+        <input type="number" id="adv-nprice" inputmode="numeric" step="any" min="0.01" placeholder="3000">
+      </label>
+      <label>판매 수수료(%)
+        <input type="number" id="adv-nfee" inputmode="decimal" step="any" min="0" max="99" value="10">
+      </label>
+      <label>배송비(엔·판매자 부담분)
+        <input type="number" id="adv-nship" inputmode="numeric" step="any" min="0" value="0">
+      </label>
+      <label>원가·매입가(엔)
+        <input type="number" id="adv-ncost" inputmode="numeric" step="any" min="0" placeholder="1000">
+      </label>
+      <button type="button" id="adv-np-run">실수령 이익 계산</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>파는 가격과 매입가를 넣기만 하면 <strong>이익이 얼마나 남는지(이익률)</strong>를 알 수 있습니다. 「이익률 30%로 하려면 얼마에 팔아야 하나?」의 역산도 가능합니다. 가게의 가격 책정, 핸드메이드·중고 거래의 가격 결정에 활용하세요. 금액 단위는 모두 엔입니다.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>「판매가와 원가로 이익률 계산」 또는 「목표 이익률에서 판매가 역산」을 선택합니다.</li>
+    <li>판매가와 원가(또는 원가와 목표 이익률)를 입력합니다.</li>
+    <li>두 항목을 입력하는 순간 결과가 표시됩니다(버튼을 누를 필요는 없습니다).</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>마진(이익) = 판매가 − 원가</strong></li>
+    <li><strong>이익률(매출총이익률) = 마진 ÷ 판매가 × 100</strong>(판매가 기준) / <strong>원가율 = 원가 ÷ 판매가 × 100</strong></li>
+    <li><strong>판매가 역산 = 원가 ÷ (1 − 목표 이익률÷100)</strong>. 「원가에 30% 붙이기」(원가×1.3)와는 결과가 다르다는 점에 주의하세요.</li>
+    <li>계산 예: 원가 600엔으로 이익률 40%를 원한다면 → 600 ÷ 0.6 = <strong>1,000엔</strong>(600×1.4=840엔으로는 이익률이 28.6%밖에 되지 않습니다)</li>
+  </ul>
+
+  <h3>출처·전제 명시</h3>
+  <ul class="sources">
+    <li>판매가 기준 이익률(매출총이익률)의 정의에 따른 산술 계산입니다.</li>
+  </ul>
+
+  <h2>계산의 전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>여기서 말하는 「원가」는 매입·재료비입니다. 인건비·임대료·수수료 등의 경비는 포함하지 않으므로, 이익률이 곧 손에 남는 비율은 아닙니다.</li>
+    <li>중고 거래 앱이나 온라인 판매에서는 판매 수수료(10% 전후)와 배송비도 빼고 생각해야 합니다.</li>
+    <li>일본 음식점의 원가율은 30% 전후를 기준으로 보는 경우가 많지만, 업태에 따라 크게 다릅니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">「이익률」과 「원가에 ○% 붙이기」는 무엇이 다른가요?</h3>
+  <p class="faq-a">기준이 다릅니다. 원가 600엔에 30%를 붙이면(마크업) 780엔이지만, 그 이익률은 180÷780=23%입니다. 이익률 30%로 만들려면 600÷0.7=857엔에 팔아야 합니다. 혼동하면 예상보다 이익이 얇아지므로 주의하세요.</p>
+  <h3 class="faq-q">이익률은 몇 %면 적당한가요?</h3>
+  <p class="faq-a">업종에 따라 다릅니다. 흔히 소매는 20〜30%, 음식점은 60〜70%(원가율 30〜40%), 핸드메이드는 재료비의 3배(이익률 67%)를 기준으로 든다고 이야기합니다. 경비와 작업 시간을 감당할 수 있는지로 판단하세요.</p>
+  <h3 class="faq-q">소비세는 포함해서 계산해야 하나요?</h3>
+  <p class="faq-a">세금 제외 가격으로 통일하는 것이 기본입니다. 세금 포함 가격으로 계산하면 이익률이 실제와 어긋나므로, 한쪽 기준으로 통일해 주세요.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=genka">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/genka/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var firstLabel = document.getElementById("first-label");
+  var secondLabel = document.getElementById("second-label");
+  var first = document.getElementById("first");
+  var second = document.getElementById("second");
+  var MSG = {
+    invalid_price: "판매가는 0보다 큰 값으로 입력해 주세요.",
+    invalid_cost: "원가는 0 이상으로 입력해 주세요.",
+    invalid_margin: "목표 이익률은 0〜99.9%로 입력해 주세요."
+  };
+  mode.addEventListener("change", function () {
+    var isA = mode.value === "analyze";
+    firstLabel.childNodes[0].textContent = isA ? "판매가(엔)" : "원가(엔)";
+    secondLabel.childNodes[0].textContent = isA ? "원가(엔)" : "목표 이익률(%)";
+    first.placeholder = isA ? "예: 1000" : "예: 600";
+    second.placeholder = isA ? "예: 600" : "예: 30";
+    runMain();
+  });
+  function runMain() {
+    if (first.value === "" || second.value === "") { box.hidden = true; return; }
+    var a = parseFloat(first.value);
+    var b = parseFloat(second.value);
+    if (mode.value === "analyze") {
+      var r = GenkaCalc.analyze(a, b);
+      if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "입력값을 확인해 주세요.") + "</p>"; box.hidden = false; return; }
+      box.innerHTML =
+        '<div class="result-main">이익률 ' + r.marginPct.toLocaleString() + " %</div>" +
+        '<div class="table-scroll"><table class="data-table"><tbody>' +
+        "<tr><td>마진(이익)</td><td>" + r.profit.toLocaleString() + " 엔</td></tr>" +
+        "<tr><td>원가율</td><td>" + r.costPct.toLocaleString() + " %</td></tr>" +
+        "</tbody></table></div>" + (r.profit < 0 ? '<p class="result-error">적자입니다.</p>' : "");
+    } else {
+      var r2 = GenkaCalc.priceFor(a, b);
+      if (!r2.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r2.code] || "입력값을 확인해 주세요.") + "</p>"; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">판매가 ' + r2.price.toLocaleString() + " 엔</div>" +
+        "<p>원가 " + a.toLocaleString() + "엔에서 이익률 " + b.toLocaleString() + "%를 확보하는 판매가입니다.</p>";
+    }
+    box.hidden = false;
+  }
+  document.getElementById("genka-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
+  });
+  [first, second].forEach(function (el) {
+    el.addEventListener("input", runMain);
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var beBox = document.getElementById("adv-be-result");
+  var advBox = document.getElementById("adv-result");
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
+  }
+  function runBreakEven() {
+    var fixed = parseFloat(document.getElementById("adv-fixed").value);
+    var variable = parseFloat(document.getElementById("adv-var").value);
+    var price = parseFloat(document.getElementById("adv-price").value);
+    var targetRaw = document.getElementById("adv-target").value;
+    var target = targetRaw === "" ? 0 : parseFloat(targetRaw);
+    if (isNaN(fixed) || isNaN(variable) || isNaN(price) || isNaN(target)) {
+      showError(beBox, "고정비·1개당 변동비·판매 단가를 입력해 주세요.");
+      return;
+    }
+    var r = GenkaCalc.breakEven(fixed, variable, price, target);
+    if (!r.ok) {
+      showError(beBox, r.code === "no_margin"
+        ? "판매 단가가 1개당 변동비 이하입니다. 이 가격으로는 몇 개를 팔아도 흑자가 되지 않습니다."
+        : "입력값을 확인해 주세요(모두 0엔 이상, 판매 단가는 0보다 큰 값).");
+      return;
+    }
+    beBox.innerHTML =
+      '<div class="result-main">' + r.qty.toLocaleString() + "개 이상이면 " + (target > 0 ? "목표 달성" : "흑자") + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>그때의 매출액</td><td>" + r.sales.toLocaleString() + " 엔</td></tr>" +
+      "<tr><td>1개당 이익(공헌이익)</td><td>" + r.unitMargin.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " 엔(" + r.marginRatePct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%)</td></tr>" +
+      "</tbody></table></div>" +
+      (target > 0 ? '<p class="adv-note">목표 이익 ' + target.toLocaleString() + " 엔을 포함한 필요 수량입니다.</p>" : "");
+    beBox.hidden = false;
+  }
+  function runNetProfit() {
+    var price = parseFloat(document.getElementById("adv-nprice").value);
+    var fee = parseFloat(document.getElementById("adv-nfee").value);
+    var ship = parseFloat(document.getElementById("adv-nship").value);
+    var cost = parseFloat(document.getElementById("adv-ncost").value);
+    if (isNaN(price) || isNaN(fee) || isNaN(ship) || isNaN(cost)) {
+      showError(advBox, "판매가·수수료율·배송비·원가를 입력해 주세요.");
+      return;
+    }
+    var r = GenkaCalc.netProfit(price, fee, ship, cost);
+    if (!r.ok) { showError(advBox, "입력값을 확인해 주세요(수수료율은 0〜99%)."); return; }
+    advBox.innerHTML =
+      '<div class="result-main">실수령 ' + r.profit.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " 엔</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>판매 수수료(" + fee + "%)</td><td>" + r.fee.toLocaleString() + " 엔</td></tr>" +
+      "<tr><td>실질 이익률</td><td>" + r.marginPct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " %</td></tr>" +
+      "</tbody></table></div>" +
+      (r.profit < 0 ? '<p class="result-error">적자입니다. 판매가를 올리거나 배송비가 저렴한 발송 방법을 검토해 보세요.</p>' : "");
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-be-run").addEventListener("click", runBreakEven);
+  document.getElementById("adv-np-run").addEventListener("click", runNetProfit);
+  ["adv-fixed", "adv-var", "adv-price", "adv-target"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-fixed").value !== "" &&
+          document.getElementById("adv-var").value !== "" &&
+          document.getElementById("adv-price").value !== "") runBreakEven();
+    });
+  });
+  ["adv-nprice", "adv-nfee", "adv-nship", "adv-ncost"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-nprice").value !== "" &&
+          document.getElementById("adv-nfee").value !== "" &&
+          document.getElementById("adv-nship").value !== "" &&
+          document.getElementById("adv-ncost").value !== "") runNetProfit();
+    });
+  });
+})();
+</script>
+</body>
+</html>

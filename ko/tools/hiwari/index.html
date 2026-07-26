@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>일본 월세 일할 계산기(입주일·퇴거일 기준, 실일수/30일 방식) | Quick Calc</title>
+  <meta name="description" content="일본에서 월 중간에 입주·퇴거할 때의 일할(日割) 월세를 무료로 계산. 실일수 방식과 30일 고정 방식을 동시에 표시해 계약서 방식에 맞춰 확인할 수 있고, 시키킹·레이킹을 포함한 입주 초기 비용 합계도 냅니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/hiwari/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="일본 월세 일할 계산기(입주일·퇴거일 기준, 실일수/30일 방식) | Quick Calc">
+  <meta property="og:description" content="일본에서 월 중간에 입주·퇴거할 때의 일할(日割) 월세를 무료로 계산. 실일수 방식과 30일 고정 방식을 동시에 표시해 계약서 방식에 맞춰 확인할 수 있고, 시키킹·레이킹을 포함한 입주 초기 비용 합계도 냅니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/hiwari/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"일본 월세 일할 계산기","item":"https://quick-calc.site/ko/tools/hiwari/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>일본 월세 일할 계산기</h1>
+  <form class="tool-form" id="hiwari-form">
+    <label>월세(엔)
+      <span class="field-note">공익비·관리비도 일할 계산되는 경우에는 합산한 금액으로</span>
+      <input type="number" id="rent" inputmode="numeric" min="1" max="10000000" step="1" required placeholder="예: 80000">
+    </label>
+    <label>입주 or 퇴거
+      <select id="mode">
+        <option value="movein" selected>입주(입주일〜월말분을 지불)</option>
+        <option value="moveout">퇴거(월초〜퇴거일분을 지불)</option>
+      </select>
+    </label>
+    <div class="field-row">
+      <label><span id="date-label">입주일</span>(년)
+        <select id="date-year"></select>
+      </label>
+      <label>월
+        <select id="date-month"></select>
+      </label>
+      <label>일
+        <select id="date-day"></select>
+      </label>
+    </div>
+    <button type="submit">일할 월세 계산하기</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 입주 초기 비용을 한 번에 계산</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">시키킹·레이킹까지 넣어 「처음에 낼 총액」 계산</h3>
+      <p class="adv-note">시키킹 등은 계약서·견적서에 적힌 「월세 몇 개월분」으로 입력해 주세요(월세·입주일은 위 폼의 값, 일할은 실일수 방식).</p>
+      <label>시키킹·보증금(개월분)
+        <input type="number" id="adv-shikikin" inputmode="decimal" step="any" min="0" max="12" value="1">
+      </label>
+      <label>레이킹·사례금(개월분)
+        <input type="number" id="adv-reikin" inputmode="decimal" step="any" min="0" max="12" value="1">
+      </label>
+      <label>중개수수료(개월분)
+        <span class="field-note">상한은 월세 1개월분+소비세. 세금 포함이면 1.1 입력</span>
+        <input type="number" id="adv-chukai" inputmode="decimal" step="any" min="0" max="12" value="1">
+      </label>
+      <label>선불 월세(개월분)
+        <span class="field-note">다음 달 월세를 먼저 내는 경우에는 1</span>
+        <input type="number" id="adv-mae" inputmode="decimal" step="any" min="0" max="12" value="1">
+      </label>
+      <label>기타 비용(엔)
+        <span class="field-note">보증회사 이용료·화재보험·열쇠 교체비 등. 없으면 0</span>
+        <input type="number" id="adv-other" inputmode="numeric" step="1" min="0" max="10000000" value="0">
+      </label>
+      <button type="button" id="adv-run">초기 비용 총액 계산</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    어느 방식을 쓰는지(1엔 미만의 끝수 처리 포함)는 <strong>임대차 계약서의 규정이 우선</strong>됩니다. 이 도구는 1엔 미만 버림으로 계산합니다. 정확한 금액은 관리회사·집주인에게 확인하는 것을 권장합니다.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>일본에서 월 중간에 이사할 때 그 달 월세는 날수만큼 나눠 내는데, 이를 일본어로 「<strong>히와리(日割)</strong>」라고 합니다. 이 도구는 일본 임대차 계약에서 흔히 쓰이는 두 가지 계산 방식(그 달의 실제 일수로 나누기 / 30일로 나누기)을 나란히 표시하고, 일본 임대 특유의 <strong>시키킹(보증금)·레이킹(사례금)</strong>까지 더한 입주 초기 비용 총액도 한 번에 낼 수 있습니다. 계약서·견적서 금액 확인에 활용하세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>월세를 입력합니다(공익비도 일할 대상이면 합산).</li>
+    <li>「입주」인지 「퇴거」인지 선택하고 날짜를 고릅니다(처음에는 오늘 날짜가 들어 있습니다).</li>
+    <li>고르는 순간 두 방식의 일할 금액이 나란히 바로 아래에 표시됩니다. 버튼은 필요 없습니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>실일수 방식: 일할 월세 = 월세 × 대상 일수 ÷ 그 달의 일수</strong>(28〜31일)</li>
+    <li><strong>30일 고정 방식: 일할 월세 = 월세 × 대상 일수 ÷ 30</strong>(달의 길이와 상관없이 30으로 나눔)</li>
+    <li>입주의 대상 일수는 「입주일부터 월말까지」, 퇴거는 「월초부터 퇴거일까지」입니다.</li>
+    <li>계산 예: 월세 8만 엔·7월 20일 입주(7월은 31일)→ 대상 12일분. 실일수 방식: 80,000 × 12 ÷ 31 = <strong>30,967엔</strong> / 30일 방식: 80,000 × 12 ÷ 30 = <strong>32,000엔</strong></li>
+    <li>30일 방식으로 월세를 초과하는 경우에는 월세를 상한으로 합니다.</li>
+  </ul>
+
+  <h3>출처·전제 명시</h3>
+  <ul class="sources">
+    <li>산술 계산입니다. 일할 방식·끝수 처리는 일본에서 법으로 통일되어 있지 않으며, 개별 임대차 계약의 규정에 따릅니다.</li>
+  </ul>
+
+  <h2>계산 전제와 주의</h2>
+  <ul class="cautions">
+    <li>2월(28일/29일)은 방식에 따른 차이가 커집니다. 실일수 방식에서는 하루당 단가가 높아지고, 31일인 달에는 낮아집니다.</li>
+    <li>입주 달의 월세와는 별도로 「다음 달분 선불 월세」를 초기 비용으로 요구받는 것이 일반적입니다. 일할분과 합쳐 자금 계획을 세워 주세요.</li>
+    <li>퇴거의 경우, 계약에 따라서는 일할 계산 없이 「월말까지 전액」이 되는 계약(해약 예고 1개월 등)도 있습니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">실일수 방식과 30일 방식, 어느 쪽이 일반적인가요?</h3>
+  <p class="faq-a">일본에서는 둘 다 널리 쓰입니다. 계약서의 「임대료 일할 계산」 조항에 기재가 있으면 그것이 우선입니다. 기재가 없으면 관리회사에 확인해 주세요.</p>
+  <h3 class="faq-q">공익비·관리비도 일할 계산되나요?</h3>
+  <p class="faq-a">계약에 따라 다릅니다. 월세와 같이 일할 계산되는 계약이 많지만 전액 청구되는 경우도 있습니다. 일할 계산된다면 월세와 합산한 금액으로 계산해 주세요.</p>
+  <h3 class="faq-q">언제 입주하는 것이 이득인가요?</h3>
+  <p class="faq-a">일할이 있는 계약이라면 입주일이 월초에 가까울수록 「일할+선불 월세」의 초기 비용이 늘고, 월말에 가까울수록 줄어듭니다. 다만 프리렌트(월세 무료 기간)의 유무나 퇴거하는 집 월세와의 이중 지불 기간까지 포함해 비교하는 것이 확실합니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=hiwari">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/hiwari/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var today = new Date();
+  var ERROR_MESSAGES = {
+    invalid_rent: "월세를 1엔 이상으로 입력해 주세요.",
+    invalid_date: "날짜를 올바르게 입력해 주세요.",
+    invalid_mode: "입주인지 퇴거인지 선택해 주세요."
+  };
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, "일", Math.min(keep, max));
+  }
+  fillSelect(document.getElementById("date-year"), today.getFullYear() - 10, today.getFullYear() + 10, "년", today.getFullYear());
+  fillSelect(document.getElementById("date-month"), 1, 12, "월", today.getMonth() + 1);
+  fillSelect(document.getElementById("date-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), "일", today.getDate());
+  function pad2(n) { return n < 10 ? "0" + n : String(n); }
+  function selectedIso() {
+    adjustDays("date-year", "date-month", "date-day");
+    return val("date-year") + "-" + pad2(val("date-month")) + "-" + pad2(val("date-day"));
+  }
+  function run(showErrors) {
+    var rentRaw = document.getElementById("rent").value;
+    if (rentRaw === "") {
+      if (showErrors) {
+        box.innerHTML = '<p class="result-error">' + ERROR_MESSAGES.invalid_rent + "</p>";
+        box.hidden = false;
+      } else {
+        box.hidden = true;
+      }
+      return;
+    }
+    var rent = parseInt(rentRaw, 10);
+    var mode = document.getElementById("mode").value;
+    var r = HiwariCalc.prorate(rent, selectedIso(), mode);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "입력값을 확인해 주세요.") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">실일수 방식 ' + r.actual.toLocaleString() + " 엔</div>" +
+      "<p>대상 일수: " + r.days + "일분(이 달은 " + r.daysInMonth + "일)</p>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>방식</th><th>계산</th><th>일할 월세</th></tr></thead><tbody>' +
+      "<tr><td>실일수 방식</td><td>월세 × " + r.days + " ÷ " + r.daysInMonth + "</td><td><strong>" + r.actual.toLocaleString() + "엔</strong></td></tr>" +
+      "<tr><td>30일 고정 방식</td><td>월세 × " + r.days + " ÷ 30</td><td><strong>" + r.by30.toLocaleString() + "엔</strong></td></tr>" +
+      "</tbody></table></div>" +
+      "<p>1엔 미만은 버림. 어느 방식인지는 계약서를 확인해 주세요.</p>";
+    box.hidden = false;
+  }
+  document.getElementById("mode").addEventListener("change", function () {
+    document.getElementById("date-label").textContent =
+      document.getElementById("mode").value === "movein" ? "입주일" : "퇴거일";
+    run(false);
+  });
+  ["date-year", "date-month", "date-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", function () { run(false); });
+  });
+  document.getElementById("rent").addEventListener("input", function () { run(false); });
+  document.getElementById("hiwari-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+  window.HiwariPage = { selectedIso: selectedIso, rerun: run };
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var ADV_ERRORS = {
+    invalid_rent: "월세(위 폼)를 1〜10,000,000엔 범위로 입력해 주세요.",
+    invalid_date: "입주일(위 폼)을 입력해 주세요.",
+    invalid_months: "시키킹·레이킹 등의 개월 수는 0〜12 범위로 입력해 주세요.",
+    invalid_other: "기타 비용은 0〜10,000,000엔 범위로 입력해 주세요."
+  };
+  function runAdv() {
+    var rent = parseFloat(document.getElementById("rent").value);
+    var iso = window.HiwariPage.selectedIso();
+    function monthVal(id) {
+      var v = parseFloat(document.getElementById(id).value);
+      return isNaN(v) ? 0 : v;
+    }
+    var other = parseFloat(document.getElementById("adv-other").value);
+    if (isNaN(other)) other = 0;
+    var r = HiwariCalc.initialCost(rent, iso,
+      monthVal("adv-shikikin"), monthVal("adv-reikin"),
+      monthVal("adv-chukai"), monthVal("adv-mae"), other);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + (ADV_ERRORS[r.code] || "입력값을 확인해 주세요.") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">초기 비용 총액 약 ' + r.total.toLocaleString() + ' 엔</div>' +
+      '<p>월세의 약 <strong>' + r.monthsOfRent.toLocaleString(undefined, { maximumFractionDigits: 1 }) + '개월분</strong>입니다.</p>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>일할 월세(' + r.days + '일분)</td><td>' + r.prorated.toLocaleString() + ' 엔</td></tr>' +
+      '<tr><td>시키킹(보증금)</td><td>' + r.shikikin.toLocaleString() + ' 엔</td></tr>' +
+      '<tr><td>레이킹(사례금)</td><td>' + r.reikin.toLocaleString() + ' 엔</td></tr>' +
+      '<tr><td>중개수수료</td><td>' + r.chukai.toLocaleString() + ' 엔</td></tr>' +
+      '<tr><td>선불 월세</td><td>' + r.maeYachin.toLocaleString() + ' 엔</td></tr>' +
+      '<tr><td>기타</td><td>' + r.other.toLocaleString() + ' 엔</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">계약이 30일 고정 방식으로 일할 계산하는 경우에는 위 폼의 결과(30일 고정 방식)와의 차액만큼 총액이 달라집니다. 정확한 금액은 계약서·견적서에서 확인해 주세요.</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", runAdv);
+  function autoAdv() {
+    if (document.getElementById("rent").value !== "") { runAdv(); } else { advBox.hidden = true; }
+  }
+  ["adv-shikikin", "adv-reikin", "adv-chukai", "adv-mae", "adv-other"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoAdv);
+  });
+  ["rent"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { if (!advBox.hidden) autoAdv(); });
+  });
+  ["date-year", "date-month", "date-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", function () { if (!advBox.hidden) autoAdv(); });
+  });
+})();
+</script>
+</body>
+</html>

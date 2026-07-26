@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Japan Rental Property Investment Simulator — When Does It Break Even? | Quick Calc</title>
+  <meta name="description" content="See in which year selling a Japanese rental property finally turns your total profit positive, from just five inputs. Charts the loan balance, estimated sale price, tax effect and cumulative cash flow for up to 50 years, with Japan's short-term and long-term capital gains tax built in.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/fudosan/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Japan Rental Property Investment Simulator — When Does It Break Even? | Quick Calc">
+  <meta property="og:description" content="See in which year selling a Japanese rental property finally turns your total profit positive, from just five inputs. Charts the loan balance, estimated sale price, tax effect and cumulative cash flow for up to 50 years, with Japan's short-term and long-term capital gains tax built in.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/fudosan/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Japan Rental Property Investment Simulator","item":"https://quick-calc.site/en/tools/fudosan/"}]}</script>
+  <!-- @meta end -->
+  <style>
+    .chart-wrap { position: relative; margin: 20px 0 4px; }
+    .chart-wrap svg { width: 100%; height: auto; display: block; }
+    .chart-title { font-weight: 700; font-size: 1rem; margin: 24px 0 0; }
+    .chart-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 0.82rem; color: var(--color-muted); margin: 4px 0 0; }
+    .chart-legend .chip { display: inline-block; width: 14px; height: 4px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+    .chart-tip {
+      position: absolute; pointer-events: none; background: var(--color-bg);
+      border: 1px solid var(--color-border); border-radius: 8px; padding: 6px 10px;
+      font-size: 0.78rem; line-height: 1.5; box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      white-space: nowrap; display: none; z-index: 2;
+    }
+    .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+    .stat { border: 1px solid var(--color-border); border-radius: 10px; padding: 8px 12px; }
+    .stat .k { font-size: 0.75rem; color: var(--color-muted); }
+    .stat .v { font-weight: 700; font-size: 1.02rem; }
+    #result .data-table th, #result .data-table td { white-space: nowrap; }
+  </style>
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Japan Rental Property Investment Simulator</h1>
+  <form class="tool-form" id="fudosan-form">
+    <label>Property price (man-yen)
+      <span class="field-note">In units of 10,000 yen (man-yen). 1 man-yen = 10,000 yen, so 2000 means 20,000,000 yen.</span>
+      <input type="number" id="price" inputmode="decimal" min="100" max="100000" step="any" required placeholder="e.g. 2000">
+    </label>
+    <label>Building structure and age
+      <span style="display:flex;gap:.5em;align-items:center;">
+        <select id="structure" aria-label="Structure">
+          <option value="rc" selected>RC / reinforced concrete (condo)</option>
+          <option value="steel">Steel frame</option>
+          <option value="wood">Wood frame</option>
+        </select>
+        Age <input type="number" id="age" inputmode="numeric" min="0" max="80" step="1" value="10" style="width:5em;" aria-label="Building age in years"> years
+      </span>
+    </label>
+    <label>Monthly rent (yen)
+      <input type="number" id="rentm" inputmode="decimal" min="1000" max="10000000" step="any" required placeholder="e.g. 85000">
+    </label>
+    <label>Gross annual salary from your main job (man-yen)
+      <span class="field-note">Used for the tax saving from offsetting a rental loss against your salary income (loss aggregation, or son-eki tsusan). In units of 10,000 yen.</span>
+      <input type="number" id="salary" inputmode="decimal" min="0" max="100000" step="any" required placeholder="e.g. 600">
+    </label>
+    <details class="adv-box" id="adv">
+      <summary><span class="plus">＋</span>More features: set the auto-estimated assumptions yourself</summary>
+      <div class="adv-inner">
+        <label>Down payment (man-yen)<input type="number" id="down" inputmode="decimal" min="0" step="any" value="0"></label>
+        <label>Purchase costs rate (%)<span class="field-note">Registration, taxes, agent commission and so on. Default 7%</span><input type="number" id="costrate" inputmode="decimal" min="0" max="20" step="0.1" value="7"></label>
+        <label>Interest rate (% per year)<input type="number" id="rate" inputmode="decimal" min="0" max="20" step="0.01" value="2"></label>
+        <label>Loan term (years)<input type="number" id="years" inputmode="numeric" min="1" max="50" step="1" value="35"></label>
+        <label>Building's share of the property price (%)<span class="field-note">Affects depreciation and the restriction on land-related loan interest. Default 50%</span><input type="number" id="bratio" inputmode="numeric" min="0" max="100" step="1" value="50"></label>
+        <label>Vacancy rate (%)<input type="number" id="vacancy" inputmode="numeric" min="0" max="90" step="1" value="5"></label>
+        <label>Rent decline rate (% per year)<input type="number" id="decline" inputmode="decimal" min="-5" max="10" step="0.1" value="1"></label>
+        <label>Operating expense ratio (% of full-occupancy rent)<span class="field-note">Building management fee, repair reserve, fixed asset and city planning tax, rental management fee and so on. Default 20%</span><input type="number" id="opex" inputmode="numeric" min="0" max="90" step="1" value="20"></label>
+        <label>Gross yield at sale (%)<span class="field-note">Blank = sold at the same yield as at purchase. A higher figure is more conservative</span><input type="number" id="saleyield" inputmode="decimal" min="0.1" max="30" step="0.1" placeholder="Blank = same as at purchase"></label>
+        <label>Selling costs rate (%)<span class="field-note">Agent commission and so on. Default 4%</span><input type="number" id="salecost" inputmode="decimal" min="0" max="20" step="0.1" value="4"></label>
+        <label>Social insurance premiums (yen/year)<span class="field-note">Blank = estimated at 15% of salary</span><input type="number" id="socialins" inputmode="decimal" min="0" step="any" placeholder="Blank = 15% of salary"></label>
+        <label>Other income deductions (yen/year)<input type="number" id="otherded" inputmode="decimal" min="0" step="any" value="0"></label>
+      </div>
+    </details>
+    <button type="submit">Chart the long-term projection</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    This tool is a <strong>rough simulation</strong>. Tax amounts use Japan's simplified quick-reference tables (the blue-return special deduction and the adjustment credit are not reflected), and future rent, sale price and interest rates are estimates based on assumptions. For an actual tax filing or a real purchase decision, consult a <strong>Japanese tax accountant (zeirishi) or a real-estate professional</strong>.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Enter five things — price, structure and age, rent, and your salary — and see <strong>in which year selling the property would finally leave you in the black overall</strong>, as a chart. The loan balance, the taxes and your yearly take-home cash are all worked out for you. The detailed assumptions can be changed afterwards. It is built on <strong>Japan's tax rules for rental property</strong>: depreciation of used buildings, offsetting a rental loss against salary income, and capital gains tax on the sale. If you live in Japan and are weighing up an investment condo or apartment building, use it for a quick reality check before you commit.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter the property price, the structure and building age, the monthly rent and your annual salary. The tool estimates everything else.</li>
+    <li>Once those four items are filled in, the break-even year, two charts and a year-by-year table appear automatically (the button works too).</li>
+    <li>To change the assumptions, open “More features” and adjust the interest rate, vacancy rate, sale yield and so on. It recalculates as soon as you change anything.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Loan</strong>: equal-instalment repayment of principal and interest. Interest, principal repaid and the outstanding balance are accumulated year by year from the monthly balance (defaults: 100% financing, 2% interest, 35 years).</li>
+    <li><strong>Depreciation</strong>: the building value (50% of the price by default) is depreciated on a straight-line basis over the useful life given by Japan's simplified method for used assets — based on statutory lives of 47 years for RC, 34 for steel frame and 22 for wood frame, as “(statutory life − years elapsed) + years elapsed × 20%”. <strong>Once depreciation runs out the tax saving thins and the tax burden rises, and the simulation carries on through that point (the “dead cross”)</strong>.</li>
+    <li><strong>Rent and vacancy</strong>: rent falls 1% a year with a 5% vacancy rate (defaults). Operating expenses are 20% of full-occupancy rent — a rule-of-thumb total for the building management fee, repair reserve, fixed asset and city planning tax, rental management fee and so on.</li>
+    <li><strong>Tax saving (loss aggregation)</strong>: in any year the rental income is a loss, it is offset against salary income and the reduction in income tax (quick-reference table plus the special reconstruction income tax) and resident tax is calculated. The rule that the part of the loss corresponding to loan interest on the land acquisition cannot be offset (Act on Special Measures Concerning Taxation) is also reflected.</li>
+    <li><strong>Estimated sale price</strong>: derived by income capitalisation, as “that year's full-occupancy rent ÷ gross yield” (by default the same yield as at purchase, so a falling rent also means a falling sale price). A book-value line (land + remaining building value) is shown for reference.</li>
+    <li><strong>Capital gains tax</strong>: gain = (sale price − selling costs) − (acquisition cost − accumulated depreciation). Depending on the holding period, <strong>39.63% for short-term or 20.315% for long-term</strong> is applied automatically. Assuming a purchase at the start of a year and a sale at the end of one, this makes year 7 onwards long-term. Strictly, the test in Japan is whether the holding period exceeds five years as of 1 January of the year of the sale.</li>
+    <li><strong>Total profit or loss if sold in that year = cumulative cash flow + net sale proceeds (after the loan balance, selling costs and tax) − initial cash outlay (down payment + purchase costs)</strong>. The first year this reaches zero or more is the break-even year.</li>
+  </ul>
+
+  <h3>Sources (primary information)</h3>
+  <ul class="sources">
+    <li>Depreciation (simplified method for used assets, statutory useful lives): <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2108.htm" target="_blank" rel="noopener">National Tax Agency, Tax Answer No.2108 (useful life of used assets)</a> (in Japanese)</li>
+    <li>Capital gains tax rates (short-term and long-term): <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/joto/3208.htm" target="_blank" rel="noopener">National Tax Agency, Tax Answer No.3208 (calculating tax on long-term capital gains)</a> and No.3211 (short-term) (in Japanese)</li>
+    <li>Loss aggregation and the land-interest restriction: <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1391.htm" target="_blank" rel="noopener">National Tax Agency, Tax Answer No.1391</a> / income tax rates: No.2260 (in Japanese)</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>Major repairs, equipment replacement, rising interest rates and market conditions at the time of sale are not reflected. It is worth setting the sale yield 1–2 points above the purchase yield to see what happens if you can only sell cheaply.</li>
+    <li>The acquisition cost is approximated as “property price − accumulated depreciation”. In practice some purchase costs can be added to the acquisition cost, which lowers the tax, so this tool is slightly conservative.</li>
+    <li>Your annual salary is assumed to stay the same for the whole period.</li>
+    <li>For a new or nearly new property there is also real property acquisition tax and first-year registration costs. Adjust the purchase costs rate to cover them.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">No year ever shows a positive total. Why?</h3>
+  <p class="faq-a">It is a sign that the price, borrowing and expenses are too heavy for the rent the property brings in. In “More features”, try raising the down payment, lowering the interest rate (refinancing) or lowering the expense ratio and watch how the break-even point moves. If it still never turns positive, the deal simply does not work as an investment on those assumptions.</p>
+  <h3 class="faq-q">Why does the result change so much between year 6 and year 7?</h3>
+  <p class="faq-a">Because the capital gains tax rate switches from short-term (39.63%) to long-term (20.315%). For a property that sells at a gain, waiting until it qualifies as long-term makes a large difference to what you keep. The exact test is that you must have held the property for more than five years as of 1 January of the year in which you sell, so check the timing of an actual sale with a professional.</p>
+  <h3 class="faq-q">What is a “dead cross”?</h3>
+  <p class="faq-a">It is the point where the principal portion of your loan repayment — which is not a deductible expense — exceeds the depreciation expense, which is a deduction that costs you no cash. From then on it becomes easy to end up in the situation where the books show a profit and your tax goes up while the cash in your hand goes down. This tool shows the year it happens.</p>
+  <h3 class="faq-q">Are the numbers accurate?</h3>
+  <p class="faq-a">The loan, depreciation, tax rate tables and capital gains formulas are implemented as set out in the Japanese official materials and are verified by tests. But future rent, vacancy and sale prices are estimates based on assumptions, so treat the result as a scenario — what happens if these assumptions hold.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=fudosan">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/fudosan/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var COLORS = { green: "#12915f", orange: "#c2661f", blue: "#5b7fbf" };
+
+  function man(v) { return Math.round(v / 10000).toLocaleString(); }
+  function manSigned(v) { return (v >= 0 ? "+" : "−") + Math.abs(Math.round(v / 10000)).toLocaleString(); }
+
+  function val(id) { var v = document.getElementById(id).value; return v === "" ? null : parseFloat(v); }
+
+  // ===== SVG line chart (no external libraries) =====
+  function drawChart(series, opts) {
+    var W = 640, H = 300, L = 60, R = 14, T = 14, B = 30;
+    var n = series[0].values.length;
+    var min = 0, max = 0;
+    series.forEach(function (s) { s.values.forEach(function (v) { if (v < min) min = v; if (v > max) max = v; }); });
+    if (max === min) max = min + 1;
+    var span = max - min;
+    max += span * 0.06; min -= span * 0.06;
+    function sx(i) { return L + (W - L - R) * (n === 1 ? 0.5 : i / (n - 1)); }
+    function sy(v) { return T + (H - T - B) * (1 - (v - min) / (max - min)); }
+    // y-axis ticks (man-yen): round intervals
+    var rawStep = (max - min) / 5;
+    var pow = Math.pow(10, Math.floor(Math.log(rawStep) / Math.LN10));
+    var step = [1, 2, 2.5, 5, 10].map(function (m) { return m * pow; }).filter(function (s) { return s >= rawStep; })[0] || 10 * pow;
+    var g = "";
+    for (var yv = Math.ceil(min / step) * step; yv <= max; yv += step) {
+      var yy = sy(yv);
+      g += '<line x1="' + L + '" y1="' + yy + '" x2="' + (W - R) + '" y2="' + yy + '" stroke="var(--color-border)" stroke-width="1"/>' +
+        '<text x="' + (L - 6) + '" y="' + (yy + 4) + '" text-anchor="end" font-size="11" fill="var(--color-muted)">' + man(yv) + "</text>";
+    }
+    if (min < 0 && max > 0) {
+      g += '<line x1="' + L + '" y1="' + sy(0) + '" x2="' + (W - R) + '" y2="' + sy(0) + '" stroke="var(--color-muted)" stroke-width="1.5"/>';
+    }
+    for (var xi = 0; xi < n; xi++) {
+      var year = xi + 1;
+      if (year === 1 || year % 5 === 0) {
+        g += '<text x="' + sx(xi) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="11" fill="var(--color-muted)">Y' + year + "</text>";
+      }
+    }
+    series.forEach(function (s) {
+      var pts = s.values.map(function (v, i) { return sx(i).toFixed(1) + "," + sy(v).toFixed(1); }).join(" ");
+      g += '<polyline points="' + pts + '" fill="none" stroke="' + s.color + '" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"' + (s.dash ? ' stroke-dasharray="6 5"' : "") + "/>";
+    });
+    if (opts && opts.marker != null) {
+      var mi = opts.marker - 1;
+      g += '<circle cx="' + sx(mi) + '" cy="' + sy(series[0].values[mi]) + '" r="5.5" fill="' + series[0].color + '" stroke="var(--color-bg)" stroke-width="2"/>';
+    }
+    var legend = series.map(function (s) {
+      return '<span><span class="chip" style="background:' + s.color + (s.dash ? ";height:0;border-top:3px dashed " + s.color + ";background:none" : "") + '"></span>' + s.name + "</span>";
+    }).join("");
+    return '<p class="chart-title">' + opts.title + "</p>" +
+      '<div class="chart-wrap"><svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + opts.title + '">' + g + "</svg>" +
+      '<div class="chart-tip"></div></div>' +
+      '<div class="chart-legend">' + legend + "</div>";
+  }
+
+  // Year-by-year tooltip on tap / hover
+  function attachTips(root, data) {
+    root.querySelectorAll(".chart-wrap").forEach(function (wrap, ci) {
+      var svg = wrap.querySelector("svg");
+      var tip = wrap.querySelector(".chart-tip");
+      function onMove(ev) {
+        var rect = svg.getBoundingClientRect();
+        var x = (ev.touches ? ev.touches[0].clientX : ev.clientX) - rect.left;
+        var frac = (x / rect.width * 640 - 60) / (640 - 60 - 14);
+        var i = Math.round(frac * (data.years.length - 1));
+        if (i < 0) i = 0;
+        if (i >= data.years.length) i = data.years.length - 1;
+        var d = data.years[i];
+        tip.innerHTML = ci === 0
+          ? "<strong>Year " + d.y + "</strong><br>Est. sale price " + man(d.valueIncome) + " man-yen<br>Loan balance " + man(d.loanBalance) + " man-yen<br>Book value " + man(d.valueCost) + " man-yen"
+          : "Sold in <strong>year " + d.y + "</strong><br>Total <strong>" + manSigned(d.totalIfSold) + " man-yen</strong><br>Cumulative CF " + manSigned(d.cumCF) + " / tax effect " + manSigned(d.cumTax) + " man-yen";
+        tip.style.display = "block";
+        var tx = x + 12;
+        if (tx > rect.width - 170) tx = x - 175;
+        tip.style.left = tx + "px";
+        tip.style.top = "10px";
+      }
+      wrap.addEventListener("pointermove", onMove);
+      wrap.addEventListener("touchstart", onMove, { passive: true });
+      wrap.addEventListener("pointerleave", function () { tip.style.display = "none"; });
+    });
+  }
+
+  function runSim(auto) {
+    var input = {
+      price: val("price") * 10000,
+      structure: document.getElementById("structure").value,
+      age: parseInt(document.getElementById("age").value, 10),
+      rentMonthly: val("rentm"),
+      salary: val("salary") * 10000,
+      downPayment: (val("down") || 0) * 10000,
+      costRatePct: val("costrate"),
+      ratePct: val("rate"),
+      years: val("years"),
+      buildingRatioPct: val("bratio"),
+      vacancyPct: val("vacancy"),
+      rentDeclinePct: val("decline"),
+      opexRatePct: val("opex"),
+      saleYieldPct: val("saleyield"),
+      saleCostPct: val("salecost"),
+      socialIns: val("socialins"),
+      otherDeduction: val("otherded")
+    };
+    var r = FudosanCalc.simulateLongTerm(input);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">Please check your inputs (' + r.code + '). Limits apply, such as a property price of at least 100 man-yen (1,000,000 yen) and rent of at least 1,000 yen.</p>';
+      box.hidden = false;
+      return;
+    }
+    var thisYear = new Date().getFullYear();
+    var headline = r.breakEvenYear
+      ? '<div class="result-main">Sell in year ' + r.breakEvenYear + " (around " + (thisYear + r.breakEvenYear - 1) + ") or later and your total turns positive</div>"
+      : '<div class="result-main" style="color:#b3261e;">The total never turns positive within ' + r.horizon + " years</div>";
+    var last = r.years[r.years.length - 1];
+    var stats =
+      '<div class="stat-row">' +
+      '<div class="stat"><div class="k">Gross yield</div><div class="v">' + r.grossYieldPct.toLocaleString() + '%</div></div>' +
+      '<div class="stat"><div class="k">Monthly loan payment</div><div class="v">' + r.monthly.toLocaleString() + ' yen</div></div>' +
+      '<div class="stat"><div class="k">Initial cash outlay (down payment + purchase costs)</div><div class="v">' + man(r.initialOutlay) + ' man-yen</div></div>' +
+      '<div class="stat"><div class="k">Depreciation period / dead cross</div><div class="v">' + r.usefulLifeYears + " yrs / " + (r.deadCrossYear ? "year " + r.deadCrossYear + " onward" : "none in period") + "</div></div>" +
+      "</div>";
+    var chart1 = drawChart([
+      { name: "Estimated sale price (income approach)", color: COLORS.green, values: r.years.map(function (d) { return d.valueIncome; }) },
+      { name: "Loan balance", color: COLORS.orange, values: r.years.map(function (d) { return d.loanBalance; }) },
+      { name: "Reference: book value (land + remaining building value)", color: COLORS.blue, dash: true, values: r.years.map(function (d) { return d.valueCost; }) }
+    ], { title: "Property value and loan balance over time (man-yen)" });
+    var chart2 = drawChart([
+      { name: "Total profit or loss if sold that year", color: COLORS.green, values: r.years.map(function (d) { return d.totalIfSold; }) },
+      { name: "Cumulative cash flow", color: COLORS.orange, values: r.years.map(function (d) { return d.cumCF; }) },
+      { name: "Cumulative tax effect (saving +, extra tax −)", color: COLORS.blue, dash: true, values: r.years.map(function (d) { return d.cumTax; }) }
+    ], { title: "What if you sold now? Total profit or loss over time (man-yen)", marker: r.breakEvenYear });
+    var rows = "";
+    var keyYears = [1, 2, 3, 5, 7, 10, 15, 20, 25, 30, 35, 40, 45, 50];
+    if (r.breakEvenYear && keyYears.indexOf(r.breakEvenYear) === -1) {
+      keyYears.push(r.breakEvenYear);
+      keyYears.sort(function (a, b) { return a - b; });
+    }
+    keyYears.forEach(function (y) {
+      if (y > r.horizon) return;
+      var d = r.years[y - 1];
+      var hl = y === r.breakEvenYear ? ' style="background:var(--color-accent-weak);font-weight:700;"' : "";
+      rows += "<tr" + hl + "><td>Year " + y + (d.longTerm ? "" : "※") + "</td><td>" + man(d.loanBalance) + "</td><td>" + man(d.valueIncome) + "</td><td>" + manSigned(d.cf) + "</td><td>" + manSigned(d.cumCF) + "</td><td><strong>" + manSigned(d.totalIfSold) + "</strong></td></tr>";
+    });
+    var assumptions = "interest " + (input.ratePct == null ? 2 : input.ratePct) + "%, " + (input.years == null ? 35 : input.years) + "-year term / down payment " + man(input.downPayment) + " man-yen + purchase costs " + (input.costRatePct == null ? 7 : input.costRatePct) + "% / building share " + (input.buildingRatioPct == null ? 50 : input.buildingRatioPct) + "% / vacancy " + (input.vacancyPct == null ? 5 : input.vacancyPct) + "%, rent decline " + (input.rentDeclinePct == null ? 1 : input.rentDeclinePct) + "%/yr / expense ratio " + (input.opexRatePct == null ? 20 : input.opexRatePct) + "% / sale yield " + (input.saleYieldPct == null ? "same as at purchase" : input.saleYieldPct + "%") + ", selling costs " + (input.saleCostPct == null ? 4 : input.saleCostPct) + "%";
+    box.innerHTML = headline + stats + chart1 + chart2 +
+      '<div class="table-scroll" style="margin-top:20px;"><table class="data-table"><thead><tr><th>Year</th><th>Loan balance<br>(man-yen)</th><th>Est. sale<br>(man-yen)</th><th>Annual CF<br>(man-yen)</th><th>Cumulative CF<br>(man-yen)</th><th>Total if<br>sold</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>" +
+      '<p style="font-size:0.8rem;color:var(--color-muted);">Years marked ※ are short-term capital gains (39.63%). From year 7 the long-term rate (20.315%) applies. The break-even year is highlighted.<br>Assumptions used: ' + assumptions + "</p>";
+    box.hidden = false;
+    attachTips(box, r);
+    if (!auto) box.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  document.getElementById("fudosan-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runSim(false);
+  });
+  // Once the four required items (price, building age, rent, salary) are filled in, recalculate 300ms after any change
+  var debounceTimer = null;
+  function requiredFilled() {
+    return ["price", "age", "rentm", "salary"].every(function (id) {
+      return document.getElementById(id).value !== "";
+    });
+  }
+  function scheduleAuto() {
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(function () {
+      debounceTimer = null;
+      if (requiredFilled()) runSim(true);
+    }, 300);
+  }
+  var form = document.getElementById("fudosan-form");
+  form.addEventListener("input", scheduleAuto);
+  form.addEventListener("change", scheduleAuto);
+})();
+</script>
+</body>
+</html>

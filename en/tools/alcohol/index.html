@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Pure Alcohol Intake Calculator (Check Your Drink Amount) | Quick Calc</title>
+  <meta name="description" content="Calculate the pure alcohol (g) and standard drinks in what you drink from the volume and ABV, free. Checks by sex whether you reach the drinking level that raises lifestyle-disease risk under the guideline of Japan's Ministry of Health, Labour and Welfare.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/alcohol/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Pure Alcohol Intake Calculator (Check Your Drink Amount) | Quick Calc">
+  <meta property="og:description" content="Calculate the pure alcohol (g) and standard drinks in what you drink from the volume and ABV, free. Checks by sex whether you reach the drinking level that raises lifestyle-disease risk under the guideline of Japan's Ministry of Health, Labour and Welfare.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/alcohol/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Pure Alcohol Intake Calculator (Check Your Drink Amount)","item":"https://quick-calc.site/en/tools/alcohol/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Pure Alcohol Intake Calculator</h1>
+  <form class="tool-form" id="alcohol-form">
+    <span class="field-note">Enter the amount and the ABV — the result appears right below</span>
+    <label>Amount drunk (mL)
+      <span class="field-note">e.g. medium bottle / tall can of beer = 500, 1 go of sake = 180, one glass of wine = about 125</span>
+      <input type="number" id="volume" inputmode="decimal" step="1" min="1" max="10000" placeholder="500" required>
+    </label>
+    <label>Alcohol by volume (%)
+      <span class="field-note">e.g. beer = 5, sake = 15, wine = 12, canned chuhai = 3–9</span>
+      <input type="number" id="abv" inputmode="decimal" step="0.1" min="0.1" max="96" placeholder="5" required>
+    </label>
+    <label>Sex (used for the risk check)
+      <select id="sex">
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+    </label>
+    <button type="submit">Calculate</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: total for several drinks, time to break down the alcohol</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Total up a whole drinking session</h3>
+      <p class="adv-note">If you had several drinks, just pick the drink type (or type the amount and ABV by hand) — up to 5 rows are totaled instantly.</p>
+      <div id="adv-drink-rows"></div>
+      <button type="button" id="adv-total-run">Calculate the total</button>
+
+      <h3 class="adv-h">How long until the alcohol is broken down?</h3>
+      <p class="adv-note">Estimates roughly how many hours after your last drink, using a breakdown rate of body weight × 0.1 g per hour (if the amount is blank, the result above is used).</p>
+      <label>Body weight (kg)
+        <input type="number" id="adv-weight" inputmode="decimal" step="any" min="20" max="300" placeholder="e.g. 60">
+      </label>
+      <label>Pure alcohol (g)
+        <input type="number" id="adv-grams" inputmode="decimal" step="any" min="1" max="500" placeholder="Blank = use the total above">
+      </label>
+      <label>Time you finished drinking (optional)
+        <input type="time" id="adv-end-time">
+      </label>
+      <button type="button" id="adv-time-run">Calculate the breakdown time</button>
+      <p class="adv-note">The breakdown rate is a rough average with large individual and day-to-day differences — <strong>never use “the calculation says it is zero, so I can drive” as a judgment</strong>.</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    The results of this tool are <strong>approximations</strong>. Alcohol affects people very differently — if you are constitutionally sensitive to alcohol, pregnant, or taking medication, you should avoid drinking regardless of these numbers.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Just enter the amount and ABV of a drink to see <strong>how much pure alcohol enters your body</strong>. It also checks whether you reach the “risk-raising amount” defined in the national guideline of Japan’s Ministry of Health, Labour and Welfare — the benchmark used in Japan. Useful for reviewing your evening drinks.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter the amount of alcohol you drank (or plan to drink) in mL.</li>
+    <li>Enter the drink’s alcohol by volume (%) — it is printed on the can or bottle label.</li>
+    <li>As you type, the pure alcohol amount and the risk check appear right below. No button needed.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Pure alcohol (g)</strong> = amount (mL) × ABV (%) ÷ 100 × 0.8 (the specific gravity of alcohol)<br>
+      Example: 500 mL of beer (5%) = 500 × 0.05 × 0.8 = <strong>20 g</strong></li>
+    <li><strong>Standard drinks</strong> = pure alcohol ÷ 10 (the internationally used unit of 1 drink = 10 g of pure alcohol)</li>
+  </ul>
+  <p>The risk check uses the <strong>drinking amount that raises the risk of lifestyle-related diseases</strong> (pure alcohol per day) defined in the “Guidelines on Health-Conscious Drinking” of Japan’s Ministry of Health, Labour and Welfare.</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>Daily pure-alcohol reference amounts (Ministry of Health, Labour and Welfare, Japan)</caption>
+      <thead><tr><th>Category</th><th>Pure alcohol</th></tr></thead>
+      <tbody>
+        <tr><td>Amount that raises lifestyle-disease risk (men)</td><td>40 g or more</td></tr>
+        <tr><td>Amount that raises lifestyle-disease risk (women)</td><td>20 g or more</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Sources (primary information)</h3>
+  <ul class="sources">
+    <li>Ministry of Health, Labour and Welfare (Japan), e-Health Net “Units of alcohol consumption” — formula and drink conversion, in Japanese<br>
+      <a href="https://kennet.mhlw.go.jp/information/information/alcohol/a-02-001.html" rel="noopener" target="_blank">https://kennet.mhlw.go.jp/information/information/alcohol/a-02-001.html</a> (accessed July 18, 2026)</li>
+    <li>Ministry of Health, Labour and Welfare (Japan), “Guidelines on Health-Conscious Drinking” — basis of the risk check, in Japanese<br>
+      <a href="https://www.mhlw.go.jp/stf/newpage_38541.html" rel="noopener" target="_blank">https://www.mhlw.go.jp/stf/newpage_38541.html</a> (accessed July 18, 2026)</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>The “risk-raising amount” is a statistical benchmark for the risk of developing disease — it does not mean anything below it is safe. For some conditions (such as high blood pressure), risk rises even with small amounts of alcohol.</li>
+    <li>The speed at which alcohol is broken down varies greatly between individuals; the same amount affects different people differently.</li>
+    <li>In Japan, drinking under the age of 20 and drink-driving are prohibited by law.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">I hold my drink well — can I drink more?</h3>
+  <p class="faq-a">“Not getting drunk easily” and “less health impact” are different things. Lifestyle-disease risk depends on the amount of pure alcohol, so even people with a strong constitution need to manage the amount.</p>
+  <h3 class="faq-q">How many hours until the alcohol leaves my body?</h3>
+  <p class="faq-a">The breakdown speed varies enormously with build and constitution, so this tool does not judge it for you. Never drive on the basis of “it should be out of my system by now”.</p>
+  <h3 class="faq-q">Why does even one canned chuhai count as a risk?</h3>
+  <p class="faq-a">A high-alcohol canned chuhai (9%, 500 mL) contains 36 g of pure alcohol — about 1.8 medium bottles of beer. Because the result depends on both ABV and volume, high-ABV drinks add up even in small amounts.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=alcohol">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/alcohol/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_volume: "Enter an amount between " + AlcoholCalc.VOLUME_MIN_ML + " and " + AlcoholCalc.VOLUME_MAX_ML + " mL.",
+    invalid_abv: "Enter an ABV between " + AlcoholCalc.ABV_MIN + " and " + AlcoholCalc.ABV_MAX + " %.",
+    invalid_sex: "Select your sex."
+  };
+  var box = document.getElementById("result");
+  var volumeEl = document.getElementById("volume");
+  var abvEl = document.getElementById("abv");
+  function run() {
+    if (volumeEl.value === "" || abvEl.value === "") { box.hidden = true; return; }
+    var result = AlcoholCalc.calculate(
+      parseFloat(volumeEl.value),
+      parseFloat(abvEl.value),
+      document.getElementById("sex").value
+    );
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">Pure alcohol: ' + result.grams.toFixed(1) + " g</div>" +
+        "<p>About <strong>" + result.drinks.toFixed(1) + " drinks</strong> (1 drink = 10 g)</p>" +
+        (result.exceedsRisk
+          ? "<p><strong>This reaches the daily amount that raises lifestyle-disease risk.</strong> Consider reviewing how much you drink.</p>"
+          : "<p>This does not reach the daily amount that raises lifestyle-disease risk.</p>");
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "Check the entered values.") + "</p>";
+    }
+    box.hidden = false;
+  }
+  volumeEl.addEventListener("input", run);
+  abvEl.addEventListener("input", run);
+  document.getElementById("sex").addEventListener("change", run);
+  document.getElementById("alcohol-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  var lastTotalG = null;
+  var advDrinkRows = document.getElementById("adv-drink-rows");
+  var PRESETS = [
+    { label: "Beer, medium bottle / tall can", ml: 500, abv: 5 },
+    { label: "Beer, regular can", ml: 350, abv: 5 },
+    { label: "Canned chuhai", ml: 350, abv: 5 },
+    { label: "Strong-type chuhai", ml: 500, abv: 9 },
+    { label: "Highball", ml: 350, abv: 7 },
+    { label: "Sake, 1 go", ml: 180, abv: 15 },
+    { label: "Wine, one glass", ml: 125, abv: 12 },
+    { label: "Shochu, one glass with water / hot water", ml: 90, abv: 25 },
+    { label: "Whisky, single", ml: 30, abv: 43 }
+  ];
+  (function buildRows() {
+    function makeRow(i) {
+      var div = document.createElement("div");
+      div.className = "adv-drink-row";
+      div.style.cssText = "display:flex;flex-wrap:wrap;gap:.5em;margin-bottom:8px;";
+      var sel = document.createElement("select");
+      sel.add(new Option("(pick a drink to auto-fill)", ""));
+      PRESETS.forEach(function (p, idx) {
+        sel.add(new Option(p.label + " (" + p.ml + " ml, " + p.abv + "%)", String(idx)));
+      });
+      sel.setAttribute("aria-label", "Drink type for drink " + (i + 1));
+      var ml = document.createElement("input");
+      ml.type = "number"; ml.min = "1"; ml.max = "10000"; ml.step = "1";
+      ml.setAttribute("inputmode", "decimal");
+      ml.placeholder = "Amount (mL)";
+      ml.setAttribute("aria-label", "Amount of drink " + (i + 1) + " (mL)");
+      ml.style.width = "6.5em";
+      var abv = document.createElement("input");
+      abv.type = "number"; abv.min = "0.1"; abv.max = "96"; abv.step = "any";
+      abv.setAttribute("inputmode", "decimal");
+      abv.placeholder = "ABV (%)";
+      abv.setAttribute("aria-label", "ABV of drink " + (i + 1) + " (%)");
+      abv.style.width = "6.5em";
+      sel.addEventListener("change", function () {
+        if (sel.value === "") return;
+        var p = PRESETS[parseInt(sel.value, 10)];
+        ml.value = p.ml;
+        abv.value = p.abv;
+        runTotal(false);
+      });
+      ml.addEventListener("input", function () { runTotal(false); });
+      abv.addEventListener("input", function () { runTotal(false); });
+      div.appendChild(sel);
+      div.appendChild(ml);
+      div.appendChild(abv);
+      advDrinkRows.appendChild(div);
+    }
+    for (var i = 0; i < 5; i++) makeRow(i);
+  })();
+  function runTotal(fromButton) {
+    var items = [];
+    var rowEls = advDrinkRows.querySelectorAll(".adv-drink-row");
+    for (var i = 0; i < rowEls.length; i++) {
+      var inputs = rowEls[i].querySelectorAll("input");
+      var ml = parseFloat(inputs[0].value);
+      var abv = parseFloat(inputs[1].value);
+      if (!isFinite(ml) && !isFinite(abv)) continue;
+      if (!isFinite(ml) || !isFinite(abv)) {
+        if (fromButton) advErr("Row " + (i + 1) + ": enter both the amount and the ABV.");
+        return;
+      }
+      items.push({ ml: ml, abv: abv });
+    }
+    if (items.length === 0) { if (fromButton) advErr("Enter the amount (mL) and ABV (%) of at least one drink."); return; }
+    var r = AlcoholCalc.totalDrinks(items);
+    if (!r.ok) {
+      advErr(r.code === "invalid_volume" ? "Enter amounts between 1 and 10,000 mL."
+        : "Enter an ABV between 0.1 and 96%.");
+      return;
+    }
+    lastTotalG = r.grams;
+    advBox.innerHTML =
+      '<div class="result-main">Total pure alcohol: about ' +
+      r.grams.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " g</div>" +
+      "<p>Across " + items.length + " drinks, that is <strong>about " +
+      r.drinks.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      " drinks</strong> (1 drink = 10 g of pure alcohol). The daily risk-raising amounts are 40 g or more for men and 20 g or more for women.</p>" +
+      '<p class="adv-note">This value is carried over automatically to “How long until the alcohol is broken down?” below.</p>';
+    advBox.hidden = false;
+  }
+  function mainFormGrams() {
+    var v = parseFloat(document.getElementById("volume").value);
+    var a = parseFloat(document.getElementById("abv").value);
+    if (!isFinite(v) || !isFinite(a)) return null;
+    var r = AlcoholCalc.calculate(v, a, document.getElementById("sex").value);
+    return r.ok ? r.grams : null;
+  }
+  function runTime(fromButton) {
+    var wEl = document.getElementById("adv-weight");
+    if (wEl.value === "") { if (fromButton) advErr("Enter your body weight."); return; }
+    var gEl = document.getElementById("adv-grams");
+    var grams;
+    if (gEl.value === "") {
+      grams = lastTotalG !== null ? lastTotalG : mainFormGrams();
+      if (grams === null) {
+        if (fromButton) advErr("Enter the pure alcohol amount, or first calculate it in the form or the total above.");
+        return;
+      }
+    } else {
+      grams = parseFloat(gEl.value);
+    }
+    var r = AlcoholCalc.breakdownTime(parseFloat(wEl.value), grams, document.getElementById("adv-end-time").value);
+    if (!r.ok) {
+      var msg = r.code === "invalid_weight" ? "Enter a body weight between 20 and 300 kg."
+        : r.code === "invalid_grams" ? "Enter a pure alcohol amount between 1 and 500 g."
+        : "Check the time you finished drinking.";
+      advErr(msg);
+      return;
+    }
+    var html =
+      '<div class="result-main">About ' +
+      r.hours.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " hours after your last drink</div>" +
+      "<p>Rough time to break down " + grams.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      " g of pure alcohol at about " + r.rateGPerHour.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      " g/hour (body weight × 0.1 g).</p>";
+    if (r.finishTime !== undefined) {
+      html += "<p>The breakdown would finish around <strong>" + r.finishTime + (r.nextDay ? " the next day" : "") + "</strong> by this calculation.</p>";
+    }
+    html += '<p class="adv-note">This is a rough estimate with large individual and day-to-day differences. Never use this result to decide whether you can drive.</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-total-run").addEventListener("click", function () { runTotal(true); });
+  document.getElementById("adv-time-run").addEventListener("click", function () { runTime(true); });
+  ["adv-weight", "adv-grams", "adv-end-time"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runTime(false); });
+  });
+})();
+</script>
+</body>
+</html>

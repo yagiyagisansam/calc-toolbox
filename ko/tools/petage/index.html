@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>강아지·고양이 나이 계산기(사람 나이로 몇 살?) | Quick Calc</title>
+  <meta name="description" content="고양이와 소형·중형견의 나이를 사람 나이로 무료 환산: 1살≈사람 15세, 2살≈24세, 이후 매년 약 +4세의 기준 공식으로 계산합니다. 우리 아이는 사람 나이로 몇 살? 시니어기 기준과 역환산도 제공.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/petage/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="강아지·고양이 나이 계산기(사람 나이로 몇 살?) | Quick Calc">
+  <meta property="og:description" content="고양이와 소형·중형견의 나이를 사람 나이로 무료 환산: 1살≈사람 15세, 2살≈24세, 이후 매년 약 +4세의 기준 공식으로 계산합니다. 우리 아이는 사람 나이로 몇 살? 시니어기 기준과 역환산도 제공.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/petage/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"강아지·고양이 나이 환산 계산기","item":"https://quick-calc.site/ko/tools/petage/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>강아지·고양이 나이 환산 계산기</h1>
+  <form class="tool-form" id="petage-form">
+    <label>반려동물 종류
+      <select id="type">
+        <option value="cat" selected>고양이</option>
+        <option value="dog">개(소형·중형)</option>
+      </select>
+    </label>
+    <label>반려동물의 나이(살)
+      <span class="field-note">생후 6개월이면 0.5로 입력. 입력과 동시에 환산됩니다</span>
+      <input type="number" id="age" inputmode="decimal" min="0.1" max="30" step="0.1" required placeholder="예: 3">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 역환산(사람→반려동물)과 나이 조견표</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">역환산: 사람의 나이는 반려동물의 몇 살?</h3>
+      <p class="adv-note">「내 나이는 우리 아이로 치면 몇 살쯤일까?」를 계산합니다.</p>
+      <label>종류
+        <select id="adv-type">
+          <option value="cat">고양이</option>
+          <option value="dog">개(소형·중형)</option>
+        </select>
+      </label>
+      <label>사람의 나이(세)
+        <input type="number" id="adv-human" inputmode="numeric" min="2" max="136" step="1" placeholder="예: 35">
+      </label>
+      <div class="tool-result" id="adv-rev-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">1〜20살 나이 조견표</h3>
+      <p class="adv-note">반려동물의 1〜20살이 사람 나이로 몇 세에 해당하는지 일람입니다(환산 공식은 고양이와 소형·중형견 공통).</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>고양이나 개의 나이만 넣으면 <strong>사람 나이로 몇 살쯤인지</strong> 바로 알 수 있는 도구입니다(고양이와 소형·중형견 대상). 시니어기에 들어가는 시기의 기준도 함께 표시합니다. 건강검진이나 사료 교체 시기를 생각할 때 참고하세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>고양이인지 개(소형·중형)인지 선택합니다.</li>
+    <li>반려동물의 나이를 입력합니다(생후 6개월이면 0.5).</li>
+    <li>입력하는 순간 사람 나이 기준과 라이프 스테이지가 자동으로 표시됩니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>1살 = 사람의 약 15세 / 2살 = 약 24세 / 이후 1년마다 약 +4세</strong></li>
+    <li>처음 2년 동안 사람의 24세에 해당하는 수준까지 빠르게 성장하고, 그 뒤로는 완만하게 나이를 먹는다는 환산으로, 서구 수의사 단체 등이 기준으로 소개하는 방식입니다.</li>
+    <li>계산 예: 고양이 5살 → 24 + 4×3 = <strong>사람의 약 36세</strong></li>
+    <li>속설인 「사람 나이 = 반려동물 나이 ×7」은 성장이 빠른 어린 시기와 맞지 않아, 현재는 이 방식이 주류입니다.</li>
+  </ul>
+
+  <h3>출처와 전제</h3>
+  <ul class="sources">
+    <li>환산 공식은 서구 수의사 단체 등에서 널리 쓰이는 기준(예: <a href="https://www.aaha.org/" target="_blank" rel="noopener">미국동물병원협회(AAHA)</a>의 라이프 스테이지 가이드라인 등, 영어)에 근거합니다. 과학적으로 확립된 「정확한 환산」이 아니라 어림 기준입니다.</li>
+  </ul>
+
+  <h2>전제와 주의사항</h2>
+  <ul class="cautions">
+    <li><strong>대형견(약 25kg 이상)은 노화가 더 빨라</strong> 이 공식이 맞지 않습니다(대형견은 7〜8살에 시니어기로 봅니다).</li>
+    <li>품종·사육 환경·개체차에 따라 실제 노화 속도는 크게 달라집니다. 건강 관리는 단골 수의사와 상담해 주세요.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">「개의 1년 = 사람의 7년」은 틀린 건가요?</h3>
+  <p class="faq-a">지나치게 단순화한 것입니다. 개와 고양이는 처음 1〜2년 만에 사람의 20세 수준까지 빠르게 성장하므로, ×7은 어린 시기와 맞지 않습니다. 처음엔 빠르고 그 뒤엔 완만하다는 이 도구의 방식이 실제에 더 가까운 기준으로 여겨집니다.</p>
+  <h3 class="faq-q">몇 살부터 시니어(노령기)인가요?</h3>
+  <p class="faq-a">고양이와 소형·중형견은 대체로 7살 무렵부터 사람으로 치면 40대 중반에 들어갑니다. 7살이 지나면 연 1회였던 건강검진을 연 2회로 늘리는 것이 권장되는 경우가 많습니다.</p>
+  <h3 class="faq-q">고양이는 몇 살까지 사나요?</h3>
+  <p class="faq-a">완전 실내 사육 고양이의 평균 수명은 16살 안팎으로 보고됩니다. 20살(사람의 약 96세)을 넘기는 장수 고양이도 드물지 않게 되었습니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=petage">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/petage/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var STAGE_KO = { "子ども": "유년기", "成年期": "성년기", "シニア期": "시니어기" };
+  var box = document.getElementById("result");
+  function run() {
+    if (document.getElementById("age").value === "") { box.hidden = true; return; }
+    var type = document.getElementById("type").value;
+    var r = PetageCalc.humanAge(type, parseFloat(document.getElementById("age").value));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">나이는 0.1〜30살 범위로 입력해 주세요.</p>';
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">사람 나이로 약 ' + r.humanAge.toLocaleString() + "세</div>" +
+      "<p>라이프 스테이지 기준: <strong>" + (STAGE_KO[r.stage] || r.stage) + "</strong>" + (r.stage === "シニア期" ? "(건강검진은 연 2회 권장)" : "") + "</p>" +
+      "<p>※소형·중형견과 고양이의 기준입니다. 대형견에는 맞지 않습니다.</p>";
+    box.hidden = false;
+  }
+  document.getElementById("age").addEventListener("input", run);
+  document.getElementById("type").addEventListener("change", run);
+  document.getElementById("petage-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run();
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var STAGE_KO = { "子ども": "유년기", "成年期": "성년기", "シニア期": "시니어기" };
+  var revBox = document.getElementById("adv-rev-result");
+  var tableBox = document.getElementById("adv-result");
+
+  // ---- 역환산(즉시) ----
+  function runRev() {
+    var human = document.getElementById("adv-human");
+    var type = document.getElementById("adv-type").value;
+    if (human.value === "") { revBox.hidden = true; return; }
+    var r = PetageCalc.petAge(type, parseFloat(human.value));
+    if (!r.ok) {
+      revBox.innerHTML = '<p class="result-error">사람의 나이는 2〜136세 범위로 입력해 주세요.</p>';
+      revBox.hidden = false;
+      return;
+    }
+    var name = type === "cat" ? "고양이" : "개(소형·중형)";
+    revBox.innerHTML =
+      '<div class="result-main">' + name + "의 약 " +
+      r.petAge.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "살에 해당</div>" +
+      '<p class="adv-note">수의 진료에서 쓰이는 기준 공식에 따른 어림값입니다.</p>';
+    revBox.hidden = false;
+  }
+  document.getElementById("adv-human").addEventListener("input", runRev);
+  document.getElementById("adv-type").addEventListener("change", runRev);
+
+  // ---- 나이 조견표(즉시 표시) ----
+  (function () {
+    var r = PetageCalc.ageTable();
+    var rows = "";
+    for (var i = 0; i < r.rows.length; i++) {
+      var row = r.rows[i];
+      rows += "<tr><td>" + row.age + "살</td><td>약 " +
+        row.human.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "세</td><td>" + (STAGE_KO[row.stage] || row.stage) + "</td></tr>";
+    }
+    tableBox.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>반려동물의 나이</th><th>사람 나이 기준</th><th>구분</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+    tableBox.hidden = false;
+  })();
+})();
+</script>
+</body>
+</html>

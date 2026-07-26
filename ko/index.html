@@ -6,7 +6,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Quick Calc | 일본 생활에 유용한 무료 계산 도구</title>
-  <meta name="description" content="건강·돈·날짜·일상생활의 무료 웹 계산 도구. 일본 생활 전용 도구(일본 연호 변환, 일본 기준 BMI 등) 포함. 가입 불필요, 모바일 지원, 모든 페이지에 계산 근거와 출처 명시.">
+  <meta name="description" content="건강·돈·날짜·일상생활의 무료 웹 계산 도구. 일본 생활 전용 도구(일본 연호 변환, 영문 주소 변환, 일본 기준 BMI 등) 포함. 가입 불필요, 모바일 지원, 모든 페이지에 계산 근거와 출처 명시.">
   <link rel="stylesheet" href="../shared/style.css">
   <!-- @meta start -->
   <link rel="canonical" href="https://quick-calc.site/ko/">
@@ -14,19 +14,12 @@
   <meta name="theme-color" content="#0b6e4f">
   <meta property="og:site_name" content="Quick Calc">
   <meta property="og:title" content="Quick Calc | 일본 생활에 유용한 무료 계산 도구">
-  <meta property="og:description" content="건강·돈·날짜·일상생활의 무료 웹 계산 도구. 일본 생활 전용 도구(일본 연호 변환, 일본 기준 BMI 등) 포함. 가입 불필요, 모바일 지원, 모든 페이지에 계산 근거와 출처 명시.">
+  <meta property="og:description" content="건강·돈·날짜·일상생활의 무료 웹 계산 도구. 일본 생활 전용 도구(일본 연호 변환, 영문 주소 변환, 일본 기준 BMI 등) 포함. 가입 불필요, 모바일 지원, 모든 페이지에 계산 근거와 출처 명시.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://quick-calc.site/ko/">
   <meta property="og:locale" content="ko_KR">
   <meta name="twitter:card" content="summary">
   <!-- @meta end -->
-  <!-- @hreflang start -->
-  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/">
-  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/">
-  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/">
-  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/">
-  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/">
-  <!-- @hreflang end -->
 </head>
 <body>
 <!-- @partial:header start -->
@@ -39,18 +32,50 @@
   <p>일본 생활에 유용한 무료 계산 도구. 모든 도구에 계산식과 1차 정보 출처를 명시합니다.</p>
   <h2>건강</h2>
   <ul class="related">
-    <li><a href="./tools/bmi/">BMI·표준체중 계산기(일본 기준)</a> — 일본 건강검진에서 쓰이는 기준으로 BMI·표준체중 판정.</li>
+    <li><a href="./tools/alcohol/">순수 알코올량 계산기</a> — 술의 양과 도수만 입력하면 순수 알코올량(g)과 드링크 수를 무료로 계산.</li>
+    <li><a href="./tools/bmi/">BMI·표준체중 계산기</a> — 키와 몸무게만 입력하면 BMI와 표준체중(BMI 22)을 무료로 계산.</li>
+    <li><a href="./tools/bmr/">기초대사량 계산기</a> — 나이·성별·몸무게만 입력하면 하루 기초대사량(kcal)을 무료로 계산합니다.</li>
+    <li><a href="./tools/caffeine/">카페인 섭취량 계산기</a> — 커피·홍차·녹차·에너지 드링크 등의 카페인량을 합산해 하루 기준(건강한 성인 400mg·임신 중에는 더 적게)과 비교합니다.</li>
+    <li><a href="./tools/hosu/">걸음 수→거리·칼로리 환산 계산기</a> — 걸음 수와 키로 걸은 거리(km)·시간·소모 칼로리의 대략적인 값을 계산합니다.</li>
+    <li><a href="./tools/ninshin/">출산 예정일·임신 주수 계산기</a> — 마지막 생리 시작일로 출산 예정일과 현재 임신 주수(〇주 △일)를 무료로 계산.</li>
+    <li><a href="./tools/protein/">단백질 섭취량 계산기</a> — 몸무게와 운동량으로 하루 단백질 섭취 기준량을 계산합니다.</li>
+    <li><a href="./tools/shinpaku/">목표 심박수 계산기(카보넨 공식)</a> — 나이와 안정 시 심박수로 지방 연소·지구력 향상에 알맞은 목표 심박수 구간을 카보넨(Karvonen) 공식으로 계산.</li>
+    <li><a href="./tools/shio/">염분량 계산기(나트륨⇔식염상당량)</a> — 식품 표시의 나트륨(mg)을 식염상당량(g)으로 한 번에 환산, 무료.</li>
+    <li><a href="./tools/sleep/">수면 시간 계산기</a> — 취침 시각과 기상 시각만 입력하면 수면 시간을 무료로 계산.</li>
+    <li><a href="./tools/sports/">운동별 소모 칼로리 계산기</a> — 조깅·사이클링·수영·테니스·근력운동·줄넘기·요가 등 13종 운동의 소모 칼로리를 METs 방식(공식 METs표)으로 계산합니다.</li>
+    <li><a href="./tools/tdee/">하루 섭취 칼로리 계산기</a> — 나이·성별·몸무게·활동량으로 하루에 필요한 섭취 칼로리 기준(추정 에너지 필요량)을 무료로 계산합니다.</li>
+    <li><a href="./tools/walking/">걷기 소모 칼로리 계산기</a> — 몸무게·시간·걷는 속도로 걷기의 소모 칼로리를 METs 방식(일본 후생노동성 공식)으로 계산합니다.</li>
+  </ul>
+  <h2>돈</h2>
+  <ul class="related">
+    <li><a href="./tools/hiwari/">일본 월세 일할 계산기</a> — 일본에서 월 중간에 입주·퇴거할 때의 일할(日割) 월세를 무료로 계산.</li>
+    <li><a href="./tools/point/">할인과 포인트 적립 어느 쪽이 이득? 계산기</a> — 「10% 할인」과 「10% 포인트 적립」은 같지 않다?</li>
+    <li><a href="./tools/tax/">일본 소비세 계산기(세금 포함⇔제외)</a> — 세금 제외→포함, 포함→제외를 한 번에 계산하는 무료 일본 소비세 계산기.</li>
+    <li><a href="./tools/waribiki/">할인 계산기(○% 할인하면 얼마?)</a> — 「30% 할인하면 얼마?」를 한 번에 계산.</li>
   </ul>
   <h2>날짜·시간</h2>
   <ul class="related">
-    <li><a href="./tools/wareki/">서기·일본 연호(와레키) 변환기</a> — 서기⇔일본 연호 변환. 서류에 옮겨 적을 수 있는 한자 표기 제공.</li>
+    <li><a href="./tools/age/">나이 계산기(만 나이·띠·하야우마레 판정)</a> — 생년월일로 만 나이와 띠, 일본 학년 기준 「하야우마레」(1월 1일〜4월 1일 출생) 여부를 무료로 계산.</li>
+    <li><a href="./tools/days/">일수 계산기(날짜 차이·○일 후)</a> — 두 날짜 사이의 일수와 기준일에서 ○일 후(○일 전)의 날짜·요일을 무료로 계산합니다.</li>
+    <li><a href="./tools/eigyobi/">일본 영업일 계산기(주말·공휴일 제외)</a> — 「3영업일 후는 언제?」를 주말과 일본 공휴일(대체공휴일 포함)을 빼고 즉시 계산.</li>
+    <li><a href="./tools/jikan/">시간 계산기(합계·시각 차이)</a> — 「1:30+0:45+8:00」 같은 시간 합계와 시작〜종료 시각의 경과 시간을 계산.</li>
+    <li><a href="./tools/kinenbi/">기념일 카운트 계산기</a> — 생일이나 기념일을 입력하면 「오늘로 며칠째인지」와 100일째·1000일째·1만 일째 등 기념일 날짜를 무료로 한 번에 계산합니다.</li>
+    <li><a href="./tools/wareki/">서기·일본 연호(와레키) 변환기</a> — 서기⇔일본 연호(메이지·다이쇼·쇼와·헤이세이·레이와)를 무료로 즉시 변환.</li>
+  </ul>
+  <h2>생활·변환</h2>
+  <ul class="related">
+    <li><a href="./tools/heikin/">평균·중앙값 계산기</a> — 숫자를 붙여넣기만 하면 평균·중앙값·최대·최소·합계를 한 번에 계산합니다.</li>
+    <li><a href="./tools/hensachi/">편차치 계산기</a> — 일본 입시에서 쓰이는 「편차치」(평균 50·표준편차 10으로 환산한 표준화 점수)를 무료로 계산합니다.</li>
+    <li><a href="./tools/kome/">쌀 합(合)·그램 환산 계산기</a> — 쌀 1합(合)=약 150g, 물은 1합당 약 200ml 기준으로, 합 수에서 쌀 무게·물 양·밥이 되는 양·밥공기 수를 한 번에 계산.</li>
+    <li><a href="./tools/percent/">퍼센트 계산기</a> — 「A는 B의 몇 %?」「A의 ○%는 얼마?」「A에서 B로 몇 % 증가(감소)?」 세 가지를 무료로 바로 계산합니다.</li>
+    <li><a href="./tools/petage/">강아지·고양이 나이 환산 계산기</a> — 고양이와 소형·중형견의 나이를 사람 나이로 무료 환산: 1살≈사람 15세, 2살≈24세, 이후 매년 약 +4세의 기준 공식으로 계산합니다.</li>
+    <li><a href="./tools/seiza/">별자리·탄생석 계산기</a> — 생일을 입력하면 12별자리와 탄생석을 무료로 바로 표시합니다.</li>
+    <li><a href="./tools/shincho/">키 피트·인치 변환</a> — 키의 cm와 피트·인치 표기(5'7″ 등)를 서로 변환.</li>
+    <li><a href="./tools/spoon/">큰술·작은술·컵 환산 계산기</a> — 큰술 1=15ml, 작은술 1=5ml, 1컵=200ml(일본 기준)로 상호 환산.</li>
   </ul>
 </main>
 <!-- @partial:footer start -->
 <footer class="site-footer">
-<!-- @langsw start -->
-<nav class="lang-switch" aria-label="언어"><a href="/" lang="ja" hreflang="ja">日本語</a><a href="/en/" lang="en" hreflang="en">English</a><a href="/zh/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
-<!-- @langsw end -->
   <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
   <nav>
     <a href="./privacy.html">개인정보 처리방침</a>

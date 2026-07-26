@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>纯酒精量计算器(饮酒量自查) | Quick Calc</title>
+  <meta name="description" content="输入酒的量和酒精度数,免费计算纯酒精量(g)和标准杯数。按日本厚生劳动省指南,分男女判定是否达到提高生活习惯病风险的饮酒量。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/alcohol/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="纯酒精量计算器(饮酒量自查) | Quick Calc">
+  <meta property="og:description" content="输入酒的量和酒精度数,免费计算纯酒精量(g)和标准杯数。按日本厚生劳动省指南,分男女判定是否达到提高生活习惯病风险的饮酒量。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/alcohol/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"纯酒精量计算器(饮酒量自查)","item":"https://quick-calc.site/zh/tools/alcohol/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>纯酒精量计算器</h1>
+  <form class="tool-form" id="alcohol-form">
+    <span class="field-note">输入量和度数,结果立即显示在下方</span>
+    <label>饮用量(mL)
+      <span class="field-note">例: 啤酒中瓶·大罐=500、日本清酒1合=180、葡萄酒1杯=约125</span>
+      <input type="number" id="volume" inputmode="decimal" step="1" min="1" max="10000" placeholder="500" required>
+    </label>
+    <label>酒精度数(%)
+      <span class="field-note">例: 啤酒=5、日本清酒=15、葡萄酒=12、罐装Chuhai(日式气泡酒)=3〜9</span>
+      <input type="number" id="abv" inputmode="decimal" step="0.1" min="0.1" max="96" placeholder="5" required>
+    </label>
+    <label>性别(用于风险判定)
+      <select id="sex">
+        <option value="male">男性</option>
+        <option value="female">女性</option>
+      </select>
+    </label>
+    <button type="submit">计算</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 多杯酒的合计·分解所需时间</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">聚餐喝的酒一起算</h3>
+      <p class="adv-note">喝了多种酒时,只需选择酒的种类(或手动输入量和度数),最多5行即时合计。</p>
+      <div id="adv-drink-rows"></div>
+      <button type="button" id="adv-total-run">计算合计</button>
+
+      <h3 class="adv-h">分解完大约要多久?</h3>
+      <p class="adv-note">按分解速度「体重×0.1g/小时」的参考值,计算「从喝完起大约几小时」(量留空则使用上面的计算结果)。</p>
+      <label>体重(kg)
+        <input type="number" id="adv-weight" inputmode="decimal" step="any" min="20" max="300" placeholder="例: 60">
+      </label>
+      <label>纯酒精量(g)
+        <input type="number" id="adv-grams" inputmode="decimal" step="any" min="1" max="500" placeholder="留空则使用上面的合计">
+      </label>
+      <label>喝完的时刻(可选)
+        <input type="time" id="adv-end-time">
+      </label>
+      <button type="button" id="adv-time-run">计算分解时间</button>
+      <p class="adv-note">分解速度因人、因身体状况差异很大,只是参考值,<strong>不能以「计算上已归零」为由判断可以开车</strong>。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    本工具的计算结果为<strong>约值</strong>。酒精的影响个体差异很大,体质不胜酒力的人、孕期、服药中的人,无论数值如何都应避免饮酒。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>只需输入酒的量和度数,就能知道<strong>进入体内的纯酒精量</strong>。还会按日本厚生劳动省国家指南判定是否达到「提高疾病风险的饮酒量」(即日本使用的基准)。适合想重新审视日常饮酒量的人。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>以mL为单位输入喝了(或打算喝)的酒量。</li>
+    <li>输入酒精度数(%)(罐身或瓶身标签上有标注)。</li>
+    <li>输入的同时,纯酒精量和判定立即显示在下方,无需点击按钮。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>纯酒精量(g)</strong> = 量(mL) × 度数(%) ÷ 100 × 0.8(酒精的比重)<br>
+      例: 啤酒500mL(5%)= 500 × 0.05 × 0.8 = <strong>20g</strong></li>
+    <li><strong>标准杯数</strong> = 纯酒精量 ÷ 10(国际通用的 1杯=纯酒精10g)</li>
+  </ul>
+  <p>判定基准是日本厚生劳动省《关于关注健康饮酒的指南》中给出的<strong>提高生活习惯病风险的饮酒量</strong>(每日纯酒精量)。</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>每日纯酒精量的参考值(日本厚生劳动省)</caption>
+      <thead><tr><th>类别</th><th>纯酒精量</th></tr></thead>
+      <tbody>
+        <tr><td>提高生活习惯病风险的量(男性)</td><td>40g以上</td></tr>
+        <tr><td>提高生活习惯病风险的量(女性)</td><td>20g以上</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出处(一次信息)</h3>
+  <ul class="sources">
+    <li>日本厚生劳动省 e-健康网「饮酒量的单位」— 计算公式·标准杯换算(日文)<br>
+      <a href="https://kennet.mhlw.go.jp/information/information/alcohol/a-02-001.html" rel="noopener" target="_blank">https://kennet.mhlw.go.jp/information/information/alcohol/a-02-001.html</a>(2026年7月18日查阅)</li>
+    <li>日本厚生劳动省《关于关注健康饮酒的指南》— 风险判定的基准(日文)<br>
+      <a href="https://www.mhlw.go.jp/stf/newpage_38541.html" rel="noopener" target="_blank">https://www.mhlw.go.jp/stf/newpage_38541.html</a>(2026年7月18日查阅)</li>
+  </ul>
+
+  <h2>前提与注意</h2>
+  <ul class="cautions">
+    <li>「提高风险的量」是关于疾病发病风险的统计参考值,不代表低于该值就安全。有些疾病(如高血压)即使少量饮酒也会增加风险。</li>
+    <li>酒精的分解速度个体差异很大,同样的量对不同人的影响不同。</li>
+    <li>在日本,未满20岁饮酒和酒后驾驶都是法律禁止的。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">酒量好的人是不是可以多喝?</h3>
+  <p class="faq-a">「不容易醉」和「对健康影响小」是两回事。生活习惯病风险取决于纯酒精量,即使酒量好也需要控制量。</p>
+  <h3 class="faq-q">喝下去的酒几小时能代谢完?</h3>
+  <p class="faq-a">酒精的分解速度因体格·体质差异非常大,本工具不做判定。绝对不要以「按计算应该已经代谢完」为由开车。</p>
+  <h3 class="faq-q">为什么一罐Chuhai就可能达到风险量?</h3>
+  <p class="faq-a">高酒精度的罐装Chuhai(9%·500mL)含纯酒精36g,约相当于1.8瓶中瓶啤酒。结果由度数和量共同决定,度数高的饮料即使量少也会很多。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=alcohol">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/alcohol/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_volume: "量请在 " + AlcoholCalc.VOLUME_MIN_ML + "〜" + AlcoholCalc.VOLUME_MAX_ML + " mL 范围内输入。",
+    invalid_abv: "度数请在 " + AlcoholCalc.ABV_MIN + "〜" + AlcoholCalc.ABV_MAX + " % 范围内输入。",
+    invalid_sex: "请选择性别。"
+  };
+  var box = document.getElementById("result");
+  var volumeEl = document.getElementById("volume");
+  var abvEl = document.getElementById("abv");
+  function run() {
+    if (volumeEl.value === "" || abvEl.value === "") { box.hidden = true; return; }
+    var result = AlcoholCalc.calculate(
+      parseFloat(volumeEl.value),
+      parseFloat(abvEl.value),
+      document.getElementById("sex").value
+    );
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">纯酒精量 ' + result.grams.toFixed(1) + " g</div>" +
+        "<p>约 <strong>" + result.drinks.toFixed(1) + " 标准杯</strong>(1杯=10g)</p>" +
+        (result.exceedsRisk
+          ? "<p><strong>已达到提高生活习惯病风险的量(每日)。</strong>建议重新考虑饮酒量。</p>"
+          : "<p>未达到提高生活习惯病风险的量(每日)。</p>");
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "请检查输入的数值。") + "</p>";
+    }
+    box.hidden = false;
+  }
+  volumeEl.addEventListener("input", run);
+  abvEl.addEventListener("input", run);
+  document.getElementById("sex").addEventListener("change", run);
+  document.getElementById("alcohol-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  var lastTotalG = null;
+  var advDrinkRows = document.getElementById("adv-drink-rows");
+  var PRESETS = [
+    { label: "啤酒 中瓶·大罐", ml: 500, abv: 5 },
+    { label: "啤酒 普通罐", ml: 350, abv: 5 },
+    { label: "罐装Chuhai", ml: 350, abv: 5 },
+    { label: "Strong系高度Chuhai", ml: 500, abv: 9 },
+    { label: "Highball(威士忌苏打)", ml: 350, abv: 7 },
+    { label: "日本清酒 1合", ml: 180, abv: 15 },
+    { label: "葡萄酒 1杯", ml: 125, abv: 12 },
+    { label: "烧酒 兑水·兑热水1杯", ml: 90, abv: 25 },
+    { label: "威士忌 单份", ml: 30, abv: 43 }
+  ];
+  (function buildRows() {
+    function makeRow(i) {
+      var div = document.createElement("div");
+      div.className = "adv-drink-row";
+      div.style.cssText = "display:flex;flex-wrap:wrap;gap:.5em;margin-bottom:8px;";
+      var sel = document.createElement("select");
+      sel.add(new Option("(选择酒的种类即自动填入)", ""));
+      PRESETS.forEach(function (p, idx) {
+        sel.add(new Option(p.label + "(" + p.ml + "ml·" + p.abv + "%)", String(idx)));
+      });
+      sel.setAttribute("aria-label", "第" + (i + 1) + "杯酒的种类");
+      var ml = document.createElement("input");
+      ml.type = "number"; ml.min = "1"; ml.max = "10000"; ml.step = "1";
+      ml.setAttribute("inputmode", "decimal");
+      ml.placeholder = "量(mL)";
+      ml.setAttribute("aria-label", "第" + (i + 1) + "杯的量(mL)");
+      ml.style.width = "6.5em";
+      var abv = document.createElement("input");
+      abv.type = "number"; abv.min = "0.1"; abv.max = "96"; abv.step = "any";
+      abv.setAttribute("inputmode", "decimal");
+      abv.placeholder = "度数(%)";
+      abv.setAttribute("aria-label", "第" + (i + 1) + "杯的度数(%)");
+      abv.style.width = "6.5em";
+      sel.addEventListener("change", function () {
+        if (sel.value === "") return;
+        var p = PRESETS[parseInt(sel.value, 10)];
+        ml.value = p.ml;
+        abv.value = p.abv;
+        runTotal(false);
+      });
+      ml.addEventListener("input", function () { runTotal(false); });
+      abv.addEventListener("input", function () { runTotal(false); });
+      div.appendChild(sel);
+      div.appendChild(ml);
+      div.appendChild(abv);
+      advDrinkRows.appendChild(div);
+    }
+    for (var i = 0; i < 5; i++) makeRow(i);
+  })();
+  function runTotal(fromButton) {
+    var items = [];
+    var rowEls = advDrinkRows.querySelectorAll(".adv-drink-row");
+    for (var i = 0; i < rowEls.length; i++) {
+      var inputs = rowEls[i].querySelectorAll("input");
+      var ml = parseFloat(inputs[0].value);
+      var abv = parseFloat(inputs[1].value);
+      if (!isFinite(ml) && !isFinite(abv)) continue;
+      if (!isFinite(ml) || !isFinite(abv)) {
+        if (fromButton) advErr("第" + (i + 1) + "行请同时输入量和度数。");
+        return;
+      }
+      items.push({ ml: ml, abv: abv });
+    }
+    if (items.length === 0) { if (fromButton) advErr("请至少输入1件酒的量(mL)和度数(%)。"); return; }
+    var r = AlcoholCalc.totalDrinks(items);
+    if (!r.ok) {
+      advErr(r.code === "invalid_volume" ? "量请在1〜10,000mL范围内输入。"
+        : "度数请在0.1〜96%范围内输入。");
+      return;
+    }
+    lastTotalG = r.grams;
+    advBox.innerHTML =
+      '<div class="result-main">合计 纯酒精 约 ' +
+      r.grams.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " g</div>" +
+      "<p>" + items.length + "杯的合计,相当于<strong>约 " +
+      r.drinks.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      " 标准杯</strong>(1杯=纯酒精10g)。提高生活习惯病风险的参考量为每日男性40g、女性20g以上。</p>" +
+      '<p class="adv-note">此数值会自动传入下方的「分解完大约要多久?」。</p>';
+    advBox.hidden = false;
+  }
+  function mainFormGrams() {
+    var v = parseFloat(document.getElementById("volume").value);
+    var a = parseFloat(document.getElementById("abv").value);
+    if (!isFinite(v) || !isFinite(a)) return null;
+    var r = AlcoholCalc.calculate(v, a, document.getElementById("sex").value);
+    return r.ok ? r.grams : null;
+  }
+  function runTime(fromButton) {
+    var wEl = document.getElementById("adv-weight");
+    if (wEl.value === "") { if (fromButton) advErr("请输入体重。"); return; }
+    var gEl = document.getElementById("adv-grams");
+    var grams;
+    if (gEl.value === "") {
+      grams = lastTotalG !== null ? lastTotalG : mainFormGrams();
+      if (grams === null) {
+        if (fromButton) advErr("请输入纯酒精量,或先在上面的表单/合计栏中计算。");
+        return;
+      }
+    } else {
+      grams = parseFloat(gEl.value);
+    }
+    var r = AlcoholCalc.breakdownTime(parseFloat(wEl.value), grams, document.getElementById("adv-end-time").value);
+    if (!r.ok) {
+      var msg = r.code === "invalid_weight" ? "体重请在20〜300kg范围内输入。"
+        : r.code === "invalid_grams" ? "纯酒精量请在1〜500g范围内输入。"
+        : "请检查喝完的时刻。";
+      advErr(msg);
+      return;
+    }
+    var html =
+      '<div class="result-main">从喝完起 约 ' +
+      r.hours.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " 小时</div>" +
+      "<p>将纯酒精 " + grams.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      " g 按分解速度 约" + r.rateGPerHour.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      " g/小时(体重×0.1g)分解的参考值。</p>";
+    if (r.finishTime !== undefined) {
+      html += "<p>按计算,分解完成大约在<strong>" + (r.nextDay ? "次日 " : "") + r.finishTime + " 前后</strong>。</p>";
+    }
+    html += '<p class="adv-note">个体·身体状况差异很大,仅为约值。请勿以此结果判断能否开车。</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-total-run").addEventListener("click", function () { runTotal(true); });
+  document.getElementById("adv-time-run").addEventListener("click", function () { runTime(true); });
+  ["adv-weight", "adv-grams", "adv-end-time"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runTime(false); });
+  });
+})();
+</script>
+</body>
+</html>

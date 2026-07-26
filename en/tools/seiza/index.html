@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Star Sign &amp; Birthstone Finder (Just Enter Your Birthday) | Quick Calc</title>
+  <meta name="description" content="Enter your birthday to instantly see your zodiac (star) sign and birthstone, free. Boundary days such as April 19/20 are made clear. Handy for profiles and gift picking.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/seiza/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Star Sign &amp; Birthstone Finder (Just Enter Your Birthday) | Quick Calc">
+  <meta property="og:description" content="Enter your birthday to instantly see your zodiac (star) sign and birthstone, free. Boundary days such as April 19/20 are made clear. Handy for profiles and gift picking.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/seiza/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Star Sign &amp; Birthstone Finder","item":"https://quick-calc.site/en/tools/seiza/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Star Sign &amp; Birthstone Finder</h1>
+  <form class="tool-form" id="seiza-form">
+    <span class="field-note">Pick your birthday — your star sign and birthstone appear right below</span>
+    <div class="field-row">
+      <label>Birthday (month)
+        <select id="month"></select>
+      </label>
+      <label>Day
+        <select id="day"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: weekday you were born and a table of all 12 signs</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Add your birth year for more detail</h3>
+      <p class="adv-note">Enter your birth year to see the weekday you were born and a note if your birthday is on a sign boundary (cusp). The month and day selected above are used.</p>
+      <label>Birth year (Western calendar)
+        <input type="number" id="adv-year" inputmode="numeric" min="1600" max="2200" step="1" placeholder="e.g. 1990">
+      </label>
+      <button type="button" id="adv-detail-run">Check the weekday and sign in detail</button>
+      <h3 class="adv-h">Date ranges of the 12 signs</h3>
+      <p class="adv-note">See the date range of every sign at a glance.</p>
+      <button type="button" id="adv-list-run">Show the table</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Just pick your birthday (month and day) to instantly see <strong>your star sign and birthstone</strong>. Boundary days — “is April 20 Aries or Taurus?” — are clear at a glance. Handy for filling in profiles or choosing a stone as a gift. The birthstones follow the list commonly used in Japan.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Pick the month and day of the birthday (no year needed).</li>
+    <li>The moment you pick, the star sign (with its Japanese name) and the birthstone appear below. No button needed.</li>
+  </ol>
+
+  <h2>How it is determined</h2>
+  <ul class="method">
+    <li>The 12 signs are assigned by <strong>the commonly used date ranges</strong> (for example, Aries is March 21 – April 19).</li>
+    <li>The sign divisions are based on the position of the sun (the zodiac), so the boundary dates shift by about one day from year to year. If you were born on a boundary day, your sign can depend on your birth year and time.</li>
+    <li>The birthstone shown is the representative gem for each month (the main one where a month has several).</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>The sign date ranges are the divisions customarily used in astrology. The birthstones are representative stones based on the selection by Japan&rsquo;s national jewelry wholesalers&rsquo; cooperative (全国宝石卸商協同組合, revised in 2021), which is widely used in Japan. Neither implies any scientifically proven effect.</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>If you were born on a boundary day (such as between April 19 and 20), different publications may list your sign one day differently.</li>
+    <li>Birthstone lists differ somewhat by country and organization (some list coral for March or moonstone for June, for example).</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">I was born on the boundary between two signs. Which one is mine?</h3>
+  <p class="faq-a">The switch between signs is set by the moment the sun moves from one sign to the next, and the date shifts by about a day depending on the year. To know precisely, you need your birth year and time of birth. For ordinary profile purposes, the ranges used by this tool are fine.</p>
+  <h3 class="faq-q">Why do books and shops show different birthstones?</h3>
+  <p class="faq-a">Because the selection differs slightly by country and jewelry organization. In Japan, the selection by the national jewelry wholesalers&rsquo; cooperative (revised in 2021 with additions) is widely used.</p>
+  <h3 class="faq-q">Can I also find my Chinese zodiac animal?</h3>
+  <p class="faq-a">Yes — the Age Calculator on this site shows the Chinese zodiac animal together with your age from your birth date (see “All tools”).</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=seiza">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/seiza/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  var STONE_EN = {
+    "ガーネット": "Garnet",
+    "アメシスト": "Amethyst",
+    "アクアマリン": "Aquamarine",
+    "ダイヤモンド": "Diamond",
+    "エメラルド": "Emerald",
+    "パール(真珠)": "Pearl",
+    "ルビー": "Ruby",
+    "ペリドット": "Peridot",
+    "サファイア": "Sapphire",
+    "オパール": "Opal",
+    "トパーズ": "Topaz",
+    "ターコイズ(トルコ石)": "Turquoise"
+  };
+  var box = document.getElementById("result");
+  var monthSel = document.getElementById("month");
+  var daySel = document.getElementById("day");
+  var today = new Date();
+  var DAYS = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  for (var m = 1; m <= 12; m++) monthSel.add(new Option(MONTHS[m - 1], m));
+  monthSel.value = today.getMonth() + 1;
+  function fillDays() {
+    var cur = parseInt(daySel.value || String(today.getDate()), 10);
+    daySel.innerHTML = "";
+    for (var d = 1; d <= DAYS[monthSel.value - 1]; d++) daySel.add(new Option(d, d));
+    daySel.value = Math.min(cur, DAYS[monthSel.value - 1]);
+  }
+  fillDays();
+  function run() {
+    var r = SeizaCalc.lookup(parseInt(monthSel.value, 10), parseInt(daySel.value, 10));
+    if (!r.ok) { box.innerHTML = '<p class="result-error">Select a valid date.</p>'; box.hidden = false; return; }
+    box.innerHTML =
+      '<div class="result-main">' + r.signEn + "</div>" +
+      "<p>Japanese name: <strong>" + r.sign + "</strong> / Birthstone: <strong>" + (STONE_EN[r.stone] || r.stone) + "</strong></p>";
+    box.hidden = false;
+    if (window.__seizaAdvRefresh) { window.__seizaAdvRefresh(); }
+  }
+  monthSel.addEventListener("change", function () { fillDays(); run(); });
+  daySel.addEventListener("change", run);
+  document.getElementById("seiza-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run();
+  });
+  run();
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  var WD_EN = { "日曜日": "Sunday", "月曜日": "Monday", "火曜日": "Tuesday", "水曜日": "Wednesday", "木曜日": "Thursday", "金曜日": "Friday", "土曜日": "Saturday" };
+  var STONE_EN = {
+    "ガーネット": "Garnet",
+    "アメシスト": "Amethyst",
+    "アクアマリン": "Aquamarine",
+    "ダイヤモンド": "Diamond",
+    "エメラルド": "Emerald",
+    "パール(真珠)": "Pearl",
+    "ルビー": "Ruby",
+    "ペリドット": "Peridot",
+    "サファイア": "Sapphire",
+    "オパール": "Opal",
+    "トパーズ": "Topaz",
+    "ターコイズ(トルコ石)": "Turquoise"
+  };
+  var advBox = document.getElementById("adv-result");
+  var lastAdv = "";
+  function runDetail(fromButton) {
+    lastAdv = "detail";
+    var raw = document.getElementById("adv-year").value;
+    var y = parseInt(raw, 10);
+    if (!fromButton && !(y >= 1600 && y <= 2200)) { return; }
+    var mo = parseInt(document.getElementById("month").value, 10);
+    var d = parseInt(document.getElementById("day").value, 10);
+    var r = SeizaCalc.detail(y, mo, d);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">Enter a real date (year 1600–2200 in the Western calendar). February 29 exists only in leap years.</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var html = '<div class="result-main">' + MONTHS[mo - 1] + " " + d + ", " + y + " was a " + (WD_EN[r.youbi] || r.youbi) + "</div>" +
+      "<p>Star sign: <strong>" + r.signEn + " (" + r.sign + ")</strong> / Birthstone: " + (STONE_EN[r.stone] || r.stone) + ".</p>";
+    if (r.cusp) {
+      html += '<p class="adv-note">This birthday is close to a sign boundary (cusp — the switch around ' + r.cusp.boundaryM + "/" + r.cusp.boundaryD +
+        "). Because the boundary shifts by about a day from year to year, depending on your birth year and time you could be <strong>" +
+        r.cusp.otherSignEn + "</strong>.</p>";
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-detail-run").addEventListener("click", function () { runDetail(true); });
+  document.getElementById("adv-year").addEventListener("input", function () { runDetail(false); });
+  window.__seizaAdvRefresh = function () {
+    if (!advBox.hidden && lastAdv === "detail" && document.getElementById("adv-year").value !== "") { runDetail(false); }
+  };
+  document.getElementById("adv-list-run").addEventListener("click", function () {
+    lastAdv = "list";
+    var signs = SeizaCalc.SIGNS;
+    var html = '<div class="result-main">Date ranges of the 12 signs</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Sign</th><th>Dates</th></tr></thead><tbody>';
+    for (var i = 0; i < signs.length; i++) {
+      var s = signs[i];
+      var n = signs[(i + 1) % signs.length];
+      var endM = n[0];
+      var endD = n[1] - 1;
+      html += "<tr><td>" + s[3] + " (" + s[2] + ")</td><td>" +
+        s[0] + "/" + s[1] + " – " + endM + "/" + endD + "</td></tr>";
+    }
+    html += "</tbody></table></div>" +
+      '<p class="adv-note">Boundary dates can shift by about one day depending on the year.</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

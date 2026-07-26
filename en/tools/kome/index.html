@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Rice Gō ⇔ Gram Converter (How Many Grams Is 1 Gō? How Much Water?) | Quick Calc</title>
+  <meta name="description" content="Using the guides 1 gō of rice ≈ 150 g and about 200 ml of water per gō, get the rice weight, water amount, cooked yield and number of bowls from the gō count in one go. Also converts grams back to gō.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/kome/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Rice Gō ⇔ Gram Converter (How Many Grams Is 1 Gō? How Much Water?) | Quick Calc">
+  <meta property="og:description" content="Using the guides 1 gō of rice ≈ 150 g and about 200 ml of water per gō, get the rice weight, water amount, cooked yield and number of bowls from the gō count in one go. Also converts grams back to gō.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/kome/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Rice Gō ⇔ Gram Converter","item":"https://quick-calc.site/en/tools/kome/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Rice Gō ⇔ Gram Converter</h1>
+  <form class="tool-form" id="kome-form">
+    <label>Type of calculation
+      <select id="mode">
+        <option value="fromGo" selected>From gō (water amount and cooked yield)</option>
+        <option value="fromGram">From grams back to gō</option>
+      </select>
+    </label>
+    <label id="value-label-go">Amount of rice (gō)
+      <span class="field-note">The water amount and cooked yield appear below the moment you choose</span>
+      <select id="value-go"></select>
+    </label>
+    <label id="value-label-gram" style="display:none;">Weight of rice (g)
+      <input type="number" id="value" inputmode="decimal" min="0" step="any" placeholder="e.g. 300">
+    </label>
+    <button type="submit">Calculate</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: work backwards from how much you want to eat</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Work backwards from the amount of cooked rice</h3>
+      <p class="adv-note">When the cooked amount is fixed — for example “I need 600 g of rice for curry” — this works out the gō and water you need.</p>
+      <label>Cooked rice (g)
+        <input type="number" id="adv-cooked" inputmode="numeric" step="any" min="1" max="6600" placeholder="600">
+      </label>
+      <button type="button" id="adv-cooked-run">Work out gō and water</button>
+      <div class="tool-result" id="adv-result-cooked" hidden aria-live="polite"></div>
+      <h3 class="adv-h">From the number of people: “how many gō should I cook?”</h3>
+      <p class="adv-note">Taking 1 bowl ≈ 150 g of cooked rice, this gets the gō you need from the number of people and bowls per person.</p>
+      <label>Number of people
+        <input type="number" id="adv-people" inputmode="numeric" step="1" min="1" max="20" placeholder="4">
+      </label>
+      <label>Bowls per person
+        <span class="field-note">As a guide, a regular serving = 1 bowl and a large serving = 1.5 bowls</span>
+        <input type="number" id="adv-bowls-each" inputmode="decimal" step="any" min="0.5" max="5" value="1">
+      </label>
+      <button type="button" id="adv-people-run">Calculate the gō needed</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Just pick a number of gō (合) — the traditional Japanese rice unit printed on rice-cooker cups — and see the <strong>rice weight, water amount and cooked yield</strong> at once. You can also work backwards from “I want 500 g of cooked rice” or “I’m cooking for 4 people”. Handy whenever you are unsure how much water to add.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Choose how many gō you want to cook (in steps of 0.5 gō). The rice weight, water amount and cooked yield appear the moment you choose.</li>
+    <li>If you weighed the rice left in the bag in grams, use “From grams back to gō” to convert the other way.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>1 gō = 180 ml</strong> (one Japanese rice-measuring cup; 1/10 of the traditional shō, about 1.8 L) ≒ <strong>about 150 g of white rice</strong></li>
+    <li><strong>Water guide = about 200 ml per gō</strong> (1.1–1.2 times the rice volume). In a rice cooker, the markings on the inner pot take priority.</li>
+    <li><strong>Cooked rice weighs about 2.2 times the raw rice</strong> (1 gō → about 330 g of cooked rice). At 150 g per bowl, that is about 2.2 bowls.</li>
+  </ul>
+
+  <h3>Sources (primary information)</h3>
+  <ul class="sources">
+    <li>1 gō = 180 ml is the volume derived from the traditional Japanese unit (shō) under Japan’s Measurement Act. The weight, water amount and cooked yield are common Japanese guidelines (they vary with the rice variety, whether the rice is newly harvested, and how it is rinsed).</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>No-wash rice (musenmai) packs slightly more rice into the same volume, so add a little more water (about +10–20 ml per gō) as a guide.</li>
+    <li>Newly harvested rice contains more moisture, so use slightly less water; older rice needs slightly more to match your taste.</li>
+    <li>When cooking in a rice cooker, following the water-level lines on the inner pot is the most reliable method.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">How many people does 1 gō serve?</h3>
+  <p class="faq-a">It makes about 2.2 bowls, so as a guide it is one meal for 2 adults. Many households cook about 1 gō per person when packing lunch boxes or feeding big eaters.</p>
+  <h3 class="faq-q">How do I measure 1 gō without a measuring cup?</h3>
+  <p class="faq-a">Weighing 150 g on a kitchen scale is the accurate way. With a 200 ml paper cup, filling it to just under nine-tenths gives roughly 180 ml.</p>
+  <h3 class="faq-q">How many gō is a 5 kg bag of rice, and how long does it last?</h3>
+  <p class="faq-a">5,000 g ÷ 150 g = about 33 gō. A household cooking 2 gō a day gets about 16 days out of it. You can check this with the reverse mode of this tool.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=kome">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/kome/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var goSelect = document.getElementById("value-go");
+  var input = document.getElementById("value");
+  var labelGo = document.getElementById("value-label-go");
+  var labelGram = document.getElementById("value-label-gram");
+  (function fillGo() {
+    var html = "";
+    for (var v = 0.5; v <= 10; v += 0.5) {
+      html += '<option value="' + v + '"' + (v === 2 ? " selected" : "") + ">" +
+        v.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " gō</option>";
+    }
+    goSelect.innerHTML = html;
+  })();
+  function run(showErrors) {
+    if (mode.value === "fromGo") {
+      var r = KomeCalc.fromGo(parseFloat(goSelect.value));
+      if (!r.ok) { box.innerHTML = '<p class="result-error">Enter a number of gō greater than 0 and up to 20.</p>'; box.hidden = false; return; }
+      box.innerHTML =
+        '<div class="result-main">Rice ' + r.riceG.toLocaleString() + " g · water about " + r.waterMl.toLocaleString() + " ml</div>" +
+        '<div class="table-scroll"><table class="data-table"><tbody>' +
+        "<tr><td>Rice weight</td><td>about " + r.riceG.toLocaleString() + " g</td></tr>" +
+        "<tr><td>Water (guide)</td><td>about " + r.waterMl.toLocaleString() + " ml</td></tr>" +
+        "<tr><td>Cooked yield</td><td>about " + r.cookedG.toLocaleString() + " g</td></tr>" +
+        "<tr><td>Bowls (150 g)</td><td>about " + r.bowls.toLocaleString() + " bowls</td></tr>" +
+        "</tbody></table></div><p>In a rice cooker, follow the markings on the inner pot.</p>";
+    } else {
+      if (input.value === "") {
+        if (showErrors) {
+          box.innerHTML = '<p class="result-error">Enter the weight of rice (g).</p>';
+          box.hidden = false;
+        } else {
+          box.hidden = true;
+        }
+        return;
+      }
+      var r2 = KomeCalc.fromGram(parseFloat(input.value));
+      if (!r2.ok) { box.innerHTML = '<p class="result-error">Enter a weight greater than 0 and up to 30,000 g.</p>'; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">About ' + r2.go.toLocaleString() + " gō</div><p>Calculated as 1 gō = about 150 g.</p>";
+    }
+    box.hidden = false;
+  }
+  mode.addEventListener("change", function () {
+    var isGo = mode.value === "fromGo";
+    labelGo.style.display = isGo ? "" : "none";
+    labelGram.style.display = isGo ? "none" : "";
+    run(false);
+  });
+  goSelect.addEventListener("change", function () { run(false); });
+  input.addEventListener("input", function () { run(false); });
+  document.getElementById("kome-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+  run(false);
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var cookedBox = document.getElementById("adv-result-cooked");
+  function goSuggest(go) {
+    var s = Math.ceil(go * 2) / 2;
+    return s.toLocaleString(undefined, { maximumFractionDigits: 1 });
+  }
+  function renderResult(box, r, headNote) {
+    box.innerHTML =
+      '<div class="result-main">' + headNote + 'about ' + r.go.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' gō of rice</div>' +
+      '<p>For a round amount, <strong>' + goSuggest(r.go) + ' gō</strong> is a good choice.</p>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>Rice weight</td><td>about ' + r.riceG.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' g</td></tr>' +
+      '<tr><td>Water</td><td>about ' + r.waterMl.toLocaleString() + ' ml</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">The water amount is a guide for white rice (about 200 ml per gō). If your rice cooker has water-level markings, follow those instead.</p>';
+    box.hidden = false;
+  }
+  function runCooked() {
+    var cooked = parseFloat(document.getElementById("adv-cooked").value);
+    var r = KomeCalc.fromCooked(cooked);
+    if (!r.ok) {
+      cookedBox.innerHTML = '<p class="result-error">Enter a cooked-rice amount between 1 and 6,600 g (up to 20 gō).</p>';
+      cookedBox.hidden = false;
+      return;
+    }
+    renderResult(cookedBox, r, "");
+  }
+  function runPeople() {
+    var people = parseFloat(document.getElementById("adv-people").value);
+    var each = parseFloat(document.getElementById("adv-bowls-each").value);
+    if (isNaN(people) || people !== Math.floor(people) || people < 1 || people > 20 || isNaN(each)) {
+      advBox.innerHTML = '<p class="result-error">Enter a whole number of people (1–20) and 0.5–5 bowls per person.</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var r = KomeCalc.fromBowls(people * each);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">The total number of bowls is too large (up to 40). Check the bowl count.</p>';
+      advBox.hidden = false;
+      return;
+    }
+    renderResult(advBox, r, 'Cooked rice about ' + r.cookedG.toLocaleString() + ' g = ');
+  }
+  document.getElementById("adv-cooked-run").addEventListener("click", runCooked);
+  document.getElementById("adv-people-run").addEventListener("click", runPeople);
+  document.getElementById("adv-cooked").addEventListener("input", function () {
+    if (document.getElementById("adv-cooked").value !== "") { runCooked(); } else { cookedBox.hidden = true; }
+  });
+  function autoPeople() {
+    if (document.getElementById("adv-people").value !== "" &&
+        document.getElementById("adv-bowls-each").value !== "") {
+      runPeople();
+    } else {
+      advBox.hidden = true;
+    }
+  }
+  document.getElementById("adv-people").addEventListener("input", autoPeople);
+  document.getElementById("adv-bowls-each").addEventListener("input", autoPeople);
+})();
+</script>
+</body>
+</html>

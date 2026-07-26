@@ -1,0 +1,24 @@
+{
+  "tool": "gakunen",
+  "module": "calc.js",
+  "global": "GakunenCalc",
+  "cases": [
+    { "name": "4月2日生まれは学年の先頭(2026年度に小1)", "func": "gradeOn", "args": ["2019-04-02", "2026-07-26"], "expect": { "ok": true, "schoolYear": 2026, "overallGrade": 1, "stage": "elementary", "gradeInStage": 1, "label": "小学校1年", "hayaumare": false } },
+    { "name": "4月1日生まれは早生まれで1つ上(2026年度に小2)", "func": "gradeOn", "args": ["2019-04-01", "2026-07-26"], "expect": { "ok": true, "overallGrade": 2, "label": "小学校2年", "hayaumare": true } },
+    { "name": "3月生まれも早生まれ", "func": "gradeOn", "args": ["2019-03-15", "2026-07-26"], "expect": { "ok": true, "label": "小学校2年", "hayaumare": true } },
+    { "name": "小6の次は中1(通算7年)", "func": "gradeOn", "args": ["2013-05-05", "2026-07-26"], "expect": { "ok": true, "overallGrade": 7, "stage": "juniorhigh", "gradeInStage": 1, "label": "中学校1年" } },
+    { "name": "高1は通算10年", "func": "gradeOn", "args": ["2010-05-05", "2026-07-26"], "expect": { "ok": true, "overallGrade": 10, "stage": "highschool", "gradeInStage": 1, "label": "高校1年" } },
+    { "name": "高3は通算12年", "func": "gradeOn", "args": ["2008-05-05", "2026-07-26"], "expect": { "ok": true, "overallGrade": 12, "label": "高校3年" } },
+    { "name": "入学前は就学前", "func": "gradeOn", "args": ["2024-01-01", "2026-07-26"], "expect": { "ok": true, "stage": "preschool", "label": "就学前" } },
+    { "name": "高校を終えた年代は高校卒業後", "func": "gradeOn", "args": ["1990-05-05", "2026-07-26"], "expect": { "ok": true, "stage": "graduated", "label": "高校卒業後" } },
+    { "name": "3月は前年度(2025年度)として数える", "func": "gradeOn", "args": ["2018-05-05", "2026-03-31"], "expect": { "ok": true, "schoolYear": 2025, "label": "小学校1年" } },
+    { "name": "4月1日から新年度(2026年度)", "func": "gradeOn", "args": ["2018-05-05", "2026-04-01"], "expect": { "ok": true, "schoolYear": 2026, "label": "小学校2年" } },
+    { "name": "基準日が生年月日より前ならエラー", "func": "gradeOn", "args": ["2020-05-05", "2019-05-05"], "expect": { "ok": false, "code": "invalid_order" } },
+    { "name": "存在しない日付はエラー", "func": "gradeOn", "args": ["2019-02-30", "2026-07-26"], "expect": { "ok": false, "code": "invalid_date" } },
+    { "name": "逆引き: 2026年度の小1は2019/4/2〜2020/4/1生まれ", "func": "birthRangeOf", "args": [2026, 1], "expect": { "ok": true, "from": "2019-04-02", "to": "2020-04-01", "label": "小学校1年" } },
+    { "name": "逆引き: 2026年度の高3は2008/4/2〜2009/4/1生まれ", "func": "birthRangeOf", "args": [2026, 12], "expect": { "ok": true, "from": "2008-04-02", "to": "2009-04-01", "label": "高校3年" } },
+    { "name": "逆引き: 学年が範囲外ならエラー", "func": "birthRangeOf", "args": [2026, 13], "expect": { "ok": false, "code": "invalid_grade" } },
+    { "name": "在学期間: 2026年度の中2は2025年入学・2028年卒業", "func": "stageTerm", "args": [2026, 8], "expect": { "ok": true, "stageName": "中学校", "entryYear": 2025, "gradYear": 2028 } },
+    { "name": "在学期間: 2026年度の小1は2026年入学・2032年卒業", "func": "stageTerm", "args": [2026, 1], "expect": { "ok": true, "stageName": "小学校", "entryYear": 2026, "gradYear": 2032 } }
+  ]
+}

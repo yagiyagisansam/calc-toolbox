@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>하루 섭취 칼로리 계산기(추정 에너지 필요량) | Quick Calc</title>
+  <meta name="description" content="나이·성별·몸무게·활동량으로 하루에 필요한 섭취 칼로리 기준(추정 에너지 필요량)을 무료로 계산합니다. 일본 후생노동성의 기초대사 기준값과 신체활동수준에 근거하며 다이어트 식사 관리에 활용할 수 있습니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/tdee/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="하루 섭취 칼로리 계산기(추정 에너지 필요량) | Quick Calc">
+  <meta property="og:description" content="나이·성별·몸무게·활동량으로 하루에 필요한 섭취 칼로리 기준(추정 에너지 필요량)을 무료로 계산합니다. 일본 후생노동성의 기초대사 기준값과 신체활동수준에 근거하며 다이어트 식사 관리에 활용할 수 있습니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/tdee/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"하루 섭취 칼로리 계산기(추정 에너지 필요량)","item":"https://quick-calc.site/ko/tools/tdee/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>하루 섭취 칼로리 계산기</h1>
+  <form class="tool-form" id="tdee-form">
+    <span class="field-note">나이·성별·몸무게·활동수준을 입력하면 바로 아래에 결과가 표시됩니다</span>
+    <label>나이(세)
+      <span class="field-note">지원 범위: 18〜120세(성인 대상)</span>
+      <input type="number" id="age" inputmode="numeric" step="1" min="18" max="120" placeholder="30" required>
+    </label>
+    <label>성별
+      <select id="sex">
+        <option value="male">남성</option>
+        <option value="female">여성</option>
+      </select>
+    </label>
+    <label>몸무게(kg)
+      <input type="number" id="weight" inputmode="decimal" step="any" min="20" max="300" placeholder="60" required>
+    </label>
+    <label>신체활동수준
+      <select id="pal">
+        <option value="low">Ⅰ 낮음(대부분 앉아서 생활)</option>
+        <option value="normal" selected>Ⅱ 보통(통근·집안일·가벼운 운동)</option>
+        <option value="high">Ⅲ 높음(서서 하는 일·활발한 운동 습관)</option>
+      </select>
+    </label>
+    <button type="submit">계산하기</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 목표 체중에서 역산, PFC 밸런스</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">목표 체중까지의 「하루 목표 섭취 칼로리」 역산</h3>
+      <p class="adv-note">목표 체중과 기간을 입력하면 체지방 1kg≒7,200kcal 기준으로 「하루 몇 kcal로 억제하면(늘리면) 되는지」를 역산합니다(다른 항목은 위 값을 사용).</p>
+      <label>목표 체중(kg)
+        <input type="number" id="adv-target-weight" inputmode="decimal" step="any" min="20" max="300" placeholder="예: 60">
+      </label>
+      <label>목표 기간(개월)
+        <input type="number" id="adv-months" inputmode="numeric" step="1" min="1" max="60" value="3">
+      </label>
+      <button type="button" id="adv-goal-run">목표 섭취 칼로리 역산하기</button>
+
+      <h3 class="adv-h">그 칼로리, 무엇을 얼마나 먹을까?(PFC 밸런스)</h3>
+      <p class="adv-note">하루 섭취 칼로리에서 단백질(P)·지방(F)·탄수화물(C)을 각각 몇 그램 섭취하면 좋은지 일본의 국가 목표량으로 계산합니다(위에서 역산하면 자동으로 채워집니다).</p>
+      <label>하루 섭취 칼로리(kcal)
+        <input type="number" id="adv-pfc-kcal" inputmode="numeric" step="1" min="400" max="10000" placeholder="예: 2000">
+      </label>
+      <button type="button" id="adv-pfc-run">PFC 기준 계산하기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    이 도구의 계산 결과는 <strong>대략적인 값</strong>입니다. 체격·근육량·활동 내용에 따라 개인차가 있으며, 임신 중·수유 중이거나 질환이 있는 분에게는 적용할 수 없습니다. 식사요법은 의사·영양사의 지도를 따라 주세요.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>나이·성별·몸무게와 하루에 움직이는 양만 고르면 <strong>하루에 먹어도 되는 칼로리의 기준</strong>을 알 수 있습니다. 일본 「식사섭취기준」의 사고방식, 즉 일본의 영양 지도에서 쓰이는 국가 기준으로 계산합니다. 다이어트나 몸 만들기의 식사 계획을 세울 때 활용해 보세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>나이·성별·몸무게를 입력합니다.</li>
+    <li>평소 활동량에 가까운 「신체활동수준」을 고릅니다. 고민된다면 「Ⅱ 보통」이 기준입니다.</li>
+    <li>입력과 동시에 하루 섭취 칼로리 기준과 기초대사량이 바로 아래에 표시됩니다. 버튼은 누를 필요 없습니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>섭취 칼로리 기준(추정 에너지 필요량) = 기초대사량 × 신체활동수준</strong></li>
+    <li>기초대사량 = 기초대사 기준값(연령 구분별·남녀별) × 몸무게(이 사이트의 기초대사량 계산과 같은 방식)</li>
+    <li>신체활동수준(성인의 대표값): <strong>Ⅰ 낮음=1.50 / Ⅱ 보통=1.75 / Ⅲ 높음=2.00</strong></li>
+    <li>계산 예: 30세 남성 70kg·보통 → 기초대사 약 1,561kcal × 1.75 = <strong>약 2,732kcal/일</strong></li>
+  </ul>
+
+  <h3>출처(1차 정보)</h3>
+  <ul class="sources">
+    <li>일본 후생노동성 e-헬스넷 「가령과 에너지 대사」(기초대사 기준값 표)(일본어)<br>
+      <a href="https://kennet.mhlw.go.jp/information/information/food/e-07-002.html" rel="noopener" target="_blank">https://kennet.mhlw.go.jp/information/information/food/e-07-002.html</a>(2026년 7월 18일 열람)</li>
+    <li>일본 후생노동성 「일본인 식사섭취기준(2025년판)」 책정 포인트(추정 에너지 필요량·신체활동수준)(일본어)<br>
+      <a href="https://www.mhlw.go.jp/content/10904750/001396865.pdf" rel="noopener" target="_blank">https://www.mhlw.go.jp/content/10904750/001396865.pdf</a>(2026년 7월 18일 열람)</li>
+  </ul>
+
+  <h2>전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>이 값은 「현재 체중을 유지」하기 위한 에너지량의 기준입니다. 감량하려면 이보다 적게, 증량하려면 많이 먹게 되지만, 극단적인 제한은 건강을 해칩니다.</li>
+    <li>신체활동수준의 대표값은 성인 기준입니다. 고령자는 같은 구분이라도 다소 낮아지는 경향이 있습니다.</li>
+    <li>18세 미만(성장기)은 다른 기준이 적용되므로 대상이 아닙니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">살을 빼고 싶으면 몇 kcal로 하면 되나요?</h3>
+  <p class="faq-a">일반적으로 이 기준보다 하루 200〜500kcal 정도 줄이면 완만한 감량이 된다고 하지만, 필요량을 크게 밑도는 제한은 근육량 감소와 요요를 부릅니다. 구체적인 목표는 의사·영양사와 상담해 주세요.</p>
+  <h3 class="faq-q">기초대사량과는 무엇이 다른가요?</h3>
+  <p class="faq-a">기초대사량은 「안정 상태에서도 소비되는 최소한의 에너지」이고, 이 도구의 결과는 거기에 일상 활동 몫을 곱한 「하루 소비에 맞는 섭취량의 기준」입니다.</p>
+  <h3 class="faq-q">신체활동수준은 어떻게 고르면 되나요?</h3>
+  <p class="faq-a">책상 업무 중심이고 이동도 적으면 Ⅰ, 통근·장보기·집안일이나 가벼운 운동이 있으면 Ⅱ, 서서 하는 일이나 활발한 운동 습관이 있으면 Ⅲ이 기준입니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=tdee">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/tdee/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_age: "나이는 18〜120세 범위의 정수로 입력해 주세요.",
+    invalid_sex: "성별을 선택해 주세요.",
+    invalid_weight: "몸무게는 20〜300kg 범위로 입력해 주세요.",
+    invalid_pal: "신체활동수준을 선택해 주세요."
+  };
+  var box = document.getElementById("result");
+  var ageEl = document.getElementById("age");
+  var weightEl = document.getElementById("weight");
+  function run() {
+    if (ageEl.value === "" || weightEl.value === "") { box.hidden = true; return; }
+    var result = TdeeCalc.calculate(
+      parseFloat(ageEl.value),
+      document.getElementById("sex").value,
+      parseFloat(weightEl.value),
+      document.getElementById("pal").value
+    );
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">약 ' + result.tdeeKcal.toLocaleString() + " kcal/일</div>" +
+        "<p>기초대사량: <strong>약 " + result.bmrKcal.toLocaleString() + " kcal/일</strong> × 신체활동수준 " + result.palValue.toFixed(2) + "</p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "입력값을 확인해 주세요.") + "</p>";
+    }
+    box.hidden = false;
+  }
+  ageEl.addEventListener("input", run);
+  weightEl.addEventListener("input", run);
+  document.getElementById("sex").addEventListener("change", run);
+  document.getElementById("pal").addEventListener("change", run);
+  document.getElementById("tdee-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var lastAdv = null;
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function runGoal(fromButton) {
+    var age = parseInt(document.getElementById("age").value, 10);
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(age) || !isFinite(w)) { if (fromButton) advErr("먼저 위 폼에 나이·성별·몸무게를 입력해 주세요."); return; }
+    var twEl = document.getElementById("adv-target-weight");
+    if (twEl.value === "") { if (fromButton) advErr("목표 체중을 입력해 주세요."); return; }
+    if (document.getElementById("adv-months").value === "") { if (fromButton) advErr("목표 기간을 입력해 주세요."); return; }
+    var r = TdeeCalc.targetIntake(
+      age,
+      document.getElementById("sex").value,
+      w,
+      document.getElementById("pal").value,
+      parseFloat(twEl.value),
+      parseFloat(document.getElementById("adv-months").value)
+    );
+    if (!r.ok) {
+      var msg = r.code === "invalid_target_weight" ? "목표 체중은 20〜300kg 범위로 입력해 주세요."
+        : r.code === "invalid_months" ? "목표 기간은 1〜60개월 범위로 입력해 주세요."
+        : "위 폼의 입력값을 확인해 주세요.";
+      advErr(msg);
+      return;
+    }
+    var adjustText;
+    if (r.dailyAdjustKcal > 0) {
+      adjustText = "하루에 약 " + r.dailyAdjustKcal.toLocaleString() + " kcal 줄이는 계산입니다.";
+    } else if (r.dailyAdjustKcal < 0) {
+      adjustText = "하루에 약 " + Math.abs(r.dailyAdjustKcal).toLocaleString() + " kcal 늘리는 계산입니다.";
+    } else {
+      adjustText = "현재 체중을 유지하는 계산입니다.";
+    }
+    var html =
+      '<div class="result-main">하루 목표 약 ' + r.targetIntakeKcal.toLocaleString() + " kcal</div>" +
+      "<p>하루 소비 기준 " + r.tdeeKcal.toLocaleString() + " kcal에 대해, " + adjustText + "</p>";
+    if (r.warning) {
+      html += '<p class="result-error">주의: 목표가 기초대사량(약 ' + r.bmrKcal.toLocaleString() +
+        " kcal)을 밑돌고 있습니다. 극단적인 식사 제한은 건강을 해치는 원인입니다. 기간을 늘리거나 목표를 다시 검토해 주세요.</p>";
+    }
+    html += '<p class="adv-note">체지방 1kg≒7,200kcal·1개월≒30일의 개산입니다. 실제 감량 속도에는 개인차가 있습니다.</p>';
+    var pfcEl = document.getElementById("adv-pfc-kcal");
+    if (pfcEl.value === "" && r.targetIntakeKcal >= 400) {
+      pfcEl.value = r.targetIntakeKcal;
+    }
+    lastAdv = runGoal;
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  function runPfc(fromButton) {
+    var kEl = document.getElementById("adv-pfc-kcal");
+    if (kEl.value === "") { if (fromButton) advErr("하루 섭취 칼로리를 입력해 주세요."); return; }
+    var r = TdeeCalc.pfcBalance(parseFloat(kEl.value));
+    if (!r.ok) { advErr("칼로리는 400〜10,000kcal 범위로 입력해 주세요."); return; }
+    lastAdv = runPfc;
+    advBox.innerHTML =
+      '<div class="result-main">' + parseFloat(kEl.value).toLocaleString() + " kcal의 PFC 밸런스 기준</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>영양소</th><th>하루 기준</th></tr></thead><tbody>' +
+      "<tr><td>단백질(P)</td><td>" + r.proteinMinG.toLocaleString() + "〜" + r.proteinMaxG.toLocaleString() + " g</td></tr>" +
+      "<tr><td>지방(F)</td><td>" + r.fatMinG.toLocaleString() + "〜" + r.fatMaxG.toLocaleString() + " g</td></tr>" +
+      "<tr><td>탄수화물(C)</td><td>" + r.carbMinG.toLocaleString() + "〜" + r.carbMaxG.toLocaleString() + " g</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">「일본인 식사섭취기준(2020년판)」의 목표량(단백질 13〜20%·지방 20〜30%·탄수화물 50〜65%)에 따른 기준입니다.</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-goal-run").addEventListener("click", function () { runGoal(true); });
+  document.getElementById("adv-pfc-run").addEventListener("click", function () { runPfc(true); });
+  document.getElementById("adv-target-weight").addEventListener("input", function () { runGoal(false); });
+  document.getElementById("adv-months").addEventListener("input", function () { runGoal(false); });
+  document.getElementById("adv-pfc-kcal").addEventListener("input", function () { runPfc(false); });
+  ["age", "weight"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { if (lastAdv === runGoal) runGoal(false); });
+  });
+  ["sex", "pal"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", function () { if (lastAdv === runGoal) runGoal(false); });
+  });
+})();
+</script>
+</body>
+</html>

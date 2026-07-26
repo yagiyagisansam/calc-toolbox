@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>入学·毕业年份查询(日本履历书用) | Quick Calc</title>
+  <meta name="description" content="输入出生年月日,按日本学制(4月入学·3月毕业)自动算出小学到大学的入学·毕业年份,可直接填进日本履历书的学历栏。西历和日本年号同时显示,并支持早出生(1月1日〜4月1日)以及复读·留级·休学的调整。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/rireki/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="入学·毕业年份查询(日本履历书用) | Quick Calc">
+  <meta property="og:description" content="输入出生年月日,按日本学制(4月入学·3月毕业)自动算出小学到大学的入学·毕业年份,可直接填进日本履历书的学历栏。西历和日本年号同时显示,并支持早出生(1月1日〜4月1日)以及复读·留级·休学的调整。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/rireki/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"入学·毕业年份查询(日本履历书用)","item":"https://quick-calc.site/zh/tools/rireki/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>入学·毕业年份查询(日本履历书用)</h1>
+  <form class="tool-form" id="rireki-form">
+    <span class="field-note">选好出生年月日,下方立即显示学历一览表</span>
+    <div class="field-row">
+      <label>出生年月日(年)
+        <select id="birth-year"></select>
+      </label>
+      <label>月
+        <select id="birth-month"></select>
+      </label>
+      <label>日
+        <select id="birth-day"></select>
+      </label>
+    </div>
+    <label>复读·留级等年数(选填)
+      <span class="field-note">高中毕业后复读1年就填「1」</span>
+      <input type="number" id="gap" inputmode="numeric" min="0" max="10" step="1" value="0">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 复读·留级·休学的分别调整与学历栏文例</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">把复读·留级·休学分开调整</h3>
+      <p class="adv-note">把复读、留级、休学、读研分开反映,生成调整后的一览表(出生年月日使用上面表单中的值)。</p>
+      <label>复读的年数
+        <input type="number" id="adv-ronin" inputmode="numeric" min="0" max="10" step="1" value="0">
+      </label>
+      <label>大学留级的年数
+        <input type="number" id="adv-ryunen" inputmode="numeric" min="0" max="10" step="1" value="0">
+      </label>
+      <label>大学休学的年数
+        <input type="number" id="adv-kyugaku" inputmode="numeric" min="0" max="10" step="1" value="0">
+      </label>
+      <label>是否读研究生院
+        <select id="adv-grad">
+          <option value="none" selected>不读(到大学为止)</option>
+          <option value="master">读到硕士(2年)</option>
+          <option value="doctor">读到博士(硕士2年+博士3年)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-detail-run">生成调整后的一览表</button>
+      <h3 class="adv-h">生成学历栏文例</h3>
+      <p class="adv-note">填入学校名称,即可生成反映上述调整的学历栏文例(日文格式,可直接抄到履历书上)。</p>
+      <label>初中名称
+        <input type="text" id="adv-jhs-name" placeholder="例: 品川区立◯◯中学校">
+      </label>
+      <label>高中名称
+        <input type="text" id="adv-hs-name" placeholder="例: ◯◯高等学校">
+      </label>
+      <label>大学名称·学部
+        <input type="text" id="adv-uni-name" placeholder="例: ◯◯大学◯◯学部">
+      </label>
+      <button type="button" id="adv-text-run">生成文例</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>只要输入出生年月日,就能立刻得到日本履历书(履歴書)学历栏要写的<strong>入学·毕业年份</strong>,西历和日本年号同时显示。本工具<strong>基于日本的学制</strong>: 4月入学、3月毕业,同一学年为「4月2日〜次年4月1日出生」,因此也能正确判定早出生(1月1日〜4月1日)。在日本求职、写履历书或Entry Sheet时很方便。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>选择出生年月日。</li>
+    <li>如果有复读·留级的年数就填进去(会加到大学的入学·毕业年份上)。</li>
+    <li>选好的瞬间,学历一览表就会以西历和日本年号显示在下方,无需点击按钮。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li>日本的学年划分是<strong>4月2日出生〜次年4月1日出生</strong>为同一学年。4月1日出生的人在生日前一天(3月31日)就满6周岁,因此归入上一个学年。</li>
+    <li><strong>小学入学年份</strong>: 4/2〜12/31出生→出生年+7年的4月 / 1/1〜4/1出生(早出生)→出生年+6年的4月</li>
+    <li>之后按小学6年·初中3年·高中3年·大学4年计算(入学为4月、毕业为3月)。</li>
+  </ul>
+
+  <h3>出处(一次信息)</h3>
+  <ul class="sources">
+    <li>入学时期的判定依据是<a href="https://elaws.e-gov.go.jp/document?lawid=322AC0000000026" target="_blank" rel="noopener">学校教育法(1947年法律第26号)</a>第17条(从满6周岁之日的次日以后最初的学年开始)以及年龄计算相关法律的运用。(日文)</li>
+  </ul>
+
+  <h2>前提与注意</h2>
+  <ul class="cautions">
+    <li>大学按4年制计算。短期大学·专门学校(2年)和6年制学部(医·齿·药等)请自行换算毕业年份。</li>
+    <li>有复读·留级·休学时,请把合计年数填入「调整年数」(会加到大学的入学·毕业年份上)。</li>
+    <li>不支持9月入学等特殊情况。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">为什么4月1日出生算「早出生」?</h3>
+  <p class="faq-a">按日本法律,年龄是在生日前一天结束的瞬间增加1岁。4月1日出生的人在3月31日就满6周岁,满足「4月1日前满6周岁」的条件,因此进入上一个学年。</p>
+  <h3 class="faq-q">履历书该用西历还是日本年号?</h3>
+  <p class="faq-a">两者都可以,但整份材料要统一,这是基本礼节。本工具两种都会显示,请按对方指定的格式填写。</p>
+  <h3 class="faq-q">中途退学怎么写?</h3>
+  <p class="faq-a">一般写成「◯年◯月 △△大学□□学部 中途退学」(中途退学=中途退学、肄业),即写到最后在籍的时间。入学年份可以直接用本工具的结果。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=rireki">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/rireki/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, "日", Math.min(keep, max));
+  }
+  fillSelect(document.getElementById("birth-year"), 1900, 2100, "年", 2000);
+  fillSelect(document.getElementById("birth-month"), 1, 12, "月", 4);
+  fillSelect(document.getElementById("birth-day"), 1, daysInMonth(2000, 4), "日", 2);
+  function pad2(n) { return (n < 10 ? "0" : "") + n; }
+  window.__rirekiBirthISO = function () {
+    adjustDays("birth-year", "birth-month", "birth-day");
+    return val("birth-year") + "-" + pad2(val("birth-month")) + "-" + pad2(val("birth-day"));
+  };
+
+  function run() {
+    var r = RirekiCalc.schoolYears(window.__rirekiBirthISO());
+    if (!r.ok) { box.innerHTML = '<p class="result-error">请正确输入出生年月日。</p>'; box.hidden = false; return; }
+    var gap = parseInt(document.getElementById("gap").value || "0", 10);
+    if (!(gap >= 0 && gap <= 10)) gap = 0;
+    var w = RirekiCalc.wareki;
+    function row(label, inY, outY) {
+      return "<tr><td>" + label + "</td><td>" + inY + "年4月<br><span style=\"color:var(--color-muted);font-size:0.85em;\">" + w(inY) + "</span></td><td>" + outY + "年3月<br><span style=\"color:var(--color-muted);font-size:0.85em;\">" + w(outY) + "</span></td></tr>";
+    }
+    box.innerHTML =
+      '<div class="result-main">' + (r.hayaumare ? "早出生(1/1〜4/1出生·上一学年)" : "晚出生(4/2〜12/31出生)") + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>学校</th><th>入学</th><th>毕业</th></tr></thead><tbody>' +
+      row("小学", r.elemIn, r.elemOut) +
+      row("初中", r.jhsIn, r.jhsOut) +
+      row("高中", r.hsIn, r.hsOut) +
+      row("大学(4年制)", r.uniIn + gap, r.uniOut + gap) +
+      "</tbody></table></div>" +
+      (gap > 0 ? "<p>大学部分已加上调整的" + gap + "年。</p>" : "");
+    box.hidden = false;
+    if (window.__rirekiAdvRefresh) { window.__rirekiAdvRefresh(); }
+  }
+  document.getElementById("rireki-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run();
+  });
+  ["birth-year", "birth-month", "birth-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", run);
+  });
+  document.getElementById("gap").addEventListener("input", run);
+  run();
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var lastAdv = "";
+  function advCalc() {
+    var birth = window.__rirekiBirthISO();
+    var ronin = parseInt(document.getElementById("adv-ronin").value, 10) || 0;
+    var ryunen = parseInt(document.getElementById("adv-ryunen").value, 10) || 0;
+    var kyugaku = parseInt(document.getElementById("adv-kyugaku").value, 10) || 0;
+    var grad = document.getElementById("adv-grad").value;
+    return RirekiCalc.detailedYears(birth, ronin, ryunen, kyugaku, grad);
+  }
+  function advFail(code) {
+    var msg = code === "invalid_years" ? "复读·留级·休学的年数请填0〜10的整数。"
+      : "请先在上面的表单中输入出生年月日。";
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function advYm(y, m) {
+    return y + "年" + m + "月(" + RirekiCalc.wareki(y) + m + "月)";
+  }
+  function runDetail() {
+    lastAdv = "detail";
+    var r = advCalc();
+    if (!r.ok) { advFail(r.code); return; }
+    var rows = [
+      ["小学 入学", r.elemIn], ["小学 毕业", r.elemOut, true],
+      ["初中 毕业", r.jhsOut, true],
+      ["高中 入学", r.hsIn], ["高中 毕业", r.hsOut, true],
+      ["大学 入学", r.uniIn], ["大学 毕业", r.uniOut, true]
+    ];
+    if (r.msIn !== null) rows.push(["研究生院(硕士)入学", r.msIn], ["研究生院(硕士)毕业", r.msOut, true]);
+    if (r.drIn !== null) rows.push(["研究生院(博士)入学", r.drIn], ["研究生院(博士)毕业", r.drOut, true]);
+    var html = '<div class="result-main">调整后的学历一览表</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>事项</th><th>年月</th></tr></thead><tbody>';
+    for (var i = 0; i < rows.length; i++) {
+      html += "<tr><td>" + rows[i][0] + "</td><td>" + advYm(rows[i][1], rows[i][2] ? 3 : 4) + "</td></tr>";
+    }
+    html += "</tbody></table></div>" +
+      '<p class="adv-note">毕业·修了按3月、入学按4月显示,研究生院按标准年限(硕士2年·博士3年)计算。</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  function runText() {
+    lastAdv = "text";
+    var r = advCalc();
+    if (!r.ok) { advFail(r.code); return; }
+    function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+    var jhs = esc(document.getElementById("adv-jhs-name").value) || "◯◯中学校";
+    var hs = esc(document.getElementById("adv-hs-name").value) || "◯◯高等学校";
+    var uni = esc(document.getElementById("adv-uni-name").value) || "◯◯大学◯◯学部";
+    var lines = [
+      advYm(r.jhsOut, 3) + " " + jhs + " 卒業",
+      advYm(r.hsIn, 4) + " " + hs + " 入学",
+      advYm(r.hsOut, 3) + " " + hs + " 卒業",
+      advYm(r.uniIn, 4) + " " + uni + " 入学",
+      advYm(r.uniOut, 3) + " " + uni + " 卒業"
+    ];
+    if (r.msIn !== null) {
+      lines.push(advYm(r.msIn, 4) + " ◯◯大学大学院◯◯研究科(修士課程) 入学");
+      lines.push(advYm(r.msOut, 3) + " ◯◯大学大学院◯◯研究科(修士課程) 修了");
+    }
+    if (r.drIn !== null) {
+      lines.push(advYm(r.drIn, 4) + " ◯◯大学大学院◯◯研究科(博士課程) 入学");
+      lines.push(advYm(r.drOut, 3) + " ◯◯大学大学院◯◯研究科(博士課程) 修了");
+    }
+    advBox.innerHTML = '<div class="result-main">学历栏文例</div>' +
+      '<textarea rows="' + (lines.length + 1) + '" readonly style="width:100%;" aria-label="学历栏文例">' +
+      lines.join("\n").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</textarea>" +
+      '<p class="adv-note">文例为日文,可直接抄到履历书上(入学=入学、卒業=毕业、修了=修完)。括号里是日本年号,西历和日本年号请二选一,并在整份材料中统一。</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-detail-run").addEventListener("click", runDetail);
+  document.getElementById("adv-text-run").addEventListener("click", runText);
+  function refreshLast() {
+    if (advBox.hidden) { return; }
+    if (lastAdv === "detail") { runDetail(); }
+    else if (lastAdv === "text") { runText(); }
+  }
+  function onDetailParam() {
+    if (!advBox.hidden && lastAdv === "text") { runText(); } else { runDetail(); }
+  }
+  ["adv-ronin", "adv-ryunen", "adv-kyugaku"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", onDetailParam);
+  });
+  document.getElementById("adv-grad").addEventListener("change", onDetailParam);
+  ["adv-jhs-name", "adv-hs-name", "adv-uni-name"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runText);
+  });
+  window.__rirekiAdvRefresh = refreshLast;
+})();
+</script>
+</body>
+</html>

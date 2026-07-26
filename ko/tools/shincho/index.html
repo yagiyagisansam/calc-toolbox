@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>키 피트·인치 변환(170cm는 5'7″) | Quick Calc</title>
+  <meta name="description" content="키의 cm와 피트·인치 표기(5'7″ 등)를 서로 변환. 해외 프로필·운동선수 키·미국식 사이즈 표기를 바로 확인할 수 있습니다. 1피트=30.48cm의 정의값으로 계산합니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/shincho/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="키 피트·인치 변환(170cm는 5'7″) | Quick Calc">
+  <meta property="og:description" content="키의 cm와 피트·인치 표기(5'7″ 등)를 서로 변환. 해외 프로필·운동선수 키·미국식 사이즈 표기를 바로 확인할 수 있습니다. 1피트=30.48cm의 정의값으로 계산합니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/shincho/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"키 피트·인치 변환","item":"https://quick-calc.site/ko/tools/shincho/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>키 피트·인치 변환</h1>
+  <form class="tool-form" id="shincho-form">
+    <label>변환 방향
+      <select id="mode">
+        <option value="toFeet" selected>cm → 피트·인치</option>
+        <option value="toCm">피트·인치 → cm</option>
+      </select>
+    </label>
+    <div id="cm-field">
+      <label>키(cm)
+        <input type="number" id="cm" inputmode="decimal" min="30" max="300" step="any" placeholder="예: 170">
+      </label>
+    </div>
+    <div id="ft-fields" hidden>
+      <label>피트·인치
+        <span style="display:flex;gap:.5em;align-items:center;">
+          <input type="number" id="feet" inputmode="numeric" min="1" max="9" step="1" style="width:5em;" aria-label="피트"> ft
+          <input type="number" id="inches" inputmode="decimal" min="0" max="11.9" step="any" style="width:5em;" aria-label="인치"> in
+        </span>
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 앞뒤 5cm 조견표, 피트별 조견표</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">±5cm 피트·인치 조견표</h3>
+      <p class="adv-note">입력한 키를 중심으로 앞뒤 5cm(1cm 간격)의 변환표를 만듭니다.</p>
+      <label>중심이 되는 키(cm)
+        <input type="number" id="adv-cm" inputmode="decimal" min="30" max="300" step="any" placeholder="예: 170">
+      </label>
+      <div class="tool-result" id="adv-cm-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">피트별 인치 0〜11 조견표</h3>
+      <p class="adv-note">「5'9"는 몇 cm?」처럼 해외 키 표기를 연달아 확인할 때는 피트를 하나 고르면 인치 0〜11의 cm 환산을 한눈에 볼 수 있습니다.</p>
+      <label>피트
+        <select id="adv-feet">
+          <option value="4">4피트(약 122〜150cm)</option>
+          <option value="5" selected>5피트(약 152〜180cm)</option>
+          <option value="6">6피트(약 183〜211cm)</option>
+          <option value="7">7피트(약 213〜241cm)</option>
+        </select>
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>cm로 표시된 키가 미국 등 해외에서 자주 쓰는 <strong>「5피트 7인치」 같은 표현으로 얼마가 되는지</strong> 바로 알 수 있는 도구입니다. 피트·인치에서 cm로의 역변환도 가능합니다. 해외 SNS 프로필을 읽을 때나 영어로 키를 물어볼 때 활용해 보세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>변환 방향을 선택합니다.</li>
+    <li>키(cm) 또는 피트·인치를 입력합니다.</li>
+    <li>입력하는 순간 결과가 자동으로 표시됩니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>1인치 = 2.54cm, 1피트 = 12인치 = 30.48cm</strong>(정의값)</li>
+    <li>계산 예: 170cm ÷ 2.54 = 66.93인치 = 5피트+6.93인치 → 표기는 반올림하여 <strong>5'7″</strong></li>
+    <li>「'」가 피트, 「″」가 인치 기호입니다.</li>
+  </ul>
+
+  <h3>출처(1차 정보)</h3>
+  <ul class="sources">
+    <li>국제 인치의 정의값(1인치=2.54cm)에 기반한 산술 계산입니다.</li>
+  </ul>
+
+  <h2>전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>피트·인치 표기는 인치를 반올림한 「부르는 방식」이므로 ±1cm 정도의 폭이 있습니다(5'7″는 약 168.9〜171.5cm).</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">170cm는 미국에서 뭐라고 하면 되나요?</h3>
+  <p class="faq-a">「five seven(5피트 7)」이라고 하면 통합니다. 정확히는 66.93인치이며, 반올림하면 5'7″입니다.</p>
+  <h3 class="faq-q">6피트는 몇 cm인가요?</h3>
+  <p class="faq-a">182.88cm입니다. 영어권에서 「6피트」는 장신의 기준으로 자주 쓰이는 표현입니다.</p>
+  <h3 class="faq-q">몸무게의 파운드 변환도 되나요?</h3>
+  <p class="faq-a">이 페이지는 키만 변환합니다. 참고로 1파운드는 정의값으로 0.45359237kg이며, 1kg은 약 2.2파운드입니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=shincho">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/shincho/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var cmField = document.getElementById("cm-field");
+  var ftFields = document.getElementById("ft-fields");
+  function run() {
+    if (mode.value === "toFeet") {
+      if (document.getElementById("cm").value === "") { box.hidden = true; return; }
+      var r = ShinchoCalc.toFeet(parseFloat(document.getElementById("cm").value));
+      if (!r.ok) { box.innerHTML = '<p class="result-error">키는 30〜300cm 범위로 입력해 주세요.</p>'; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">' + r.feet + "'" + r.inches + "″</div>" +
+        "<p>" + r.feet + "피트 " + r.inches + "인치(정확히는 " + r.totalInches.toLocaleString() + "인치)</p>";
+    } else {
+      if (document.getElementById("feet").value === "") { box.hidden = true; return; }
+      var r2 = ShinchoCalc.toCm(parseFloat(document.getElementById("feet").value), parseFloat(document.getElementById("inches").value || "0"));
+      if (!r2.ok) { box.innerHTML = '<p class="result-error">피트는 1〜9의 정수, 인치는 0〜11.9 범위로 입력해 주세요.</p>'; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">' + r2.cm.toLocaleString() + " cm</div>";
+    }
+    box.hidden = false;
+  }
+  mode.addEventListener("change", function () {
+    var isTo = mode.value === "toFeet";
+    cmField.hidden = !isTo;
+    ftFields.hidden = isTo;
+    run();
+  });
+  ["cm", "feet", "inches"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", run);
+  });
+  document.getElementById("shincho-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run();
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var cmBox = document.getElementById("adv-cm-result");
+  var feetBox = document.getElementById("adv-result");
+
+  // ---- ±5cm 조견표(즉시) ----
+  function runCmTable() {
+    var advCm = document.getElementById("adv-cm");
+    if (advCm.value === "") { cmBox.hidden = true; return; }
+    var r = ShinchoCalc.heightTable(parseFloat(advCm.value));
+    if (!r.ok) {
+      cmBox.innerHTML = '<p class="result-error">키는 30〜300cm 범위로 입력해 주세요.</p>';
+      cmBox.hidden = false;
+      return;
+    }
+    var rows = "";
+    for (var i = 0; i < r.rows.length; i++) {
+      var row = r.rows[i];
+      var mark = row.cm === r.center ? " ← 입력값" : "";
+      rows += "<tr><td>" + row.cm.toLocaleString() + " cm" + mark + "</td><td>" +
+        row.feet + "'" + row.inches + '"' + "(" + row.feet + "피트 " + row.inches + "인치)</td></tr>";
+    }
+    cmBox.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>키</th><th>피트·인치 표기</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+    cmBox.hidden = false;
+  }
+  document.getElementById("adv-cm").addEventListener("input", runCmTable);
+
+  // ---- 피트별 조견표(즉시) ----
+  function runFeetTable() {
+    var r = ShinchoCalc.feetTable(parseInt(document.getElementById("adv-feet").value, 10));
+    if (!r.ok) { feetBox.hidden = true; return; }
+    var rows = "";
+    for (var i = 0; i < r.rows.length; i++) {
+      var row = r.rows[i];
+      rows += "<tr><td>" + r.feet + "'" + row.inches + '"' + "</td><td>" +
+        row.cm.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " cm</td></tr>";
+    }
+    feetBox.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>표기</th><th>키</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+    feetBox.hidden = false;
+  }
+  document.getElementById("adv-feet").addEventListener("change", runFeetTable);
+  runFeetTable();
+})();
+</script>
+</body>
+</html>

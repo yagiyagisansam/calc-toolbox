@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>每日所需摄入热量计算器(估算能量需要量) | Quick Calc</title>
+  <meta name="description" content="根据年龄、性别、体重和活动量,免费计算一天所需摄入热量的参考值(估算能量需要量)。基于日本厚生劳动省的基础代谢基准值和身体活动水平,可用于减肥的饮食管理。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/tdee/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="每日所需摄入热量计算器(估算能量需要量) | Quick Calc">
+  <meta property="og:description" content="根据年龄、性别、体重和活动量,免费计算一天所需摄入热量的参考值(估算能量需要量)。基于日本厚生劳动省的基础代谢基准值和身体活动水平,可用于减肥的饮食管理。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/tdee/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"每日所需摄入热量计算器(估算能量需要量)","item":"https://quick-calc.site/zh/tools/tdee/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>每日所需摄入热量计算器</h1>
+  <form class="tool-form" id="tdee-form">
+    <span class="field-note">输入年龄、性别、体重和活动水平,结果立即显示在下方</span>
+    <label>年龄(岁)
+      <span class="field-note">支持范围: 18〜120岁(面向成人)</span>
+      <input type="number" id="age" inputmode="numeric" step="1" min="18" max="120" placeholder="30" required>
+    </label>
+    <label>性别
+      <select id="sex">
+        <option value="male">男性</option>
+        <option value="female">女性</option>
+      </select>
+    </label>
+    <label>体重(kg)
+      <input type="number" id="weight" inputmode="decimal" step="any" min="20" max="300" placeholder="60" required>
+    </label>
+    <label>身体活动水平
+      <select id="pal">
+        <option value="low">Ⅰ 低(大部分时间坐着)</option>
+        <option value="normal" selected>Ⅱ 普通(有通勤、家务、轻度运动)</option>
+        <option value="high">Ⅲ 高(站立工作或有活跃的运动习惯)</option>
+      </select>
+    </label>
+    <button type="submit">计算</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 由目标体重反算·PFC三大营养素配比</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">反算达到目标体重的「每日目标摄入热量」</h3>
+      <p class="adv-note">输入目标体重和期限,按体脂肪1kg≒7,200kcal的参考值,反算「每天该控制在(或增加到)多少kcal」(其余项目使用上面输入的值)。</p>
+      <label>目标体重(kg)
+        <input type="number" id="adv-target-weight" inputmode="decimal" step="any" min="20" max="300" placeholder="例: 60">
+      </label>
+      <label>目标期限(个月)
+        <input type="number" id="adv-months" inputmode="numeric" step="1" min="1" max="60" value="3">
+      </label>
+      <button type="button" id="adv-goal-run">反算目标摄入热量</button>
+
+      <h3 class="adv-h">这些热量该吃什么、吃多少?(PFC配比)</h3>
+      <p class="adv-note">根据一天的摄入热量,按日本国家目标量计算蛋白质(P)、脂肪(F)、碳水化合物(C)各应摄入多少克(在上面反算后会自动填入)。</p>
+      <label>一天的摄入热量(kcal)
+        <input type="number" id="adv-pfc-kcal" inputmode="numeric" step="1" min="400" max="10000" placeholder="例: 2000">
+      </label>
+      <button type="button" id="adv-pfc-run">计算PFC参考值</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    本工具的计算结果为<strong>约值</strong>。体格、肌肉量、活动内容不同会有个人差异,孕期、哺乳期或患有疾病者不适用。饮食治疗请遵循医生和注册营养师的指导。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>只需选择年龄、性别、体重和每天的活动量,就能知道<strong>一天可以吃多少热量的参考值</strong>。计算采用日本《饮食摄取基准》的思路,即日本营养指导所使用的国家标准。适合在减肥或增肌时制定饮食计划。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>输入年龄、性别和体重。</li>
+    <li>选择最接近平时活动量的「身体活动水平」。拿不准就选「Ⅱ 普通」。</li>
+    <li>输入的同时,一天的摄入热量参考值和基础代谢量立即显示在下方,无需点击按钮。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>摄入热量参考值(估算能量需要量) = 基础代谢量 × 身体活动水平</strong></li>
+    <li>基础代谢量 = 基础代谢基准值(按年龄段、男女分列) × 体重(与本站基础代谢量计算相同的方式)</li>
+    <li>身体活动水平(成人的代表值): <strong>Ⅰ 低=1.50 / Ⅱ 普通=1.75 / Ⅲ 高=2.00</strong></li>
+    <li>计算示例: 30岁男性70kg·普通 → 基础代谢约1,561kcal × 1.75 = <strong>约2,732kcal/日</strong></li>
+  </ul>
+
+  <h3>出处(一次信息)</h3>
+  <ul class="sources">
+    <li>日本厚生劳动省 e-健康网「加龄与能量代谢」(基础代谢基准值表)(日文)<br>
+      <a href="https://kennet.mhlw.go.jp/information/information/food/e-07-002.html" rel="noopener" target="_blank">https://kennet.mhlw.go.jp/information/information/food/e-07-002.html</a>(2026年7月18日查阅)</li>
+    <li>日本厚生劳动省《日本人饮食摄取基准(2025年版)》制定要点(估算能量需要量·身体活动水平)(日文)<br>
+      <a href="https://www.mhlw.go.jp/content/10904750/001396865.pdf" rel="noopener" target="_blank">https://www.mhlw.go.jp/content/10904750/001396865.pdf</a>(2026年7月18日查阅)</li>
+  </ul>
+
+  <h2>前提与注意</h2>
+  <ul class="cautions">
+    <li>该数值是「维持现在体重」所需能量的参考值。想减重就比它少吃,想增重就多吃,但极端限制会损害健康。</li>
+    <li>身体活动水平的代表值为成人数值。高龄者即使同一档,实际水平也往往偏低一些。</li>
+    <li>未满18岁(生长发育期)适用其他标准,不在本工具适用范围内。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">想瘦下来的话,应该吃多少kcal?</h3>
+  <p class="faq-a">一般认为,每天比该参考值少摄入200〜500kcal左右可实现平缓减重;但大幅低于所需量的限制会导致肌肉减少和反弹。具体目标请咨询医生或注册营养师。</p>
+  <h3 class="faq-q">和基础代谢量有什么区别?</h3>
+  <p class="faq-a">基础代谢量是「即使安静不动也会消耗的最低限度能量」;本工具的结果是在其基础上乘以日常活动量,得出「与一天消耗相当的摄入量参考值」。</p>
+  <h3 class="faq-q">身体活动水平该怎么选?</h3>
+  <p class="faq-a">以办公桌工作为主、移动也少选Ⅰ;有通勤、购物、家务或轻度运动选Ⅱ;站立工作或运动习惯活跃选Ⅲ。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=tdee">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/tdee/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_age: "年龄请在 18〜120岁 范围内以整数输入。",
+    invalid_sex: "请选择性别。",
+    invalid_weight: "体重请在 20〜300kg 范围内输入。",
+    invalid_pal: "请选择身体活动水平。"
+  };
+  var box = document.getElementById("result");
+  var ageEl = document.getElementById("age");
+  var weightEl = document.getElementById("weight");
+  function run() {
+    if (ageEl.value === "" || weightEl.value === "") { box.hidden = true; return; }
+    var result = TdeeCalc.calculate(
+      parseFloat(ageEl.value),
+      document.getElementById("sex").value,
+      parseFloat(weightEl.value),
+      document.getElementById("pal").value
+    );
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">约 ' + result.tdeeKcal.toLocaleString() + " kcal/日</div>" +
+        "<p>基础代谢量: <strong>约" + result.bmrKcal.toLocaleString() + " kcal/日</strong> × 身体活动水平 " + result.palValue.toFixed(2) + "</p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "请检查输入的数值。") + "</p>";
+    }
+    box.hidden = false;
+  }
+  ageEl.addEventListener("input", run);
+  weightEl.addEventListener("input", run);
+  document.getElementById("sex").addEventListener("change", run);
+  document.getElementById("pal").addEventListener("change", run);
+  document.getElementById("tdee-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var lastAdv = null;
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function runGoal(fromButton) {
+    var age = parseInt(document.getElementById("age").value, 10);
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(age) || !isFinite(w)) { if (fromButton) advErr("请先在上面的表单中输入年龄、性别和体重。"); return; }
+    var twEl = document.getElementById("adv-target-weight");
+    if (twEl.value === "") { if (fromButton) advErr("请输入目标体重。"); return; }
+    if (document.getElementById("adv-months").value === "") { if (fromButton) advErr("请输入目标期限。"); return; }
+    var r = TdeeCalc.targetIntake(
+      age,
+      document.getElementById("sex").value,
+      w,
+      document.getElementById("pal").value,
+      parseFloat(twEl.value),
+      parseFloat(document.getElementById("adv-months").value)
+    );
+    if (!r.ok) {
+      var msg = r.code === "invalid_target_weight" ? "目标体重请在20〜300kg范围内输入。"
+        : r.code === "invalid_months" ? "目标期限请在1〜60个月范围内输入。"
+        : "请检查上面表单中的输入值。";
+      advErr(msg);
+      return;
+    }
+    var adjustText;
+    if (r.dailyAdjustKcal > 0) {
+      adjustText = "相当于每天少摄入约 " + r.dailyAdjustKcal.toLocaleString() + " kcal。";
+    } else if (r.dailyAdjustKcal < 0) {
+      adjustText = "相当于每天多摄入约 " + Math.abs(r.dailyAdjustKcal).toLocaleString() + " kcal。";
+    } else {
+      adjustText = "相当于保持现在的体重。";
+    }
+    var html =
+      '<div class="result-main">每日目标 约 ' + r.targetIntakeKcal.toLocaleString() + " kcal</div>" +
+      "<p>相对于一天约 " + r.tdeeKcal.toLocaleString() + " kcal 的消耗参考值," + adjustText + "</p>";
+    if (r.warning) {
+      html += '<p class="result-error">注意: 目标低于基础代谢量(约 ' + r.bmrKcal.toLocaleString() +
+        " kcal)。极端的饮食限制会损害身体,请拉长期限或重新设定目标。</p>";
+    }
+    html += '<p class="adv-note">按体脂肪1kg≒7,200kcal、1个月≒30天的概算。实际的减重速度因人而异。</p>';
+    var pfcEl = document.getElementById("adv-pfc-kcal");
+    if (pfcEl.value === "" && r.targetIntakeKcal >= 400) {
+      pfcEl.value = r.targetIntakeKcal;
+    }
+    lastAdv = runGoal;
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  function runPfc(fromButton) {
+    var kEl = document.getElementById("adv-pfc-kcal");
+    if (kEl.value === "") { if (fromButton) advErr("请输入一天的摄入热量。"); return; }
+    var r = TdeeCalc.pfcBalance(parseFloat(kEl.value));
+    if (!r.ok) { advErr("热量请在400〜10,000kcal范围内输入。"); return; }
+    lastAdv = runPfc;
+    advBox.innerHTML =
+      '<div class="result-main">' + parseFloat(kEl.value).toLocaleString() + " kcal 的PFC配比参考</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>营养素</th><th>一天的参考量</th></tr></thead><tbody>' +
+      "<tr><td>蛋白质(P)</td><td>" + r.proteinMinG.toLocaleString() + "〜" + r.proteinMaxG.toLocaleString() + " g</td></tr>" +
+      "<tr><td>脂肪(F)</td><td>" + r.fatMinG.toLocaleString() + "〜" + r.fatMaxG.toLocaleString() + " g</td></tr>" +
+      "<tr><td>碳水化合物(C)</td><td>" + r.carbMinG.toLocaleString() + "〜" + r.carbMaxG.toLocaleString() + " g</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">基于《日本人饮食摄取基准(2020年版)》的目标量(蛋白质13〜20%·脂肪20〜30%·碳水化合物50〜65%)的参考值。</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-goal-run").addEventListener("click", function () { runGoal(true); });
+  document.getElementById("adv-pfc-run").addEventListener("click", function () { runPfc(true); });
+  document.getElementById("adv-target-weight").addEventListener("input", function () { runGoal(false); });
+  document.getElementById("adv-months").addEventListener("input", function () { runGoal(false); });
+  document.getElementById("adv-pfc-kcal").addEventListener("input", function () { runPfc(false); });
+  ["age", "weight"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { if (lastAdv === runGoal) runGoal(false); });
+  });
+  ["sex", "pal"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", function () { if (lastAdv === runGoal) runGoal(false); });
+  });
+})();
+</script>
+</body>
+</html>

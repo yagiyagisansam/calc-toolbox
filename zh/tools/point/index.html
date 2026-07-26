@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>打折和积分返还哪个划算?计算器(比较实际价格) | Quick Calc</title>
+  <meta name="description" content="「10%OFF」和「10%积分返还」其实不一样?计算实际价格和折扣换算率(10%返还≈9.09%OFF),一键判定哪个更划算。用于比较日本的打折与积分活动。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/point/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="打折和积分返还哪个划算?计算器(比较实际价格) | Quick Calc">
+  <meta property="og:description" content="「10%OFF」和「10%积分返还」其实不一样?计算实际价格和折扣换算率(10%返还≈9.09%OFF),一键判定哪个更划算。用于比较日本的打折与积分活动。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/point/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"打折和积分返还哪个划算?计算器(比较实际价格)","item":"https://quick-calc.site/zh/tools/point/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>打折和积分返还哪个划算?计算器</h1>
+  <form class="tool-form" id="point-form">
+    <label>商品价格(日元)
+      <input type="number" id="price" inputmode="numeric" min="1" step="1" required placeholder="例: 10000">
+    </label>
+    <label>方案① 折扣率(%OFF)
+      <input type="number" id="discount" inputmode="decimal" min="0" max="99.9" step="any" required placeholder="例: 10">
+    </label>
+    <label>方案② 积分返还率(%)
+      <input type="number" id="point" inputmode="decimal" min="0" max="100" step="any" required placeholder="例: 10">
+    </label>
+    <span class="field-note">输入3项后自动判定</span>
+    <button type="submit">计算哪个划算</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 打平所需的返还率与积分用不完的情况</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">和○%OFF打平需要多少返还率?</h3>
+      <p class="adv-note">「是买打○%折的,还是参加积分返还活动?」——倒推两者打平的临界返还率。</p>
+      <label>折扣率(%OFF)
+        <input type="number" id="adv-bdisc" inputmode="decimal" step="any" min="0" max="99.9" placeholder="10">
+      </label>
+      <button type="button" id="adv-be-run">计算打平的返还率</button>
+      <div class="tool-result" id="adv-be-result" hidden aria-live="polite"></div>
+      <h3 class="adv-h">积分不会全部用掉的话?</h3>
+      <p class="adv-note">按「大概只会用掉7成」等积分用不完的情况,计算实际能省多少。</p>
+      <label>商品价格(日元)
+        <input type="number" id="adv-uprice" inputmode="numeric" step="1" min="1" placeholder="10000">
+      </label>
+      <label>积分返还率(%)
+        <input type="number" id="adv-upoint" inputmode="decimal" step="any" min="0" max="100" placeholder="10">
+      </label>
+      <label>积分使用率(%·全部用掉填100)
+        <input type="number" id="adv-uuse" inputmode="decimal" step="any" min="0" max="100" value="70">
+      </label>
+      <button type="button" id="adv-use-run">计算实际省多少</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>「10%OFF」和「10%积分返还」——看起来一样,<strong>其实打折稍微更划算</strong>。本工具计算两种方案的实际支出并判定哪个更划算。日本的商店和无现金支付常有积分返还活动,在打折价和积分活动之间犹豫时可以用它比一比。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>输入商品价格。</li>
+    <li>输入要比较的「折扣率」和「积分返还率」(其中一个为0也可以)。</li>
+    <li>3项输完的同时,判定结果和实际价格对比表立即显示,无需点击按钮。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>打折: 支付额 = 价格 × (1 − 折扣率÷100)</strong></li>
+    <li><strong>积分返还: 实际负担 = 价格 × (1 − 返还率÷100)</strong>(前提是获得的积分日后全部用掉)</li>
+    <li>但积分返还时「实际支付的钱」仍是原价。每100日元返r日元积分,<strong>换算成折扣率是 100r ÷ (100 + r) %</strong>(10%返还即 1000÷110 = 约9.09%OFF)。同样的数字下打折更划算,原因就在这里。</li>
+    <li>计算例: 1万日元的商品,「10%OFF」支付9,000日元;「10%返还」支付10,000日元+得1,000积分(实际相当于9,000日元),但换算成折扣只有9.09%,所以<strong>10%OFF更划算</strong>。</li>
+  </ul>
+
+  <h3>出处·前提说明</h3>
+  <ul class="sources">
+    <li>算术计算。积分按「1积分=1日元、日后可全额使用」的前提计算。</li>
+  </ul>
+
+  <h2>前提与注意</h2>
+  <ul class="cautions">
+    <li>如果积分有有效期、用途受限或容易失效,实际价值会低于计算值。</li>
+    <li>很多制度对「用积分支付的部分」不再送积分,这也是返还比打折稍微吃亏的原因之一。</li>
+    <li>有返还上限(例: 最多2,000积分)的活动,商品越贵实际返还率越低。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">为什么「10%OFF」和「10%返还」不一样?</h3>
+  <p class="faq-a">10%OFF是花9,000日元买到1万日元的商品。10%返还是付1万日元、得1,000日元积分,相当于「花1万日元买到11,000日元的价值」,换算成折扣率约9.09%。先少付钱的打折总是稍微更划算。</p>
+  <h3 class="faq-q">多少返还率才和「20%OFF」打平?</h3>
+  <p class="faq-a">25%返还。把r=25代入换算式 100r÷(100+r),得 2500÷125=20%,正好相当于20%OFF。</p>
+  <h3 class="faq-q">反正积分都会用掉,那不是实际一样吗?</h3>
+  <p class="faq-a">如果确定能全部用完,实际负担额确实相同(1万日元·10%时双方都是9,000日元)。但返还是「钱先花出去」,还有失效·忘记使用的风险,这点上不利。本工具同时显示两种视角(实际负担额和折扣换算率)。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=point">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/point/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var ERROR_MESSAGES = {
+    invalid_price: "价格请输入1日元以上。",
+    invalid_discount: "折扣率请在0〜99.9%范围内输入。",
+    invalid_point: "返还率请在0〜100%范围内输入。"
+  };
+  var VERDICT = {
+    discount: "打折(○%OFF)更划算",
+    point: "积分返还更划算",
+    even: "两者基本打平"
+  };
+  function runMain() {
+    if (document.getElementById("price").value === "" ||
+        document.getElementById("discount").value === "" ||
+        document.getElementById("point").value === "") { box.hidden = true; return; }
+    var price = parseFloat(document.getElementById("price").value);
+    var d = parseFloat(document.getElementById("discount").value);
+    var p = parseFloat(document.getElementById("point").value);
+    var r = PointCalc.compare(price, d, p);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "请检查输入的数值。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">' + VERDICT[r.better].replace("○", d.toLocaleString()) + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>方案</th><th>支付额</th><th>实际负担</th></tr></thead><tbody>' +
+      "<tr><td>" + d.toLocaleString() + "%OFF</td><td>" + r.discounted.toLocaleString() + "日元</td><td>" + r.discounted.toLocaleString() + "日元</td></tr>" +
+      "<tr><td>" + p.toLocaleString() + "%返还</td><td>" + price.toLocaleString() + "日元</td><td>" + r.pointNet.toLocaleString() + "日元(+" + r.pointValue.toLocaleString() + "积分)</td></tr>" +
+      "</tbody></table></div>" +
+      "<p>" + p.toLocaleString() + "%返还换算成折扣约相当于 <strong>" + r.pointEquivPct.toLocaleString() + "%OFF</strong>(前提是积分全部用掉)。</p>";
+    box.hidden = false;
+  }
+  document.getElementById("point-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
+  });
+  ["price", "discount", "point"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runMain);
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var beBox = document.getElementById("adv-be-result");
+  var advBox = document.getElementById("adv-result");
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
+  }
+  function runBreakeven() {
+    var d = parseFloat(document.getElementById("adv-bdisc").value);
+    if (isNaN(d)) { showError(beBox, "请输入折扣率。"); return; }
+    var r = PointCalc.breakevenPoint(d);
+    if (!r.ok) { showError(beBox, "折扣率请输入0以上、100以下(不含100)。"); return; }
+    beBox.innerHTML =
+      '<div class="result-main">返还率 ' + r.pointPct.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " % 时打平</div>" +
+      '<p class="adv-note">要和 ' + d.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%OFF 一样划算,积分返还需要达到 " + r.pointPct.toLocaleString(undefined, { maximumFractionDigits: 2 }) + "%。低于这个返还率就选打折更划算(前提是积分全部用完)。</p>";
+    beBox.hidden = false;
+  }
+  function runPartialUse() {
+    var price = parseFloat(document.getElementById("adv-uprice").value);
+    var pt = parseFloat(document.getElementById("adv-upoint").value);
+    var use = parseFloat(document.getElementById("adv-uuse").value);
+    if (isNaN(price) || isNaN(pt) || isNaN(use)) { showError(advBox, "请输入价格·返还率·使用率。"); return; }
+    var r = PointCalc.partialUse(price, pt, use);
+    if (!r.ok) { showError(advBox, "价格请输入1〜1,000万日元,返还率和使用率请输入0〜100%。"); return; }
+    advBox.innerHTML =
+      '<div class="result-main">实际相当于 ' + r.effectivePct.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " %OFF</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>可得积分</td><td>" + r.earned.toLocaleString() + " 日元分</td></tr>" +
+      "<tr><td>实际会用的部分(" + use.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%)</td><td>" + r.used.toLocaleString() + " 日元分</td></tr>" +
+      "<tr><td>实际负担</td><td>" + r.net.toLocaleString() + " 日元</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">不会用掉的积分按价值为零计算。</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-be-run").addEventListener("click", runBreakeven);
+  document.getElementById("adv-use-run").addEventListener("click", runPartialUse);
+  document.getElementById("adv-bdisc").addEventListener("input", function () {
+    if (document.getElementById("adv-bdisc").value !== "") runBreakeven();
+  });
+  ["adv-uprice", "adv-upoint", "adv-uuse"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-uprice").value !== "" &&
+          document.getElementById("adv-upoint").value !== "" &&
+          document.getElementById("adv-uuse").value !== "") runPartialUse();
+    });
+  });
+})();
+</script>
+</body>
+</html>

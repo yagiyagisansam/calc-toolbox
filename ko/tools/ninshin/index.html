@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>출산 예정일·임신 주수 계산기(마지막 생리일 기준·주기 보정 지원) | Quick Calc</title>
+  <meta name="description" content="마지막 생리 시작일로 출산 예정일과 현재 임신 주수(〇주 △일)를 무료로 계산. 생리 주기가 28일이 아닐 때의 보정도 지원하며 임신 초기·중기·후기 구분도 표시합니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/ninshin/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="출산 예정일·임신 주수 계산기(마지막 생리일 기준·주기 보정 지원) | Quick Calc">
+  <meta property="og:description" content="마지막 생리 시작일로 출산 예정일과 현재 임신 주수(〇주 △일)를 무료로 계산. 생리 주기가 28일이 아닐 때의 보정도 지원하며 임신 초기·중기·후기 구분도 표시합니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/ninshin/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"출산 예정일·임신 주수 계산기","item":"https://quick-calc.site/ko/tools/ninshin/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>출산 예정일·임신 주수 계산기</h1>
+  <form class="tool-form" id="ninshin-form">
+    <span class="field-note">마지막 생리 시작일을 고르면 바로 아래에 예정일과 주수가 표시됩니다</span>
+    <div class="field-row">
+      <label>마지막 생리 시작일(년)
+        <select id="lmp-year"></select>
+      </label>
+      <label>월
+        <select id="lmp-month"></select>
+      </label>
+      <label>일
+        <select id="lmp-day"></select>
+      </label>
+    </div>
+    <label>생리 주기(일)
+      <span class="field-note">모르면 28 그대로 두면 됩니다</span>
+      <input type="number" id="cycle" inputmode="numeric" min="20" max="45" step="1" value="28" required>
+    </label>
+    <label>기준일(이 날짜 시점으로 계산)
+      <span class="field-note">초기값은 오늘</span>
+      <input type="date" id="asof" min="1900-01-01" max="2200-12-31" required>
+    </label>
+    <div class="tool-result" id="result" aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 출산 예정일로 주수와 주요 시점 알아보기</summary>
+    <div class="adv-inner">
+      <p class="adv-note">마지막 생리일을 몰라도 병원에서 들은 출산 예정일(40주 0일)로 역산할 수 있습니다.</p>
+      <div class="field-row">
+        <label>출산 예정일(년)
+          <select id="due-year"></select>
+        </label>
+        <label>월
+          <select id="due-month"></select>
+        </label>
+        <label>일
+          <select id="due-day"></select>
+        </label>
+      </div>
+
+      <h3 class="adv-h">오늘로 임신 몇 주 며칠?</h3>
+      <label>기준일(초기값은 오늘)
+        <input type="date" id="adv-asof">
+      </label>
+      <div class="tool-result" id="adv-week-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">주요 시점 날짜 일람</h3>
+      <p class="adv-note">안정기 기준·산전 휴업(일본 기준) 시작·정기산(만삭) 시작·산후 휴업 종료 등의 날짜 일람입니다.</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    이 도구의 결과는 <strong>생리 주기에 따른 대략적인 값</strong>입니다. 실제 출산 예정일은 임신 초기 초음파 검사(태아 크기)를 바탕으로 <strong>의사가 정한 날짜가 우선</strong>됩니다. 임신 판정과 건강 관리는 반드시 산부인과에서 진료를 받아 주세요.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>마지막 생리 시작일만 입력하면 <strong>출산 예정일과 지금이 임신 몇 주 며칠인지</strong> 알 수 있는 도구입니다. 생리 주기가 28일이 아닐 때의 보정도 가능합니다. 주수를 마지막 생리 시작일부터 세는 것은 일본 산부인과의 표준 방식입니다. 일본에서 모자건강수첩(母子手帳)을 받기 전의 셀프 체크나 가족에게 알릴 시기를 생각할 때 활용해 보세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>마지막 생리(가장 최근 생리)가 시작된 날을 선택합니다.</li>
+    <li>생리 주기를 알면 입력합니다(28일이 아니면 예정일이 보정됩니다).</li>
+    <li>선택하는 순간 출산 예정일·현재 주수·임신 구분이 표시됩니다. 버튼은 필요 없습니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>출산 예정일 = 마지막 생리 시작일 + 280일</strong>(임신 40주 0일). 임신 주수를 마지막 생리 시작일부터 세는 것은 산과의 표준적인 방법(네겔레 법칙)입니다.</li>
+    <li>생리 주기가 28일이 아니면 배란일의 차이를 보정하기 위해 <strong>(주기 − 28)일</strong>을 더하거나 뺍니다(예: 주기가 35일이면 예정일은 7일 뒤로).</li>
+    <li>임신 주수 = 기점부터의 경과 일수 ÷ 7(버림). 나머지가 「일」이 됩니다.</li>
+    <li>구분: 임신 13주까지=초기 / 14〜27주=중기 / 28주부터=후기</li>
+    <li>계산 예: 마지막 생리가 1월 1일(주기 28일) → 예정일은 10월 8일. 7월 24일 시점에는 임신 29주 1일(후기).</li>
+  </ul>
+
+  <h3>출처(1차 정보)</h3>
+  <ul class="sources">
+    <li>임신 기간을 세는 방법(마지막 생리 첫날부터 40주 0일을 출산 예정일로 함): <a href="https://www.jsog.or.jp/citizen/5713/" target="_blank" rel="noopener">일본산과부인과학회 「산과·부인과 질환: 임신·출산 관련 용어 해설」</a>(일본어)</li>
+    <li>주기 보정은 네겔레 법칙에 기반한 일반적인 조정 방법입니다.</li>
+  </ul>
+
+  <h2>전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>생리 주기가 불규칙한 분은 이 계산의 오차가 커집니다. 최종 예정일은 초음파 검사로 의사가 확정합니다.</li>
+    <li>예정일 당일에 태어나는 경우는 일부이며, 정기산(37주 0일〜41주 6일) 범위에서의 출산이 일반적입니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">예정일에 맞춰 태어나나요?</h3>
+  <p class="faq-a">예정일은 어디까지나 「40주 0일」의 기준일입니다. 37주 0일〜41주 6일의 출산은 정기산이라고 하며, 대부분의 출산이 이 범위에서 이루어집니다. 예정일 전후 2주 정도는 폭이 있다고 생각해 두면 안심입니다.</p>
+  <h3 class="faq-q">병원에서 들은 예정일과 이 도구의 결과가 다릅니다. 왜인가요?</h3>
+  <p class="faq-a">산부인과에서는 임신 초기 초음파 검사로 태아의 크기(머리엉덩길이)를 재서 예정일을 수정하는 경우가 있기 때문입니다. <strong>의사가 정한 예정일이 맞는 값</strong>이며, 이 도구는 진료 전의 참고용으로 사용해 주세요.</p>
+  <h3 class="faq-q">「임신 〇개월」과는 어떻게 대응하나요?</h3>
+  <p class="faq-a">일본에서는 임신 1개월=0〜3주, 2개월=4〜7주처럼 4주를 1개월로 셉니다. 예를 들어 12주는 임신 4개월, 20주는 임신 6개월에 해당합니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=ninshin">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/ninshin/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var today = new Date();
+
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, "일", Math.min(keep, max));
+  }
+  function isoOf(prefix) {
+    adjustDays(prefix + "-year", prefix + "-month", prefix + "-day");
+    return val(prefix + "-year") + "-" +
+      String(val(prefix + "-month")).padStart(2, "0") + "-" +
+      String(val(prefix + "-day")).padStart(2, "0");
+  }
+  function initDate(prefix, yFrom, yTo) {
+    fillSelect(document.getElementById(prefix + "-year"), yFrom, yTo, "년", today.getFullYear());
+    fillSelect(document.getElementById(prefix + "-month"), 1, 12, "월", today.getMonth() + 1);
+    fillSelect(document.getElementById(prefix + "-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), "일", today.getDate());
+  }
+  window.NinshinUi = { isoOf: isoOf, initDate: initDate };
+
+  initDate("lmp", today.getFullYear() - 2, today.getFullYear());
+
+  var box = document.getElementById("result");
+  var asofInput = document.getElementById("asof");
+  asofInput.value = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + String(today.getDate()).padStart(2, "0");
+
+  var TRIMESTER_KO = { "初期": "초기", "中期": "중기", "後期": "후기" };
+  var ERROR_MESSAGES = {
+    invalid_asof: "기준일을 올바르게 입력해 주세요.",
+    invalid_cycle: "생리 주기는 20〜45일의 정수로 입력해 주세요.",
+    lmp_after_asof: "마지막 생리 시작일이 기준일보다 뒤에 있습니다."
+  };
+  function run() {
+    var lmp = isoOf("lmp");
+    var cycle = document.getElementById("cycle").value;
+    if (cycle === "" || asofInput.value === "") { box.hidden = true; return; }
+    var r = NinshinCalc.dueDate(lmp, asofInput.value, parseInt(cycle, 10));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "입력값을 확인해 주세요.") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var over = r.week >= 42 ? '<p class="result-error">계산상 42주를 넘습니다. 입력한 날짜를 확인해 주세요.</p>' : "";
+    box.innerHTML =
+      '<div class="result-main">출산 예정일 ' + r.due + "</div>" +
+      "<p>기준일 시점으로 <strong>임신 " + r.week + "주 " + r.day + "일</strong>(임신 " + (TRIMESTER_KO[r.trimester] || r.trimester) + ")</p>" + over +
+      "<p>※의사의 진단에 따른 예정일이 우선됩니다.</p>";
+    box.hidden = false;
+  }
+  ["lmp-year", "lmp-month", "lmp-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", run);
+  });
+  document.getElementById("cycle").addEventListener("input", run);
+  asofInput.addEventListener("change", run);
+  asofInput.addEventListener("input", run);
+  document.getElementById("ninshin-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var isoOf = window.NinshinUi.isoOf;
+  var today = new Date();
+  window.NinshinUi.initDate("due", today.getFullYear() - 1, today.getFullYear() + 1);
+
+  var weekBox = document.getElementById("adv-week-result");
+  var msBox = document.getElementById("adv-result");
+  var advAsof = document.getElementById("adv-asof");
+  advAsof.value = today.getFullYear() + "-" +
+    ("0" + (today.getMonth() + 1)).slice(-2) + "-" + ("0" + today.getDate()).slice(-2);
+
+  var TRIMESTER_KO = { "初期": "초기", "中期": "중기", "後期": "후기" };
+  var MILESTONE_LABEL_KO = {
+    "妊娠中期の開始": "임신 중기 시작",
+    "安定期の目安(16週)": "안정기 기준(16주)",
+    "妊娠後期の開始": "임신 후기 시작",
+    "産前休業の開始(予定日の6週間前)": "산전 휴업 시작(일본 기준·예정일 6주 전)",
+    "正期産の開始": "정기산(만삭) 시작",
+    "出産予定日": "출산 예정일",
+    "産後休業の終了(出産の8週間後)": "산후 휴업 종료(일본 기준·출산 8주 후)"
+  };
+  var MILESTONE_WEEKS_KO = {
+    "14週0日": "14주 0일",
+    "16週0日": "16주 0일",
+    "28週0日": "28주 0일",
+    "34週0日": "34주 0일",
+    "37週0日": "37주 0일",
+    "40週0日": "40주 0일",
+    "出産の8週間後": "출산 8주 후"
+  };
+
+  function koDate(iso) {
+    var p = iso.split("-");
+    return parseInt(p[0], 10) + "년 " + parseInt(p[1], 10) + "월 " + parseInt(p[2], 10) + "일";
+  }
+
+  // ---- 예정일로 주수(즉시) ----
+  function runWeek() {
+    if (advAsof.value === "") { weekBox.hidden = true; return; }
+    var r = NinshinCalc.weeksFromDue(isoOf("due"), advAsof.value);
+    if (!r.ok) {
+      var msg = r.code === "too_early" ? "기준일이 너무 이릅니다(임신 0주보다 앞이 됩니다). 예정일과 기준일을 확인해 주세요."
+        : r.code === "out_of_range" ? "기준일이 예정일에서 너무 멀리 떨어져 있습니다(43주 이후). 예정일과 기준일을 확인해 주세요."
+        : "날짜를 올바르게 입력해 주세요.";
+      weekBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+      weekBox.hidden = false;
+      return;
+    }
+    weekBox.innerHTML =
+      '<div class="result-main">임신 ' + r.week + '주 ' + r.day + '일</div>' +
+      "<p>구분: 임신 " + (TRIMESTER_KO[r.trimester] || r.trimester) + "(임신 " + r.elapsedDays.toLocaleString() + "일째)</p>" +
+      '<p class="adv-note">예정일을 40주 0일로 본 대략적인 값이므로, 주수의 정식 판단은 의사에게 확인해 주세요.</p>';
+    weekBox.hidden = false;
+  }
+
+  // ---- 주요 시점 날짜 일람(즉시) ----
+  function runMilestones() {
+    var r = NinshinCalc.milestones(isoOf("due"));
+    if (!r.ok) { msBox.hidden = true; return; }
+    var rows = "";
+    for (var i = 0; i < r.rows.length; i++) {
+      var m = r.rows[i];
+      rows += "<tr><td>" + (MILESTONE_LABEL_KO[m.label] || m.label) + "</td><td>" + (MILESTONE_WEEKS_KO[m.weeks] || m.weeks) + "</td><td>" + koDate(m.date) + "</td></tr>";
+    }
+    msBox.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>시점</th><th>주수</th><th>날짜</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>" +
+      '<p class="adv-note">산전·산후 휴업은 일본 노동기준법의 일수(산전 6주·산후 8주, 다태 임신은 산전 14주)로 계산한 주수 기반의 대략적인 값이므로, 의학적 판단은 반드시 의사와 상담해 주세요.</p>';
+    msBox.hidden = false;
+  }
+
+  function runAdv() { runWeek(); runMilestones(); }
+  ["due-year", "due-month", "due-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runAdv);
+  });
+  advAsof.addEventListener("change", runWeek);
+  advAsof.addEventListener("input", runWeek);
+  runAdv();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Japanese Tablespoon, Teaspoon &amp; Cup Converter (Instant ml) | Quick Calc</title>
+  <meta name="description" content="Convert between Japanese kitchen measures — 1 tablespoon = 15 ml, 1 teaspoon = 5 ml, 1 cup = 200 ml. Instant answers to “how many ml is 3 tablespoons?” and “how many tablespoons is 50 ml?”. For adjusting recipes or cooking without measuring spoons.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/spoon/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Japanese Tablespoon, Teaspoon &amp; Cup Converter (Instant ml) | Quick Calc">
+  <meta property="og:description" content="Convert between Japanese kitchen measures — 1 tablespoon = 15 ml, 1 teaspoon = 5 ml, 1 cup = 200 ml. Instant answers to “how many ml is 3 tablespoons?” and “how many tablespoons is 50 ml?”. For adjusting recipes or cooking without measuring spoons.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/spoon/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Japanese Tablespoon, Teaspoon &amp; Cup Converter","item":"https://quick-calc.site/en/tools/spoon/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Japanese Tablespoon, Teaspoon &amp; Cup Converter</h1>
+  <form class="tool-form" id="spoon-form">
+    <label>Amount
+      <span class="field-note">The conversion appears right below as you type</span>
+      <input type="number" id="value" inputmode="decimal" min="0" step="any" required placeholder="e.g. 3">
+    </label>
+    <label>Unit
+      <select id="unit">
+        <option value="tbsp" selected>Tablespoon (ōsaji)</option>
+        <option value="tsp">Teaspoon (kosaji)</option>
+        <option value="cup">Cup (200 ml)</option>
+        <option value="ml">ml (cc)</option>
+      </select>
+    </label>
+    <button type="submit">Convert</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: convert to and from the weight (grams) of an ingredient</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Tablespoons and teaspoons → grams</h3>
+      <p class="adv-note">The same tablespoon weighs a different number of grams depending on the ingredient (water 15 g, sugar 9 g, soy sauce 18 g and so on), so this calculates the weight from the spoons and the ingredient.</p>
+      <label>Tablespoons
+        <input type="number" id="adv-tbsp" inputmode="decimal" min="0" step="any" value="1" placeholder="e.g. 2">
+      </label>
+      <label>Teaspoons
+        <input type="number" id="adv-tsp" inputmode="decimal" min="0" step="any" value="0" placeholder="e.g. 1">
+      </label>
+      <label>Ingredient
+        <select id="adv-mat">
+          <option value="water">Water</option>
+          <option value="sugar" selected>Sugar (Japanese white sugar)</option>
+          <option value="salt">Salt (table salt)</option>
+          <option value="flour">Flour (cake flour)</option>
+          <option value="oil">Oil</option>
+          <option value="soy">Soy sauce</option>
+          <option value="miso">Miso</option>
+        </select>
+      </label>
+      <button type="button" id="adv-grams-run">Convert to grams</button>
+      <div class="tool-result" id="adv-grams-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">Grams → tablespoons and teaspoons</h3>
+      <p class="adv-note">The reverse conversion for measuring a recipe written in grams — like “30 g of sugar” — with spoons instead of a scale.</p>
+      <label>Weight (g)
+        <input type="number" id="adv-grams" inputmode="decimal" min="0" step="any" placeholder="e.g. 30">
+      </label>
+      <label>Ingredient
+        <select id="adv-mat2">
+          <option value="water">Water</option>
+          <option value="sugar" selected>Sugar (Japanese white sugar)</option>
+          <option value="salt">Salt (table salt)</option>
+          <option value="flour">Flour (cake flour)</option>
+          <option value="oil">Oil</option>
+          <option value="soy">Soy sauce</option>
+          <option value="miso">Miso</option>
+        </select>
+      </label>
+      <button type="button" id="adv-spoon-run">Convert to spoons</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>“How many ml is 3 tablespoons?” “How many tablespoons is 50 ml?” — just type a number to restate the <strong>tablespoon, teaspoon, cup and ml amounts</strong> in Japanese recipes. These are <strong>the Japanese kitchen-measure sizes</strong> (tablespoon 15 ml, teaspoon 5 ml, cup 200 ml — note that a Japanese cup differs from a US cup). Useful when you have no measuring spoons or cup at hand, or want to scale a recipe.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter the amount (the number) from the recipe.</li>
+    <li>Choose its unit (tablespoon, teaspoon, cup or ml).</li>
+    <li>The amount in every unit appears the moment you type — no button needed.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>1 teaspoon = 5 ml / 1 tablespoon = 15 ml / 1 cup = 200 ml</strong> (the standard sizes of Japanese measuring spoons and cups)</li>
+    <li>1 tablespoon = 3 teaspoons, and 1 cup = 13 tablespoons + 1 teaspoon.</li>
+    <li>ml and cc are the same amount (1 ml = 1 cc).</li>
+  </ul>
+
+  <h3>Sources (primary information)</h3>
+  <ul class="sources">
+    <li>The conversion is based on the capacities of standard Japanese measuring utensils (teaspoon 5 ml, tablespoon 15 ml, cup 200 ml).</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>This is a <strong>volume conversion</strong>. Weight (g) depends on the density of the ingredient (1 tablespoon is 15 g of water, but about 12 g of oil, about 9 g of Japanese white sugar and about 18 g of salt).</li>
+    <li>One cup in overseas recipes is different (about 240 ml in the US, 250 ml in Australia). The rice cup that comes with Japanese rice cookers is 180 ml — also a different thing.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">How many grams is 1 tablespoon?</h3>
+  <p class="faq-a">It depends on the ingredient. As a guide: 15 g for water, vinegar or sake; about 18 g for soy sauce or mirin; about 12 g for oil or butter; about 9 g for Japanese white sugar; about 18 g for salt. This tool converts by volume (ml).</p>
+  <h3 class="faq-q">What can I use instead of a measuring spoon?</h3>
+  <p class="faq-a">A plastic-bottle cap holds about 7.5 ml (half a tablespoon), and a curry spoon holds a little under 1 tablespoon as a guide. For baking, where accuracy matters, proper measuring utensils are recommended.</p>
+  <h3 class="faq-q">How much is a “pinch” or a “dash” in Japanese recipes?</h3>
+  <p class="faq-a">As a guide, a dash (shōshō) is the amount you pick up between thumb and index finger (about 1/8 teaspoon), and a pinch (hitotsumami) is the amount picked up with three fingers (about 1/5–1/4 teaspoon).</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=spoon">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/spoon/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  function run() {
+    if (document.getElementById("value").value.trim() === "") { box.hidden = true; return; }
+    var r = SpoonCalc.convert(parseFloat(document.getElementById("value").value), document.getElementById("unit").value);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">Enter an amount greater than 0.</p>';
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">' + r.ml.toLocaleString() + " ml</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>Tablespoons</td><td>" + r.tbsp.toLocaleString() + "</td></tr>" +
+      "<tr><td>Teaspoons</td><td>" + r.tsp.toLocaleString() + "</td></tr>" +
+      "<tr><td>Cups (200 ml)</td><td>" + r.cup.toLocaleString() + "</td></tr>" +
+      "</tbody></table></div>";
+    box.hidden = false;
+  }
+  document.getElementById("value").addEventListener("input", run);
+  document.getElementById("unit").addEventListener("change", run);
+  document.getElementById("spoon-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var MAT_EN = {
+    "水": "Water",
+    "砂糖(上白糖)": "Sugar (Japanese white sugar)",
+    "塩(食塩)": "Salt (table salt)",
+    "小麦粉(薄力粉)": "Flour (cake flour)",
+    "油": "Oil",
+    "しょうゆ": "Soy sauce",
+    "みそ": "Miso"
+  };
+  var advBox = document.getElementById("adv-result");
+  var gramsBox = document.getElementById("adv-grams-result");
+  var fmt = function (x) { return x.toLocaleString(undefined, { maximumFractionDigits: 2 }); };
+  function runGrams(force) {
+    var tbspRaw = document.getElementById("adv-tbsp").value;
+    var tspRaw = document.getElementById("adv-tsp").value;
+    if (tbspRaw.trim() === "" && tspRaw.trim() === "" && !force) { gramsBox.hidden = true; return; }
+    var tbsp = parseFloat(tbspRaw) || 0;
+    var tsp = parseFloat(tspRaw) || 0;
+    var r = SpoonCalc.toGrams(tbsp, tsp, document.getElementById("adv-mat").value);
+    if (!r.ok) {
+      if (!force) { gramsBox.hidden = true; return; }
+      gramsBox.innerHTML = '<p class="result-error">Enter a number of spoons greater than 0 in either the tablespoon or teaspoon field.</p>';
+      gramsBox.hidden = false;
+      return;
+    }
+    gramsBox.innerHTML =
+      '<div class="result-main">About ' + fmt(r.grams) + ' g</div>' +
+      '<p>' + (MAT_EN[r.label] || r.label) + ': calculated with the guides of about ' + r.gramsPerTbsp + ' g per tablespoon / about ' + r.gramsPerTsp + ' g per teaspoon. These are level spoonfuls (not heaped).</p>';
+    gramsBox.hidden = false;
+  }
+  ["adv-tbsp", "adv-tsp"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runGrams(false); });
+  });
+  document.getElementById("adv-mat").addEventListener("change", function () { runGrams(false); });
+  document.getElementById("adv-grams-run").addEventListener("click", function () { runGrams(true); });
+  function runSpoon(force) {
+    if (document.getElementById("adv-grams").value.trim() === "" && !force) { advBox.hidden = true; return; }
+    var r = SpoonCalc.fromGrams(parseFloat(document.getElementById("adv-grams").value), document.getElementById("adv-mat2").value);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">Enter a weight (g) greater than 0.</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var combo = "";
+    if (r.tbspWhole > 0 && r.tspRest > 0) combo = r.tbspWhole.toLocaleString() + " tbsp + " + fmt(r.tspRest) + " tsp";
+    else if (r.tbspWhole > 0) combo = "Exactly " + r.tbspWhole.toLocaleString() + " tbsp";
+    else combo = fmt(r.tsp) + " tsp";
+    advBox.innerHTML =
+      '<div class="result-main">' + combo + '</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>Tablespoons only</td><td>about ' + fmt(r.tbsp) + '</td></tr>' +
+      '<tr><td>Teaspoons only</td><td>about ' + fmt(r.tsp) + '</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">An approximation using the guide values for ' + (MAT_EN[r.label] || r.label) + '.</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-grams").addEventListener("input", function () { runSpoon(false); });
+  document.getElementById("adv-mat2").addEventListener("change", function () { runSpoon(false); });
+  document.getElementById("adv-spoon-run").addEventListener("click", function () { runSpoon(true); });
+  runGrams(false);
+})();
+</script>
+</body>
+</html>

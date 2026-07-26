@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>折扣计算器(○%OFF后是多少钱?优惠金额与折扣率) | Quick Calc</title>
+  <meta name="description" content="「30%OFF后多少钱?」一键算出。可计算折后价格和优惠金额,也能反过来由促销价倒推折扣率。免费,适合在日本超市·打折季·奥特莱斯购物时使用。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/waribiki/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="折扣计算器(○%OFF后是多少钱?优惠金额与折扣率) | Quick Calc">
+  <meta property="og:description" content="「30%OFF后多少钱?」一键算出。可计算折后价格和优惠金额,也能反过来由促销价倒推折扣率。免费,适合在日本超市·打折季·奥特莱斯购物时使用。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/waribiki/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"折扣计算器(○%OFF后是多少钱?优惠金额与折扣率)","item":"https://quick-calc.site/zh/tools/waribiki/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>折扣计算器(○%OFF后是多少钱?)</h1>
+  <form class="tool-form" id="waribiki-form">
+    <label>计算类型
+      <select id="mode">
+        <option value="off" selected>计算○%OFF后的价格</option>
+        <option value="rate">倒推折扣率(原价→促销价)</option>
+      </select>
+    </label>
+    <label>原价(日元)
+      <input type="number" id="price" inputmode="decimal" min="1" step="any" required placeholder="例: 2980">
+    </label>
+    <label id="second-label">折扣率(%OFF)
+      <input type="number" id="second" inputmode="decimal" min="0" max="100000000" step="any" required placeholder="例: 30">
+    </label>
+    <span class="field-note">输入2项后自动计算</span>
+    <button type="submit">计算</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 折上折与优惠券比较</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">折上折(在此基础上再减○%)</h3>
+      <p class="adv-note">计算「先30%OFF,收银台再减20%」这类双重折扣的最终价格。</p>
+      <label>原价(日元)
+        <input type="number" id="adv-dprice" inputmode="numeric" step="any" min="1" placeholder="10000">
+      </label>
+      <label>第1次折扣率(%)
+        <input type="number" id="adv-p1" inputmode="decimal" step="any" min="0" max="100" placeholder="20">
+      </label>
+      <label>追加折扣(%)
+        <input type="number" id="adv-p2" inputmode="decimal" step="any" min="0" max="100" placeholder="10">
+      </label>
+      <button type="button" id="adv-double-run">计算最终价格</button>
+      <div class="tool-result" id="adv-double-result" hidden aria-live="polite"></div>
+      <h3 class="adv-h">「减○日元」和「○%OFF」哪个划算?</h3>
+      <p class="adv-note">有2种优惠券可选时,比较用哪张付款更便宜。</p>
+      <label>原价(日元)
+        <input type="number" id="adv-cprice" inputmode="numeric" step="any" min="1" placeholder="3000">
+      </label>
+      <label>优惠券A: 立减金额(日元)
+        <input type="number" id="adv-cyen" inputmode="numeric" step="any" min="0" placeholder="500">
+      </label>
+      <label>优惠券B: 折扣率(%)
+        <input type="number" id="adv-cpct" inputmode="decimal" step="any" min="0" max="100" placeholder="20">
+      </label>
+      <button type="button" id="adv-coupon-run">比较哪个划算</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>当场算出「30%OFF」「2割引」<strong>到底是多少钱</strong>的工具。也能由原价和促销价倒推「打了几折(减了百分之几)」。在日本打折季购物时很好用。顺带一提,日本的「2割引」相当于减20%(8折),「半額」是半价。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>选择「○%OFF后的价格」还是「倒推折扣率」。</li>
+    <li>输入原价和折扣率(或促销价)。</li>
+    <li>输入的同时,折后价格和优惠金额(或折扣率)立即显示,无需点击按钮。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>折后价格 = 原价 × (1 − 折扣率÷100)</strong>(不足1日元四舍五入)</li>
+    <li><strong>折扣率 = (1 − 促销价÷原价) × 100</strong></li>
+    <li>计算例: 2,980日元的30%OFF → 2,980 × 0.7 = <strong>2,086日元</strong>(减894日元)</li>
+    <li>日本标签上的「2割引」=减20%(8折),「半額」=减50%(5折)。</li>
+  </ul>
+
+  <h3>出处·前提说明</h3>
+  <ul class="sources">
+    <li>基于价格和折扣率的算术计算。</li>
+  </ul>
+
+  <h2>前提与注意</h2>
+  <ul class="cautions">
+    <li>部分店铺对尾数采用舍去或进位处理,收银台金额可能有1日元左右的差异。</li>
+    <li>「在标价基础上再减20%」这类折上折,请把本工具分2次使用(30%OFF+20%OFF不等于50%OFF)。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">「30%OFF后再减20%」是50%OFF吗?</h3>
+  <p class="faq-a">不是。折扣是依次相乘的: 0.7 × 0.8 = 0.56,相当于44%OFF。1,000日元的商品会变成560日元。用本工具分2次计算即可验证。</p>
+  <h3 class="faq-q">应该按含税价还是不含税价计算?</h3>
+  <p class="faq-a">折扣通常是对标示价格(多为含税价)打的。本工具把折扣率直接应用于你在「原价」中输入的金额。</p>
+  <h3 class="faq-q">积分返还和折扣哪个划算?</h3>
+  <p class="faq-a">同样的百分比,折扣更划算。因为积分返还要先付全款,积分要等以后使用才算数。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=waribiki">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/waribiki/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var label = document.getElementById("second-label");
+  var second = document.getElementById("second");
+  var MSG = {
+    invalid_price: "原价请输入1日元以上。",
+    invalid_pct: "折扣率请在0〜100%范围内输入。",
+    invalid_sale: "促销价请在0日元〜原价的范围内输入。"
+  };
+  var priceEl = document.getElementById("price");
+  mode.addEventListener("change", function () {
+    var isOff = mode.value === "off";
+    label.childNodes[0].textContent = isOff ? "折扣率(%OFF)" : "促销价(日元)";
+    second.placeholder = isOff ? "例: 30" : "例: 1480";
+    runMain();
+  });
+  function runMain() {
+    if (priceEl.value === "" || second.value === "") { box.hidden = true; return; }
+    var price = parseFloat(priceEl.value);
+    var v = parseFloat(second.value);
+    if (mode.value === "off") {
+      var r = WaribikiCalc.off(price, v);
+      if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "请检查输入的数值。") + "</p>"; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">' + r.sale.toLocaleString() + " 日元</div>" +
+        "<p>优惠金额: <strong>" + r.saved.toLocaleString() + "日元</strong>(" + v.toLocaleString() + "%OFF)</p>";
+    } else {
+      var r2 = WaribikiCalc.rate(price, v);
+      if (!r2.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r2.code] || "请检查输入的数值。") + "</p>"; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">约 ' + r2.pct.toLocaleString() + " %OFF</div>" +
+        "<p>优惠金额: " + (price - v).toLocaleString() + "日元</p>";
+    }
+    box.hidden = false;
+  }
+  document.getElementById("waribiki-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
+  });
+  [priceEl, second].forEach(function (el) {
+    el.addEventListener("input", runMain);
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var doubleBox = document.getElementById("adv-double-result");
+  var advBox = document.getElementById("adv-result");
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
+  }
+  function runDouble() {
+    var price = parseFloat(document.getElementById("adv-dprice").value);
+    var p1 = parseFloat(document.getElementById("adv-p1").value);
+    var p2 = parseFloat(document.getElementById("adv-p2").value);
+    if (isNaN(price) || isNaN(p1) || isNaN(p2)) { showError(doubleBox, "请输入原价和2个折扣率。"); return; }
+    var r = WaribikiCalc.doubleOff(price, p1, p2);
+    if (!r.ok) { showError(doubleBox, "原价请输入1日元以上,折扣率请在0〜100%范围内输入。"); return; }
+    doubleBox.innerHTML =
+      '<div class="result-main">' + r.sale.toLocaleString() + " 日元</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>优惠金额合计</td><td>" + r.saved.toLocaleString() + " 日元</td></tr>" +
+      "<tr><td>实际折扣率</td><td><strong>" + r.effectivePct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%OFF</strong></td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">' + p1.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%OFF + " + p2.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%OFF 并不是简单相加的 " + r.naivePct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%OFF,而是 <strong>" + r.effectivePct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%OFF</strong>(因为第2次折扣是在已经降价后的价格上再打的)。</p>";
+    doubleBox.hidden = false;
+  }
+  function runCoupon() {
+    var price = parseFloat(document.getElementById("adv-cprice").value);
+    var yen = parseFloat(document.getElementById("adv-cyen").value);
+    var pct = parseFloat(document.getElementById("adv-cpct").value);
+    if (isNaN(price) || isNaN(yen) || isNaN(pct)) { showError(advBox, "请输入原价·立减金额·折扣率。"); return; }
+    var r = WaribikiCalc.couponCompare(price, yen, pct);
+    if (!r.ok) { showError(advBox, "原价请输入1日元以上,立减金额0日元以上,折扣率0〜100%。"); return; }
+    var verdict = r.better === "even"
+      ? "两种付款金额相同"
+      : r.better === "yen"
+        ? "立减" + yen.toLocaleString() + "日元更划算,省 " + r.diff.toLocaleString() + " 日元"
+        : pct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%OFF更划算,省 " + r.diff.toLocaleString() + " 日元";
+    advBox.innerHTML =
+      '<div class="result-main">' + verdict + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>优惠券A(立减" + yen.toLocaleString() + "日元)</td><td>" + r.byYen.toLocaleString() + " 日元</td></tr>" +
+      "<tr><td>优惠券B(" + pct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%OFF)</td><td>" + r.byPct.toLocaleString() + " 日元</td></tr>" +
+      "</tbody></table></div>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-double-run").addEventListener("click", runDouble);
+  document.getElementById("adv-coupon-run").addEventListener("click", runCoupon);
+  ["adv-dprice", "adv-p1", "adv-p2"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-dprice").value !== "" &&
+          document.getElementById("adv-p1").value !== "" &&
+          document.getElementById("adv-p2").value !== "") runDouble();
+    });
+  });
+  ["adv-cprice", "adv-cyen", "adv-cpct"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-cprice").value !== "" &&
+          document.getElementById("adv-cyen").value !== "" &&
+          document.getElementById("adv-cpct").value !== "") runCoupon();
+    });
+  });
+})();
+</script>
+</body>
+</html>

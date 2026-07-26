@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Sleep Cycle Calculator — What Time Should I Go to Bed? | Quick Calc</title>
+  <meta name="description" content="Work backwards from the time you want to wake up and get the bedtimes that land on the boundary of the roughly 90-minute sleep cycle. The time it takes you to fall asleep is included, so you get a one-shot answer to “I need to be up at 6:30 tomorrow — when should I go to bed?”">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/cycle/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Sleep Cycle Calculator — What Time Should I Go to Bed? | Quick Calc">
+  <meta property="og:description" content="Work backwards from the time you want to wake up and get the bedtimes that land on the boundary of the roughly 90-minute sleep cycle. The time it takes you to fall asleep is included, so you get a one-shot answer to “I need to be up at 6:30 tomorrow — when should I go to bed?”">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/cycle/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Sleep Cycle Calculator","item":"https://quick-calc.site/en/tools/cycle/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Sleep Cycle Calculator</h1>
+  <form class="tool-form" id="cycle-form">
+    <span class="field-note">Change a time and the suggestions just below update automatically</span>
+    <label>Type of calculation
+      <select id="mode">
+        <option value="bed" selected>From a wake-up time, work back to a bedtime</option>
+        <option value="wake">From a bedtime, work out a wake-up time</option>
+      </select>
+    </label>
+    <label id="time-label">Wake-up time
+      <input type="time" id="time" value="06:30" required>
+    </label>
+    <label>Time it takes you to fall asleep (minutes)
+      <span class="field-note">15 minutes is a good default; use 5 if you drop off quickly</span>
+      <input type="number" id="fall" inputmode="numeric" min="0" max="60" step="5" value="15">
+    </label>
+    <button type="submit">Show the suggested times</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: match your own cycle length, or go to bed right now</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Recalculate with your own cycle length</h3>
+      <p class="adv-note">Cycle length varies from person to person (roughly 70–110 minutes), so if 90 minutes does not fit you, recalculate with 80 or 100 minutes (the times are taken from the form above).</p>
+      <label>Cycle length
+        <select id="adv-cycle-len">
+          <option value="80">80 minutes (short)</option>
+          <option value="90" selected>90 minutes (average)</option>
+          <option value="100">100 minutes (long)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-cycle-run">Recalculate with this cycle</button>
+      <h3 class="adv-h">If I go to bed right now, when should I get up?</h3>
+      <p class="adv-note">Using the current time as the starting point, this suggests wake-up times that fall on a cycle boundary (the cycle length and the time to fall asleep come from the settings above).</p>
+      <button type="button" id="adv-now-run">Show wake-up times for going to bed now</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Just enter the time you want to wake up and you immediately get <strong>three suggested bedtimes that are easy to wake up from</strong>. Sleep repeats in cycles of about 90 minutes, so the idea is to wake up at the boundary between cycles. Handy on the nights when you think, “I have to be up at 6 tomorrow — when should I go to bed?”</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter the time you want to wake up (or the time you plan to go to bed).</li>
+    <li>Enter roughly how long it takes you to fall asleep (15 minutes is a good default).</li>
+    <li>As you type, times matching 6 hours, 7.5 hours and 9 hours of sleep appear below. No button needed.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Suggested bedtime = wake-up time − (90 minutes × number of cycles) − time to fall asleep</strong></li>
+    <li>Three patterns are shown: 4 cycles (6 hours), 5 cycles (7.5 hours) and 6 cycles (9 hours). Adults are recommended to get at least 6 hours of sleep.</li>
+    <li>Example: waking at 6:30 with 15 minutes to fall asleep gives a 5-cycle (7.5-hour) bedtime of <strong>22:45</strong>.</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>Explanation of the sleep cycle (non-REM and REM sleep repeating in roughly 90-minute cycles): <a href="https://www.e-healthnet.mhlw.go.jp/information/heart" target="_blank" rel="noopener">Ministry of Health, Labour and Welfare (Japan), e-Health Net (rest and mental health)</a> (in Japanese). 90 minutes is an average; individual differences of roughly 70–110 minutes are normal.</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>Cycle length differs a lot between people, so there is no guarantee that a multiple of 90 minutes will always leave you refreshed. Treat the times as a rough guide.</li>
+    <li>What matters most is <strong>getting enough sleep and keeping your bedtime and wake-up time the same every day</strong>.</li>
+    <li>If strong daytime sleepiness or insomnia continues, see a doctor.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">Is the 90-minute cycle real?</h3>
+  <p class="faq-a">That non-REM and REM sleep repeat in cycles of about 90 minutes is a well-known physiological phenomenon. However, the cycle ranges from about 70 to 110 minutes depending on the person, and it also changes over the course of a single night. The times here are a guide in the sense of “if your cycle is the average 90 minutes, this is the time”.</p>
+  <h3 class="faq-q">Is 6 hours of sleep enough?</h3>
+  <p class="faq-a">Most adults do well on roughly 6 to 8 hours, and the amount needed varies from person to person. Strong sleepiness during the day is a sign you are not getting enough. If you can, pick the 5-cycle (7.5-hour) option or longer.</p>
+  <h3 class="faq-q">I go to bed at the suggested time but cannot fall asleep.</h3>
+  <p class="faq-a">A phone screen, caffeine or a very hot bath right before bed all make it harder to fall asleep. Getting into bed when you are not sleepy can also backfire. The standard advice is to get into bed once you feel sleepy, and instead keep your wake-up time constant.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=cycle">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/cycle/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var timeLabel = document.getElementById("time-label");
+  mode.addEventListener("change", function () {
+    timeLabel.childNodes[0].textContent = mode.value === "bed" ? "Wake-up time" : "Bedtime";
+    document.getElementById("time").value = mode.value === "bed" ? "06:30" : "23:00";
+    run(false);
+  });
+  function run(fromSubmit) {
+    var t = document.getElementById("time").value;
+    if (!fromSubmit && t === "") { box.hidden = true; return; }
+    var fall = parseFloat(document.getElementById("fall").value || "15");
+    var isBed = mode.value === "bed";
+    var r = isBed ? CycleCalc.bedTimes(t, fall) : CycleCalc.wakeTimes(t, fall);
+    if (!r.ok) { box.innerHTML = '<p class="result-error">Enter a valid time and a time to fall asleep (0–60 minutes).</p>'; box.hidden = false; return; }
+    var rows = r.options.map(function (o) {
+      var time = isBed ? o.bedTime : o.wakeTime;
+      var star = o.cycles === 5 ? ' <span class="mark-rec">Recommended</span>' : "";
+      return "<tr><td><strong>" + time + "</strong>" + star + "</td><td>" + o.sleepHours + " hours (" + o.cycles + " cycles)</td></tr>";
+    }).join("");
+    box.innerHTML =
+      '<div class="result-main">Suggested ' + (isBed ? "bedtime" : "wake-up time") + ": " + (isBed ? r.options[1].bedTime : r.options[1].wakeTime) + " and others</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>' + (isBed ? "Time to go to bed" : "Time to get up") + "</th><th>Sleep</th></tr></thead><tbody>" +
+      rows + '</tbody></table></div><p><span class="mark-rec">Recommended</span> = 7.5 hours. Cycle length varies from person to person.</p>';
+    box.hidden = false;
+    if (window.__cycleAdvRefresh) { window.__cycleAdvRefresh(); }
+  }
+  document.getElementById("cycle-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+  document.getElementById("time").addEventListener("change", function () { run(false); });
+  document.getElementById("time").addEventListener("input", function () { run(false); });
+  document.getElementById("fall").addEventListener("input", function () { run(false); });
+  run(false);
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advRender(r, headline, timeHead) {
+    if (!r.ok) {
+      var msg = r.code === "invalid_time" ? "Enter a time in the form above."
+        : r.code === "invalid_fall" ? "Enter a time to fall asleep between 0 and 60 minutes."
+        : "Check the entered values.";
+      advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    var html = '<div class="result-main">' + headline + '</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Cycles</th><th>Sleep</th><th>' +
+      timeHead + '</th></tr></thead><tbody>';
+    for (var i = 0; i < r.options.length; i++) {
+      var o = r.options[i];
+      html += "<tr><td>" + o.cycles + "</td><td>about " +
+        o.sleepHours.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " hours</td><td>" + o.time + "</td></tr>";
+    }
+    html += "</tbody></table></div>" +
+      '<p class="adv-note">Cycle length varies from person to person, so these times are only a guide.</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  function runCustom() {
+    var mode = document.getElementById("mode").value;
+    var time = document.getElementById("time").value;
+    var fall = parseFloat(document.getElementById("fall").value);
+    if (isNaN(fall)) fall = 15;
+    var len = parseInt(document.getElementById("adv-cycle-len").value, 10);
+    var r = CycleCalc.customOptions(mode, time, fall, len);
+    advRender(r, "Times for a " + len + "-minute cycle",
+      mode === "bed" ? "Suggested bedtime" : "Suggested wake-up time");
+  }
+  document.getElementById("adv-cycle-run").addEventListener("click", runCustom);
+  document.getElementById("adv-cycle-len").addEventListener("change", runCustom);
+  window.__cycleAdvRefresh = function () {
+    if (!advBox.hidden) { runCustom(); }
+  };
+  document.getElementById("adv-now-run").addEventListener("click", function () {
+    var now = new Date();
+    var hm = now.getHours() + ":" + (now.getMinutes() < 10 ? "0" : "") + now.getMinutes();
+    var fall = parseFloat(document.getElementById("fall").value);
+    if (isNaN(fall)) fall = 15;
+    var len = parseInt(document.getElementById("adv-cycle-len").value, 10);
+    var r = CycleCalc.customOptions("wake", hm, fall, len);
+    advRender(r, "Wake-up times if you go to bed now (" + hm + ")", "Suggested wake-up time");
+  });
+})();
+</script>
+</body>
+</html>

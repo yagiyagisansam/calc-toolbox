@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Password Generator — Strong Random Passwords, Made on Your Device | Quick Calc</title>
+  <meta name="description" content="Generate a strong random password on your own device, choosing the length and the character types (lowercase, uppercase, digits, symbols). The strength in bits is shown, and nothing is ever sent to a server.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/password/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Password Generator — Strong Random Passwords, Made on Your Device | Quick Calc">
+  <meta property="og:description" content="Generate a strong random password on your own device, choosing the length and the character types (lowercase, uppercase, digits, symbols). The strength in bits is shown, and nothing is ever sent to a server.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/password/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Password Generator — Strong Random Passwords, Made on Your Device","item":"https://quick-calc.site/en/tools/password/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Password Generator</h1>
+  <form class="tool-form" id="password-form">
+    <label>Length: <span id="len-view">16</span> characters
+      <input type="range" id="length" min="4" max="64" value="16">
+    </label>
+    <label><input type="checkbox" id="lower" checked> Lowercase letters (abc)</label>
+    <label><input type="checkbox" id="upper" checked> Uppercase letters (ABC)</label>
+    <label><input type="checkbox" id="digits" checked> Digits (123)</label>
+    <label><input type="checkbox" id="symbols" checked> Symbols (!#$…)</label>
+    <span class="field-note">One password is already generated when you open the page. Changing the length or character types creates a new one automatically</span>
+    <button type="submit">Generate another password</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: generate several at once with your own rules, and check strength</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Generate several at once</h3>
+      <p class="adv-note">The length and character types come from the form above. “Exclude look-alike characters” keeps out easily confused characters such as l (lowercase L) and 1, or O (capital o) and 0.</p>
+      <label style="display:block;"><input type="checkbox" id="adv-similar" checked> Exclude look-alike characters (l 1 I O 0 o)</label>
+      <label>Limit the symbols used (leave empty for all standard symbols)
+        <input type="text" id="adv-symset" placeholder="e.g. !#_-@" autocomplete="off">
+      </label>
+      <label>How many to generate (1–10)
+        <input type="number" id="adv-count" inputmode="numeric" min="1" max="10" step="1" value="5">
+      </label>
+      <button type="button" id="adv-gen-run">Generate them</button>
+      <div class="tool-result" id="adv-gen-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">Check the strength of a password you already have</h3>
+      <p class="adv-note">Estimates how hard it is to guess, from the character types used and the length (what you type is processed on your device only and is never sent or stored anywhere).</p>
+      <label>Password to check
+        <input type="text" id="adv-check-pw" autocomplete="off" placeholder="e.g. mypassword123">
+      </label>
+      <button type="button" id="adv-check-run">Check the strength</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">What this tool does</span><p>Press a button and get a <strong>random password that is hard to guess</strong>, created on the spot. Everything happens inside your own device and nothing is sent anywhere. Handy when you sign up for a new service or replace an old password.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Choose the length with the slider (recommended: 12 characters or more; 16 or more for important accounts).</li>
+    <li>Tick the character types you want to use (adjust them to the site’s restrictions).</li>
+    <li>One password is ready as soon as the page opens. Use “Copy”, or press “Generate another password” as many times as you like.</li>
+  </ol>
+
+  <h2>How it works</h2>
+  <ul class="method">
+    <li>Randomness comes from the browser’s built-in cryptographic random number generator (crypto.getRandomValues).</li>
+    <li>At least one character from each selected type is included, and then the whole password is shuffled randomly.</li>
+    <li><strong>Strength estimate (bits) = length × log₂(number of usable characters)</strong>. 80 bits or more is generally treated as safe for the time being; 16 characters with all character types gives 105 bits.</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>Strength as information entropy is the common measure used in materials such as the <a href="https://www.ipa.go.jp/security/anshin/measures/password.html" target="_blank" rel="noopener">IPA (Information-technology Promotion Agency, Japan) guidance on passwords</a> (in Japanese).</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>Do not reuse the same generated password across several services.</li>
+    <li>We recommend storing it in a password manager app (or your browser’s built-in password store).</li>
+    <li>If a service does not accept certain symbols, untick the symbols box or generate again.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">Is the generated password saved or sent anywhere?</h3>
+  <p class="faq-a">No. Generation happens entirely inside the browser on your device, and nothing is sent to or stored on this site’s servers or anywhere else. It disappears when you close the page, so copy it and store it somewhere safe if you need it.</p>
+  <h3 class="faq-q">How many characters are safe?</h3>
+  <p class="faq-a">In general, 12 or more characters mixing uppercase, lowercase, digits and symbols is the guideline, and 16 or more is recommended for important accounts (email, banking). Increasing the length is the single most effective step.</p>
+  <h3 class="faq-q">Isn’t a password I can remember better?</h3>
+  <p class="faq-a">Passwords people invent tend to be easier to guess. Random generation plus storage in a password manager is the current standard approach. If you really must memorise one, joining four or more unrelated words (a passphrase) also works well.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=password">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/password/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var LEVEL_EN = { "非常に強い": "very strong", "強い": "strong", "ふつう": "average", "弱い": "weak" };
+  var box = document.getElementById("result");
+  var lenInput = document.getElementById("length");
+  var lenView = document.getElementById("len-view");
+  lenInput.addEventListener("input", function () { lenView.textContent = lenInput.value; });
+  function run() {
+    var r = PasswordCalc.generate(parseInt(lenInput.value, 10), {
+      lower: document.getElementById("lower").checked,
+      upper: document.getElementById("upper").checked,
+      digits: document.getElementById("digits").checked,
+      symbols: document.getElementById("symbols").checked
+    });
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (r.code === "no_charset" ? "Select at least one character type." : "The length must be between 4 and 64 characters.") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var strength = r.entropyBits >= 100 ? "非常に強い" : r.entropyBits >= 80 ? "強い" : r.entropyBits >= 60 ? "ふつう" : "弱い";
+    box.innerHTML =
+      '<div class="result-main" style="word-break:break-all;font-family:ui-monospace,monospace;font-size:1.25rem;" id="pw-out"></div>' +
+      '<p><button type="button" id="copy-btn" style="font-size:0.95rem;padding:8px 16px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-bg);color:var(--color-text);cursor:pointer;">Copy</button> <span id="copy-done"></span></p>' +
+      "<p>Strength estimate: <strong>" + r.entropyBits + " bits (" + (LEVEL_EN[strength] || strength) + ")</strong> / " + r.poolSize + " possible characters × " + r.length + " characters</p>";
+    document.getElementById("pw-out").textContent = r.password;
+    document.getElementById("copy-btn").addEventListener("click", function () {
+      navigator.clipboard.writeText(r.password).then(function () {
+        document.getElementById("copy-done").textContent = "Copied";
+      });
+    });
+    box.hidden = false;
+  }
+  lenInput.addEventListener("input", run);
+  ["lower", "upper", "digits", "symbols"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", run);
+  });
+  document.getElementById("password-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var LEVEL_EN = { "非常に強い": "Very strong", "強い": "Strong", "ふつう": "Average", "弱い": "Weak" };
+  var advBox = document.getElementById("adv-result");
+  var genBox = document.getElementById("adv-gen-result");
+  function runGen(force) {
+    if (!force && genBox.hidden) return;
+    if (document.getElementById("adv-count").value.trim() === "" && !force) { genBox.hidden = true; return; }
+    var r = PasswordCalc.generateCustom(
+      parseInt(document.getElementById("length").value, 10),
+      {
+        lower: document.getElementById("lower").checked,
+        upper: document.getElementById("upper").checked,
+        digits: document.getElementById("digits").checked,
+        symbols: document.getElementById("symbols").checked,
+        excludeSimilar: document.getElementById("adv-similar").checked,
+        symbolSet: document.getElementById("adv-symset").value
+      },
+      parseInt(document.getElementById("adv-count").value, 10)
+    );
+    if (!r.ok) {
+      var msg = r.code === "invalid_count" ? "The number to generate must be between 1 and 10."
+        : r.code === "invalid_symbols" ? "Symbols must be half-width ASCII symbols such as !#$%&()*+,-./:; ."
+        : r.code === "no_charset" ? "Select at least one character type in the form above."
+        : "The length must be between 4 and 64 characters.";
+      genBox.innerHTML = '<p class="result-error">' + msg + '</p>';
+      genBox.hidden = false;
+      return;
+    }
+    genBox.innerHTML =
+      '<p>Generated ' + r.count + ' passwords (strength estimate: ' + r.entropyBits + ' bits / ' + r.poolSize + ' possible characters):</p>' +
+      '<textarea id="adv-gen-out" rows="' + Math.min(r.count + 1, 11) + '" style="width:100%;font-family:ui-monospace,monospace;font-size:1rem;padding:10px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-bg);color:var(--color-text);" readonly></textarea>' +
+      '<p><button type="button" id="adv-gen-copy" style="font-size:0.95rem;padding:8px 16px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-bg);color:var(--color-text);cursor:pointer;">Copy all</button> <span id="adv-gen-done"></span></p>';
+    document.getElementById("adv-gen-out").value = r.passwords.join("\n");
+    document.getElementById("adv-gen-copy").addEventListener("click", function () {
+      navigator.clipboard.writeText(r.passwords.join("\n")).then(function () {
+        document.getElementById("adv-gen-done").textContent = "Copied";
+      });
+    });
+    genBox.hidden = false;
+  }
+  document.getElementById("adv-gen-run").addEventListener("click", function () { runGen(true); });
+  document.getElementById("adv-similar").addEventListener("change", function () { runGen(false); });
+  document.getElementById("adv-symset").addEventListener("input", function () { runGen(false); });
+  document.getElementById("adv-count").addEventListener("input", function () { runGen(false); });
+  document.getElementById("length").addEventListener("input", function () { runGen(false); });
+  ["lower", "upper", "digits", "symbols"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", function () { runGen(false); });
+  });
+  function runCheck(force) {
+    var pw = document.getElementById("adv-check-pw").value;
+    if (pw === "" && !force) { advBox.hidden = true; return; }
+    var r = PasswordCalc.checkStrength(pw);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">Enter the password you want to check (up to 256 characters).</p>';
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">' + (LEVEL_EN[r.level] || r.level) + ' (' + r.entropyBits + ' bits)</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>Length</td><td>' + r.length + ' characters</td></tr>' +
+      '<tr><td>Character types used</td><td>about ' + r.poolSize + ' possible characters</td></tr>' +
+      '<tr><td>Guideline</td><td>80 bits or more is “strong”; under 60 bits, we recommend creating a new one</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">Using a plain dictionary word, or reusing the password on other services, is dangerous however high the bit figure is.</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-check-pw").addEventListener("input", function () { runCheck(false); });
+  document.getElementById("adv-check-run").addEventListener("click", function () { runCheck(true); });
+})();
+</script>
+</body>
+</html>

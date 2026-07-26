@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>운동별 소모 칼로리 계산기(조깅·수영·근력운동 등 13종) | Quick Calc</title>
+  <meta name="description" content="조깅·사이클링·수영·테니스·근력운동·줄넘기·요가 등 13종 운동의 소모 칼로리를 METs 방식(공식 METs표)으로 계산합니다. 몸무게와 시간만 입력. 지방 환산 포함.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/sports/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="운동별 소모 칼로리 계산기(조깅·수영·근력운동 등 13종) | Quick Calc">
+  <meta property="og:description" content="조깅·사이클링·수영·테니스·근력운동·줄넘기·요가 등 13종 운동의 소모 칼로리를 METs 방식(공식 METs표)으로 계산합니다. 몸무게와 시간만 입력. 지방 환산 포함.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/sports/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"운동별 소모 칼로리 계산기(조깅·수영·근력운동 등 13종)","item":"https://quick-calc.site/ko/tools/sports/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>운동별 소모 칼로리 계산기</h1>
+  <form class="tool-form" id="sports-form">
+    <span class="field-note">종목을 고르고 몸무게와 시간을 입력하면 바로 아래에 결과가 표시됩니다</span>
+    <label>운동 종류
+      <select id="activity"></select>
+    </label>
+    <label>몸무게(kg)
+      <input type="number" id="weight" inputmode="decimal" min="20" max="300" step="0.1" required placeholder="예: 60">
+    </label>
+    <label>운동 시간(분)
+      <input type="number" id="minutes" inputmode="numeric" min="1" max="600" step="1" required placeholder="예: 30">
+    </label>
+    <button type="submit">소모 칼로리 계산하기</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 여러 종목 합계·목표 칼로리에 필요한 시간</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">오늘 한 운동을 한번에 합계</h3>
+      <p class="adv-note">여러 운동을 한 날은 종목과 시간을 입력하면 한번에 합계를 냅니다(최대 5건·몸무게는 위 값을 사용).</p>
+      <div id="adv-rows"></div>
+      <button type="button" id="adv-total-run">합계 계산하기</button>
+
+      <h3 class="adv-h">목표 칼로리에는 어떤 운동을 몇 분?</h3>
+      <p class="adv-note">소모하고 싶은 칼로리에 필요한 시간을 13종 운동별로 짧은 순으로 나열합니다.</p>
+      <label>목표 소모 칼로리(kcal)
+        <input type="number" id="adv-target-kcal" inputmode="numeric" step="1" min="1" max="5000" placeholder="예: 300">
+      </label>
+      <button type="button" id="adv-compare-run">종목별 필요 시간 보기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>몸무게와 운동한 시간만 입력하면 <strong>운동으로 소모한 칼로리</strong>를 알 수 있는 도구입니다. 계산은 일본 공식 운동 지침의 METs 공식을 사용하며, 조깅·수영·근력운동 등 13종의 운동에 대응합니다. 오늘 운동이 어느 정도였는지 알고 싶을 때 활용해 보세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>운동 종류를 선택합니다(딱 맞는 종목이 없으면 강도가 비슷한 종목으로 대신해 주세요).</li>
+    <li>몸무게와 운동 시간을 입력합니다.</li>
+    <li>입력과 동시에 소모 칼로리와 지방 환산 기준이 바로 아래에 표시됩니다. 종목을 다시 고르면 즉시 재계산됩니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>소모 에너지(kcal) = 1.05 × METs × 시간(h) × 몸무게(kg)</strong>(일본 후생노동성 운동 지침에서 쓰이는 공식)</li>
+    <li>METs(메츠)는 안정 시를 1로 한 운동 강도로, 이 도구는 「신체활동 METs표」의 값을 사용: 조깅 7.0 / 달리기 8km/h 8.3 / 사이클링 6.8 / 자유형(천천히) 5.8 / 테니스 7.3 / 근력운동(맨몸) 3.5 / 줄넘기 8.8 등</li>
+    <li>계산 예: 60kg인 사람이 조깅 30분 → 1.05 × 7.0 × 0.5 × 60 = <strong>약 221kcal</strong></li>
+    <li>지방 환산은 체지방 1kg≒7,200kcal의 기준으로 나눈 값입니다.</li>
+  </ul>
+
+  <h3>출처·전제 명시</h3>
+  <ul class="sources">
+    <li>METs 값: <a href="https://www.nibiohn.go.jp/eiken/programs/2011mets.pdf" target="_blank" rel="noopener">일본 국립건강·영양연구소 「신체활동 METs표」(2011 개정판)</a>(일본어) / 계산식: <a href="https://www.e-healthnet.mhlw.go.jp/information/exercise/s-02-004.html" target="_blank" rel="noopener">일본 후생노동성 e-헬스넷 「METs」</a>(일본어)</li>
+  </ul>
+
+  <h2>계산 전제와 주의</h2>
+  <ul class="cautions">
+    <li>이 공식에는 안정 시 소모(기초대사 분량)가 포함됩니다. 운동으로 「추가된 분량」만 알고 싶다면 METs에서 1을 빼서 어림해 주세요.</li>
+    <li>같은 종목이라도 강도(속도·부하)에 따라 실제 METs는 달라집니다. 표시는 대표적인 값입니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">조각 케이크 1개 분량을 소모하려면?</h3>
+  <p class="faq-a">조각 케이크 1개는 약 300〜350kcal입니다. 60kg인 사람이라면 조깅 약 45분, 보통 속도의 걷기라면 약 1시간 50분에 해당합니다. 「먹은 만큼 운동으로 상쇄」는 상당히 힘들기 때문에 식사 조절과 병행하는 것이 현실적입니다.</p>
+  <h3 class="faq-q">근력운동의 소모 칼로리가 생각보다 적은데요?</h3>
+  <p class="faq-a">근력운동 자체의 소모는 많지 않지만, 근육량이 늘면 기초대사가 올라가 장기적으로 살이 잘 찌지 않게 됩니다. 소모 칼로리만으로 가치를 재지 않는 것이 포인트입니다.</p>
+  <h3 class="faq-q">걷기는 어떻게 계산하나요?</h3>
+  <p class="faq-a">보통 속도의 걷기(약 4km/h)는 약 3.0METs이므로 같은 공식으로 어림할 수 있습니다: 1.05 × 3.0 × 시간(h) × 몸무게(kg). 예를 들어 60kg인 사람이 30분 걸으면 약 95kcal입니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=sports">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/sports/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var LABEL_KO = {
+    "ジョギング(全般)": "조깅(전반)",
+    "ランニング(8km/h)": "달리기(8km/h)",
+    "サイクリング(16〜19km/h)": "사이클링(16〜19km/h)",
+    "水泳(クロール・ゆっくり)": "수영(자유형·천천히)",
+    "水泳(平泳ぎ・レジャー)": "수영(평영·레저)",
+    "テニス(全般)": "테니스(전반)",
+    "卓球": "탁구",
+    "ゴルフ(全般)": "골프(전반)",
+    "筋トレ(自重・軽〜中強度)": "근력운동(맨몸·저〜중강도)",
+    "ヨガ(ハタヨガ)": "요가(하타 요가)",
+    "なわとび(ゆっくり)": "줄넘기(천천히)",
+    "ラジオ体操第一": "라디오 체조 제1(일본)",
+    "山登り(軽い荷物)": "등산(가벼운 짐)"
+  };
+  window.SportsLabel = function (label) { return LABEL_KO[label] || label; };
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var sel = document.getElementById("activity");
+  Object.keys(SportsCalc.ACTIVITIES).forEach(function (key) {
+    var a = SportsCalc.ACTIVITIES[key];
+    sel.add(new Option(SportsLabel(a.label) + "(" + a.mets + "METs)", key));
+  });
+  var MSG = {
+    invalid_weight: "몸무게는 20〜300kg 범위로 입력해 주세요.",
+    invalid_minutes: "시간은 1〜600분 범위로 입력해 주세요.",
+    invalid_activity: "운동 종류를 선택해 주세요."
+  };
+  var weightEl = document.getElementById("weight");
+  var minutesEl = document.getElementById("minutes");
+  function run() {
+    if (weightEl.value === "" || minutesEl.value === "") { box.hidden = true; return; }
+    var r = SportsCalc.calories(
+      parseFloat(weightEl.value),
+      parseFloat(minutesEl.value),
+      sel.value
+    );
+    if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "입력값을 확인해 주세요.") + "</p>"; box.hidden = false; return; }
+    box.innerHTML =
+      '<div class="result-main">약 ' + r.kcal.toLocaleString() + " kcal</div>" +
+      "<p>" + SportsLabel(r.label) + " / 지방 환산 약 <strong>" + r.fatG.toLocaleString() + "g</strong> 분량(1kg≒7,200kcal 기준)</p>";
+    box.hidden = false;
+  }
+  weightEl.addEventListener("input", run);
+  minutesEl.addEventListener("input", run);
+  sel.addEventListener("change", run);
+  document.getElementById("sports-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  var lastAdv = null;
+  var advRows = document.getElementById("adv-rows");
+  (function buildRows() {
+    for (var i = 0; i < 5; i++) {
+      var div = document.createElement("div");
+      div.className = "adv-sport-row";
+      div.style.cssText = "display:flex;gap:.5em;margin-bottom:8px;";
+      var sel = document.createElement("select");
+      sel.add(new Option("(선택 안 함)", ""));
+      Object.keys(SportsCalc.ACTIVITIES).forEach(function (key) {
+        var a = SportsCalc.ACTIVITIES[key];
+        sel.add(new Option(SportsLabel(a.label) + "(" + a.mets + "METs)", key));
+      });
+      sel.setAttribute("aria-label", "종목 " + (i + 1));
+      var input = document.createElement("input");
+      input.type = "number";
+      input.min = "1"; input.max = "600"; input.step = "1";
+      input.setAttribute("inputmode", "numeric");
+      input.placeholder = "시간(분)";
+      input.setAttribute("aria-label", "종목 " + (i + 1) + "의 시간(분)");
+      input.style.width = "8em";
+      sel.addEventListener("change", function () { runTotal(false); });
+      input.addEventListener("input", function () { runTotal(false); });
+      div.appendChild(sel);
+      div.appendChild(input);
+      advRows.appendChild(div);
+    }
+  })();
+  function runTotal(fromButton) {
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(w)) { if (fromButton) advErr("먼저 위 폼에 몸무게를 입력해 주세요."); return; }
+    var items = [];
+    var rowEls = advRows.querySelectorAll(".adv-sport-row");
+    for (var i = 0; i < rowEls.length; i++) {
+      var key = rowEls[i].querySelector("select").value;
+      var min = parseFloat(rowEls[i].querySelector("input").value);
+      if (key === "" || !isFinite(min)) continue;
+      items.push({ activity: key, minutes: min });
+    }
+    if (items.length === 0) { if (fromButton) advErr("종목과 시간(분)을 1건 이상 입력해 주세요."); return; }
+    var r = SportsCalc.totalCalories(w, items);
+    if (!r.ok) {
+      advErr(r.code === "invalid_minutes" ? "시간은 1〜600분 범위로 입력해 주세요."
+        : "입력값을 확인해 주세요(몸무게 20〜300kg).");
+      return;
+    }
+    var rows = "";
+    for (var j = 0; j < r.items.length; j++) {
+      rows += "<tr><td>" + SportsLabel(r.items[j].label) + "</td><td>" + r.items[j].minutes.toLocaleString() +
+        " 분</td><td>약 " + r.items[j].kcal.toLocaleString() + " kcal</td></tr>";
+    }
+    lastAdv = runTotal;
+    advBox.innerHTML =
+      '<div class="result-main">합계 약 ' + r.totalKcal.toLocaleString() + " kcal</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>종목</th><th>시간</th><th>소모</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>" +
+      "<p>지방 환산 약 <strong>" + r.fatG.toLocaleString() + "g</strong> 분량(1kg≒7,200kcal 기준).</p>";
+    advBox.hidden = false;
+  }
+  function runCompare(fromButton) {
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(w)) { if (fromButton) advErr("먼저 위 폼에 몸무게를 입력해 주세요."); return; }
+    var kEl = document.getElementById("adv-target-kcal");
+    if (kEl.value === "") { if (fromButton) advErr("목표 소모 칼로리를 입력해 주세요."); return; }
+    var r = SportsCalc.minutesForKcalAll(w, parseFloat(kEl.value));
+    if (!r.ok) {
+      advErr(r.code === "invalid_kcal" ? "목표 소모 칼로리는 1〜5,000kcal 범위로 입력해 주세요."
+        : "몸무게는 20〜300kg 범위로 입력해 주세요.");
+      return;
+    }
+    var sorted = r.items.slice().sort(function (a, b) { return a.minutes - b.minutes; });
+    var rows = "";
+    for (var i = 0; i < sorted.length; i++) {
+      rows += "<tr><td>" + SportsLabel(sorted[i].label) + "</td><td>약 " + sorted[i].minutes.toLocaleString() + " 분</td></tr>";
+    }
+    lastAdv = runCompare;
+    advBox.innerHTML =
+      '<div class="result-main">' + parseFloat(kEl.value).toLocaleString() + " kcal 소모에 필요한 시간</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>종목</th><th>필요 시간(올림)</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-total-run").addEventListener("click", function () { runTotal(true); });
+  document.getElementById("adv-compare-run").addEventListener("click", function () { runCompare(true); });
+  document.getElementById("adv-target-kcal").addEventListener("input", function () { runCompare(false); });
+  document.getElementById("weight").addEventListener("input", function () { if (lastAdv) lastAdv(false); });
+})();
+</script>
+</body>
+</html>

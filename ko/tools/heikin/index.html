@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>평균·중앙값 계산기(숫자만 붙여넣기) | Quick Calc</title>
+  <meta name="description" content="숫자를 붙여넣기만 하면 평균·중앙값·최대·최소·합계를 한 번에 계산합니다. 시험 점수, 매출, 기록 집계에. 쉼표·공백·줄바꿈 구분을 지원하는 무료 도구입니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/heikin/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="평균·중앙값 계산기(숫자만 붙여넣기) | Quick Calc">
+  <meta property="og:description" content="숫자를 붙여넣기만 하면 평균·중앙값·최대·최소·합계를 한 번에 계산합니다. 시험 점수, 매출, 기록 집계에. 쉼표·공백·줄바꿈 구분을 지원하는 무료 도구입니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/heikin/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"평균·중앙값 계산기(숫자만 붙여넣기)","item":"https://quick-calc.site/ko/tools/heikin/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>평균·중앙값 계산기</h1>
+  <form class="tool-form" id="heikin-form">
+    <label>숫자(쉼표·공백·줄바꿈 구분)
+      <span class="field-note">붙여넣으면 바로 아래에 평균·중앙값이 표시됩니다</span>
+      <textarea id="list" rows="4" required placeholder="예: 80, 92, 76, 88, 65"></textarea>
+    </label>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 가중평균·절사평균·목표 평균 역산</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">가중평균(가중치를 준 평균)</h3>
+      <p class="adv-note">한 줄에 「값,가중치」 한 쌍씩 입력하면 「중간고사는 가중치 2, 기말고사는 가중치 3」 같은 가중치를 반영한 평균을 계산합니다.</p>
+      <label>값과 가중치(한 줄에 「값,가중치」. 예: 90,2)
+        <textarea id="adv-pairs" rows="4" placeholder="예:&#10;90,2&#10;70,3"></textarea>
+      </label>
+      <button type="button" id="adv-weighted-run">가중평균 계산하기</button>
+      <div class="tool-result" id="adv-weighted-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">최대·최소를 뺀 평균(절사평균)</h3>
+      <p class="adv-note">극단적인 값에 휘둘리지 않도록, 위 입력란의 숫자에서 최고와 최저를 하나씩 빼고 평균을 냅니다.</p>
+      <button type="button" id="adv-trim-run">위 숫자로 계산하기</button>
+      <div class="tool-result" id="adv-trim-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">다음에 얼마를 받아야 목표 평균에 도달할까?</h3>
+      <p class="adv-note">위 입력란의 숫자를 「지금까지의 결과」로 보고, 한 번 더에서 목표 평균을 만들기 위해 필요한 값을 역산합니다.</p>
+      <label>목표 평균
+        <input type="number" id="adv-target" inputmode="decimal" step="any" placeholder="예: 80">
+      </label>
+      <button type="button" id="adv-need-run">필요한 값 계산하기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>시험 점수나 매출 같은 숫자를 붙여넣기만 하면 <strong>평균과 중앙값</strong>을 바로 알 수 있는 도구입니다. 합계·최대·최소도 함께 표시합니다. 성적 집계나 기록 정리에 활용하세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>숫자를 쉼표·공백·줄바꿈 중 하나로 구분해 입력합니다(Excel의 열을 붙여넣어도 됩니다).</li>
+    <li>붙여넣는(입력하는) 순간 개수·합계·평균·중앙값·최대·최소가 표시됩니다. 버튼은 필요 없습니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>평균 = 합계 ÷ 개수</strong></li>
+    <li><strong>중앙값</strong> = 작은 순으로 나열했을 때 한가운데 값(짝수 개일 때는 가운데 2개의 평균)</li>
+    <li>계산 예: 10, 10, 20의 평균은 13.3이지만 중앙값은 10. 큰 이상치가 있는 데이터에서는 중앙값이 「보통」이라는 체감에 더 가깝습니다.</li>
+  </ul>
+
+  <h3>출처와 전제</h3>
+  <ul class="sources">
+    <li>통계의 기본 정의(산술평균·중앙값)에 따른 계산입니다.</li>
+  </ul>
+
+  <h2>전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>숫자가 아닌 문자가 섞여 있으면 오류가 납니다(단위나 「점」 등은 빼고 붙여넣어 주세요).</li>
+    <li>한 번에 계산할 수 있는 것은 10,000개까지입니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">평균과 중앙값 중 어느 쪽을 봐야 하나요?</h3>
+  <p class="faq-a">데이터에 극단적인 값(이상치)이 없다면 평균으로 충분합니다. 연 수입이나 주택 가격처럼 일부 큰 값이 섞이는 데이터에서는 중앙값이 「한가운데의 체감」에 더 맞습니다. 둘 다 보는 것을 추천합니다.</p>
+  <h3 class="faq-q">Excel에서 복사한 세로 한 열 데이터도 쓸 수 있나요?</h3>
+  <p class="faq-a">쓸 수 있습니다. 줄바꿈 구분으로 인식되므로 열을 선택해 복사한 뒤 그대로 붙여넣으면 됩니다.</p>
+  <h3 class="faq-q">편차치도 계산할 수 있나요?</h3>
+  <p class="faq-a">편차치는 이 사이트의 편차치 계산기를 이용해 주세요(「전체 도구」에서 찾을 수 있습니다). 점수 목록을 붙여넣어 한 번에 계산할 수 있습니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=heikin">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/heikin/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  function run() {
+    var raw = document.getElementById("list").value.trim();
+    if (raw === "") { box.hidden = true; return; }
+    var parts = raw.split(/[\s,、]+/).filter(function (s) { return s !== ""; });
+    var list = parts.map(function (s) { return parseFloat(s); });
+    var bad = list.some(function (v) { return !isFinite(v); });
+    var r = bad ? { ok: false, code: "invalid_value" } : HeikinCalc.stats(list);
+    if (!r.ok) {
+      var msg = r.code === "invalid_value" ? "숫자로 읽을 수 없는 값이 섞여 있습니다. 숫자만 구분해 입력해 주세요." : "숫자를 1〜10,000개 입력해 주세요.";
+      box.innerHTML = '<p class="result-error">' + msg + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">평균 ' + r.mean.toLocaleString() + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>중앙값</td><td>" + r.median.toLocaleString() + "</td></tr>" +
+      "<tr><td>개수</td><td>" + r.n.toLocaleString() + "</td></tr>" +
+      "<tr><td>합계</td><td>" + r.sum.toLocaleString() + "</td></tr>" +
+      "<tr><td>최소 / 최대</td><td>" + r.min.toLocaleString() + " / " + r.max.toLocaleString() + "</td></tr>" +
+      "</tbody></table></div>";
+    box.hidden = false;
+  }
+  document.getElementById("list").addEventListener("input", run);
+  document.getElementById("heikin-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function parseList() {
+    return document.getElementById("list").value.split(/[\s,、]+/)
+      .filter(function (p) { return p !== ""; })
+      .map(function (p) { return parseFloat(p); });
+  }
+  var wBox = document.getElementById("adv-weighted-result");
+  var tBox = document.getElementById("adv-trim-result");
+  function runWeighted() {
+    if (document.getElementById("adv-pairs").value.trim() === "") { wBox.hidden = true; return; }
+    var lines = document.getElementById("adv-pairs").value.split(/\n+/)
+      .map(function (l) { return l.trim(); })
+      .filter(function (l) { return l !== ""; });
+    var pairs = lines.map(function (l) {
+      var nums = l.split(/[\s,、:]+/).filter(function (p) { return p !== ""; })
+        .map(function (p) { return parseFloat(p); });
+      return nums.length === 2 ? nums : [NaN, NaN];
+    });
+    var r = HeikinCalc.weightedMean(pairs);
+    if (!r.ok) {
+      var msg = r.code === "invalid_weight" ? "가중치는 0 이상의 숫자로, 합계가 0보다 크게 입력해 주세요."
+        : "한 줄에 「값,가중치」 두 숫자를 입력해 주세요(예: 90,2).";
+      wBox.innerHTML = '<p class="result-error">' + msg + '</p>';
+      wBox.hidden = false;
+      return;
+    }
+    wBox.innerHTML =
+      '<div class="result-main">가중평균 ' + r.mean.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '</div>' +
+      '<p>' + r.n.toLocaleString() + ' 쌍 / 가중치 합계 ' + r.weightSum.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '</p>';
+    wBox.hidden = false;
+  }
+  document.getElementById("adv-pairs").addEventListener("input", runWeighted);
+  document.getElementById("adv-weighted-run").addEventListener("click", runWeighted);
+  function runTrim(force) {
+    if (document.getElementById("list").value.trim() === "" && !force) { tBox.hidden = true; return; }
+    var r = HeikinCalc.trimmedMean(parseList());
+    if (!r.ok) {
+      if (!force && tBox.hidden) return;
+      tBox.innerHTML = '<p class="result-error">위 입력란에 숫자를 3개 이상 입력해 주세요.</p>';
+      tBox.hidden = false;
+      return;
+    }
+    tBox.innerHTML =
+      '<div class="result-main">절사평균 ' + r.mean.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '</div>' +
+      '<p>최솟값(' + r.removedMin.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ')과 최댓값(' +
+      r.removedMax.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ')을 하나씩 뺀 ' +
+      r.used.toLocaleString() + '개의 평균입니다.</p>';
+    tBox.hidden = false;
+  }
+  document.getElementById("adv-trim-run").addEventListener("click", function () { runTrim(true); });
+  document.getElementById("list").addEventListener("input", function () { runTrim(false); });
+  function runNeed(force) {
+    var targetRaw = document.getElementById("adv-target").value;
+    if ((targetRaw.trim() === "" || document.getElementById("list").value.trim() === "") && !force) {
+      advBox.hidden = true;
+      return;
+    }
+    var target = parseFloat(targetRaw);
+    var r = HeikinCalc.needScore(parseList(), target);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">위 입력란에 숫자를 입력하고, 목표 평균을 숫자로 지정해 주세요.</p>';
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">다음에 필요한 값: ' + r.needed.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '</div>' +
+      '<p>지금 평균은 ' + r.currentMean.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '(' + r.n.toLocaleString() +
+      '개)입니다. 다음 한 번에 위 값을 받으면 ' + (r.n + 1).toLocaleString() + '개의 평균은 ' +
+      target.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '입니다.</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-target").addEventListener("input", function () { runNeed(false); });
+  document.getElementById("list").addEventListener("input", function () { runNeed(false); });
+  document.getElementById("adv-need-run").addEventListener("click", function () { runNeed(true); });
+})();
+</script>
+</body>
+</html>

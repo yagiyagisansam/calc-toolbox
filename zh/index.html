@@ -6,7 +6,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Quick Calc | 在日生活实用免费计算工具</title>
-  <meta name="description" content="健康·金钱·日期·日常生活的免费在线计算工具,包含在日生活专用工具(日本年号换算、日本标准BMI等)。无需注册,手机适配,每个页面都注明计算依据和出处。">
+  <meta name="description" content="健康·金钱·日期·日常生活的免费在线计算工具,包含在日生活专用工具(日本年号换算、英文地址转换、日本标准BMI等)。无需注册,手机适配,每个页面都注明计算依据和出处。">
   <link rel="stylesheet" href="../shared/style.css">
   <!-- @meta start -->
   <link rel="canonical" href="https://quick-calc.site/zh/">
@@ -14,19 +14,12 @@
   <meta name="theme-color" content="#0b6e4f">
   <meta property="og:site_name" content="Quick Calc">
   <meta property="og:title" content="Quick Calc | 在日生活实用免费计算工具">
-  <meta property="og:description" content="健康·金钱·日期·日常生活的免费在线计算工具,包含在日生活专用工具(日本年号换算、日本标准BMI等)。无需注册,手机适配,每个页面都注明计算依据和出处。">
+  <meta property="og:description" content="健康·金钱·日期·日常生活的免费在线计算工具,包含在日生活专用工具(日本年号换算、英文地址转换、日本标准BMI等)。无需注册,手机适配,每个页面都注明计算依据和出处。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://quick-calc.site/zh/">
   <meta property="og:locale" content="zh_CN">
   <meta name="twitter:card" content="summary">
   <!-- @meta end -->
-  <!-- @hreflang start -->
-  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/">
-  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/">
-  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/">
-  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/">
-  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/">
-  <!-- @hreflang end -->
 </head>
 <body>
 <!-- @partial:header start -->
@@ -39,18 +32,51 @@
   <p>在日生活实用的免费计算工具。每个工具都注明计算公式和一次信息出处。</p>
   <h2>健康</h2>
   <ul class="related">
-    <li><a href="./tools/bmi/">BMI·标准体重计算器(日本标准)</a> — 按日本体检使用的标准判定BMI和标准体重。</li>
+    <li><a href="./tools/alcohol/">纯酒精量计算器</a> — 输入酒的量和酒精度数,免费计算纯酒精量(g)和标准杯数。按日本厚生劳动省指南,分男女判定是否达到提高生活习惯病风险的饮酒量。</li>
+    <li><a href="./tools/bmi/">BMI·标准体重计算器</a> — 输入身高体重,免费计算BMI和标准体重(BMI 22)。按日本肥胖学会标准(偏瘦·正常·肥胖1〜4级)判定,即日本体检使用的标准。附计算公式和出处。</li>
+    <li><a href="./tools/bmr/">基础代谢量计算器</a> — 输入年龄、性别和体重,免费计算一天的基础代谢量(kcal)。基于日本厚生劳动省《日本人饮食摄取基准》的基础代谢基准值,附计算依据和出处。</li>
+    <li><a href="./tools/caffeine/">咖啡因摄入量计算器</a> — 合计咖啡·红茶·绿茶·能量饮料等的咖啡因量,并与每日参考值(健康成人400mg·孕期更少)比较。适合自查是否喝多了。</li>
+    <li><a href="./tools/hosu/">步数→距离·卡路里换算器</a> — 根据步数和身高计算步行距离(km)·时间·消耗卡路里的大致数值。步幅按身高×0.45估算。「今天的8,000步走了几公里?」立刻知道。适合步数打卡和减肥记录。</li>
+    <li><a href="./tools/ninshin/">预产期·孕周计算器</a> — 根据末次月经的开始日免费计算预产期和当前孕周(〇周△天)。支持月经周期不是28天时的修正,并显示孕早期·中期·晚期的区分。</li>
+    <li><a href="./tools/protein/">蛋白质摄入量计算器</a> — 根据体重和运动量计算一天所需蛋白质的参考量,并换算成常见食品(鸡胸肉、鸡蛋、牛奶、纳豆各需多少)。适合健身、减肥和饮食管理。</li>
+    <li><a href="./tools/shinpaku/">目标心率计算器(卡沃宁公式)</a> — 根据年龄和安静心率,用卡沃宁公式(Karvonen法)计算适合燃脂和提升耐力的目标心率区间。适用于步行·慢跑·健身车的强度设定。</li>
+    <li><a href="./tools/shio/">盐分计算器(钠⇔食盐相当量)</a> — 把食品标签上的钠(mg)一键换算成食盐相当量(g),免费使用。同时显示占日本每日目标量(男性7.5g·女性6.5g未满)的比例。换算系数依据日本食品表示基准,适合减盐·健康管理。</li>
+    <li><a href="./tools/sleep/">睡眠时长计算器</a> — 只需输入就寝时刻和起床时刻,免费计算睡眠时长,跨越午夜也能正确计算。适合记录每日睡眠,或从起床时刻反推该几点睡。</li>
+    <li><a href="./tools/sports/">运动消耗卡路里计算器</a> — 按METs法(官方METs表)计算慢跑·骑行·游泳·网球·力量训练·跳绳·瑜伽等13种运动的消耗卡路里。只需输入体重和时间,附脂肪换算。</li>
+    <li><a href="./tools/tdee/">每日所需摄入热量计算器</a> — 根据年龄、性别、体重和活动量,免费计算一天所需摄入热量的参考值(估算能量需要量)。基于日本厚生劳动省的基础代谢基准值和身体活动水平,可用于减肥的饮食管理。</li>
+    <li><a href="./tools/walking/">步行消耗卡路里计算器</a> — 根据体重·时间·步行速度,按METs法(日本厚生劳动省的公式)计算步行消耗的卡路里,并显示相当于多少克脂肪。散步·快走·减肥的参考。免费·无需注册。</li>
+  </ul>
+  <h2>金钱</h2>
+  <ul class="related">
+    <li><a href="./tools/hiwari/">日本房租日割(按日分摊)计算器</a> — 在日本月中入住或退租时的按日分摊(日割)房租免费计算。同时显示实际天数方式和固定30天方式,可对照租房合同确认,还能连敷金·礼金一起算出入住初期费用。</li>
+    <li><a href="./tools/point/">打折和积分返还哪个划算?计算器</a> — 「10%OFF」和「10%积分返还」其实不一样?计算实际价格和折扣换算率(10%返还≈9.09%OFF),一键判定哪个更划算。用于比较日本的打折与积分活动。</li>
+    <li><a href="./tools/tax/">日本消费税计算器(含税⇔不含税)</a> — 不含税→含税、含税→不含税,一键换算的免费日本消费税计算器。支持标准税率10%和轻减税率8%(食品饮料),并显示税额明细。附出处(日本国税厅)。</li>
+    <li><a href="./tools/waribiki/">折扣计算器(○%OFF后是多少钱?)</a> — 「30%OFF后多少钱?」一键算出。可计算折后价格和优惠金额,也能反过来由促销价倒推折扣率。免费,适合在日本超市·打折季·奥特莱斯购物时使用。</li>
   </ul>
   <h2>日期·时间</h2>
   <ul class="related">
-    <li><a href="./tools/wareki/">西历·日本年号(和历)换算器</a> — 西历⇔日本年号互转,附可直接抄写到表格上的汉字写法。</li>
+    <li><a href="./tools/age/">年龄计算器(周岁·生肖·早生判定)</a> — 根据出生日期免费计算周岁年龄和生肖,并判断是否属于日本学年制度的「早生」(1月1日〜4月1日出生)。可指定基准日查询「当时几岁」,支持2月29日出生。</li>
+    <li><a href="./tools/days/">天数计算器(日期间隔·○天后)</a> — 免费计算两个日期之间相差多少天,以及从基准日起○天后(○天前)的日期和星期。适合确认截止日、纪念日、付款和提交期限。支持闰年。</li>
+    <li><a href="./tools/eigyobi/">日本工作日计算器(排除周末·日本节假日)</a> — 按日本的法定节假日(含振替休日)计算「3个工作日后是哪天」,也能统计期间内的工作日数。日本的节假日与中国不同,核对交货期、付款期限、办手续时间时很方便。免费即时,支持2026〜2027年。</li>
+    <li><a href="./tools/jikan/">时间计算器(合计·时刻之差)</a> — 计算「1:30+0:45+8:00」这样的时间合计,以及开始〜结束时刻的经过时间,并同时给出工资计算常用的十进制小时(如1.75小时)。统计工时·加班时间很方便,免费即时。</li>
+    <li><a href="./tools/kinenbi/">纪念日天数计算器</a> — 输入生日或纪念日,免费一次算出「今天是第几天」以及第100天·第1000天·第10000天等节点日期。适合情侣纪念日、追星应援、宝宝百日和出生一万天庆祝。</li>
+    <li><a href="./tools/tsukisu/">○个月后·月数 计算器</a> — 免费计算「3个月后是几号?」「两个日期相差几个月?」,自动进行月末调整。适合确认合同期限、付款周期、纪念日和宝宝月龄。也支持○个月前。</li>
+    <li><a href="./tools/wareki/">西历·日本年号(和历)换算器</a> — 西历⇔日本年号(明治·大正·昭和·平成·令和)免费即时换算。改元年份同时显示新旧两个年号,可直接抄写到日本的表格和证件上。</li>
+  </ul>
+  <h2>生活·换算</h2>
+  <ul class="related">
+    <li><a href="./tools/heikin/">平均值·中位数计算器</a> — 只需粘贴数值,即可一次算出平均值、中位数、最大、最小、合计。适合统计考试分数、销售额、各类记录。支持逗号·空格·换行分隔的免费工具。</li>
+    <li><a href="./tools/hensachi/">偏差值计算器</a> — 免费计算日本升学考试通用的「偏差值」(以平均50、标准差10为基准的标准化分数)。输入得分、平均分、标准差即可计算,也可粘贴分数列表一次算出所有人的偏差值。附计算公式。</li>
+    <li><a href="./tools/kome/">米的合·克换算计算器</a> — 按大米1合=约150g、每合水约200ml的标准,由合数一并算出米的重量、加水量、煮好的饭量和几碗饭。也支持由克数反算合数。「合」是日本电饭锅量杯使用的单位。</li>
+    <li><a href="./tools/percent/">百分比计算器</a> — 免费一键计算「A是B的百分之几」「A的○%是多少」「从A到B增减了百分之几」三种百分比。算折扣、达成率、同比增减都很方便。</li>
+    <li><a href="./tools/petage/">猫狗年龄换算器</a> — 把猫和中小型犬的年龄免费换算成人类年龄: 1岁≈人类15岁、2岁≈24岁,之后每年约+4岁。我家的孩子相当于人几岁?还能查老年期的大致时间和反向换算。</li>
+    <li><a href="./tools/seiza/">星座·诞生石速查器</a> — 输入生日立即免费显示12星座和诞生石。「4月20日出生是什么座?」这样的交界日也一目了然。填写个人资料、挑选礼物时都能用。</li>
+    <li><a href="./tools/shincho/">身高英尺·英寸换算</a> — 身高的cm与英尺·英寸表示(如5'7″)相互换算。海外资料上的身高·运动员身高·美国的尺码表示一看就懂。按1英尺=30.48cm的定义值计算。</li>
+    <li><a href="./tools/spoon/">大匙·小匙·量杯换算计算器</a> — 按日本标准大匙1=15ml、小匙1=5ml、1杯=200ml相互换算。「大匙3是多少ml?」「50ml是几大匙?」一键得到答案。调整食谱分量、手边没有量匙时使用。</li>
   </ul>
 </main>
 <!-- @partial:footer start -->
 <footer class="site-footer">
-<!-- @langsw start -->
-<nav class="lang-switch" aria-label="语言"><a href="/" lang="ja" hreflang="ja">日本語</a><a href="/en/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/" lang="ko" hreflang="ko">한국어</a></nav>
-<!-- @langsw end -->
   <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
   <nav>
     <a href="./privacy.html">隐私政策</a>

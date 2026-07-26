@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>坪·平方米(㎡)·畳 换算器 | Quick Calc</title>
+  <meta name="description" content="免费一次换算坪(坪)⇔平方米(㎡)⇔畳(榻榻米),这三个单位是日本房产广告和户型图上常见的面积单位。依据1坪=约3.31㎡、1畳=1.62㎡(日本房产广告的标示基准),并注明出处。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/tsubo/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="坪·平方米(㎡)·畳 换算器 | Quick Calc">
+  <meta property="og:description" content="免费一次换算坪(坪)⇔平方米(㎡)⇔畳(榻榻米),这三个单位是日本房产广告和户型图上常见的面积单位。依据1坪=约3.31㎡、1畳=1.62㎡(日本房产广告的标示基准),并注明出处。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/tsubo/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"坪·平方米(㎡)·畳 换算器","item":"https://quick-calc.site/zh/tools/tsubo/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>坪·平方米(㎡)·畳 换算器</h1>
+  <form class="tool-form" id="tsubo-form">
+    <label>面积数值
+      <span class="field-note">输入数字后,换算结果会立即显示在下方(支持范围: 0.01〜100,000)</span>
+      <input type="number" id="value" inputmode="decimal" step="0.01" min="0.01" max="100000" placeholder="100" required>
+    </label>
+    <label>输入值的单位
+      <select id="unit">
+        <option value="sqm">平方米(㎡)</option>
+        <option value="tsubo">坪</option>
+        <option value="jo">畳(榻榻米)</option>
+      </select>
+    </label>
+    <button type="submit">换算</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 建蔽率·容积率与坪单价的计算</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">从建蔽率·容积率计算可建面积</h3>
+      <p class="adv-note">根据土地广告上写的<strong>建蔽率</strong>(建筑物可占土地的比例)和<strong>容积率</strong>(各层楼板面积合计的上限比例),计算可建建筑物的上限。</p>
+      <label>土地面积
+        <input type="number" id="adv-land" inputmode="decimal" step="any" min="0.01" max="100000" placeholder="例: 100">
+      </label>
+      <label>土地面积的单位
+        <select id="adv-land-unit">
+          <option value="sqm" selected>平方米(㎡)</option>
+          <option value="tsubo">坪</option>
+        </select>
+      </label>
+      <label>建蔽率(%)
+        <input type="number" id="adv-kenpei" inputmode="decimal" step="any" min="1" max="100" placeholder="例: 60">
+      </label>
+      <label>容积率(%)
+        <input type="number" id="adv-yoseki" inputmode="decimal" step="any" min="1" max="2000" placeholder="例: 200">
+      </label>
+      <button type="button" id="adv-limit-run">计算上限</button>
+      <div class="tool-result" id="adv-limit-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">坪单价的计算</h3>
+      <p class="adv-note">根据房产的价格和面积,计算坪单价和㎡单价。</p>
+      <label>价格(万日元)
+        <span class="field-note">日本房产广告以「万日元」标价。1万日元=10,000日元,填3000即3,000万日元</span>
+        <input type="number" id="adv-price" inputmode="decimal" step="any" min="1" placeholder="例: 3000">
+      </label>
+      <label>面积
+        <input type="number" id="adv-area" inputmode="decimal" step="any" min="0.01" max="100000" placeholder="例: 100">
+      </label>
+      <label>面积的单位
+        <select id="adv-area-unit">
+          <option value="sqm" selected>平方米(㎡)</option>
+          <option value="tsubo">坪</option>
+        </select>
+      </label>
+      <button type="button" id="adv-price-run">计算坪单价</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    本工具的换算结果为<strong>约值</strong>。畳按广告标示基准「1枚=1.62㎡」换算,与实际的畳的尺寸(京间·中京间·江户间·团地间)可能不同。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>只需输入一个面积数字,就能立即知道<strong>换成坪·平方米(㎡)·畳分别是多少</strong>。在日本找房时,广告和户型图上这三个单位混着用(广告写「6畳」,合同上却写㎡),用本工具即可快速换算,对房间大小心里有数。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>输入要换算的面积数值(例: 100)。</li>
+    <li>选择该数值的单位(㎡·坪·畳)。</li>
+    <li>输入的瞬间,三个单位的数值全部显示,无需按钮。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>1坪 = 400/121㎡ ≒ 3.31㎡</strong>(1㎡ ≒ 0.3025坪)<br>
+      由1尺=10/33米的定义可得 1坪=(6尺)²=400/121㎡。另外,日本《计量法》不允许在交易和证明中使用尺贯法(坪),坪的标示属于习惯性的参考值。</li>
+    <li><strong>1畳 = 1.62㎡</strong><br>
+      这是日本房产广告标示「◯畳」时的基准(以墙心面积计,每枚畳不少于1.62㎡)。</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>常用换算速查表(约值)</caption>
+      <thead><tr><th>㎡</th><th>坪</th><th>畳</th></tr></thead>
+      <tbody>
+        <tr><td>9.72</td><td>2.94</td><td>6</td></tr>
+        <tr><td>16.2</td><td>4.9</td><td>10</td></tr>
+        <tr><td>33.06</td><td>10</td><td>20.41</td></tr>
+        <tr><td>66.12</td><td>20</td><td>40.81</td></tr>
+        <tr><td>100</td><td>30.25</td><td>61.73</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出处(一次信息)</h3>
+  <ul class="sources">
+    <li>计量法(平成4年法律第51号)(交易·证明中的法定计量单位)— 日本官方法令原文(日文)<br>
+      <a href="https://laws.e-gov.go.jp/law/404AC0000000051" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/404AC0000000051</a>(2026年7月18日查阅)</li>
+    <li>不动产公正交易协议会联合会「关于不动产标示的公正竞争规约·同施行规则」(1畳=1.62㎡的标示基准)— 日文<br>
+      <a href="https://www.rftc.jp/koseikyosokiyaku/" rel="noopener" target="_blank">https://www.rftc.jp/koseikyosokiyaku/</a>(2026年7月18日查阅)</li>
+  </ul>
+
+  <h2>计算的前提与注意</h2>
+  <ul class="cautions">
+    <li>实际的畳的尺寸因地区和种类而异(京间 约1.82㎡、中京间 约1.66㎡、江户间 约1.55㎡、团地间 约1.45㎡左右)。本工具统一按广告标示基准的1.62㎡换算。</li>
+    <li>房产的正式面积请以登记簿和图纸(以㎡标示)为准。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">1坪是几畳?</h3>
+  <p class="faq-a">按广告标示基准(1畳=1.62㎡)换算,1坪≒2.04畳。习惯上记作「1坪≒2枚畳」。</p>
+  <h3 class="faq-q">同一个房子,为什么不同资料上的面积不一样?</h3>
+  <p class="faq-a">广告多用以墙体中心线测量的「墙心面积」,登记则多用以墙体内侧测量的「内法面积」,因此同一个房间数值会不同。</p>
+  <h3 class="faq-q">为什么「6畳」的房间感觉比想象中小?</h3>
+  <p class="faq-a">实际的畳的尺寸因地区和建筑而异(江户间·团地间比京间小),而且广告只要满足1.62㎡×6=9.72㎡以上的基准,就可以标示为「6畳」。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=tsubo">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/tsubo/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_value: "面积请输入 " + TsuboCalc.VALUE_MIN + "〜" + TsuboCalc.VALUE_MAX + " 范围内的数值。",
+    invalid_unit: "请选择单位。"
+  };
+  var box = document.getElementById("result");
+  function run() {
+    if (document.getElementById("value").value.trim() === "") { box.hidden = true; return; }
+    var value = parseFloat(document.getElementById("value").value);
+    var unit = document.getElementById("unit").value;
+    var result = TsuboCalc.convert(value, unit);
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">' + result.sqm.toLocaleString() + " ㎡</div>" +
+        "<p><strong>" + result.tsubo.toLocaleString() + " 坪</strong> / <strong>" + result.jo.toLocaleString() + " 畳</strong></p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "请检查输入值。") + "</p>";
+    }
+    box.hidden = false;
+  }
+  document.getElementById("value").addEventListener("input", run);
+  document.getElementById("unit").addEventListener("change", run);
+  document.getElementById("tsubo-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var limitBox = document.getElementById("adv-limit-result");
+  var fmt = function (x, d) { return x.toLocaleString(undefined, { maximumFractionDigits: d === undefined ? 2 : d }); };
+  function runLimit(force) {
+    if ((document.getElementById("adv-land").value.trim() === "" ||
+         document.getElementById("adv-kenpei").value.trim() === "" ||
+         document.getElementById("adv-yoseki").value.trim() === "") && !force) { limitBox.hidden = true; return; }
+    var land = parseFloat(document.getElementById("adv-land").value);
+    if (document.getElementById("adv-land-unit").value === "tsubo") {
+      land = land * TsuboCalc.SQM_PER_TSUBO;
+    }
+    var r = TsuboCalc.buildingLimits(
+      land,
+      parseFloat(document.getElementById("adv-kenpei").value),
+      parseFloat(document.getElementById("adv-yoseki").value)
+    );
+    if (!r.ok) {
+      var msg = r.code === "invalid_kenpei" ? "建蔽率请输入1〜100%。"
+        : r.code === "invalid_yoseki" ? "容积率请输入1〜2000%。"
+        : "土地面积请输入数值。";
+      limitBox.innerHTML = '<p class="result-error">' + msg + '</p>';
+      limitBox.hidden = false;
+      return;
+    }
+    limitBox.innerHTML =
+      '<div class="result-main">总楼板面积上限 ' + fmt(r.floorSqm) + ' ㎡(约' + fmt(r.floorTsubo) + '坪)</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>建筑面积的上限(一层部分)</td><td>' + fmt(r.buildingSqm) + ' ㎡(约' + fmt(r.buildingTsubo) + '坪)</td></tr>' +
+      '<tr><td>总楼板面积的上限(各层合计)</td><td>' + fmt(r.floorSqm) + ' ㎡(约' + fmt(r.floorTsubo) + '坪)</td></tr>' +
+      '<tr><td>参考: 按建蔽率满建时的层数</td><td>约 ' + fmt(r.floorsHint, 1) + ' 层</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">高度限制、斜线限制等还可能进一步限制。准确情况请向当地政府或建筑师确认。</p>';
+    limitBox.hidden = false;
+  }
+  ["adv-land", "adv-kenpei", "adv-yoseki"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runLimit(false); });
+  });
+  document.getElementById("adv-land-unit").addEventListener("change", function () { runLimit(false); });
+  document.getElementById("adv-limit-run").addEventListener("click", function () { runLimit(true); });
+  function runPrice(force) {
+    if ((document.getElementById("adv-price").value.trim() === "" ||
+         document.getElementById("adv-area").value.trim() === "") && !force) { advBox.hidden = true; return; }
+    var r = TsuboCalc.pricePerArea(
+      parseFloat(document.getElementById("adv-price").value),
+      parseFloat(document.getElementById("adv-area").value),
+      document.getElementById("adv-area-unit").value
+    );
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">价格和面积请输入大于0的数值。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">坪单价 约 ' + fmt(r.perTsubo) + ' 万日元</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>坪单价</td><td>' + fmt(r.perTsubo) + ' 万日元/坪(' + fmt(r.tsubo) + '坪)</td></tr>' +
+      '<tr><td>㎡单价</td><td>' + fmt(r.perSqm) + ' 万日元/㎡(' + fmt(r.sqm) + '㎡)</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">1万日元=10,000日元,这是日本房产广告使用的单位。</p>';
+    advBox.hidden = false;
+  }
+  ["adv-price", "adv-area"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runPrice(false); });
+  });
+  document.getElementById("adv-area-unit").addEventListener("change", function () { runPrice(false); });
+  document.getElementById("adv-price-run").addEventListener("click", function () { runPrice(true); });
+})();
+</script>
+</body>
+</html>

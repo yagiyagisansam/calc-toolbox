@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>별자리·탄생석 계산기(생일만 입력) | Quick Calc</title>
+  <meta name="description" content="생일을 입력하면 12별자리와 탄생석을 무료로 바로 표시합니다. 「4월 20일생은 무슨 자리?」 같은 경계일도 한눈에 확인. 프로필 작성이나 선물 고르기에 활용하세요.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/seiza/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="별자리·탄생석 계산기(생일만 입력) | Quick Calc">
+  <meta property="og:description" content="생일을 입력하면 12별자리와 탄생석을 무료로 바로 표시합니다. 「4월 20일생은 무슨 자리?」 같은 경계일도 한눈에 확인. 프로필 작성이나 선물 고르기에 활용하세요.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/seiza/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"별자리·탄생석 계산기","item":"https://quick-calc.site/ko/tools/seiza/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>별자리·탄생석 계산기</h1>
+  <form class="tool-form" id="seiza-form">
+    <span class="field-note">생일을 선택하면 바로 아래에 별자리와 탄생석이 표시됩니다</span>
+    <div class="field-row">
+      <label>생일(월)
+        <select id="month"></select>
+      </label>
+      <label>일
+        <select id="day"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 태어난 날의 요일과 12별자리 일람표</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">태어난 해를 넣어 자세히 알아보기</h3>
+      <p class="adv-note">태어난 해를 입력하면 태어난 날의 요일과, 생일이 별자리 경계(커스프)에 가까울 때의 안내를 표시합니다(월·일은 위에서 선택한 값을 사용합니다).</p>
+      <label>태어난 해(서기)
+        <input type="number" id="adv-year" inputmode="numeric" min="1600" max="2200" step="1" placeholder="예: 1990">
+      </label>
+      <button type="button" id="adv-detail-run">요일과 별자리 자세히 보기</button>
+      <h3 class="adv-h">12별자리 기간 일람표</h3>
+      <p class="adv-note">모든 별자리의 날짜 구분을 한 번에 확인할 수 있습니다.</p>
+      <button type="button" id="adv-list-run">일람표 보기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>생일(월과 일)만 선택하면 <strong>나의 별자리와 탄생석</strong>을 바로 알 수 있는 도구입니다. 「4월 20일은 양자리? 황소자리?」 같은 경계일도 한눈에 확인할 수 있습니다. 프로필 작성이나 보석 선물 고르기에 활용하세요. 탄생석은 일본에서 널리 쓰이는 선정 기준을 따릅니다.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>생일의 월과 일을 선택합니다(연도는 필요 없습니다).</li>
+    <li>선택하는 순간 별자리(영어 표기 포함)와 탄생석이 아래에 표시됩니다. 버튼은 필요 없습니다.</li>
+  </ol>
+
+  <h2>판정 방법과 근거</h2>
+  <ul class="method">
+    <li>12별자리는 <strong>일반적으로 쓰이는 날짜 구분</strong>(양자리 3/21〜4/19 등)으로 판정합니다.</li>
+    <li>별자리 구분은 태양의 위치(황도 12궁)에 근거하므로, 경계일은 해에 따라 하루 정도 달라집니다. 경계일에 태어난 분은 태어난 해·시각에 따라 바뀔 수 있습니다.</li>
+    <li>탄생석은 월별 대표적인 보석을 표시합니다(여러 개인 달은 주요한 것).</li>
+  </ul>
+
+  <h3>출처와 전제</h3>
+  <ul class="sources">
+    <li>별자리의 날짜 구분은 점성술에서 관용적으로 쓰이는 구분이며, 탄생석은 일본의 전국보석도매상협동조합(全国宝石卸商協同組合)의 선정(2021년 개정)을 참고한 대표 보석입니다. 어느 쪽도 자연과학적인 효과를 나타내는 것은 아닙니다.</li>
+  </ul>
+
+  <h2>전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>경계일(4/19와 4/20 사이 등)에 태어난 경우, 매체에 따라 별자리 표기가 하루 차이 날 수 있습니다.</li>
+    <li>탄생석은 나라·단체에 따라 일부 다릅니다(3월에 산호, 6월에 문스톤을 드는 경우 등).</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">별자리 경계일에 태어났습니다. 어느 별자리인가요?</h3>
+  <p class="faq-a">별자리의 전환은 태양이 별자리 사이를 이동하는 순간으로 정해지며, 그 날짜는 해에 따라 하루 정도 달라집니다. 정확히 알고 싶다면 태어난 해와 출생 시각으로 확인해야 합니다. 일반적인 프로필 작성에는 이 도구의 구분으로 충분합니다.</p>
+  <h3 class="faq-q">책이나 가게마다 탄생석이 다른 이유는?</h3>
+  <p class="faq-a">탄생석 선정이 나라와 보석 단체마다 조금씩 다르기 때문입니다. 일본에서는 전국보석도매상협동조합의 선정(2021년 개정·추가)이 널리 쓰입니다.</p>
+  <h3 class="faq-q">띠도 알아볼 수 있나요?</h3>
+  <p class="faq-a">이 사이트의 「나이 계산기」에서 생년월일을 넣으면 띠와 만 나이를 함께 확인할 수 있습니다(「전체 도구」에서 찾을 수 있습니다).</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=seiza">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/seiza/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var SIGN_KO = {
+    "Aquarius": "물병자리", "Pisces": "물고기자리", "Aries": "양자리", "Taurus": "황소자리",
+    "Gemini": "쌍둥이자리", "Cancer": "게자리", "Leo": "사자자리", "Virgo": "처녀자리",
+    "Libra": "천칭자리", "Scorpio": "전갈자리", "Sagittarius": "궁수자리", "Capricorn": "염소자리"
+  };
+  var STONE_KO = {
+    "ガーネット": "가넷",
+    "アメシスト": "자수정",
+    "アクアマリン": "아쿠아마린",
+    "ダイヤモンド": "다이아몬드",
+    "エメラルド": "에메랄드",
+    "パール(真珠)": "진주",
+    "ルビー": "루비",
+    "ペリドット": "페리도트",
+    "サファイア": "사파이어",
+    "オパール": "오팔",
+    "トパーズ": "토파즈",
+    "ターコイズ(トルコ石)": "터키석(터콰이즈)"
+  };
+  var box = document.getElementById("result");
+  var monthSel = document.getElementById("month");
+  var daySel = document.getElementById("day");
+  var today = new Date();
+  var DAYS = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  for (var m = 1; m <= 12; m++) monthSel.add(new Option(m + "월", m));
+  monthSel.value = today.getMonth() + 1;
+  function fillDays() {
+    var cur = parseInt(daySel.value || String(today.getDate()), 10);
+    daySel.innerHTML = "";
+    for (var d = 1; d <= DAYS[monthSel.value - 1]; d++) daySel.add(new Option(d + "일", d));
+    daySel.value = Math.min(cur, DAYS[monthSel.value - 1]);
+  }
+  fillDays();
+  function run() {
+    var r = SeizaCalc.lookup(parseInt(monthSel.value, 10), parseInt(daySel.value, 10));
+    if (!r.ok) { box.innerHTML = '<p class="result-error">날짜를 올바르게 선택해 주세요.</p>'; box.hidden = false; return; }
+    box.innerHTML =
+      '<div class="result-main">' + (SIGN_KO[r.signEn] || r.signEn) + "</div>" +
+      "<p>영어 표기: <strong>" + r.signEn + "</strong> / 탄생석: <strong>" + (STONE_KO[r.stone] || r.stone) + "</strong></p>";
+    box.hidden = false;
+    if (window.__seizaAdvRefresh) { window.__seizaAdvRefresh(); }
+  }
+  monthSel.addEventListener("change", function () { fillDays(); run(); });
+  daySel.addEventListener("change", run);
+  document.getElementById("seiza-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run();
+  });
+  run();
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var SIGN_KO = {
+    "Aquarius": "물병자리", "Pisces": "물고기자리", "Aries": "양자리", "Taurus": "황소자리",
+    "Gemini": "쌍둥이자리", "Cancer": "게자리", "Leo": "사자자리", "Virgo": "처녀자리",
+    "Libra": "천칭자리", "Scorpio": "전갈자리", "Sagittarius": "궁수자리", "Capricorn": "염소자리"
+  };
+  var STONE_KO = {
+    "ガーネット": "가넷",
+    "アメシスト": "자수정",
+    "アクアマリン": "아쿠아마린",
+    "ダイヤモンド": "다이아몬드",
+    "エメラルド": "에메랄드",
+    "パール(真珠)": "진주",
+    "ルビー": "루비",
+    "ペリドット": "페리도트",
+    "サファイア": "사파이어",
+    "オパール": "오팔",
+    "トパーズ": "토파즈",
+    "ターコイズ(トルコ石)": "터키석(터콰이즈)"
+  };
+  var WD_KO = { "日曜日": "일요일", "月曜日": "월요일", "火曜日": "화요일", "水曜日": "수요일", "木曜日": "목요일", "金曜日": "금요일", "土曜日": "토요일" };
+  var advBox = document.getElementById("adv-result");
+  var lastAdv = "";
+  function runDetail(fromButton) {
+    lastAdv = "detail";
+    var raw = document.getElementById("adv-year").value;
+    var y = parseInt(raw, 10);
+    if (!fromButton && !(y >= 1600 && y <= 2200)) { return; }
+    var mo = parseInt(document.getElementById("month").value, 10);
+    var d = parseInt(document.getElementById("day").value, 10);
+    var r = SeizaCalc.detail(y, mo, d);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">실재하는 날짜를 입력해 주세요(연도는 서기 1600〜2200년). 윤년이 아니면 2월 29일은 없습니다.</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var html = '<div class="result-main">' + y + "년 " + mo + "월 " + d + "일은 " + (WD_KO[r.youbi] || r.youbi) + "</div>" +
+      "<p>별자리는 <strong>" + (SIGN_KO[r.signEn] || r.signEn) + "(" + r.signEn + ")</strong>, 탄생석은 " + (STONE_KO[r.stone] || r.stone) + "입니다.</p>";
+    if (r.cusp) {
+      html += '<p class="adv-note">이 생일은 별자리 경계(커스프, ' + r.cusp.boundaryM + "/" + r.cusp.boundaryD +
+        " 무렵 전환)에 가까운 날입니다. 별자리 경계는 해에 따라 하루 정도 달라지므로, 태어난 해·시각에 따라 <strong>" +
+        (SIGN_KO[r.cusp.otherSignEn] || r.cusp.otherSignEn) + "(" + r.cusp.otherSignEn + ")</strong>이 될 수도 있습니다.</p>";
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-detail-run").addEventListener("click", function () { runDetail(true); });
+  document.getElementById("adv-year").addEventListener("input", function () { runDetail(false); });
+  window.__seizaAdvRefresh = function () {
+    if (!advBox.hidden && lastAdv === "detail" && document.getElementById("adv-year").value !== "") { runDetail(false); }
+  };
+  document.getElementById("adv-list-run").addEventListener("click", function () {
+    lastAdv = "list";
+    var signs = SeizaCalc.SIGNS;
+    var html = '<div class="result-main">12별자리 기간 일람</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>별자리</th><th>기간</th></tr></thead><tbody>';
+    for (var i = 0; i < signs.length; i++) {
+      var s = signs[i];
+      var n = signs[(i + 1) % signs.length];
+      var endM = n[0];
+      var endD = n[1] - 1;
+      html += "<tr><td>" + (SIGN_KO[s[3]] || s[3]) + "(" + s[3] + ")</td><td>" +
+        s[0] + "/" + s[1] + " 〜 " + endM + "/" + endD + "</td></tr>";
+    }
+    html += "</tbody></table></div>" +
+      '<p class="adv-note">경계일은 해에 따라 하루 정도 달라질 수 있습니다.</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

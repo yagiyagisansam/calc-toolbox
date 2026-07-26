@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>日本房租日割(按日分摊)计算器(按入住日·退租日,实际天数/30天方式) | Quick Calc</title>
+  <meta name="description" content="在日本月中入住或退租时的按日分摊(日割)房租免费计算。同时显示实际天数方式和固定30天方式,可对照租房合同确认,还能连敷金·礼金一起算出入住初期费用。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/hiwari/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="日本房租日割(按日分摊)计算器(按入住日·退租日,实际天数/30天方式) | Quick Calc">
+  <meta property="og:description" content="在日本月中入住或退租时的按日分摊(日割)房租免费计算。同时显示实际天数方式和固定30天方式,可对照租房合同确认,还能连敷金·礼金一起算出入住初期费用。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/hiwari/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"日本房租日割(按日分摊)计算器","item":"https://quick-calc.site/zh/tools/hiwari/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>日本房租日割(按日分摊)计算器</h1>
+  <form class="tool-form" id="hiwari-form">
+    <label>月租(日元)
+      <span class="field-note">共益费·管理费也按日分摊时,请填入合计金额</span>
+      <input type="number" id="rent" inputmode="numeric" min="1" max="10000000" step="1" required placeholder="例: 80000">
+    </label>
+    <label>入住 or 退租
+      <select id="mode">
+        <option value="movein" selected>入住(支付入住日〜月末的部分)</option>
+        <option value="moveout">退租(支付月初〜退租日的部分)</option>
+      </select>
+    </label>
+    <div class="field-row">
+      <label><span id="date-label">入住日</span>(年)
+        <select id="date-year"></select>
+      </label>
+      <label>月
+        <select id="date-month"></select>
+      </label>
+      <label>日
+        <select id="date-day"></select>
+      </label>
+    </div>
+    <button type="submit">计算日割房租</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 一次算出入住初期费用</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">连敷金·礼金一起算出「最初要付的总额」</h3>
+      <p class="adv-note">敷金等请按合同书·报价单上的「相当于几个月房租」填写(房租·入住日取上方表单的值,日割按实际天数方式)。</p>
+      <label>敷金·押金(月数)
+        <input type="number" id="adv-shikikin" inputmode="decimal" step="any" min="0" max="12" value="1">
+      </label>
+      <label>礼金(月数)
+        <input type="number" id="adv-reikin" inputmode="decimal" step="any" min="0" max="12" value="1">
+      </label>
+      <label>中介手续费(月数)
+        <span class="field-note">上限为1个月房租+消费税。含税填1.1</span>
+        <input type="number" id="adv-chukai" inputmode="decimal" step="any" min="0" max="12" value="1">
+      </label>
+      <label>预付房租(月数)
+        <span class="field-note">需要先付下个月的房租时填1</span>
+        <input type="number" id="adv-mae" inputmode="decimal" step="any" min="0" max="12" value="1">
+      </label>
+      <label>其他费用(日元)
+        <span class="field-note">担保公司费用·火灾保险·换锁费等。没有填0</span>
+        <input type="number" id="adv-other" inputmode="numeric" step="1" min="0" max="10000000" value="0">
+      </label>
+      <button type="button" id="adv-run">计算初期费用总额</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    采用哪种方式(包括不足1日元的处理)<strong>以租赁合同的约定为准</strong>。本工具按不足1日元舍去计算。准确金额建议向管理公司·房东确认。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>在日本月中搬家时,当月房租按天数折算——日语叫「<strong>日割(ひわり)</strong>」。本工具把日本租房合同里常用的两种算法(按当月实际天数除/按固定30天除)并排显示,还能把日本租房特有的<strong>敷金(押金)、礼金</strong>等加进去,一次算出入住初期费用总额。核对合同·报价单上的金额时很方便。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>输入月租(共益费也参与日割时请合计)。</li>
+    <li>选择「入住」或「退租」,再选日期(初始为今天的日期)。</li>
+    <li>选好的瞬间,两种方式的日割金额就并排显示在下方,无需点击按钮。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>实际天数方式: 日割房租 = 月租 × 对象天数 ÷ 当月天数</strong>(28〜31天)</li>
+    <li><strong>固定30天方式: 日割房租 = 月租 × 对象天数 ÷ 30</strong>(不论月份长短一律按30天除)</li>
+    <li>入住时的对象天数为「入住日〜月末」,退租时为「月初〜退租日」。</li>
+    <li>计算例: 月租8万日元、7月20日入住(7月有31天)→ 对象12天。实际天数方式: 80,000 × 12 ÷ 31 = <strong>30,967日元</strong> / 30天方式: 80,000 × 12 ÷ 30 = <strong>32,000日元</strong></li>
+    <li>30天方式超过月租时,以月租为上限。</li>
+  </ul>
+
+  <h3>出处与前提</h3>
+  <ul class="sources">
+    <li>纯算术计算。日割的方式和尾数处理在日本没有统一的法律规定,以各租赁合同的约定为准。</li>
+  </ul>
+
+  <h2>计算前提与注意</h2>
+  <ul class="cautions">
+    <li>2月(28/29天)时两种方式的差额最大。实际天数方式下,2月每天的单价更高,31天的月份则更低。</li>
+    <li>除入住月的日割房租外,一般还会被要求把下个月的房租作为「预付房租」一并支付。请把两者加在一起做资金安排。</li>
+    <li>退租时,有的合同不做日割,而是「付到月末为止的全额」(如需提前1个月预告解约的合同)。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">实际天数方式和30天方式,哪种更常见?</h3>
+  <p class="faq-a">两种在日本都很常用。以租赁合同中「租金的日割计算」条款为准;合同没写的话,请向管理公司确认。</p>
+  <h3 class="faq-q">共益费·管理费也按日分摊吗?</h3>
+  <p class="faq-a">取决于合同。多数合同和房租一样按日分摊,但也有全额收取的情况。若参与分摊,请把它和房租合计后再计算。</p>
+  <h3 class="faq-q">哪天入住最划算?</h3>
+  <p class="faq-a">在有日割的合同下,入住日越靠近月初,「日割+预付房租」的初期费用越多;越靠近月末越少。不过还要把免租期(free rent)的有无、与旧住处房租的双重支付期间一起比较才稳妥。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=hiwari">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/hiwari/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var today = new Date();
+  var ERROR_MESSAGES = {
+    invalid_rent: "月租请输入1日元以上。",
+    invalid_date: "请输入正确的日期。",
+    invalid_mode: "请选择入住或退租。"
+  };
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, "日", Math.min(keep, max));
+  }
+  fillSelect(document.getElementById("date-year"), today.getFullYear() - 10, today.getFullYear() + 10, "年", today.getFullYear());
+  fillSelect(document.getElementById("date-month"), 1, 12, "月", today.getMonth() + 1);
+  fillSelect(document.getElementById("date-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), "日", today.getDate());
+  function pad2(n) { return n < 10 ? "0" + n : String(n); }
+  function selectedIso() {
+    adjustDays("date-year", "date-month", "date-day");
+    return val("date-year") + "-" + pad2(val("date-month")) + "-" + pad2(val("date-day"));
+  }
+  function run(showErrors) {
+    var rentRaw = document.getElementById("rent").value;
+    if (rentRaw === "") {
+      if (showErrors) {
+        box.innerHTML = '<p class="result-error">' + ERROR_MESSAGES.invalid_rent + "</p>";
+        box.hidden = false;
+      } else {
+        box.hidden = true;
+      }
+      return;
+    }
+    var rent = parseInt(rentRaw, 10);
+    var mode = document.getElementById("mode").value;
+    var r = HiwariCalc.prorate(rent, selectedIso(), mode);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "请检查输入内容。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">实际天数方式 ' + r.actual.toLocaleString() + " 日元</div>" +
+      "<p>对象天数: " + r.days + "天(本月共" + r.daysInMonth + "天)</p>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>方式</th><th>计算</th><th>日割房租</th></tr></thead><tbody>' +
+      "<tr><td>实际天数方式</td><td>月租 × " + r.days + " ÷ " + r.daysInMonth + "</td><td><strong>" + r.actual.toLocaleString() + "日元</strong></td></tr>" +
+      "<tr><td>固定30天方式</td><td>月租 × " + r.days + " ÷ 30</td><td><strong>" + r.by30.toLocaleString() + "日元</strong></td></tr>" +
+      "</tbody></table></div>" +
+      "<p>不足1日元舍去。采用哪种方式请查看合同。</p>";
+    box.hidden = false;
+  }
+  document.getElementById("mode").addEventListener("change", function () {
+    document.getElementById("date-label").textContent =
+      document.getElementById("mode").value === "movein" ? "入住日" : "退租日";
+    run(false);
+  });
+  ["date-year", "date-month", "date-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", function () { run(false); });
+  });
+  document.getElementById("rent").addEventListener("input", function () { run(false); });
+  document.getElementById("hiwari-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+  window.HiwariPage = { selectedIso: selectedIso, rerun: run };
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var ADV_ERRORS = {
+    invalid_rent: "月租(上方表单)请输入 1〜10,000,000日元 的范围。",
+    invalid_date: "请输入入住日(上方表单)。",
+    invalid_months: "敷金·礼金等的月数请输入 0〜12 的范围。",
+    invalid_other: "其他费用请输入 0〜10,000,000日元 的范围。"
+  };
+  function runAdv() {
+    var rent = parseFloat(document.getElementById("rent").value);
+    var iso = window.HiwariPage.selectedIso();
+    function monthVal(id) {
+      var v = parseFloat(document.getElementById(id).value);
+      return isNaN(v) ? 0 : v;
+    }
+    var other = parseFloat(document.getElementById("adv-other").value);
+    if (isNaN(other)) other = 0;
+    var r = HiwariCalc.initialCost(rent, iso,
+      monthVal("adv-shikikin"), monthVal("adv-reikin"),
+      monthVal("adv-chukai"), monthVal("adv-mae"), other);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + (ADV_ERRORS[r.code] || "请检查输入内容。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">初期费用总额 约' + r.total.toLocaleString() + ' 日元</div>' +
+      '<p>约相当于房租的 <strong>' + r.monthsOfRent.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' 个月</strong>。</p>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>日割房租(' + r.days + '天)</td><td>' + r.prorated.toLocaleString() + ' 日元</td></tr>' +
+      '<tr><td>敷金(押金)</td><td>' + r.shikikin.toLocaleString() + ' 日元</td></tr>' +
+      '<tr><td>礼金</td><td>' + r.reikin.toLocaleString() + ' 日元</td></tr>' +
+      '<tr><td>中介手续费</td><td>' + r.chukai.toLocaleString() + ' 日元</td></tr>' +
+      '<tr><td>预付房租</td><td>' + r.maeYachin.toLocaleString() + ' 日元</td></tr>' +
+      '<tr><td>其他</td><td>' + r.other.toLocaleString() + ' 日元</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">如合同按固定30天方式做日割,总额会相差上方表单中30天方式与实际天数方式的差额。准确金额请以合同书·报价单为准。</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", runAdv);
+  function autoAdv() {
+    if (document.getElementById("rent").value !== "") { runAdv(); } else { advBox.hidden = true; }
+  }
+  ["adv-shikikin", "adv-reikin", "adv-chukai", "adv-mae", "adv-other"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoAdv);
+  });
+  ["rent"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { if (!advBox.hidden) autoAdv(); });
+  });
+  ["date-year", "date-month", "date-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", function () { if (!advBox.hidden) autoAdv(); });
+  });
+})();
+</script>
+</body>
+</html>

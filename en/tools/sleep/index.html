@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Sleep Duration Calculator (From Bedtime and Wake-up Time) | Quick Calc</title>
+  <meta name="description" content="Just enter your bedtime and wake-up time to calculate your sleep duration for free — it works even across midnight. Handy for daily sleep logs or working back to a target bedtime from your wake-up time.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/sleep/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Sleep Duration Calculator (From Bedtime and Wake-up Time) | Quick Calc">
+  <meta property="og:description" content="Just enter your bedtime and wake-up time to calculate your sleep duration for free — it works even across midnight. Handy for daily sleep logs or working back to a target bedtime from your wake-up time.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/sleep/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Sleep Duration Calculator (From Bedtime and Wake-up Time)","item":"https://quick-calc.site/en/tools/sleep/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Sleep Duration Calculator</h1>
+  <form class="tool-form" id="sleep-form">
+    <span class="field-note">Pick the times — your sleep duration appears right below</span>
+    <label>Bedtime
+      <input type="time" id="bed" value="23:00" required>
+    </label>
+    <label>Wake-up time
+      <input type="time" id="wake" value="06:30" required>
+    </label>
+    <button type="submit">Calculate</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: one-week sleep log, working back to your bedtime</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Was this week enough? (sleep-debt check)</h3>
+      <p class="adv-note">Each time you enter a day’s sleep (in hours, decimals OK), the average and the difference from 7 hours a day are calculated from just the days entered so far (blank days are ignored).</p>
+      <div id="adv-week" style="display:flex;flex-wrap:wrap;gap:8px;">
+        <input type="number" id="adv-d1" inputmode="decimal" step="any" min="0" max="24" placeholder="Day 1" aria-label="Sleep on day 1 (hours)" style="width:6em;">
+        <input type="number" id="adv-d2" inputmode="decimal" step="any" min="0" max="24" placeholder="Day 2" aria-label="Sleep on day 2 (hours)" style="width:6em;">
+        <input type="number" id="adv-d3" inputmode="decimal" step="any" min="0" max="24" placeholder="Day 3" aria-label="Sleep on day 3 (hours)" style="width:6em;">
+        <input type="number" id="adv-d4" inputmode="decimal" step="any" min="0" max="24" placeholder="Day 4" aria-label="Sleep on day 4 (hours)" style="width:6em;">
+        <input type="number" id="adv-d5" inputmode="decimal" step="any" min="0" max="24" placeholder="Day 5" aria-label="Sleep on day 5 (hours)" style="width:6em;">
+        <input type="number" id="adv-d6" inputmode="decimal" step="any" min="0" max="24" placeholder="Day 6" aria-label="Sleep on day 6 (hours)" style="width:6em;">
+        <input type="number" id="adv-d7" inputmode="decimal" step="any" min="0" max="24" placeholder="Day 7" aria-label="Sleep on day 7 (hours)" style="width:6em;">
+      </div>
+      <button type="button" id="adv-week-run">Show the weekly summary</button>
+
+      <h3 class="adv-h">Work back to when you should go to bed</h3>
+      <p class="adv-note">Enter your target sleep duration, and the bedtime is worked back from the wake-up time in the form above.</p>
+      <label>Target sleep (hours)
+        <input type="number" id="adv-target-hours" inputmode="decimal" step="any" min="1" max="16" value="7">
+      </label>
+      <button type="button" id="adv-bed-run">Work out the bedtime</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    This tool calculates the simple time difference between going to bed and getting up — an <strong>approximation</strong>. It does not include the time it takes to fall asleep or time awake during the night, so the time actually asleep may be shorter.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Just enter when you went to bed and when you got up to instantly see <strong>how long you slept</strong> — calculated correctly even across midnight. Useful for getting your sleep rhythm in order.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter your bedtime (the time you fall asleep).</li>
+    <li>As soon as you enter your wake-up time, the sleep duration appears right below. No button needed.</li>
+    <li>“Up at 6 and want 7 hours of sleep” — you can also use it to try out bedtimes worked back from your wake-up time.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Sleep duration = wake-up time − bedtime</strong> (24-hour clock; if the wake-up time is earlier, it is treated as crossing midnight)</li>
+    <li>Example: bed at 23:00 → up at 6:30 = 7 hours 30 minutes</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>This is simple arithmetic on clock times. Sleep needs vary from person to person, and this tool does not judge “how many hours are appropriate”.</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>Naps are not included. If you want to include naps, calculate them separately and add them up.</li>
+    <li>Sleep quality (depth, night-time awakenings) cannot be measured. If strong daytime sleepiness persists, consult a medical professional.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">How many hours of sleep are ideal?</h3>
+  <p class="faq-a">Sleep needs vary greatly with age and between individuals, and there is no single right answer. A practical yardstick is whether you can get through the day without strong sleepiness.</p>
+  <h3 class="faq-q">I heard waking up at a multiple of 90 minutes is better?</h3>
+  <p class="faq-a">The sleep cycle is often said to be “about 90 minutes”, but the actual cycle varies between people (and even within one night), so this tool does not make 90-minute recommendations.</p>
+  <h3 class="faq-q">How should I handle going back to sleep or hitting snooze?</h3>
+  <p class="faq-a">Use the time you finally got out of bed as the wake-up time to get your “time lying down”, or the time you first woke up to get your “main sleep”. Choose whichever matches your purpose.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=sleep">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/sleep/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_bed: "Enter your bedtime.",
+    invalid_wake: "Enter your wake-up time.",
+    same_time: "The bedtime and wake-up time are the same."
+  };
+  var box = document.getElementById("result");
+  var bedEl = document.getElementById("bed");
+  var wakeEl = document.getElementById("wake");
+  function run() {
+    if (bedEl.value === "" || wakeEl.value === "") { box.hidden = true; return; }
+    var result = SleepCalc.calculate(bedEl.value, wakeEl.value);
+    if (result.ok) {
+      box.innerHTML = '<div class="result-main">' + result.hours + " h " +
+        (result.minutes > 0 ? result.minutes + " min" : "") + "</div>" +
+        "<p>Total: " + result.totalMinutes.toLocaleString() + " minutes</p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "Check the entered values.") + "</p>";
+    }
+    box.hidden = false;
+  }
+  bedEl.addEventListener("input", run);
+  wakeEl.addEventListener("input", run);
+  document.getElementById("sleep-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  var lastAdv = null;
+  function runWeek(fromButton) {
+    var list = [];
+    var entered = 0;
+    for (var i = 1; i <= 7; i++) {
+      var v = document.getElementById("adv-d" + i).value;
+      if (v === "") { list.push(null); continue; }
+      list.push(parseFloat(v));
+      entered++;
+    }
+    if (entered === 0) {
+      if (fromButton) advErr("Enter at least one day of sleep.");
+      else if (lastAdv === runWeek) advBox.hidden = true;
+      return;
+    }
+    var r = SleepCalc.weekStatsPartial(list);
+    if (!r.ok) { advErr("Enter sleep durations between 0 and 24 hours."); return; }
+    lastAdv = runWeek;
+    var fmt1 = function (v) { return v.toLocaleString(undefined, { maximumFractionDigits: 1 }); };
+    var idealTotal = 7 * r.days;
+    var judge;
+    if (r.diffHours < 0) {
+      judge = "That is <strong>about " + fmt1(Math.abs(r.diffHours)) +
+        " hours short</strong> of the ideal (7 hours × " + r.days + " days = " + idealTotal + " hours) — a rough measure of accumulating sleep shortfall (sleep debt).";
+    } else if (r.diffHours > 0) {
+      judge = "You slept about " + fmt1(r.diffHours) + " hours more than the ideal (" + idealTotal + " hours).";
+    } else {
+      judge = "<strong>You are right on the ideal pace (7 hours a day).</strong>";
+    }
+    advBox.innerHTML =
+      '<div class="result-main">Average: ' + fmt1(r.avgHours) + " hours/day</div>" +
+      "<p>Calculated from the " + r.days + " day(s) entered so far. It updates automatically as you fill in the remaining days.</p>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>Total over " + r.days + " days</td><td>" + fmt1(r.totalHours) + " hours</td></tr>" +
+      "<tr><td>Difference from the ideal (" + idealTotal + " hours)</td><td>" + (r.diffHours > 0 ? "+" : "") + fmt1(r.diffHours) + " hours</td></tr>" +
+      "</tbody></table></div>" +
+      "<p>" + judge + "</p>" +
+      '<p class="adv-note">Sleep needs vary between people. 7 hours is only a general guide.</p>';
+    advBox.hidden = false;
+  }
+  function runBed(fromButton) {
+    var wake = document.getElementById("wake").value;
+    if (wake === "") { if (fromButton) advErr("First enter the wake-up time in the form above."); return; }
+    var tEl = document.getElementById("adv-target-hours");
+    if (tEl.value === "") { if (fromButton) advErr("Enter your target sleep duration."); return; }
+    var r = SleepCalc.bedTimeFor(wake, parseFloat(tEl.value));
+    if (!r.ok) {
+      advErr(r.code === "invalid_target" ? "Enter a target sleep duration between 1 and 16 hours."
+        : "Check the wake-up time.");
+      return;
+    }
+    lastAdv = runBed;
+    advBox.innerHTML =
+      '<div class="result-main">In bed by ' + r.bedTime + "</div>" +
+      "<p>To wake at " + wake + " with " + parseFloat(tEl.value).toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      " hours of sleep, you would need to fall asleep by <strong>" + r.bedTime + "</strong>. The time it takes to fall asleep is not included, so getting into bed a little earlier is a good idea.</p>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-week-run").addEventListener("click", function () { runWeek(true); });
+  document.getElementById("adv-bed-run").addEventListener("click", function () { runBed(true); });
+  for (var d = 1; d <= 7; d++) {
+    document.getElementById("adv-d" + d).addEventListener("input", function () { runWeek(false); });
+  }
+  document.getElementById("adv-target-hours").addEventListener("input", function () { runBed(false); });
+  document.getElementById("wake").addEventListener("input", function () { if (lastAdv === runBed) runBed(false); });
+})();
+</script>
+</body>
+</html>

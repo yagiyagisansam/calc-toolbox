@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Days Between Dates Calculator (Date Difference &amp; Weekday N Days Later) | Quick Calc</title>
+  <meta name="description" content="Count the days between two dates and get the date and weekday N days after (or before) a base date, free. Handy for deadlines, anniversaries and payment due dates. Leap years supported.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/days/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Days Between Dates Calculator (Date Difference &amp; Weekday N Days Later) | Quick Calc">
+  <meta property="og:description" content="Count the days between two dates and get the date and weekday N days after (or before) a base date, free. Handy for deadlines, anniversaries and payment due dates. Leap years supported.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/days/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Days Between Dates Calculator","item":"https://quick-calc.site/en/tools/days/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Days Between Dates Calculator</h1>
+  <form class="tool-form" id="between-form">
+    <span class="field-note">Pick a start date and an end date — the number of days appears right below</span>
+    <div class="field-row">
+      <label>Start date (year)
+        <select id="from-year"></select>
+      </label>
+      <label>Month
+        <select id="from-month"></select>
+      </label>
+      <label>Day
+        <select id="from-day"></select>
+      </label>
+    </div>
+    <div class="field-row">
+      <label>End date (year)
+        <select id="to-year"></select>
+      </label>
+      <label>Month
+        <select id="to-month"></select>
+      </label>
+      <label>Day
+        <select id="to-day"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="add-form">
+    <span class="field-note">For “What date is 100 days from now?” — use a negative number for days before</span>
+    <div class="field-row">
+      <label>Base date (year)
+        <select id="base-year"></select>
+      </label>
+      <label>Month
+        <select id="base-month"></select>
+      </label>
+      <label>Day
+        <select id="base-day"></select>
+      </label>
+    </div>
+    <label>How many days later? (negative = earlier)
+      <span class="field-note">e.g. 100 / -30 (supported range: ±36,500 days)</span>
+      <input type="number" id="offset" inputmode="numeric" step="1" min="-36500" max="36500" placeholder="100" required>
+    </label>
+    <div class="tool-result" id="result-b" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: breakdown in weeks and months, and the date N months later</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Breakdown in weeks and months</h3>
+      <p class="adv-note">Shows the difference between the start and end dates above also as weeks plus remaining days and as an approximate number of months (counting the first day gives the style used for hospital-stay counts and the like).</p>
+      <label><input type="checkbox" id="adv-include"> Count the first day (include both ends)</label>
+      <div class="tool-result" id="adv-bd-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">Date N months later (or earlier)</h3>
+      <p class="adv-note">Gives the date and weekday the specified number of months after the base date above (negative for earlier).</p>
+      <label>How many months later?
+        <input type="number" id="adv-months" inputmode="numeric" min="-1200" max="1200" step="1" placeholder="e.g. 3">
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    There are two ways to count days: excluding the first day (elapsed days) and including it (days counting both ends). This tool shows <strong>both</strong>. Note that contractual or legal period calculations may prescribe a specific counting method.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Instantly see <strong>how many days</strong> lie between two dates. You can also calculate a future date, such as “what date is 100 days from now?”. Useful for counting down to an event or for period calculations on paperwork.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Days between dates: pick a start date and an end date — the number of days in between appears the moment you choose them. No button needed.</li>
+    <li>Date N days later: pick a base date and enter a number of days (negative for the past); the resulting date and weekday appear automatically.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li>Based on the Gregorian calendar (the current calendar), dates are converted to serial day numbers to compute differences and additions. Leap years are handled (one every 4 years, except that years divisible by 100 but not by 400 are common years).</li>
+    <li><strong>Elapsed days</strong> do not include the first day (July 18 → July 19 is “1 day”). <strong>Days including both ends</strong> add 1 to this.</li>
+    <li>Example: 2026-07-18 → 2026-08-01 is 14 days (15 days including both ends)</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>Arithmetic based on the Gregorian calendar (leap-year rules).</li>
+    <li>Public holidays and business days are not taken into account (the calculation is calendar-day based).</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>To count in business days (excluding weekends and holidays), subtract the days off from this tool's result.</li>
+    <li>Legal period calculations (such as the first-day-exclusion principle of the Japanese Civil Code) follow their own specific rules. For important deadlines, check the governing provisions.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">Does “N days later” include the day itself?</h3>
+  <p class="faq-a">No. One day after July 18 is July 19. If you want to count the day itself as day 1, subtract 1 from the number of days you enter.</p>
+  <h3 class="faq-q">Can it calculate months or years ahead?</h3>
+  <p class="faq-a">This tool works in days only. Because months have different lengths (28–31 days), convert to days first (as a guide: 1 month ≈ 30 days, 1 year = 365 or 366 days).</p>
+  <h3 class="faq-q">Can I use past dates?</h3>
+  <p class="faq-a">Years 1600 to 2500 are supported. Enter a negative number of days to get the date N days before.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=days">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/days/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var today = new Date();
+  var WD_EN = { "月": "Mon", "火": "Tue", "水": "Wed", "木": "Thu", "金": "Fri", "土": "Sat", "日": "Sun" };
+  var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+  function fillSelect(el, from, to, selected, texts) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + (texts ? texts[v - from] : v) + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, Math.min(keep, max));
+  }
+  function isoOf(prefix) {
+    adjustDays(prefix + "-year", prefix + "-month", prefix + "-day");
+    return val(prefix + "-year") + "-" +
+      String(val(prefix + "-month")).padStart(2, "0") + "-" +
+      String(val(prefix + "-day")).padStart(2, "0");
+  }
+  function fmtDate(iso) {
+    var p = iso.split("-");
+    return MONTHS[parseInt(p[1], 10) - 1] + " " + parseInt(p[2], 10) + ", " + parseInt(p[0], 10);
+  }
+  function plural(n, word) {
+    return n.toLocaleString() + " " + word + (n === 1 ? "" : "s");
+  }
+  function initDate(prefix) {
+    fillSelect(document.getElementById(prefix + "-year"), 1600, 2500, today.getFullYear());
+    fillSelect(document.getElementById(prefix + "-month"), 1, 12, today.getMonth() + 1, MONTHS);
+    fillSelect(document.getElementById(prefix + "-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), today.getDate());
+  }
+  initDate("from");
+  initDate("to");
+  initDate("base");
+
+  var box = document.getElementById("result");
+  var boxB = document.getElementById("result-b");
+  var bdBox = document.getElementById("adv-bd-result");
+  var moBox = document.getElementById("adv-result");
+
+  var ERROR_MESSAGES = {
+    from_after_to: "The start date is after the end date.",
+    invalid_offset: "Enter a whole number of days between -36,500 and 36,500.",
+    out_of_range: "The result is outside the supported range (years 1600–2500)."
+  };
+
+  // ---- Days between dates (instant) ----
+  function runBetween() {
+    var result = DaysCalc.between(isoOf("from"), isoOf("to"));
+    if (!result.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "Check the entered values.") + "</p>";
+    } else {
+      box.innerHTML =
+        '<div class="result-main">' + plural(result.days, "day") + "</div>" +
+        "<p>Including both ends (first and last day): <strong>" + plural(result.inclusiveDays, "day") + "</strong></p>";
+    }
+    box.hidden = false;
+    runBreakdown();
+  }
+
+  // ---- Date N days later (instant) ----
+  function runAdd() {
+    var offset = document.getElementById("offset").value;
+    var base = isoOf("base");
+    if (offset === "") { boxB.hidden = true; runMonths(); return; }
+    var result = DaysCalc.addDays(base, parseFloat(offset));
+    if (!result.ok) {
+      boxB.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "Check the entered values.") + "</p>";
+    } else {
+      boxB.innerHTML = '<div class="result-main">' + fmtDate(result.date) + " (" + WD_EN[result.weekday] + ")</div>";
+    }
+    boxB.hidden = false;
+    runMonths();
+  }
+
+  // ---- More features: breakdown in weeks and months (instant) ----
+  function runBreakdown() {
+    var inc = document.getElementById("adv-include").checked;
+    var r = DaysCalc.breakdown(isoOf("from"), isoOf("to"), inc);
+    if (!r.ok) { bdBox.hidden = true; return; }
+    bdBox.innerHTML =
+      '<div class="result-main">' + plural(r.days, "day") + " (" +
+      (inc ? "counting the first day" : "not counting the first day") + ")</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>In weeks</td><td>" + plural(r.weeks, "week") +
+      (r.weekDays > 0 ? " and " + plural(r.weekDays, "day") : "") + "</td></tr>" +
+      "<tr><td>Approximate months</td><td>" + plural(r.months, "month") +
+      (r.monthDays > 0 ? " and " + plural(r.monthDays, "day") : "") + "</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">The month figure is the calendar difference (counted without including the first day).</p>';
+    bdBox.hidden = false;
+  }
+
+  // ---- More features: date N months later (instant) ----
+  function runMonths() {
+    var mo = document.getElementById("adv-months");
+    if (mo.value === "") { moBox.hidden = true; return; }
+    var base = isoOf("base");
+    var r = DaysCalc.addMonths(base, parseFloat(mo.value));
+    if (!r.ok) {
+      var msg = r.code === "invalid_months" ? "Enter a whole number of months between -1,200 and 1,200."
+        : r.code === "out_of_range" ? "The result is outside the supported range (years 1600–2500)."
+        : "Enter a valid base date.";
+      moBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+      moBox.hidden = false;
+      return;
+    }
+    var n = parseFloat(mo.value);
+    moBox.innerHTML =
+      '<div class="result-main">' + fmtDate(r.date) + " (" + WD_EN[r.weekday] + ")</div>" +
+      "<p>" + plural(Math.abs(n), "month") + (n < 0 ? " before " : " after ") + fmtDate(base) + "</p>" +
+      '<p class="adv-note">If the target month has no such day, the date is rounded to the end of the month (one month after January 31 is February 28).</p>';
+    moBox.hidden = false;
+  }
+
+  ["from-year", "from-month", "from-day", "to-year", "to-month", "to-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runBetween);
+  });
+  ["base-year", "base-month", "base-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runAdd);
+  });
+  document.getElementById("offset").addEventListener("input", runAdd);
+  document.getElementById("adv-include").addEventListener("change", runBreakdown);
+  document.getElementById("adv-months").addEventListener("input", runMonths);
+  document.getElementById("between-form").addEventListener("submit", function (e) { e.preventDefault(); runBetween(); });
+  document.getElementById("add-form").addEventListener("submit", function (e) { e.preventDefault(); runAdd(); });
+
+  runBetween();
+})();
+</script>
+</body>
+</html>

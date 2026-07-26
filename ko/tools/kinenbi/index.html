@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>기념일 카운트 계산기(사귄 지 며칠? 태어난 지 며칠? 1만 일 기념일) | Quick Calc</title>
+  <meta name="description" content="생일이나 기념일을 입력하면 「오늘로 며칠째인지」와 100일째·1000일째·1만 일째 등 기념일 날짜를 무료로 한 번에 계산합니다. 커플 기념일, 팬 활동, 아기 백일·생후 1만 일 축하에 유용합니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/kinenbi/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="기념일 카운트 계산기(사귄 지 며칠? 태어난 지 며칠? 1만 일 기념일) | Quick Calc">
+  <meta property="og:description" content="생일이나 기념일을 입력하면 「오늘로 며칠째인지」와 100일째·1000일째·1만 일째 등 기념일 날짜를 무료로 한 번에 계산합니다. 커플 기념일, 팬 활동, 아기 백일·생후 1만 일 축하에 유용합니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/kinenbi/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"기념일 카운트 계산기","item":"https://quick-calc.site/ko/tools/kinenbi/"}]}</script>
+  <!-- @meta end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>기념일 카운트 계산기</h1>
+  <form class="tool-form" id="kinenbi-form">
+    <span class="field-note">기념일을 선택하면 「오늘로 며칠째인지」와 기념 시점이 바로 아래에 표시됩니다</span>
+    <div class="field-row">
+      <label>기념일(년)
+        <select id="base-year"></select>
+      </label>
+      <label>월
+        <select id="base-month"></select>
+      </label>
+      <label>일
+        <select id="base-day"></select>
+      </label>
+    </div>
+    <label>기준일(이 날짜 기준으로 계산)
+      <span class="field-note">기본값은 오늘</span>
+      <input type="date" id="asof" min="1900-01-01" max="2200-12-31" required>
+    </label>
+    <div class="tool-result" id="result" aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 주년 목록과 100일 단위 기념일</summary>
+    <div class="adv-inner">
+      <p class="adv-note">기념일과 기준일은 위 폼에서 선택한 값을 그대로 사용합니다.</p>
+
+      <h3 class="adv-h">1〜10주년 날짜 목록</h3>
+      <div class="tool-result" id="adv-anniv-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">100일 단위 기념일(100일째〜1000일째)</h3>
+      <p class="adv-note">첫날을 1일째로 셉니다(일본의 백일 축하 「오쿠이조메」와 같은 계산법).</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    「N일째」는 <strong>기념일 당일을 1일째</strong>로 셉니다(백일의 「100일째」나 커플 기념일의 일반적인 계산법). 「N일 경과」로 세면 하루 차이가 나니 주의하세요.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>생일이나 사귀기 시작한 날 등 기념일을 입력하기만 하면 <strong>오늘로 며칠째인지</strong>와 1000일·1만 일 같은 기념일 날짜를 바로 알 수 있는 도구입니다. 아기 백일 날짜 잡기, 커플 기념일 확인에 활용하세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>기념일(생일·사귀기 시작한 날·최애의 데뷔일 등)을 선택합니다.</li>
+    <li>선택하는 순간 오늘이 며칠째인지와 각 기념 시점의 날짜·요일·남은 일수가 목록으로 표시됩니다. 버튼은 필요 없습니다.</li>
+    <li>다가올 기념일은 캘린더에 등록해 축하 계획에 활용하세요.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li>그레고리력(현행 달력)으로 일수를 셉니다(윤년 대응).</li>
+    <li><strong>N일째 날짜 = 기념일 + (N−1)일</strong>(기념일 당일=1일째)</li>
+    <li>기념 시점은 100·200·300·365·500·777·1000·2000·3000·5000·7777·10000·15000·20000·25000·30000일째를 표시합니다.</li>
+    <li>계산 예: 1990년 7월 18일생은 2026년 7월 18일이 <strong>13,150일째</strong>. 태어난 지 20,000일째는 2045년 4월 19일입니다.</li>
+  </ul>
+
+  <h3>출처·전제 명시</h3>
+  <ul class="sources">
+    <li>역법(그레고리력)에 기반한 산술 계산입니다.</li>
+  </ul>
+
+  <h2>계산의 전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>「1주년」 등 연 단위 기념일은 같은 월·일로 계산하므로 365일째/366일째와 어긋날 수 있습니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">「사귄 지 100일」은 사귄 날을 포함하나요?</h3>
+  <p class="faq-a">세는 방법은 두 가지가 있지만, 이 도구는 기념일 당일을 1일째로 세는 방식입니다(100일째=99일 후). 상대방과 세는 방법을 맞춰 두면 오해를 막을 수 있습니다.</p>
+  <h3 class="faq-q">태어난 지 1만 일은 몇 살쯤인가요?</h3>
+  <p class="faq-a">약 27.4세입니다(10000÷365.25≒27.4년). 2만 일은 약 54.8세, 3만 일은 약 82.1세에 해당합니다. 인생의 큰 기념 시점으로 축하하는 사람이 늘고 있습니다.</p>
+  <h3 class="faq-q">결혼기념일처럼 「앞으로 올」 기념일에도 쓸 수 있나요?</h3>
+  <p class="faq-a">네. 과거 날짜면 「며칠째」, 다가올 시점이면 「앞으로 며칠」이 표시되어 은혼식 같은 장기 기념일 계획에도 편리합니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=kinenbi">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/kinenbi/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var today = new Date();
+  var WD_KO = { "月": "월", "火": "화", "水": "수", "木": "목", "金": "금", "土": "토", "日": "일" };
+
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, "일", Math.min(keep, max));
+  }
+  function koDate(iso) {
+    var p = iso.split("-");
+    return parseInt(p[0], 10) + "년 " + parseInt(p[1], 10) + "월 " + parseInt(p[2], 10) + "일";
+  }
+
+  var box = document.getElementById("result");
+  var annivBox = document.getElementById("adv-anniv-result");
+  var hundBox = document.getElementById("adv-result");
+  var asofInput = document.getElementById("asof");
+  asofInput.value = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + String(today.getDate()).padStart(2, "0");
+
+  fillSelect(document.getElementById("base-year"), 1900, 2200, "년", today.getFullYear());
+  fillSelect(document.getElementById("base-month"), 1, 12, "월", today.getMonth() + 1);
+  fillSelect(document.getElementById("base-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), "일", today.getDate());
+
+  function baseIso() {
+    adjustDays("base-year", "base-month", "base-day");
+    return val("base-year") + "-" +
+      String(val("base-month")).padStart(2, "0") + "-" +
+      String(val("base-day")).padStart(2, "0");
+  }
+
+  var ERROR_MESSAGES = {
+    invalid_asof: "기준일을 정확히 입력해 주세요.",
+    base_after_asof: "기념일이 기준일보다 뒤에 있습니다."
+  };
+  function untilText(n) {
+    if (n === 0) return "오늘";
+    if (n > 0) return "앞으로 " + n.toLocaleString() + "일";
+    return Math.abs(n).toLocaleString() + "일 전";
+  }
+  function advTable(boxEl, r, headLabel, key, fmt) {
+    if (!r.ok) { boxEl.hidden = true; return; }
+    var rows = "";
+    for (var i = 0; i < r.rows.length; i++) {
+      var m = r.rows[i];
+      rows += "<tr><td>" + fmt(m[key]) + "</td><td>" + koDate(m.date) +
+        "(" + WD_KO[m.weekday] + ")</td><td>" + untilText(m.daysUntil) + "</td></tr>";
+    }
+    boxEl.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>' + headLabel +
+      "</th><th>날짜</th><th>기준일부터</th></tr></thead><tbody>" + rows + "</tbody></table></div>";
+    boxEl.hidden = false;
+  }
+
+  function run() {
+    var base = baseIso();
+    var asof = asofInput.value;
+    if (asof === "") { box.hidden = true; return; }
+    var r = KinenbiCalc.milestones(base, asof);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "입력값을 확인해 주세요.") + "</p>";
+      box.hidden = false;
+      annivBox.hidden = true;
+      hundBox.hidden = true;
+      return;
+    }
+    var rows = r.milestones.map(function (m) {
+      var status = m.daysUntil === 0 ? "<strong>오늘!</strong>" :
+        m.daysUntil > 0 ? "앞으로 <strong>" + m.daysUntil.toLocaleString() + "일</strong>" :
+        Math.abs(m.daysUntil).toLocaleString() + "일 전";
+      return "<tr><td>" + m.n.toLocaleString() + "일째</td><td>" + m.date + "(" + WD_KO[m.weekday] + ")</td><td>" + status + "</td></tr>";
+    }).join("");
+    box.innerHTML =
+      '<div class="result-main">오늘로 ' + r.dayNumber.toLocaleString() + "일째</div>" +
+      "<p>(경과 일수: " + r.elapsedDays.toLocaleString() + "일)</p>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>구분</th><th>날짜</th><th>카운트</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+    box.hidden = false;
+    advTable(annivBox, KinenbiCalc.anniversaries(base, asof), "주년", "years", function (v) { return v + "주년"; });
+    advTable(hundBox, KinenbiCalc.hundredDays(base, asof), "구분", "n", function (v) { return v.toLocaleString() + "일째"; });
+  }
+
+  ["base-year", "base-month", "base-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", run);
+  });
+  asofInput.addEventListener("change", run);
+  asofInput.addEventListener("input", run);
+  document.getElementById("kinenbi-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+
+  run();
+})();
+</script>
+</body>
+</html>
