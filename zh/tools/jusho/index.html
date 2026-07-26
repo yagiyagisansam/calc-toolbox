@@ -6,7 +6,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>日本地址英文转换器(罗马字·输入邮编自动生成) | Quick Calc</title>
-  <meta name="description" content="只要输入日本的邮政编码,就能把日本地址转换成英文写法(罗马字·由小到大的顺序),免费即时。可用于海外网购填写地址、国际邮件的收件人和寄件人栏。读音取自日本邮政的邮编数据,也可以自己修改。">
+  <meta name="description" content="只要输入日本的邮政编码,就能把日本地址转换成英文写法(罗马字·由小到大的顺序),免费即时。可用于海外网购填写地址、国际邮件的收件人和寄件人栏。也能反向把罗马字写的日本地址还原成日文写法(〒+汉字),方便填写市役所、医院的表格。">
   <link rel="stylesheet" href="../../../shared/style.css">
   <!-- @meta start -->
   <link rel="canonical" href="https://quick-calc.site/zh/tools/jusho/">
@@ -14,7 +14,7 @@
   <meta name="theme-color" content="#0b6e4f">
   <meta property="og:site_name" content="Quick Calc">
   <meta property="og:title" content="日本地址英文转换器(罗马字·输入邮编自动生成) | Quick Calc">
-  <meta property="og:description" content="只要输入日本的邮政编码,就能把日本地址转换成英文写法(罗马字·由小到大的顺序),免费即时。可用于海外网购填写地址、国际邮件的收件人和寄件人栏。读音取自日本邮政的邮编数据,也可以自己修改。">
+  <meta property="og:description" content="只要输入日本的邮政编码,就能把日本地址转换成英文写法(罗马字·由小到大的顺序),免费即时。可用于海外网购填写地址、国际邮件的收件人和寄件人栏。也能反向把罗马字写的日本地址还原成日文写法(〒+汉字),方便填写市役所、医院的表格。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://quick-calc.site/zh/tools/jusho/">
   <meta property="og:locale" content="zh_CN">
@@ -38,6 +38,39 @@
 <!-- @partial:header end -->
 <main>
   <h1>日本地址英文转换器</h1>
+  <form class="tool-form" id="mode-form">
+    <label>转换方向
+      <select id="mode">
+        <option value="to-en" selected>日本地址 → 英文写法</option>
+        <option value="to-ja">母国的写法 → 日文写法</option>
+      </select>
+    </label>
+  </form>
+
+  <form class="tool-form" id="rev-form" hidden>
+    <label>您所在国家·地区
+      <span class="field-note">各国书写地址的方式不同,示例会随之切换</span>
+      <select id="country"></select>
+    </label>
+    <label>地址(按您平时的写法直接粘贴即可)
+      <span class="field-note" id="rev-example"></span>
+      <textarea id="foreign-input" rows="3" autocomplete="off"></textarea>
+    </label>
+    <div class="tool-result" id="rev-result" hidden aria-live="polite"></div>
+    <button type="button" id="copy-ja" hidden>复制日文地址</button>
+
+    <div id="rev-lookup" hidden>
+      <p class="field-note">未找到邮政编码。可以用町名的罗马字来查找。</p>
+      <div class="field-row">
+        <label>町名(罗马字)
+          <input type="text" id="town-query" autocomplete="off" placeholder="例: Nishishinjuku">
+        </label>
+      </div>
+      <button type="button" id="town-search">用该町名查找</button>
+      <div class="tool-result" id="town-candidates" hidden aria-live="polite"></div>
+    </div>
+  </form>
+
   <form class="tool-form" id="jusho-form">
     <label>邮政编码
       <span class="field-note">输入7位数字后,地址和罗马字会自动填入</span>
@@ -104,21 +137,45 @@
     罗马字是根据日本邮政邮编数据中的假名读音<strong>自动转换</strong>的。如果与当地实际读法不同,请直接修改罗马字栏(结果会立即更新)。
   </div>
 
-  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>只要输入日本的邮政编码,就能把日本地址转换成<strong>英文写法(罗马字·海外通用的由小到大顺序)</strong>。海外购物网站登记收货地址、国际邮件的收件人和寄件人栏、往国内(母国)寄包裹的运单,以及只能填英文的海外服务表单,都可以直接使用。</p></div>
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>可以把日本地址转换成<strong>英文写法(罗马字·海外通用的由小到大顺序)</strong>。<strong>反过来,也能把用罗马字写的日本地址还原成日文写法(〒+汉字)</strong>。海外网购登记收货地址、国际邮件的收件人栏,以及在市役所、医院的表格上需要用日文填写住址时,都可以使用。</p></div>
 
   <h2>使用方法</h2>
   <ol class="steps">
-    <li>输入邮政编码(例: 100-0014),地址和罗马字会自动填入。</li>
-    <li>填写丁目·番地·号(例: 1-2-3)。有楼名·房间号时,用罗马字补充。</li>
-    <li>英文写法的地址会立即显示在下方。点「复制英文地址」即可直接粘贴。</li>
+    <li>先选择「转换方向」。要把日文地址转成英文,选<strong>日本地址 → 英文写法</strong>;要把罗马字地址还原成日文,选<strong>母国的写法 → 日文写法</strong>。</li>
+    <li>转成英文时: 输入邮政编码(例: 100-0014),地址和罗马字会自动填入,再补上丁目·番地·号和楼名即可。</li>
+    <li>还原成日文时: 选择您所在的国家,按平时的写法直接粘贴地址。即使各国的书写顺序不同,也能正确识别。</li>
+    <li>结果会立即显示在下方。点复制按钮即可直接粘贴。</li>
   </ol>
 
   <h2>转换方法与依据</h2>
   <ul class="method">
-    <li><strong>顺序</strong>: 英文写法为「楼名·房间 → 番地 町域 → 市区町村 → 都道府县 邮政编码 → JAPAN」(与日语顺序相反),依据日本邮政关于国际邮件地址写法的说明。</li>
+    <li><strong>英文写法的顺序</strong>: 「楼名·房间 → 番地 町域 → 市区町村 → 都道府县 邮政编码 → JAPAN」(与日语顺序相反),依据日本邮政关于国际邮件地址写法的说明。</li>
     <li><strong>地址与读音</strong>: 从日本邮政的邮编数据(全国约12万条)中取出该邮编对应的地址和假名读音,再转换为平文式(赫本式)罗马字。</li>
     <li><strong>政令指定都市</strong>按「区, 市」的顺序(例: Chuo-ku, Sapporo),<strong>郡下的町村</strong>按「町村, 郡」的顺序(例: Yoichi-cho, Yoichi-gun)书写。</li>
+    <li><strong>还原成日文写法时</strong>,不看顺序,而是按<strong>形状</strong>识别: 7位数字视为邮政编码,数字和连字符组成的一串(3-2-1)视为番地,其余视为楼名·房间号,再用邮政编码查出都道府县·市区町村·町域的汉字。因此无论是由大到小还是由小到大书写,结果都相同。</li>
   </ul>
+
+  <h3>支持的国家·地区(在日外国人人数最多的前10位)</h3>
+  <p>本工具会按国家切换地址写法的示例,以及房间号写法(Apt·Unit·Apto·Kamar 等)的识别规则。列表中没有的国家,选择「其他国家和地区」也能同样转换。</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>支持的国家·地区与地址的书写顺序</caption>
+      <thead><tr><th>国家·地区</th><th>地址的书写顺序</th></tr></thead>
+      <tbody>
+        <tr><td>中国</td><td>由大到小(从都道府县开始)</td></tr>
+        <tr><td>台湾</td><td>由大到小(从都道府县开始)</td></tr>
+        <tr><td>越南</td><td>由小到大(从番地开始)</td></tr>
+        <tr><td>韩国</td><td>由小到大(从番地开始)</td></tr>
+        <tr><td>菲律宾</td><td>由小到大(从番地开始)</td></tr>
+        <tr><td>尼泊尔</td><td>由小到大(从番地开始)</td></tr>
+        <tr><td>印度尼西亚</td><td>由小到大(从番地开始)</td></tr>
+        <tr><td>巴西</td><td>由小到大(从番地开始)</td></tr>
+        <tr><td>缅甸</td><td>由小到大(从番地开始)</td></tr>
+        <tr><td>斯里兰卡</td><td>由小到大(从番地开始)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>前10位的国家·地区依据日本出入国在留管理厅的统计(截至令和7年〔2025年〕末)。<strong>书写顺序不同也不会影响结果</strong>,拿不准时选「其他国家和地区」即可。</p>
 
   <h3>出处(一次信息)</h3>
   <ul class="sources">
@@ -126,6 +183,8 @@
       <a href="https://www.post.japanpost.jp/int/use/writing/normal.html" rel="noopener" target="_blank">https://www.post.japanpost.jp/int/use/writing/normal.html</a>(2026年7月26日查阅)</li>
     <li>日本邮政「邮政编码数据下载」(地址·假名读音的数据源。使用2026年7月时点的数据)(日文)<br>
       <a href="https://www.post.japanpost.jp/zipcode/download.html" rel="noopener" target="_blank">https://www.post.japanpost.jp/zipcode/download.html</a>(2026年7月26日查阅)</li>
+    <li>出入国在留管理厅「令和7年末现在的在留外国人数」(支持的国家·地区的选定依据)(日文)<br>
+      <a href="https://www.moj.go.jp/isa/publications/press/13_00062.html" rel="noopener" target="_blank">https://www.moj.go.jp/isa/publications/press/13_00062.html</a>(2026年7月26日查阅)</li>
   </ul>
 
   <h2>转换的前提与注意</h2>
@@ -133,11 +192,14 @@
     <li>罗马字为自动转换,可能与当地固有读法(如难读地名)不同。可在罗马字栏直接修改。</li>
     <li>京都市的「通り名」地址(如「〜通上ル」)以及大型企业的专用邮编,可能查不到町域。这时请在町域的罗马字栏手动输入。</li>
     <li>日本地址的英文写法在法律上并没有唯一的标准答案。本工具输出的是符合日本邮政说明的常见写法。</li>
+    <li>还原成日文写法时,<strong>楼名仍保持罗马字</strong>。因为楼名是专有名词,无法从邮政编码得知其正确的日文写法。如果知道公寓的日文名称,请自行改写。</li>
   </ul>
 
   <h2 id="faq">常见问题</h2>
   <h3 class="faq-q">为什么英文地址的顺序是反过来的?</h3>
   <p class="faq-a">因为英语圈的习惯是按「小范围 → 大范围」书写。把日本式(大→小)整个倒过来排列,就是英文式。</p>
+  <h3 class="faq-q">不知道邮政编码时怎么办?</h3>
+  <p class="faq-a">在「母国的写法 → 日文写法」中如果没有找到邮政编码,页面会出现用町名罗马字(例: Nishishinjuku)查找候选的输入栏。全国有多个同名町名时,请从候选中选择。</p>
   <h3 class="faq-q">从国外往日本寄东西时,地址必须写英文吗?</h3>
   <p class="faq-a">只有国名(JAPAN)需要写成寄出国能看懂的形式,日本国内的部分即使用日语书写也能正常投递(日本邮政的说明)。英文写法适合对方不会写日语,或海外网站的输入栏只能填字母的情况。</p>
   <h3 class="faq-q">「1-2-3」中哪个是丁目?</h3>
@@ -273,6 +335,180 @@
       setTimeout(function () { copyBtn.textContent = COPY_LABEL; }, 1500);
     });
   });
+})();
+</script>
+<script>
+/* 母国的写法 → 日文写法 */
+(function () {
+  "use strict";
+  var COUNTRY_NAMES = {
+    cn: "中国", vn: "越南", kr: "韩国", ph: "菲律宾", np: "尼泊尔",
+    id: "印度尼西亚", br: "巴西", mm: "缅甸", lk: "斯里兰卡", tw: "台湾",
+    other: "其他国家和地区"
+  };
+  // 按书写顺序给出的示例。不为每个国家单独存字符串,而是根据 calc.js 的 order 组装
+  var EXAMPLES = {
+    "small-first": "例: Apt 201, 3-2-1 Nishishinjuku, Shinjuku-ku, Tokyo 160-0023",
+    "large-first": "例: 160-0023 Tokyo, Shinjuku-ku, Nishishinjuku 3-2-1, Apt 201"
+  };
+
+  var COPY_JA_LABEL = "复制日文地址";
+
+  var modeEl = document.getElementById("mode");
+  var revForm = document.getElementById("rev-form");
+  var enForm = document.getElementById("jusho-form");
+  var countryEl = document.getElementById("country");
+  var exampleEl = document.getElementById("rev-example");
+  var inputEl = document.getElementById("foreign-input");
+  var resultEl = document.getElementById("rev-result");
+  var copyJaBtn = document.getElementById("copy-ja");
+  var lookupBox = document.getElementById("rev-lookup");
+  var townQuery = document.getElementById("town-query");
+  var candBox = document.getElementById("town-candidates");
+
+  var shardCache = {};
+  var revCache = {};
+  var pickedZip = "";  // 从候选中选定的邮政编码
+  var copyText = "";
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function getShard(zip3) {
+    if (shardCache[zip3]) return Promise.resolve(shardCache[zip3]);
+    return fetch("../../../shared/postal/" + zip3 + ".json")
+      .then(function (r) { if (!r.ok) throw new Error("nf"); return r.json(); })
+      .then(function (d) { shardCache[zip3] = d; return d; });
+  }
+  function getRev(letter) {
+    if (revCache[letter]) return Promise.resolve(revCache[letter]);
+    return fetch("../../../shared/postal/rev/" + letter + ".json")
+      .then(function (r) { if (!r.ok) throw new Error("nf"); return r.json(); })
+      .then(function (d) { revCache[letter] = d; return d; });
+  }
+
+  // 国家选项由 calc.js 的 COUNTRIES 生成(顺序也遵循 calc.js)
+  var opts = "";
+  for (var i = 0; i < JushoCalc.COUNTRIES.length; i++) {
+    var c = JushoCalc.COUNTRIES[i].code;
+    opts += '<option value="' + c + '">' + (COUNTRY_NAMES[c] || c) + "</option>";
+  }
+  countryEl.innerHTML = opts;
+
+  function syncExample() {
+    var country = JushoCalc.countryOf(countryEl.value);
+    exampleEl.textContent = EXAMPLES[country.order];
+    inputEl.placeholder = EXAMPLES[country.order].replace(/^例: /, "");
+  }
+
+  function show(zip, rec, parsed) {
+    var refined = JushoCalc.refineBuilding(parsed, [rec[0], rec[1], rec[2], rec[3], rec[4], rec[5]]);
+    var r = JushoCalc.japaneseAddress({
+      zip: zip, pref: rec[0], city: rec[1], town: rec[2],
+      banchi: parsed.banchi, building: refined.building
+    });
+    if (!r.ok) { resultEl.hidden = true; copyJaBtn.hidden = true; return; }
+    copyText = r.lines.join("\n");
+    var chome = JushoCalc.banchiToChome(parsed.banchi);
+    resultEl.innerHTML =
+      '<div class="result-main">日文写法</div>' +
+      '<p style="white-space:pre-line;font-size:1.05rem;margin:6px 0;"><strong>' + esc(copyText) + "</strong></p>" +
+      "<p>写成一行时:<br>" + esc(r.single) + "</p>" +
+      (chome ? "<p>用「丁目」写法时: " + esc("〒" + zip + " " + rec[0] + rec[1] + rec[2] + chome) + "</p>" : "") +
+      (refined.building ? "<p><small>楼名是专有名词,因此保留识别到的原样写法。</small></p>" : "");
+    resultEl.hidden = false;
+    copyJaBtn.hidden = false;
+  }
+
+  function fail(msg, showLookup) {
+    resultEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    resultEl.hidden = false;
+    copyJaBtn.hidden = true;
+    lookupBox.hidden = !showLookup;
+  }
+
+  function run() {
+    var parsed = JushoCalc.parseForeignAddress(inputEl.value, countryEl.value);
+    if (!parsed.ok) {
+      resultEl.hidden = true; copyJaBtn.hidden = true; lookupBox.hidden = true;
+      return;
+    }
+    var zip = parsed.zip || pickedZip;
+    if (!zip) {
+      // 没有邮政编码时,改为按町名查找
+      lookupBox.hidden = false;
+      if (!townQuery.value && parsed.words.length) townQuery.value = parsed.words[0];
+      fail("未找到邮政编码。可在下方栏中按町名查找。", true);
+      return;
+    }
+    lookupBox.hidden = true;
+    var digits = zip.replace("-", "");
+    getShard(digits.slice(0, 3))
+      .then(function (data) {
+        var rec = data[digits.slice(3)];
+        if (!rec) { fail("未找到该邮政编码,请确认号码。", true); return; }
+        show(zip, rec, parsed);
+      })
+      .catch(function () { fail("未找到该邮政编码,请确认号码。", true); });
+  }
+
+  function searchTown() {
+    var key = JushoCalc.revKey(townQuery.value);
+    if (!key) { candBox.hidden = true; return; }
+    candBox.innerHTML = "<p>正在查找…</p>";
+    candBox.hidden = false;
+    getRev(key[0])
+      .then(function (table) {
+        var zips = table[key];
+        if (!zips || !zips.length) {
+          candBox.innerHTML = '<p class="result-error">未找到该町名,请确认拼写。</p>';
+          return;
+        }
+        return Promise.all(zips.map(function (z) {
+          return getShard(z.slice(0, 3)).then(function (d) { return { zip: z, rec: d[z.slice(3)] }; });
+        })).then(function (list) {
+          var rows = list.filter(function (x) { return x.rec; }).map(function (x) {
+            var z = x.zip.slice(0, 3) + "-" + x.zip.slice(3);
+            return '<li><button type="button" class="cand" data-zip="' + z + '">' +
+              esc(x.rec[0] + x.rec[1] + x.rec[2]) + "(〒" + z + ")</button></li>";
+          }).join("");
+          candBox.innerHTML = "<p>请选择符合的地址。</p><ul class=\"related\">" + rows + "</ul>";
+        });
+      })
+      .catch(function () {
+        candBox.innerHTML = '<p class="result-error">未找到该町名,请确认拼写。</p>';
+      });
+  }
+
+  candBox.addEventListener("click", function (e) {
+    var btn = e.target.closest ? e.target.closest("button.cand") : null;
+    if (!btn) return;
+    pickedZip = btn.getAttribute("data-zip");
+    candBox.hidden = true;
+    run();
+  });
+
+  function syncMode() {
+    var toJa = modeEl.value === "to-ja";
+    revForm.hidden = !toJa;
+    enForm.hidden = toJa;
+    if (toJa) { syncExample(); run(); }
+  }
+  modeEl.addEventListener("change", syncMode);
+  countryEl.addEventListener("change", function () { syncExample(); run(); });
+  inputEl.addEventListener("input", function () { pickedZip = ""; run(); });
+  document.getElementById("town-search").addEventListener("click", searchTown);
+  document.getElementById("rev-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  copyJaBtn.addEventListener("click", function () {
+    if (!copyText) return;
+    navigator.clipboard.writeText(copyText).then(function () {
+      copyJaBtn.textContent = "已复制";
+      setTimeout(function () { copyJaBtn.textContent = COPY_JA_LABEL; }, 1500);
+    });
+  });
+
+  syncExample();
+  syncMode();
 })();
 </script>
 </body>

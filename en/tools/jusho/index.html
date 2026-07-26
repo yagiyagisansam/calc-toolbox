@@ -6,7 +6,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Japanese Address in English — Romaji Address Converter | Quick Calc</title>
-  <meta name="description" content="Turn a Japanese address into English (romaji, Western order) just by typing the postal code, free and instant. Made for overseas shopping sites, international mail and forms that need Roman letters. The readings come from Japan Post postal code data and can be edited by hand.">
+  <meta name="description" content="Turn a Japanese address into English (romaji, Western order) just by typing the postal code, free and instant. It also works the other way round, turning a romaji address back into Japanese (〒 and kanji) for city-hall and hospital forms. The readings come from Japan Post postal code data and can be edited by hand.">
   <link rel="stylesheet" href="../../../shared/style.css">
   <!-- @meta start -->
   <link rel="canonical" href="https://quick-calc.site/en/tools/jusho/">
@@ -14,7 +14,7 @@
   <meta name="theme-color" content="#0b6e4f">
   <meta property="og:site_name" content="Quick Calc">
   <meta property="og:title" content="Japanese Address in English — Romaji Address Converter | Quick Calc">
-  <meta property="og:description" content="Turn a Japanese address into English (romaji, Western order) just by typing the postal code, free and instant. Made for overseas shopping sites, international mail and forms that need Roman letters. The readings come from Japan Post postal code data and can be edited by hand.">
+  <meta property="og:description" content="Turn a Japanese address into English (romaji, Western order) just by typing the postal code, free and instant. It also works the other way round, turning a romaji address back into Japanese (〒 and kanji) for city-hall and hospital forms. The readings come from Japan Post postal code data and can be edited by hand.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://quick-calc.site/en/tools/jusho/">
   <meta property="og:locale" content="en_US">
@@ -38,6 +38,39 @@
 <!-- @partial:header end -->
 <main>
   <h1>Japanese Address in English</h1>
+  <form class="tool-form" id="mode-form">
+    <label>Direction
+      <select id="mode">
+        <option value="to-en" selected>Japanese address → English</option>
+        <option value="to-ja">The way you write it at home → Japanese</option>
+      </select>
+    </label>
+  </form>
+
+  <form class="tool-form" id="rev-form" hidden>
+    <label>Your country or region
+      <span class="field-note">Addresses are written in a different order in each country, so the example changes with your choice</span>
+      <select id="country"></select>
+    </label>
+    <label>Address (paste it exactly the way you normally write it)
+      <span class="field-note" id="rev-example"></span>
+      <textarea id="foreign-input" rows="3" autocomplete="off"></textarea>
+    </label>
+    <div class="tool-result" id="rev-result" hidden aria-live="polite"></div>
+    <button type="button" id="copy-ja" hidden>Copy the Japanese address</button>
+
+    <div id="rev-lookup" hidden>
+      <p class="field-note">No postal code was found. You can search by the town name in Roman letters instead.</p>
+      <div class="field-row">
+        <label>Town name (romaji)
+          <input type="text" id="town-query" autocomplete="off" placeholder="e.g. Nishishinjuku">
+        </label>
+      </div>
+      <button type="button" id="town-search">Search for this town name</button>
+      <div class="tool-result" id="town-candidates" hidden aria-live="polite"></div>
+    </div>
+  </form>
+
   <form class="tool-form" id="jusho-form">
     <label>Postal code
       <span class="field-note">Type all 7 digits and the address and its romaji fill in automatically</span>
@@ -104,21 +137,45 @@
     The romaji is a <strong>machine conversion</strong> of the kana readings in Japan Post postal code data. If your area is read differently, simply rewrite the romaji fields (the result updates immediately).
   </div>
 
-  <div class="lead-card"><span class="lead-label">What this tool does</span><p>Type a Japanese postal code and get your address in <strong>English (romaji, in the Western small-to-large order)</strong>. Use it when an overseas shopping site asks for your address in Roman letters, when you fill in the sender or recipient block for international mail, or when you send a parcel home and the form has no space for Japanese characters.</p></div>
+  <div class="lead-card"><span class="lead-label">What this tool does</span><p>It turns a Japanese address into <strong>English (romaji, in the Western small-to-large order)</strong>. <strong>It also works the other way round, turning a Japanese address written in Roman letters back into Japanese (〒 plus kanji)</strong>. Use it for overseas shopping sites and international mail, and for the moments when a city-hall or hospital form asks you to write your address in Japanese.</p></div>
 
   <h2>How to use</h2>
   <ol class="steps">
-    <li>Type your postal code (for example 100-0014). The address and its romaji fill in automatically.</li>
-    <li>Add the block and house number (for example 1-2-3). If you have a building name or room number, add it in Roman letters.</li>
-    <li>The English address appears right below. Tap “Copy the English address” to paste it anywhere.</li>
+    <li>Choose the direction. To turn a Japanese address into English, pick <strong>Japanese address → English</strong>; to turn a romaji address back into Japanese, pick <strong>The way you write it at home → Japanese</strong>.</li>
+    <li>Going into English: type your postal code (for example 100-0014) and the address and its romaji fill in automatically, then add the block and house number and the building name.</li>
+    <li>Going back into Japanese: choose your country and paste the address exactly the way you normally write it. It is read correctly whichever order your country uses.</li>
+    <li>The result appears right below. Use the copy button to paste it straight into a form.</li>
   </ol>
 
   <h2>How it is converted</h2>
   <ul class="method">
-    <li><strong>Order</strong>: the English version runs “building and room → house number and town area → city or ward → prefecture and postal code → JAPAN”, the reverse of the Japanese order. This follows Japan Post guidance on addressing international mail.</li>
+    <li><strong>Order in English</strong>: “building and room → house number and town area → city or ward → prefecture and postal code → JAPAN”, the reverse of the Japanese order. This follows Japan Post guidance on addressing international mail.</li>
     <li><strong>Address and reading</strong>: the address and its kana reading for each postal code come from Japan Post postal code data (about 120,000 entries nationwide) and are converted to Hepburn romanization.</li>
     <li><strong>Designated cities</strong> are written as “ward, city” (for example Chuo-ku, Sapporo), and <strong>rural districts</strong> as “town or village, district” (for example Yoichi-cho, Yoichi-gun).</li>
+    <li><strong>Going back into Japanese</strong>, the address is read by <strong>shape rather than by order</strong>: a group of 7 digits is taken as the postal code, a group of digits and hyphens (3-2-1) as the house number, and whatever is left as the building name and room number. The kanji for the prefecture, city and town area are then looked up from the postal code. That is why the result is the same whether you write from large to small or from small to large.</li>
   </ul>
+
+  <h3>Countries and regions covered (the 10 largest groups of foreign residents in Japan)</h3>
+  <p>The example address and the way room numbers are recognised (Apt, Unit, Apto, Kamar and so on) switch according to the country. If your country is not on the list, choose “Other countries/regions” and the conversion works just the same.</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>Countries and regions covered, and the order addresses are written in</caption>
+      <thead><tr><th>Country or region</th><th>Order an address is written in</th></tr></thead>
+      <tbody>
+        <tr><td>China</td><td>Large to small (starting with the prefecture)</td></tr>
+        <tr><td>Taiwan</td><td>Large to small (starting with the prefecture)</td></tr>
+        <tr><td>Vietnam</td><td>Small to large (starting with the house number)</td></tr>
+        <tr><td>South Korea</td><td>Small to large (starting with the house number)</td></tr>
+        <tr><td>Philippines</td><td>Small to large (starting with the house number)</td></tr>
+        <tr><td>Nepal</td><td>Small to large (starting with the house number)</td></tr>
+        <tr><td>Indonesia</td><td>Small to large (starting with the house number)</td></tr>
+        <tr><td>Brazil</td><td>Small to large (starting with the house number)</td></tr>
+        <tr><td>Myanmar</td><td>Small to large (starting with the house number)</td></tr>
+        <tr><td>Sri Lanka</td><td>Small to large (starting with the house number)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The ten largest countries and regions are taken from the statistics of the Immigration Services Agency (as of the end of Reiwa 7 / 2025). <strong>A different order does not change the result</strong>, so if you are unsure, “Other countries/regions” is fine.</p>
 
   <h3>Sources (primary information)</h3>
   <ul class="sources">
@@ -126,6 +183,8 @@
       <a href="https://www.post.japanpost.jp/int/use/writing/normal.html" rel="noopener" target="_blank">https://www.post.japanpost.jp/int/use/writing/normal.html</a> (accessed July 26, 2026)</li>
     <li>Japan Post, “Postal code data download” (source of the addresses and kana readings; the data used here is from July 2026) — in Japanese<br>
       <a href="https://www.post.japanpost.jp/zipcode/download.html" rel="noopener" target="_blank">https://www.post.japanpost.jp/zipcode/download.html</a> (accessed July 26, 2026)</li>
+    <li>Immigration Services Agency, “Number of foreign residents as of the end of Reiwa 7 (2025)” (basis for the list of countries and regions covered) — in Japanese<br>
+      <a href="https://www.moj.go.jp/isa/publications/press/13_00062.html" rel="noopener" target="_blank">https://www.moj.go.jp/isa/publications/press/13_00062.html</a> (accessed July 26, 2026)</li>
   </ul>
 
   <h2>Assumptions and notes</h2>
@@ -133,11 +192,14 @@
     <li>Because the romaji is generated automatically, it can differ from the actual local reading (some place names are read in unusual ways). You can correct it directly in the romaji fields.</li>
     <li>For Kyoto street-name addresses (“…dori agaru” and similar) and for the individual postal codes of large businesses, the town area may be missing. In that case type it into the town area romaji field yourself.</li>
     <li>There is no single legally correct way to write a Japanese address in English. This tool produces the common style described by Japan Post.</li>
+    <li>When converting back into Japanese, <strong>the building name stays in Roman letters</strong>. A building name is a proper noun, and its correct Japanese spelling cannot be derived from the postal code. If you know how your building is written, please replace it yourself.</li>
   </ul>
 
   <h2 id="faq">Frequently asked questions</h2>
   <h3 class="faq-q">Why is the order reversed in English?</h3>
   <p class="faq-a">English-speaking countries write addresses from the smallest unit to the largest, the opposite of Japan. Take the Japanese order (large to small) and reverse it and you have the English one.</p>
+  <h3 class="faq-q">What if I do not know my postal code?</h3>
+  <p class="faq-a">When no postal code is found in “The way you write it at home → Japanese”, a field appears where you can search by the town name in Roman letters (for example Nishishinjuku). If the same town name exists in several places in Japan, pick the right one from the candidates.</p>
   <h3 class="faq-q">If someone sends me a parcel from abroad, does the address have to be in English?</h3>
   <p class="faq-a">Only the country name (JAPAN) has to be readable in the sending country. According to Japan Post, the part inside Japan can be written in Japanese and will still be delivered. The English version is useful when the sender cannot write Japanese or when a website only accepts Roman letters.</p>
   <h3 class="faq-q">In “1-2-3”, which number is the chome?</h3>
@@ -273,6 +335,179 @@
       setTimeout(function () { copyBtn.textContent = COPY_LABEL; }, 1500);
     });
   });
+})();
+</script>
+<script>
+/* The way you write it at home -> Japanese */
+(function () {
+  "use strict";
+  var COUNTRY_NAMES = {
+    cn: "China", vn: "Vietnam", kr: "South Korea", ph: "Philippines", np: "Nepal",
+    id: "Indonesia", br: "Brazil", mm: "Myanmar", lk: "Sri Lanka", tw: "Taiwan",
+    other: "Other countries/regions"
+  };
+  var COPY_JA_LABEL = "Copy the Japanese address";
+  // One example per order. Built from the order in calc.js rather than per country.
+  var EXAMPLES = {
+    "small-first": "e.g. Apt 201, 3-2-1 Nishishinjuku, Shinjuku-ku, Tokyo 160-0023",
+    "large-first": "e.g. 160-0023 Tokyo, Shinjuku-ku, Nishishinjuku 3-2-1, Apt 201"
+  };
+
+  var modeEl = document.getElementById("mode");
+  var revForm = document.getElementById("rev-form");
+  var enForm = document.getElementById("jusho-form");
+  var countryEl = document.getElementById("country");
+  var exampleEl = document.getElementById("rev-example");
+  var inputEl = document.getElementById("foreign-input");
+  var resultEl = document.getElementById("rev-result");
+  var copyJaBtn = document.getElementById("copy-ja");
+  var lookupBox = document.getElementById("rev-lookup");
+  var townQuery = document.getElementById("town-query");
+  var candBox = document.getElementById("town-candidates");
+
+  var shardCache = {};
+  var revCache = {};
+  var pickedZip = "";  // postal code chosen from the candidates
+  var copyText = "";
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function getShard(zip3) {
+    if (shardCache[zip3]) return Promise.resolve(shardCache[zip3]);
+    return fetch("../../../shared/postal/" + zip3 + ".json")
+      .then(function (r) { if (!r.ok) throw new Error("nf"); return r.json(); })
+      .then(function (d) { shardCache[zip3] = d; return d; });
+  }
+  function getRev(letter) {
+    if (revCache[letter]) return Promise.resolve(revCache[letter]);
+    return fetch("../../../shared/postal/rev/" + letter + ".json")
+      .then(function (r) { if (!r.ok) throw new Error("nf"); return r.json(); })
+      .then(function (d) { revCache[letter] = d; return d; });
+  }
+
+  // The country options come from COUNTRIES in calc.js (order included)
+  var opts = "";
+  for (var i = 0; i < JushoCalc.COUNTRIES.length; i++) {
+    var c = JushoCalc.COUNTRIES[i].code;
+    opts += '<option value="' + c + '">' + (COUNTRY_NAMES[c] || c) + "</option>";
+  }
+  countryEl.innerHTML = opts;
+
+  function syncExample() {
+    var country = JushoCalc.countryOf(countryEl.value);
+    exampleEl.textContent = EXAMPLES[country.order];
+    inputEl.placeholder = EXAMPLES[country.order].replace(/^e\.g\. /, "");
+  }
+
+  function show(zip, rec, parsed) {
+    var refined = JushoCalc.refineBuilding(parsed, [rec[0], rec[1], rec[2], rec[3], rec[4], rec[5]]);
+    var r = JushoCalc.japaneseAddress({
+      zip: zip, pref: rec[0], city: rec[1], town: rec[2],
+      banchi: parsed.banchi, building: refined.building
+    });
+    if (!r.ok) { resultEl.hidden = true; copyJaBtn.hidden = true; return; }
+    copyText = r.lines.join("\n");
+    var chome = JushoCalc.banchiToChome(parsed.banchi);
+    resultEl.innerHTML =
+      '<div class="result-main">Japanese format</div>' +
+      '<p style="white-space:pre-line;font-size:1.05rem;margin:6px 0;"><strong>' + esc(copyText) + "</strong></p>" +
+      "<p>On a single line:<br>" + esc(r.single) + "</p>" +
+      (chome ? "<p>Written with chome, ban and go: " + esc("〒" + zip + " " + rec[0] + rec[1] + rec[2] + chome) + "</p>" : "") +
+      (refined.building ? "<p><small>A building name is a proper noun, so it is left exactly as it was read.</small></p>" : "");
+    resultEl.hidden = false;
+    copyJaBtn.hidden = false;
+  }
+
+  function fail(msg, showLookup) {
+    resultEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    resultEl.hidden = false;
+    copyJaBtn.hidden = true;
+    lookupBox.hidden = !showLookup;
+  }
+
+  function run() {
+    var parsed = JushoCalc.parseForeignAddress(inputEl.value, countryEl.value);
+    if (!parsed.ok) {
+      resultEl.hidden = true; copyJaBtn.hidden = true; lookupBox.hidden = true;
+      return;
+    }
+    var zip = parsed.zip || pickedZip;
+    if (!zip) {
+      // Without a postal code, let the user search by town name
+      lookupBox.hidden = false;
+      if (!townQuery.value && parsed.words.length) townQuery.value = parsed.words[0];
+      fail("No postal code was found. Use the field below to search by town name.", true);
+      return;
+    }
+    lookupBox.hidden = true;
+    var digits = zip.replace("-", "");
+    getShard(digits.slice(0, 3))
+      .then(function (data) {
+        var rec = data[digits.slice(3)];
+        if (!rec) { fail("This postal code was not found. Please check the number.", true); return; }
+        show(zip, rec, parsed);
+      })
+      .catch(function () { fail("This postal code was not found. Please check the number.", true); });
+  }
+
+  function searchTown() {
+    var key = JushoCalc.revKey(townQuery.value);
+    if (!key) { candBox.hidden = true; return; }
+    candBox.innerHTML = "<p>Searching…</p>";
+    candBox.hidden = false;
+    getRev(key[0])
+      .then(function (table) {
+        var zips = table[key];
+        if (!zips || !zips.length) {
+          candBox.innerHTML = '<p class="result-error">This town name was not found. Please check the spelling.</p>';
+          return;
+        }
+        return Promise.all(zips.map(function (z) {
+          return getShard(z.slice(0, 3)).then(function (d) { return { zip: z, rec: d[z.slice(3)] }; });
+        })).then(function (list) {
+          var rows = list.filter(function (x) { return x.rec; }).map(function (x) {
+            var z = x.zip.slice(0, 3) + "-" + x.zip.slice(3);
+            return '<li><button type="button" class="cand" data-zip="' + z + '">' +
+              esc(x.rec[0] + x.rec[1] + x.rec[2]) + "(〒" + z + ")</button></li>";
+          }).join("");
+          candBox.innerHTML = "<p>Choose the address that matches.</p><ul class=\"related\">" + rows + "</ul>";
+        });
+      })
+      .catch(function () {
+        candBox.innerHTML = '<p class="result-error">This town name was not found. Please check the spelling.</p>';
+      });
+  }
+
+  candBox.addEventListener("click", function (e) {
+    var btn = e.target.closest ? e.target.closest("button.cand") : null;
+    if (!btn) return;
+    pickedZip = btn.getAttribute("data-zip");
+    candBox.hidden = true;
+    run();
+  });
+
+  function syncMode() {
+    var toJa = modeEl.value === "to-ja";
+    revForm.hidden = !toJa;
+    enForm.hidden = toJa;
+    if (toJa) { syncExample(); run(); }
+  }
+  modeEl.addEventListener("change", syncMode);
+  countryEl.addEventListener("change", function () { syncExample(); run(); });
+  inputEl.addEventListener("input", function () { pickedZip = ""; run(); });
+  document.getElementById("town-search").addEventListener("click", searchTown);
+  document.getElementById("rev-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  copyJaBtn.addEventListener("click", function () {
+    if (!copyText) return;
+    navigator.clipboard.writeText(copyText).then(function () {
+      copyJaBtn.textContent = "Copied";
+      setTimeout(function () { copyJaBtn.textContent = COPY_JA_LABEL; }, 1500);
+    });
+  });
+
+  syncExample();
+  syncMode();
 })();
 </script>
 </body>

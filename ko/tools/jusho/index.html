@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <title>일본 주소 영문 변환기(우편번호로 로마자 자동 입력) | Quick Calc</title>
-  <meta name="description" content="우편번호만 입력하면 일본 주소를 영문 표기(로마자·역순)로 바꿔 주는 무료 도구입니다. 해외 쇼핑몰의 주소 등록, 국제우편의 받는 사람·보내는 사람 칸에 쓸 수 있습니다. 읽는 법은 일본우편의 우편번호 데이터에서 자동으로 채워지며 직접 고칠 수도 있습니다.">
+  <title>일본 주소 영문 변환기(로마자⇄일본어 주소) | Quick Calc</title>
+  <meta name="description" content="우편번호만 입력하면 일본 주소를 영문 표기(로마자·역순)로 바꾸고, 반대로 로마자로 쓴 주소를 일본어 표기(〒+한자)로 되돌려 주는 무료 도구입니다. 해외 쇼핑몰 주소 등록·국제우편 주소 기재는 물론, 구청이나 병원 서류에 일본어로 주소를 적어야 할 때도 쓸 수 있습니다. 읽는 법은 일본우편의 우편번호 데이터에서 자동으로 채워지며 직접 고칠 수도 있습니다.">
   <link rel="stylesheet" href="../../../shared/style.css">
   <!-- @meta start -->
   <link rel="canonical" href="https://quick-calc.site/ko/tools/jusho/">
   <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
   <meta name="theme-color" content="#0b6e4f">
   <meta property="og:site_name" content="Quick Calc">
-  <meta property="og:title" content="일본 주소 영문 변환기(우편번호로 로마자 자동 입력) | Quick Calc">
-  <meta property="og:description" content="우편번호만 입력하면 일본 주소를 영문 표기(로마자·역순)로 바꿔 주는 무료 도구입니다. 해외 쇼핑몰의 주소 등록, 국제우편의 받는 사람·보내는 사람 칸에 쓸 수 있습니다. 읽는 법은 일본우편의 우편번호 데이터에서 자동으로 채워지며 직접 고칠 수도 있습니다.">
+  <meta property="og:title" content="일본 주소 영문 변환기(로마자⇄일본어 주소) | Quick Calc">
+  <meta property="og:description" content="우편번호만 입력하면 일본 주소를 영문 표기(로마자·역순)로 바꾸고, 반대로 로마자로 쓴 주소를 일본어 표기(〒+한자)로 되돌려 주는 무료 도구입니다. 해외 쇼핑몰 주소 등록·국제우편 주소 기재는 물론, 구청이나 병원 서류에 일본어로 주소를 적어야 할 때도 쓸 수 있습니다. 읽는 법은 일본우편의 우편번호 데이터에서 자동으로 채워지며 직접 고칠 수도 있습니다.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://quick-calc.site/ko/tools/jusho/">
   <meta property="og:locale" content="ko_KR">
@@ -38,6 +38,39 @@
 <!-- @partial:header end -->
 <main>
   <h1>일본 주소 영문 변환기</h1>
+  <form class="tool-form" id="mode-form">
+    <label>변환 방향
+      <select id="mode">
+        <option value="to-en" selected>일본 주소 → 영문 표기</option>
+        <option value="to-ja">모국 방식 주소 → 일본어 표기</option>
+      </select>
+    </label>
+  </form>
+
+  <form class="tool-form" id="rev-form" hidden>
+    <label>거주하시는 국가·지역
+      <span class="field-note">나라마다 주소 쓰는 방식이 달라 예시를 바꿔 드립니다</span>
+      <select id="country"></select>
+    </label>
+    <label>주소(평소 쓰던 방식 그대로 붙여넣기)
+      <span class="field-note" id="rev-example"></span>
+      <textarea id="foreign-input" rows="3" autocomplete="off"></textarea>
+    </label>
+    <div class="tool-result" id="rev-result" hidden aria-live="polite"></div>
+    <button type="button" id="copy-ja" hidden>일본어 주소 복사</button>
+
+    <div id="rev-lookup" hidden>
+      <p class="field-note">우편번호를 찾을 수 없습니다. 동네 이름(정역)의 로마자로 찾을 수 있습니다.</p>
+      <div class="field-row">
+        <label>동네 이름(로마자)
+          <input type="text" id="town-query" autocomplete="off" placeholder="예: Nishishinjuku">
+        </label>
+      </div>
+      <button type="button" id="town-search">이 동네 이름으로 찾기</button>
+      <div class="tool-result" id="town-candidates" hidden aria-live="polite"></div>
+    </div>
+  </form>
+
   <form class="tool-form" id="jusho-form">
     <label>우편번호
       <span class="field-note">7자리를 입력하면 주소와 로마자가 자동으로 채워집니다</span>
@@ -104,21 +137,45 @@
     로마자는 일본우편 우편번호 데이터의 가나 읽기를 <strong>자동 변환</strong>한 것입니다. 실제 지역의 읽는 법과 다르면 로마자 칸을 직접 고쳐 주세요(결과에 바로 반영됩니다).
   </div>
 
-  <div class="lead-card"><span class="lead-label">이 도구로 할 수 있는 것</span><p>우편번호만 입력하면 일본 주소를 <strong>영문 표기(로마자·해외식 역순)</strong>로 바꿔 줍니다. 해외 쇼핑몰에 배송지를 등록할 때, 국제우편의 받는 사람·보내는 사람 칸을 적을 때, 본국으로 소포를 보낼 때, 그리고 알파벳만 입력할 수 있는 해외 서비스 양식에 그대로 쓸 수 있습니다.</p></div>
+  <div class="lead-card"><span class="lead-label">이 도구로 할 수 있는 것</span><p>일본 주소를 <strong>영문 표기(로마자·해외식 순서)</strong>로 바꿔 주는 도구입니다. <strong>반대로, 로마자로 쓴 일본 주소를 일본어 표기(〒+한자)로 되돌릴 수도 있습니다</strong>. 해외 쇼핑몰의 배송지 등록이나 국제우편의 주소 기재는 물론, 구청이나 병원 서류에 일본어로 주소를 적어야 할 때 사용해 보세요.</p></div>
 
   <h2>사용 방법</h2>
   <ol class="steps">
-    <li>우편번호(예: 100-0014)를 입력하면 주소와 로마자가 자동으로 채워집니다.</li>
-    <li>번지(예: 1-2-3)를 입력합니다. 건물명·호실이 있으면 로마자로 덧붙입니다.</li>
-    <li>영문 표기 주소가 바로 아래에 표시됩니다. 「영문 주소 복사」를 누르면 그대로 붙여넣을 수 있습니다.</li>
+    <li>「변환 방향」을 선택합니다. 일본어 주소를 영문으로 바꾸려면 <strong>일본 주소 → 영문 표기</strong>, 로마자 주소를 일본어로 되돌리려면 <strong>모국 방식 주소 → 일본어 표기</strong>입니다.</li>
+    <li>영문 표기로 바꿀 때: 우편번호(예: 100-0014)를 입력하면 주소와 로마자가 자동으로 채워지므로, 번지와 건물명을 덧붙입니다.</li>
+    <li>일본어 표기로 되돌릴 때: 거주하시는 나라를 고르고, 평소 쓰던 방식 그대로 주소를 붙여넣습니다. 나라마다 순서가 달라도 읽어 냅니다.</li>
+    <li>결과는 바로 아래에 표시됩니다. 복사 버튼을 누르면 그대로 붙여넣을 수 있습니다.</li>
   </ol>
 
   <h2>변환 방법과 근거</h2>
   <ul class="method">
-    <li><strong>순서</strong>: 영문 표기는 「건물·호실 → 번지 정역 → 시구정촌 → 도도부현 우편번호 → JAPAN」 순서(일본어와 반대)이며, 일본우편의 국제우편 주소 기재 안내를 따릅니다.</li>
+    <li><strong>영문 표기의 순서</strong>: 「건물·호실 → 번지 정역 → 시구정촌 → 도도부현 우편번호 → JAPAN」 순서(일본어와 반대)이며, 일본우편의 국제우편 주소 기재 안내를 따릅니다.</li>
     <li><strong>주소와 읽는 법</strong>: 일본우편의 우편번호 데이터(전국 약 12만 건)에서 해당 우편번호의 주소와 가나 읽기를 가져와 헵번식 로마자로 변환합니다.</li>
     <li><strong>정령지정도시</strong>는 「구, 시」 순서(예: Chuo-ku, Sapporo), <strong>군 지역</strong>은 「정·촌, 군」 순서(예: Yoichi-cho, Yoichi-gun)로 표기합니다.</li>
+    <li><strong>일본어 표기로 되돌릴 때</strong>는 순서가 아니라 <strong>형태</strong>로 읽어 냅니다. 7자리 숫자는 우편번호, 숫자와 하이픈으로 이루어진 덩어리(3-2-1)는 번지, 나머지는 건물명·호실로 잡고, 우편번호에서 도도부현·시구정촌·정역의 한자를 찾아냅니다. 그래서 큰 단위부터 썼든 작은 단위부터 썼든 결과는 같습니다.</li>
   </ul>
+
+  <h3>지원하는 국가·지역(일본 내 재류외국인 수 상위 10)</h3>
+  <p>주소 쓰는 방식의 예시와, 호실 표기(Apt·Unit·Apto·Kamar 등)의 인식 방식을 나라별로 바꿉니다. 목록에 없는 나라는 「기타」를 선택하면 똑같이 변환할 수 있습니다.</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>지원 국가·지역과 주소를 쓰는 순서</caption>
+      <thead><tr><th>국가·지역</th><th>주소를 쓰는 순서</th></tr></thead>
+      <tbody>
+        <tr><td>중국</td><td>큰 단위부터(도도부현부터)</td></tr>
+        <tr><td>대만</td><td>큰 단위부터(도도부현부터)</td></tr>
+        <tr><td>베트남</td><td>작은 단위부터(번지부터)</td></tr>
+        <tr><td>한국</td><td>작은 단위부터(번지부터)</td></tr>
+        <tr><td>필리핀</td><td>작은 단위부터(번지부터)</td></tr>
+        <tr><td>네팔</td><td>작은 단위부터(번지부터)</td></tr>
+        <tr><td>인도네시아</td><td>작은 단위부터(번지부터)</td></tr>
+        <tr><td>브라질</td><td>작은 단위부터(번지부터)</td></tr>
+        <tr><td>미얀마</td><td>작은 단위부터(번지부터)</td></tr>
+        <tr><td>스리랑카</td><td>작은 단위부터(번지부터)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>상위 10개 국가·지역은 일본 출입국재류관리청 통계(레이와 7년/2025년 말 기준)에 따릅니다. <strong>쓰는 순서가 달라도 결과는 바뀌지 않으므로</strong>, 헷갈리면 「기타」를 골라도 괜찮습니다.</p>
 
   <h3>출처(1차 정보)</h3>
   <ul class="sources">
@@ -126,6 +183,8 @@
       <a href="https://www.post.japanpost.jp/int/use/writing/normal.html" rel="noopener" target="_blank">https://www.post.japanpost.jp/int/use/writing/normal.html</a>(2026년 7월 26일 열람)</li>
     <li>일본우편 「우편번호 데이터 다운로드」(주소·가나 읽기의 데이터 출처. 2026년 7월 시점의 데이터 사용)(일본어)<br>
       <a href="https://www.post.japanpost.jp/zipcode/download.html" rel="noopener" target="_blank">https://www.post.japanpost.jp/zipcode/download.html</a>(2026년 7월 26일 열람)</li>
+    <li>일본 출입국재류관리청 「레이와 7년(2025년) 말 기준 재류외국인 수에 대하여」(지원 국가·지역의 선정 근거)(일본어)<br>
+      <a href="https://www.moj.go.jp/isa/publications/press/13_00062.html" rel="noopener" target="_blank">https://www.moj.go.jp/isa/publications/press/13_00062.html</a>(2026년 7월 26일 열람)</li>
   </ul>
 
   <h2>변환의 전제와 주의사항</h2>
@@ -133,11 +192,14 @@
     <li>로마자는 자동 변환이므로 고유한 읽는 법(예: 읽기 어려운 지명)과 다를 수 있습니다. 로마자 칸에서 직접 수정할 수 있습니다.</li>
     <li>교토시의 거리 이름 주소(「〜通上ル」 등)나 대형 사업소 전용 우편번호는 정역(町域)이 채워지지 않을 수 있습니다. 그때는 정역 로마자 칸에 직접 입력해 주세요.</li>
     <li>주소의 영문 표기에 법적으로 정해진 유일한 정답은 없습니다. 이 도구는 일본우편의 안내에 따른 일반적인 표기를 출력합니다.</li>
+    <li>일본어 표기로 되돌릴 때 <strong>건물명은 로마자 그대로 남습니다</strong>. 건물명은 고유명사여서 올바른 일본어 표기를 우편번호만으로는 알 수 없기 때문입니다. 맨션 이름을 아신다면 직접 고쳐 주세요.</li>
   </ul>
 
   <h2 id="faq">자주 묻는 질문</h2>
   <h3 class="faq-q">영문에서는 왜 주소 순서가 반대인가요?</h3>
   <p class="faq-a">영어권에서는 「좁은 범위 → 넓은 범위」 순으로 쓰는 관습이 있기 때문입니다. 일본식(넓은 범위 → 좁은 범위)을 그대로 뒤집으면 영문식이 됩니다.</p>
+  <h3 class="faq-q">우편번호를 모를 때는 어떻게 하나요?</h3>
+  <p class="faq-a">「모국 방식 주소 → 일본어 표기」에서 우편번호를 찾지 못했을 때는, 동네 이름의 로마자(예: Nishishinjuku)로 후보를 찾을 수 있는 칸이 나타납니다. 같은 동네 이름이 전국에 여러 곳 있으면 후보 중에서 골라 주세요.</p>
   <h3 class="faq-q">해외에서 일본으로 보낼 때 주소는 반드시 영문이어야 하나요?</h3>
   <p class="faq-a">국가명(JAPAN)은 보내는 나라에서 알아볼 수 있게 적어야 하지만, 일본 국내 부분은 일본어로 적어도 배달됩니다(일본우편 안내). 영문 표기는 상대가 일본어를 못 쓰거나 해외 사이트의 입력란이 알파벳만 받을 때 편리합니다.</p>
   <h3 class="faq-q">「1-2-3」에서 어디까지가 丁目(초메)인가요?</h3>
@@ -273,6 +335,180 @@
       setTimeout(function () { copyBtn.textContent = COPY_LABEL; }, 1500);
     });
   });
+})();
+</script>
+<script>
+/* 모국 방식 주소 → 일본어 표기 */
+(function () {
+  "use strict";
+  var COUNTRY_NAMES = {
+    cn: "중국", vn: "베트남", kr: "한국", ph: "필리핀", np: "네팔",
+    id: "인도네시아", br: "브라질", mm: "미얀마", lk: "스리랑카", tw: "대만",
+    other: "기타 국가·지역"
+  };
+  // 순서별 기재 예시. 나라별로 문자열을 두지 않고 calc.js의 order에서 조립한다
+  var EXAMPLES = {
+    "small-first": "예: Apt 201, 3-2-1 Nishishinjuku, Shinjuku-ku, Tokyo 160-0023",
+    "large-first": "예: 160-0023 Tokyo, Shinjuku-ku, Nishishinjuku 3-2-1, Apt 201"
+  };
+
+  var COPY_JA_LABEL = "일본어 주소 복사";
+
+  var modeEl = document.getElementById("mode");
+  var revForm = document.getElementById("rev-form");
+  var enForm = document.getElementById("jusho-form");
+  var countryEl = document.getElementById("country");
+  var exampleEl = document.getElementById("rev-example");
+  var inputEl = document.getElementById("foreign-input");
+  var resultEl = document.getElementById("rev-result");
+  var copyJaBtn = document.getElementById("copy-ja");
+  var lookupBox = document.getElementById("rev-lookup");
+  var townQuery = document.getElementById("town-query");
+  var candBox = document.getElementById("town-candidates");
+
+  var shardCache = {};
+  var revCache = {};
+  var pickedZip = "";  // 후보에서 고른 우편번호
+  var copyText = "";
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function getShard(zip3) {
+    if (shardCache[zip3]) return Promise.resolve(shardCache[zip3]);
+    return fetch("../../../shared/postal/" + zip3 + ".json")
+      .then(function (r) { if (!r.ok) throw new Error("nf"); return r.json(); })
+      .then(function (d) { shardCache[zip3] = d; return d; });
+  }
+  function getRev(letter) {
+    if (revCache[letter]) return Promise.resolve(revCache[letter]);
+    return fetch("../../../shared/postal/rev/" + letter + ".json")
+      .then(function (r) { if (!r.ok) throw new Error("nf"); return r.json(); })
+      .then(function (d) { revCache[letter] = d; return d; });
+  }
+
+  // 국가 선택지는 calc.js의 COUNTRIES에서 만든다(순서도 calc.js를 따른다)
+  var opts = "";
+  for (var i = 0; i < JushoCalc.COUNTRIES.length; i++) {
+    var c = JushoCalc.COUNTRIES[i].code;
+    opts += '<option value="' + c + '">' + (COUNTRY_NAMES[c] || c) + "</option>";
+  }
+  countryEl.innerHTML = opts;
+
+  function syncExample() {
+    var country = JushoCalc.countryOf(countryEl.value);
+    exampleEl.textContent = EXAMPLES[country.order];
+    inputEl.placeholder = EXAMPLES[country.order].replace(/^예: /, "");
+  }
+
+  function show(zip, rec, parsed) {
+    var refined = JushoCalc.refineBuilding(parsed, [rec[0], rec[1], rec[2], rec[3], rec[4], rec[5]]);
+    var r = JushoCalc.japaneseAddress({
+      zip: zip, pref: rec[0], city: rec[1], town: rec[2],
+      banchi: parsed.banchi, building: refined.building
+    });
+    if (!r.ok) { resultEl.hidden = true; copyJaBtn.hidden = true; return; }
+    copyText = r.lines.join("\n");
+    var chome = JushoCalc.banchiToChome(parsed.banchi);
+    resultEl.innerHTML =
+      '<div class="result-main">일본어 표기</div>' +
+      '<p style="white-space:pre-line;font-size:1.05rem;margin:6px 0;"><strong>' + esc(copyText) + "</strong></p>" +
+      "<p>한 줄로 쓸 때:<br>" + esc(r.single) + "</p>" +
+      (chome ? "<p>丁目(초메) 표기로 쓸 때: " + esc("〒" + zip + " " + rec[0] + rec[1] + rec[2] + chome) + "</p>" : "") +
+      (refined.building ? "<p><small>건물명은 고유명사이므로 읽어 들인 표기 그대로 두었습니다.</small></p>" : "");
+    resultEl.hidden = false;
+    copyJaBtn.hidden = false;
+  }
+
+  function fail(msg, showLookup) {
+    resultEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    resultEl.hidden = false;
+    copyJaBtn.hidden = true;
+    lookupBox.hidden = !showLookup;
+  }
+
+  function run() {
+    var parsed = JushoCalc.parseForeignAddress(inputEl.value, countryEl.value);
+    if (!parsed.ok) {
+      resultEl.hidden = true; copyJaBtn.hidden = true; lookupBox.hidden = true;
+      return;
+    }
+    var zip = parsed.zip || pickedZip;
+    if (!zip) {
+      // 우편번호가 없을 때는 동네 이름으로 찾을 수 있게 한다
+      lookupBox.hidden = false;
+      if (!townQuery.value && parsed.words.length) townQuery.value = parsed.words[0];
+      fail("우편번호를 찾을 수 없습니다. 아래 칸에서 동네 이름으로 찾을 수 있습니다.", true);
+      return;
+    }
+    lookupBox.hidden = true;
+    var digits = zip.replace("-", "");
+    getShard(digits.slice(0, 3))
+      .then(function (data) {
+        var rec = data[digits.slice(3)];
+        if (!rec) { fail("해당 우편번호를 찾을 수 없습니다. 번호를 확인해 주세요.", true); return; }
+        show(zip, rec, parsed);
+      })
+      .catch(function () { fail("해당 우편번호를 찾을 수 없습니다. 번호를 확인해 주세요.", true); });
+  }
+
+  function searchTown() {
+    var key = JushoCalc.revKey(townQuery.value);
+    if (!key) { candBox.hidden = true; return; }
+    candBox.innerHTML = "<p>찾는 중…</p>";
+    candBox.hidden = false;
+    getRev(key[0])
+      .then(function (table) {
+        var zips = table[key];
+        if (!zips || !zips.length) {
+          candBox.innerHTML = '<p class="result-error">해당 동네 이름을 찾을 수 없습니다. 철자를 확인해 주세요.</p>';
+          return;
+        }
+        return Promise.all(zips.map(function (z) {
+          return getShard(z.slice(0, 3)).then(function (d) { return { zip: z, rec: d[z.slice(3)] }; });
+        })).then(function (list) {
+          var rows = list.filter(function (x) { return x.rec; }).map(function (x) {
+            var z = x.zip.slice(0, 3) + "-" + x.zip.slice(3);
+            return '<li><button type="button" class="cand" data-zip="' + z + '">' +
+              esc(x.rec[0] + x.rec[1] + x.rec[2]) + "(〒" + z + ")</button></li>";
+          }).join("");
+          candBox.innerHTML = "<p>해당하는 주소를 선택해 주세요.</p><ul class=\"related\">" + rows + "</ul>";
+        });
+      })
+      .catch(function () {
+        candBox.innerHTML = '<p class="result-error">해당 동네 이름을 찾을 수 없습니다. 철자를 확인해 주세요.</p>';
+      });
+  }
+
+  candBox.addEventListener("click", function (e) {
+    var btn = e.target.closest ? e.target.closest("button.cand") : null;
+    if (!btn) return;
+    pickedZip = btn.getAttribute("data-zip");
+    candBox.hidden = true;
+    run();
+  });
+
+  function syncMode() {
+    var toJa = modeEl.value === "to-ja";
+    revForm.hidden = !toJa;
+    enForm.hidden = toJa;
+    if (toJa) { syncExample(); run(); }
+  }
+  modeEl.addEventListener("change", syncMode);
+  countryEl.addEventListener("change", function () { syncExample(); run(); });
+  inputEl.addEventListener("input", function () { pickedZip = ""; run(); });
+  document.getElementById("town-search").addEventListener("click", searchTown);
+  document.getElementById("rev-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  copyJaBtn.addEventListener("click", function () {
+    if (!copyText) return;
+    navigator.clipboard.writeText(copyText).then(function () {
+      copyJaBtn.textContent = "복사했습니다";
+      setTimeout(function () { copyJaBtn.textContent = COPY_JA_LABEL; }, 1500);
+    });
+  });
+
+  syncExample();
+  syncMode();
 })();
 </script>
 </body>

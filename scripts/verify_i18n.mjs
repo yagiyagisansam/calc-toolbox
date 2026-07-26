@@ -104,6 +104,7 @@ for (const lang of LANGS) {
 
       // 通信・DOM操作を伴うツールは実際に動かして確認する
       if (slug === "jusho") {
+        // 日本の住所 → 英語表記
         await page.fill("#zip", "100-0014");
         await page.waitForFunction(() => {
           const b = document.getElementById("result");
@@ -114,6 +115,30 @@ for (const lang of LANGS) {
         await page.fill("#banchi", "1丁目2番3号");
         const txt = await page.textContent("#result");
         if (!/1-2-3 Nagatacho/.test(txt)) throw new Error(`番地の整形が効いていない: ${txt.slice(0, 120)}`);
+
+        // 母国の書き方 → 日本語表記
+        await page.selectOption("#mode", "to-ja");
+        await page.selectOption("#country", "np");
+        await page.fill("#foreign-input", "Apt 201, 3-2-1 Nishishinjuku, Shinjuku-ku, Tokyo 160-0023");
+        await page.waitForFunction(() => {
+          const b = document.getElementById("rev-result");
+          return b && !b.hidden && b.textContent.indexOf("東京都新宿区西新宿3-2-1") >= 0;
+        }, null, { timeout: 8000 }).catch(() => {
+          throw new Error("逆変換で日本語表記にできない(shared/postalへの相対パスと解析を確認)");
+        });
+        const rev = await page.textContent("#rev-result");
+        if (rev.indexOf("Apt 201") < 0) throw new Error(`建物名が保持されていない: ${rev.slice(0, 120)}`);
+
+        // 郵便番号が無いときの町名検索
+        await page.fill("#foreign-input", "3-2-1 Nishishinjuku, Shinjuku-ku, Tokyo");
+        await page.waitForFunction(() => !document.getElementById("rev-lookup").hidden, null, { timeout: 8000 })
+          .catch(() => { throw new Error("郵便番号なしのとき町名検索が出ない"); });
+        await page.click("#town-search");
+        await page.waitForFunction(() => document.querySelectorAll("button.cand").length > 0, null, { timeout: 8000 })
+          .catch(() => { throw new Error("町名の逆引き候補が出ない(shared/postal/revへの相対パスを確認)"); });
+        await page.click("button.cand");
+        await page.waitForFunction(() => document.getElementById("rev-result").textContent.indexOf("東京都") >= 0,
+          null, { timeout: 8000 }).catch(() => { throw new Error("候補を選んでも結果が出ない"); });
       }
       if (slug === "shukujitsu" || slug === "gakunen") {
         const filled = await page.evaluate(() => {
