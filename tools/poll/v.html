@@ -51,6 +51,15 @@
 
   <p class="pb-center mt20"><a class="pb-link" href="./new.html">自分もアンケートを作ってみる(無料・登録不要)</a></p>
   <button type="button" class="pb-report" id="report-btn" hidden>問題のあるアンケートを報告する</button>
+
+  <div class="pb-modal-bg" id="report-confirm-bg" hidden>
+    <div class="pb-modal" role="dialog" aria-modal="true" aria-labelledby="report-confirm-title">
+      <p class="pb-q pb-q-sm" id="report-confirm-title">このアンケートを報告しますか?</p>
+      <p class="pb-meta">誹謗中傷・わいせつ・宣伝など、問題のある内容のときに報告してください。報告は取り消せません。</p>
+      <button type="button" class="pb-btn" id="report-yes">はい、報告する</button>
+      <button type="button" class="pb-btn-sub" id="report-no">いいえ、やめる</button>
+    </div>
+  </div>
 </main>
 <footer class="pb-footer">
   <p>このページの投票データ(選んだ選択肢)は、集計のため外部データベースに保存されます(個人を特定する情報は収集しません)。詳しくは<a href="../../privacy.html">プライバシーポリシー</a>をご覧ください。</p>

@@ -239,18 +239,26 @@ grant execute on function public.poll_results(text, text) to anon;
 -- ---- ④ 点検・対応のRPC(管理用トークンが必要) ----
 
 -- 未対応の通報と不具合報告をまとめて返す
-create or replace function public.ops_pending(p_token text)
+-- 通報は「押し間違い」で1件付くことがあるため、直近 p_days 日で p_min_reports 件以上
+-- 集まったアンケートだけを判定対象として返す(既定: 7日で5件以上)
+drop function if exists public.ops_pending(text);
+
+create or replace function public.ops_pending(p_token text, p_min_reports integer default 5, p_days integer default 7)
 returns jsonb
 language plpgsql
 stable
 security definer
 set search_path = public
 as $$
+declare
+  min_n int := greatest(coalesce(p_min_reports, 5), 1);
+  win   int := least(greatest(coalesce(p_days, 7), 1), 366);
 begin
   if not public.ops_auth(p_token) then
     raise exception 'forbidden';
   end if;
   return jsonb_build_object(
+    'threshold', jsonb_build_object('min_reports', min_n, 'days', win),
     'reports', coalesce((
       select jsonb_agg(x order by x->>'first_reported')
       from (
@@ -268,7 +276,9 @@ begin
         from public.reports r
         join public.polls p on p.id = r.poll_id
         where r.reviewed_at is null
+          and r.created_at > now() - make_interval(days => win)
         group by p.id, p.question, p.options, p.is_public, p.blocked, p.created_at
+        having count(*) >= min_n
       ) s
     ), '[]'::jsonb),
     'bugs', coalesce((
@@ -343,12 +353,12 @@ begin
 end;
 $$;
 
-revoke all on function public.ops_pending(text) from public, authenticated;
+revoke all on function public.ops_pending(text, integer, integer) from public, authenticated;
 revoke all on function public.ops_block_poll(text, text, text) from public, authenticated;
 revoke all on function public.ops_keep_poll(text, text) from public, authenticated;
 revoke all on function public.ops_close_bug(text, bigint, text, text) from public, authenticated;
 
-grant execute on function public.ops_pending(text) to anon;
+grant execute on function public.ops_pending(text, integer, integer) to anon;
 grant execute on function public.ops_block_poll(text, text, text) to anon;
 grant execute on function public.ops_keep_poll(text, text) to anon;
 grant execute on function public.ops_close_bug(text, bigint, text, text) to anon;
@@ -356,6 +366,7 @@ grant execute on function public.ops_close_bug(text, bigint, text, text) to anon
 -- =============================================================
 -- 運用メモ:
 --  - 毎日の点検は ops_pending で未対応分を取得する
+--    (通報は直近7日で5件以上集まったアンケートだけが対象。引数で変更できる)
 --  - 問題のあるアンケートは ops_block_poll で公開停止(データは残す)
 --  - 完全に消す場合は従来どおり delete from public.polls where id = '対象のID';
 -- =============================================================

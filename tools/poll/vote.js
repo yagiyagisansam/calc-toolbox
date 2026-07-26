@@ -600,13 +600,34 @@ if (window.top !== window.self) {
     box.hidden = false;
   });
 
-  document.getElementById("report-btn").addEventListener("click", function () {
-    var btn = this;
-    if (!window.confirm("このアンケートを不適切な内容として報告しますか?")) return;
-    btn.disabled = true;
+  // 通報は誤タップを防ぐため、サイト内の確認ダイアログを挟んでから送信する
+  var reportBtn = document.getElementById("report-btn");
+  var reportBg = document.getElementById("report-confirm-bg");
+
+  reportBtn.addEventListener("click", function () {
+    reportBg.hidden = false;
+    document.getElementById("report-no").focus();
+  });
+
+  document.getElementById("report-no").addEventListener("click", function () {
+    reportBg.hidden = true;
+    reportBtn.focus();
+  });
+
+  reportBg.addEventListener("click", function (e) {
+    if (e.target === reportBg) { reportBg.hidden = true; reportBtn.focus(); }
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !reportBg.hidden) { reportBg.hidden = true; reportBtn.focus(); }
+  });
+
+  document.getElementById("report-yes").addEventListener("click", function () {
+    reportBg.hidden = true;
+    reportBtn.disabled = true;
     PollNet.report(pollId, voterId()).then(function (r) {
-      btn.textContent = r.ok ? "報告を受け付けました。ご協力ありがとうございます。" : "報告を送信できませんでした。時間をおいてお試しください。";
-      if (!r.ok) btn.disabled = false;
+      reportBtn.textContent = r.ok ? "報告を受け付けました。ご協力ありがとうございます。" : "報告を送信できませんでした。時間をおいてお試しください。";
+      if (!r.ok) reportBtn.disabled = false;
     });
   });
 
