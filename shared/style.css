@@ -177,7 +177,7 @@ a { color: var(--color-accent); }
   background: var(--color-surface);
 }
 .tool-form label { font-weight: 600; font-size: 0.92rem; display: block; }
-.tool-form .field-note { font-weight: 400; color: var(--color-muted); font-size: 0.8rem; }
+.tool-form .field-note { font-weight: 400; color: var(--color-muted); font-size: 0.8rem; margin-left: 6px; }
 .tool-form input[type="number"],
 .tool-form input[type="text"],
 .tool-form input[type="date"],
@@ -471,3 +471,43 @@ ul.related li a:hover { border-color: var(--color-accent); color: var(--color-ac
   padding: 0 7px;
   vertical-align: middle;
 }
+
+/* 送信前の確認ダイアログ(お問い合わせフォーム) */
+.modal-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 50;
+}
+.modal-bg[hidden] { display: none; }
+.modal {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 20px 18px;
+  max-width: 380px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.confirm-title { font-size: 1.05rem; font-weight: 700; margin: 0 0 12px; }
+.confirm-list { margin: 0; font-size: 0.9rem; }
+.confirm-list dt { font-weight: 700; color: var(--color-muted); font-size: 0.8rem; margin-top: 10px; }
+.confirm-list dd { margin: 2px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.confirm-note { font-size: 0.8rem; color: var(--color-muted); margin: 14px 0 0; }
+.confirm-yes, .confirm-no {
+  display: block;
+  width: 100%;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.confirm-yes { margin-top: 14px; border: none; background: var(--color-accent); color: #fff; }
+.confirm-no { margin-top: 10px; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text); }
+.confirm-yes:active, .confirm-no:active { opacity: 0.85; }

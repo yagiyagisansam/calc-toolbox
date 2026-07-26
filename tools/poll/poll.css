@@ -88,6 +88,8 @@ body {
 /* 見出し・質問 */
 .pb-q { font-size: 1.22rem; font-weight: 800; line-height: 1.45; overflow-wrap: anywhere; }
 .pb-meta { color: var(--muted); font-size: 0.78rem; margin-top: 8px; }
+/* 集計時点の表示(更新ボタンの直下・中央寄せ) */
+.pb-stamp { text-align: center; margin-top: 10px; }
 .pb-sec { display: flex; align-items: baseline; gap: 8px; margin: 24px 2px 10px; }
 .pb-sec b { font-size: 1rem; font-weight: 800; }
 .pb-sec span { font-size: 0.72rem; color: var(--muted); }

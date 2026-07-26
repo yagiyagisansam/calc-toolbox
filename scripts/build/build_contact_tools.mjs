@@ -1,6 +1,9 @@
-// contact.html(お問い合わせフォーム)の種別リストを data.js から再生成する
+// お問い合わせフォームの選択肢データを data.js から再生成する
 // 使い方: node scripts/build/build_contact_tools.mjs
 // ツールを追加したら実行すること(手書きの一覧を持たないための生成スクリプト)
+//
+// 出力: shared/contact-tools.js
+//   1段目(計算ツール / みんなの投票)の選択に応じて、2段目の選択肢を組み立てるためのデータ
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
@@ -12,22 +15,33 @@ const TOOLS = JSON.parse(dataSrc.slice(dataSrc.indexOf("= ") + 2).replace(/;\s*$
 const CAT_ORDER = ["健康", "お金", "日付", "変換"];
 const CAT_LABEL = { "健康": "健康・からだ", "お金": "お金", "日付": "日付・時間", "変換": "暮らし・変換" };
 
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
+// 「みんなの投票」は計算ツールではなく統計ツール側に置く
+const POLL_SLUG = "poll";
+const calcTools = TOOLS.filter((t) => t.slug !== POLL_SLUG);
 
-const groups = CAT_ORDER.map((cat) => {
-  const items = TOOLS.filter((t) => t.cat === cat).sort((a, b) => a.name.localeCompare(b.name, "ja"));
-  if (!items.length) return "";
-  const opts = items.map((t) => `          <option value="${esc(t.slug)}">${esc(t.name)}</option>`).join("\n");
-  return `        <optgroup label="${esc(CAT_LABEL[cat] || cat)}">\n${opts}\n        </optgroup>`;
-}).filter(Boolean).join("\n");
+const calcGroups = CAT_ORDER.map((cat) => ({
+  label: CAT_LABEL[cat] || cat,
+  items: calcTools
+    .filter((t) => t.cat === cat)
+    .sort((a, b) => a.name.localeCompare(b.name, "ja"))
+    .map((t) => ({ v: t.slug, n: t.name })),
+})).filter((g) => g.items.length);
 
-const block = `        <option value="">選んでください</option>\n${groups}\n        <option value="other">その他(ご意見・ご要望・サイト全体のこと)</option>`;
+// 統計ツール側は、画面ごとの分かりやすい単位で分ける
+const pollGroups = [{
+  label: "みんなの投票",
+  items: [
+    { v: "poll-create", n: "アンケートを作るとき" },
+    { v: "poll-vote", n: "投票・結果の表示" },
+    { v: "poll-delete", n: "アンケートの削除" },
+    { v: "poll", n: "その他(みんなの投票全般)" },
+  ],
+}];
 
-const file = ROOT + "/contact.html";
-const html = readFileSync(file, "utf8");
-const re = /(<!-- @tools start[^>]*-->\n)[\s\S]*?(\n\s*<!-- @tools end -->)/;
-if (!re.test(html)) throw new Error("contact.html に @tools のマーカーが見つかりません");
-writeFileSync(file, html.replace(re, (m, head, tail) => head + block + tail), "utf8");
-console.log(`contact.html: ${TOOLS.length} ツールの種別リストを生成しました`);
+const out =
+  "// 自動生成: node scripts/build/build_contact_tools.mjs\n" +
+  "// お問い合わせフォームの選択肢。ツールを追加したら再生成すること\n" +
+  "var CONTACT_TOOLS = " + JSON.stringify({ calc: calcGroups, poll: pollGroups }, null, 1) + ";\n";
+
+writeFileSync(ROOT + "/shared/contact-tools.js", out, "utf8");
+console.log(`shared/contact-tools.js: 計算ツール${calcTools.length}件・みんなの投票${pollGroups[0].items.length}項目を生成しました`);

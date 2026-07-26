@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://ssxskriqlaiohdutxprn.supabase.co; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'; require-trusted-types-for 'script'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <title>お問い合わせ | 計算ツールボックス</title>
-  <meta name="description" content="計算ツールボックスへのお問い合わせフォームです。計算の誤り・不具合・ご意見をお送りいただけます。">
+  <title>お問い合わせ・よくある質問 | 計算ツールボックス</title>
+  <meta name="description" content="計算ツールボックスのよくある質問とお問い合わせフォームです。計算の誤り・不具合・ご意見をお送りいただけます。">
   <link rel="stylesheet" href="./shared/style.css">
   <!-- @meta start -->
   <link rel="canonical" href="https://quick-calc.site/contact.html">
   <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A//www.w3.org/2000/svg'%20viewBox%3D'0%200%2024%2024'%3E%3Crect%20width%3D'24'%20height%3D'24'%20rx%3D'5'%20fill%3D'%230b6e4f'/%3E%3Cg%20fill%3D'none'%20stroke%3D'%23fff'%20stroke-width%3D'1.7'%20stroke-linecap%3D'round'%3E%3Crect%20x%3D'6.6'%20y%3D'4.6'%20width%3D'10.8'%20height%3D'14.8'%20rx%3D'2.4'/%3E%3Cpath%20d%3D'M9.6%208.2h4.8'/%3E%3Cpath%20d%3D'M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
   <meta name="theme-color" content="#0b6e4f">
   <meta property="og:site_name" content="計算ツールボックス">
-  <meta property="og:title" content="お問い合わせ | 計算ツールボックス">
-  <meta property="og:description" content="計算ツールボックスへのお問い合わせフォームです。計算の誤り・不具合・ご意見をお送りいただけます。">
+  <meta property="og:title" content="お問い合わせ・よくある質問 | 計算ツールボックス">
+  <meta property="og:description" content="計算ツールボックスのよくある質問とお問い合わせフォームです。計算の誤り・不具合・ご意見をお送りいただけます。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://quick-calc.site/contact.html">
   <meta property="og:locale" content="ja_JP">
@@ -29,102 +29,71 @@
 </header>
 <!-- @partial:header end -->
 <main>
-  <h1>お問い合わせ</h1>
-  <p>計算結果の誤り・動かない箇所・ご意見やご要望など、お気づきの点をお送りください。いただいた内容はすべて運営者が確認します。</p>
+  <h1>お問い合わせ・よくある質問</h1>
+  <p>まずはよくある質問をご確認ください。解決しない場合は、ページ下部のフォームからお送りいただけます。</p>
+
+  <h2>よくある質問</h2>
+
+  <h3 class="faq-q">計算結果が自分の計算と合いません</h3>
+  <p class="faq-a">各ツールのページ下部に、計算式・前提条件・出典を書いています。端数処理(切り捨て・四捨五入)や前提の違いで差が出ることが多いので、まずそちらをご確認ください。それでも合わない場合は、入力した値と正しいはずの結果を添えてフォームからお知らせください。</p>
+
+  <h3 class="faq-q">計算結果をそのまま申告や契約に使えますか?</h3>
+  <p class="faq-a">すべて概算です。税・社会保険・ローンなどの制度に関わる数値は、公的機関の窓口や専門家にご確認ください。詳しくは<a href="./disclaimer.html">免責事項</a>をご覧ください。</p>
+
+  <h3 class="faq-q">入力した値はどこかに送信されますか?</h3>
+  <p class="faq-a">計算ツールに入力した値は、すべてお使いの端末の中だけで計算しています。サーバーへ送信も保存もしていません(「みんなの投票」だけは集計のため質問・選択肢・票数を保存します)。詳しくは<a href="./privacy.html">プライバシーポリシー</a>をご覧ください。</p>
+
+  <h3 class="faq-q">会員登録や料金は必要ですか?</h3>
+  <p class="faq-a">すべて無料で、登録も不要です。</p>
+
+  <h3 class="faq-q">自分で作ったアンケートを削除したい</h3>
+  <p class="faq-a">作った端末で「みんなの投票」のトップを開くと「この端末で作ったアンケート」に並びます。その「削除」から、いつでもご自分で削除できます(集まった票も一緒に消えます)。投票ページの削除ボタンからも同じことができます。<a href="./tools/poll/">みんなの投票を開く</a></p>
+
+  <h3 class="faq-q">アンケートの結果が更新されません</h3>
+  <p class="faq-a">結果の下にある「最新の結果に更新」を押すと再集計されます。結果の下に集計した時刻が出るので、そこが変われば更新できています。</p>
+
+  <h3 class="faq-q">不適切なアンケートを見つけました</h3>
+  <p class="faq-a">そのアンケートのページの下部にある「問題のあるアンケートを報告する」からお知らせください。</p>
+
+  <h3 class="faq-q">返信はもらえますか?</h3>
+  <p class="faq-a">いただいた内容はすべて運営者が確認しますが、返信はいたしかねます。あらかじめご了承ください。</p>
+
+  <h2 id="form">お問い合わせフォーム</h2>
+  <p>上のよくある質問で解決しない場合は、こちらからお送りください。上の2つの選択は任意です。</p>
 
   <form class="tool-form" id="contact-form" novalidate>
-    <label for="tool">どのことについてですか?
-      <select id="tool" name="tool" required>
-        <!-- @tools start : scripts/build/build_contact_tools.mjs が自動生成する -->
-        <option value="">選んでください</option>
-        <optgroup label="健康・からだ">
-          <option value="tdee">1日の摂取カロリー目安 計算機</option>
-          <option value="bmi">BMI・適正体重 計算機</option>
-          <option value="walking">ウォーキング消費カロリー 計算機</option>
-          <option value="caffeine">カフェイン摂取量 計算機</option>
-          <option value="protein">タンパク質摂取量 計算機</option>
-          <option value="pace">ランニングペース 計算機</option>
-          <option value="sports">運動別 消費カロリー計算機</option>
-          <option value="shio">塩分量 計算機(ナトリウム⇔食塩相当量)</option>
-          <option value="bmr">基礎代謝量 計算機</option>
-          <option value="ninshin">出産予定日・妊娠週数 計算機</option>
-          <option value="alcohol">純アルコール量 計算機</option>
-          <option value="cycle">睡眠サイクル計算機</option>
-          <option value="sleep">睡眠時間 計算機</option>
-          <option value="hosu">歩数→距離・カロリー換算 計算機</option>
-          <option value="shinpaku">目標心拍数 計算機(カルボーネン法)</option>
-        </optgroup>
-        <optgroup label="お金">
-          <option value="fuel">ガソリン代 計算機</option>
-          <option value="tip">チップ計算機(海外旅行用)</option>
-          <option value="loan">ローン返済 計算機</option>
-          <option value="hiwari">家賃日割り計算機</option>
-          <option value="warikan">割り勘 計算機</option>
-          <option value="point">割引とポイント還元 どっちが得? 計算機</option>
-          <option value="waribiki">割引計算機(○%オフはいくら?)</option>
-          <option value="zangyo">残業代 計算機</option>
-          <option value="jikyu">時給⇔月収・年収 換算計算機</option>
-          <option value="kariire">住宅ローン 借入可能額 計算機</option>
-          <option value="tax">消費税 計算機</option>
-          <option value="tanka">単価比較 計算機(どっちが安い?)</option>
-          <option value="teiki">定期券は元が取れる? 計算機</option>
-          <option value="denki">電気代 計算機</option>
-          <option value="nenpi">燃費計算機(満タン法)</option>
-          <option value="fudosan">不動産投資 収支・損益分岐計算機</option>
-          <option value="compound">複利・積立シミュレーション</option>
-          <option value="yukyu">有給休暇の付与日数 計算機</option>
-          <option value="genka">利益率・原価率 計算機</option>
-        </optgroup>
-        <optgroup label="日付・時間">
-          <option value="tsukisu">○ヶ月後・月数 計算機</option>
-          <option value="eigyobi">営業日計算機(土日祝を除く)</option>
-          <option value="kinenbi">記念日カウント計算機</option>
-          <option value="jikan">時間計算機(合計・時刻の差)</option>
-          <option value="wareki">西暦・和暦 変換計算機</option>
-          <option value="days">日数計算機(日付の差・○日後)</option>
-          <option value="rireki">入学・卒業年 早見計算機(履歴書用)</option>
-          <option value="age">年齢計算機(満年齢・早生まれ・干支)</option>
-        </optgroup>
-        <optgroup label="暮らし・変換">
-          <option value="inch">インチ⇔cm・ポンド⇔kg 変換計算機</option>
-          <option value="kome">お米の合・グラム換算 計算機</option>
-          <option value="byte">データ容量 換算(KB・MB・GB・TB)</option>
-          <option value="percent">パーセント計算機</option>
-          <option value="password">パスワード生成ツール</option>
-          <option value="mile">マイル⇔km 換算計算機</option>
-          <option value="poll">みんなの投票(アンケート作成・リアルタイム集計)</option>
-          <option value="roman">ローマ数字 変換</option>
-          <option value="ondo">温度換算 計算機(摂氏⇔華氏⇔ケルビン)</option>
-          <option value="petage">犬・猫の年齢換算 計算機</option>
-          <option value="shincho">身長 フィート・インチ換算</option>
-          <option value="seiza">星座・誕生石 早見計算機</option>
-          <option value="zenkaku">全角⇔半角 変換ツール</option>
-          <option value="speed">速さ・時間・距離 計算機</option>
-          <option value="spoon">大さじ・小さじ・カップ 換算計算機</option>
-          <option value="tsubo">坪・平米・畳 変換計算機</option>
-          <option value="renji">電子レンジ加熱時間 換算計算機</option>
-          <option value="moji">文字数カウント</option>
-          <option value="heikin">平均値・中央値 計算機</option>
-          <option value="hensachi">偏差値 計算機</option>
-        </optgroup>
-        <option value="other">その他(ご意見・ご要望・サイト全体のこと)</option>
-        <!-- @tools end -->
+    <label for="category">お問い合わせ内容<span class="field-note">任意</span>
+      <select id="category" name="category">
+        <option value="">選ばない</option>
+        <option value="calc">計算ツールについて</option>
+        <option value="poll">みんなの投票(アンケート)について</option>
+        <option value="site">サイト全体・その他</option>
       </select>
     </label>
-    <label for="message">お問い合わせの内容
-      <span class="field-note">不具合の場合は、入力した値・表示された結果・正しいはずの結果を書いていただけると助かります(5〜1000文字)</span>
+    <label for="tool" id="tool-row" hidden>どのツールですか<span class="field-note">任意</span>
+      <select id="tool" name="tool">
+        <option value="">選ばない</option>
+      </select>
+    </label>
+    <label for="message">詳しい内容<span class="field-note">必須。不具合の場合は、入力した値・表示された結果・正しいはずの結果を書いていただけると助かります(5〜1000文字)</span>
       <textarea id="message" name="message" rows="7" required maxlength="1000" placeholder="例: 身長170cm・体重60kgでBMIが表示されない"></textarea>
     </label>
-    <button type="submit" id="send-btn">送信する</button>
+    <button type="submit" id="send-btn">入力内容を確認する</button>
   </form>
 
   <div class="tool-result" id="contact-result" hidden></div>
 
-  <p class="note-box">お名前・メールアドレス・電話番号などの個人情報は書かないでください。匿名で送信され、こちらから返信することはできません。</p>
+  <div class="modal-bg" id="confirm-bg" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      <p class="confirm-title" id="confirm-title">この内容で送信しますか?</p>
+      <dl class="confirm-list" id="confirm-list"></dl>
+      <p class="confirm-note">送信後の取り消しや修正はできません。</p>
+      <button type="button" class="confirm-yes" id="confirm-yes">はい、送信する</button>
+      <button type="button" class="confirm-no" id="confirm-no">いいえ、戻って直す</button>
+    </div>
+  </div>
 
-  <h2>アンケート(みんなの投票)について</h2>
-  <p>ご自分で作ったアンケートは、<strong>作った端末から自分で削除できます</strong>。「みんなの投票」のトップにある「この端末で作ったアンケート」、または投票ページの削除ボタンからどうぞ。</p>
-  <p><a href="./tools/poll/">みんなの投票を開く</a></p>
+  <p class="note-box">お名前・メールアドレス・電話番号などの個人情報は書かないでください。匿名で送信され、こちらから返信することはできません。</p>
 </main>
 <!-- @partial:footer start -->
 <footer class="site-footer">
@@ -140,6 +109,7 @@
 </footer>
 <!-- @partial:footer end -->
 <script src="./tools/poll/config.js"></script>
+<script src="./shared/contact-tools.js"></script>
 <script src="./shared/contact.js"></script>
 </body>
 </html>

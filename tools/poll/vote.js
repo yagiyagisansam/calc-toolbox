@@ -306,8 +306,18 @@ if (window.top !== window.self) {
     refresh.type = "button";
     refresh.className = "pb-btn-sub";
     refresh.textContent = "最新の結果に更新";
-    refresh.addEventListener("click", function () { load(true); });
+    refresh.addEventListener("click", function () {
+      refresh.disabled = true;
+      refresh.textContent = "更新中…";
+      load(true);
+    });
     resultEl.appendChild(refresh);
+
+    // 何時時点の集計かを出す。更新するとこの時刻が変わるので、反映されたことが目で分かる
+    var stamp = document.createElement("p");
+    stamp.className = "pb-meta pb-stamp";
+    stamp.textContent = formatStamp(new Date()) + "時点の結果です";
+    resultEl.appendChild(stamp);
 
     // ＋書き出し(CSV・結果画像)
     var exp = document.createElement("details");
@@ -539,6 +549,14 @@ if (window.top !== window.self) {
       e.preventDefault();
       load(true, "投票せずに現在の結果を表示しています(このページを開き直すと投票できます)。");
     };
+  }
+
+  // 「7月26日 10:23:41」の形。集計時点の表示に使う。
+  // 秒まで出すのは、同じ分のうちに更新しても時刻が変わり、更新できたと分かるようにするため
+  function formatStamp(d) {
+    function two(n) { return (n < 10 ? "0" : "") + n; }
+    return (d.getMonth() + 1) + "月" + d.getDate() + "日 " +
+      two(d.getHours()) + ":" + two(d.getMinutes()) + ":" + two(d.getSeconds()) + " ";
   }
 
   var pollId = new URLSearchParams(location.search).get("id") || "";
