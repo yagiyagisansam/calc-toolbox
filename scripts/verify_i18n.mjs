@@ -86,6 +86,8 @@ for (const lang of LANGS) {
         hreflang: [...document.querySelectorAll('link[rel="alternate"][hreflang]')].map((l) => l.getAttribute("hreflang")),
         sw: !!document.querySelector("nav.lang-switch"),
         swCurrent: !!document.querySelector("nav.lang-switch .lang-current"),
+        swTop: !!document.querySelector("body > .lang-bar:first-child"),
+        swLabel: document.querySelector(".lang-label")?.textContent?.trim(),
         ogLocale: document.querySelector('meta[property="og:locale"]')?.content,
         canonical: document.querySelector('link[rel="canonical"]')?.href,
         h1: document.querySelector("h1")?.textContent?.trim(),
@@ -98,6 +100,8 @@ for (const lang of LANGS) {
         if (!meta.hreflang.includes(h)) throw new Error(`hreflang ${h} が無い`);
       }
       if (!meta.sw || !meta.swCurrent) throw new Error("言語スイッチャが無い/現在言語の印が無い");
+      if (!meta.swTop) throw new Error("言語スイッチャがページ最上部にない");
+      if (meta.swLabel !== "Language") throw new Error(`言語スイッチャの見出しが Language でない: ${meta.swLabel}`);
       if (!meta.h1) throw new Error("h1が空");
       const left = JA_LEFTOVERS.filter((w) => meta.bodyText.includes(w));
       if (left.length) throw new Error(`日本語の定型文言が残存: ${left.join(", ")}`);
@@ -157,11 +161,26 @@ for (const lang of LANGS) {
       const m = await page.evaluate(() => ({
         htmlLang: document.documentElement.getAttribute("lang"),
         sw: !!document.querySelector("nav.lang-switch"),
-        links: [...document.querySelectorAll('main a[href^="./tools/"]')].length
+        links: [...document.querySelectorAll('main a[href^="./tools/"]')].length,
+        tiles: document.querySelectorAll("#grid .tile").length,
+        tabs: document.querySelectorAll(".tp-tab").length,
+        popular: document.querySelectorAll("#popular .tile").length,
+        search: !!document.getElementById("search-input"),
+        poll: !!document.getElementById("poll-card"),
+        overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth
       }));
       if (m.htmlLang !== lang.htmlLang) throw new Error(`html lang=${m.htmlLang}`);
       if (p === "" && m.links === 0) throw new Error("トップにツールへのリンクが無い");
       if (p !== "" && !m.sw) throw new Error("言語スイッチャが無い");
+      if (p === "") {
+        // 日本語版トップと同じUIが揃っているか
+        if (m.tiles < 60) throw new Error(`タイルが少ない: ${m.tiles}`);
+        if (m.tabs !== 5) throw new Error(`カテゴリタブが5個でない: ${m.tabs}`);
+        if (m.popular === 0) throw new Error("人気枠が空");
+        if (!m.search) throw new Error("検索欄が無い");
+        if (!m.poll) throw new Error("統計ツール枠が無い");
+        if (m.overflow) throw new Error("横方向にはみ出している");
+      }
     });
   }
 }

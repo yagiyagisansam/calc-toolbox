@@ -36,13 +36,15 @@ function urlPath(langDir, rel) {
   return prefix + "/" + rel;
 }
 
+// 既存のブロックを取り除いてから、アンカーの直後に入れ直す。
+// (挿入位置を変えたときに古い場所に残らないようにするため)
 function replaceBlock(html, name, block, anchorRe) {
-  const re = new RegExp(`[ \\t]*<!-- @${name} start -->[\\s\\S]*?<!-- @${name} end -->\\n?`);
-  if (re.test(html)) return html.replace(re, block);
-  const m = html.match(anchorRe);
+  const re = new RegExp(`[ \\t]*<!-- @${name} start -->[\\s\\S]*?<!-- @${name} end -->\\n?`, "g");
+  const stripped = html.replace(re, "");
+  const m = stripped.match(anchorRe);
   if (!m) return null;
   const at = m.index + m[0].length;
-  return html.slice(0, at) + block + html.slice(at);
+  return stripped.slice(0, at) + block + stripped.slice(at);
 }
 
 // 翻訳版が1つ以上あるページを言語横断でグループ化
@@ -77,15 +79,21 @@ for (const [rel, langSet] of [...groups.entries()].sort()) {
     let next = replaceBlock(html, "hreflang", hreflangBlock, /<!-- @meta end -->\n/);
     if (next === null) { console.error(`skip(hreflangの挿入位置なし): ${file}`); continue; }
 
-    // 言語スイッチャ(フッタ先頭・現在言語はリンクにしない)
+    // 言語スイッチャ(ページ最上部・現在言語はリンクにしない)
     const items = versions.map((l) =>
       l.code === lang.code
         ? `<span class="lang-current">${l.label}</span>`
         : `<a href="${urlPath(l.dir, rel)}" lang="${l.htmlLang}" hreflang="${l.code}">${l.label}</a>`
     );
-    const swBlock = `<!-- @langsw start -->\n<nav class="lang-switch" aria-label="${SWITCH_LABEL[lang.code]}">${items.join("")}</nav>\n<!-- @langsw end -->\n`;
-    next = replaceBlock(next, "langsw", swBlock, /<footer class="site-footer">\n/);
-    if (next === null) { console.error(`skip(フッタなし): ${file}`); continue; }
+    const globe = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 2.6 15 0 18M12 3c-2.6 2.6-2.6 15 0 18"/></svg>';
+    const swBlock = `<!-- @langsw start -->
+<div class="lang-bar">
+  <nav class="lang-switch" aria-label="${SWITCH_LABEL[lang.code]}"><span class="lang-label">${globe}Language</span>${items.join("")}</nav>
+</div>
+<!-- @langsw end -->
+`;
+    next = replaceBlock(next, "langsw", swBlock, /<body>\n/);
+    if (next === null) { console.error(`skip(bodyなし): ${file}`); continue; }
 
     if (next !== html) { writeFileSync(file, next); changed++; }
   }

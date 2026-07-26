@@ -6,7 +6,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Quick Calc | 在日生活实用免费计算工具</title>
-  <meta name="description" content="健康·金钱·日期·日常生活的免费在线计算工具,包含在日生活专用工具(日本年号换算、英文地址转换、日本标准BMI等)。无需注册,手机适配,每个页面都注明计算依据和出处。">
+  <meta name="description" content="健康·金钱·日期·日常生活的免费在线计算工具(64个),包含日本年号换算、英文地址转换、日本标准BMI等在日生活专用工具。无需注册,手机适配,每个页面都注明计算依据和出处。">
   <link rel="stylesheet" href="../shared/style.css">
   <!-- @meta start -->
   <link rel="canonical" href="https://quick-calc.site/zh/">
@@ -14,11 +14,12 @@
   <meta name="theme-color" content="#0b6e4f">
   <meta property="og:site_name" content="Quick Calc">
   <meta property="og:title" content="Quick Calc | 在日生活实用免费计算工具">
-  <meta property="og:description" content="健康·金钱·日期·日常生活的免费在线计算工具,包含在日生活专用工具(日本年号换算、英文地址转换、日本标准BMI等)。无需注册,手机适配,每个页面都注明计算依据和出处。">
+  <meta property="og:description" content="健康·金钱·日期·日常生活的免费在线计算工具(64个),包含日本年号换算、英文地址转换、日本标准BMI等在日生活专用工具。无需注册,手机适配,每个页面都注明计算依据和出处。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://quick-calc.site/zh/">
   <meta property="og:locale" content="zh_CN">
   <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Quick Calc","url":"https://quick-calc.site/zh/","inLanguage":"zh-CN"}</script>
   <!-- @meta end -->
   <!-- @hreflang start -->
   <link rel="alternate" hreflang="ja" href="https://quick-calc.site/">
@@ -27,100 +28,385 @@
   <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/">
   <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/">
   <!-- @hreflang end -->
+  <style>
+    :root {
+      --tp-bg: #f7f5f0; --tp-tile: #ffffff; --tp-ink: #26282b; --tp-muted: #93989e; --tp-gold: #b8873a;
+      --tp-shadow: 0 1px 2px rgba(30,32,34,0.05), 0 6px 16px rgba(30,32,34,0.06);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --tp-bg: #141619; --tp-tile: #1f2326; --tp-ink: #eceff1; --tp-muted: #8b9196; --tp-shadow: 0 1px 2px rgba(0,0,0,0.4); }
+    }
+    body { background: var(--tp-bg); color: var(--tp-ink); }
+    main { padding-bottom: 40px; }
+    .brand { display: flex; align-items: center; gap: 10px; padding: 22px 0 4px; }
+    .brand .mark { width: 40px; height: 40px; border-radius: 13px; background: var(--color-accent); display: flex; align-items: center; justify-content: center; box-shadow: var(--tp-shadow); flex: 0 0 auto; }
+    .brand .mark svg { width: 24px; height: 24px; color: #fff; }
+    .brand h1 { font-size: 1.28rem; margin: 0; font-weight: 800; letter-spacing: -0.01em; line-height: 1.3; }
+    .brand .tg { font-size: 0.72rem; color: var(--tp-muted); margin: 1px 0 0; }
+    .tp-search { display: flex; align-items: center; gap: 9px; background: var(--tp-tile); border-radius: 16px; padding: 13px 16px; color: var(--tp-muted); box-shadow: var(--tp-shadow); margin: 14px 0 0; }
+    .tp-search input { border: none; outline: none; background: none; font-size: 1rem; width: 100%; color: var(--tp-ink); }
+    .tp-search .site-search-ic { width: 18px; height: 18px; }
+    .tp-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 16px 0 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .tp-tabs::-webkit-scrollbar { display: none; }
+    .tp-tab { flex: 0 0 auto; padding: 8px 16px; border-radius: 999px; border: none; background: rgba(120,124,130,0.1); color: var(--tp-ink); font-size: 0.88rem; cursor: pointer; white-space: nowrap; font-weight: 500; }
+    .tp-tab.on { background: var(--tp-ink); color: var(--tp-bg); font-weight: 700; }
+    .tp-sec { display: flex; align-items: baseline; gap: 8px; margin: 20px 2px 10px; }
+    .tp-sec b { font-size: 1.02rem; font-weight: 800; }
+    .tp-sec span { font-size: 0.7rem; color: var(--tp-muted); }
+    .tp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 10px; }
+    @media (min-width: 560px) { .tp-grid { grid-template-columns: repeat(6, 1fr); } }
+    .tile { display: flex; flex-direction: column; align-items: center; gap: 7px; text-decoration: none; color: var(--tp-ink); }
+    .tile[hidden] { display: none; }
+    .tile .ic { width: 100%; aspect-ratio: 1; max-width: 76px; display: flex; align-items: center; justify-content: center; border-radius: 24px; box-shadow: var(--tp-shadow); position: relative; }
+    .tile .ic svg { width: 46%; height: 46%; }
+    /* 名前はラテン文字だと長くなるため2行まで折り返す(日本語版はnowrap) */
+    .tile .nm { font-size: 0.71rem; font-weight: 600; text-align: center; letter-spacing: -0.01em; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
+    .tile .rk { position: absolute; top: -7px; left: -3px; min-width: 20px; height: 20px; border-radius: 999px; background: var(--tp-gold); color: #fff; font-size: 0.68rem; font-weight: 800; display: flex; align-items: center; justify-content: center; padding: 0 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    .tile .rk.silver { background: #9aa2ab; }
+    .tile .rk.bronze { background: #b0795a; }
+    .tile .rk.plain { background: var(--tp-tile); color: var(--tp-muted); box-shadow: inset 0 0 0 1.5px rgba(120,124,130,0.25); }
+    .g0 { background: #e4f2ea; color: #0e7d59; }
+    .g1 { background: #f7ecd9; color: #a3690f; }
+    .g2 { background: #e5edf9; color: #3a66a8; }
+    .g3 { background: #eee8f7; color: #6f4fa8; }
+    @media (prefers-color-scheme: dark) {
+      .g0 { background: #20352b; color: #4fc596; }
+      .g1 { background: #382e1c; color: #d9a04a; }
+      .g2 { background: #222e41; color: #7ba3e0; }
+      .g3 { background: #2e2740; color: #a98ce0; }
+    }
+    .no-hit { color: var(--tp-muted); font-size: 0.88rem; margin: 8px 2px; }
+    .poll-card { display: flex; align-items: center; gap: 14px; background: var(--tp-tile); border-radius: 20px; padding: 16px; text-decoration: none; color: var(--tp-ink); box-shadow: var(--tp-shadow); }
+    .poll-card .pic { width: 52px; height: 52px; flex: 0 0 auto; border-radius: 17px; background: #fde8ec; color: #d64560; display: flex; align-items: center; justify-content: center; }
+    .poll-card .pic svg { width: 26px; height: 26px; }
+    .poll-card .pt b { display: block; font-size: 0.98rem; font-weight: 800; }
+    .poll-card .pt small { display: block; font-size: 0.76rem; color: var(--tp-muted); margin-top: 2px; line-height: 1.5; }
+    @media (prefers-color-scheme: dark) { .poll-card .pic { background: #3a2229; color: #ff8798; } }
+    .seo-list { margin-top: 34px; font-size: 0.85rem; }
+    .seo-list summary { cursor: pointer; color: var(--tp-muted); font-weight: 600; }
+    .seo-list h3 { font-size: 0.95rem; margin: 14px 0 4px; }
+    .seo-list ul { padding-left: 1.2em; margin: 4px 0; }
+    .seo-list li { margin: 3px 0; color: var(--tp-muted); }
+    .about { margin-top: 28px; font-size: 0.85rem; color: var(--tp-muted); }
+  </style>
 </head>
 <body>
-<!-- @partial:header start -->
-<header class="site-header">
-  <a class="site-brand" href="./"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
-</header>
-<!-- @partial:header end -->
+<!-- @langsw start -->
+<div class="lang-bar">
+  <nav class="lang-switch" aria-label="语言"><span class="lang-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 2.6 15 0 18M12 3c-2.6 2.6-2.6 15 0 18"/></svg>Language</span><a href="/" lang="ja" hreflang="ja">日本語</a><a href="/en/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/" lang="ko" hreflang="ko">한국어</a></nav>
+</div>
+<!-- @langsw end -->
 <main>
-  <h1>Quick Calc</h1>
-  <p>在日生活实用的免费计算工具。每个工具都注明计算公式和一次信息出处。</p>
-  <h2>健康</h2>
-  <ul class="related">
-    <li><a href="./tools/alcohol/">纯酒精量计算器</a> — 输入酒的量和酒精度数,免费计算纯酒精量(g)和标准杯数。按日本厚生劳动省指南,分男女判定是否达到提高生活习惯病风险的饮酒量。</li>
-    <li><a href="./tools/bmi/">BMI·标准体重计算器</a> — 输入身高体重,免费计算BMI和标准体重(BMI 22)。按日本肥胖学会标准(偏瘦·正常·肥胖1〜4级)判定,即日本体检使用的标准。附计算公式和出处。</li>
-    <li><a href="./tools/bmr/">基础代谢量计算器</a> — 输入年龄、性别和体重,免费计算一天的基础代谢量(kcal)。基于日本厚生劳动省《日本人饮食摄取基准》的基础代谢基准值,附计算依据和出处。</li>
-    <li><a href="./tools/caffeine/">咖啡因摄入量计算器</a> — 合计咖啡·红茶·绿茶·能量饮料等的咖啡因量,并与每日参考值(健康成人400mg·孕期更少)比较。适合自查是否喝多了。</li>
-    <li><a href="./tools/cycle/">睡眠周期计算器</a> — 从起床时间倒推,列出符合约90分钟睡眠周期的就寝时间候选。可设定入睡所需时间,一键回答「明天6点半起床,今晚几点睡?」。</li>
-    <li><a href="./tools/hosu/">步数→距离·卡路里换算器</a> — 根据步数和身高计算步行距离(km)·时间·消耗卡路里的大致数值。步幅按身高×0.45估算。「今天的8,000步走了几公里?」立刻知道。适合步数打卡和减肥记录。</li>
-    <li><a href="./tools/ninshin/">预产期·孕周计算器</a> — 根据末次月经的开始日免费计算预产期和当前孕周(〇周△天)。支持月经周期不是28天时的修正,并显示孕早期·中期·晚期的区分。</li>
-    <li><a href="./tools/pace/">跑步配速计算器</a> — 用距离和目标时间免费计算每公里配速和时速。也能反过来用配速预测全马·半马的完赛时间。附5km/10km/半马/全马预设。</li>
-    <li><a href="./tools/protein/">蛋白质摄入量计算器</a> — 根据体重和运动量计算一天所需蛋白质的参考量,并换算成常见食品(鸡胸肉、鸡蛋、牛奶、纳豆各需多少)。适合健身、减肥和饮食管理。</li>
-    <li><a href="./tools/shinpaku/">目标心率计算器(卡沃宁公式)</a> — 根据年龄和安静心率,用卡沃宁公式(Karvonen法)计算适合燃脂和提升耐力的目标心率区间。适用于步行·慢跑·健身车的强度设定。</li>
-    <li><a href="./tools/shio/">盐分计算器(钠⇔食盐相当量)</a> — 把食品标签上的钠(mg)一键换算成食盐相当量(g),免费使用。同时显示占日本每日目标量(男性7.5g·女性6.5g未满)的比例。换算系数依据日本食品表示基准,适合减盐·健康管理。</li>
-    <li><a href="./tools/sleep/">睡眠时长计算器</a> — 只需输入就寝时刻和起床时刻,免费计算睡眠时长,跨越午夜也能正确计算。适合记录每日睡眠,或从起床时刻反推该几点睡。</li>
-    <li><a href="./tools/sports/">运动消耗卡路里计算器</a> — 按METs法(官方METs表)计算慢跑·骑行·游泳·网球·力量训练·跳绳·瑜伽等13种运动的消耗卡路里。只需输入体重和时间,附脂肪换算。</li>
-    <li><a href="./tools/tdee/">每日所需摄入热量计算器</a> — 根据年龄、性别、体重和活动量,免费计算一天所需摄入热量的参考值(估算能量需要量)。基于日本厚生劳动省的基础代谢基准值和身体活动水平,可用于减肥的饮食管理。</li>
-    <li><a href="./tools/walking/">步行消耗卡路里计算器</a> — 根据体重·时间·步行速度,按METs法(日本厚生劳动省的公式)计算步行消耗的卡路里,并显示相当于多少克脂肪。散步·快走·减肥的参考。免费·无需注册。</li>
-  </ul>
-  <h2>金钱</h2>
-  <ul class="related">
-    <li><a href="./tools/compound/">复利·定投模拟计算器</a> — 输入每月定投金额和预期年化收益率,免费模拟将来能积累多少钱。也支持一次性投资的复利计算。附计算公式和前提(税前·不含手续费的约值)。</li>
-    <li><a href="./tools/denki/">电费计算器</a> — 输入家电的功率(W)和使用时间,免费计算1天·1个月·1年的电费(日元)。单价默认采用日本官方参考单价31日元/kWh,也可改成自己合约的单价。</li>
-    <li><a href="./tools/fudosan/">日本房产投资 收支·盈亏平衡计算器</a> — 只需5项输入,即可算出日本投资房「第几年卖出才能通算转正」。以最长50年的图表展示贷款余额、预计售价、节税效果和累计收支,并已内置日本的短期·长期转让所得税率。详细设置可自行修改前提。</li>
-    <li><a href="./tools/fuel/">油费计算器</a> — 根据行驶距离、油耗(km/L)和汽油单价,免费计算兜风或通勤所需的油费和耗油量。金额以日元计算,油耗按日本常用的km/L填写,方便估算旅行·回乡的费用和通勤成本。</li>
-    <li><a href="./tools/genka/">利润率·成本率 计算器</a> — 输入售价和成本,立即算出毛利·利润率·成本率。还支持「想要30%利润率该卖多少钱」的售价逆算,适合在日本开店定价、手工制品销售和二手转卖。</li>
-    <li><a href="./tools/hiwari/">日本房租日割(按日分摊)计算器</a> — 在日本月中入住或退租时的按日分摊(日割)房租免费计算。同时显示实际天数方式和固定30天方式,可对照租房合同确认,还能连敷金·礼金一起算出入住初期费用。</li>
-    <li><a href="./tools/jikyu/">时薪⇔月薪·年薪 换算器</a> — 输入时薪、每天工时和每月出勤天数,免费即时算出税前的月薪和年薪。也能从月薪反推时薪,方便比较日本的兼职·派遣招聘条件,核对工资条上的金额。</li>
-    <li><a href="./tools/kariire/">日本房贷 可贷额度计算器</a> — 输入年收入·还款负担率·利率·期限,反推在日本能贷到多少房贷的大致额度。同时显示每月还款额,适合作为「年收入500万日元能买多少钱的房子?」的第一步估算。采用等额本息方式。</li>
-    <li><a href="./tools/loan/">贷款还款计算器(等额本息)</a> — 输入贷款金额·利率·还款期限,免费计算每月还款额·总还款额·利息总额(等额本息)。适合估算日本的房贷·车贷。附计算公式。</li>
-    <li><a href="./tools/nenpi/">油耗计算器(加满法)</a> — 用行驶距离和加油量,按加满法计算实际油耗(km/L)。同时显示欧洲式的L/100km、本次加油费和每公里燃料费。免费·无需注册。</li>
-    <li><a href="./tools/point/">打折和积分返还哪个划算?计算器</a> — 「10%OFF」和「10%积分返还」其实不一样?计算实际价格和折扣换算率(10%返还≈9.09%OFF),一键判定哪个更划算。用于比较日本的打折与积分活动。</li>
-    <li><a href="./tools/tanka/">单价比较 计算器(哪个更便宜?)</a> — 只要输入价格和容量,就能并排比较「每100g」「每1个」的单价。大包装和小包装到底哪个划算一目了然,最多可比较3件商品的免费购物计算器。</li>
-    <li><a href="./tools/tax/">日本消费税计算器(含税⇔不含税)</a> — 不含税→含税、含税→不含税,一键换算的免费日本消费税计算器。支持标准税率10%和轻减税率8%(食品饮料),并显示税额明细。附出处(日本国税厅)。</li>
-    <li><a href="./tools/teiki/">定期券(月票)划算吗? 计算器</a> — 输入日本定期券(通勤·通学月票)的价格和单程车费,算出一个月要坐几天才能回本。同时显示与每次刷交通IC卡付费的差额,方便判断一周去几天公司买定期券才划算。</li>
-    <li><a href="./tools/tip/">小费计算器(出国旅行用)</a> — 输入金额并选择小费率(15%·18%·20%),一次算出小费金额、含小费的总额和AA分账时每人应付的钱。去美国·夏威夷等有小费文化的国家旅行时,结账不再手忙脚乱。</li>
-    <li><a href="./tools/waribiki/">折扣计算器(○%OFF后是多少钱?)</a> — 「30%OFF后多少钱?」一键算出。可计算折后价格和优惠金额,也能反过来由促销价倒推折扣率。免费,适合在日本超市·打折季·奥特莱斯购物时使用。</li>
-    <li><a href="./tools/warikan/">AA制(割り勘)计算器</a> — 输入总金额和人数,免费算出每人应付多少。可按100日元、500日元等整数金额向上取整,方便收钱,适合在日本组织聚餐、酒会的干事使用。</li>
-    <li><a href="./tools/yukyu/">带薪年假(有给)天数计算器</a> — 根据工龄和工作方式(每周工作天数),免费算出在日本能拿到多少天带薪年假(有給休暇)。支持兼职·打工的比例发放,并显示日本劳动基准法规定的天数和「每年必须休5天」的义务。</li>
-    <li><a href="./tools/zangyo/">加班费计算器(日本)</a> — 输入基础时薪和加班时间,免费算出日本法律规定的加班费(加算工资)。支持时间外25%、每月超60小时50%、法定休息日35%、深夜+25%的法定加算率,也能从月薪换算出基础时薪。</li>
-  </ul>
-  <h2>日期·时间</h2>
-  <ul class="related">
-    <li><a href="./tools/age/">年龄计算器(周岁·生肖·早生判定)</a> — 根据出生日期免费计算周岁年龄和生肖,并判断是否属于日本学年制度的「早生」(1月1日〜4月1日出生)。可指定基准日查询「当时几岁」,支持2月29日出生。</li>
-    <li><a href="./tools/days/">天数计算器(日期间隔·○天后)</a> — 免费计算两个日期之间相差多少天,以及从基准日起○天后(○天前)的日期和星期。适合确认截止日、纪念日、付款和提交期限。支持闰年。</li>
-    <li><a href="./tools/eigyobi/">日本工作日计算器(排除周末·日本节假日)</a> — 按日本的法定节假日(含振替休日)计算「3个工作日后是哪天」,也能统计期间内的工作日数。日本的节假日与中国不同,核对交货期、付款期限、办手续时间时很方便。免费即时,支持2026〜2027年。</li>
-    <li><a href="./tools/gakunen/">日本学年(年级)计算器</a> — 输入出生年月日,立即知道在日本的学校现在是几年级(小学1年级〜高中3年级)。免费工具,同时显示该学段的入学·毕业年份、是否属于「早生まれ」,并可从年级反查出生年月日范围。</li>
-    <li><a href="./tools/jikan/">时间计算器(合计·时刻之差)</a> — 计算「1:30+0:45+8:00」这样的时间合计,以及开始〜结束时刻的经过时间,并同时给出工资计算常用的十进制小时(如1.75小时)。统计工时·加班时间很方便,免费即时。</li>
-    <li><a href="./tools/kinenbi/">纪念日天数计算器</a> — 输入生日或纪念日,免费一次算出「今天是第几天」以及第100天·第1000天·第10000天等节点日期。适合情侣纪念日、追星应援、宝宝百日和出生一万天庆祝。</li>
-    <li><a href="./tools/rireki/">入学·毕业年份查询(日本履历书用)</a> — 输入出生年月日,按日本学制(4月入学·3月毕业)自动算出小学到大学的入学·毕业年份,可直接填进日本履历书的学历栏。西历和日本年号同时显示,并支持早出生(1月1日〜4月1日)以及复读·留级·休学的调整。</li>
-    <li><a href="./tools/shukujitsu/">日本节假日日历</a> — 一览2026年·2027年日本的全部法定节假日,并立即显示距离下一个节假日还有几天。还会列出该年所有3天以上的连休,方便安排旅行、跑市役所和银行的时间。免费即时。</li>
-    <li><a href="./tools/tsukisu/">○个月后·月数 计算器</a> — 免费计算「3个月后是几号?」「两个日期相差几个月?」,自动进行月末调整。适合确认合同期限、付款周期、纪念日和宝宝月龄。也支持○个月前。</li>
-    <li><a href="./tools/wareki/">西历·日本年号(和历)换算器</a> — 西历⇔日本年号(明治·大正·昭和·平成·令和)免费即时换算。改元年份同时显示新旧两个年号,可直接抄写到日本的表格和证件上。</li>
-  </ul>
-  <h2>生活·换算</h2>
-  <ul class="related">
-    <li><a href="./tools/byte/">数据容量换算(KB·MB·GB·TB)</a> — 输入一个容量,一次换算出KB·MB·GB·TB的全部数值。可在电脑用的1024进制和存储产品标注的1000进制之间切换,弄清「买的是500GB,电脑上却只有465GB」是怎么回事。适合确认手机容量和文件大小。</li>
-    <li><a href="./tools/heikin/">平均值·中位数计算器</a> — 只需粘贴数值,即可一次算出平均值、中位数、最大、最小、合计。适合统计考试分数、销售额、各类记录。支持逗号·空格·换行分隔的免费工具。</li>
-    <li><a href="./tools/hensachi/">偏差值计算器</a> — 免费计算日本升学考试通用的「偏差值」(以平均50、标准差10为基准的标准化分数)。输入得分、平均分、标准差即可计算,也可粘贴分数列表一次算出所有人的偏差值。附计算公式。</li>
-    <li><a href="./tools/inch/">英寸⇔cm·磅⇔kg 换算计算器</a> — 免费在英寸和厘米、磅和千克之间相互换算。采用国际定义值,换算精确。适合确认电视·显示器尺寸,海淘选衣服鞋子,以及看懂哑铃的磅数。</li>
-    <li><a href="./tools/jusho/">日本地址英文转换器</a> — 只要输入日本的邮政编码,就能把日本地址转换成英文写法(罗马字·由小到大的顺序),免费即时。可用于海外网购填写地址、国际邮件的收件人和寄件人栏。也能反向把罗马字写的日本地址还原成日文写法(〒+汉字),方便填写市役所、医院的表格。</li>
-    <li><a href="./tools/kome/">米的合·克换算计算器</a> — 按大米1合=约150g、每合水约200ml的标准,由合数一并算出米的重量、加水量、煮好的饭量和几碗饭。也支持由克数反算合数。「合」是日本电饭锅量杯使用的单位。</li>
-    <li><a href="./tools/mile/">英里⇔km 换算计算器</a> — 按定义值精确地在英里和公里之间相互换算,并支持海里(nautical mile)。适合在美国自驾、了解马拉松距离、航空里程,以及看懂船舶和飞机的速度。</li>
-    <li><a href="./tools/moji/">字数统计</a> — 粘贴文本即可瞬间统计字数,同时显示含空格与不含空格两种结果。还会显示行数和日本400字稿纸的换算张数,适合检查求职表(ES)、报告、社交平台投稿的字数限制。</li>
-    <li><a href="./tools/ondo/">温度换算计算器</a> — 摄氏(°C)、华氏(°F)、开尔文(K)一次性互相换算。适用于外国食谱的烤箱温度、国外天气预报和理科作业。按定义式精确换算。</li>
-    <li><a href="./tools/password/">密码生成器</a> — 在您的设备内生成安全的随机密码,可自选长度和字符种类(大小写字母·数字·符号)。同时显示强度(比特数),内容不会发送到网络,免费即用。</li>
-    <li><a href="./tools/percent/">百分比计算器</a> — 免费一键计算「A是B的百分之几」「A的○%是多少」「从A到B增减了百分之几」三种百分比。算折扣、达成率、同比增减都很方便。</li>
-    <li><a href="./tools/petage/">猫狗年龄换算器</a> — 把猫和中小型犬的年龄免费换算成人类年龄: 1岁≈人类15岁、2岁≈24岁,之后每年约+4岁。我家的孩子相当于人几岁?还能查老年期的大致时间和反向换算。</li>
-    <li><a href="./tools/renji/">微波炉加热时间换算器</a> — 把包装上写的加热时间换算成你家微波炉瓦数对应的时间,免费即时计算。日本的冷冻食品包装和菜谱都按瓦数标注加热时间(例:「600W 1分30秒」),瓦数不一样时用这个工具换算。同时显示10秒为单位的参考值。</li>
-    <li><a href="./tools/roman/">罗马数字转换器</a> — 阿拉伯数字和罗马数字(I·V·X·L·C·D·M)免费即时互转。适用于钟表表盘、电影片名、年份刻印的读法,2026是MMXXVI。支持减法规则的精确转换。</li>
-    <li><a href="./tools/seiza/">星座·诞生石速查器</a> — 输入生日立即免费显示12星座和诞生石。「4月20日出生是什么座?」这样的交界日也一目了然。填写个人资料、挑选礼物时都能用。</li>
-    <li><a href="./tools/shincho/">身高英尺·英寸换算</a> — 身高的cm与英尺·英寸表示(如5'7″)相互换算。海外资料上的身高·运动员身高·美国的尺码表示一看就懂。按1英尺=30.48cm的定义值计算。</li>
-    <li><a href="./tools/speed/">速度·时间·距离计算器</a> — 速度(km/h)·距离(km)·时间三者中输入两个,免费自动算出剩下的一个。「时速80km跑150km要几小时?」这类问题一键得出答案。还能计算到达时刻·出发时刻,以及时速换算分速·秒速。</li>
-    <li><a href="./tools/spoon/">大匙·小匙·量杯换算计算器</a> — 按日本标准大匙1=15ml、小匙1=5ml、1杯=200ml相互换算。「大匙3是多少ml?」「50ml是几大匙?」一键得到答案。调整食谱分量、手边没有量匙时使用。</li>
-    <li><a href="./tools/tsubo/">坪·平方米(㎡)·畳 换算器</a> — 免费一次换算坪(坪)⇔平方米(㎡)⇔畳(榻榻米),这三个单位是日本房产广告和户型图上常见的面积单位。依据1坪=约3.31㎡、1畳=1.62㎡(日本房产广告的标示基准),并注明出处。</li>
-    <li><a href="./tools/zenkaku/">全角⇔半角 转换工具</a> — 把全角的英文字母、数字、符号和空格一次性转换为半角(也支持反向转换)。在日本的表单上被要求「请用半角输入」时,或整理名单、通讯录时都能用,粘贴即可转换。</li>
-  </ul>
+  <div class="brand">
+    <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg></span>
+    <div>
+      <h1>Quick Calc</h1>
+      <p class="tg">生活中的64个计算工具·无需注册·完全免费</p>
+    </div>
+  </div>
+
+  <div class="tp-search" id="search"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input type="search" id="search-input" placeholder="搜索(例: 房租、地址、工作日)" aria-label="搜索工具" autocomplete="off"></div>
+  <div class="tp-tabs" id="tabs" role="tablist"></div>
+
+  <div id="pop-sec">
+    <div class="tp-sec"><b>热门</b></div>
+    <div class="tp-grid" id="popular"></div>
+  </div>
+
+  <div class="tp-sec" id="genre-title"><b>全部</b><span>64 个</span></div>
+  <p class="no-hit" id="no-hit" hidden>没有找到相应的工具。请换个词试试(例: 房租、折扣、卡路里)。</p>
+  <div class="tp-grid" id="grid">
+      <a class="tile" href="./tools/alcohol/" data-slug="alcohol" data-cat="健康" data-kw="纯酒精量计算器 输入酒的量和酒精度数,免费计算纯酒精量(g)和标准杯数。按日本厚生劳动省指南,分男女判定是否达到提高生活习惯病风险的饮酒量。" title="纯酒精量计算器">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="6" width="9" height="13.5" rx="1.5"/><path d="M14.5 9.5h2a2.5 2.5 0 0 1 2.5 2.5v2a2.5 2.5 0 0 1-2.5 2.5h-2"/><path d="M5.5 9.5h9"/><path d="M8.5 12.5v4M11.5 12.5v4"/></svg></span><span class="nm">纯酒精量</span>
+      </a>
+      <a class="tile" href="./tools/bmi/" data-slug="bmi" data-cat="健康" data-kw="BMI·标准体重计算器 输入身高体重,免费计算BMI和标准体重(BMI 22)。按日本肥胖学会标准(偏瘦·正常·肥胖1〜4级)判定,即日本体检使用的标准。附计算公式和出处。" title="BMI·标准体重计算器">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="3.5" width="15" height="17" rx="3"/><path d="M9 8.5a3 3 0 0 1 6 0"/><path d="M12 8.5l1.5-1.8"/><ellipse cx="9.6" cy="15.3" rx="1.3" ry="2.2"/><ellipse cx="14.4" cy="15.3" rx="1.3" ry="2.2"/></svg></span><span class="nm">BMI·标准体重</span>
+      </a>
+      <a class="tile" href="./tools/bmr/" data-slug="bmr" data-cat="健康" data-kw="基础代谢量计算器 输入年龄、性别和体重,免费计算一天的基础代谢量(kcal)。基于日本厚生劳动省《日本人饮食摄取基准》的基础代谢基准值,附计算依据和出处。" title="基础代谢量计算器">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c1.2 3.4 4.8 5.4 4.8 9.6a4.8 4.8 0 0 1-9.6 0c0-2.2 1-3.7 2.1-5.5.3 1.7 1 2.7 2 3.2-.1-2.5.1-5 .7-7.3z"/></svg></span><span class="nm">基础代谢量</span>
+      </a>
+      <a class="tile" href="./tools/caffeine/" data-slug="caffeine" data-cat="健康" data-kw="咖啡因摄入量计算器 合计咖啡·红茶·绿茶·能量饮料等的咖啡因量,并与每日参考值(健康成人400mg·孕期更少)比较。适合自查是否喝多了。" title="咖啡因摄入量计算器">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 10.5h11v4.5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 11.5h1.2a2.4 2.4 0 0 1 0 4.8H16"/><path d="M8.5 4c0 1.6 1.5 1.6 1.5 3.2M12.5 4c0 1.6 1.5 1.6 1.5 3.2"/></svg></span><span class="nm">咖啡因摄入量</span>
+      </a>
+      <a class="tile" href="./tools/cycle/" data-slug="cycle" data-cat="健康" data-kw="睡眠周期计算器 从起床时间倒推,列出符合约90分钟睡眠周期的就寝时间候选。可设定入睡所需时间,一键回答「明天6点半起床,今晚几点睡?」。" title="睡眠周期计算器">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.1 8.1a4.4 4.4 0 1 0 3.1 6.5 3.8 3.8 0 0 1-3.1-6.5z"/><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5"/><path d="M20.5 12l2.2-2.2M20.5 12l-2.5-1.9"/></svg></span><span class="nm">睡眠周期</span>
+      </a>
+      <a class="tile" href="./tools/hosu/" data-slug="hosu" data-cat="健康" data-kw="步数→距离·卡路里换算器 根据步数和身高计算步行距离(km)·时间·消耗卡路里的大致数值。步幅按身高×0.45估算。「今天的8,000步走了几公里?」立刻知道。适合步数打卡和减肥记录。" title="步数→距离·卡路里换算器">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="7.3" cy="6.6" rx="2" ry="2.9" transform="rotate(-12 7.3 6.6)"/><circle cx="8.2" cy="11.2" r="1"/><ellipse cx="14.1" cy="12" rx="2" ry="2.9" transform="rotate(-12 14.1 12)"/><circle cx="15" cy="16.5" r="1"/><path d="M6 20.7h12m0 0l-2.4-2.2m2.4 2.2l-2.4 2.2"/></svg></span><span class="nm">步数→距离·卡路里</span>
+      </a>
+      <a class="tile" href="./tools/ninshin/" data-slug="ninshin" data-cat="健康" data-kw="预产期·孕周计算器 根据末次月经的开始日免费计算预产期和当前孕周(〇周△天)。支持月经周期不是28天时的修正,并显示孕早期·中期·晚期的区分。" title="预产期·孕周计算器">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="7.5"/><path d="M12 5.5c-.2-1.6 1-2.8 2.4-2.4"/><path d="M9.3 12.5h.01M14.7 12.5h.01"/><path d="M9.5 15.5a3.3 3.3 0 0 0 5 0"/></svg></span><span class="nm">预产期·孕周</span>
+      </a>
+      <a class="tile" href="./tools/pace/" data-slug="pace" data-cat="健康" data-kw="跑步配速计算器 用距离和目标时间免费计算每公里配速和时速。也能反过来用配速预测全马·半马的完赛时间。附5km/10km/半马/全马预设。" title="跑步配速计算器">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 6V3.5M9.5 3.5h5"/><path d="M12 13.5l3-2.8"/></svg></span><span class="nm">跑步配速</span>
+      </a>
+      <a class="tile" href="./tools/protein/" data-slug="protein" data-cat="健康" data-kw="蛋白质摄入量计算器 根据体重和运动量计算一天所需蛋白质的参考量,并换算成常见食品(鸡胸肉、鸡蛋、牛奶、纳豆各需多少)。适合健身、减肥和饮食管理。" title="蛋白质摄入量计算器">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="14.5" cy="9" r="5.5"/><path d="M10.5 12.8L6 17.3"/><circle cx="5" cy="18.3" r="1.7"/><circle cx="7.6" cy="20.4" r="1.7"/></svg></span><span class="nm">蛋白质摄入量</span>
+      </a>
+      <a class="tile" href="./tools/shinpaku/" data-slug="shinpaku" data-cat="健康" data-kw="目标心率计算器(卡沃宁公式) 根据年龄和安静心率,用卡沃宁公式(Karvonen法)计算适合燃脂和提升耐力的目标心率区间。适用于步行·慢跑·健身车的强度设定。" title="目标心率计算器(卡沃宁公式)">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20C5.5 14.5 4.3 9.6 7.6 7c2.2-1.7 4.4.2 4.4 2 0-1.8 2.2-3.7 4.4-2 3.3 2.6 2.1 7.5-4.4 13z"/><path d="M7 12h3l1.5-2.5 1.8 4 1.4-1.5H17"/></svg></span><span class="nm">目标心率</span>
+      </a>
+      <a class="tile" href="./tools/shio/" data-slug="shio" data-cat="健康" data-kw="盐分计算器(钠⇔食盐相当量) 把食品标签上的钠(mg)一键换算成食盐相当量(g),免费使用。同时显示占日本每日目标量(男性7.5g·女性6.5g未满)的比例。换算系数依据日本食品表示基准,适合减盐·健康管理。" title="盐分计算器(钠⇔食盐相当量)">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="3.5" rx="1"/><path d="M8.5 6.5h7l1 12a2 2 0 0 1-2 2.2h-5a2 2 0 0 1-2-2.2z"/><path d="M11 10.5h.01M13 12.5h.01M11.5 14.5h.01"/></svg></span><span class="nm">盐分</span>
+      </a>
+      <a class="tile" href="./tools/sleep/" data-slug="sleep" data-cat="健康" data-kw="睡眠时长计算器 只需输入就寝时刻和起床时刻,免费计算睡眠时长,跨越午夜也能正确计算。适合记录每日睡眠,或从起床时刻反推该几点睡。" title="睡眠时长计算器">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 3.5a8.5 8.5 0 1 0 6 12.5 7.3 7.3 0 0 1-6-12.5z"/></svg></span><span class="nm">睡眠时长</span>
+      </a>
+      <a class="tile" href="./tools/sports/" data-slug="sports" data-cat="健康" data-kw="运动消耗卡路里计算器 按METs法(官方METs表)计算慢跑·骑行·游泳·网球·力量训练·跳绳·瑜伽等13种运动的消耗卡路里。只需输入体重和时间,附脂肪换算。" title="运动消耗卡路里计算器">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12h8"/><rect x="4.6" y="7.5" width="2.6" height="9" rx="1"/><rect x="16.8" y="7.5" width="2.6" height="9" rx="1"/><rect x="2.1" y="9.6" width="1.8" height="4.8" rx="0.9"/><rect x="20.1" y="9.6" width="1.8" height="4.8" rx="0.9"/></svg></span><span class="nm">运动消耗卡路里</span>
+      </a>
+      <a class="tile" href="./tools/tdee/" data-slug="tdee" data-cat="健康" data-kw="每日所需摄入热量计算器 根据年龄、性别、体重和活动量,免费计算一天所需摄入热量的参考值(估算能量需要量)。基于日本厚生劳动省的基础代谢基准值和身体活动水平,可用于减肥的饮食管理。" title="每日所需摄入热量计算器">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.5v6.5M5.2 3.5v3.3a1.8 1.8 0 0 0 3.6 0V3.5"/><path d="M7 10v10.5"/><path d="M17.6 3.5c-2.2 2.6-2.2 6.4.4 8V20.5"/></svg></span><span class="nm">每日所需摄入热量</span>
+      </a>
+      <a class="tile" href="./tools/walking/" data-slug="walking" data-cat="健康" data-kw="步行消耗卡路里计算器 根据体重·时间·步行速度,按METs法(日本厚生劳动省的公式)计算步行消耗的卡路里,并显示相当于多少克脂肪。散步·快走·减肥的参考。免费·无需注册。" title="步行消耗卡路里计算器">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="8.3" cy="7.3" rx="2.2" ry="3.2" transform="rotate(-12 8.3 7.3)"/><circle cx="9.3" cy="12.4" r="1.1"/><ellipse cx="15.7" cy="14.1" rx="2.2" ry="3.2" transform="rotate(-12 15.7 14.1)"/><circle cx="16.7" cy="19.2" r="1.1"/></svg></span><span class="nm">步行消耗卡路里</span>
+      </a>
+      <a class="tile" href="./tools/compound/" data-slug="compound" data-cat="お金" data-kw="复利·定投模拟计算器 输入每月定投金额和预期年化收益率,免费模拟将来能积累多少钱。也支持一次性投资的复利计算。附计算公式和前提(税前·不含手续费的约值)。" title="复利·定投模拟计算器">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 15.5l3.8-4 2.8 2.8 5-5.8"/><path d="M15 8.5h3.6V12"/></svg></span><span class="nm">复利·定投</span>
+      </a>
+      <a class="tile" href="./tools/denki/" data-slug="denki" data-cat="お金" data-kw="电费计算器 输入家电的功率(W)和使用时间,免费计算1天·1个月·1年的电费(日元)。单价默认采用日本官方参考单价31日元/kWh,也可改成自己合约的单价。" title="电费计算器">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.2 15.2a5.8 5.8 0 1 1 5.6 0c-.8.5-1 1.3-1 2.3h-3.6c0-1-.2-1.8-1-2.3z"/><path d="M10 20.5h4"/></svg></span><span class="nm">电费</span>
+      </a>
+      <a class="tile" href="./tools/fudosan/" data-slug="fudosan" data-cat="お金" data-kw="日本房产投资 收支·盈亏平衡计算器 只需5项输入,即可算出日本投资房「第几年卖出才能通算转正」。以最长50年的图表展示贷款余额、预计售价、节税效果和累计收支,并已内置日本的短期·长期转让所得税率。详细设置可自行修改前提。" title="日本房产投资 收支·盈亏平衡计算器">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v8.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M9.8 11.5l2.2 3 2.2-3M12 14.5v4M10.2 15.8h3.6M10.2 17.8h3.6"/></svg></span><span class="nm">日本房产投资…</span>
+      </a>
+      <a class="tile" href="./tools/fuel/" data-slug="fuel" data-cat="お金" data-kw="油费计算器 根据行驶距离、油耗(km/L)和汽油单价,免费计算兜风或通勤所需的油费和耗油量。金额以日元计算,油耗按日本常用的km/L填写,方便估算旅行·回乡的费用和通勤成本。" title="油费计算器">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="4" width="9.5" height="16" rx="1.5"/><path d="M7 7h4.5v4H7z"/><path d="M14 11h2.5a1.5 1.5 0 0 1 1.5 1.5V17"/><path d="M18 12l1.5-1.5-1.5-1.5" transform="translate(0 -1.5)"/></svg></span><span class="nm">油费</span>
+      </a>
+      <a class="tile" href="./tools/genka/" data-slug="genka" data-cat="お金" data-kw="利润率·成本率 计算器 输入售价和成本,立即算出毛利·利润率·成本率。还支持「想要30%利润率该卖多少钱」的售价逆算,适合在日本开店定价、手工制品销售和二手转卖。" title="利润率·成本率 计算器">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 12V3.5"/><path d="M12 12l6.5 5.5"/></svg></span><span class="nm">利润率·成本率</span>
+      </a>
+      <a class="tile" href="./tools/hiwari/" data-slug="hiwari" data-cat="お金" data-kw="日本房租日割(按日分摊)计算器 在日本月中入住或退租时的按日分摊(日割)房租免费计算。同时显示实际天数方式和固定30天方式,可对照租房合同确认,还能连敷金·礼金一起算出入住初期费用。" title="日本房租日割(按日分摊)计算器">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5L12 4l8 6.5v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><rect x="8.3" y="11" width="7.4" height="6.3" rx="1"/><path d="M8.3 13.4h7.4M10.6 11V9.6M13.4 11V9.6"/></svg></span><span class="nm">日本房租日割</span>
+      </a>
+      <a class="tile" href="./tools/jikyu/" data-slug="jikyu" data-cat="お金" data-kw="时薪⇔月薪·年薪 换算器 输入时薪、每天工时和每月出勤天数,免费即时算出税前的月薪和年薪。也能从月薪反推时薪,方便比较日本的兼职·派遣招聘条件,核对工资条上的金额。" title="时薪⇔月薪·年薪 换算器">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.3" cy="10.3" r="6.8"/><path d="M10.3 6.5v3.8l2.6 1.6"/><circle cx="17.7" cy="17.7" r="4.5"/><path d="M16 15.8l1.7 2.2 1.7-2.2M17.7 18v2.5M16.3 18.9h2.8"/></svg></span><span class="nm">时薪⇔月薪·年薪</span>
+      </a>
+      <a class="tile" href="./tools/kariire/" data-slug="kariire" data-cat="お金" data-kw="日本房贷 可贷额度计算器 输入年收入·还款负担率·利率·期限,反推在日本能贷到多少房贷的大致额度。同时显示每月还款额,适合作为「年收入500万日元能买多少钱的房子?」的第一步估算。采用等额本息方式。" title="日本房贷 可贷额度计算器">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5L12 4l8 6.5V19.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><circle cx="11.2" cy="13" r="3.1"/><path d="M13.5 15.3l2.8 2.8"/></svg></span><span class="nm">日本房贷 可贷额度</span>
+      </a>
+      <a class="tile" href="./tools/loan/" data-slug="loan" data-cat="お金" data-kw="贷款还款计算器(等额本息) 输入贷款金额·利率·还款期限,免费计算每月还款额·总还款额·利息总额(等额本息)。适合估算日本的房贷·车贷。附计算公式。" title="贷款还款计算器(等额本息)">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9l8-5 8 5z"/><path d="M6.5 11.5v6M12 11.5v6M17.5 11.5v6"/><path d="M4 20.5h16"/></svg></span><span class="nm">贷款还款</span>
+      </a>
+      <a class="tile" href="./tools/nenpi/" data-slug="nenpi" data-cat="お金" data-kw="油耗计算器(加满法) 用行驶距离和加油量,按加满法计算实际油耗(km/L)。同时显示欧洲式的L/100km、本次加油费和每公里燃料费。免费·无需注册。" title="油耗计算器(加满法)">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 13.8l1.7-4.1a2 2 0 0 1 1.9-1.2h7.8a2 2 0 0 1 1.9 1.2l1.7 4.1v4.4h-2.4"/><path d="M4.5 13.8v4.4h2.4"/><path d="M4.5 13.8h15"/><circle cx="8.2" cy="18.4" r="1.6"/><circle cx="15.8" cy="18.4" r="1.6"/><path d="M9.8 18.4h4.4"/><path d="M18.9 2.8c1 1.3 1.6 2.1 1.6 3a1.9 1.9 0 1 1-3.8 0c0-.9.7-1.7 2.2-3z" transform="translate(-6.9 0)"/></svg></span><span class="nm">油耗</span>
+      </a>
+      <a class="tile" href="./tools/point/" data-slug="point" data-cat="お金" data-kw="打折和积分返还哪个划算?计算器 「10%OFF」和「10%积分返还」其实不一样?计算实际价格和折扣换算率(10%返还≈9.09%OFF),一键判定哪个更划算。用于比较日本的打折与积分活动。" title="打折和积分返还哪个划算?计算器">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="1.2"/><path d="M3.5 6.8h17v3.2h-17z"/><path d="M12 6.8V20"/><path d="M12 6.5C10 3 6.5 4.5 8.5 6.5M12 6.5c2-3.5 5.5-2 3.5 0"/></svg></span><span class="nm">打折和积分返还哪个…</span>
+      </a>
+      <a class="tile" href="./tools/tanka/" data-slug="tanka" data-cat="お金" data-kw="单价比较 计算器(哪个更便宜?) 只要输入价格和容量,就能并排比较「每100g」「每1个」的单价。大包装和小包装到底哪个划算一目了然,最多可比较3件商品的免费购物计算器。" title="单价比较 计算器(哪个更便宜?)">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 4.5h2.3l2.2 11h9.8l2.4-8H7.2"/><circle cx="9.7" cy="19.3" r="1.5"/><circle cx="15.9" cy="19.3" r="1.5"/></svg></span><span class="nm">单价比较</span>
+      </a>
+      <a class="tile" href="./tools/tax/" data-slug="tax" data-cat="お金" data-kw="日本消费税计算器(含税⇔不含税) 不含税→含税、含税→不含税,一键换算的免费日本消费税计算器。支持标准税率10%和轻减税率8%(食品饮料),并显示税额明细。附出处(日本国税厅)。" title="日本消费税计算器(含税⇔不含税)">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h10v18l-2.5-1.6L12 21l-2.5-1.6L7 21z"/><path d="M9.8 8h4.4M9.8 11.2h4.4M9.8 14.4h2.4"/></svg></span><span class="nm">日本消费税</span>
+      </a>
+      <a class="tile" href="./tools/teiki/" data-slug="teiki" data-cat="お金" data-kw="定期券(月票)划算吗? 计算器 输入日本定期券(通勤·通学月票)的价格和单程车费,算出一个月要坐几天才能回本。同时显示与每次刷交通IC卡付费的差额,方便判断一周去几天公司买定期券才划算。" title="定期券(月票)划算吗? 计算器">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3.5" width="14" height="14.5" rx="3"/><rect x="7.5" y="6.5" width="9" height="4.5" rx="0.8"/><path d="M8.5 14.5h.01M15.5 14.5h.01"/><path d="M8 18l-1.8 3M16 18l1.8 3"/></svg></span><span class="nm">定期券划算吗?</span>
+      </a>
+      <a class="tile" href="./tools/tip/" data-slug="tip" data-cat="お金" data-kw="小费计算器(出国旅行用) 输入金额并选择小费率(15%·18%·20%),一次算出小费金额、含小费的总额和AA分账时每人应付的钱。去美国·夏威夷等有小费文化的国家旅行时,结账不再手忙脚乱。" title="小费计算器(出国旅行用)">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 6.5v11"/><path d="M14.8 8.8a2.9 2.4 0 1 0-2.8 3.2 2.9 2.4 0 1 1-2.8 3.2"/></svg></span><span class="nm">小费</span>
+      </a>
+      <a class="tile" href="./tools/waribiki/" data-slug="waribiki" data-cat="お金" data-kw="折扣计算器(○%OFF后是多少钱?) 「30%OFF后多少钱?」一键算出。可计算折后价格和优惠金额,也能反过来由促销价倒推折扣率。免费,适合在日本超市·打折季·奥特莱斯购物时使用。" title="折扣计算器(○%OFF后是多少钱?)">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h7.2L20 12.8 12.8 20 4 11.2z"/><circle cx="7.6" cy="7.6" r="1.3"/><path d="M11 16l4.6-4.6"/><circle cx="11.2" cy="12" r="1.2"/><circle cx="15.4" cy="15.6" r="1.2"/></svg></span><span class="nm">折扣</span>
+      </a>
+      <a class="tile" href="./tools/warikan/" data-slug="warikan" data-cat="お金" data-kw="AA制(割り勘)计算器 输入总金额和人数,免费算出每人应付多少。可按100日元、500日元等整数金额向上取整,方便收钱,适合在日本组织聚餐、酒会的干事使用。" title="AA制(割り勘)计算器">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M8 12h8"/><path d="M12 8.2h.01M12 15.8h.01"/></svg></span><span class="nm">AA制</span>
+      </a>
+      <a class="tile" href="./tools/yukyu/" data-slug="yukyu" data-cat="お金" data-kw="带薪年假(有给)天数计算器 根据工龄和工作方式(每周工作天数),免费算出在日本能拿到多少天带薪年假(有給休暇)。支持兼职·打工的比例发放,并显示日本劳动基准法规定的天数和「每年必须休5天」的义务。" title="带薪年假(有给)天数计算器">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.8 10.8a8.7 8.7 0 0 1 16.4-2.9z"/><path d="M12.7 9.4L8.5 21"/><path d="M4.5 21h11"/></svg></span><span class="nm">带薪年假天数</span>
+      </a>
+      <a class="tile" href="./tools/zangyo/" data-slug="zangyo" data-cat="お金" data-kw="加班费计算器(日本) 输入基础时薪和加班时间,免费算出日本法律规定的加班费(加算工资)。支持时间外25%、每月超60小时50%、法定休息日35%、深夜+25%的法定加算率,也能从月薪换算出基础时薪。" title="加班费计算器(日本)">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="13" r="7.5"/><path d="M11 8.5V13l3.2 2"/><path d="M18.7 3.5v4M16.7 5.5h4"/></svg></span><span class="nm">加班费</span>
+      </a>
+      <a class="tile" href="./tools/age/" data-slug="age" data-cat="日付" data-kw="年龄计算器(周岁·生肖·早生判定) 根据出生日期免费计算周岁年龄和生肖,并判断是否属于日本学年制度的「早生」(1月1日〜4月1日出生)。可指定基准日查询「当时几岁」,支持2月29日出生。" title="年龄计算器(周岁·生肖·早生判定)">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="12" width="15" height="8" rx="1.5"/><path d="M9 12V8.5M15 12V8.5"/><path d="M9 8.5c-.8-1 0-2.2.9-2.7M15 8.5c-.8-1 0-2.2.9-2.7" transform="translate(0 -1.5)"/><path d="M3 20h18" transform="translate(0 0.5)"/></svg></span><span class="nm">年龄</span>
+      </a>
+      <a class="tile" href="./tools/days/" data-slug="days" data-cat="日付" data-kw="天数计算器(日期间隔·○天后) 免费计算两个日期之间相差多少天,以及从基准日起○天后(○天前)的日期和星期。适合确认截止日、纪念日、付款和提交期限。支持闰年。" title="天数计算器(日期间隔·○天后)">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15.5" rx="2"/><path d="M4 10h16M8.5 3v4M15.5 3v4"/><path d="M8.5 14h.01M12 14h.01M15.5 14h.01M8.5 17h.01M12 17h.01"/></svg></span><span class="nm">天数</span>
+      </a>
+      <a class="tile" href="./tools/eigyobi/" data-slug="eigyobi" data-cat="日付" data-kw="日本工作日计算器(排除周末·日本节假日) 按日本的法定节假日(含振替休日)计算「3个工作日后是哪天」,也能统计期间内的工作日数。日本的节假日与中国不同,核对交货期、付款期限、办手续时间时很方便。免费即时,支持2026〜2027年。" title="日本工作日计算器(排除周末·日本节假日)">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15.5" rx="2"/><path d="M4 10h16M8.5 3v4M15.5 3v4"/><path d="M9 15l2.3 2.3 4-4"/></svg></span><span class="nm">日本工作日</span>
+      </a>
+      <a class="tile" href="./tools/gakunen/" data-slug="gakunen" data-cat="日付" data-kw="日本学年(年级)计算器 输入出生年月日,立即知道在日本的学校现在是几年级(小学1年级〜高中3年级)。免费工具,同时显示该学段的入学·毕业年份、是否属于「早生まれ」,并可从年级反查出生年月日范围。" title="日本学年(年级)计算器">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12.5" rx="2"/><path d="M7 20.5l2.2-4M17 20.5l-2.2-4"/><path d="M7 8h6M7 11.5h9"/></svg></span><span class="nm">日本学年</span>
+      </a>
+      <a class="tile" href="./tools/jikan/" data-slug="jikan" data-cat="日付" data-kw="时间计算器(合计·时刻之差) 计算「1:30+0:45+8:00」这样的时间合计,以及开始〜结束时刻的经过时间,并同时给出工资计算常用的十进制小时(如1.75小时)。统计工时·加班时间很方便,免费即时。" title="时间计算器(合计·时刻之差)">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 6.8V12l3.6 2.2"/></svg></span><span class="nm">时间</span>
+      </a>
+      <a class="tile" href="./tools/kinenbi/" data-slug="kinenbi" data-cat="日付" data-kw="纪念日天数计算器 输入生日或纪念日,免费一次算出「今天是第几天」以及第100天·第1000天·第10000天等节点日期。适合情侣纪念日、追星应援、宝宝百日和出生一万天庆祝。" title="纪念日天数计算器">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20C5.5 14.5 4.3 9.6 7.6 7c2.2-1.7 4.4.2 4.4 2 0-1.8 2.2-3.7 4.4-2 3.3 2.6 2.1 7.5-4.4 13z"/><path d="M4 4.5v3M2.5 6h3M19.5 16.5v3M18 18h3"/></svg></span><span class="nm">纪念日天数</span>
+      </a>
+      <a class="tile" href="./tools/rireki/" data-slug="rireki" data-cat="日付" data-kw="入学·毕业年份查询(日本履历书用) 输入出生年月日,按日本学制(4月入学·3月毕业)自动算出小学到大学的入学·毕业年份,可直接填进日本履历书的学历栏。西历和日本年号同时显示,并支持早出生(1月1日〜4月1日)以及复读·留级·休学的调整。" title="入学·毕业年份查询(日本履历书用)">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 9.5L12 5l9.5 4.5L12 14z"/><path d="M6.8 11.8v4.4c0 1.6 2.3 2.9 5.2 2.9s5.2-1.3 5.2-2.9v-4.4"/><path d="M21.5 9.5v5.5"/></svg></span><span class="nm">入学·毕业年份查询</span>
+      </a>
+      <a class="tile" href="./tools/shukujitsu/" data-slug="shukujitsu" data-cat="日付" data-kw="日本节假日日历 一览2026年·2027年日本的全部法定节假日,并立即显示距离下一个节假日还有几天。还会列出该年所有3天以上的连休,方便安排旅行、跑市役所和银行的时间。免费即时。" title="日本节假日日历">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15.5" rx="2"/><path d="M4 10h16M8.5 3v4M15.5 3v4"/><path d="M12 12.4l1.1 2.2 2.4.35-1.75 1.7.42 2.4L12 18l-2.17 1.05.42-2.4-1.75-1.7 2.4-.35z"/></svg></span><span class="nm">日本节假日日历</span>
+      </a>
+      <a class="tile" href="./tools/tsukisu/" data-slug="tsukisu" data-cat="日付" data-kw="○个月后·月数 计算器 免费计算「3个月后是几号?」「两个日期相差几个月?」,自动进行月末调整。适合确认合同期限、付款周期、纪念日和宝宝月龄。也支持○个月前。" title="○个月后·月数 计算器">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15.5" rx="2"/><path d="M4 10h16M8.5 3v4M15.5 3v4"/><path d="M8.5 15.5h6m0 0l-2-2m2 2l-2 2"/></svg></span><span class="nm">○个月后·月数</span>
+      </a>
+      <a class="tile" href="./tools/wareki/" data-slug="wareki" data-cat="日付" data-kw="西历·日本年号(和历)换算器 西历⇔日本年号(明治·大正·昭和·平成·令和)免费即时换算。改元年份同时显示新旧两个年号,可直接抄写到日本的表格和证件上。" title="西历·日本年号(和历)换算器">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 6.5c5.7-1.7 11.3-1.7 17 0"/><path d="M7 5.8V21M17 5.8V21"/><path d="M5.5 10.5h13"/><path d="M12 6.3v4.2"/></svg></span><span class="nm">西历·日本年号</span>
+      </a>
+      <a class="tile" href="./tools/byte/" data-slug="byte" data-cat="変換" data-kw="数据容量换算(KB·MB·GB·TB) 输入一个容量,一次换算出KB·MB·GB·TB的全部数值。可在电脑用的1024进制和存储产品标注的1000进制之间切换,弄清「买的是500GB,电脑上却只有465GB」是怎么回事。适合确认手机容量和文件大小。" title="数据容量换算(KB·MB·GB·TB)">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5.6" rx="7" ry="2.6"/><path d="M5 5.6v12.8c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V5.6"/><path d="M5 12c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6"/></svg></span><span class="nm">数据容量</span>
+      </a>
+      <a class="tile" href="./tools/heikin/" data-slug="heikin" data-cat="変換" data-kw="平均值·中位数计算器 只需粘贴数值,即可一次算出平均值、中位数、最大、最小、合计。适合统计考试分数、销售额、各类记录。支持逗号·空格·换行分隔的免费工具。" title="平均值·中位数计算器">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="12" width="3.4" height="8" rx="0.8"/><rect x="10.3" y="7.5" width="3.4" height="12.5" rx="0.8"/><rect x="16.1" y="10" width="3.4" height="10" rx="0.8"/><path d="M3.5 9.2h17" stroke-dasharray="2.4 2.4"/></svg></span><span class="nm">平均值·中位数</span>
+      </a>
+      <a class="tile" href="./tools/hensachi/" data-slug="hensachi" data-cat="変換" data-kw="偏差值计算器 免费计算日本升学考试通用的「偏差值」(以平均50、标准差10为基准的标准化分数)。输入得分、平均分、标准差即可计算,也可粘贴分数列表一次算出所有人的偏差值。附计算公式。" title="偏差值计算器">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 19h17"/><path d="M4 19c4 0 4.4-12.5 8-12.5S16 19 20 19"/><path d="M12 10.5V19" stroke-dasharray="2.4 2.4"/></svg></span><span class="nm">偏差值</span>
+      </a>
+      <a class="tile" href="./tools/inch/" data-slug="inch" data-cat="変換" data-kw="英寸⇔cm·磅⇔kg 换算计算器 免费在英寸和厘米、磅和千克之间相互换算。采用国际定义值,换算精确。适合确认电视·显示器尺寸,海淘选衣服鞋子,以及看懂哑铃的磅数。" title="英寸⇔cm·磅⇔kg 换算计算器">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8.8" width="18" height="6.4" rx="1.2"/><path d="M6.5 8.8v2.4M9.5 8.8v3.7M12.5 8.8v2.4M15.5 8.8v3.7M18.5 8.8v2.4"/></svg></span><span class="nm">英寸⇔cm·磅⇔k…</span>
+      </a>
+      <a class="tile" href="./tools/jusho/" data-slug="jusho" data-cat="変換" data-kw="日本地址英文转换器 只要输入日本的邮政编码,就能把日本地址转换成英文写法(罗马字·由小到大的顺序),免费即时。可用于海外网购填写地址、国际邮件的收件人和寄件人栏。也能反向把罗马字写的日本地址还原成日文写法(〒+汉字),方便填写市役所、医院的表格。" title="日本地址英文转换器">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3.6 7.2l8.4 5.8 8.4-5.8"/></svg></span><span class="nm">日本地址英文</span>
+      </a>
+      <a class="tile" href="./tools/kome/" data-slug="kome" data-cat="変換" data-kw="米的合·克换算计算器 按大米1合=约150g、每合水约200ml的标准,由合数一并算出米的重量、加水量、煮好的饭量和几碗饭。也支持由克数反算合数。「合」是日本电饭锅量杯使用的单位。" title="米的合·克换算计算器">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5h15c0 4.5-3.1 7.5-7.5 7.5s-7.5-3-7.5-7.5z"/><path d="M9 4.5c-1 1.2-1 2.3 0 3.5M13.5 4.5c-1 1.2-1 2.3 0 3.5"/></svg></span><span class="nm">米的合·克</span>
+      </a>
+      <a class="tile" href="./tools/mile/" data-slug="mile" data-cat="変換" data-kw="英里⇔km 换算计算器 按定义值精确地在英里和公里之间相互换算,并支持海里(nautical mile)。适合在美国自驾、了解马拉松距离、航空里程,以及看懂船舶和飞机的速度。" title="英里⇔km 换算计算器">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 21L10.5 3M16.5 21L13.5 3"/><path d="M12 6.5V9M12 12v2.5M12 17.5V20"/></svg></span><span class="nm">英里⇔km</span>
+      </a>
+      <a class="tile" href="./tools/moji/" data-slug="moji" data-cat="変換" data-kw="字数统计 粘贴文本即可瞬间统计字数,同时显示含空格与不含空格两种结果。还会显示行数和日本400字稿纸的换算张数,适合检查求职表(ES)、报告、社交平台投稿的字数限制。" title="字数统计">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.4 4.4l3.7 3.7L8.2 17l-4.1.8.8-4.1z"/><path d="M11.8 6l3.7 3.7"/><path d="M13.5 20.5h7M3.5 20.5h6"/></svg></span><span class="nm">字数统计</span>
+      </a>
+      <a class="tile" href="./tools/ondo/" data-slug="ondo" data-cat="変換" data-kw="温度换算计算器 摄氏(°C)、华氏(°F)、开尔文(K)一次性互相换算。适用于外国食谱的烤箱温度、国外天气预报和理科作业。按定义式精确换算。" title="温度换算计算器">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 15.6V5a2 2 0 0 1 4 0v10.6a3.6 3.6 0 1 1-4 0z"/><path d="M10.5 15.5V9"/><path d="M15.8 6h2.2M15.8 9.5h2.2M15.8 13h2.2"/></svg></span><span class="nm">温度</span>
+      </a>
+      <a class="tile" href="./tools/password/" data-slug="password" data-cat="変換" data-kw="密码生成器 在您的设备内生成安全的随机密码,可自选长度和字符种类(大小写字母·数字·符号)。同时显示强度(比特数),内容不会发送到网络,免费即用。" title="密码生成器">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="10.5" width="13" height="9.5" rx="2.2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/><circle cx="12" cy="14.5" r="1.5"/><path d="M12 16v2"/></svg></span><span class="nm">密码生成器</span>
+      </a>
+      <a class="tile" href="./tools/percent/" data-slug="percent" data-cat="変換" data-kw="百分比计算器 免费一键计算「A是B的百分之几」「A的○%是多少」「从A到B增减了百分之几」三种百分比。算折扣、达成率、同比增减都很方便。" title="百分比计算器">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18L18 6"/><circle cx="7.6" cy="7.6" r="2.6"/><circle cx="16.4" cy="16.4" r="2.6"/></svg></span><span class="nm">百分比</span>
+      </a>
+      <a class="tile" href="./tools/petage/" data-slug="petage" data-cat="変換" data-kw="猫狗年龄换算器 把猫和中小型犬的年龄免费换算成人类年龄: 1岁≈人类15岁、2岁≈24岁,之后每年约+4岁。我家的孩子相当于人几岁?还能查老年期的大致时间和反向换算。" title="猫狗年龄换算器">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12.6c3.4 0 5.4 2.1 5.4 4.2 0 1.9-1.6 3-3.2 2.5-1-.3-1.6-.5-2.2-.5s-1.2.2-2.2.5c-1.6.5-3.2-.6-3.2-2.5 0-2.1 2-4.2 5.4-4.2z"/><circle cx="6.3" cy="9.2" r="1.8"/><circle cx="10" cy="6.6" r="1.8"/><circle cx="14" cy="6.6" r="1.8"/><circle cx="17.7" cy="9.2" r="1.8"/></svg></span><span class="nm">猫狗年龄</span>
+      </a>
+      <a class="tile" href="./tools/renji/" data-slug="renji" data-cat="変換" data-kw="微波炉加热时间换算器 把包装上写的加热时间换算成你家微波炉瓦数对应的时间,免费即时计算。日本的冷冻食品包装和菜谱都按瓦数标注加热时间(例:「600W 1分30秒」),瓦数不一样时用这个工具换算。同时显示10秒为单位的参考值。" title="微波炉加热时间换算器">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2"/><rect x="6" y="7.8" width="8.5" height="8.5" rx="1"/><circle cx="17.4" cy="9.3" r="1"/><path d="M16.4 12.8h2M16.4 15.2h2"/></svg></span><span class="nm">微波炉加热时间</span>
+      </a>
+      <a class="tile" href="./tools/roman/" data-slug="roman" data-cat="変換" data-kw="罗马数字转换器 阿拉伯数字和罗马数字(I·V·X·L·C·D·M)免费即时互转。适用于钟表表盘、电影片名、年份刻印的读法,2026是MMXXVI。支持减法规则的精确转换。" title="罗马数字转换器">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8l5.5 8M10.5 8L5 16"/><path d="M14.2 8v8M18.2 8v8"/><path d="M13.2 8h2M13.2 16h2M17.2 8h2M17.2 16h2"/></svg></span><span class="nm">罗马数字</span>
+      </a>
+      <a class="tile" href="./tools/seiza/" data-slug="seiza" data-cat="変換" data-kw="星座·诞生石速查器 输入生日立即免费显示12星座和诞生石。「4月20日出生是什么座?」这样的交界日也一目了然。填写个人资料、挑选礼物时都能用。" title="星座·诞生石速查器">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.6l2.5 5.3 5.8.7-4.3 4 1.1 5.8L12 16.6l-5.1 2.8 1.1-5.8-4.3-4 5.8-.7z"/></svg></span><span class="nm">星座·诞生石速查器</span>
+      </a>
+      <a class="tile" href="./tools/shincho/" data-slug="shincho" data-cat="変換" data-kw="身高英尺·英寸换算 身高的cm与英尺·英寸表示(如5'7″)相互换算。海外资料上的身高·运动员身高·美国的尺码表示一看就懂。按1英尺=30.48cm的定义值计算。" title="身高英尺·英寸换算">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.5 3.5v17M18.5 5.5h-2.4M18.5 9h-2.4M18.5 12.5h-2.4M18.5 16h-2.4M18.5 19.5h-2.4"/><circle cx="8.5" cy="6" r="2.4"/><path d="M8.5 8.4v6M8.5 14.4l-2.6 5M8.5 14.4l2.6 5M8.5 10l-3 2M8.5 10l3 2"/></svg></span><span class="nm">身高英尺·英寸</span>
+      </a>
+      <a class="tile" href="./tools/speed/" data-slug="speed" data-cat="変換" data-kw="速度·时间·距离计算器 速度(km/h)·距离(km)·时间三者中输入两个,免费自动算出剩下的一个。「时速80km跑150km要几小时?」这类问题一键得出答案。还能计算到达时刻·出发时刻,以及时速换算分速·秒速。" title="速度·时间·距离计算器">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 15.5a7.5 7.5 0 0 1 15 0"/><path d="M12 15.5l4-4.6"/><circle cx="12" cy="15.5" r="1.3"/><path d="M6 12.2l1.5.9M18 12.2l-1.5.9M12 7.8v1.8"/><path d="M4.5 18.8h15"/></svg></span><span class="nm">速度·时间·距离</span>
+      </a>
+      <a class="tile" href="./tools/spoon/" data-slug="spoon" data-cat="変換" data-kw="大匙·小匙·量杯换算计算器 按日本标准大匙1=15ml、小匙1=5ml、1杯=200ml相互换算。「大匙3是多少ml?」「50ml是几大匙?」一键得到答案。调整食谱分量、手边没有量匙时使用。" title="大匙·小匙·量杯换算计算器">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="7.2" rx="3.4" ry="4.6"/><path d="M12 11.8V21"/></svg></span><span class="nm">大匙·小匙·量杯</span>
+      </a>
+      <a class="tile" href="./tools/tsubo/" data-slug="tsubo" data-cat="変換" data-kw="坪·平方米(㎡)·畳 换算器 免费一次换算坪(坪)⇔平方米(㎡)⇔畳(榻榻米),这三个单位是日本房产广告和户型图上常见的面积单位。依据1坪=约3.31㎡、1畳=1.62㎡(日本房产广告的标示基准),并注明出处。" title="坪·平方米(㎡)·畳 换算器">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="4.5" width="15" height="15" rx="1"/><path d="M8.5 15.5l7-7m0 0h-3.4m3.4 0v3.4M8.5 15.5h3.4m-3.4 0v-3.4"/></svg></span><span class="nm">坪·平方米·畳</span>
+      </a>
+      <a class="tile" href="./tools/zenkaku/" data-slug="zenkaku" data-cat="変換" data-kw="全角⇔半角 转换工具 把全角的英文字母、数字、符号和空格一次性转换为半角(也支持反向转换)。在日本的表单上被要求「请用半角输入」时,或整理名单、通讯录时都能用,粘贴即可转换。" title="全角⇔半角 转换工具">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 16.5L8 6h.8l4 10.5"/><path d="M5.5 12.8h5.8"/><path d="M15 11.5h5.5m0 0l-2.3-2.3m2.3 2.3l-2.3 2.3" transform="translate(0 3)"/></svg></span><span class="nm">全角⇔半角</span>
+      </a>
+  </div>
+
+  <div id="poll-sec">
+    <div class="tp-sec"><b>统计工具</b><span>与计算工具不同的另一种工具</span></div>
+    <a class="poll-card" id="poll-card" href="../tools/poll/" data-kw="大家的投票 创建问卷并分享,实时统计结果(无需注册)。仅日文。 poll survey vote 投票 アンケート">
+      <span class="pic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4.2" width="12.5" height="3.4" rx="1.7"/><rect x="4" y="10.3" width="16" height="3.4" rx="1.7"/><rect x="4" y="16.4" width="7.5" height="3.4" rx="1.7"/></svg></span>
+      <span class="pt"><b>大家的投票</b><small>创建问卷并分享,实时统计结果(无需注册)。仅日文。</small></span>
+    </a>
+  </div>
+
+  <details class="seo-list">
+    <summary>展开64个工具的说明列表</summary>
+      <h3>健康</h3>
+      <ul>
+        <li><a href="./tools/alcohol/">纯酒精量计算器</a> — 输入酒的量和酒精度数,免费计算纯酒精量(g)和标准杯数。按日本厚生劳动省指南,分男女判定是否达到提高生活习惯病风险的饮酒量。</li>
+        <li><a href="./tools/bmi/">BMI·标准体重计算器</a> — 输入身高体重,免费计算BMI和标准体重(BMI 22)。按日本肥胖学会标准(偏瘦·正常·肥胖1〜4级)判定,即日本体检使用的标准。附计算公式和出处。</li>
+        <li><a href="./tools/bmr/">基础代谢量计算器</a> — 输入年龄、性别和体重,免费计算一天的基础代谢量(kcal)。基于日本厚生劳动省《日本人饮食摄取基准》的基础代谢基准值,附计算依据和出处。</li>
+        <li><a href="./tools/caffeine/">咖啡因摄入量计算器</a> — 合计咖啡·红茶·绿茶·能量饮料等的咖啡因量,并与每日参考值(健康成人400mg·孕期更少)比较。适合自查是否喝多了。</li>
+        <li><a href="./tools/cycle/">睡眠周期计算器</a> — 从起床时间倒推,列出符合约90分钟睡眠周期的就寝时间候选。可设定入睡所需时间,一键回答「明天6点半起床,今晚几点睡?」。</li>
+        <li><a href="./tools/hosu/">步数→距离·卡路里换算器</a> — 根据步数和身高计算步行距离(km)·时间·消耗卡路里的大致数值。步幅按身高×0.45估算。「今天的8,000步走了几公里?」立刻知道。适合步数打卡和减肥记录。</li>
+        <li><a href="./tools/ninshin/">预产期·孕周计算器</a> — 根据末次月经的开始日免费计算预产期和当前孕周(〇周△天)。支持月经周期不是28天时的修正,并显示孕早期·中期·晚期的区分。</li>
+        <li><a href="./tools/pace/">跑步配速计算器</a> — 用距离和目标时间免费计算每公里配速和时速。也能反过来用配速预测全马·半马的完赛时间。附5km/10km/半马/全马预设。</li>
+        <li><a href="./tools/protein/">蛋白质摄入量计算器</a> — 根据体重和运动量计算一天所需蛋白质的参考量,并换算成常见食品(鸡胸肉、鸡蛋、牛奶、纳豆各需多少)。适合健身、减肥和饮食管理。</li>
+        <li><a href="./tools/shinpaku/">目标心率计算器(卡沃宁公式)</a> — 根据年龄和安静心率,用卡沃宁公式(Karvonen法)计算适合燃脂和提升耐力的目标心率区间。适用于步行·慢跑·健身车的强度设定。</li>
+        <li><a href="./tools/shio/">盐分计算器(钠⇔食盐相当量)</a> — 把食品标签上的钠(mg)一键换算成食盐相当量(g),免费使用。同时显示占日本每日目标量(男性7.5g·女性6.5g未满)的比例。换算系数依据日本食品表示基准,适合减盐·健康管理。</li>
+        <li><a href="./tools/sleep/">睡眠时长计算器</a> — 只需输入就寝时刻和起床时刻,免费计算睡眠时长,跨越午夜也能正确计算。适合记录每日睡眠,或从起床时刻反推该几点睡。</li>
+        <li><a href="./tools/sports/">运动消耗卡路里计算器</a> — 按METs法(官方METs表)计算慢跑·骑行·游泳·网球·力量训练·跳绳·瑜伽等13种运动的消耗卡路里。只需输入体重和时间,附脂肪换算。</li>
+        <li><a href="./tools/tdee/">每日所需摄入热量计算器</a> — 根据年龄、性别、体重和活动量,免费计算一天所需摄入热量的参考值(估算能量需要量)。基于日本厚生劳动省的基础代谢基准值和身体活动水平,可用于减肥的饮食管理。</li>
+        <li><a href="./tools/walking/">步行消耗卡路里计算器</a> — 根据体重·时间·步行速度,按METs法(日本厚生劳动省的公式)计算步行消耗的卡路里,并显示相当于多少克脂肪。散步·快走·减肥的参考。免费·无需注册。</li>
+      </ul>
+      <h3>金钱</h3>
+      <ul>
+        <li><a href="./tools/compound/">复利·定投模拟计算器</a> — 输入每月定投金额和预期年化收益率,免费模拟将来能积累多少钱。也支持一次性投资的复利计算。附计算公式和前提(税前·不含手续费的约值)。</li>
+        <li><a href="./tools/denki/">电费计算器</a> — 输入家电的功率(W)和使用时间,免费计算1天·1个月·1年的电费(日元)。单价默认采用日本官方参考单价31日元/kWh,也可改成自己合约的单价。</li>
+        <li><a href="./tools/fudosan/">日本房产投资 收支·盈亏平衡计算器</a> — 只需5项输入,即可算出日本投资房「第几年卖出才能通算转正」。以最长50年的图表展示贷款余额、预计售价、节税效果和累计收支,并已内置日本的短期·长期转让所得税率。详细设置可自行修改前提。</li>
+        <li><a href="./tools/fuel/">油费计算器</a> — 根据行驶距离、油耗(km/L)和汽油单价,免费计算兜风或通勤所需的油费和耗油量。金额以日元计算,油耗按日本常用的km/L填写,方便估算旅行·回乡的费用和通勤成本。</li>
+        <li><a href="./tools/genka/">利润率·成本率 计算器</a> — 输入售价和成本,立即算出毛利·利润率·成本率。还支持「想要30%利润率该卖多少钱」的售价逆算,适合在日本开店定价、手工制品销售和二手转卖。</li>
+        <li><a href="./tools/hiwari/">日本房租日割(按日分摊)计算器</a> — 在日本月中入住或退租时的按日分摊(日割)房租免费计算。同时显示实际天数方式和固定30天方式,可对照租房合同确认,还能连敷金·礼金一起算出入住初期费用。</li>
+        <li><a href="./tools/jikyu/">时薪⇔月薪·年薪 换算器</a> — 输入时薪、每天工时和每月出勤天数,免费即时算出税前的月薪和年薪。也能从月薪反推时薪,方便比较日本的兼职·派遣招聘条件,核对工资条上的金额。</li>
+        <li><a href="./tools/kariire/">日本房贷 可贷额度计算器</a> — 输入年收入·还款负担率·利率·期限,反推在日本能贷到多少房贷的大致额度。同时显示每月还款额,适合作为「年收入500万日元能买多少钱的房子?」的第一步估算。采用等额本息方式。</li>
+        <li><a href="./tools/loan/">贷款还款计算器(等额本息)</a> — 输入贷款金额·利率·还款期限,免费计算每月还款额·总还款额·利息总额(等额本息)。适合估算日本的房贷·车贷。附计算公式。</li>
+        <li><a href="./tools/nenpi/">油耗计算器(加满法)</a> — 用行驶距离和加油量,按加满法计算实际油耗(km/L)。同时显示欧洲式的L/100km、本次加油费和每公里燃料费。免费·无需注册。</li>
+        <li><a href="./tools/point/">打折和积分返还哪个划算?计算器</a> — 「10%OFF」和「10%积分返还」其实不一样?计算实际价格和折扣换算率(10%返还≈9.09%OFF),一键判定哪个更划算。用于比较日本的打折与积分活动。</li>
+        <li><a href="./tools/tanka/">单价比较 计算器(哪个更便宜?)</a> — 只要输入价格和容量,就能并排比较「每100g」「每1个」的单价。大包装和小包装到底哪个划算一目了然,最多可比较3件商品的免费购物计算器。</li>
+        <li><a href="./tools/tax/">日本消费税计算器(含税⇔不含税)</a> — 不含税→含税、含税→不含税,一键换算的免费日本消费税计算器。支持标准税率10%和轻减税率8%(食品饮料),并显示税额明细。附出处(日本国税厅)。</li>
+        <li><a href="./tools/teiki/">定期券(月票)划算吗? 计算器</a> — 输入日本定期券(通勤·通学月票)的价格和单程车费,算出一个月要坐几天才能回本。同时显示与每次刷交通IC卡付费的差额,方便判断一周去几天公司买定期券才划算。</li>
+        <li><a href="./tools/tip/">小费计算器(出国旅行用)</a> — 输入金额并选择小费率(15%·18%·20%),一次算出小费金额、含小费的总额和AA分账时每人应付的钱。去美国·夏威夷等有小费文化的国家旅行时,结账不再手忙脚乱。</li>
+        <li><a href="./tools/waribiki/">折扣计算器(○%OFF后是多少钱?)</a> — 「30%OFF后多少钱?」一键算出。可计算折后价格和优惠金额,也能反过来由促销价倒推折扣率。免费,适合在日本超市·打折季·奥特莱斯购物时使用。</li>
+        <li><a href="./tools/warikan/">AA制(割り勘)计算器</a> — 输入总金额和人数,免费算出每人应付多少。可按100日元、500日元等整数金额向上取整,方便收钱,适合在日本组织聚餐、酒会的干事使用。</li>
+        <li><a href="./tools/yukyu/">带薪年假(有给)天数计算器</a> — 根据工龄和工作方式(每周工作天数),免费算出在日本能拿到多少天带薪年假(有給休暇)。支持兼职·打工的比例发放,并显示日本劳动基准法规定的天数和「每年必须休5天」的义务。</li>
+        <li><a href="./tools/zangyo/">加班费计算器(日本)</a> — 输入基础时薪和加班时间,免费算出日本法律规定的加班费(加算工资)。支持时间外25%、每月超60小时50%、法定休息日35%、深夜+25%的法定加算率,也能从月薪换算出基础时薪。</li>
+      </ul>
+      <h3>日期</h3>
+      <ul>
+        <li><a href="./tools/age/">年龄计算器(周岁·生肖·早生判定)</a> — 根据出生日期免费计算周岁年龄和生肖,并判断是否属于日本学年制度的「早生」(1月1日〜4月1日出生)。可指定基准日查询「当时几岁」,支持2月29日出生。</li>
+        <li><a href="./tools/days/">天数计算器(日期间隔·○天后)</a> — 免费计算两个日期之间相差多少天,以及从基准日起○天后(○天前)的日期和星期。适合确认截止日、纪念日、付款和提交期限。支持闰年。</li>
+        <li><a href="./tools/eigyobi/">日本工作日计算器(排除周末·日本节假日)</a> — 按日本的法定节假日(含振替休日)计算「3个工作日后是哪天」,也能统计期间内的工作日数。日本的节假日与中国不同,核对交货期、付款期限、办手续时间时很方便。免费即时,支持2026〜2027年。</li>
+        <li><a href="./tools/gakunen/">日本学年(年级)计算器</a> — 输入出生年月日,立即知道在日本的学校现在是几年级(小学1年级〜高中3年级)。免费工具,同时显示该学段的入学·毕业年份、是否属于「早生まれ」,并可从年级反查出生年月日范围。</li>
+        <li><a href="./tools/jikan/">时间计算器(合计·时刻之差)</a> — 计算「1:30+0:45+8:00」这样的时间合计,以及开始〜结束时刻的经过时间,并同时给出工资计算常用的十进制小时(如1.75小时)。统计工时·加班时间很方便,免费即时。</li>
+        <li><a href="./tools/kinenbi/">纪念日天数计算器</a> — 输入生日或纪念日,免费一次算出「今天是第几天」以及第100天·第1000天·第10000天等节点日期。适合情侣纪念日、追星应援、宝宝百日和出生一万天庆祝。</li>
+        <li><a href="./tools/rireki/">入学·毕业年份查询(日本履历书用)</a> — 输入出生年月日,按日本学制(4月入学·3月毕业)自动算出小学到大学的入学·毕业年份,可直接填进日本履历书的学历栏。西历和日本年号同时显示,并支持早出生(1月1日〜4月1日)以及复读·留级·休学的调整。</li>
+        <li><a href="./tools/shukujitsu/">日本节假日日历</a> — 一览2026年·2027年日本的全部法定节假日,并立即显示距离下一个节假日还有几天。还会列出该年所有3天以上的连休,方便安排旅行、跑市役所和银行的时间。免费即时。</li>
+        <li><a href="./tools/tsukisu/">○个月后·月数 计算器</a> — 免费计算「3个月后是几号?」「两个日期相差几个月?」,自动进行月末调整。适合确认合同期限、付款周期、纪念日和宝宝月龄。也支持○个月前。</li>
+        <li><a href="./tools/wareki/">西历·日本年号(和历)换算器</a> — 西历⇔日本年号(明治·大正·昭和·平成·令和)免费即时换算。改元年份同时显示新旧两个年号,可直接抄写到日本的表格和证件上。</li>
+      </ul>
+      <h3>生活</h3>
+      <ul>
+        <li><a href="./tools/byte/">数据容量换算(KB·MB·GB·TB)</a> — 输入一个容量,一次换算出KB·MB·GB·TB的全部数值。可在电脑用的1024进制和存储产品标注的1000进制之间切换,弄清「买的是500GB,电脑上却只有465GB」是怎么回事。适合确认手机容量和文件大小。</li>
+        <li><a href="./tools/heikin/">平均值·中位数计算器</a> — 只需粘贴数值,即可一次算出平均值、中位数、最大、最小、合计。适合统计考试分数、销售额、各类记录。支持逗号·空格·换行分隔的免费工具。</li>
+        <li><a href="./tools/hensachi/">偏差值计算器</a> — 免费计算日本升学考试通用的「偏差值」(以平均50、标准差10为基准的标准化分数)。输入得分、平均分、标准差即可计算,也可粘贴分数列表一次算出所有人的偏差值。附计算公式。</li>
+        <li><a href="./tools/inch/">英寸⇔cm·磅⇔kg 换算计算器</a> — 免费在英寸和厘米、磅和千克之间相互换算。采用国际定义值,换算精确。适合确认电视·显示器尺寸,海淘选衣服鞋子,以及看懂哑铃的磅数。</li>
+        <li><a href="./tools/jusho/">日本地址英文转换器</a> — 只要输入日本的邮政编码,就能把日本地址转换成英文写法(罗马字·由小到大的顺序),免费即时。可用于海外网购填写地址、国际邮件的收件人和寄件人栏。也能反向把罗马字写的日本地址还原成日文写法(〒+汉字),方便填写市役所、医院的表格。</li>
+        <li><a href="./tools/kome/">米的合·克换算计算器</a> — 按大米1合=约150g、每合水约200ml的标准,由合数一并算出米的重量、加水量、煮好的饭量和几碗饭。也支持由克数反算合数。「合」是日本电饭锅量杯使用的单位。</li>
+        <li><a href="./tools/mile/">英里⇔km 换算计算器</a> — 按定义值精确地在英里和公里之间相互换算,并支持海里(nautical mile)。适合在美国自驾、了解马拉松距离、航空里程,以及看懂船舶和飞机的速度。</li>
+        <li><a href="./tools/moji/">字数统计</a> — 粘贴文本即可瞬间统计字数,同时显示含空格与不含空格两种结果。还会显示行数和日本400字稿纸的换算张数,适合检查求职表(ES)、报告、社交平台投稿的字数限制。</li>
+        <li><a href="./tools/ondo/">温度换算计算器</a> — 摄氏(°C)、华氏(°F)、开尔文(K)一次性互相换算。适用于外国食谱的烤箱温度、国外天气预报和理科作业。按定义式精确换算。</li>
+        <li><a href="./tools/password/">密码生成器</a> — 在您的设备内生成安全的随机密码,可自选长度和字符种类(大小写字母·数字·符号)。同时显示强度(比特数),内容不会发送到网络,免费即用。</li>
+        <li><a href="./tools/percent/">百分比计算器</a> — 免费一键计算「A是B的百分之几」「A的○%是多少」「从A到B增减了百分之几」三种百分比。算折扣、达成率、同比增减都很方便。</li>
+        <li><a href="./tools/petage/">猫狗年龄换算器</a> — 把猫和中小型犬的年龄免费换算成人类年龄: 1岁≈人类15岁、2岁≈24岁,之后每年约+4岁。我家的孩子相当于人几岁?还能查老年期的大致时间和反向换算。</li>
+        <li><a href="./tools/renji/">微波炉加热时间换算器</a> — 把包装上写的加热时间换算成你家微波炉瓦数对应的时间,免费即时计算。日本的冷冻食品包装和菜谱都按瓦数标注加热时间(例:「600W 1分30秒」),瓦数不一样时用这个工具换算。同时显示10秒为单位的参考值。</li>
+        <li><a href="./tools/roman/">罗马数字转换器</a> — 阿拉伯数字和罗马数字(I·V·X·L·C·D·M)免费即时互转。适用于钟表表盘、电影片名、年份刻印的读法,2026是MMXXVI。支持减法规则的精确转换。</li>
+        <li><a href="./tools/seiza/">星座·诞生石速查器</a> — 输入生日立即免费显示12星座和诞生石。「4月20日出生是什么座?」这样的交界日也一目了然。填写个人资料、挑选礼物时都能用。</li>
+        <li><a href="./tools/shincho/">身高英尺·英寸换算</a> — 身高的cm与英尺·英寸表示(如5'7″)相互换算。海外资料上的身高·运动员身高·美国的尺码表示一看就懂。按1英尺=30.48cm的定义值计算。</li>
+        <li><a href="./tools/speed/">速度·时间·距离计算器</a> — 速度(km/h)·距离(km)·时间三者中输入两个,免费自动算出剩下的一个。「时速80km跑150km要几小时?」这类问题一键得出答案。还能计算到达时刻·出发时刻,以及时速换算分速·秒速。</li>
+        <li><a href="./tools/spoon/">大匙·小匙·量杯换算计算器</a> — 按日本标准大匙1=15ml、小匙1=5ml、1杯=200ml相互换算。「大匙3是多少ml?」「50ml是几大匙?」一键得到答案。调整食谱分量、手边没有量匙时使用。</li>
+        <li><a href="./tools/tsubo/">坪·平方米(㎡)·畳 换算器</a> — 免费一次换算坪(坪)⇔平方米(㎡)⇔畳(榻榻米),这三个单位是日本房产广告和户型图上常见的面积单位。依据1坪=约3.31㎡、1畳=1.62㎡(日本房产广告的标示基准),并注明出处。</li>
+        <li><a href="./tools/zenkaku/">全角⇔半角 转换工具</a> — 把全角的英文字母、数字、符号和空格一次性转换为半角(也支持反向转换)。在日本的表单上被要求「请用半角输入」时,或整理名单、通讯录时都能用,粘贴即可转换。</li>
+      </ul>
+  </details>
+
+  <div class="about">
+    <p>这里汇集了健康·金钱·日期·日常生活中随手就想算一下的免费在线工具。每个工具都注明<strong>计算方法和依据(一次信息出处)</strong>。计算结果是基于所输入数值的约值,详情请见<a href="./disclaimer.html">免责声明</a>。</p>
+  </div>
 </main>
 <!-- @partial:footer start -->
 <footer class="site-footer">
-<!-- @langsw start -->
-<nav class="lang-switch" aria-label="语言"><a href="/" lang="ja" hreflang="ja">日本語</a><a href="/en/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/" lang="ko" hreflang="ko">한국어</a></nav>
-<!-- @langsw end -->
   <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
   <nav>
+    <a href="./">全部工具</a>
     <a href="./privacy.html">隐私政策</a>
     <a href="./disclaimer.html">免责声明</a>
     <a href="../contact.html">联系我们</a>
@@ -129,5 +415,89 @@
   <p>© 2026 Quick Calc</p>
 </footer>
 <!-- @partial:footer end -->
+<script>
+(function () {
+  "use strict";
+  var RANK = ["moji","password","waribiki","days","bmi","wareki","eigyobi","kinenbi","jikan","tax","fudosan","heikin"];
+  var CATS = [["all","全部"],["健康","健康"],["お金","金钱"],["日付","日期"],["変換","生活"]];
+  var UNIT = "个";
+  var RESULTS = "搜索结果";
+  var current = "all";
+  var tabsEl = document.getElementById("tabs");
+  var grid = document.getElementById("grid");
+  var popEl = document.getElementById("popular");
+  var tiles = [].slice.call(grid.querySelectorAll(".tile"));
+  var bySlug = {};
+  tiles.forEach(function (t) { bySlug[t.dataset.slug] = t; });
+
+  function norm(s) { return s.toLowerCase(); }
+  var index = tiles.map(function (t) { return norm(t.dataset.kw + " " + t.textContent); });
+  var pollCard = document.getElementById("poll-card");
+  var pollIndex = norm(pollCard.dataset.kw + " " + pollCard.textContent);
+
+  // 人気: 日本語版と同じ利用データ基準のランキング(週次更新)
+  function renderPopular() {
+    popEl.innerHTML = "";
+    var shown = 0;
+    RANK.forEach(function (slug, i) {
+      var t = bySlug[slug];
+      if (!t || shown >= 8) return;
+      var clone = t.cloneNode(true);
+      clone.hidden = false;
+      var rk = document.createElement("span");
+      var n = ++shown;
+      rk.className = "rk" + (n === 1 ? "" : n === 2 ? " silver" : n === 3 ? " bronze" : " plain");
+      rk.textContent = n;
+      clone.querySelector(".ic").appendChild(rk);
+      popEl.appendChild(clone);
+    });
+    if (!shown) document.getElementById("pop-sec").style.display = "none";
+  }
+
+  CATS.forEach(function (c) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "tp-tab" + (c[0] === current ? " on" : "");
+    b.textContent = c[1];
+    b.setAttribute("role", "tab");
+    b.onclick = function () {
+      current = c[0];
+      tabsEl.querySelectorAll(".tp-tab").forEach(function (t, i) { t.classList.toggle("on", CATS[i][0] === current); });
+      render();
+    };
+    tabsEl.appendChild(b);
+  });
+
+  var input = document.getElementById("search-input");
+  function render() {
+    var q = norm(input.value.trim());
+    var terms = q.split(/\s+/).filter(Boolean);
+    var shown = 0;
+    tiles.forEach(function (t, i) {
+      var hit;
+      if (terms.length) {
+        hit = terms.every(function (w) { return index[i].indexOf(w) !== -1; });
+      } else {
+        hit = current === "all" || t.dataset.cat === current;
+      }
+      t.hidden = !hit;
+      if (hit) shown++;
+    });
+    document.getElementById("pop-sec").style.display = (terms.length || current !== "all") ? "none" : "";
+    var pollHit = terms.length ? terms.every(function (w) { return pollIndex.indexOf(w) !== -1; }) : current === "all";
+    document.getElementById("poll-sec").style.display = pollHit ? "" : "none";
+    if (pollHit && terms.length) shown++;
+    var label = terms.length ? RESULTS : CATS.filter(function (c) { return c[0] === current; })[0][1];
+    document.getElementById("genre-title").innerHTML = "<b>" + label + "</b><span>" + shown + " " + UNIT + "</span>";
+    document.getElementById("no-hit").hidden = shown > 0;
+  }
+  input.addEventListener("input", render);
+
+  var q0 = new URLSearchParams(location.search).get("q");
+  if (q0) { input.value = q0; render(); }
+  if (location.hash === "#search") setTimeout(function () { input.focus(); }, 60);
+  renderPopular();
+})();
+</script>
 </body>
 </html>

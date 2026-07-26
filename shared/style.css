@@ -118,8 +118,37 @@ a { color: var(--color-accent); }
 }
 .site-footer nav { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-bottom: 8px; }
 .site-footer a { color: var(--color-muted); }
-.lang-switch { display: flex; flex-wrap: wrap; gap: 4px 14px; padding-bottom: 10px; margin-bottom: 12px; border-bottom: 1px solid var(--color-border); }
-.lang-switch .lang-current { font-weight: 600; color: var(--color-text); }
+/* 言語切替(全ページ共通・ページ最上部) */
+.lang-bar {
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+.lang-switch {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 7px 16px;
+  font-size: 0.82rem;
+}
+.lang-switch .lang-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--color-muted);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.lang-switch .lang-label svg { width: 15px; height: 15px; }
+.lang-switch a { color: var(--color-muted); text-decoration: none; }
+.lang-switch a:hover { text-decoration: underline; }
+.lang-switch .lang-current {
+  font-weight: 700;
+  color: var(--color-text);
+  border-bottom: 2px solid var(--color-accent);
+}
 
 /* サイト内検索(トップページ) */
 .tool-search {

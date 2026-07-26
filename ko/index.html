@@ -6,7 +6,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Quick Calc | 일본 생활에 유용한 무료 계산 도구</title>
-  <meta name="description" content="건강·돈·날짜·일상생활의 무료 웹 계산 도구. 일본 생활 전용 도구(일본 연호 변환, 영문 주소 변환, 일본 기준 BMI 등) 포함. 가입 불필요, 모바일 지원, 모든 페이지에 계산 근거와 출처 명시.">
+  <meta name="description" content="건강·돈·날짜·일상생활의 무료 웹 계산 도구 64개. 일본 연호 변환, 영문 주소 변환, 일본 기준 BMI 등 일본 생활 전용 도구 포함. 가입 불필요, 모바일 지원, 모든 페이지에 계산 근거와 출처 명시.">
   <link rel="stylesheet" href="../shared/style.css">
   <!-- @meta start -->
   <link rel="canonical" href="https://quick-calc.site/ko/">
@@ -14,11 +14,12 @@
   <meta name="theme-color" content="#0b6e4f">
   <meta property="og:site_name" content="Quick Calc">
   <meta property="og:title" content="Quick Calc | 일본 생활에 유용한 무료 계산 도구">
-  <meta property="og:description" content="건강·돈·날짜·일상생활의 무료 웹 계산 도구. 일본 생활 전용 도구(일본 연호 변환, 영문 주소 변환, 일본 기준 BMI 등) 포함. 가입 불필요, 모바일 지원, 모든 페이지에 계산 근거와 출처 명시.">
+  <meta property="og:description" content="건강·돈·날짜·일상생활의 무료 웹 계산 도구 64개. 일본 연호 변환, 영문 주소 변환, 일본 기준 BMI 등 일본 생활 전용 도구 포함. 가입 불필요, 모바일 지원, 모든 페이지에 계산 근거와 출처 명시.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://quick-calc.site/ko/">
   <meta property="og:locale" content="ko_KR">
   <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Quick Calc","url":"https://quick-calc.site/ko/","inLanguage":"ko"}</script>
   <!-- @meta end -->
   <!-- @hreflang start -->
   <link rel="alternate" hreflang="ja" href="https://quick-calc.site/">
@@ -27,100 +28,385 @@
   <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/">
   <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/">
   <!-- @hreflang end -->
+  <style>
+    :root {
+      --tp-bg: #f7f5f0; --tp-tile: #ffffff; --tp-ink: #26282b; --tp-muted: #93989e; --tp-gold: #b8873a;
+      --tp-shadow: 0 1px 2px rgba(30,32,34,0.05), 0 6px 16px rgba(30,32,34,0.06);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --tp-bg: #141619; --tp-tile: #1f2326; --tp-ink: #eceff1; --tp-muted: #8b9196; --tp-shadow: 0 1px 2px rgba(0,0,0,0.4); }
+    }
+    body { background: var(--tp-bg); color: var(--tp-ink); }
+    main { padding-bottom: 40px; }
+    .brand { display: flex; align-items: center; gap: 10px; padding: 22px 0 4px; }
+    .brand .mark { width: 40px; height: 40px; border-radius: 13px; background: var(--color-accent); display: flex; align-items: center; justify-content: center; box-shadow: var(--tp-shadow); flex: 0 0 auto; }
+    .brand .mark svg { width: 24px; height: 24px; color: #fff; }
+    .brand h1 { font-size: 1.28rem; margin: 0; font-weight: 800; letter-spacing: -0.01em; line-height: 1.3; }
+    .brand .tg { font-size: 0.72rem; color: var(--tp-muted); margin: 1px 0 0; }
+    .tp-search { display: flex; align-items: center; gap: 9px; background: var(--tp-tile); border-radius: 16px; padding: 13px 16px; color: var(--tp-muted); box-shadow: var(--tp-shadow); margin: 14px 0 0; }
+    .tp-search input { border: none; outline: none; background: none; font-size: 1rem; width: 100%; color: var(--tp-ink); }
+    .tp-search .site-search-ic { width: 18px; height: 18px; }
+    .tp-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 16px 0 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .tp-tabs::-webkit-scrollbar { display: none; }
+    .tp-tab { flex: 0 0 auto; padding: 8px 16px; border-radius: 999px; border: none; background: rgba(120,124,130,0.1); color: var(--tp-ink); font-size: 0.88rem; cursor: pointer; white-space: nowrap; font-weight: 500; }
+    .tp-tab.on { background: var(--tp-ink); color: var(--tp-bg); font-weight: 700; }
+    .tp-sec { display: flex; align-items: baseline; gap: 8px; margin: 20px 2px 10px; }
+    .tp-sec b { font-size: 1.02rem; font-weight: 800; }
+    .tp-sec span { font-size: 0.7rem; color: var(--tp-muted); }
+    .tp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 10px; }
+    @media (min-width: 560px) { .tp-grid { grid-template-columns: repeat(6, 1fr); } }
+    .tile { display: flex; flex-direction: column; align-items: center; gap: 7px; text-decoration: none; color: var(--tp-ink); }
+    .tile[hidden] { display: none; }
+    .tile .ic { width: 100%; aspect-ratio: 1; max-width: 76px; display: flex; align-items: center; justify-content: center; border-radius: 24px; box-shadow: var(--tp-shadow); position: relative; }
+    .tile .ic svg { width: 46%; height: 46%; }
+    /* 名前はラテン文字だと長くなるため2行まで折り返す(日本語版はnowrap) */
+    .tile .nm { font-size: 0.71rem; font-weight: 600; text-align: center; letter-spacing: -0.01em; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
+    .tile .rk { position: absolute; top: -7px; left: -3px; min-width: 20px; height: 20px; border-radius: 999px; background: var(--tp-gold); color: #fff; font-size: 0.68rem; font-weight: 800; display: flex; align-items: center; justify-content: center; padding: 0 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    .tile .rk.silver { background: #9aa2ab; }
+    .tile .rk.bronze { background: #b0795a; }
+    .tile .rk.plain { background: var(--tp-tile); color: var(--tp-muted); box-shadow: inset 0 0 0 1.5px rgba(120,124,130,0.25); }
+    .g0 { background: #e4f2ea; color: #0e7d59; }
+    .g1 { background: #f7ecd9; color: #a3690f; }
+    .g2 { background: #e5edf9; color: #3a66a8; }
+    .g3 { background: #eee8f7; color: #6f4fa8; }
+    @media (prefers-color-scheme: dark) {
+      .g0 { background: #20352b; color: #4fc596; }
+      .g1 { background: #382e1c; color: #d9a04a; }
+      .g2 { background: #222e41; color: #7ba3e0; }
+      .g3 { background: #2e2740; color: #a98ce0; }
+    }
+    .no-hit { color: var(--tp-muted); font-size: 0.88rem; margin: 8px 2px; }
+    .poll-card { display: flex; align-items: center; gap: 14px; background: var(--tp-tile); border-radius: 20px; padding: 16px; text-decoration: none; color: var(--tp-ink); box-shadow: var(--tp-shadow); }
+    .poll-card .pic { width: 52px; height: 52px; flex: 0 0 auto; border-radius: 17px; background: #fde8ec; color: #d64560; display: flex; align-items: center; justify-content: center; }
+    .poll-card .pic svg { width: 26px; height: 26px; }
+    .poll-card .pt b { display: block; font-size: 0.98rem; font-weight: 800; }
+    .poll-card .pt small { display: block; font-size: 0.76rem; color: var(--tp-muted); margin-top: 2px; line-height: 1.5; }
+    @media (prefers-color-scheme: dark) { .poll-card .pic { background: #3a2229; color: #ff8798; } }
+    .seo-list { margin-top: 34px; font-size: 0.85rem; }
+    .seo-list summary { cursor: pointer; color: var(--tp-muted); font-weight: 600; }
+    .seo-list h3 { font-size: 0.95rem; margin: 14px 0 4px; }
+    .seo-list ul { padding-left: 1.2em; margin: 4px 0; }
+    .seo-list li { margin: 3px 0; color: var(--tp-muted); }
+    .about { margin-top: 28px; font-size: 0.85rem; color: var(--tp-muted); }
+  </style>
 </head>
 <body>
-<!-- @partial:header start -->
-<header class="site-header">
-  <a class="site-brand" href="./"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
-</header>
-<!-- @partial:header end -->
+<!-- @langsw start -->
+<div class="lang-bar">
+  <nav class="lang-switch" aria-label="언어"><span class="lang-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 2.6 15 0 18M12 3c-2.6 2.6-2.6 15 0 18"/></svg>Language</span><a href="/" lang="ja" hreflang="ja">日本語</a><a href="/en/" lang="en" hreflang="en">English</a><a href="/zh/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+</div>
+<!-- @langsw end -->
 <main>
-  <h1>Quick Calc</h1>
-  <p>일본 생활에 유용한 무료 계산 도구. 모든 도구에 계산식과 1차 정보 출처를 명시합니다.</p>
-  <h2>건강</h2>
-  <ul class="related">
-    <li><a href="./tools/alcohol/">순수 알코올량 계산기</a> — 술의 양과 도수만 입력하면 순수 알코올량(g)과 드링크 수를 무료로 계산.</li>
-    <li><a href="./tools/bmi/">BMI·표준체중 계산기</a> — 키와 몸무게만 입력하면 BMI와 표준체중(BMI 22)을 무료로 계산.</li>
-    <li><a href="./tools/bmr/">기초대사량 계산기</a> — 나이·성별·몸무게만 입력하면 하루 기초대사량(kcal)을 무료로 계산합니다.</li>
-    <li><a href="./tools/caffeine/">카페인 섭취량 계산기</a> — 커피·홍차·녹차·에너지 드링크 등의 카페인량을 합산해 하루 기준(건강한 성인 400mg·임신 중에는 더 적게)과 비교합니다.</li>
-    <li><a href="./tools/cycle/">수면 사이클 계산기</a> — 기상 시각에서 거꾸로 계산해 약 90분 수면 주기의 경계에 맞는 취침 시각 후보를 보여줍니다.</li>
-    <li><a href="./tools/hosu/">걸음 수→거리·칼로리 환산 계산기</a> — 걸음 수와 키로 걸은 거리(km)·시간·소모 칼로리의 대략적인 값을 계산합니다.</li>
-    <li><a href="./tools/ninshin/">출산 예정일·임신 주수 계산기</a> — 마지막 생리 시작일로 출산 예정일과 현재 임신 주수(〇주 △일)를 무료로 계산.</li>
-    <li><a href="./tools/pace/">러닝 페이스 계산기</a> — 거리와 목표 시간으로 1km당 페이스와 시속을 무료로 계산합니다.</li>
-    <li><a href="./tools/protein/">단백질 섭취량 계산기</a> — 몸무게와 운동량으로 하루 단백질 섭취 기준량을 계산합니다.</li>
-    <li><a href="./tools/shinpaku/">목표 심박수 계산기(카보넨 공식)</a> — 나이와 안정 시 심박수로 지방 연소·지구력 향상에 알맞은 목표 심박수 구간을 카보넨(Karvonen) 공식으로 계산.</li>
-    <li><a href="./tools/shio/">염분량 계산기(나트륨⇔식염상당량)</a> — 식품 표시의 나트륨(mg)을 식염상당량(g)으로 한 번에 환산, 무료.</li>
-    <li><a href="./tools/sleep/">수면 시간 계산기</a> — 취침 시각과 기상 시각만 입력하면 수면 시간을 무료로 계산.</li>
-    <li><a href="./tools/sports/">운동별 소모 칼로리 계산기</a> — 조깅·사이클링·수영·테니스·근력운동·줄넘기·요가 등 13종 운동의 소모 칼로리를 METs 방식(공식 METs표)으로 계산합니다.</li>
-    <li><a href="./tools/tdee/">하루 섭취 칼로리 계산기</a> — 나이·성별·몸무게·활동량으로 하루에 필요한 섭취 칼로리 기준(추정 에너지 필요량)을 무료로 계산합니다.</li>
-    <li><a href="./tools/walking/">걷기 소모 칼로리 계산기</a> — 몸무게·시간·걷는 속도로 걷기의 소모 칼로리를 METs 방식(일본 후생노동성 공식)으로 계산합니다.</li>
-  </ul>
-  <h2>돈</h2>
-  <ul class="related">
-    <li><a href="./tools/compound/">복리·적립투자 시뮬레이션</a> — 매달 적립액과 예상 수익률을 넣으면 장래에 얼마가 되는지 무료로 시뮬레이션합니다.</li>
-    <li><a href="./tools/denki/">전기요금 계산기</a> — 가전의 소비전력(W)과 사용 시간으로 하루·한 달·1년 전기요금(엔)을 무료로 계산합니다.</li>
-    <li><a href="./tools/fudosan/">일본 부동산 투자 수지·손익분기 계산기</a> — 5개 항목만 입력하면 일본 투자용 부동산을 「몇 년째에 팔아야 통산 손익이 플러스가 되는지」 알 수 있습니다.</li>
-    <li><a href="./tools/fuel/">주유비 계산기</a> — 주행 거리·연비·휘발유 단가로 드라이브나 통근에 드는 주유비와 사용 연료를 무료로 계산합니다.</li>
-    <li><a href="./tools/genka/">이익률·원가율 계산기</a> — 판매가와 원가를 입력하면 마진·이익률·원가율을 바로 계산합니다.</li>
-    <li><a href="./tools/hiwari/">일본 월세 일할 계산기</a> — 일본에서 월 중간에 입주·퇴거할 때의 일할(日割) 월세를 무료로 계산.</li>
-    <li><a href="./tools/jikyu/">시급⇔월급·연봉 환산기</a> — 시급과 하루 근무시간·월 근무일수로 세전 월급과 연봉을 무료로 바로 계산합니다.</li>
-    <li><a href="./tools/kariire/">일본 주택담보대출 대출가능액 계산기</a> — 연봉·상환부담률·금리·기간을 넣으면 일본 주택담보대출로 얼마까지 빌릴 수 있는지 대략적인 금액을 역산합니다.</li>
-    <li><a href="./tools/loan/">대출 상환 계산기(원리금균등상환)</a> — 대출금·금리·상환 기간을 넣으면 매달 상환액·총상환액·이자 총액을 무료로 계산합니다(원리금균등상환).</li>
-    <li><a href="./tools/nenpi/">연비 계산기(가득 주유법)</a> — 주행거리와 주유량으로 실연비(km/L)를 가득 주유법으로 계산합니다.</li>
-    <li><a href="./tools/point/">할인과 포인트 적립 어느 쪽이 이득? 계산기</a> — 「10% 할인」과 「10% 포인트 적립」은 같지 않다?</li>
-    <li><a href="./tools/tanka/">단가 비교 계산기(어느 쪽이 쌀까?)</a> — 가격과 용량만 입력하면 「100g당」「1개당」 단가를 나란히 비교합니다.</li>
-    <li><a href="./tools/tax/">일본 소비세 계산기(세금 포함⇔제외)</a> — 세금 제외→포함, 포함→제외를 한 번에 계산하는 무료 일본 소비세 계산기.</li>
-    <li><a href="./tools/teiki/">정기권 본전 계산기(며칠 타면 이득?)</a> — 일본 정기권(定期券)의 가격과 편도 운임을 넣으면 한 달에 며칠을 타야 본전을 뽑는지 계산합니다.</li>
-    <li><a href="./tools/tip/">팁 계산기(해외여행용)</a> — 금액과 팁 비율(15%·18%·20%)을 넣으면 팁 금액, 팁을 포함한 합계, 더치페이 시 1인당 금액까지 한 번에 계산합니다.</li>
-    <li><a href="./tools/waribiki/">할인 계산기(○% 할인하면 얼마?)</a> — 「30% 할인하면 얼마?」를 한 번에 계산.</li>
-    <li><a href="./tools/warikan/">더치페이(와리캉) 계산기</a> — 총액과 인원수만 입력하면 1인당 낼 금액을 무료로 계산합니다.</li>
-    <li><a href="./tools/yukyu/">연차 유급휴가 부여일수 계산기</a> — 근속연수와 근무 형태(주당 근무일수)로 일본에서 받을 수 있는 연차 유급휴가 일수를 무료로 계산합니다.</li>
-    <li><a href="./tools/zangyo/">잔업수당 계산기(일본)</a> — 기초시급과 잔업시간을 입력하면 일본 법률이 정한 잔업수당(가산임금)을 무료로 계산합니다.</li>
-  </ul>
-  <h2>날짜·시간</h2>
-  <ul class="related">
-    <li><a href="./tools/age/">나이 계산기(만 나이·띠·하야우마레 판정)</a> — 생년월일로 만 나이와 띠, 일본 학년 기준 「하야우마레」(1월 1일〜4월 1일 출생) 여부를 무료로 계산.</li>
-    <li><a href="./tools/days/">일수 계산기(날짜 차이·○일 후)</a> — 두 날짜 사이의 일수와 기준일에서 ○일 후(○일 전)의 날짜·요일을 무료로 계산합니다.</li>
-    <li><a href="./tools/eigyobi/">일본 영업일 계산기(주말·공휴일 제외)</a> — 「3영업일 후는 언제?」를 주말과 일본 공휴일(대체공휴일 포함)을 빼고 즉시 계산.</li>
-    <li><a href="./tools/gakunen/">일본 학년 계산기</a> — 생년월일만 넣으면 일본 학교에서 지금 몇 학년인지(초등학교 1학년〜고등학교 3학년) 바로 알 수 있는 무료 도구입니다.</li>
-    <li><a href="./tools/jikan/">시간 계산기(합계·시각 차이)</a> — 「1:30+0:45+8:00」 같은 시간 합계와 시작〜종료 시각의 경과 시간을 계산.</li>
-    <li><a href="./tools/kinenbi/">기념일 카운트 계산기</a> — 생일이나 기념일을 입력하면 「오늘로 며칠째인지」와 100일째·1000일째·1만 일째 등 기념일 날짜를 무료로 한 번에 계산합니다.</li>
-    <li><a href="./tools/rireki/">입학·졸업 연도 계산기(일본 이력서용)</a> — 생년월일을 넣으면 일본 학제(4월 입학·3월 졸업)에 따라 초등학교부터 대학교까지의 입학·졸업 연도를 계산해, 일본 이력서(履歴書)의 학력란에 그대로 적을 수 있습니다.</li>
-    <li><a href="./tools/shukujitsu/">일본 공휴일 달력</a> — 2026년·2027년 일본의 공휴일을 한눈에 확인하고 다음 공휴일까지 며칠 남았는지 바로 알 수 있습니다.</li>
-    <li><a href="./tools/tsukisu/">○개월 후·개월 수 계산기</a> — 「3개월 후는 며칠?」「이 두 날짜는 몇 개월 차이?」를 월말 조정까지 반영해 무료로 정확하게 계산합니다.</li>
-    <li><a href="./tools/wareki/">서기·일본 연호(와레키) 변환기</a> — 서기⇔일본 연호(메이지·다이쇼·쇼와·헤이세이·레이와)를 무료로 즉시 변환.</li>
-  </ul>
-  <h2>생활·변환</h2>
-  <ul class="related">
-    <li><a href="./tools/byte/">데이터 용량 변환(KB·MB·GB·TB)</a> — 용량을 입력하면 KB·MB·GB·TB 전체 단위의 값을 한 번에 변환합니다.</li>
-    <li><a href="./tools/heikin/">평균·중앙값 계산기</a> — 숫자를 붙여넣기만 하면 평균·중앙값·최대·최소·합계를 한 번에 계산합니다.</li>
-    <li><a href="./tools/hensachi/">편차치 계산기</a> — 일본 입시에서 쓰이는 「편차치」(평균 50·표준편차 10으로 환산한 표준화 점수)를 무료로 계산합니다.</li>
-    <li><a href="./tools/inch/">인치⇔cm·파운드⇔kg 변환 계산기</a> — 인치와 센티미터, 파운드와 킬로그램을 무료로 바로 상호 변환합니다.</li>
-    <li><a href="./tools/jusho/">일본 주소 영문 변환기</a> — 우편번호만 입력하면 일본 주소를 영문 표기(로마자·역순)로 바꾸고, 반대로 로마자로 쓴 주소를 일본어 표기(〒+한자)로 되돌려 주는 무료 도구입니다.</li>
-    <li><a href="./tools/kome/">쌀 합(合)·그램 환산 계산기</a> — 쌀 1합(合)=약 150g, 물은 1합당 약 200ml 기준으로, 합 수에서 쌀 무게·물 양·밥이 되는 양·밥공기 수를 한 번에 계산.</li>
-    <li><a href="./tools/mile/">마일⇔km 환산 계산기</a> — 마일과 킬로미터를 정의값으로 정확하게 상호 환산하고 해리(노티컬 마일)도 지원합니다.</li>
-    <li><a href="./tools/moji/">글자 수 세기</a> — 텍스트를 붙여넣기만 하면 글자 수를 즉시 세어 줍니다(공백 포함/제외 동시 표시).</li>
-    <li><a href="./tools/ondo/">온도 변환 계산기</a> — 섭씨(°C)·화씨(°F)·켈빈(K)을 한 번에 상호 변환합니다.</li>
-    <li><a href="./tools/password/">비밀번호 생성기</a> — 안전한 랜덤 비밀번호를 사용 중인 기기 안에서 생성합니다.</li>
-    <li><a href="./tools/percent/">퍼센트 계산기</a> — 「A는 B의 몇 %?」「A의 ○%는 얼마?」「A에서 B로 몇 % 증가(감소)?」 세 가지를 무료로 바로 계산합니다.</li>
-    <li><a href="./tools/petage/">강아지·고양이 나이 환산 계산기</a> — 고양이와 소형·중형견의 나이를 사람 나이로 무료 환산: 1살≈사람 15세, 2살≈24세, 이후 매년 약 +4세의 기준 공식으로 계산합니다.</li>
-    <li><a href="./tools/renji/">전자레인지 가열시간 환산기</a> — 포장에 적힌 가열시간을 우리 집 전자레인지 와트수에 맞는 시간으로 무료 즉시 환산합니다.</li>
-    <li><a href="./tools/roman/">로마 숫자 변환기</a> — 아라비아 숫자와 로마 숫자(I·V·X·L·C·D·M)를 무료로 즉시 상호 변환합니다.</li>
-    <li><a href="./tools/seiza/">별자리·탄생석 계산기</a> — 생일을 입력하면 12별자리와 탄생석을 무료로 바로 표시합니다.</li>
-    <li><a href="./tools/shincho/">키 피트·인치 변환</a> — 키의 cm와 피트·인치 표기(5'7″ 등)를 서로 변환.</li>
-    <li><a href="./tools/speed/">속도·시간·거리 계산기</a> — 속도(km/h)·거리(km)·시간 중 두 개를 입력하면 나머지 하나를 무료로 자동 계산합니다.</li>
-    <li><a href="./tools/spoon/">큰술·작은술·컵 환산 계산기</a> — 큰술 1=15ml, 작은술 1=5ml, 1컵=200ml(일본 기준)로 상호 환산.</li>
-    <li><a href="./tools/tsubo/">쓰보(坪)·제곱미터(㎡)·조(畳) 변환기</a> — 일본 부동산 광고와 평면도에 나오는 면적 단위인 쓰보(坪)⇔제곱미터(㎡)⇔조(畳, 다다미)를 무료로 한 번에 상호 변환합니다.</li>
-    <li><a href="./tools/zenkaku/">전각⇔반각 변환 도구</a> — 전각 영숫자·기호·공백을 한 번에 반각으로 변환합니다(반대 방향도 가능).</li>
-  </ul>
+  <div class="brand">
+    <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg></span>
+    <div>
+      <h1>Quick Calc</h1>
+      <p class="tg">생활 속 계산 도구 64개 · 가입 불필요 · 모두 무료</p>
+    </div>
+  </div>
+
+  <div class="tp-search" id="search"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input type="search" id="search-input" placeholder="검색(예: 월세, 주소, 영업일)" aria-label="도구 검색" autocomplete="off"></div>
+  <div class="tp-tabs" id="tabs" role="tablist"></div>
+
+  <div id="pop-sec">
+    <div class="tp-sec"><b>인기</b></div>
+    <div class="tp-grid" id="popular"></div>
+  </div>
+
+  <div class="tp-sec" id="genre-title"><b>전체</b><span>64 개</span></div>
+  <p class="no-hit" id="no-hit" hidden>해당하는 도구가 없습니다. 다른 말로 검색해 보세요(예: 월세, 할인, 칼로리).</p>
+  <div class="tp-grid" id="grid">
+      <a class="tile" href="./tools/alcohol/" data-slug="alcohol" data-cat="健康" data-kw="순수 알코올량 계산기 술의 양과 도수만 입력하면 순수 알코올량(g)과 드링크 수를 무료로 계산." title="순수 알코올량 계산기">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="6" width="9" height="13.5" rx="1.5"/><path d="M14.5 9.5h2a2.5 2.5 0 0 1 2.5 2.5v2a2.5 2.5 0 0 1-2.5 2.5h-2"/><path d="M5.5 9.5h9"/><path d="M8.5 12.5v4M11.5 12.5v4"/></svg></span><span class="nm">순수 알코올량</span>
+      </a>
+      <a class="tile" href="./tools/bmi/" data-slug="bmi" data-cat="健康" data-kw="BMI·표준체중 계산기 키와 몸무게만 입력하면 BMI와 표준체중(BMI 22)을 무료로 계산." title="BMI·표준체중 계산기">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="3.5" width="15" height="17" rx="3"/><path d="M9 8.5a3 3 0 0 1 6 0"/><path d="M12 8.5l1.5-1.8"/><ellipse cx="9.6" cy="15.3" rx="1.3" ry="2.2"/><ellipse cx="14.4" cy="15.3" rx="1.3" ry="2.2"/></svg></span><span class="nm">BMI·표준체중</span>
+      </a>
+      <a class="tile" href="./tools/bmr/" data-slug="bmr" data-cat="健康" data-kw="기초대사량 계산기 나이·성별·몸무게만 입력하면 하루 기초대사량(kcal)을 무료로 계산합니다." title="기초대사량 계산기">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c1.2 3.4 4.8 5.4 4.8 9.6a4.8 4.8 0 0 1-9.6 0c0-2.2 1-3.7 2.1-5.5.3 1.7 1 2.7 2 3.2-.1-2.5.1-5 .7-7.3z"/></svg></span><span class="nm">기초대사량</span>
+      </a>
+      <a class="tile" href="./tools/caffeine/" data-slug="caffeine" data-cat="健康" data-kw="카페인 섭취량 계산기 커피·홍차·녹차·에너지 드링크 등의 카페인량을 합산해 하루 기준(건강한 성인 400mg·임신 중에는 더 적게)과 비교합니다." title="카페인 섭취량 계산기">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 10.5h11v4.5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 11.5h1.2a2.4 2.4 0 0 1 0 4.8H16"/><path d="M8.5 4c0 1.6 1.5 1.6 1.5 3.2M12.5 4c0 1.6 1.5 1.6 1.5 3.2"/></svg></span><span class="nm">카페인 섭취량</span>
+      </a>
+      <a class="tile" href="./tools/cycle/" data-slug="cycle" data-cat="健康" data-kw="수면 사이클 계산기 기상 시각에서 거꾸로 계산해 약 90분 수면 주기의 경계에 맞는 취침 시각 후보를 보여줍니다." title="수면 사이클 계산기">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.1 8.1a4.4 4.4 0 1 0 3.1 6.5 3.8 3.8 0 0 1-3.1-6.5z"/><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5"/><path d="M20.5 12l2.2-2.2M20.5 12l-2.5-1.9"/></svg></span><span class="nm">수면 사이클</span>
+      </a>
+      <a class="tile" href="./tools/hosu/" data-slug="hosu" data-cat="健康" data-kw="걸음 수→거리·칼로리 환산 계산기 걸음 수와 키로 걸은 거리(km)·시간·소모 칼로리의 대략적인 값을 계산합니다." title="걸음 수→거리·칼로리 환산 계산기">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="7.3" cy="6.6" rx="2" ry="2.9" transform="rotate(-12 7.3 6.6)"/><circle cx="8.2" cy="11.2" r="1"/><ellipse cx="14.1" cy="12" rx="2" ry="2.9" transform="rotate(-12 14.1 12)"/><circle cx="15" cy="16.5" r="1"/><path d="M6 20.7h12m0 0l-2.4-2.2m2.4 2.2l-2.4 2.2"/></svg></span><span class="nm">걸음 수→거리·칼로리</span>
+      </a>
+      <a class="tile" href="./tools/ninshin/" data-slug="ninshin" data-cat="健康" data-kw="출산 예정일·임신 주수 계산기 마지막 생리 시작일로 출산 예정일과 현재 임신 주수(〇주 △일)를 무료로 계산." title="출산 예정일·임신 주수 계산기">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="7.5"/><path d="M12 5.5c-.2-1.6 1-2.8 2.4-2.4"/><path d="M9.3 12.5h.01M14.7 12.5h.01"/><path d="M9.5 15.5a3.3 3.3 0 0 0 5 0"/></svg></span><span class="nm">출산 예정일·임신 주수</span>
+      </a>
+      <a class="tile" href="./tools/pace/" data-slug="pace" data-cat="健康" data-kw="러닝 페이스 계산기 거리와 목표 시간으로 1km당 페이스와 시속을 무료로 계산합니다." title="러닝 페이스 계산기">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 6V3.5M9.5 3.5h5"/><path d="M12 13.5l3-2.8"/></svg></span><span class="nm">러닝 페이스</span>
+      </a>
+      <a class="tile" href="./tools/protein/" data-slug="protein" data-cat="健康" data-kw="단백질 섭취량 계산기 몸무게와 운동량으로 하루 단백질 섭취 기준량을 계산합니다." title="단백질 섭취량 계산기">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="14.5" cy="9" r="5.5"/><path d="M10.5 12.8L6 17.3"/><circle cx="5" cy="18.3" r="1.7"/><circle cx="7.6" cy="20.4" r="1.7"/></svg></span><span class="nm">단백질 섭취량</span>
+      </a>
+      <a class="tile" href="./tools/shinpaku/" data-slug="shinpaku" data-cat="健康" data-kw="목표 심박수 계산기(카보넨 공식) 나이와 안정 시 심박수로 지방 연소·지구력 향상에 알맞은 목표 심박수 구간을 카보넨(Karvonen) 공식으로 계산." title="목표 심박수 계산기(카보넨 공식)">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20C5.5 14.5 4.3 9.6 7.6 7c2.2-1.7 4.4.2 4.4 2 0-1.8 2.2-3.7 4.4-2 3.3 2.6 2.1 7.5-4.4 13z"/><path d="M7 12h3l1.5-2.5 1.8 4 1.4-1.5H17"/></svg></span><span class="nm">목표 심박수</span>
+      </a>
+      <a class="tile" href="./tools/shio/" data-slug="shio" data-cat="健康" data-kw="염분량 계산기(나트륨⇔식염상당량) 식품 표시의 나트륨(mg)을 식염상당량(g)으로 한 번에 환산, 무료." title="염분량 계산기(나트륨⇔식염상당량)">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="3.5" rx="1"/><path d="M8.5 6.5h7l1 12a2 2 0 0 1-2 2.2h-5a2 2 0 0 1-2-2.2z"/><path d="M11 10.5h.01M13 12.5h.01M11.5 14.5h.01"/></svg></span><span class="nm">염분량</span>
+      </a>
+      <a class="tile" href="./tools/sleep/" data-slug="sleep" data-cat="健康" data-kw="수면 시간 계산기 취침 시각과 기상 시각만 입력하면 수면 시간을 무료로 계산." title="수면 시간 계산기">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 3.5a8.5 8.5 0 1 0 6 12.5 7.3 7.3 0 0 1-6-12.5z"/></svg></span><span class="nm">수면 시간</span>
+      </a>
+      <a class="tile" href="./tools/sports/" data-slug="sports" data-cat="健康" data-kw="운동별 소모 칼로리 계산기 조깅·사이클링·수영·테니스·근력운동·줄넘기·요가 등 13종 운동의 소모 칼로리를 METs 방식(공식 METs표)으로 계산합니다." title="운동별 소모 칼로리 계산기">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12h8"/><rect x="4.6" y="7.5" width="2.6" height="9" rx="1"/><rect x="16.8" y="7.5" width="2.6" height="9" rx="1"/><rect x="2.1" y="9.6" width="1.8" height="4.8" rx="0.9"/><rect x="20.1" y="9.6" width="1.8" height="4.8" rx="0.9"/></svg></span><span class="nm">운동별 소모 칼로리</span>
+      </a>
+      <a class="tile" href="./tools/tdee/" data-slug="tdee" data-cat="健康" data-kw="하루 섭취 칼로리 계산기 나이·성별·몸무게·활동량으로 하루에 필요한 섭취 칼로리 기준(추정 에너지 필요량)을 무료로 계산합니다." title="하루 섭취 칼로리 계산기">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.5v6.5M5.2 3.5v3.3a1.8 1.8 0 0 0 3.6 0V3.5"/><path d="M7 10v10.5"/><path d="M17.6 3.5c-2.2 2.6-2.2 6.4.4 8V20.5"/></svg></span><span class="nm">하루 섭취 칼로리</span>
+      </a>
+      <a class="tile" href="./tools/walking/" data-slug="walking" data-cat="健康" data-kw="걷기 소모 칼로리 계산기 몸무게·시간·걷는 속도로 걷기의 소모 칼로리를 METs 방식(일본 후생노동성 공식)으로 계산합니다." title="걷기 소모 칼로리 계산기">
+        <span class="ic g0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="8.3" cy="7.3" rx="2.2" ry="3.2" transform="rotate(-12 8.3 7.3)"/><circle cx="9.3" cy="12.4" r="1.1"/><ellipse cx="15.7" cy="14.1" rx="2.2" ry="3.2" transform="rotate(-12 15.7 14.1)"/><circle cx="16.7" cy="19.2" r="1.1"/></svg></span><span class="nm">걷기 소모 칼로리</span>
+      </a>
+      <a class="tile" href="./tools/compound/" data-slug="compound" data-cat="お金" data-kw="복리·적립투자 시뮬레이션 매달 적립액과 예상 수익률을 넣으면 장래에 얼마가 되는지 무료로 시뮬레이션합니다." title="복리·적립투자 시뮬레이션">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 15.5l3.8-4 2.8 2.8 5-5.8"/><path d="M15 8.5h3.6V12"/></svg></span><span class="nm">복리·적립투자</span>
+      </a>
+      <a class="tile" href="./tools/denki/" data-slug="denki" data-cat="お金" data-kw="전기요금 계산기 가전의 소비전력(W)과 사용 시간으로 하루·한 달·1년 전기요금(엔)을 무료로 계산합니다." title="전기요금 계산기">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.2 15.2a5.8 5.8 0 1 1 5.6 0c-.8.5-1 1.3-1 2.3h-3.6c0-1-.2-1.8-1-2.3z"/><path d="M10 20.5h4"/></svg></span><span class="nm">전기요금</span>
+      </a>
+      <a class="tile" href="./tools/fudosan/" data-slug="fudosan" data-cat="お金" data-kw="일본 부동산 투자 수지·손익분기 계산기 5개 항목만 입력하면 일본 투자용 부동산을 「몇 년째에 팔아야 통산 손익이 플러스가 되는지」 알 수 있습니다." title="일본 부동산 투자 수지·손익분기 계산기">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v8.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M9.8 11.5l2.2 3 2.2-3M12 14.5v4M10.2 15.8h3.6M10.2 17.8h3.6"/></svg></span><span class="nm">일본 부동산 투자…</span>
+      </a>
+      <a class="tile" href="./tools/fuel/" data-slug="fuel" data-cat="お金" data-kw="주유비 계산기 주행 거리·연비·휘발유 단가로 드라이브나 통근에 드는 주유비와 사용 연료를 무료로 계산합니다." title="주유비 계산기">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="4" width="9.5" height="16" rx="1.5"/><path d="M7 7h4.5v4H7z"/><path d="M14 11h2.5a1.5 1.5 0 0 1 1.5 1.5V17"/><path d="M18 12l1.5-1.5-1.5-1.5" transform="translate(0 -1.5)"/></svg></span><span class="nm">주유비</span>
+      </a>
+      <a class="tile" href="./tools/genka/" data-slug="genka" data-cat="お金" data-kw="이익률·원가율 계산기 판매가와 원가를 입력하면 마진·이익률·원가율을 바로 계산합니다." title="이익률·원가율 계산기">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 12V3.5"/><path d="M12 12l6.5 5.5"/></svg></span><span class="nm">이익률·원가율</span>
+      </a>
+      <a class="tile" href="./tools/hiwari/" data-slug="hiwari" data-cat="お金" data-kw="일본 월세 일할 계산기 일본에서 월 중간에 입주·퇴거할 때의 일할(日割) 월세를 무료로 계산." title="일본 월세 일할 계산기">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5L12 4l8 6.5v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><rect x="8.3" y="11" width="7.4" height="6.3" rx="1"/><path d="M8.3 13.4h7.4M10.6 11V9.6M13.4 11V9.6"/></svg></span><span class="nm">일본 월세 일할</span>
+      </a>
+      <a class="tile" href="./tools/jikyu/" data-slug="jikyu" data-cat="お金" data-kw="시급⇔월급·연봉 환산기 시급과 하루 근무시간·월 근무일수로 세전 월급과 연봉을 무료로 바로 계산합니다." title="시급⇔월급·연봉 환산기">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.3" cy="10.3" r="6.8"/><path d="M10.3 6.5v3.8l2.6 1.6"/><circle cx="17.7" cy="17.7" r="4.5"/><path d="M16 15.8l1.7 2.2 1.7-2.2M17.7 18v2.5M16.3 18.9h2.8"/></svg></span><span class="nm">시급⇔월급·연봉 환산기</span>
+      </a>
+      <a class="tile" href="./tools/kariire/" data-slug="kariire" data-cat="お金" data-kw="일본 주택담보대출 대출가능액 계산기 연봉·상환부담률·금리·기간을 넣으면 일본 주택담보대출로 얼마까지 빌릴 수 있는지 대략적인 금액을 역산합니다." title="일본 주택담보대출 대출가능액 계산기">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5L12 4l8 6.5V19.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><circle cx="11.2" cy="13" r="3.1"/><path d="M13.5 15.3l2.8 2.8"/></svg></span><span class="nm">일본 주택담보대출…</span>
+      </a>
+      <a class="tile" href="./tools/loan/" data-slug="loan" data-cat="お金" data-kw="대출 상환 계산기(원리금균등상환) 대출금·금리·상환 기간을 넣으면 매달 상환액·총상환액·이자 총액을 무료로 계산합니다(원리금균등상환)." title="대출 상환 계산기(원리금균등상환)">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9l8-5 8 5z"/><path d="M6.5 11.5v6M12 11.5v6M17.5 11.5v6"/><path d="M4 20.5h16"/></svg></span><span class="nm">대출 상환</span>
+      </a>
+      <a class="tile" href="./tools/nenpi/" data-slug="nenpi" data-cat="お金" data-kw="연비 계산기(가득 주유법) 주행거리와 주유량으로 실연비(km/L)를 가득 주유법으로 계산합니다." title="연비 계산기(가득 주유법)">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 13.8l1.7-4.1a2 2 0 0 1 1.9-1.2h7.8a2 2 0 0 1 1.9 1.2l1.7 4.1v4.4h-2.4"/><path d="M4.5 13.8v4.4h2.4"/><path d="M4.5 13.8h15"/><circle cx="8.2" cy="18.4" r="1.6"/><circle cx="15.8" cy="18.4" r="1.6"/><path d="M9.8 18.4h4.4"/><path d="M18.9 2.8c1 1.3 1.6 2.1 1.6 3a1.9 1.9 0 1 1-3.8 0c0-.9.7-1.7 2.2-3z" transform="translate(-6.9 0)"/></svg></span><span class="nm">연비</span>
+      </a>
+      <a class="tile" href="./tools/point/" data-slug="point" data-cat="お金" data-kw="할인과 포인트 적립 어느 쪽이 이득? 계산기 「10% 할인」과 「10% 포인트 적립」은 같지 않다?" title="할인과 포인트 적립 어느 쪽이 이득? 계산기">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="1.2"/><path d="M3.5 6.8h17v3.2h-17z"/><path d="M12 6.8V20"/><path d="M12 6.5C10 3 6.5 4.5 8.5 6.5M12 6.5c2-3.5 5.5-2 3.5 0"/></svg></span><span class="nm">할인과 포인트 적립…</span>
+      </a>
+      <a class="tile" href="./tools/tanka/" data-slug="tanka" data-cat="お金" data-kw="단가 비교 계산기(어느 쪽이 쌀까?) 가격과 용량만 입력하면 「100g당」「1개당」 단가를 나란히 비교합니다." title="단가 비교 계산기(어느 쪽이 쌀까?)">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 4.5h2.3l2.2 11h9.8l2.4-8H7.2"/><circle cx="9.7" cy="19.3" r="1.5"/><circle cx="15.9" cy="19.3" r="1.5"/></svg></span><span class="nm">단가 비교</span>
+      </a>
+      <a class="tile" href="./tools/tax/" data-slug="tax" data-cat="お金" data-kw="일본 소비세 계산기(세금 포함⇔제외) 세금 제외→포함, 포함→제외를 한 번에 계산하는 무료 일본 소비세 계산기." title="일본 소비세 계산기(세금 포함⇔제외)">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h10v18l-2.5-1.6L12 21l-2.5-1.6L7 21z"/><path d="M9.8 8h4.4M9.8 11.2h4.4M9.8 14.4h2.4"/></svg></span><span class="nm">일본 소비세</span>
+      </a>
+      <a class="tile" href="./tools/teiki/" data-slug="teiki" data-cat="お金" data-kw="정기권 본전 계산기(며칠 타면 이득?) 일본 정기권(定期券)의 가격과 편도 운임을 넣으면 한 달에 며칠을 타야 본전을 뽑는지 계산합니다." title="정기권 본전 계산기(며칠 타면 이득?)">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3.5" width="14" height="14.5" rx="3"/><rect x="7.5" y="6.5" width="9" height="4.5" rx="0.8"/><path d="M8.5 14.5h.01M15.5 14.5h.01"/><path d="M8 18l-1.8 3M16 18l1.8 3"/></svg></span><span class="nm">정기권 본전</span>
+      </a>
+      <a class="tile" href="./tools/tip/" data-slug="tip" data-cat="お金" data-kw="팁 계산기(해외여행용) 금액과 팁 비율(15%·18%·20%)을 넣으면 팁 금액, 팁을 포함한 합계, 더치페이 시 1인당 금액까지 한 번에 계산합니다." title="팁 계산기(해외여행용)">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 6.5v11"/><path d="M14.8 8.8a2.9 2.4 0 1 0-2.8 3.2 2.9 2.4 0 1 1-2.8 3.2"/></svg></span><span class="nm">팁</span>
+      </a>
+      <a class="tile" href="./tools/waribiki/" data-slug="waribiki" data-cat="お金" data-kw="할인 계산기(○% 할인하면 얼마?) 「30% 할인하면 얼마?」를 한 번에 계산." title="할인 계산기(○% 할인하면 얼마?)">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h7.2L20 12.8 12.8 20 4 11.2z"/><circle cx="7.6" cy="7.6" r="1.3"/><path d="M11 16l4.6-4.6"/><circle cx="11.2" cy="12" r="1.2"/><circle cx="15.4" cy="15.6" r="1.2"/></svg></span><span class="nm">할인</span>
+      </a>
+      <a class="tile" href="./tools/warikan/" data-slug="warikan" data-cat="お金" data-kw="더치페이(와리캉) 계산기 총액과 인원수만 입력하면 1인당 낼 금액을 무료로 계산합니다." title="더치페이(와리캉) 계산기">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M8 12h8"/><path d="M12 8.2h.01M12 15.8h.01"/></svg></span><span class="nm">더치페이</span>
+      </a>
+      <a class="tile" href="./tools/yukyu/" data-slug="yukyu" data-cat="お金" data-kw="연차 유급휴가 부여일수 계산기 근속연수와 근무 형태(주당 근무일수)로 일본에서 받을 수 있는 연차 유급휴가 일수를 무료로 계산합니다." title="연차 유급휴가 부여일수 계산기">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.8 10.8a8.7 8.7 0 0 1 16.4-2.9z"/><path d="M12.7 9.4L8.5 21"/><path d="M4.5 21h11"/></svg></span><span class="nm">연차 유급휴가 부여일수</span>
+      </a>
+      <a class="tile" href="./tools/zangyo/" data-slug="zangyo" data-cat="お金" data-kw="잔업수당 계산기(일본) 기초시급과 잔업시간을 입력하면 일본 법률이 정한 잔업수당(가산임금)을 무료로 계산합니다." title="잔업수당 계산기(일본)">
+        <span class="ic g1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="13" r="7.5"/><path d="M11 8.5V13l3.2 2"/><path d="M18.7 3.5v4M16.7 5.5h4"/></svg></span><span class="nm">잔업수당</span>
+      </a>
+      <a class="tile" href="./tools/age/" data-slug="age" data-cat="日付" data-kw="나이 계산기(만 나이·띠·하야우마레 판정) 생년월일로 만 나이와 띠, 일본 학년 기준 「하야우마레」(1월 1일〜4월 1일 출생) 여부를 무료로 계산." title="나이 계산기(만 나이·띠·하야우마레 판정)">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="12" width="15" height="8" rx="1.5"/><path d="M9 12V8.5M15 12V8.5"/><path d="M9 8.5c-.8-1 0-2.2.9-2.7M15 8.5c-.8-1 0-2.2.9-2.7" transform="translate(0 -1.5)"/><path d="M3 20h18" transform="translate(0 0.5)"/></svg></span><span class="nm">나이</span>
+      </a>
+      <a class="tile" href="./tools/days/" data-slug="days" data-cat="日付" data-kw="일수 계산기(날짜 차이·○일 후) 두 날짜 사이의 일수와 기준일에서 ○일 후(○일 전)의 날짜·요일을 무료로 계산합니다." title="일수 계산기(날짜 차이·○일 후)">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15.5" rx="2"/><path d="M4 10h16M8.5 3v4M15.5 3v4"/><path d="M8.5 14h.01M12 14h.01M15.5 14h.01M8.5 17h.01M12 17h.01"/></svg></span><span class="nm">일수</span>
+      </a>
+      <a class="tile" href="./tools/eigyobi/" data-slug="eigyobi" data-cat="日付" data-kw="일본 영업일 계산기(주말·공휴일 제외) 「3영업일 후는 언제?」를 주말과 일본 공휴일(대체공휴일 포함)을 빼고 즉시 계산." title="일본 영업일 계산기(주말·공휴일 제외)">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15.5" rx="2"/><path d="M4 10h16M8.5 3v4M15.5 3v4"/><path d="M9 15l2.3 2.3 4-4"/></svg></span><span class="nm">일본 영업일</span>
+      </a>
+      <a class="tile" href="./tools/gakunen/" data-slug="gakunen" data-cat="日付" data-kw="일본 학년 계산기 생년월일만 넣으면 일본 학교에서 지금 몇 학년인지(초등학교 1학년〜고등학교 3학년) 바로 알 수 있는 무료 도구입니다." title="일본 학년 계산기">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12.5" rx="2"/><path d="M7 20.5l2.2-4M17 20.5l-2.2-4"/><path d="M7 8h6M7 11.5h9"/></svg></span><span class="nm">일본 학년</span>
+      </a>
+      <a class="tile" href="./tools/jikan/" data-slug="jikan" data-cat="日付" data-kw="시간 계산기(합계·시각 차이) 「1:30+0:45+8:00」 같은 시간 합계와 시작〜종료 시각의 경과 시간을 계산." title="시간 계산기(합계·시각 차이)">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 6.8V12l3.6 2.2"/></svg></span><span class="nm">시간</span>
+      </a>
+      <a class="tile" href="./tools/kinenbi/" data-slug="kinenbi" data-cat="日付" data-kw="기념일 카운트 계산기 생일이나 기념일을 입력하면 「오늘로 며칠째인지」와 100일째·1000일째·1만 일째 등 기념일 날짜를 무료로 한 번에 계산합니다." title="기념일 카운트 계산기">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20C5.5 14.5 4.3 9.6 7.6 7c2.2-1.7 4.4.2 4.4 2 0-1.8 2.2-3.7 4.4-2 3.3 2.6 2.1 7.5-4.4 13z"/><path d="M4 4.5v3M2.5 6h3M19.5 16.5v3M18 18h3"/></svg></span><span class="nm">기념일 카운트</span>
+      </a>
+      <a class="tile" href="./tools/rireki/" data-slug="rireki" data-cat="日付" data-kw="입학·졸업 연도 계산기(일본 이력서용) 생년월일을 넣으면 일본 학제(4월 입학·3월 졸업)에 따라 초등학교부터 대학교까지의 입학·졸업 연도를 계산해, 일본 이력서(履歴書)의 학력란에 그대로 적을 수 있습니다." title="입학·졸업 연도 계산기(일본 이력서용)">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 9.5L12 5l9.5 4.5L12 14z"/><path d="M6.8 11.8v4.4c0 1.6 2.3 2.9 5.2 2.9s5.2-1.3 5.2-2.9v-4.4"/><path d="M21.5 9.5v5.5"/></svg></span><span class="nm">입학·졸업 연도</span>
+      </a>
+      <a class="tile" href="./tools/shukujitsu/" data-slug="shukujitsu" data-cat="日付" data-kw="일본 공휴일 달력 2026년·2027년 일본의 공휴일을 한눈에 확인하고 다음 공휴일까지 며칠 남았는지 바로 알 수 있습니다." title="일본 공휴일 달력">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15.5" rx="2"/><path d="M4 10h16M8.5 3v4M15.5 3v4"/><path d="M12 12.4l1.1 2.2 2.4.35-1.75 1.7.42 2.4L12 18l-2.17 1.05.42-2.4-1.75-1.7 2.4-.35z"/></svg></span><span class="nm">일본 공휴일 달력</span>
+      </a>
+      <a class="tile" href="./tools/tsukisu/" data-slug="tsukisu" data-cat="日付" data-kw="○개월 후·개월 수 계산기 「3개월 후는 며칠?」「이 두 날짜는 몇 개월 차이?」를 월말 조정까지 반영해 무료로 정확하게 계산합니다." title="○개월 후·개월 수 계산기">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15.5" rx="2"/><path d="M4 10h16M8.5 3v4M15.5 3v4"/><path d="M8.5 15.5h6m0 0l-2-2m2 2l-2 2"/></svg></span><span class="nm">○개월 후·개월 수</span>
+      </a>
+      <a class="tile" href="./tools/wareki/" data-slug="wareki" data-cat="日付" data-kw="서기·일본 연호(와레키) 변환기 서기⇔일본 연호(메이지·다이쇼·쇼와·헤이세이·레이와)를 무료로 즉시 변환." title="서기·일본 연호(와레키) 변환기">
+        <span class="ic g2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 6.5c5.7-1.7 11.3-1.7 17 0"/><path d="M7 5.8V21M17 5.8V21"/><path d="M5.5 10.5h13"/><path d="M12 6.3v4.2"/></svg></span><span class="nm">서기·일본 연호</span>
+      </a>
+      <a class="tile" href="./tools/byte/" data-slug="byte" data-cat="変換" data-kw="데이터 용량 변환(KB·MB·GB·TB) 용량을 입력하면 KB·MB·GB·TB 전체 단위의 값을 한 번에 변환합니다." title="데이터 용량 변환(KB·MB·GB·TB)">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5.6" rx="7" ry="2.6"/><path d="M5 5.6v12.8c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V5.6"/><path d="M5 12c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6"/></svg></span><span class="nm">데이터 용량</span>
+      </a>
+      <a class="tile" href="./tools/heikin/" data-slug="heikin" data-cat="変換" data-kw="평균·중앙값 계산기 숫자를 붙여넣기만 하면 평균·중앙값·최대·최소·합계를 한 번에 계산합니다." title="평균·중앙값 계산기">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="12" width="3.4" height="8" rx="0.8"/><rect x="10.3" y="7.5" width="3.4" height="12.5" rx="0.8"/><rect x="16.1" y="10" width="3.4" height="10" rx="0.8"/><path d="M3.5 9.2h17" stroke-dasharray="2.4 2.4"/></svg></span><span class="nm">평균·중앙값</span>
+      </a>
+      <a class="tile" href="./tools/hensachi/" data-slug="hensachi" data-cat="変換" data-kw="편차치 계산기 일본 입시에서 쓰이는 「편차치」(평균 50·표준편차 10으로 환산한 표준화 점수)를 무료로 계산합니다." title="편차치 계산기">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 19h17"/><path d="M4 19c4 0 4.4-12.5 8-12.5S16 19 20 19"/><path d="M12 10.5V19" stroke-dasharray="2.4 2.4"/></svg></span><span class="nm">편차치</span>
+      </a>
+      <a class="tile" href="./tools/inch/" data-slug="inch" data-cat="変換" data-kw="인치⇔cm·파운드⇔kg 변환 계산기 인치와 센티미터, 파운드와 킬로그램을 무료로 바로 상호 변환합니다." title="인치⇔cm·파운드⇔kg 변환 계산기">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8.8" width="18" height="6.4" rx="1.2"/><path d="M6.5 8.8v2.4M9.5 8.8v3.7M12.5 8.8v2.4M15.5 8.8v3.7M18.5 8.8v2.4"/></svg></span><span class="nm">인치⇔cm·파운드⇔kg</span>
+      </a>
+      <a class="tile" href="./tools/jusho/" data-slug="jusho" data-cat="変換" data-kw="일본 주소 영문 변환기 우편번호만 입력하면 일본 주소를 영문 표기(로마자·역순)로 바꾸고, 반대로 로마자로 쓴 주소를 일본어 표기(〒+한자)로 되돌려 주는 무료 도구입니다." title="일본 주소 영문 변환기">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3.6 7.2l8.4 5.8 8.4-5.8"/></svg></span><span class="nm">일본 주소 영문</span>
+      </a>
+      <a class="tile" href="./tools/kome/" data-slug="kome" data-cat="変換" data-kw="쌀 합(合)·그램 환산 계산기 쌀 1합(合)=약 150g, 물은 1합당 약 200ml 기준으로, 합 수에서 쌀 무게·물 양·밥이 되는 양·밥공기 수를 한 번에 계산." title="쌀 합(合)·그램 환산 계산기">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5h15c0 4.5-3.1 7.5-7.5 7.5s-7.5-3-7.5-7.5z"/><path d="M9 4.5c-1 1.2-1 2.3 0 3.5M13.5 4.5c-1 1.2-1 2.3 0 3.5"/></svg></span><span class="nm">쌀 합·그램</span>
+      </a>
+      <a class="tile" href="./tools/mile/" data-slug="mile" data-cat="変換" data-kw="마일⇔km 환산 계산기 마일과 킬로미터를 정의값으로 정확하게 상호 환산하고 해리(노티컬 마일)도 지원합니다." title="마일⇔km 환산 계산기">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 21L10.5 3M16.5 21L13.5 3"/><path d="M12 6.5V9M12 12v2.5M12 17.5V20"/></svg></span><span class="nm">마일⇔km</span>
+      </a>
+      <a class="tile" href="./tools/moji/" data-slug="moji" data-cat="変換" data-kw="글자 수 세기 텍스트를 붙여넣기만 하면 글자 수를 즉시 세어 줍니다(공백 포함/제외 동시 표시)." title="글자 수 세기">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.4 4.4l3.7 3.7L8.2 17l-4.1.8.8-4.1z"/><path d="M11.8 6l3.7 3.7"/><path d="M13.5 20.5h7M3.5 20.5h6"/></svg></span><span class="nm">글자 수 세기</span>
+      </a>
+      <a class="tile" href="./tools/ondo/" data-slug="ondo" data-cat="変換" data-kw="온도 변환 계산기 섭씨(°C)·화씨(°F)·켈빈(K)을 한 번에 상호 변환합니다." title="온도 변환 계산기">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 15.6V5a2 2 0 0 1 4 0v10.6a3.6 3.6 0 1 1-4 0z"/><path d="M10.5 15.5V9"/><path d="M15.8 6h2.2M15.8 9.5h2.2M15.8 13h2.2"/></svg></span><span class="nm">온도</span>
+      </a>
+      <a class="tile" href="./tools/password/" data-slug="password" data-cat="変換" data-kw="비밀번호 생성기 안전한 랜덤 비밀번호를 사용 중인 기기 안에서 생성합니다." title="비밀번호 생성기">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="10.5" width="13" height="9.5" rx="2.2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/><circle cx="12" cy="14.5" r="1.5"/><path d="M12 16v2"/></svg></span><span class="nm">비밀번호 생성기</span>
+      </a>
+      <a class="tile" href="./tools/percent/" data-slug="percent" data-cat="変換" data-kw="퍼센트 계산기 「A는 B의 몇 %?」「A의 ○%는 얼마?」「A에서 B로 몇 % 증가(감소)?」 세 가지를 무료로 바로 계산합니다." title="퍼센트 계산기">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18L18 6"/><circle cx="7.6" cy="7.6" r="2.6"/><circle cx="16.4" cy="16.4" r="2.6"/></svg></span><span class="nm">퍼센트</span>
+      </a>
+      <a class="tile" href="./tools/petage/" data-slug="petage" data-cat="変換" data-kw="강아지·고양이 나이 환산 계산기 고양이와 소형·중형견의 나이를 사람 나이로 무료 환산: 1살≈사람 15세, 2살≈24세, 이후 매년 약 +4세의 기준 공식으로 계산합니다." title="강아지·고양이 나이 환산 계산기">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12.6c3.4 0 5.4 2.1 5.4 4.2 0 1.9-1.6 3-3.2 2.5-1-.3-1.6-.5-2.2-.5s-1.2.2-2.2.5c-1.6.5-3.2-.6-3.2-2.5 0-2.1 2-4.2 5.4-4.2z"/><circle cx="6.3" cy="9.2" r="1.8"/><circle cx="10" cy="6.6" r="1.8"/><circle cx="14" cy="6.6" r="1.8"/><circle cx="17.7" cy="9.2" r="1.8"/></svg></span><span class="nm">강아지·고양이 나이</span>
+      </a>
+      <a class="tile" href="./tools/renji/" data-slug="renji" data-cat="変換" data-kw="전자레인지 가열시간 환산기 포장에 적힌 가열시간을 우리 집 전자레인지 와트수에 맞는 시간으로 무료 즉시 환산합니다." title="전자레인지 가열시간 환산기">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2"/><rect x="6" y="7.8" width="8.5" height="8.5" rx="1"/><circle cx="17.4" cy="9.3" r="1"/><path d="M16.4 12.8h2M16.4 15.2h2"/></svg></span><span class="nm">전자레인지 가열시간…</span>
+      </a>
+      <a class="tile" href="./tools/roman/" data-slug="roman" data-cat="変換" data-kw="로마 숫자 변환기 아라비아 숫자와 로마 숫자(I·V·X·L·C·D·M)를 무료로 즉시 상호 변환합니다." title="로마 숫자 변환기">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8l5.5 8M10.5 8L5 16"/><path d="M14.2 8v8M18.2 8v8"/><path d="M13.2 8h2M13.2 16h2M17.2 8h2M17.2 16h2"/></svg></span><span class="nm">로마 숫자</span>
+      </a>
+      <a class="tile" href="./tools/seiza/" data-slug="seiza" data-cat="変換" data-kw="별자리·탄생석 계산기 생일을 입력하면 12별자리와 탄생석을 무료로 바로 표시합니다." title="별자리·탄생석 계산기">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.6l2.5 5.3 5.8.7-4.3 4 1.1 5.8L12 16.6l-5.1 2.8 1.1-5.8-4.3-4 5.8-.7z"/></svg></span><span class="nm">별자리·탄생석</span>
+      </a>
+      <a class="tile" href="./tools/shincho/" data-slug="shincho" data-cat="変換" data-kw="키 피트·인치 변환 키의 cm와 피트·인치 표기(5'7″ 등)를 서로 변환." title="키 피트·인치 변환">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.5 3.5v17M18.5 5.5h-2.4M18.5 9h-2.4M18.5 12.5h-2.4M18.5 16h-2.4M18.5 19.5h-2.4"/><circle cx="8.5" cy="6" r="2.4"/><path d="M8.5 8.4v6M8.5 14.4l-2.6 5M8.5 14.4l2.6 5M8.5 10l-3 2M8.5 10l3 2"/></svg></span><span class="nm">키 피트·인치</span>
+      </a>
+      <a class="tile" href="./tools/speed/" data-slug="speed" data-cat="変換" data-kw="속도·시간·거리 계산기 속도(km/h)·거리(km)·시간 중 두 개를 입력하면 나머지 하나를 무료로 자동 계산합니다." title="속도·시간·거리 계산기">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 15.5a7.5 7.5 0 0 1 15 0"/><path d="M12 15.5l4-4.6"/><circle cx="12" cy="15.5" r="1.3"/><path d="M6 12.2l1.5.9M18 12.2l-1.5.9M12 7.8v1.8"/><path d="M4.5 18.8h15"/></svg></span><span class="nm">속도·시간·거리</span>
+      </a>
+      <a class="tile" href="./tools/spoon/" data-slug="spoon" data-cat="変換" data-kw="큰술·작은술·컵 환산 계산기 큰술 1=15ml, 작은술 1=5ml, 1컵=200ml(일본 기준)로 상호 환산." title="큰술·작은술·컵 환산 계산기">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="7.2" rx="3.4" ry="4.6"/><path d="M12 11.8V21"/></svg></span><span class="nm">큰술·작은술·컵</span>
+      </a>
+      <a class="tile" href="./tools/tsubo/" data-slug="tsubo" data-cat="変換" data-kw="쓰보(坪)·제곱미터(㎡)·조(畳) 변환기 일본 부동산 광고와 평면도에 나오는 면적 단위인 쓰보(坪)⇔제곱미터(㎡)⇔조(畳, 다다미)를 무료로 한 번에 상호 변환합니다." title="쓰보(坪)·제곱미터(㎡)·조(畳) 변환기">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="4.5" width="15" height="15" rx="1"/><path d="M8.5 15.5l7-7m0 0h-3.4m3.4 0v3.4M8.5 15.5h3.4m-3.4 0v-3.4"/></svg></span><span class="nm">쓰보·제곱미터·조</span>
+      </a>
+      <a class="tile" href="./tools/zenkaku/" data-slug="zenkaku" data-cat="変換" data-kw="전각⇔반각 변환 도구 전각 영숫자·기호·공백을 한 번에 반각으로 변환합니다(반대 방향도 가능)." title="전각⇔반각 변환 도구">
+        <span class="ic g3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 16.5L8 6h.8l4 10.5"/><path d="M5.5 12.8h5.8"/><path d="M15 11.5h5.5m0 0l-2.3-2.3m2.3 2.3l-2.3 2.3" transform="translate(0 3)"/></svg></span><span class="nm">전각⇔반각</span>
+      </a>
+  </div>
+
+  <div id="poll-sec">
+    <div class="tp-sec"><b>통계 도구</b><span>계산 도구와는 다른 별도의 도구입니다</span></div>
+    <a class="poll-card" id="poll-card" href="../tools/poll/" data-kw="모두의 투표 설문을 만들어 공유하고 결과를 실시간으로 집계합니다(가입 불필요). 일본어만 지원합니다. poll survey vote 投票 アンケート">
+      <span class="pic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4.2" width="12.5" height="3.4" rx="1.7"/><rect x="4" y="10.3" width="16" height="3.4" rx="1.7"/><rect x="4" y="16.4" width="7.5" height="3.4" rx="1.7"/></svg></span>
+      <span class="pt"><b>모두의 투표</b><small>설문을 만들어 공유하고 결과를 실시간으로 집계합니다(가입 불필요). 일본어만 지원합니다.</small></span>
+    </a>
+  </div>
+
+  <details class="seo-list">
+    <summary>64개 도구의 설명 목록 열기</summary>
+      <h3>건강</h3>
+      <ul>
+        <li><a href="./tools/alcohol/">순수 알코올량 계산기</a> — 술의 양과 도수만 입력하면 순수 알코올량(g)과 드링크 수를 무료로 계산.</li>
+        <li><a href="./tools/bmi/">BMI·표준체중 계산기</a> — 키와 몸무게만 입력하면 BMI와 표준체중(BMI 22)을 무료로 계산.</li>
+        <li><a href="./tools/bmr/">기초대사량 계산기</a> — 나이·성별·몸무게만 입력하면 하루 기초대사량(kcal)을 무료로 계산합니다.</li>
+        <li><a href="./tools/caffeine/">카페인 섭취량 계산기</a> — 커피·홍차·녹차·에너지 드링크 등의 카페인량을 합산해 하루 기준(건강한 성인 400mg·임신 중에는 더 적게)과 비교합니다.</li>
+        <li><a href="./tools/cycle/">수면 사이클 계산기</a> — 기상 시각에서 거꾸로 계산해 약 90분 수면 주기의 경계에 맞는 취침 시각 후보를 보여줍니다.</li>
+        <li><a href="./tools/hosu/">걸음 수→거리·칼로리 환산 계산기</a> — 걸음 수와 키로 걸은 거리(km)·시간·소모 칼로리의 대략적인 값을 계산합니다.</li>
+        <li><a href="./tools/ninshin/">출산 예정일·임신 주수 계산기</a> — 마지막 생리 시작일로 출산 예정일과 현재 임신 주수(〇주 △일)를 무료로 계산.</li>
+        <li><a href="./tools/pace/">러닝 페이스 계산기</a> — 거리와 목표 시간으로 1km당 페이스와 시속을 무료로 계산합니다.</li>
+        <li><a href="./tools/protein/">단백질 섭취량 계산기</a> — 몸무게와 운동량으로 하루 단백질 섭취 기준량을 계산합니다.</li>
+        <li><a href="./tools/shinpaku/">목표 심박수 계산기(카보넨 공식)</a> — 나이와 안정 시 심박수로 지방 연소·지구력 향상에 알맞은 목표 심박수 구간을 카보넨(Karvonen) 공식으로 계산.</li>
+        <li><a href="./tools/shio/">염분량 계산기(나트륨⇔식염상당량)</a> — 식품 표시의 나트륨(mg)을 식염상당량(g)으로 한 번에 환산, 무료.</li>
+        <li><a href="./tools/sleep/">수면 시간 계산기</a> — 취침 시각과 기상 시각만 입력하면 수면 시간을 무료로 계산.</li>
+        <li><a href="./tools/sports/">운동별 소모 칼로리 계산기</a> — 조깅·사이클링·수영·테니스·근력운동·줄넘기·요가 등 13종 운동의 소모 칼로리를 METs 방식(공식 METs표)으로 계산합니다.</li>
+        <li><a href="./tools/tdee/">하루 섭취 칼로리 계산기</a> — 나이·성별·몸무게·활동량으로 하루에 필요한 섭취 칼로리 기준(추정 에너지 필요량)을 무료로 계산합니다.</li>
+        <li><a href="./tools/walking/">걷기 소모 칼로리 계산기</a> — 몸무게·시간·걷는 속도로 걷기의 소모 칼로리를 METs 방식(일본 후생노동성 공식)으로 계산합니다.</li>
+      </ul>
+      <h3>돈</h3>
+      <ul>
+        <li><a href="./tools/compound/">복리·적립투자 시뮬레이션</a> — 매달 적립액과 예상 수익률을 넣으면 장래에 얼마가 되는지 무료로 시뮬레이션합니다.</li>
+        <li><a href="./tools/denki/">전기요금 계산기</a> — 가전의 소비전력(W)과 사용 시간으로 하루·한 달·1년 전기요금(엔)을 무료로 계산합니다.</li>
+        <li><a href="./tools/fudosan/">일본 부동산 투자 수지·손익분기 계산기</a> — 5개 항목만 입력하면 일본 투자용 부동산을 「몇 년째에 팔아야 통산 손익이 플러스가 되는지」 알 수 있습니다.</li>
+        <li><a href="./tools/fuel/">주유비 계산기</a> — 주행 거리·연비·휘발유 단가로 드라이브나 통근에 드는 주유비와 사용 연료를 무료로 계산합니다.</li>
+        <li><a href="./tools/genka/">이익률·원가율 계산기</a> — 판매가와 원가를 입력하면 마진·이익률·원가율을 바로 계산합니다.</li>
+        <li><a href="./tools/hiwari/">일본 월세 일할 계산기</a> — 일본에서 월 중간에 입주·퇴거할 때의 일할(日割) 월세를 무료로 계산.</li>
+        <li><a href="./tools/jikyu/">시급⇔월급·연봉 환산기</a> — 시급과 하루 근무시간·월 근무일수로 세전 월급과 연봉을 무료로 바로 계산합니다.</li>
+        <li><a href="./tools/kariire/">일본 주택담보대출 대출가능액 계산기</a> — 연봉·상환부담률·금리·기간을 넣으면 일본 주택담보대출로 얼마까지 빌릴 수 있는지 대략적인 금액을 역산합니다.</li>
+        <li><a href="./tools/loan/">대출 상환 계산기(원리금균등상환)</a> — 대출금·금리·상환 기간을 넣으면 매달 상환액·총상환액·이자 총액을 무료로 계산합니다(원리금균등상환).</li>
+        <li><a href="./tools/nenpi/">연비 계산기(가득 주유법)</a> — 주행거리와 주유량으로 실연비(km/L)를 가득 주유법으로 계산합니다.</li>
+        <li><a href="./tools/point/">할인과 포인트 적립 어느 쪽이 이득? 계산기</a> — 「10% 할인」과 「10% 포인트 적립」은 같지 않다?</li>
+        <li><a href="./tools/tanka/">단가 비교 계산기(어느 쪽이 쌀까?)</a> — 가격과 용량만 입력하면 「100g당」「1개당」 단가를 나란히 비교합니다.</li>
+        <li><a href="./tools/tax/">일본 소비세 계산기(세금 포함⇔제외)</a> — 세금 제외→포함, 포함→제외를 한 번에 계산하는 무료 일본 소비세 계산기.</li>
+        <li><a href="./tools/teiki/">정기권 본전 계산기(며칠 타면 이득?)</a> — 일본 정기권(定期券)의 가격과 편도 운임을 넣으면 한 달에 며칠을 타야 본전을 뽑는지 계산합니다.</li>
+        <li><a href="./tools/tip/">팁 계산기(해외여행용)</a> — 금액과 팁 비율(15%·18%·20%)을 넣으면 팁 금액, 팁을 포함한 합계, 더치페이 시 1인당 금액까지 한 번에 계산합니다.</li>
+        <li><a href="./tools/waribiki/">할인 계산기(○% 할인하면 얼마?)</a> — 「30% 할인하면 얼마?」를 한 번에 계산.</li>
+        <li><a href="./tools/warikan/">더치페이(와리캉) 계산기</a> — 총액과 인원수만 입력하면 1인당 낼 금액을 무료로 계산합니다.</li>
+        <li><a href="./tools/yukyu/">연차 유급휴가 부여일수 계산기</a> — 근속연수와 근무 형태(주당 근무일수)로 일본에서 받을 수 있는 연차 유급휴가 일수를 무료로 계산합니다.</li>
+        <li><a href="./tools/zangyo/">잔업수당 계산기(일본)</a> — 기초시급과 잔업시간을 입력하면 일본 법률이 정한 잔업수당(가산임금)을 무료로 계산합니다.</li>
+      </ul>
+      <h3>날짜</h3>
+      <ul>
+        <li><a href="./tools/age/">나이 계산기(만 나이·띠·하야우마레 판정)</a> — 생년월일로 만 나이와 띠, 일본 학년 기준 「하야우마레」(1월 1일〜4월 1일 출생) 여부를 무료로 계산.</li>
+        <li><a href="./tools/days/">일수 계산기(날짜 차이·○일 후)</a> — 두 날짜 사이의 일수와 기준일에서 ○일 후(○일 전)의 날짜·요일을 무료로 계산합니다.</li>
+        <li><a href="./tools/eigyobi/">일본 영업일 계산기(주말·공휴일 제외)</a> — 「3영업일 후는 언제?」를 주말과 일본 공휴일(대체공휴일 포함)을 빼고 즉시 계산.</li>
+        <li><a href="./tools/gakunen/">일본 학년 계산기</a> — 생년월일만 넣으면 일본 학교에서 지금 몇 학년인지(초등학교 1학년〜고등학교 3학년) 바로 알 수 있는 무료 도구입니다.</li>
+        <li><a href="./tools/jikan/">시간 계산기(합계·시각 차이)</a> — 「1:30+0:45+8:00」 같은 시간 합계와 시작〜종료 시각의 경과 시간을 계산.</li>
+        <li><a href="./tools/kinenbi/">기념일 카운트 계산기</a> — 생일이나 기념일을 입력하면 「오늘로 며칠째인지」와 100일째·1000일째·1만 일째 등 기념일 날짜를 무료로 한 번에 계산합니다.</li>
+        <li><a href="./tools/rireki/">입학·졸업 연도 계산기(일본 이력서용)</a> — 생년월일을 넣으면 일본 학제(4월 입학·3월 졸업)에 따라 초등학교부터 대학교까지의 입학·졸업 연도를 계산해, 일본 이력서(履歴書)의 학력란에 그대로 적을 수 있습니다.</li>
+        <li><a href="./tools/shukujitsu/">일본 공휴일 달력</a> — 2026년·2027년 일본의 공휴일을 한눈에 확인하고 다음 공휴일까지 며칠 남았는지 바로 알 수 있습니다.</li>
+        <li><a href="./tools/tsukisu/">○개월 후·개월 수 계산기</a> — 「3개월 후는 며칠?」「이 두 날짜는 몇 개월 차이?」를 월말 조정까지 반영해 무료로 정확하게 계산합니다.</li>
+        <li><a href="./tools/wareki/">서기·일본 연호(와레키) 변환기</a> — 서기⇔일본 연호(메이지·다이쇼·쇼와·헤이세이·레이와)를 무료로 즉시 변환.</li>
+      </ul>
+      <h3>생활</h3>
+      <ul>
+        <li><a href="./tools/byte/">데이터 용량 변환(KB·MB·GB·TB)</a> — 용량을 입력하면 KB·MB·GB·TB 전체 단위의 값을 한 번에 변환합니다.</li>
+        <li><a href="./tools/heikin/">평균·중앙값 계산기</a> — 숫자를 붙여넣기만 하면 평균·중앙값·최대·최소·합계를 한 번에 계산합니다.</li>
+        <li><a href="./tools/hensachi/">편차치 계산기</a> — 일본 입시에서 쓰이는 「편차치」(평균 50·표준편차 10으로 환산한 표준화 점수)를 무료로 계산합니다.</li>
+        <li><a href="./tools/inch/">인치⇔cm·파운드⇔kg 변환 계산기</a> — 인치와 센티미터, 파운드와 킬로그램을 무료로 바로 상호 변환합니다.</li>
+        <li><a href="./tools/jusho/">일본 주소 영문 변환기</a> — 우편번호만 입력하면 일본 주소를 영문 표기(로마자·역순)로 바꾸고, 반대로 로마자로 쓴 주소를 일본어 표기(〒+한자)로 되돌려 주는 무료 도구입니다.</li>
+        <li><a href="./tools/kome/">쌀 합(合)·그램 환산 계산기</a> — 쌀 1합(合)=약 150g, 물은 1합당 약 200ml 기준으로, 합 수에서 쌀 무게·물 양·밥이 되는 양·밥공기 수를 한 번에 계산.</li>
+        <li><a href="./tools/mile/">마일⇔km 환산 계산기</a> — 마일과 킬로미터를 정의값으로 정확하게 상호 환산하고 해리(노티컬 마일)도 지원합니다.</li>
+        <li><a href="./tools/moji/">글자 수 세기</a> — 텍스트를 붙여넣기만 하면 글자 수를 즉시 세어 줍니다(공백 포함/제외 동시 표시).</li>
+        <li><a href="./tools/ondo/">온도 변환 계산기</a> — 섭씨(°C)·화씨(°F)·켈빈(K)을 한 번에 상호 변환합니다.</li>
+        <li><a href="./tools/password/">비밀번호 생성기</a> — 안전한 랜덤 비밀번호를 사용 중인 기기 안에서 생성합니다.</li>
+        <li><a href="./tools/percent/">퍼센트 계산기</a> — 「A는 B의 몇 %?」「A의 ○%는 얼마?」「A에서 B로 몇 % 증가(감소)?」 세 가지를 무료로 바로 계산합니다.</li>
+        <li><a href="./tools/petage/">강아지·고양이 나이 환산 계산기</a> — 고양이와 소형·중형견의 나이를 사람 나이로 무료 환산: 1살≈사람 15세, 2살≈24세, 이후 매년 약 +4세의 기준 공식으로 계산합니다.</li>
+        <li><a href="./tools/renji/">전자레인지 가열시간 환산기</a> — 포장에 적힌 가열시간을 우리 집 전자레인지 와트수에 맞는 시간으로 무료 즉시 환산합니다.</li>
+        <li><a href="./tools/roman/">로마 숫자 변환기</a> — 아라비아 숫자와 로마 숫자(I·V·X·L·C·D·M)를 무료로 즉시 상호 변환합니다.</li>
+        <li><a href="./tools/seiza/">별자리·탄생석 계산기</a> — 생일을 입력하면 12별자리와 탄생석을 무료로 바로 표시합니다.</li>
+        <li><a href="./tools/shincho/">키 피트·인치 변환</a> — 키의 cm와 피트·인치 표기(5'7″ 등)를 서로 변환.</li>
+        <li><a href="./tools/speed/">속도·시간·거리 계산기</a> — 속도(km/h)·거리(km)·시간 중 두 개를 입력하면 나머지 하나를 무료로 자동 계산합니다.</li>
+        <li><a href="./tools/spoon/">큰술·작은술·컵 환산 계산기</a> — 큰술 1=15ml, 작은술 1=5ml, 1컵=200ml(일본 기준)로 상호 환산.</li>
+        <li><a href="./tools/tsubo/">쓰보(坪)·제곱미터(㎡)·조(畳) 변환기</a> — 일본 부동산 광고와 평면도에 나오는 면적 단위인 쓰보(坪)⇔제곱미터(㎡)⇔조(畳, 다다미)를 무료로 한 번에 상호 변환합니다.</li>
+        <li><a href="./tools/zenkaku/">전각⇔반각 변환 도구</a> — 전각 영숫자·기호·공백을 한 번에 반각으로 변환합니다(반대 방향도 가능).</li>
+      </ul>
+  </details>
+
+  <div class="about">
+    <p>일본에서 생활하며 문득 계산해 보고 싶어지는 건강·돈·날짜·생활 속 물음을 그 자리에서 계산할 수 있는 무료 웹 도구 모음입니다. 모든 도구에 <strong>계산 방법과 근거(1차 정보 출처)</strong>를 명시하고 있습니다. 계산 결과는 입력값에 따른 대략적인 값이며, 자세한 내용은 <a href="./disclaimer.html">면책사항</a>을 확인해 주세요.</p>
+  </div>
 </main>
 <!-- @partial:footer start -->
 <footer class="site-footer">
-<!-- @langsw start -->
-<nav class="lang-switch" aria-label="언어"><a href="/" lang="ja" hreflang="ja">日本語</a><a href="/en/" lang="en" hreflang="en">English</a><a href="/zh/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
-<!-- @langsw end -->
   <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
   <nav>
+    <a href="./">전체 도구</a>
     <a href="./privacy.html">개인정보 처리방침</a>
     <a href="./disclaimer.html">면책사항</a>
     <a href="../contact.html">문의하기</a>
@@ -129,5 +415,89 @@
   <p>© 2026 Quick Calc</p>
 </footer>
 <!-- @partial:footer end -->
+<script>
+(function () {
+  "use strict";
+  var RANK = ["moji","password","waribiki","days","bmi","wareki","eigyobi","kinenbi","jikan","tax","fudosan","heikin"];
+  var CATS = [["all","전체"],["健康","건강"],["お金","돈"],["日付","날짜"],["変換","생활"]];
+  var UNIT = "개";
+  var RESULTS = "검색 결과";
+  var current = "all";
+  var tabsEl = document.getElementById("tabs");
+  var grid = document.getElementById("grid");
+  var popEl = document.getElementById("popular");
+  var tiles = [].slice.call(grid.querySelectorAll(".tile"));
+  var bySlug = {};
+  tiles.forEach(function (t) { bySlug[t.dataset.slug] = t; });
+
+  function norm(s) { return s.toLowerCase(); }
+  var index = tiles.map(function (t) { return norm(t.dataset.kw + " " + t.textContent); });
+  var pollCard = document.getElementById("poll-card");
+  var pollIndex = norm(pollCard.dataset.kw + " " + pollCard.textContent);
+
+  // 人気: 日本語版と同じ利用データ基準のランキング(週次更新)
+  function renderPopular() {
+    popEl.innerHTML = "";
+    var shown = 0;
+    RANK.forEach(function (slug, i) {
+      var t = bySlug[slug];
+      if (!t || shown >= 8) return;
+      var clone = t.cloneNode(true);
+      clone.hidden = false;
+      var rk = document.createElement("span");
+      var n = ++shown;
+      rk.className = "rk" + (n === 1 ? "" : n === 2 ? " silver" : n === 3 ? " bronze" : " plain");
+      rk.textContent = n;
+      clone.querySelector(".ic").appendChild(rk);
+      popEl.appendChild(clone);
+    });
+    if (!shown) document.getElementById("pop-sec").style.display = "none";
+  }
+
+  CATS.forEach(function (c) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "tp-tab" + (c[0] === current ? " on" : "");
+    b.textContent = c[1];
+    b.setAttribute("role", "tab");
+    b.onclick = function () {
+      current = c[0];
+      tabsEl.querySelectorAll(".tp-tab").forEach(function (t, i) { t.classList.toggle("on", CATS[i][0] === current); });
+      render();
+    };
+    tabsEl.appendChild(b);
+  });
+
+  var input = document.getElementById("search-input");
+  function render() {
+    var q = norm(input.value.trim());
+    var terms = q.split(/\s+/).filter(Boolean);
+    var shown = 0;
+    tiles.forEach(function (t, i) {
+      var hit;
+      if (terms.length) {
+        hit = terms.every(function (w) { return index[i].indexOf(w) !== -1; });
+      } else {
+        hit = current === "all" || t.dataset.cat === current;
+      }
+      t.hidden = !hit;
+      if (hit) shown++;
+    });
+    document.getElementById("pop-sec").style.display = (terms.length || current !== "all") ? "none" : "";
+    var pollHit = terms.length ? terms.every(function (w) { return pollIndex.indexOf(w) !== -1; }) : current === "all";
+    document.getElementById("poll-sec").style.display = pollHit ? "" : "none";
+    if (pollHit && terms.length) shown++;
+    var label = terms.length ? RESULTS : CATS.filter(function (c) { return c[0] === current; })[0][1];
+    document.getElementById("genre-title").innerHTML = "<b>" + label + "</b><span>" + shown + " " + UNIT + "</span>";
+    document.getElementById("no-hit").hidden = shown > 0;
+  }
+  input.addEventListener("input", render);
+
+  var q0 = new URLSearchParams(location.search).get("q");
+  if (q0) { input.value = q0; render(); }
+  if (location.hash === "#search") setTimeout(function () { input.focus(); }, 60);
+  renderPopular();
+})();
+</script>
 </body>
 </html>
