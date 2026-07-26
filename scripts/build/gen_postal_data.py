@@ -201,30 +201,63 @@ def clean_neighborhood(nb, nb_kana):
     return nb, nb_kana
 
 
+def rev_key(s):
+    """逆引きの照合キー。大文字小文字・空白・ハイフン・アポストロフィの差を吸収する。"""
+    return re.sub(r"[^a-z0-9]", "", s.lower())
+
+
+# 1つの町域ローマ字に対して保持する候補の上限(同名の町域は全国に多数あるため)
+REV_MAX = 12
+
+
 def main(db_path):
     con = sqlite3.connect(db_path)
     cur = con.cursor()
     shards = {}
+    rev = {}
     n = 0
     for code, data in cur.execute("select code, data from postal_data"):
         d = json.loads(data)
         pref, city = d["prefecture"], d["city"]
         nb, nb_kana = clean_neighborhood(d["neighborhood"], d["neighborhood_kana"])
+        town_rome = title_case(kana_to_romaji(nb_kana)) if nb_kana else ""
         rec = [
             pref, city, nb,
             PREFS.get(pref, title_case(kana_to_romaji(d["prefecture_kana"]))),
             city_romaji(city, d["city_kana"]),
-            title_case(kana_to_romaji(nb_kana)) if nb_kana else "",
+            town_rome,
         ]
         shards.setdefault(code[:3], {})[code[3:]] = rec
+        # 逆引き(町域ローマ字 → 郵便番号の候補)。町域が無いレコードは引きようがないので載せない
+        if town_rome:
+            k = rev_key(town_rome)
+            if k:
+                bucket = rev.setdefault(k[0], {}).setdefault(k, [])
+                if len(bucket) < REV_MAX:
+                    bucket.append(code)
         n += 1
+
     os.makedirs(OUT, exist_ok=True)
     for z3, recs in shards.items():
         with open(os.path.join(OUT, z3 + ".json"), "w", encoding="utf-8") as f:
             json.dump(recs, f, ensure_ascii=False, separators=(",", ":"))
+
+    rev_dir = os.path.join(OUT, "rev")
+    os.makedirs(rev_dir, exist_ok=True)
+    rev_keys = 0
+    for letter, table in rev.items():
+        rev_keys += len(table)
+        with open(os.path.join(rev_dir, letter + ".json"), "w", encoding="utf-8") as f:
+            json.dump(table, f, ensure_ascii=False, separators=(",", ":"))
+
     with open(os.path.join(OUT, "meta.json"), "w", encoding="utf-8") as f:
-        json.dump({"source": "日本郵便 郵便番号データ(posuto経由)", "records": n, "shards": len(shards)}, f, ensure_ascii=False)
+        json.dump({
+            "source": "日本郵便 郵便番号データ(posuto経由)",
+            "records": n, "shards": len(shards),
+            "reverseKeys": rev_keys, "reverseShards": len(rev), "reverseMax": REV_MAX
+        }, f, ensure_ascii=False)
     print(f"{n}件 / {len(shards)}シャード → shared/postal/")
+    print(f"逆引き {rev_keys}キー / {len(rev)}シャード → shared/postal/rev/")
 
 
 if __name__ == "__main__":

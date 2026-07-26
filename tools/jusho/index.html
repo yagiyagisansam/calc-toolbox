@@ -38,6 +38,39 @@
 <!-- @partial:header end -->
 <main>
   <h1>英語住所 変換ツール</h1>
+  <form class="tool-form" id="mode-form">
+    <label>変換の向き
+      <select id="mode">
+        <option value="to-en" selected>日本の住所 → 英語表記</option>
+        <option value="to-ja">母国の書き方 → 日本語表記</option>
+      </select>
+    </label>
+  </form>
+
+  <form class="tool-form" id="rev-form" hidden>
+    <label>お住まいの国・地域
+      <span class="field-note">住所の書き方が国によって違うため、例を切り替えます</span>
+      <select id="country"></select>
+    </label>
+    <label>住所(いつもの書き方のまま貼り付け)
+      <span class="field-note" id="rev-example"></span>
+      <textarea id="foreign-input" rows="3" autocomplete="off"></textarea>
+    </label>
+    <div class="tool-result" id="rev-result" hidden aria-live="polite"></div>
+    <button type="button" id="copy-ja" hidden>日本語住所をコピー</button>
+
+    <div id="rev-lookup" hidden>
+      <p class="field-note">郵便番号が見つかりませんでした。町名のローマ字から探せます。</p>
+      <div class="field-row">
+        <label>町名(ローマ字)
+          <input type="text" id="town-query" autocomplete="off" placeholder="例: Nishishinjuku">
+        </label>
+      </div>
+      <button type="button" id="town-search">この町名で探す</button>
+      <div class="tool-result" id="town-candidates" hidden aria-live="polite"></div>
+    </div>
+  </form>
+
   <form class="tool-form" id="jusho-form">
     <label>郵便番号
       <span class="field-note">7桁を入れると住所とローマ字が自動で入ります</span>
@@ -104,21 +137,45 @@
     ローマ字は日本郵便の郵便番号データのカナ読みからの<strong>機械変換</strong>です。固有の読み方と違う場合は、ローマ字の欄を直接書き換えてください(結果にすぐ反映されます)。
   </div>
 
-  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>郵便番号を入れるだけで、日本の住所を<strong>英語表記(ローマ字・海外式の並び順)</strong>に変換できるツールです。海外通販サイトの住所登録、国際郵便の宛名・差出人欄、海外のサービスへの本人情報入力にどうぞ。</p></div>
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>日本の住所を<strong>英語表記(ローマ字・海外式の並び順)</strong>に変換できるツールです。<strong>逆に、ローマ字で書かれた日本の住所を日本語表記(〒+漢字)に戻すこともできます</strong>。海外通販の住所登録・国際郵便の宛名や、役所や病院の書類に日本語で住所を書くときにどうぞ。</p></div>
 
   <h2>使い方</h2>
   <ol class="steps">
-    <li>郵便番号(例: 100-0014)を入れると、住所とローマ字が自動で入ります。</li>
-    <li>丁目・番地・号(例: 1-2-3)を入れます。建物名・部屋番号があればローマ字で足します。</li>
-    <li>英語表記の住所がすぐ下に表示されます。「英語住所をコピー」でそのまま貼り付けられます。</li>
+    <li>「変換の向き」を選びます。日本語の住所を英語にするなら<strong>日本の住所 → 英語表記</strong>、ローマ字の住所を日本語に戻すなら<strong>母国の書き方 → 日本語表記</strong>です。</li>
+    <li>英語表記にする場合: 郵便番号(例: 100-0014)を入れると住所とローマ字が自動で入るので、丁目・番地・号と建物名を足します。</li>
+    <li>日本語表記に戻す場合: お住まいの国を選び、いつもの書き方のまま住所を貼り付けます。並び順が国によって違っても読み取ります。</li>
+    <li>結果はすぐ下に表示されます。コピーボタンでそのまま貼り付けられます。</li>
   </ol>
 
   <h2>変換方法と根拠</h2>
   <ul class="method">
-    <li><strong>並び順</strong>: 英語表記は「建物・部屋 → 番地 町域 → 市区町村 → 都道府県 郵便番号 → JAPAN」の順(日本語と逆順)。日本郵便の国際郵便の宛名の書き方に沿っています。</li>
+    <li><strong>英語表記の並び順</strong>: 「建物・部屋 → 番地 町域 → 市区町村 → 都道府県 郵便番号 → JAPAN」の順(日本語と逆順)。日本郵便の国際郵便の宛名の書き方に沿っています。</li>
     <li><strong>住所と読み</strong>: 日本郵便の郵便番号データ(全国約12万件)から、郵便番号に対応する住所とカナ読みを取得し、ヘボン式ローマ字に変換しています。</li>
     <li><strong>政令指定都市</strong>は「区, 市」の順(例: Chuo-ku, Sapporo)、<strong>郡部</strong>は「町村, 郡」の順(例: Yoichi-cho, Yoichi-gun)で表記します。</li>
+    <li><strong>日本語表記に戻すとき</strong>は、並び順ではなく<strong>形</strong>で読み取ります。7桁の数字を郵便番号、数字とハイフンの塊(3-2-1)を番地、残りを建物名・部屋番号として拾い、郵便番号から都道府県・市区町村・町域の漢字を引き当てます。そのため、大きい順・小さい順のどちらで書かれていても同じ結果になります。</li>
   </ul>
+
+  <h3>対応している国・地域(在留外国人が多い上位10)</h3>
+  <p>住所の書き方の例と、部屋番号の書き方(Apt・Unit・Apto・Kamarなど)の判定を、国ごとに切り替えます。一覧にない国は「その他」を選べば同じように変換できます。</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>対応国・地域と住所を書く順番</caption>
+      <thead><tr><th>国・地域</th><th>住所を書く順番</th></tr></thead>
+      <tbody>
+        <tr><td>中国</td><td>大きい順(都道府県から)</td></tr>
+        <tr><td>台湾</td><td>大きい順(都道府県から)</td></tr>
+        <tr><td>ベトナム</td><td>小さい順(番地から)</td></tr>
+        <tr><td>韓国</td><td>小さい順(番地から)</td></tr>
+        <tr><td>フィリピン</td><td>小さい順(番地から)</td></tr>
+        <tr><td>ネパール</td><td>小さい順(番地から)</td></tr>
+        <tr><td>インドネシア</td><td>小さい順(番地から)</td></tr>
+        <tr><td>ブラジル</td><td>小さい順(番地から)</td></tr>
+        <tr><td>ミャンマー</td><td>小さい順(番地から)</td></tr>
+        <tr><td>スリランカ</td><td>小さい順(番地から)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>上位10か国・地域は、出入国在留管理庁の統計(令和7年末現在)によります。<strong>並び順が違っていても結果は変わりません</strong>ので、迷ったら「その他」で構いません。</p>
 
   <h3>出典(一次情報)</h3>
   <ul class="sources">
@@ -126,6 +183,8 @@
       <a href="https://www.post.japanpost.jp/int/use/writing/normal.html" rel="noopener" target="_blank">https://www.post.japanpost.jp/int/use/writing/normal.html</a>(2026年7月26日参照)</li>
     <li>日本郵便「郵便番号データダウンロード」(住所・カナ読みのデータ源。2026年7月時点のデータを使用)<br>
       <a href="https://www.post.japanpost.jp/zipcode/download.html" rel="noopener" target="_blank">https://www.post.japanpost.jp/zipcode/download.html</a>(2026年7月26日参照)</li>
+    <li>出入国在留管理庁「令和7年末現在における在留外国人数について」(対応する国・地域の選定根拠)<br>
+      <a href="https://www.moj.go.jp/isa/publications/press/13_00062.html" rel="noopener" target="_blank">https://www.moj.go.jp/isa/publications/press/13_00062.html</a>(2026年7月26日参照)</li>
   </ul>
 
   <h2>変換の前提と注意</h2>
@@ -133,11 +192,14 @@
     <li>ローマ字は機械変換のため、固有の読み(例: 難読地名)と異なることがあります。ローマ字欄で直接修正できます。</li>
     <li>京都市の通り名(「〜通上ル」など)や、大口事業所の個別郵便番号では町域が入らないことがあります。その場合は町域のローマ字欄に手入力してください。</li>
     <li>住所の英語表記に法的な唯一の正解はありません。本ツールは日本郵便の案内に沿った一般的な書き方を出力します。</li>
+    <li>日本語表記に戻すとき、<strong>建物名はローマ字のままです</strong>。建物名は固有名詞で、正しい日本語表記は郵便番号からはわからないためです。マンション名がわかる場合はご自身で書き換えてください。</li>
   </ul>
 
   <h2 id="faq">よくある質問</h2>
   <h3 class="faq-q">なぜ英語だと住所の順番が逆になるのですか?</h3>
   <p class="faq-a">英語圏の住所は「狭い範囲 → 広い範囲」の順で書く慣習だからです。日本式(広い→狭い)をそのまま逆に並べ替えれば英語式になります。</p>
+  <h3 class="faq-q">郵便番号がわからないときはどうすればいいですか?</h3>
+  <p class="faq-a">「母国の書き方 → 日本語表記」で郵便番号が見つからなかったときは、町名のローマ字(例: Nishishinjuku)から候補を探せる欄が出ます。同じ町名が全国にある場合は候補から選んでください。</p>
   <h3 class="faq-q">海外から日本へ送ってもらう時、住所は英語でないとだめですか?</h3>
   <p class="faq-a">国名(JAPAN)だけは差出国で分かるように書く必要がありますが、日本国内の部分は日本語で書いても配達されます(日本郵便の案内)。英語表記は、日本語を書けない相手や海外サイトの入力欄に便利です。</p>
   <h3 class="faq-q">「1-2-3」はどこまでが丁目ですか?</h3>
@@ -272,6 +334,178 @@
       setTimeout(function () { copyBtn.textContent = "英語住所をコピー"; }, 1500);
     });
   });
+})();
+</script>
+<script>
+/* 母国の書き方 → 日本語表記 */
+(function () {
+  "use strict";
+  var COUNTRY_NAMES = {
+    cn: "中国", vn: "ベトナム", kr: "韓国", ph: "フィリピン", np: "ネパール",
+    id: "インドネシア", br: "ブラジル", mm: "ミャンマー", lk: "スリランカ", tw: "台湾",
+    other: "その他の国・地域"
+  };
+  // 並び順ごとの記入例。国ごとに文字列を持たず、calc.js の order から組み立てる
+  var EXAMPLES = {
+    "small-first": "例: Apt 201, 3-2-1 Nishishinjuku, Shinjuku-ku, Tokyo 160-0023",
+    "large-first": "例: 160-0023 Tokyo, Shinjuku-ku, Nishishinjuku 3-2-1, Apt 201"
+  };
+
+  var modeEl = document.getElementById("mode");
+  var revForm = document.getElementById("rev-form");
+  var enForm = document.getElementById("jusho-form");
+  var countryEl = document.getElementById("country");
+  var exampleEl = document.getElementById("rev-example");
+  var inputEl = document.getElementById("foreign-input");
+  var resultEl = document.getElementById("rev-result");
+  var copyJaBtn = document.getElementById("copy-ja");
+  var lookupBox = document.getElementById("rev-lookup");
+  var townQuery = document.getElementById("town-query");
+  var candBox = document.getElementById("town-candidates");
+
+  var shardCache = {};
+  var revCache = {};
+  var pickedZip = "";  // 候補から選んだ郵便番号
+  var copyText = "";
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function getShard(zip3) {
+    if (shardCache[zip3]) return Promise.resolve(shardCache[zip3]);
+    return fetch("../../shared/postal/" + zip3 + ".json")
+      .then(function (r) { if (!r.ok) throw new Error("nf"); return r.json(); })
+      .then(function (d) { shardCache[zip3] = d; return d; });
+  }
+  function getRev(letter) {
+    if (revCache[letter]) return Promise.resolve(revCache[letter]);
+    return fetch("../../shared/postal/rev/" + letter + ".json")
+      .then(function (r) { if (!r.ok) throw new Error("nf"); return r.json(); })
+      .then(function (d) { revCache[letter] = d; return d; });
+  }
+
+  // 国の選択肢は calc.js の COUNTRIES から作る(順序も calc.js に従う)
+  var opts = "";
+  for (var i = 0; i < JushoCalc.COUNTRIES.length; i++) {
+    var c = JushoCalc.COUNTRIES[i].code;
+    opts += '<option value="' + c + '">' + (COUNTRY_NAMES[c] || c) + "</option>";
+  }
+  countryEl.innerHTML = opts;
+
+  function syncExample() {
+    var country = JushoCalc.countryOf(countryEl.value);
+    exampleEl.textContent = EXAMPLES[country.order];
+    inputEl.placeholder = EXAMPLES[country.order].replace(/^例: /, "");
+  }
+
+  function show(zip, rec, parsed) {
+    var refined = JushoCalc.refineBuilding(parsed, [rec[0], rec[1], rec[2], rec[3], rec[4], rec[5]]);
+    var r = JushoCalc.japaneseAddress({
+      zip: zip, pref: rec[0], city: rec[1], town: rec[2],
+      banchi: parsed.banchi, building: refined.building
+    });
+    if (!r.ok) { resultEl.hidden = true; copyJaBtn.hidden = true; return; }
+    copyText = r.lines.join("\n");
+    var chome = JushoCalc.banchiToChome(parsed.banchi);
+    resultEl.innerHTML =
+      '<div class="result-main">日本語表記</div>' +
+      '<p style="white-space:pre-line;font-size:1.05rem;margin:6px 0;"><strong>' + esc(copyText) + "</strong></p>" +
+      "<p>1行で書く場合:<br>" + esc(r.single) + "</p>" +
+      (chome ? "<p>丁目で書く場合: " + esc("〒" + zip + " " + rec[0] + rec[1] + rec[2] + chome) + "</p>" : "") +
+      (refined.building ? "<p><small>建物名は固有名詞のため、読み取った表記のままにしています。</small></p>" : "");
+    resultEl.hidden = false;
+    copyJaBtn.hidden = false;
+  }
+
+  function fail(msg, showLookup) {
+    resultEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    resultEl.hidden = false;
+    copyJaBtn.hidden = true;
+    lookupBox.hidden = !showLookup;
+  }
+
+  function run() {
+    var parsed = JushoCalc.parseForeignAddress(inputEl.value, countryEl.value);
+    if (!parsed.ok) {
+      resultEl.hidden = true; copyJaBtn.hidden = true; lookupBox.hidden = true;
+      return;
+    }
+    var zip = parsed.zip || pickedZip;
+    if (!zip) {
+      // 郵便番号が無いときは町名から探せるようにする
+      lookupBox.hidden = false;
+      if (!townQuery.value && parsed.words.length) townQuery.value = parsed.words[0];
+      fail("郵便番号が見つかりませんでした。下の欄で町名から探せます。", true);
+      return;
+    }
+    lookupBox.hidden = true;
+    var digits = zip.replace("-", "");
+    getShard(digits.slice(0, 3))
+      .then(function (data) {
+        var rec = data[digits.slice(3)];
+        if (!rec) { fail("この郵便番号は見つかりませんでした。番号をお確かめください。", true); return; }
+        show(zip, rec, parsed);
+      })
+      .catch(function () { fail("この郵便番号は見つかりませんでした。番号をお確かめください。", true); });
+  }
+
+  function searchTown() {
+    var key = JushoCalc.revKey(townQuery.value);
+    if (!key) { candBox.hidden = true; return; }
+    candBox.innerHTML = "<p>探しています…</p>";
+    candBox.hidden = false;
+    getRev(key[0])
+      .then(function (table) {
+        var zips = table[key];
+        if (!zips || !zips.length) {
+          candBox.innerHTML = '<p class="result-error">この町名は見つかりませんでした。つづりをお確かめください。</p>';
+          return;
+        }
+        return Promise.all(zips.map(function (z) {
+          return getShard(z.slice(0, 3)).then(function (d) { return { zip: z, rec: d[z.slice(3)] }; });
+        })).then(function (list) {
+          var rows = list.filter(function (x) { return x.rec; }).map(function (x) {
+            var z = x.zip.slice(0, 3) + "-" + x.zip.slice(3);
+            return '<li><button type="button" class="cand" data-zip="' + z + '">' +
+              esc(x.rec[0] + x.rec[1] + x.rec[2]) + "(〒" + z + ")</button></li>";
+          }).join("");
+          candBox.innerHTML = "<p>あてはまる住所を選んでください。</p><ul class=\"related\">" + rows + "</ul>";
+        });
+      })
+      .catch(function () {
+        candBox.innerHTML = '<p class="result-error">この町名は見つかりませんでした。つづりをお確かめください。</p>';
+      });
+  }
+
+  candBox.addEventListener("click", function (e) {
+    var btn = e.target.closest ? e.target.closest("button.cand") : null;
+    if (!btn) return;
+    pickedZip = btn.getAttribute("data-zip");
+    candBox.hidden = true;
+    run();
+  });
+
+  function syncMode() {
+    var toJa = modeEl.value === "to-ja";
+    revForm.hidden = !toJa;
+    enForm.hidden = toJa;
+    if (toJa) { syncExample(); run(); }
+  }
+  modeEl.addEventListener("change", syncMode);
+  countryEl.addEventListener("change", function () { syncExample(); run(); });
+  inputEl.addEventListener("input", function () { pickedZip = ""; run(); });
+  document.getElementById("town-search").addEventListener("click", searchTown);
+  document.getElementById("rev-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  copyJaBtn.addEventListener("click", function () {
+    if (!copyText) return;
+    navigator.clipboard.writeText(copyText).then(function () {
+      copyJaBtn.textContent = "コピーしました";
+      setTimeout(function () { copyJaBtn.textContent = "日本語住所をコピー"; }, 1500);
+    });
+  });
+
+  syncExample();
+  syncMode();
 })();
 </script>
 </body>

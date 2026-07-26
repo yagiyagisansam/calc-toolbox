@@ -17,6 +17,33 @@
     { "name": "英語住所: 建物・部屋つき", "func": "englishAddress", "args": [{ "zip": "100-0014", "pref": "Tokyo", "city": "Chiyoda-ku", "neighborhood": "Nagatacho", "banchi": "1-2-3", "building": "Sakura Bldg. 201" }], "expect": { "ok": true, "single": "Sakura Bldg. 201, 1-2-3 Nagatacho, Chiyoda-ku, Tokyo 100-0014, JAPAN" } },
     { "name": "英語住所: 政令市(区,市の順)", "func": "englishAddress", "args": [{ "zip": "060-0001", "pref": "Hokkaido", "city": "Chuo-ku, Sapporo", "neighborhood": "Kita 1 Jonishi", "banchi": "2-1", "building": "" }], "expect": { "ok": true, "single": "2-1 Kita 1 Jonishi, Chuo-ku, Sapporo, Hokkaido 060-0001, JAPAN" } },
     { "name": "英語住所: 町域なしでも組める", "func": "englishAddress", "args": [{ "zip": "100-0014", "pref": "Tokyo", "city": "Chiyoda-ku", "neighborhood": "", "banchi": "1-2-3", "building": "" }], "expect": { "ok": true, "single": "1-2-3, Chiyoda-ku, Tokyo 100-0014, JAPAN" } },
-    { "name": "英語住所: 市区町村なしはエラー", "func": "englishAddress", "args": [{ "zip": "100-0014", "pref": "Tokyo", "city": "", "neighborhood": "", "banchi": "", "building": "" }], "expect": { "ok": false, "code": "missing_area" } }
+    { "name": "英語住所: 市区町村なしはエラー", "func": "englishAddress", "args": [{ "zip": "100-0014", "pref": "Tokyo", "city": "", "neighborhood": "", "banchi": "", "building": "" }], "expect": { "ok": false, "code": "missing_area" } },
+
+    { "name": "解析: 小さい順(ネパール等)+Aptの部屋番号を番地と混同しない", "func": "parseForeignAddress", "args": ["Apt 201, 3-2-1 Nishishinjuku, Shinjuku-ku, Tokyo 160-0023", "np"], "expect": { "ok": true, "zip": "160-0023", "banchi": "3-2-1", "building": "Apt 201" } },
+    { "name": "解析: ブラジル式のApto表記", "func": "parseForeignAddress", "args": ["1-2-3 Nagatacho, Chiyoda-ku, Tokyo, 100-0014, Apto 502", "br"], "expect": { "ok": true, "zip": "100-0014", "banchi": "1-2-3", "building": "Apto 502" } },
+    { "name": "解析: フィリピン式のUnit表記", "func": "parseForeignAddress", "args": ["Unit 5B, 1-2-3 Nagatacho, Chiyoda-ku, Tokyo 1000014, JAPAN", "ph"], "expect": { "ok": true, "zip": "100-0014", "banchi": "1-2-3", "building": "Unit 5B" } },
+    { "name": "解析: インドネシア式のKamar表記", "func": "parseForeignAddress", "args": ["Nishishinjuku 3-2-1, Kamar 12, Shinjuku, Tokyo 160-0023", "id"], "expect": { "ok": true, "zip": "160-0023", "banchi": "3-2-1", "building": "Kamar 12" } },
+    { "name": "解析: 大きい順(中国・台湾等)でも同じ結果", "func": "parseForeignAddress", "args": ["Japan Tokyo 100-0014 Chiyoda-ku Nagatacho 1-2-3", "cn"], "expect": { "ok": true, "zip": "100-0014", "banchi": "1-2-3" } },
+    { "name": "解析: 郵便番号なしでも番地は取れる", "func": "parseForeignAddress", "args": ["3-2-1 Nishishinjuku, Shinjuku-ku, Tokyo", "other"], "expect": { "ok": true, "zip": "", "banchi": "3-2-1" } },
+    { "name": "解析: #付きの部屋番号は建物側", "func": "parseForeignAddress", "args": ["Sakura Heights #305, 5 Nagatacho, Chiyoda-ku, Tokyo 100-0014", "other"], "expect": { "ok": true, "zip": "100-0014", "banchi": "5", "building": "#305" } },
+    { "name": "解析: 漢字表記の1丁目2番3号は1-2-3になる", "func": "parseForeignAddress", "args": ["〒160-0023 東京都新宿区西新宿3丁目2番1号", "cn"], "expect": { "ok": true, "zip": "160-0023", "banchi": "3-2-1" } },
+    { "name": "解析: 全角の郵便番号も読める", "func": "parseForeignAddress", "args": ["１６０−００２３ Nishishinjuku 3-2-1", "other"], "expect": { "ok": true, "zip": "160-0023", "banchi": "3-2-1" } },
+    { "name": "解析: 空文字はエラー", "func": "parseForeignAddress", "args": ["   ", "other"], "expect": { "ok": false, "code": "empty" } },
+    { "name": "解析: 未知の国コードはその他扱いで動く", "func": "parseForeignAddress", "args": ["3-2-1 Nishishinjuku, Tokyo 160-0023", "zz"], "expect": { "ok": true, "zip": "160-0023", "banchi": "3-2-1" } },
+
+    { "name": "国データ: 未知コードはotherを返す", "func": "countryOf", "args": ["zz"], "expect": { "code": "other" } },
+    { "name": "国データ: ブラジルは番地から書く", "func": "countryOf", "args": ["br"], "expect": { "code": "br", "order": "small-first" } },
+    { "name": "国データ: 中国は都道府県から書く", "func": "countryOf", "args": ["cn"], "expect": { "code": "cn", "order": "large-first" } },
+
+    { "name": "照合キー: 大文字小文字とハイフンを吸収", "func": "revKey", "args": ["Shinjuku-Ku"], "expect": "shinjukuku" },
+
+    { "name": "日本語表記: 基本形", "func": "japaneseAddress", "args": [{ "zip": "160-0023", "pref": "東京都", "city": "新宿区", "town": "西新宿", "banchi": "3-2-1", "building": "" }], "expect": { "ok": true, "single": "〒160-0023 東京都新宿区西新宿3-2-1" } },
+    { "name": "日本語表記: 建物つき", "func": "japaneseAddress", "args": [{ "zip": "160-0023", "pref": "東京都", "city": "新宿区", "town": "西新宿", "banchi": "3-2-1", "building": "Apt 201" }], "expect": { "ok": true, "single": "〒160-0023 東京都新宿区西新宿3-2-1 Apt 201" } },
+    { "name": "日本語表記: 郵便番号なしでも組める", "func": "japaneseAddress", "args": [{ "zip": "", "pref": "東京都", "city": "新宿区", "town": "西新宿", "banchi": "3-2-1", "building": "" }], "expect": { "ok": true, "single": "東京都新宿区西新宿3-2-1" } },
+    { "name": "日本語表記: 市区町村なしはエラー", "func": "japaneseAddress", "args": [{ "zip": "160-0023", "pref": "東京都", "city": "", "town": "", "banchi": "", "building": "" }], "expect": { "ok": false, "code": "missing_area" } },
+
+    { "name": "丁目表記: 1-2-3 → 1丁目2番3号", "func": "banchiToChome", "args": ["1-2-3"], "expect": "1丁目2番3号" },
+    { "name": "丁目表記: 数字2つは変換しない", "func": "banchiToChome", "args": ["1-2"], "expect": "" },
+    { "name": "丁目表記: 数字以外は変換しない", "func": "banchiToChome", "args": ["a-b-c"], "expect": "" }
   ]
 }

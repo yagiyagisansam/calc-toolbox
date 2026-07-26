@@ -1,1 +1,1 @@
-{"source": "日本郵便 郵便番号データ(posuto経由)", "records": 120682, "shards": 948}
+{"source": "日本郵便 郵便番号データ(posuto経由)", "records": 120682, "shards": 948, "reverseKeys": 77589, "reverseShards": 32, "reverseMax": 12}
