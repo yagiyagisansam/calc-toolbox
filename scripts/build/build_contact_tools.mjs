@@ -1,5 +1,5 @@
-// report.html のツール選択リストを data.js から再生成する
-// 使い方: node scripts/build/build_report_tools.mjs
+// contact.html(お問い合わせフォーム)の種別リストを data.js から再生成する
+// 使い方: node scripts/build/build_contact_tools.mjs
 // ツールを追加したら実行すること(手書きの一覧を持たないための生成スクリプト)
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -23,11 +23,11 @@ const groups = CAT_ORDER.map((cat) => {
   return `        <optgroup label="${esc(CAT_LABEL[cat] || cat)}">\n${opts}\n        </optgroup>`;
 }).filter(Boolean).join("\n");
 
-const block = `        <option value="">選んでください</option>\n${groups}\n        <option value="other">その他・サイト全体</option>`;
+const block = `        <option value="">選んでください</option>\n${groups}\n        <option value="other">その他(ご意見・ご要望・サイト全体のこと)</option>`;
 
-const file = ROOT + "/report.html";
+const file = ROOT + "/contact.html";
 const html = readFileSync(file, "utf8");
 const re = /(<!-- @tools start[^>]*-->\n)[\s\S]*?(\n\s*<!-- @tools end -->)/;
-if (!re.test(html)) throw new Error("report.html に @tools のマーカーが見つかりません");
+if (!re.test(html)) throw new Error("contact.html に @tools のマーカーが見つかりません");
 writeFileSync(file, html.replace(re, (m, head, tail) => head + block + tail), "utf8");
-console.log(`report.html: ${TOOLS.length} ツールの選択リストを生成しました`);
+console.log(`contact.html: ${TOOLS.length} ツールの種別リストを生成しました`);

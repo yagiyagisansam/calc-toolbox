@@ -1,15 +1,15 @@
-// 不具合の報告(report.html)
-// 送信先はアンケートツールと同じSupabaseプロジェクト。接続設定は tools/poll/config.js を共用する。
+// お問い合わせフォーム(contact.html)
+// 送信先はアンケートツールと同じデータベース。接続設定は tools/poll/config.js を共用する。
 // anonキーは公開前提のキーで、このページからできるのは bug_reports へのINSERTだけ(RLSと列権限で制限)。
 // CSPで require-trusted-types-for 'script' を指定しているため、DOMの組み立てに innerHTML は使わない。
 (function () {
   "use strict";
 
-  var form = document.getElementById("report-form");
+  var form = document.getElementById("contact-form");
   var toolSel = document.getElementById("tool");
   var msg = document.getElementById("message");
   var btn = document.getElementById("send-btn");
-  var box = document.getElementById("report-result");
+  var box = document.getElementById("contact-result");
   if (!form || !toolSel || !msg || !btn || !box) return;
 
   // ---- 表示 ----
@@ -29,7 +29,7 @@
 
   function reporterId() {
     var s = storage();
-    var key = "bugReporter";
+    var key = "contactSender";
     var id = s ? s.getItem(key) : null;
     if (typeof id === "string" && id.length >= 8 && id.length <= 64) return id;
     var buf = new Uint8Array(16);
@@ -41,7 +41,7 @@
     return id;
   }
 
-  // ---- URLの ?tool= でツールを初期選択する ----
+  // ---- URLの ?tool= で種別を初期選択する(各ツールのフッタから来たとき) ----
   function preselect() {
     var m = /[?&]tool=([a-z0-9-]{1,40})(&|$)/.exec(window.location.search);
     if (!m) return;
@@ -79,17 +79,17 @@
     e.preventDefault();
     var tool = toolSel.value;
     var text = msg.value.trim();
-    if (!tool) { show("どのツールの不具合かを選んでください。", true); return; }
-    if (text.length < 5) { show("不具合の内容を5文字以上で書いてください。", true); return; }
-    if (text.length > 1000) { show("不具合の内容は1000文字までです。", true); return; }
-    if (!conf()) { show("ただいま報告を受け付けられません。時間をおいて試してください。", true); return; }
+    if (!tool) { show("どのことについてのお問い合わせかを選んでください。", true); return; }
+    if (text.length < 5) { show("お問い合わせの内容を5文字以上で書いてください。", true); return; }
+    if (text.length > 1000) { show("お問い合わせの内容は1000文字までです。", true); return; }
+    if (!conf()) { show("ただいまお問い合わせを受け付けられません。時間をおいて試してください。", true); return; }
 
     btn.disabled = true;
     show("送信しています…", false);
     send(tool, text).then(function (r) {
       if (r.ok) {
         form.hidden = true;
-        show("送信しました。ご協力ありがとうございます。", false);
+        show("送信しました。ありがとうございます。内容は運営者が確認します。", false);
         return;
       }
       btn.disabled = false;
