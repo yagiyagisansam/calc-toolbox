@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>微波炉加热时间换算器(500W⇔600W⇔700W) | Quick Calc</title>
+  <meta name="description" content="把包装上写的加热时间换算成你家微波炉瓦数对应的时间,免费即时计算。日本的冷冻食品包装和菜谱都按瓦数标注加热时间(例:「600W 1分30秒」),瓦数不一样时用这个工具换算。同时显示10秒为单位的参考值。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/renji/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="微波炉加热时间换算器(500W⇔600W⇔700W) | Quick Calc">
+  <meta property="og:description" content="把包装上写的加热时间换算成你家微波炉瓦数对应的时间,免费即时计算。日本的冷冻食品包装和菜谱都按瓦数标注加热时间(例:「600W 1分30秒」),瓦数不一样时用这个工具换算。同时显示10秒为单位的参考值。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/renji/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"微波炉加热时间换算器","item":"https://quick-calc.site/zh/tools/renji/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/renji/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/renji/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/renji/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/renji/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/renji/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>微波炉加热时间换算器</h1>
+  <form class="tool-form" id="renji-form">
+    <span class="field-note">输入或更改的同时,换算结果立即显示在下方</span>
+    <label>包装上标注的加热时间
+      <span class="field-note">包装或菜谱上写的时间</span>
+      <span style="display:flex;gap:.5em;align-items:center;">
+        <input type="number" id="min" inputmode="numeric" min="0" max="120" step="1" value="1" style="width:5em;" aria-label="分"> 分
+        <input type="number" id="sec" inputmode="numeric" min="0" max="59" step="1" value="30" style="width:5em;" aria-label="秒"> 秒
+      </span>
+    </label>
+    <label>包装上标注的瓦数
+      <select id="from-w">
+        <option value="200">200W(解冻)</option>
+        <option value="300">300W</option>
+        <option value="500">500W</option>
+        <option value="600" selected>600W</option>
+        <option value="700">700W</option>
+        <option value="800">800W</option>
+        <option value="1000">1000W</option>
+        <option value="1500">1500W</option>
+      </select>
+    </label>
+    <label>你家微波炉的瓦数
+      <select id="to-w">
+        <option value="200">200W(解冻)</option>
+        <option value="300">300W</option>
+        <option value="500" selected>500W</option>
+        <option value="600">600W</option>
+        <option value="700">700W</option>
+        <option value="800">800W</option>
+        <option value="1000">1000W</option>
+        <option value="1500">1500W</option>
+      </select>
+    </label>
+    <button type="submit">换算</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 500〜1000W一览表和自由瓦数换算</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">500〜1000W的一览换算表</h3>
+      <p class="adv-note">根据包装上的时间和瓦数,一次性列出500W·600W·700W·800W·1000W各自的加热时间。</p>
+      <label>包装上标注的加热时间
+        <span style="display:flex;gap:.5em;align-items:center;">
+          <input type="number" id="adv-min" inputmode="numeric" min="0" max="120" step="1" value="1" style="width:5em;" aria-label="分"> 分
+          <input type="number" id="adv-sec" inputmode="numeric" min="0" max="59" step="1" value="30" style="width:5em;" aria-label="秒"> 秒
+        </span>
+      </label>
+      <label>包装上标注的瓦数
+        <select id="adv-from-w">
+          <option value="200">200W(解冻)</option>
+          <option value="300">300W</option>
+          <option value="500">500W</option>
+          <option value="600" selected>600W</option>
+          <option value="700">700W</option>
+          <option value="800">800W</option>
+          <option value="1000">1000W</option>
+          <option value="1500">1500W</option>
+        </select>
+      </label>
+      <button type="button" id="adv-run">生成一览换算表</button>
+      <h3 class="adv-h">用列表中没有的瓦数换算</h3>
+      <p class="adv-note">850W等选项中没有的瓦数,可以在这里以100〜2000W的范围自由输入(时间使用上面栏目的值)。</p>
+      <label>包装上标注的瓦数(自由输入)
+        <input type="number" id="adv-free-from" inputmode="numeric" min="100" max="2000" step="1" value="600" placeholder="例: 600">
+      </label>
+      <label>你家微波炉的瓦数(自由输入)
+        <input type="number" id="adv-free-to" inputmode="numeric" min="100" max="2000" step="1" placeholder="例: 850">
+      </label>
+      <button type="button" id="adv-free-run">用这个瓦数换算</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    换算结果为<strong>参考值</strong>。成品效果会因机型、食品分量和冷冻状态而变化,请一边观察一边分次加热。加热过度容易导致爆开和变干。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>日本的冷冻食品和菜谱都按瓦数标注加热时间,例如「600W 1分30秒」。本工具告诉你<strong>在自己家的微波炉上该设定几分几秒</strong>,只要输入时间并选择两个瓦数即可。包装按500W或600W标注、而自家微波炉是700W以上时特别有用。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>输入包装上写的加热时间和瓦数(例: 600W 1分30秒)。</li>
+    <li>选择你家微波炉的瓦数。</li>
+    <li>选择的瞬间,换算后的时间和10秒为单位的参考值就显示在下方,无需点击按钮。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li>微波炉给食品的能量由「<strong>功率(W)×时间</strong>」决定。要得到相同的加热效果,就要调整时间使这个能量保持不变。</li>
+    <li><strong>换算后的时间 = 包装上的时间 × 包装上的瓦数 ÷ 你家的瓦数</strong></li>
+    <li>计算例: 600W 1分30秒(90秒)→ 500W时为 90 × 600 ÷ 500 = <strong>108秒(约1分50秒)</strong></li>
+    <li>微波炉的定时器多为10秒一档,因此同时显示向上取整到10秒的参考值。</li>
+  </ul>
+
+  <h3>出处与前提的说明</h3>
+  <ul class="sources">
+    <li>这是基于能量等价(功率×时间保持一定)的算术计算。</li>
+    <li>实际的加热效率会因机型(是否变频式、腔体形状)和食品而变化,所以结果只是参考值。</li>
+  </ul>
+
+  <h2>计算的前提与注意</h2>
+  <ul class="cautions">
+    <li>「500W⇔600W」这样相近瓦数之间的换算误差较小,但像200W(解冻)和1000W这样相差很大的换算,成品效果容易出现差异。</li>
+    <li>饮料和油分多的食品加热过度有突沸(突然沸腾)的危险。请设定得短一些并观察情况。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">600W加热1分钟,500W要几秒?</h3>
+  <p class="faq-a">72秒(约1分10秒)。60秒 × 600 ÷ 500 = 72秒。配合微波炉定时器的话,以1分10秒〜1分20秒为参考。</p>
+  <h3 class="faq-q">在哪里能确认自家微波炉的瓦数?</h3>
+  <p class="faq-a">在门内侧或侧面的标签上,日本的机型标为「高周波出力」(微波输出)。只有「強・弱」(强·弱)显示的机型,请查看说明书确认对应瓦数。多数机型强=500〜600W、弱=150〜200W左右。</p>
+  <h3 class="faq-q">改变瓦数,味道和成品效果也会变吗?</h3>
+  <p class="faq-a">即使总能量相同,用较低瓦数慢慢加热也更不容易受热不均。解冻推荐低瓦数(150〜200W)。用高瓦数短时间加热时中心可能还是凉的,所以中途搅拌或翻面更可靠。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/renji/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/renji/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/renji/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=renji">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/renji/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var ERROR_MESSAGES = {
+    invalid_time: "加热时间请输入1秒以上。",
+    invalid_watt: "瓦数请在100〜2000W的范围内选择。"
+  };
+  function fmt(sec) {
+    var m = Math.floor(sec / 60);
+    var s = sec % 60;
+    return (m > 0 ? m + "分" : "") + (s > 0 || m === 0 ? s + "秒" : "");
+  }
+  function run(fromSubmit) {
+    var minRaw = document.getElementById("min").value;
+    var secRaw = document.getElementById("sec").value;
+    if (!fromSubmit && minRaw === "" && secRaw === "") { box.hidden = true; return; }
+    var min = parseInt(minRaw || "0", 10);
+    var sec = parseInt(secRaw || "0", 10);
+    var fromW = parseInt(document.getElementById("from-w").value, 10);
+    var toW = parseInt(document.getElementById("to-w").value, 10);
+    var r = RenjiCalc.convert(min * 60 + sec, fromW, toW);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "请检查输入的数值。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">' + toW + "W 约为 " + fmt(r.rounded10) + "</div>" +
+      "<p>计算值: " + fmt(r.seconds) + "(" + r.seconds + "秒),这是向上取整到10秒的参考值。请一边观察一边加热。</p>";
+    box.hidden = false;
+  }
+  document.getElementById("renji-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+  ["min", "sec"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { run(false); });
+  });
+  ["from-w", "to-w"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", function () { run(false); });
+  });
+  run(false);
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advFmt(sec) {
+    var m = Math.floor(sec / 60);
+    var s = sec % 60;
+    if (m === 0) return s + "秒";
+    return m + "分" + (s > 0 ? s + "秒" : "");
+  }
+  function advReadTime() {
+    var mi = parseInt(document.getElementById("adv-min").value, 10);
+    var se = parseInt(document.getElementById("adv-sec").value, 10);
+    if (isNaN(mi)) mi = 0;
+    if (isNaN(se)) se = 0;
+    return mi * 60 + se;
+  }
+  function advShowError(code) {
+    advBox.innerHTML = '<p class="result-error">' +
+      (code === "invalid_time" ? "加热时间请输入1秒以上。" : "瓦数请在100〜2000W的范围内输入。") + "</p>";
+    advBox.hidden = false;
+  }
+  function runMulti(fromButton) {
+    if (!fromButton &&
+        document.getElementById("adv-min").value === "" &&
+        document.getElementById("adv-sec").value === "") { return; }
+    var total = advReadTime();
+    var fromW = parseInt(document.getElementById("adv-from-w").value, 10);
+    var r = RenjiCalc.multiTable(total, fromW);
+    if (!r.ok) { advShowError(r.code); return; }
+    var html = '<div class="result-main">' + fromW + "W 加热 " + advFmt(total) + " 的情况</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>瓦数</th><th>换算时间</th><th>10秒单位的参考值</th></tr></thead><tbody>';
+    for (var i = 0; i < r.rows.length; i++) {
+      var row = r.rows[i];
+      html += "<tr><td>" + row.w + "W</td><td>" + advFmt(row.seconds) + "</td><td>" + advFmt(row.rounded10) + "</td></tr>";
+    }
+    html += "</tbody></table></div>" +
+      '<p class="adv-note">10秒单位的参考值为向上取整。</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  function runFree(fromButton) {
+    if (!fromButton &&
+        (document.getElementById("adv-free-from").value === "" ||
+         document.getElementById("adv-free-to").value === "")) { return; }
+    var total = advReadTime();
+    var fromW = parseFloat(document.getElementById("adv-free-from").value);
+    var toW = parseFloat(document.getElementById("adv-free-to").value);
+    var r = RenjiCalc.convert(total, fromW, toW);
+    if (!r.ok) { advShowError(r.code); return; }
+    advBox.innerHTML =
+      '<div class="result-main">' + toW.toLocaleString() + "W 为 " + advFmt(r.seconds) + "</div>" +
+      "<p>" + fromW.toLocaleString() + "W 加热 " + advFmt(total) + " → " + toW.toLocaleString() +
+      "W 时为 <strong>" + advFmt(r.seconds) + "</strong>(10秒单位的参考值: " + advFmt(r.rounded10) + ")。</p>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", function () { runMulti(true); });
+  document.getElementById("adv-free-run").addEventListener("click", function () { runFree(true); });
+  ["adv-min", "adv-sec"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runMulti(false); });
+  });
+  document.getElementById("adv-from-w").addEventListener("change", function () { runMulti(false); });
+  ["adv-free-from", "adv-free-to"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runFree(false); });
+  });
+})();
+</script>
+</body>
+</html>

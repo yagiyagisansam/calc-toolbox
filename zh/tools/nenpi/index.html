@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>油耗计算器(加满法算km/L和油费) | Quick Calc</title>
+  <meta name="description" content="用行驶距离和加油量,按加满法计算实际油耗(km/L)。同时显示欧洲式的L/100km、本次加油费和每公里燃料费。免费·无需注册。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/nenpi/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="油耗计算器(加满法算km/L和油费) | Quick Calc">
+  <meta property="og:description" content="用行驶距离和加油量,按加满法计算实际油耗(km/L)。同时显示欧洲式的L/100km、本次加油费和每公里燃料费。免费·无需注册。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/nenpi/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"油耗计算器(加满法算km/L和油费)","item":"https://quick-calc.site/zh/tools/nenpi/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/nenpi/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/nenpi/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/nenpi/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/nenpi/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/nenpi/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>油耗计算器(加满法)</h1>
+  <form class="tool-form" id="nenpi-form">
+    <label>行驶距离(km)
+      <span class="field-note">上次加满油之后行驶的距离(小计里程表)</span>
+      <input type="number" id="distance" inputmode="decimal" min="0" max="10000" step="0.1" required placeholder="例: 400">
+    </label>
+    <label>加油量(L)
+      <span class="field-note">本次加满所用的量(加油小票上的数字)</span>
+      <input type="number" id="liters" inputmode="decimal" min="0" max="500" step="0.01" required placeholder="例: 25.5">
+    </label>
+    <label>汽油单价(日元/L)
+      <span class="field-note">可不填。填了还会算出加油费和每公里费用</span>
+      <input type="number" id="price" inputmode="decimal" min="0" max="1000" step="0.1" placeholder="例: 170">
+    </label>
+    <button type="submit">计算油耗</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 与厂家标称油耗对比·两台车的年度对比</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">达到了标称油耗的百分之几?</h3>
+      <p class="adv-note">查看实际油耗相当于标称油耗(WLTC模式等)的百分之几(达到7〜8成属于常见范围)。</p>
+      <label>实际油耗(km/L)
+        <span class="field-note">上面表单算过的话会自动填入</span>
+        <input type="number" id="adv-actual" inputmode="decimal" step="any" min="1" max="60" placeholder="15.2">
+      </label>
+      <label>标称油耗(km/L)
+        <input type="number" id="adv-catalog" inputmode="decimal" step="any" min="1" max="60" placeholder="20.4">
+      </label>
+      <button type="button" id="adv-ratio-run">计算达成率</button>
+      <div class="tool-result" id="adv-result-ratio" hidden aria-live="polite"></div>
+      <h3 class="adv-h">两台车对比: 一年油费的差额(换车的参考)</h3>
+      <p class="adv-note">用现在的车(实际油耗)、想换的车的油耗和年行驶距离,算出一年油费会相差多少。</p>
+      <label>现在的车的油耗(km/L)
+        <input type="number" id="adv-car-a" inputmode="decimal" step="any" min="1" max="60" placeholder="12">
+      </label>
+      <label>想换的车的油耗(km/L)
+        <input type="number" id="adv-car-b" inputmode="decimal" step="any" min="1" max="60" placeholder="22">
+      </label>
+      <label>年行驶距离(km)
+        <span class="field-note">以通勤和买东西为主的话,5,000〜10,000km 是常见范围</span>
+        <input type="number" id="adv-annual" inputmode="numeric" step="any" min="100" max="100000" placeholder="8000">
+      </label>
+      <label>汽油单价(日元/L)
+        <span class="field-note">上面表单已填的话可以省略</span>
+        <input type="number" id="adv-price2" inputmode="decimal" step="any" min="1" max="1000" placeholder="170">
+      </label>
+      <button type="button" id="adv-cmp-run">计算一年的差额</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>只要输入上次加油后跑的距离和这次加的汽油量,就能算出<strong>实际油耗(km/L)</strong>。km/L 是日本的汽车目录和加油站使用的单位。填入单价还会显示加油费和每公里的燃料费。适合检查车况或记录油耗。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>每次加油都加满,并把小计里程表(trip)归零。</li>
+    <li>下次加油时,输入「跑了多少距离」和「加了多少升」。</li>
+    <li>两项都输入后,实际油耗立即显示在下方。填入单价还会算出费用。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>油耗(km/L)= 行驶距离(km)÷ 加油量(L)</strong>(加满法)</li>
+    <li>加满法把「从加满到加满」之间用掉的燃料视为本次的加油量,是测量实际油耗最可靠的方法。</li>
+    <li>同时显示欧洲式表记 <strong>L/100km = 100 ÷ 油耗(km/L)</strong>(跑100km所需的燃料)。</li>
+    <li>计算例: 跑了400km、加油25L → 400 ÷ 25 = <strong>16.0km/L</strong>(6.25L/100km)。单价170日元/L时,加油费4,250日元,每公里约10.6日元。</li>
+  </ul>
+
+  <h3>出处·前提说明</h3>
+  <ul class="sources">
+    <li>基于距离、容量、单价的算术计算。</li>
+    <li>标称油耗(WLTC模式)的测定方法请参见<a href="https://www.mlit.go.jp/jidosha/jidosha_fr10_000010.html" target="_blank" rel="noopener">日本国土交通省「关于汽车的燃油经济性」</a>(日文)。</li>
+  </ul>
+
+  <h2>计算的前提与注意</h2>
+  <ul class="cautions">
+    <li>加满法会因加油枪跳枪位置的差异而产生单次误差。取几次的平均值会更准确。</li>
+    <li>实际油耗一般比标称油耗(WLTC模式)低2〜3成。开空调、堵车、短距离行驶会使其变差。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">实际油耗比标称油耗差很多,是车坏了吗?</h3>
+  <p class="faq-a">标称值(WLTC模式)是在规定行驶模式下的测定值,在实际道路上低2〜3成是正常的。不过如果油耗突然变差,建议检查胎压是否不足、机油是否老化等。</p>
+  <h3 class="faq-q">L/100km 是什么?</h3>
+  <p class="faq-a">是「跑100km要用几升」的表记方式,在欧洲很常用。和 km/L 相反,数字越小越省油。16km/L = 6.25L/100km。</p>
+  <h3 class="faq-q">混合动力车和轻自动车也能用吗?</h3>
+  <p class="faq-a">可以。只要是烧汽油的车,不分车型都是同样的计算(只靠电力行驶的EV使用「电耗(km/kWh)」这一不同的指标)。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/nenpi/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/nenpi/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/nenpi/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=nenpi">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/nenpi/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var ERROR_MESSAGES = {
+    invalid_distance: "行驶距离请输入大于0的数值(10,000km以下)。",
+    invalid_liters: "加油量请输入大于0的数值(500L以下)。",
+    invalid_price: "汽油单价请输入大于0的数值(1,000日元/L以下)。"
+  };
+  function run(showErrors) {
+    var distRaw = document.getElementById("distance").value;
+    var litersRaw = document.getElementById("liters").value;
+    if (distRaw === "" || litersRaw === "") {
+      if (showErrors) {
+        box.innerHTML = '<p class="result-error">' + ERROR_MESSAGES[distRaw === "" ? "invalid_distance" : "invalid_liters"] + "</p>";
+        box.hidden = false;
+      } else {
+        box.hidden = true;
+      }
+      return;
+    }
+    var d = parseFloat(distRaw);
+    var l = parseFloat(litersRaw);
+    var priceRaw = document.getElementById("price").value;
+    var r = priceRaw === "" ? NenpiCalc.calc(d, l) : NenpiCalc.calc(d, l, parseFloat(priceRaw));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "请检查输入的数值。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var rows =
+      "<tr><td>油耗</td><td>" + r.kmPerL.toLocaleString() + " km/L</td></tr>" +
+      "<tr><td>欧洲式表记</td><td>" + r.lPer100km.toLocaleString() + " L/100km</td></tr>";
+    if (r.fuelCost !== undefined) {
+      rows +=
+        "<tr><td>本次加油费</td><td>" + r.fuelCost.toLocaleString() + " 日元</td></tr>" +
+        "<tr><td>每公里燃料费</td><td>" + r.costPerKm.toLocaleString() + " 日元</td></tr>";
+    }
+    box.innerHTML =
+      '<div class="result-main">实际油耗 ' + r.kmPerL.toLocaleString() + " km/L</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>项目</th><th>数值</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+    box.hidden = false;
+  }
+  ["distance", "liters", "price"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { run(false); });
+  });
+  document.getElementById("nenpi-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var ratioBox = document.getElementById("adv-result-ratio");
+  var ADV_ERRORS = {
+    invalid_actual: "实际油耗请在 1〜60km/L 的范围内输入。",
+    invalid_catalog: "标称油耗请在 1〜60km/L 的范围内输入。",
+    invalid_efficiency_a: "现在的车的油耗请在 1〜60km/L 的范围内输入。",
+    invalid_efficiency_b: "想换的车的油耗请在 1〜60km/L 的范围内输入。",
+    invalid_distance: "年行驶距离请在 100〜100,000km 的范围内输入。",
+    invalid_price: "汽油单价请在 1〜1,000日元/L 的范围内输入。"
+  };
+  function advError(box, code) {
+    box.innerHTML = '<p class="result-error">' + (ADV_ERRORS[code] || "请检查输入的数值。") + "</p>";
+    box.hidden = false;
+  }
+  function prefillActual() {
+    var d = parseFloat(document.getElementById("distance").value);
+    var l = parseFloat(document.getElementById("liters").value);
+    var input = document.getElementById("adv-actual");
+    if (input.value === "" && !isNaN(d) && !isNaN(l)) {
+      var r = NenpiCalc.calc(d, l);
+      if (r.ok) input.value = r.kmPerL;
+    }
+  }
+  document.querySelector(".adv-box").addEventListener("toggle", prefillActual);
+  function runRatio() {
+    prefillActual();
+    var actual = parseFloat(document.getElementById("adv-actual").value);
+    var catalog = parseFloat(document.getElementById("adv-catalog").value);
+    var r = NenpiCalc.catalogRatio(actual, catalog);
+    if (!r.ok) { advError(ratioBox, r.code); return; }
+    var note;
+    if (r.percent >= 100) {
+      note = "超过了标称值,油耗表现非常好。";
+    } else if (r.percent >= 70) {
+      note = "属于常见范围(大致7〜8成)。";
+    } else {
+      note = "低于常见范围(7〜8成)。可能受胎压、急加速、反复短距离行驶等影响。";
+    }
+    ratioBox.innerHTML =
+      '<div class="result-main">达到标称油耗的 ' + r.percent.toLocaleString(undefined, { maximumFractionDigits: 1 }) + '%</div>' +
+      '<p>' + note + '</p>';
+    ratioBox.hidden = false;
+  }
+  function runCmp() {
+    var a = parseFloat(document.getElementById("adv-car-a").value);
+    var b = parseFloat(document.getElementById("adv-car-b").value);
+    var annual = parseFloat(document.getElementById("adv-annual").value);
+    var price = parseFloat(document.getElementById("adv-price2").value);
+    if (isNaN(price)) price = parseFloat(document.getElementById("price").value);
+    var r = NenpiCalc.compareCars(a, b, annual, price);
+    if (!r.ok) { advError(advBox, r.code); return; }
+    var head;
+    if (r.diffYen > 0) {
+      head = '换车后每年约省 ' + r.diffYen.toLocaleString() + ' 日元';
+    } else if (r.diffYen < 0) {
+      head = '换车后每年约多花 ' + Math.abs(r.diffYen).toLocaleString() + ' 日元';
+    } else {
+      head = '一年的油费基本相同';
+    }
+    advBox.innerHTML =
+      '<div class="result-main">' + head + '</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead>' +
+      '<tr><th></th><th>现在的车</th><th>想换的车</th></tr></thead><tbody>' +
+      '<tr><td>油耗</td><td>' + a.toLocaleString() + ' km/L</td><td>' + b.toLocaleString() + ' km/L</td></tr>' +
+      '<tr><td>年使用燃料</td><td>' + r.fuelLA.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' L</td><td>' + r.fuelLB.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' L</td></tr>' +
+      '<tr><td>年油费</td><td>' + r.costA.toLocaleString() + ' 日元</td><td><strong>' + r.costB.toLocaleString() + ' 日元</strong></td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">不含车价、税金、保险等差额。可用「差额 × 打算开的年数」来判断换车是否划算。</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-ratio-run").addEventListener("click", runRatio);
+  document.getElementById("adv-cmp-run").addEventListener("click", runCmp);
+  function filled(id) { return document.getElementById(id).value !== ""; }
+  function autoRatio() {
+    if (filled("adv-actual") && filled("adv-catalog")) { runRatio(); } else { ratioBox.hidden = true; }
+  }
+  function autoCmp() {
+    if (filled("adv-car-a") && filled("adv-car-b") && filled("adv-annual") &&
+        (filled("adv-price2") || filled("price"))) {
+      runCmp();
+    } else {
+      advBox.hidden = true;
+    }
+  }
+  ["adv-actual", "adv-catalog"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoRatio);
+  });
+  ["adv-car-a", "adv-car-b", "adv-annual", "adv-price2"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoCmp);
+  });
+  document.getElementById("price").addEventListener("input", function () {
+    if (!advBox.hidden) autoCmp();
+  });
+})();
+</script>
+</body>
+</html>

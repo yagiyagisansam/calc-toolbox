@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Daily Calorie Intake Calculator (Estimated Energy Requirement) | Quick Calc</title>
+  <meta name="description" content="Calculate for free how many calories you should eat per day (estimated energy requirement) from your age, sex, weight and activity level, based on the reference values and physical activity levels of Japan's Ministry of Health, Labour and Welfare. Useful for diet planning.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/tdee/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Daily Calorie Intake Calculator (Estimated Energy Requirement) | Quick Calc">
+  <meta property="og:description" content="Calculate for free how many calories you should eat per day (estimated energy requirement) from your age, sex, weight and activity level, based on the reference values and physical activity levels of Japan's Ministry of Health, Labour and Welfare. Useful for diet planning.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/tdee/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Daily Calorie Intake Calculator (Estimated Energy Requirement)","item":"https://quick-calc.site/en/tools/tdee/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/tdee/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/tdee/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/tdee/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/tdee/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/tdee/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Daily Calorie Intake Calculator</h1>
+  <form class="tool-form" id="tdee-form">
+    <span class="field-note">Enter your age, sex, weight and activity level — the result appears right below</span>
+    <label>Age (years)
+      <span class="field-note">Supported range: 18–120 (for adults)</span>
+      <input type="number" id="age" inputmode="numeric" step="1" min="18" max="120" placeholder="30" required>
+    </label>
+    <label>Sex
+      <select id="sex">
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+    </label>
+    <label>Weight (kg)
+      <input type="number" id="weight" inputmode="decimal" step="any" min="20" max="300" placeholder="60" required>
+    </label>
+    <label>Physical activity level
+      <select id="pal">
+        <option value="low">Ⅰ Low (most of the day sitting)</option>
+        <option value="normal" selected>Ⅱ Normal (commuting, housework, light exercise)</option>
+        <option value="high">Ⅲ High (standing work or an active exercise habit)</option>
+      </select>
+    </label>
+    <button type="submit">Calculate</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: work backward from a goal weight, PFC balance</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Work out a daily calorie target for your goal weight</h3>
+      <p class="adv-note">Enter your goal weight and time frame, and this works backward — using the guide of 1 kg of body fat ≈ 7,200 kcal — to how many kcal per day you should keep to (or add). The other items use the values above.</p>
+      <label>Goal weight (kg)
+        <input type="number" id="adv-target-weight" inputmode="decimal" step="any" min="20" max="300" placeholder="e.g. 60">
+      </label>
+      <label>Time frame (months)
+        <input type="number" id="adv-months" inputmode="numeric" step="1" min="1" max="60" value="3">
+      </label>
+      <button type="button" id="adv-goal-run">Calculate the daily calorie target</button>
+
+      <h3 class="adv-h">What should you eat for those calories? (PFC balance)</h3>
+      <p class="adv-note">From a daily calorie intake, this calculates how many grams each of protein (P), fat (F) and carbohydrate (C) to aim for, using the Japanese national target ranges (filled in automatically after the calculation above).</p>
+      <label>Daily calorie intake (kcal)
+        <input type="number" id="adv-pfc-kcal" inputmode="numeric" step="1" min="400" max="10000" placeholder="e.g. 2000">
+      </label>
+      <button type="button" id="adv-pfc-run">Calculate the PFC guide</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    The results are <strong>approximations</strong>. Build, muscle mass and the type of activity cause individual differences, and the tool does not apply during pregnancy or breastfeeding, or if you have a medical condition. For diet therapy, follow the guidance of a doctor or registered dietitian.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Choose your age, sex, weight and how much you move each day to get <strong>a guide to how many calories you can eat per day</strong>. It is calculated the way Japan's Dietary Reference Intakes do it — the national standard used in Japanese nutrition guidance. Useful for planning meals for dieting or body-building.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter your age, sex and weight.</li>
+    <li>Pick the physical activity level closest to your usual day. If unsure, “Ⅱ Normal” is a reasonable default.</li>
+    <li>As you type, your daily calorie guide and basal metabolic rate appear below — no button needed.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Daily calorie guide (estimated energy requirement) = basal metabolic rate × physical activity level</strong></li>
+    <li>Basal metabolic rate = basal metabolism reference value (by age group and sex) × weight (the same method as our basal metabolic rate calculation)</li>
+    <li>Physical activity level (representative values for adults): <strong>Ⅰ Low = 1.50 / Ⅱ Normal = 1.75 / Ⅲ High = 2.00</strong></li>
+    <li>Example: man, 30 years old, 70 kg, normal → BMR about 1,561 kcal × 1.75 = <strong>about 2,732 kcal/day</strong></li>
+  </ul>
+
+  <h3>Sources (primary information)</h3>
+  <ul class="sources">
+    <li>Ministry of Health, Labour and Welfare (Japan), e-Health Net “Aging and energy metabolism” (basal metabolism reference value table) — in Japanese<br>
+      <a href="https://kennet.mhlw.go.jp/information/information/food/e-07-002.html" rel="noopener" target="_blank">https://kennet.mhlw.go.jp/information/information/food/e-07-002.html</a> (accessed July 18, 2026)</li>
+    <li>Ministry of Health, Labour and Welfare (Japan), key points of the “Dietary Reference Intakes for Japanese (2025 edition)” (estimated energy requirement and physical activity levels) — in Japanese<br>
+      <a href="https://www.mhlw.go.jp/content/10904750/001396865.pdf" rel="noopener" target="_blank">https://www.mhlw.go.jp/content/10904750/001396865.pdf</a> (accessed July 18, 2026)</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>This value is a guide to the energy needed to <strong>maintain your current weight</strong>. To lose weight you would eat less than this, and to gain weight more — but extreme restriction damages your health.</li>
+    <li>The representative physical activity values are for adults. For older people, the actual level tends to be somewhat lower within the same category.</li>
+    <li>People under 18 (still growing) are out of scope, because different standards apply.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">How many kcal should I eat if I want to lose weight?</h3>
+  <p class="faq-a">It is generally said that eating about 200–500 kcal per day below this guide leads to gradual weight loss, but restricting far below your requirement causes muscle loss and rebound. For a concrete target, consult a doctor or registered dietitian.</p>
+  <h3 class="faq-q">How is this different from the basal metabolic rate?</h3>
+  <p class="faq-a">The basal metabolic rate is the minimum energy you burn even at rest; the result of this tool multiplies it by your daily activity to give a guide to the intake that matches one day's expenditure.</p>
+  <h3 class="faq-q">How do I choose the physical activity level?</h3>
+  <p class="faq-a">If you mostly do desk work and move little, choose Ⅰ; if you commute, shop, do housework or light sports, choose Ⅱ; if you work on your feet or exercise actively, choose Ⅲ.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/tdee/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/tdee/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/tdee/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=tdee">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/tdee/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_age: "Enter an age between 18 and 120 (whole years).",
+    invalid_sex: "Select a sex.",
+    invalid_weight: "Enter a weight between 20 and 300 kg.",
+    invalid_pal: "Select a physical activity level."
+  };
+  var box = document.getElementById("result");
+  var ageEl = document.getElementById("age");
+  var weightEl = document.getElementById("weight");
+  function run() {
+    if (ageEl.value === "" || weightEl.value === "") { box.hidden = true; return; }
+    var result = TdeeCalc.calculate(
+      parseFloat(ageEl.value),
+      document.getElementById("sex").value,
+      parseFloat(weightEl.value),
+      document.getElementById("pal").value
+    );
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">About ' + result.tdeeKcal.toLocaleString() + " kcal/day</div>" +
+        "<p>Basal metabolic rate: <strong>about " + result.bmrKcal.toLocaleString() + " kcal/day</strong> × physical activity level " + result.palValue.toFixed(2) + "</p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "Check the entered values.") + "</p>";
+    }
+    box.hidden = false;
+  }
+  ageEl.addEventListener("input", run);
+  weightEl.addEventListener("input", run);
+  document.getElementById("sex").addEventListener("change", run);
+  document.getElementById("pal").addEventListener("change", run);
+  document.getElementById("tdee-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var lastAdv = null;
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function runGoal(fromButton) {
+    var age = parseInt(document.getElementById("age").value, 10);
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(age) || !isFinite(w)) { if (fromButton) advErr("First enter your age, sex and weight in the form above."); return; }
+    var twEl = document.getElementById("adv-target-weight");
+    if (twEl.value === "") { if (fromButton) advErr("Enter your goal weight."); return; }
+    if (document.getElementById("adv-months").value === "") { if (fromButton) advErr("Enter the time frame."); return; }
+    var r = TdeeCalc.targetIntake(
+      age,
+      document.getElementById("sex").value,
+      w,
+      document.getElementById("pal").value,
+      parseFloat(twEl.value),
+      parseFloat(document.getElementById("adv-months").value)
+    );
+    if (!r.ok) {
+      var msg = r.code === "invalid_target_weight" ? "Enter a goal weight between 20 and 300 kg."
+        : r.code === "invalid_months" ? "Enter a time frame between 1 and 60 months."
+        : "Check the values in the form above.";
+      advErr(msg);
+      return;
+    }
+    var adjustText;
+    if (r.dailyAdjustKcal > 0) {
+      adjustText = "that means eating about " + r.dailyAdjustKcal.toLocaleString() + " kcal less per day.";
+    } else if (r.dailyAdjustKcal < 0) {
+      adjustText = "that means eating about " + Math.abs(r.dailyAdjustKcal).toLocaleString() + " kcal more per day.";
+    } else {
+      adjustText = "that keeps your current weight.";
+    }
+    var html =
+      '<div class="result-main">Daily target: about ' + r.targetIntakeKcal.toLocaleString() + " kcal</div>" +
+      "<p>Against an estimated daily expenditure of " + r.tdeeKcal.toLocaleString() + " kcal, " + adjustText + "</p>";
+    if (r.warning) {
+      html += '<p class="result-error">Warning: the target is below your basal metabolic rate (about ' + r.bmrKcal.toLocaleString() +
+        " kcal). Extreme calorie restriction harms your health. Extend the time frame or reconsider the goal.</p>";
+    }
+    html += '<p class="adv-note">A rough guide using 1 kg of body fat ≈ 7,200 kcal and 1 month ≈ 30 days. Actual weight change varies from person to person.</p>';
+    var pfcEl = document.getElementById("adv-pfc-kcal");
+    if (pfcEl.value === "" && r.targetIntakeKcal >= 400) {
+      pfcEl.value = r.targetIntakeKcal;
+    }
+    lastAdv = runGoal;
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  function runPfc(fromButton) {
+    var kEl = document.getElementById("adv-pfc-kcal");
+    if (kEl.value === "") { if (fromButton) advErr("Enter your daily calorie intake."); return; }
+    var r = TdeeCalc.pfcBalance(parseFloat(kEl.value));
+    if (!r.ok) { advErr("Enter a calorie amount between 400 and 10,000 kcal."); return; }
+    lastAdv = runPfc;
+    advBox.innerHTML =
+      '<div class="result-main">PFC balance guide for ' + parseFloat(kEl.value).toLocaleString() + " kcal</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Nutrient</th><th>Daily guide</th></tr></thead><tbody>' +
+      "<tr><td>Protein (P)</td><td>" + r.proteinMinG.toLocaleString() + "–" + r.proteinMaxG.toLocaleString() + " g</td></tr>" +
+      "<tr><td>Fat (F)</td><td>" + r.fatMinG.toLocaleString() + "–" + r.fatMaxG.toLocaleString() + " g</td></tr>" +
+      "<tr><td>Carbohydrate (C)</td><td>" + r.carbMinG.toLocaleString() + "–" + r.carbMaxG.toLocaleString() + " g</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">Based on the target ranges of the Dietary Reference Intakes for Japanese (2020 edition): protein 13–20%, fat 20–30%, carbohydrate 50–65% of energy.</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-goal-run").addEventListener("click", function () { runGoal(true); });
+  document.getElementById("adv-pfc-run").addEventListener("click", function () { runPfc(true); });
+  document.getElementById("adv-target-weight").addEventListener("input", function () { runGoal(false); });
+  document.getElementById("adv-months").addEventListener("input", function () { runGoal(false); });
+  document.getElementById("adv-pfc-kcal").addEventListener("input", function () { runPfc(false); });
+  ["age", "weight"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { if (lastAdv === runGoal) runGoal(false); });
+  });
+  ["sex", "pal"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", function () { if (lastAdv === runGoal) runGoal(false); });
+  });
+})();
+</script>
+</body>
+</html>

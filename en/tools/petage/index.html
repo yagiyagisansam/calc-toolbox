@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Dog &amp; Cat Age Calculator — How Old in Human Years? | Quick Calc</title>
+  <meta name="description" content="Convert the age of a cat or small-to-medium dog into human years for free: 1 year = about 15 human years, 2 years = about 24, then about +4 per year. Includes a senior-stage guide and reverse conversion.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/petage/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Dog &amp; Cat Age Calculator — How Old in Human Years? | Quick Calc">
+  <meta property="og:description" content="Convert the age of a cat or small-to-medium dog into human years for free: 1 year = about 15 human years, 2 years = about 24, then about +4 per year. Includes a senior-stage guide and reverse conversion.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/petage/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Dog &amp; Cat Age Calculator (Human Years)","item":"https://quick-calc.site/en/tools/petage/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/petage/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/petage/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/petage/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/petage/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/petage/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Dog &amp; Cat Age Calculator (Human Years)</h1>
+  <form class="tool-form" id="petage-form">
+    <label>Type of pet
+      <select id="type">
+        <option value="cat" selected>Cat</option>
+        <option value="dog">Dog (small or medium)</option>
+      </select>
+    </label>
+    <label>Pet&rsquo;s age (years)
+      <span class="field-note">Enter 0.5 for 6 months old. The result appears as you type</span>
+      <input type="number" id="age" inputmode="decimal" min="0.1" max="30" step="0.1" required placeholder="e.g. 3">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: reverse conversion (human → pet) and an age reference table</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Reverse conversion: how old is a human in pet years?</h3>
+      <p class="adv-note">Answers “my age would be about how many pet years?”</p>
+      <label>Type
+        <select id="adv-type">
+          <option value="cat">Cat</option>
+          <option value="dog">Dog (small or medium)</option>
+        </select>
+      </label>
+      <label>Human age (years)
+        <input type="number" id="adv-human" inputmode="numeric" min="2" max="136" step="1" placeholder="e.g. 35">
+      </label>
+      <div class="tool-result" id="adv-rev-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">Age reference table for 1–20 years</h3>
+      <p class="adv-note">Shows what human age a pet aged 1–20 corresponds to (the same formula applies to cats and small/medium dogs).</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Just enter your cat&rsquo;s or dog&rsquo;s age to instantly see <strong>roughly how old they would be in human years</strong> (for cats and small-to-medium dogs). It also shows when the senior stage typically begins. Useful when thinking about checkups or when to switch to senior food.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Choose cat or dog (small or medium).</li>
+    <li>Enter your pet&rsquo;s age (0.5 for 6 months old).</li>
+    <li>The moment you type, the approximate human age and life stage appear automatically.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>1 pet year = about 15 human years / 2 years = about 24 / then about +4 human years per year</strong></li>
+    <li>The idea is that pets grow to the equivalent of a 24-year-old human within their first two years, then age more slowly — a guideline formula introduced by Western veterinary organizations.</li>
+    <li>Example: a 5-year-old cat → 24 + 4×3 = <strong>about 36 human years</strong></li>
+    <li>The old rule of thumb “human age = pet age × 7” does not fit the fast growth of the early years, so this formula is now the mainstream guideline.</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>The formula is a guideline widely used by veterinary organizations in the West (for example, the life-stage guidelines of the <a href="https://www.aaha.org/" target="_blank" rel="noopener">American Animal Hospital Association (AAHA)</a>, in English). It is a rough guide, not a scientifically exact conversion.</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li><strong>Large dogs (roughly 25 kg and over) age faster</strong>, and this formula does not apply to them (large dogs are considered senior at around 7–8 years).</li>
+    <li>Actual aging varies a lot with breed, environment and the individual animal. For health care, consult your veterinarian.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">Is “1 dog year = 7 human years” wrong?</h3>
+  <p class="faq-a">It is an oversimplification. Dogs and cats race past the equivalent of a 20-year-old human in their first one to two years, so ×7 does not fit early life. The formula used here — fast at first, slower afterwards — is considered a closer guideline to reality.</p>
+  <h3 class="faq-q">From what age is a pet senior?</h3>
+  <p class="faq-a">Cats and small-to-medium dogs enter their mid-40s in human terms at around age 7. From age 7 it is often recommended to move from one checkup a year to two.</p>
+  <h3 class="faq-q">How long do cats live?</h3>
+  <p class="faq-a">The average lifespan of indoor-only cats is reported to be around 16 years. Cats living past 20 (about 96 human years) are no longer rare.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/petage/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/petage/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/petage/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=petage">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/petage/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var STAGE_EN = { "子ども": "Child (kitten/puppy)", "成年期": "Adult", "シニア期": "Senior" };
+  var box = document.getElementById("result");
+  function run() {
+    if (document.getElementById("age").value === "") { box.hidden = true; return; }
+    var type = document.getElementById("type").value;
+    var r = PetageCalc.humanAge(type, parseFloat(document.getElementById("age").value));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">Enter an age between 0.1 and 30 years.</p>';
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">About ' + r.humanAge.toLocaleString() + " in human years</div>" +
+      "<p>Life stage (approximate): <strong>" + (STAGE_EN[r.stage] || r.stage) + "</strong>" + (r.stage === "シニア期" ? " (two checkups a year are recommended)" : "") + "</p>" +
+      "<p>Note: a guideline for cats and small-to-medium dogs. It does not apply to large dogs.</p>";
+    box.hidden = false;
+  }
+  document.getElementById("age").addEventListener("input", run);
+  document.getElementById("type").addEventListener("change", run);
+  document.getElementById("petage-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run();
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var STAGE_EN = { "子ども": "Child (kitten/puppy)", "成年期": "Adult", "シニア期": "Senior" };
+  var revBox = document.getElementById("adv-rev-result");
+  var tableBox = document.getElementById("adv-result");
+
+  // ---- Reverse conversion (instant) ----
+  function runRev() {
+    var human = document.getElementById("adv-human");
+    var type = document.getElementById("adv-type").value;
+    if (human.value === "") { revBox.hidden = true; return; }
+    var r = PetageCalc.petAge(type, parseFloat(human.value));
+    if (!r.ok) {
+      revBox.innerHTML = '<p class="result-error">Enter a human age between 2 and 136.</p>';
+      revBox.hidden = false;
+      return;
+    }
+    var name = type === "cat" ? "a cat" : "a small or medium dog";
+    revBox.innerHTML =
+      '<div class="result-main">Equivalent to ' + name + " aged about " +
+      r.petAge.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "</div>" +
+      '<p class="adv-note">An approximation based on the guideline formula used in veterinary care.</p>';
+    revBox.hidden = false;
+  }
+  document.getElementById("adv-human").addEventListener("input", runRev);
+  document.getElementById("adv-type").addEventListener("change", runRev);
+
+  // ---- Age reference table (shown immediately) ----
+  (function () {
+    var r = PetageCalc.ageTable();
+    var rows = "";
+    for (var i = 0; i < r.rows.length; i++) {
+      var row = r.rows[i];
+      rows += "<tr><td>" + row.age + "</td><td>about " +
+        row.human.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "</td><td>" + (STAGE_EN[row.stage] || row.stage) + "</td></tr>";
+    }
+    tableBox.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Pet&rsquo;s age (years)</th><th>Human age (approx.)</th><th>Stage</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+    tableBox.hidden = false;
+  })();
+})();
+</script>
+</body>
+</html>

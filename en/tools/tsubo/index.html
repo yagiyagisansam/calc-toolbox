@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Tsubo, Square Meter and Tatami (Jo) Converter | Quick Calc</title>
+  <meta name="description" content="Convert tsubo (坪), square meters (㎡) and tatami mats (畳) — the three area units used in Japanese property listings — in one step, free. Based on 1 tsubo = about 3.31 ㎡ and 1 tatami mat = 1.62 ㎡ (the Japanese real-estate advertising standard), with the sources shown.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/tsubo/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Tsubo, Square Meter and Tatami (Jo) Converter | Quick Calc">
+  <meta property="og:description" content="Convert tsubo (坪), square meters (㎡) and tatami mats (畳) — the three area units used in Japanese property listings — in one step, free. Based on 1 tsubo = about 3.31 ㎡ and 1 tatami mat = 1.62 ㎡ (the Japanese real-estate advertising standard), with the sources shown.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/tsubo/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Tsubo, Square Meter and Tatami (Jo) Converter","item":"https://quick-calc.site/en/tools/tsubo/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/tsubo/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/tsubo/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/tsubo/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/tsubo/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/tsubo/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Tsubo, Square Meter and Tatami (Jo) Converter</h1>
+  <form class="tool-form" id="tsubo-form">
+    <label>Area value
+      <span class="field-note">Type a number and the converted values appear right below (supported range: 0.01–100,000)</span>
+      <input type="number" id="value" inputmode="decimal" step="0.01" min="0.01" max="100000" placeholder="100" required>
+    </label>
+    <label>Unit of the value you entered
+      <select id="unit">
+        <option value="sqm">Square meters (㎡)</option>
+        <option value="tsubo">Tsubo (坪)</option>
+        <option value="jo">Tatami mats / jo (畳)</option>
+      </select>
+    </label>
+    <button type="submit">Convert</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: building/floor-area ratios and price per tsubo</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">How much can be built from the building and floor-area ratios</h3>
+      <p class="adv-note">From the <strong>building coverage ratio (kenpeiritsu)</strong> — the share of the plot the building may cover — and the <strong>floor-area ratio (yosekiritsu)</strong> — the cap on the total floor area of all storeys — shown in a land listing, this works out the maximum building you may put on the plot.</p>
+      <label>Land area
+        <input type="number" id="adv-land" inputmode="decimal" step="any" min="0.01" max="100000" placeholder="e.g. 100">
+      </label>
+      <label>Unit of the land area
+        <select id="adv-land-unit">
+          <option value="sqm" selected>Square meters (㎡)</option>
+          <option value="tsubo">Tsubo (坪)</option>
+        </select>
+      </label>
+      <label>Building coverage ratio (%)
+        <input type="number" id="adv-kenpei" inputmode="decimal" step="any" min="1" max="100" placeholder="e.g. 60">
+      </label>
+      <label>Floor-area ratio (%)
+        <input type="number" id="adv-yoseki" inputmode="decimal" step="any" min="1" max="2000" placeholder="e.g. 200">
+      </label>
+      <button type="button" id="adv-limit-run">Calculate the maximum</button>
+      <div class="tool-result" id="adv-limit-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">Price per tsubo</h3>
+      <p class="adv-note">Works out the price per tsubo and per ㎡ from the price and the area of a property.</p>
+      <label>Price (in units of 10,000 yen — man-yen)
+        <span class="field-note">Japanese listings quote prices in 万円 (man-yen). 1 man-yen = 10,000 yen, so 3,000 means 30,000,000 yen</span>
+        <input type="number" id="adv-price" inputmode="decimal" step="any" min="1" placeholder="e.g. 3000">
+      </label>
+      <label>Area
+        <input type="number" id="adv-area" inputmode="decimal" step="any" min="0.01" max="100000" placeholder="e.g. 100">
+      </label>
+      <label>Unit of the area
+        <select id="adv-area-unit">
+          <option value="sqm" selected>Square meters (㎡)</option>
+          <option value="tsubo">Tsubo (坪)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-price-run">Calculate the price per tsubo</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    The conversions here are <strong>approximate</strong>. Tatami mats are converted at the advertising standard of 1.62 ㎡ per mat, which can differ from the real size of a tatami mat (Kyoma, Chukyoma, Edoma or Danchima).
+  </div>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Type one area figure and instantly see <strong>what it comes to in tsubo, square meters (㎡) and tatami mats (jo)</strong>. Japanese property listings and floor plans mix all three units — a room advertised as “6畳” (6 jo) is written in ㎡ on the contract — so this is handy when you are flat-hunting in Japan and want to picture the real size.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter the area you want to convert (for example 100).</li>
+    <li>Choose the unit of that value (㎡, tsubo or jo).</li>
+    <li>All three units appear the moment you type — no button needed.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>1 tsubo = 400/121 ㎡ ≈ 3.31 ㎡</strong> (1 ㎡ ≈ 0.3025 tsubo)<br>
+      From the definition 1 shaku = 10/33 m, one tsubo is (6 shaku)² = 400/121 ㎡. Note that the traditional shakkanho units (tsubo) are not permitted for transactions or certification under Japan's Measurement Act, so a figure in tsubo is a customary reference value.</li>
+    <li><strong>1 tatami mat (jo) = 1.62 ㎡</strong><br>
+      This is the standard that applies when a Japanese property advertisement states “◯ jo” (at least 1.62 ㎡ per mat, measured on a wall-center basis).</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>Quick reference for common conversions (approximate)</caption>
+      <thead><tr><th>㎡</th><th>Tsubo</th><th>Jo (tatami mats)</th></tr></thead>
+      <tbody>
+        <tr><td>9.72</td><td>2.94</td><td>6</td></tr>
+        <tr><td>16.2</td><td>4.9</td><td>10</td></tr>
+        <tr><td>33.06</td><td>10</td><td>20.41</td></tr>
+        <tr><td>66.12</td><td>20</td><td>40.81</td></tr>
+        <tr><td>100</td><td>30.25</td><td>61.73</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Sources (primary information)</h3>
+  <ul class="sources">
+    <li>Measurement Act (Act No. 51 of 1992) — the legal units of measurement for transactions and certification — official text, in Japanese<br>
+      <a href="https://laws.e-gov.go.jp/law/404AC0000000051" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/404AC0000000051</a> (accessed July 18, 2026)</li>
+    <li>Federation of Real Estate Transaction Fair Trade Councils, “Fair Competition Code Concerning Representations of Real Estate” and its enforcement rules — the 1.62 ㎡ per tatami mat display standard — in Japanese<br>
+      <a href="https://www.rftc.jp/koseikyosokiyaku/" rel="noopener" target="_blank">https://www.rftc.jp/koseikyosokiyaku/</a> (accessed July 18, 2026)</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>Real tatami mats differ by region and type (Kyoma about 1.82 ㎡, Chukyoma about 1.66 ㎡, Edoma about 1.55 ㎡, Danchima about 1.45 ㎡). This tool uses the single advertising standard of 1.62 ㎡.</li>
+    <li>For the official area of a property, check the registry record and the drawings, which are stated in ㎡.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">How many tatami mats is one tsubo?</h3>
+  <p class="faq-a">At the advertising standard of 1.62 ㎡ per mat, 1 tsubo is about 2.04 jo. The customary rule of thumb is “1 tsubo ≈ 2 tatami mats”.</p>
+  <h3 class="faq-q">Why does the same property show different areas on different documents?</h3>
+  <p class="faq-a">Advertisements usually use the “wall-center” area measured to the middle of the walls, while the property registry uses the “inner-edge” area measured inside the walls, so the same room can show different numbers.</p>
+  <h3 class="faq-q">A “6 jo” room felt smaller than I expected. Why?</h3>
+  <p class="faq-a">Real tatami sizes vary by region and building (Edoma and Danchima mats are smaller than Kyoma), and a listing may say “6 jo” as long as it meets the standard of 1.62 ㎡ × 6 = 9.72 ㎡ or more.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/tsubo/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/tsubo/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/tsubo/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=tsubo">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/tsubo/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_value: "Enter an area between " + TsuboCalc.VALUE_MIN + " and " + TsuboCalc.VALUE_MAX + ".",
+    invalid_unit: "Choose a unit."
+  };
+  var box = document.getElementById("result");
+  function run() {
+    if (document.getElementById("value").value.trim() === "") { box.hidden = true; return; }
+    var value = parseFloat(document.getElementById("value").value);
+    var unit = document.getElementById("unit").value;
+    var result = TsuboCalc.convert(value, unit);
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">' + result.sqm.toLocaleString() + " ㎡</div>" +
+        "<p><strong>" + result.tsubo.toLocaleString() + " tsubo</strong> / <strong>" + result.jo.toLocaleString() + " jo (tatami mats)</strong></p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "Check the entered values.") + "</p>";
+    }
+    box.hidden = false;
+  }
+  document.getElementById("value").addEventListener("input", run);
+  document.getElementById("unit").addEventListener("change", run);
+  document.getElementById("tsubo-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var limitBox = document.getElementById("adv-limit-result");
+  var fmt = function (x, d) { return x.toLocaleString(undefined, { maximumFractionDigits: d === undefined ? 2 : d }); };
+  function runLimit(force) {
+    if ((document.getElementById("adv-land").value.trim() === "" ||
+         document.getElementById("adv-kenpei").value.trim() === "" ||
+         document.getElementById("adv-yoseki").value.trim() === "") && !force) { limitBox.hidden = true; return; }
+    var land = parseFloat(document.getElementById("adv-land").value);
+    if (document.getElementById("adv-land-unit").value === "tsubo") {
+      land = land * TsuboCalc.SQM_PER_TSUBO;
+    }
+    var r = TsuboCalc.buildingLimits(
+      land,
+      parseFloat(document.getElementById("adv-kenpei").value),
+      parseFloat(document.getElementById("adv-yoseki").value)
+    );
+    if (!r.ok) {
+      var msg = r.code === "invalid_kenpei" ? "Enter a building coverage ratio between 1 and 100%."
+        : r.code === "invalid_yoseki" ? "Enter a floor-area ratio between 1 and 2000%."
+        : "Enter the land area as a number.";
+      limitBox.innerHTML = '<p class="result-error">' + msg + '</p>';
+      limitBox.hidden = false;
+      return;
+    }
+    limitBox.innerHTML =
+      '<div class="result-main">Maximum total floor area ' + fmt(r.floorSqm) + ' ㎡ (about ' + fmt(r.floorTsubo) + ' tsubo)</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>Maximum building footprint (ground floor)</td><td>' + fmt(r.buildingSqm) + ' ㎡ (about ' + fmt(r.buildingTsubo) + ' tsubo)</td></tr>' +
+      '<tr><td>Maximum total floor area (all storeys)</td><td>' + fmt(r.floorSqm) + ' ㎡ (about ' + fmt(r.floorTsubo) + ' tsubo)</td></tr>' +
+      '<tr><td>For reference: storeys if built to the full footprint</td><td>about ' + fmt(r.floorsHint, 1) + ' storeys</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">Height limits, setback (diagonal) restrictions and similar rules may restrict this further. For an exact answer, check with the local authority or an architect.</p>';
+    limitBox.hidden = false;
+  }
+  ["adv-land", "adv-kenpei", "adv-yoseki"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runLimit(false); });
+  });
+  document.getElementById("adv-land-unit").addEventListener("change", function () { runLimit(false); });
+  document.getElementById("adv-limit-run").addEventListener("click", function () { runLimit(true); });
+  function runPrice(force) {
+    if ((document.getElementById("adv-price").value.trim() === "" ||
+         document.getElementById("adv-area").value.trim() === "") && !force) { advBox.hidden = true; return; }
+    var r = TsuboCalc.pricePerArea(
+      parseFloat(document.getElementById("adv-price").value),
+      parseFloat(document.getElementById("adv-area").value),
+      document.getElementById("adv-area-unit").value
+    );
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">Enter the price and the area as numbers greater than 0.</p>';
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">About ' + fmt(r.perTsubo) + ' man-yen per tsubo</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>Price per tsubo</td><td>' + fmt(r.perTsubo) + ' man-yen/tsubo (' + fmt(r.tsubo) + ' tsubo)</td></tr>' +
+      '<tr><td>Price per ㎡</td><td>' + fmt(r.perSqm) + ' man-yen/㎡ (' + fmt(r.sqm) + ' ㎡)</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">1 man-yen = 10,000 yen, the unit Japanese listings use.</p>';
+    advBox.hidden = false;
+  }
+  ["adv-price", "adv-area"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runPrice(false); });
+  });
+  document.getElementById("adv-area-unit").addEventListener("change", function () { runPrice(false); });
+  document.getElementById("adv-price-run").addEventListener("click", function () { runPrice(true); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Discount or Point Rewards — Which Is the Better Deal? | Quick Calc</title>
+  <meta name="description" content="Is 10% off really the same as 10% back in points? Compare the effective prices and see the discount-equivalent rate (10% back is about 9.09% off). Free, for weighing Japanese sales against point campaigns.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/point/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Discount or Point Rewards — Which Is the Better Deal? | Quick Calc">
+  <meta property="og:description" content="Is 10% off really the same as 10% back in points? Compare the effective prices and see the discount-equivalent rate (10% back is about 9.09% off). Free, for weighing Japanese sales against point campaigns.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/point/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Discount or Point Rewards — Which Is the Better Deal?","item":"https://quick-calc.site/en/tools/point/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/point/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/point/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/point/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/point/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/point/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Discount or Point Rewards — Which Is the Better Deal?</h1>
+  <form class="tool-form" id="point-form">
+    <label>Item price (yen)
+      <input type="number" id="price" inputmode="numeric" min="1" step="1" required placeholder="e.g. 10000">
+    </label>
+    <label>Option 1: discount rate (% off)
+      <input type="number" id="discount" inputmode="decimal" min="0" max="99.9" step="any" required placeholder="e.g. 10">
+    </label>
+    <label>Option 2: point reward rate (%)
+      <input type="number" id="point" inputmode="decimal" min="0" max="100" step="any" required placeholder="e.g. 10">
+    </label>
+    <span class="field-note">Fill in all three fields and the verdict appears automatically</span>
+    <button type="submit">See which is the better deal</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: break-even reward rate, and points you never use</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">What reward rate matches an X% discount?</h3>
+      <p class="adv-note">Works out the break-even point for “buy in the X%-off sale, or in the point-reward campaign?”</p>
+      <label>Discount rate (% off)
+        <input type="number" id="adv-bdisc" inputmode="decimal" step="any" min="0" max="99.9" placeholder="10">
+      </label>
+      <button type="button" id="adv-be-run">Calculate the break-even reward rate</button>
+      <div class="tool-result" id="adv-be-result" hidden aria-live="polite"></div>
+      <h3 class="adv-h">What if you will not use all the points?</h3>
+      <p class="adv-note">Calculates your real saving when you will not use the points up — for example, “I will probably use only about 70%”.</p>
+      <label>Item price (yen)
+        <input type="number" id="adv-uprice" inputmode="numeric" step="1" min="1" placeholder="10000">
+      </label>
+      <label>Point reward rate (%)
+        <input type="number" id="adv-upoint" inputmode="decimal" step="any" min="0" max="100" placeholder="10">
+      </label>
+      <label>Share of points you will use (%; 100 if all)
+        <input type="number" id="adv-uuse" inputmode="decimal" step="any" min="0" max="100" value="70">
+      </label>
+      <button type="button" id="adv-use-run">Calculate the real saving</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>“10% off” and “10% back in points” — they look the same, but <strong>the discount is actually the slightly better deal</strong>. This tool calculates the effective cost of both and tells you which wins. Point-reward campaigns are everywhere in Japanese shops and cashless apps; use this when you have to choose between a sale price and a point campaign.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter the item price.</li>
+    <li>Enter the discount rate and the point reward rate you want to compare (either can be 0).</li>
+    <li>As soon as all three are filled in, the verdict and a comparison table appear — no button needed.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Discount: payment = price × (1 − discount rate ÷ 100)</strong></li>
+    <li><strong>Point rewards: effective cost = price × (1 − reward rate ÷ 100)</strong> (assuming you later use all the points you earn)</li>
+    <li>With point rewards, however, the amount you actually pay stays at full price. Points worth r yen per 100 yen convert to <strong>a discount rate of 100r ÷ (100 + r) %</strong> (10% back is 1000 ÷ 110 = about 9.09% off). This is why the discount wins at the same number.</li>
+    <li>Example: for a 10,000-yen item, “10% off” means paying 9,000 yen. “10% back” means paying 10,000 yen and getting 1,000 points (effectively 9,000 yen), but converted to a discount that is only 9.09%, so <strong>10% off is the better deal</strong>.</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>This is an arithmetic calculation. Points are assumed to be worth 1 yen each and fully usable later.</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>If the points expire, are limited in where you can spend them, or are easy to forget, their real value is lower than calculated.</li>
+    <li>Many schemes give no points on the part you pay with points — another reason rewards are slightly worse than a discount.</li>
+    <li>In campaigns with a reward cap (for example, up to 2,000 points), the effective reward rate drops for expensive items.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">Why are “10% off” and “10% back” not the same?</h3>
+  <p class="faq-a">With 10% off you buy a 10,000-yen item for 9,000 yen. With 10% back you pay 10,000 yen and receive 1,000 yen in points — you bought 11,000 yen of value for 10,000 yen, which is about 9.09% as a discount. The discount, which reduces your payment up front, always wins slightly.</p>
+  <h3 class="faq-q">What reward rate matches “20% off”?</h3>
+  <p class="faq-a">25% back. Putting r = 25 into the conversion formula 100r ÷ (100 + r) gives 2500 ÷ 125 = 20%, exactly equivalent to 20% off.</p>
+  <h3 class="faq-q">If I am going to use the points anyway, is it effectively the same?</h3>
+  <p class="faq-a">If you reliably use every point, the effective cost is the same (9,000 yen either way for 10,000 yen at 10%). But rewards are still less favorable in that your money goes out first and points can expire or be forgotten. This tool shows both views: the effective cost and the discount-equivalent rate.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/point/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/point/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/point/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=point">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/point/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var ERROR_MESSAGES = {
+    invalid_price: "Enter a price of at least 1 yen.",
+    invalid_discount: "Enter a discount rate between 0 and 99.9%.",
+    invalid_point: "Enter a reward rate between 0 and 100%."
+  };
+  var VERDICT = {
+    discount: "The discount (○% off) is the better deal",
+    point: "The point rewards are the better deal",
+    even: "They are about even"
+  };
+  function runMain() {
+    if (document.getElementById("price").value === "" ||
+        document.getElementById("discount").value === "" ||
+        document.getElementById("point").value === "") { box.hidden = true; return; }
+    var price = parseFloat(document.getElementById("price").value);
+    var d = parseFloat(document.getElementById("discount").value);
+    var p = parseFloat(document.getElementById("point").value);
+    var r = PointCalc.compare(price, d, p);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "Check the entered values.") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">' + VERDICT[r.better].replace("○", d.toLocaleString()) + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Option</th><th>You pay</th><th>Effective cost</th></tr></thead><tbody>' +
+      "<tr><td>" + d.toLocaleString() + "% off</td><td>" + r.discounted.toLocaleString() + " yen</td><td>" + r.discounted.toLocaleString() + " yen</td></tr>" +
+      "<tr><td>" + p.toLocaleString() + "% back</td><td>" + price.toLocaleString() + " yen</td><td>" + r.pointNet.toLocaleString() + " yen (+" + r.pointValue.toLocaleString() + "pt)</td></tr>" +
+      "</tbody></table></div>" +
+      "<p>" + p.toLocaleString() + "% back in points converts to about <strong>" + r.pointEquivPct.toLocaleString() + "% off</strong> (assuming you use all the points).</p>";
+    box.hidden = false;
+  }
+  document.getElementById("point-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
+  });
+  ["price", "discount", "point"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runMain);
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var beBox = document.getElementById("adv-be-result");
+  var advBox = document.getElementById("adv-result");
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
+  }
+  function runBreakeven() {
+    var d = parseFloat(document.getElementById("adv-bdisc").value);
+    if (isNaN(d)) { showError(beBox, "Enter a discount rate."); return; }
+    var r = PointCalc.breakevenPoint(d);
+    if (!r.ok) { showError(beBox, "Enter a discount rate of 0 or more and below 100."); return; }
+    beBox.innerHTML =
+      '<div class="result-main">Even at a reward rate of ' + r.pointPct.toLocaleString(undefined, { maximumFractionDigits: 2 }) + "%</div>" +
+      '<p class="adv-note">To match ' + d.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "% off, the point rewards must be " + r.pointPct.toLocaleString(undefined, { maximumFractionDigits: 2 }) + "%. At any lower reward rate, the discount is the better choice (assuming you use all the points).</p>";
+    beBox.hidden = false;
+  }
+  function runPartialUse() {
+    var price = parseFloat(document.getElementById("adv-uprice").value);
+    var pt = parseFloat(document.getElementById("adv-upoint").value);
+    var use = parseFloat(document.getElementById("adv-uuse").value);
+    if (isNaN(price) || isNaN(pt) || isNaN(use)) { showError(advBox, "Enter the price, the reward rate and the usage rate."); return; }
+    var r = PointCalc.partialUse(price, pt, use);
+    if (!r.ok) { showError(advBox, "Enter a price from 1 to 10,000,000 yen, and reward and usage rates between 0 and 100%."); return; }
+    advBox.innerHTML =
+      '<div class="result-main">Equivalent to ' + r.effectivePct.toLocaleString(undefined, { maximumFractionDigits: 2 }) + "% off</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>Points you earn</td><td>" + r.earned.toLocaleString() + " yen worth</td></tr>" +
+      "<tr><td>Points you actually use (" + use.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%)</td><td>" + r.used.toLocaleString() + " yen worth</td></tr>" +
+      "<tr><td>Effective cost</td><td>" + r.net.toLocaleString() + " yen</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">Points you never use are counted as having zero value.</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-be-run").addEventListener("click", runBreakeven);
+  document.getElementById("adv-use-run").addEventListener("click", runPartialUse);
+  document.getElementById("adv-bdisc").addEventListener("input", function () {
+    if (document.getElementById("adv-bdisc").value !== "") runBreakeven();
+  });
+  ["adv-uprice", "adv-upoint", "adv-uuse"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-uprice").value !== "" &&
+          document.getElementById("adv-upoint").value !== "" &&
+          document.getElementById("adv-uuse").value !== "") runPartialUse();
+    });
+  });
+})();
+</script>
+</body>
+</html>

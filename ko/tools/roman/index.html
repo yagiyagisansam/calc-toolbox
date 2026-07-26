@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>로마 숫자 변환기(1〜3999⇔I V X 표기) | Quick Calc</title>
+  <meta name="description" content="아라비아 숫자와 로마 숫자(I·V·X·L·C·D·M)를 무료로 즉시 상호 변환합니다. 시계 문자판, 영화 제목, 연도 각인을 읽을 때 유용하며 2026은 MMXXVI입니다. 뺄셈 규칙까지 반영한 정확한 변환.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/roman/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="로마 숫자 변환기(1〜3999⇔I V X 표기) | Quick Calc">
+  <meta property="og:description" content="아라비아 숫자와 로마 숫자(I·V·X·L·C·D·M)를 무료로 즉시 상호 변환합니다. 시계 문자판, 영화 제목, 연도 각인을 읽을 때 유용하며 2026은 MMXXVI입니다. 뺄셈 규칙까지 반영한 정확한 변환.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/roman/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"로마 숫자 변환기","item":"https://quick-calc.site/ko/tools/roman/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/roman/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/roman/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/roman/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/roman/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/roman/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>로마 숫자 변환기</h1>
+  <form class="tool-form" id="roman-form">
+    <label>변환 방향
+      <select id="mode">
+        <option value="toRoman" selected>숫자 → 로마 숫자</option>
+        <option value="fromRoman">로마 숫자 → 숫자</option>
+      </select>
+    </label>
+    <label id="input-label">숫자(1〜3999)
+      <span class="field-note">입력하면 바로 아래에 변환 결과가 표시됩니다</span>
+      <input type="text" id="value" required placeholder="예: 2026" inputmode="numeric">
+    </label>
+    <button type="submit">변환하기</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 한꺼번에 변환·날짜의 로마 숫자 표기</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">여러 개 한꺼번에 변환</h3>
+      <p class="adv-note">쉼표 또는 줄바꿈으로 구분해 한 번에 최대 20개까지 변환합니다(「시계 문자판 표기」에 체크하면 4를 IIII로 씁니다).</p>
+      <label>변환할 숫자·로마 숫자(쉼표나 줄바꿈으로 구분, 최대 20개)
+        <textarea id="adv-list" rows="4" placeholder="예: 1, 2, 3, 4 또는 MMXXVI"></textarea>
+      </label>
+      <label style="display:block;"><input type="checkbox" id="adv-clock"> 시계 문자판 표기(4를 IIII로)</label>
+      <button type="button" id="adv-list-run">한꺼번에 변환하기</button>
+      <div class="tool-result" id="adv-list-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">날짜를 로마 숫자로 쓰기</h3>
+      <p class="adv-note">생일이나 기념일을 「MMXXVI・VII・XXIV」 같은 로마 숫자 표기로 바꿉니다(반지 각인이나 디자인 초안용).</p>
+      <div class="field-row">
+        <label>연(서기)
+          <input type="number" id="adv-year" inputmode="numeric" min="1" max="3999" step="1" placeholder="예: 2026">
+        </label>
+        <label>월
+          <input type="number" id="adv-month" inputmode="numeric" min="1" max="12" step="1" placeholder="예: 7">
+        </label>
+        <label>일
+          <input type="number" id="adv-day" inputmode="numeric" min="1" max="31" step="1" placeholder="예: 24">
+        </label>
+      </div>
+      <button type="button" id="adv-date-run">날짜 변환하기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>숫자를 넣기만 하면 <strong>로마 숫자(I·V·X·M 등)로 어떻게 쓰는지</strong>를 바로 알 수 있습니다. 반대로 시계 문자판이나 영화 제목에서 본 로마 숫자를 일반 숫자로 되돌릴 수도 있습니다. 연도 각인이나 작품명의 읽는 법을 찾을 때 유용합니다.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>변환 방향을 선택합니다.</li>
+    <li>숫자(1〜3999) 또는 로마 숫자(예: MMXXVI)를 입력합니다.</li>
+    <li>입력하는 순간 결과가 표시됩니다. 버튼은 누를 필요 없습니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li>기본 기호는 I=1, V=5, X=10, L=50, C=100, D=500, M=1000 의 7개입니다.</li>
+    <li>큰 것부터 나열해 더하지만, <strong>작은 기호가 큰 기호 바로 앞에 오면 빼기</strong>를 합니다(IV=4, IX=9, XL=40, XC=90, CD=400, CM=900).</li>
+    <li>계산 예: 1994 = 1000(M) + 900(CM) + 90(XC) + 4(IV) = <strong>MCMXCIV</strong></li>
+    <li>로마 숫자→숫자 변환에서는 표준 표기인지 검증합니다(IIII는 오류).</li>
+  </ul>
+
+  <h3>출처·전제 명시</h3>
+  <ul class="sources">
+    <li>로마 숫자의 표준 표기법(뺄셈 규칙)에 기반한 변환입니다.</li>
+  </ul>
+
+  <h2>계산의 전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>로마 숫자에는 0과 음수가 없으며, 표준 표기로 나타낼 수 있는 범위는 1〜3999입니다.</li>
+    <li>시계 문자판에서는 전통적으로 4를 IIII로 쓰기도 하지만, 이 도구의 기본 폼은 표준 표기(IV)를 사용합니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">시계 문자판은 왜 「IIII」인가요?</h3>
+  <p class="faq-a">여러 설이 있지만, 문자판의 시각적 균형(맞은편 VIII과의 균형)과 전통 때문이라고 알려져 있습니다. 수학적인 표준 표기는 IV입니다.</p>
+  <h3 class="faq-q">2026년은 로마 숫자로 어떻게 쓰나요?</h3>
+  <p class="faq-a">MMXXVI입니다(M=1000이 두 개, X=10이 두 개, VI=6). 영화 엔딩 크레딧의 제작 연도 표기 등에서 자주 볼 수 있습니다.</p>
+  <h3 class="faq-q">4000 이상은 표현할 수 없나요?</h3>
+  <p class="faq-a">표준 표기로는 3999(MMMCMXCIX)까지입니다. 그 이상은 윗줄을 그어 1000배를 나타내는 방법(V̄=5000)이 있지만, 일반적인 용도에서는 거의 쓰이지 않아 이 도구는 지원하지 않습니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/roman/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/roman/" lang="en" hreflang="en">English</a><a href="/zh/tools/roman/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=roman">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/roman/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var label = document.getElementById("input-label");
+  var input = document.getElementById("value");
+  mode.addEventListener("change", function () {
+    var isTo = mode.value === "toRoman";
+    label.childNodes[0].textContent = isTo ? "숫자(1〜3999)" : "로마 숫자";
+    input.placeholder = isTo ? "예: 2026" : "예: MMXXVI";
+    input.inputMode = isTo ? "numeric" : "text";
+    run();
+  });
+  function run() {
+    if (input.value.trim() === "") { box.hidden = true; return; }
+    if (mode.value === "toRoman") {
+      var r = RomanCalc.toRoman(parseInt(input.value, 10));
+      if (!r.ok) { box.innerHTML = '<p class="result-error">1〜3999의 정수를 입력해 주세요.</p>'; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">' + r.roman + "</div>";
+    } else {
+      var r2 = RomanCalc.fromRoman(input.value);
+      if (!r2.ok) { box.innerHTML = '<p class="result-error">올바른 로마 숫자를 입력해 주세요(예: MMXXVI. 사용 가능한 문자는 I V X L C D M).</p>'; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">' + r2.value.toLocaleString() + "</div>";
+    }
+    box.hidden = false;
+  }
+  input.addEventListener("input", run);
+  document.getElementById("roman-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var listBox = document.getElementById("adv-list-result");
+  function runList() {
+    if (document.getElementById("adv-list").value.trim() === "") { listBox.hidden = true; return; }
+    var clock = document.getElementById("adv-clock").checked;
+    var r = RomanCalc.convertMany(document.getElementById("adv-list").value, clock);
+    if (!r.ok) {
+      listBox.innerHTML = '<p class="result-error">' +
+        (r.code === "too_many" ? "한 번에 변환할 수 있는 것은 20개까지입니다." : "변환할 숫자 또는 로마 숫자를 입력해 주세요.") +
+        '</p>';
+      listBox.hidden = false;
+      return;
+    }
+    var rows = r.items.map(function (it) {
+      var out = it.ok ? it.output : "변환할 수 없습니다(1〜3999의 숫자나 올바른 로마 숫자를 입력)";
+      return "<tr><td>" + it.input.replace(/[<>&]/g, "") + "</td><td>" + out + "</td></tr>";
+    }).join("");
+    listBox.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>입력</th><th>변환 결과</th></tr></thead><tbody>' +
+      rows + '</tbody></table></div>';
+    listBox.hidden = false;
+  }
+  document.getElementById("adv-list").addEventListener("input", runList);
+  document.getElementById("adv-clock").addEventListener("change", runList);
+  document.getElementById("adv-list-run").addEventListener("click", runList);
+  function runDate(force) {
+    var yRaw = document.getElementById("adv-year").value;
+    var mRaw = document.getElementById("adv-month").value;
+    var dRaw = document.getElementById("adv-day").value;
+    if ((yRaw.trim() === "" || mRaw.trim() === "" || dRaw.trim() === "") && !force) { advBox.hidden = true; return; }
+    var y = parseInt(yRaw, 10);
+    var m = parseInt(mRaw, 10);
+    var d = parseInt(dRaw, 10);
+    var r = RomanCalc.dateToRoman(y, m, d);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">실제로 존재하는 날짜를 서기 1〜3999년으로 입력해 주세요.</p>';
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">' + r.year + '・' + r.month + '・' + r.day + '</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>가운뎃점(・) 구분</td><td>' + r.year + '・' + r.month + '・' + r.day + '</td></tr>' +
+      '<tr><td>마침표(.) 구분</td><td>' + r.year + '.' + r.month + '.' + r.day + '</td></tr>' +
+      '<tr><td>하이픈(-) 구분</td><td>' + r.year + '-' + r.month + '-' + r.day + '</td></tr>' +
+      '</tbody></table></div>';
+    advBox.hidden = false;
+  }
+  ["adv-year", "adv-month", "adv-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runDate(false); });
+  });
+  document.getElementById("adv-date-run").addEventListener("click", function () { runDate(true); });
+})();
+</script>
+</body>
+</html>

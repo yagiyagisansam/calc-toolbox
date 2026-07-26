@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Electricity Cost Calculator (Japan, yen per kWh) | Quick Calc</title>
+  <meta name="description" content="Enter an appliance’s power in watts and the hours you use it to calculate what it costs per day, per month and per year in Japanese yen, for free. The unit price starts at 31 yen/kWh — the official guideline rate used on Japanese appliance catalogues — and you can change it to the rate on your own contract.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/denki/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Electricity Cost Calculator (Japan, yen per kWh) | Quick Calc">
+  <meta property="og:description" content="Enter an appliance’s power in watts and the hours you use it to calculate what it costs per day, per month and per year in Japanese yen, for free. The unit price starts at 31 yen/kWh — the official guideline rate used on Japanese appliance catalogues — and you can change it to the rate on your own contract.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/denki/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Electricity Cost Calculator","item":"https://quick-calc.site/en/tools/denki/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/denki/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/denki/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/denki/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/denki/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/denki/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Electricity Cost Calculator</h1>
+  <form class="tool-form" id="denki-form">
+    <label>Power consumption (W)
+      <span class="field-note">e.g. air conditioner = around 500, hair dryer = 1200, refrigerator = around 60 (printed on the product label or in the manual)</span>
+      <input type="number" id="watts" inputmode="decimal" step="any" min="0.1" max="20000" placeholder="500" required>
+    </label>
+    <label>Hours of use per day
+      <span class="field-note">Supported range: 0.1–24 hours</span>
+      <input type="number" id="hours" inputmode="decimal" step="0.1" min="0.1" max="24" placeholder="8" required>
+    </label>
+    <label>Electricity unit price (yen per kWh)
+      <span class="field-note">The default of 31 yen is Japan’s official guideline rate. If you know the rate on your own contract, change it</span>
+      <input type="number" id="price" inputmode="decimal" step="0.1" min="1" max="100" value="31" required>
+    </label>
+    <button type="submit">Calculate</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: add up several appliances at once</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">How much for the whole home? Up to six appliances at once</h3>
+      <p class="adv-note">List the appliances you use most and you get the total electricity cost plus the share each one takes — so you can see which one is eating the power (the unit price comes from the form above; names may be left blank).</p>
+      <div class="adv-rows" id="adv-rows">
+        <label>Appliance 1 — name / power (W) / hours per day
+          <input type="text" id="adv-name-1" placeholder="Air conditioner" maxlength="20">
+          <input type="number" id="adv-watts-1" inputmode="decimal" step="any" min="0.1" max="20000" placeholder="500">
+          <input type="number" id="adv-hours-1" inputmode="decimal" step="any" min="0.1" max="24" placeholder="8">
+        </label>
+        <label>Appliance 2
+          <input type="text" id="adv-name-2" placeholder="Refrigerator" maxlength="20">
+          <input type="number" id="adv-watts-2" inputmode="decimal" step="any" min="0.1" max="20000" placeholder="60">
+          <input type="number" id="adv-hours-2" inputmode="decimal" step="any" min="0.1" max="24" placeholder="24">
+        </label>
+        <label>Appliance 3
+          <input type="text" id="adv-name-3" maxlength="20">
+          <input type="number" id="adv-watts-3" inputmode="decimal" step="any" min="0.1" max="20000">
+          <input type="number" id="adv-hours-3" inputmode="decimal" step="any" min="0.1" max="24">
+        </label>
+        <label>Appliance 4
+          <input type="text" id="adv-name-4" maxlength="20">
+          <input type="number" id="adv-watts-4" inputmode="decimal" step="any" min="0.1" max="20000">
+          <input type="number" id="adv-hours-4" inputmode="decimal" step="any" min="0.1" max="24">
+        </label>
+        <label>Appliance 5
+          <input type="text" id="adv-name-5" maxlength="20">
+          <input type="number" id="adv-watts-5" inputmode="decimal" step="any" min="0.1" max="20000">
+          <input type="number" id="adv-hours-5" inputmode="decimal" step="any" min="0.1" max="24">
+        </label>
+        <label>Appliance 6
+          <input type="text" id="adv-name-6" maxlength="20">
+          <input type="number" id="adv-watts-6" inputmode="decimal" step="any" min="0.1" max="20000">
+          <input type="number" id="adv-hours-6" inputmode="decimal" step="any" min="0.1" max="24">
+        </label>
+      </div>
+      <button type="button" id="adv-run">Calculate the total</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    The results are <strong>approximations</strong>. Your actual bill depends on your contract with your Japanese electricity retailer — the basic charge (kihon ryokin), the tiered rates, the fuel cost adjustment (nenryohi chosei-gaku) and the renewable energy levy (saiene fukakin) are all added on top. The real power draw of an air conditioner or refrigerator also swings a lot with the temperature setting and the room temperature.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Enter an appliance’s wattage and the hours you use it per day, and you see <strong>what it costs per day, per month and per year</strong>. Amounts are in Japanese yen and the default unit price follows <strong>the guideline rate used for electricity bills in Japan</strong>, so it fits a Japanese electricity contract. Handy when you wonder what leaving the air conditioner or the kotatsu on really costs.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter the appliance’s power consumption in watts (W). You will find it on the product label, in the manual, or on the manufacturer’s website.</li>
+    <li>Enter how many hours a day you use it.</li>
+    <li>The cost appears below as you type. You can change the unit price to the rate on your own contract.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Electricity used (kWh) = power (W) × hours used (h) ÷ 1000</strong></li>
+    <li><strong>Cost = electricity used (kWh) × unit price (yen/kWh)</strong> (a month is counted as 30 days and a year as 365 days)</li>
+    <li>The default unit price of <strong>31 yen/kWh (tax included)</strong> is the “guideline unit price for electricity” (2022 July revision) set by Japan’s Fair Trade Council of the Electrical Appliance Industry (公益社団法人 全国家庭電気製品公正取引協議会). It is the official Japanese benchmark used for the running-cost figures printed on appliance catalogues in Japan.</li>
+    <li>Example: a 500 W air conditioner used 8 hours a day → 4 kWh × 31 yen = about 124 yen/day (about 3,720 yen/month)</li>
+  </ul>
+
+  <h3>Sources (primary information)</h3>
+  <ul class="sources">
+    <li>Fair Trade Council of the Electrical Appliance Industry (公益社団法人 全国家庭電気製品公正取引協議会), “Guideline unit price for electricity” (FAQ page), in Japanese<br>
+      <a href="https://www.eftc.or.jp/qa/" rel="noopener" target="_blank">https://www.eftc.or.jp/qa/</a> (accessed July 18, 2026)</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>“Power consumption (W)” is the rated value. Inverter-controlled equipment (air conditioners, refrigerators) draws a different amount depending on how it is running. For a yearly estimate, the “annual power consumption (kWh/year)” figure printed on each product in Japan is also a useful reference.</li>
+    <li>Standby power is not included.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">What if I only know the amperage (A)?</h3>
+  <p class="faq-a">For a household outlet in Japan (100 V), you can estimate it as “power (W) ≈ 100 × current (A)”. The real power draw varies somewhat with the type of equipment.</p>
+  <h3 class="faq-q">How does this differ from the “annual power consumption” on the catalogue?</h3>
+  <p class="faq-a">Annual power consumption (kWh/year) is a manufacturer’s measured value based on an assumed pattern of real use. For equipment whose output varies, such as air conditioners and refrigerators, “annual power consumption × unit price” is closer to reality.</p>
+  <h3 class="faq-q">Is it cheaper to leave it on or to switch it off often?</h3>
+  <p class="faq-a">It depends on the equipment. Some devices draw a lot of power at start-up, so there is no single answer, but if you will not be using it for a long stretch, switching it off does reduce the energy used. Try comparing different hours with this tool.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/denki/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/denki/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/denki/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=denki">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/denki/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_watts: "Enter a power consumption between " + DenkiCalc.WATTS_MIN + " and " + DenkiCalc.WATTS_MAX + " W.",
+    invalid_hours: "Enter a usage time between " + DenkiCalc.HOURS_MIN + " and " + DenkiCalc.HOURS_MAX + " hours.",
+    invalid_price: "Enter a unit price between " + DenkiCalc.PRICE_MIN + " and " + DenkiCalc.PRICE_MAX + " yen/kWh."
+  };
+  var box = document.getElementById("result");
+  function raw(id) { return document.getElementById(id).value; }
+  function run(showErrors) {
+    if (raw("watts") === "" || raw("hours") === "" || raw("price") === "") {
+      if (showErrors) {
+        var code = raw("watts") === "" ? "invalid_watts" : raw("hours") === "" ? "invalid_hours" : "invalid_price";
+        box.innerHTML = '<p class="result-error">' + ERROR_MESSAGES[code] + "</p>";
+        box.hidden = false;
+      } else {
+        box.hidden = true;
+      }
+      return;
+    }
+    var result = DenkiCalc.calculate(parseFloat(raw("watts")), parseFloat(raw("hours")), parseFloat(raw("price")));
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">About ' + result.costPerMonth.toLocaleString() + " yen/month</div>" +
+        "<p>Per day: <strong>" + result.costPerDay.toLocaleString() + " yen</strong> (" + result.kwhPerDay.toLocaleString() + " kWh)<br>" +
+        "Per year: <strong>" + result.costPerYear.toLocaleString() + " yen</strong></p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "Check the entered values.") + "</p>";
+    }
+    box.hidden = false;
+  }
+  ["watts", "hours", "price"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { run(false); });
+  });
+  document.getElementById("denki-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var ADV_ERRORS = {
+    invalid_items: "Enter at least one appliance (up to six). Both the wattage and the hours are needed.",
+    invalid_watts: "Enter a power consumption between 0.1 and 20,000 W.",
+    invalid_hours: "Enter a usage time between 0.1 and 24 hours.",
+    invalid_price: "Enter a unit price between 1 and 100 yen/kWh in the form above."
+  };
+  function runAdv(skipIncomplete) {
+    var price = parseFloat(document.getElementById("price").value);
+    var items = [];
+    var names = [];
+    for (var i = 1; i <= 6; i++) {
+      var w = document.getElementById("adv-watts-" + i).value;
+      var h = document.getElementById("adv-hours-" + i).value;
+      if (w === "" && h === "") continue;
+      if (skipIncomplete && (w === "" || h === "")) continue;
+      items.push({ watts: parseFloat(w), hours: parseFloat(h) });
+      var n = document.getElementById("adv-name-" + i).value.trim();
+      names.push(n || "Appliance " + i);
+    }
+    var r = DenkiCalc.calculateMulti(items, price);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + (ADV_ERRORS[r.code] || "Check the entered values.") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    var html =
+      '<div class="result-main">Total: about ' + r.total.costPerMonth.toLocaleString() + ' yen/month</div>' +
+      '<p>Per day: <strong>' + r.total.costPerDay.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' yen</strong> (' +
+      r.total.kwhPerDay.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' kWh) / Per year: <strong>' +
+      r.total.costPerYear.toLocaleString() + ' yen</strong></p>' +
+      '<div class="table-scroll"><table class="data-table"><thead>' +
+      '<tr><th>Appliance</th><th>Per month</th><th>Per year</th><th>Share</th></tr></thead><tbody>';
+    var maxIdx = 0;
+    for (var j = 0; j < r.items.length; j++) {
+      if (r.items[j].sharePercent > r.items[maxIdx].sharePercent) maxIdx = j;
+      html += '<tr><td>' + names[j].replace(/&/g, "&amp;").replace(/</g, "&lt;") + '</td>' +
+        '<td>' + r.items[j].costPerMonth.toLocaleString() + ' yen</td>' +
+        '<td>' + r.items[j].costPerYear.toLocaleString() + ' yen</td>' +
+        '<td>' + r.items[j].sharePercent.toLocaleString(undefined, { maximumFractionDigits: 1 }) + '%</td></tr>';
+    }
+    html += '</tbody></table></div>';
+    if (r.items.length > 1) {
+      html += '<p class="adv-note">The biggest power user is “' + names[maxIdx].replace(/&/g, "&amp;").replace(/</g, "&lt;") + '”. ' +
+        'Using it one hour less per day would save about ' + r.items[maxIdx].savePerHourMonth.toLocaleString() + ' yen a month.</p>';
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", function () { runAdv(false); });
+  function autoAdv() {
+    var hasComplete = false;
+    for (var i = 1; i <= 6; i++) {
+      if (document.getElementById("adv-watts-" + i).value !== "" &&
+          document.getElementById("adv-hours-" + i).value !== "") hasComplete = true;
+    }
+    if (hasComplete && document.getElementById("price").value !== "") {
+      runAdv(true);
+    } else {
+      advBox.hidden = true;
+    }
+  }
+  for (var i = 1; i <= 6; i++) {
+    document.getElementById("adv-watts-" + i).addEventListener("input", autoAdv);
+    document.getElementById("adv-hours-" + i).addEventListener("input", autoAdv);
+    document.getElementById("adv-name-" + i).addEventListener("input", function () {
+      if (!advBox.hidden) autoAdv();
+    });
+  }
+  document.getElementById("price").addEventListener("input", function () {
+    if (!advBox.hidden) autoAdv();
+  });
+})();
+</script>
+</body>
+</html>

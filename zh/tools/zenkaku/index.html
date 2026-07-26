@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>全角⇔半角 转换工具(英数字·符号·空格) | Quick Calc</title>
+  <meta name="description" content="把全角的英文字母、数字、符号和空格一次性转换为半角(也支持反向转换)。在日本的表单上被要求「请用半角输入」时,或整理名单、通讯录时都能用,粘贴即可转换。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/zenkaku/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="全角⇔半角 转换工具(英数字·符号·空格) | Quick Calc">
+  <meta property="og:description" content="把全角的英文字母、数字、符号和空格一次性转换为半角(也支持反向转换)。在日本的表单上被要求「请用半角输入」时,或整理名单、通讯录时都能用,粘贴即可转换。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/zenkaku/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"全角⇔半角 转换工具(英数字·符号·空格)","item":"https://quick-calc.site/zh/tools/zenkaku/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/zenkaku/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/zenkaku/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/zenkaku/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/zenkaku/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/zenkaku/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>全角⇔半角 转换工具</h1>
+  <form class="tool-form" id="zenkaku-form">
+    <label>转换方向
+      <select id="mode">
+        <option value="toHankaku" selected>全角 → 半角(英数字·符号·空格)</option>
+        <option value="toZenkaku">半角 → 全角</option>
+      </select>
+    </label>
+    <label>文本
+      <span class="field-note">粘贴后,转换结果会立即显示在下方</span>
+      <textarea id="text" rows="5" placeholder="例: TEL:03-1234-5678"></textarea>
+    </label>
+    <button type="submit">转换</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>详细功能: 选择种类转换·检查是否混入全角</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">选择要转换的字符种类</h3>
+      <p class="adv-note">可以只转换需要的种类,例如「只把数字转成半角」(勾选片假名后,还可与半角片假名ｱｲｳ互相转换)。</p>
+      <label>转换方向
+        <select id="adv-mode">
+          <option value="toHankaku" selected>全角 → 半角</option>
+          <option value="toZenkaku">半角 → 全角</option>
+        </select>
+      </label>
+      <fieldset style="border:1px solid var(--color-border);border-radius:8px;padding:8px 12px;">
+        <legend>要转换的种类</legend>
+        <label style="display:inline-block;margin-right:12px;"><input type="checkbox" id="adv-alnum" checked> 英文字母·数字</label>
+        <label style="display:inline-block;margin-right:12px;"><input type="checkbox" id="adv-kana"> 片假名</label>
+        <label style="display:inline-block;margin-right:12px;"><input type="checkbox" id="adv-symbol" checked> 符号</label>
+        <label style="display:inline-block;"><input type="checkbox" id="adv-space" checked> 空格</label>
+      </fieldset>
+      <label>文本
+        <textarea id="adv-text" rows="5" placeholder="例: 会员编号Ａ１２３(假名: ｽｽﾞｷ)"></textarea>
+      </label>
+      <button type="button" id="adv-run">只转换所选种类</button>
+      <div class="tool-result" id="adv-sel-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">检查是否混入了全角字符或半角假名</h3>
+      <p class="adv-note">检查上方「文本」栏的内容,列出混在其中的全角英数字、全角符号、全角空格和半角假名的位置。</p>
+      <button type="button" id="adv-check-run">检查上方文本栏</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>全角是日语输入法输入的宽体字符(ＡＢＣ１２３),半角是普通宽度的字符(ABC123),两者看起来相似,但在计算机中是完全不同的字符。只要粘贴文本,本工具就能<strong>把全角的英数字、符号、空格统一转换为半角</strong>(也支持从半角转回全角)。平假名、片假名、汉字保持不变。在日本的申请表单上被要求「请用半角输入」时,或需要统一通讯录、名册的写法时,都很方便。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>选择转换方向(全角→半角 / 半角→全角)。</li>
+    <li>粘贴文本后,转换结果会立刻显示,无需点击按钮。</li>
+    <li>用转换结果的「复制」按钮复制后再粘贴回去即可。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li>全角英数字和符号(Ａ〜／、！〜～)与半角在Unicode中有规则性的对应关系(相差0xFEE0)。本工具据此逐字转换。</li>
+    <li>全角空格(U+3000)⇔半角空格(U+0020)也会转换。</li>
+    <li>平假名、片假名、汉字不作处理(主表单不进行所谓的半角假名转换)。</li>
+  </ul>
+
+  <h3>出处与前提</h3>
+  <ul class="sources">
+    <li>基于Unicode全角形与半角形(Halfwidth and Fullwidth Forms)对应关系的机械转换。</li>
+  </ul>
+
+  <h2>计算的前提与注意</h2>
+  <ul class="cautions">
+    <li>主表单不支持把半角假名(ｱｲｳ)转换为全角片假名。</li>
+    <li>地址、姓名等项目,有些提交方要求使用全角。请按表单的指定使用。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">为什么日本的表单会要求「用半角输入」?</h3>
+  <p class="faq-a">因为系统内部要把它当作数值或英文字母来处理。全角的「１２３」看起来相似,但属于不同的字符,原样输入时可能无法被当作数值处理。</p>
+  <h3 class="faq-q">片假名也能转成半角(ｶﾀｶﾅ)吗?</h3>
+  <p class="faq-a">主表单不支持。半角假名容易导致乱码,现在一般都避免使用(银行系表单等特殊情况除外)。确实需要时,请在「＋详细功能」中勾选「片假名」。</p>
+  <h3 class="faq-q">粘贴的内容会被发送出去吗?</h3>
+  <p class="faq-a">不会。转换全部在您的设备内完成。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/zenkaku/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/zenkaku/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/zenkaku/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=zenkaku">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/zenkaku/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var textEl = document.getElementById("text");
+  function run() {
+    if (textEl.value === "") { box.hidden = true; return; }
+    var mode = document.getElementById("mode").value;
+    var r = ZenkakuCalc[mode](textEl.value);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">文本太长(最多10万字符)。</p>';
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<p>转换结果(已转换' + r.changed.toLocaleString() + '个字符):</p>' +
+      '<textarea id="out" rows="5" style="width:100%;font-size:1rem;padding:10px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-bg);color:var(--color-text);" readonly></textarea>' +
+      '<p><button type="button" id="copy-btn" style="font-size:0.95rem;padding:8px 16px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-bg);color:var(--color-text);cursor:pointer;">复制</button> <span id="copy-done"></span></p>';
+    document.getElementById("out").value = r.text;
+    document.getElementById("copy-btn").addEventListener("click", function () {
+      navigator.clipboard.writeText(r.text).then(function () {
+        document.getElementById("copy-done").textContent = "已复制";
+      });
+    });
+    box.hidden = false;
+  }
+  textEl.addEventListener("input", run);
+  document.getElementById("mode").addEventListener("change", run);
+  document.getElementById("zenkaku-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var selBox = document.getElementById("adv-sel-result");
+  var TYPE_LABEL = { zen_alnum: "全角英数字", zen_symbol: "全角符号", zen_space: "全角空格", han_kana: "半角假名" };
+  function runSel() {
+    if (document.getElementById("adv-text").value === "") { selBox.hidden = true; return; }
+    var targets = {
+      alnum: document.getElementById("adv-alnum").checked,
+      kana: document.getElementById("adv-kana").checked,
+      symbol: document.getElementById("adv-symbol").checked,
+      space: document.getElementById("adv-space").checked
+    };
+    var mode = document.getElementById("adv-mode").value;
+    var r = ZenkakuCalc.convertSelective(document.getElementById("adv-text").value, mode, targets);
+    if (!r.ok) {
+      selBox.innerHTML = '<p class="result-error">文本太长(最多10万字符)。</p>';
+      selBox.hidden = false;
+      return;
+    }
+    selBox.innerHTML =
+      '<p>转换结果(已转换' + r.changed.toLocaleString() + '个字符):</p>' +
+      '<textarea id="adv-out" rows="5" style="width:100%;font-size:1rem;padding:10px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-bg);color:var(--color-text);" readonly></textarea>' +
+      '<p><button type="button" id="adv-copy" style="font-size:0.95rem;padding:8px 16px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-bg);color:var(--color-text);cursor:pointer;">复制</button> <span id="adv-copy-done"></span></p>';
+    document.getElementById("adv-out").value = r.text;
+    document.getElementById("adv-copy").addEventListener("click", function () {
+      navigator.clipboard.writeText(r.text).then(function () {
+        document.getElementById("adv-copy-done").textContent = "已复制";
+      });
+    });
+    selBox.hidden = false;
+  }
+  document.getElementById("adv-text").addEventListener("input", runSel);
+  document.getElementById("adv-mode").addEventListener("change", runSel);
+  ["adv-alnum", "adv-kana", "adv-symbol", "adv-space"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runSel);
+  });
+  document.getElementById("adv-run").addEventListener("click", runSel);
+  function runCheck() {
+    var r = ZenkakuCalc.findMixed(document.getElementById("text").value);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">文本太长(最多10万字符)。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    if (r.total === 0) {
+      advBox.innerHTML = '<div class="result-main">未发现全角字符或半角假名</div>';
+      advBox.hidden = false;
+      return;
+    }
+    var rows = r.items.map(function (it) {
+      return "<tr><td>第 " + (it.index + 1).toLocaleString() + " 个字符</td><td>「" + it.ch + "」</td><td>" + TYPE_LABEL[it.type] + "</td></tr>";
+    }).join("");
+    advBox.innerHTML =
+      '<div class="result-main">共发现 ' + r.total.toLocaleString() + ' 个字符</div>' +
+      '<p>明细: 全角英数字 ' + r.counts.zen_alnum.toLocaleString() + ' / 全角符号 ' + r.counts.zen_symbol.toLocaleString() +
+      ' / 全角空格 ' + r.counts.zen_space.toLocaleString() + ' / 半角假名 ' + r.counts.han_kana.toLocaleString() + '</p>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>位置</th><th>字符</th><th>种类</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      (r.total > 50 ? '<p class="adv-note">只显示前50条。</p>' : '');
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-check-run").addEventListener("click", runCheck);
+  document.getElementById("text").addEventListener("input", function () {
+    if (!advBox.hidden) runCheck();
+  });
+})();
+</script>
+</body>
+</html>

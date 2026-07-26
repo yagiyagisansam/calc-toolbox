@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Hourly Wage to Monthly &amp; Annual Pay Calculator (Gross) | Quick Calc</title>
+  <meta name="description" content="Turn a Japanese hourly wage into gross monthly and annual pay from your hours and working days, for free. Works backwards from a monthly salary to an hourly rate too — handy for comparing part-time job ads in Japan and checking your payslip.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/jikyu/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Hourly Wage to Monthly &amp; Annual Pay Calculator (Gross) | Quick Calc">
+  <meta property="og:description" content="Turn a Japanese hourly wage into gross monthly and annual pay from your hours and working days, for free. Works backwards from a monthly salary to an hourly rate too — handy for comparing part-time job ads in Japan and checking your payslip.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/jikyu/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Hourly Wage to Monthly &amp; Annual Pay Calculator","item":"https://quick-calc.site/en/tools/jikyu/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/jikyu/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/jikyu/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/jikyu/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/jikyu/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/jikyu/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Hourly Wage to Monthly &amp; Annual Pay Calculator</h1>
+  <form class="tool-form" id="to-monthly-form">
+    <label>Hourly wage (yen)
+      <span class="field-note">e.g. 1200 (supported range: 100–100,000 yen)</span>
+      <input type="number" id="hourly" inputmode="numeric" step="1" min="100" max="100000" placeholder="1200" required>
+    </label>
+    <label>Working hours per day
+      <span class="field-note">e.g. 8, 7.5 (supported range: 0.5–24)</span>
+      <input type="number" id="hours" inputmode="decimal" step="any" min="0.5" max="24" placeholder="8" required>
+    </label>
+    <label>Working days per month
+      <span class="field-note">e.g. 20 (supported range: 1–31, whole numbers)</span>
+      <input type="number" id="days" inputmode="numeric" step="1" min="1" max="31" placeholder="20" required>
+    </label>
+    <button type="submit">Calculate monthly and annual pay</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="to-hourly-form">
+    <label>Work back to an hourly wage from a monthly salary (yen)
+      <span class="field-note">Uses the working hours and days entered above</span>
+      <input type="number" id="monthly" inputmode="numeric" step="1" min="10000" max="100000000" placeholder="200000">
+    </label>
+    <button type="submit">Calculate the hourly wage</button>
+    <div class="tool-result" id="result-b" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: effective hourly wage including commuting time, comparing two job offers</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Effective hourly wage including commuting time</h3>
+      <p class="adv-note">This adds your commuting time to the conditions in the form above and divides the same pay over the whole stretch from leaving home to getting back.</p>
+      <label>One-way commuting time (minutes)
+        <input type="number" id="adv-commute" inputmode="numeric" step="1" min="0" max="300" placeholder="30">
+      </label>
+      <button type="button" id="adv-eff-run">Calculate the effective hourly wage</button>
+      <div class="tool-result" id="adv-result-eff" hidden aria-live="polite"></div>
+      <h3 class="adv-h">Compare with another job offer</h3>
+      <p class="adv-note">With the same working hours and days, this shows which job offer is better once commuting is counted in.</p>
+      <label>Hourly wage of job B (yen)
+        <input type="number" id="adv-hourly-b" inputmode="numeric" step="1" min="100" max="100000" placeholder="1300">
+      </label>
+      <label>One-way commuting time for job B (minutes)
+        <input type="number" id="adv-commute-b" inputmode="numeric" step="1" min="0" max="300" placeholder="60">
+      </label>
+      <button type="button" id="adv-cmp-run">Compare the two offers</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    Every result is an approximation of <strong>gross pay (the amount before tax and social insurance premiums are deducted)</strong>. Your take-home pay changes a great deal depending on your dependents, whether you are enrolled in social insurance, resident tax and so on. Overtime pay, bonuses and commuting allowance are not included.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Enter your hourly wage and how you work, and see straight away <strong>what that comes to as monthly and annual pay</strong> — the gross amount before tax, which Japanese payslips call 額面 (gakumen). You can also work backwards from a monthly salary to an hourly wage. Useful for comparing part-time job ads in Japan, or for checking the figures on your Japanese payslip (給与明細).</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter your hourly wage, working hours per day and working days per month. As soon as all three are filled in, the monthly and annual pay appear right below.</li>
+    <li>To find the hourly wage from a monthly salary, fill in the hours and days first, then enter the monthly salary in the lower field (also calculated automatically).</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Gross monthly pay = hourly wage × working hours per day × working days per month</strong></li>
+    <li><strong>Gross annual pay = monthly pay × 12</strong></li>
+    <li><strong>Hourly wage (worked backwards) = monthly salary ÷ (working hours per day × working days per month)</strong></li>
+    <li>Example: 1,200 yen per hour × 8 hours × 20 days = 192,000 yen a month (about 2.3 million yen a year)</li>
+  </ul>
+
+  <h3>Sources and stated assumptions</h3>
+  <ul class="sources">
+    <li>The above is plain arithmetic on the wage, hours and days (rounded to the nearest yen).</li>
+    <li>The minimum wage is revised every year and differs by prefecture. For the current figure, check the “regional minimum wage” page of the Ministry of Health, Labour and Welfare.</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>What comes off the gross amount (income tax, resident tax, social insurance premiums and so on) depends on your working conditions and your dependents, so your take-home pay will be lower than this calculation.</li>
+    <li>Your weekly hours and days decide whether you have to enrol in social insurance and employment insurance. For details, check with your employer or the pension office.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">How much will my take-home pay be?</h3>
+  <p class="faq-a">This tool calculates the gross amount only. Take-home pay is generally said to be around 75–85% of the gross, but it varies a lot with dependents, insurance enrolment and your municipality, so check the exact figure on your payslip or with your employer.</p>
+  <h3 class="faq-q">What if I am paid weekly or by the day?</h3>
+  <p class="faq-a">If you are paid a daily wage, divide it by your working hours per day to get an hourly wage first, then enter that. For weekly figures, you can convert to working days per month using “days per week × 4.33” as a guide (one month ≈ 4.33 weeks).</p>
+  <h3 class="faq-q">Is overtime pay included?</h3>
+  <p class="faq-a">No. Overtime beyond the statutory working hours requires a premium (25% or more). If you work a lot of overtime, your actual gross pay will be higher than this calculation.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/jikyu/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/jikyu/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/jikyu/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=jikyu">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/jikyu/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var boxB = document.getElementById("result-b");
+  var ERROR_MESSAGES = {
+    invalid_hourly: "Enter an hourly wage between 100 and 100,000 yen.",
+    invalid_monthly: "Enter a monthly salary between 10,000 and 100,000,000 yen.",
+    invalid_hours: "Enter working hours per day between 0.5 and 24.",
+    invalid_days: "Enter working days per month as a whole number between 1 and 31."
+  };
+  function raw(id) { return document.getElementById(id).value; }
+  function workInputs() {
+    return {
+      hours: parseFloat(raw("hours")),
+      days: parseFloat(raw("days"))
+    };
+  }
+  function showError(target, code) {
+    target.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "Check the entered values.") + "</p>";
+    target.hidden = false;
+  }
+  function runMonthly() {
+    if (raw("hourly") === "" || raw("hours") === "" || raw("days") === "") {
+      box.hidden = true;
+      return;
+    }
+    var w = workInputs();
+    var result = JikyuCalc.toMonthly(parseFloat(raw("hourly")), w.hours, w.days);
+    if (!result.ok) { showError(box, result.code); return; }
+    box.innerHTML =
+      '<div class="result-main">Gross monthly pay: about ' + result.monthlyYen.toLocaleString() + " yen</div>" +
+      "<p>Gross annual pay: <strong>about " + result.yearlyYen.toLocaleString() + " yen</strong></p>";
+    box.hidden = false;
+  }
+  function runHourly() {
+    if (raw("monthly") === "" || raw("hours") === "" || raw("days") === "") {
+      boxB.hidden = true;
+      return;
+    }
+    var w = workInputs();
+    var result = JikyuCalc.toHourly(parseFloat(raw("monthly")), w.hours, w.days);
+    if (!result.ok) { showError(boxB, result.code); return; }
+    boxB.innerHTML = '<div class="result-main">Hourly wage: about ' + result.hourlyYen.toLocaleString() + " yen</div>";
+    boxB.hidden = false;
+  }
+  ["hourly", "hours", "days"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runMonthly(); runHourly(); });
+  });
+  document.getElementById("monthly").addEventListener("input", runHourly);
+  document.getElementById("to-monthly-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMonthly();
+    if (raw("hourly") === "" || raw("hours") === "" || raw("days") === "") {
+      showError(box, raw("hourly") === "" ? "invalid_hourly" : raw("hours") === "" ? "invalid_hours" : "invalid_days");
+    }
+  });
+  document.getElementById("to-hourly-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runHourly();
+    if (raw("monthly") === "" || raw("hours") === "" || raw("days") === "") {
+      showError(boxB, raw("monthly") === "" ? "invalid_monthly" : raw("hours") === "" ? "invalid_hours" : "invalid_days");
+    }
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var effBox = document.getElementById("adv-result-eff");
+  function mainInputs() {
+    return {
+      hourly: parseFloat(document.getElementById("hourly").value),
+      hours: parseFloat(document.getElementById("hours").value),
+      days: parseFloat(document.getElementById("days").value)
+    };
+  }
+  var ADV_ERRORS = {
+    invalid_hourly: "Enter an hourly wage between 100 and 100,000 yen (in the form above).",
+    invalid_hours: "Enter working hours per day between 0.5 and 24 (in the form above).",
+    invalid_days: "Enter working days per month as a whole number between 1 and 31 (in the form above).",
+    invalid_commute: "Enter a commuting time between 0 and 300 minutes."
+  };
+  function advError(box, code) {
+    box.innerHTML = '<p class="result-error">' + (ADV_ERRORS[code] || "Check the entered values.") + "</p>";
+    box.hidden = false;
+  }
+  function filled(id) { return document.getElementById(id).value !== ""; }
+  function mainFilled() { return filled("hourly") && filled("hours") && filled("days"); }
+  function runEff() {
+    var m = mainInputs();
+    var commute = parseFloat(document.getElementById("adv-commute").value);
+    if (isNaN(commute)) commute = 0;
+    var r = JikyuCalc.effectiveHourly(m.hourly, m.hours, m.days, commute);
+    if (!r.ok) { advError(effBox, r.code); return; }
+    effBox.innerHTML =
+      '<div class="result-main">Effective hourly wage: about ' + r.effectiveHourlyYen.toLocaleString() + ' yen</div>' +
+      '<p>That is <strong>' + r.dropYen.toLocaleString() + ' yen</strong> less than the nominal hourly wage<br>' +
+      'Commuting time per month: ' + r.commuteHoursPerMonth.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' hours (your monthly pay of ' + r.monthlyYen.toLocaleString() + ' yen does not change)</p>';
+    effBox.hidden = false;
+  }
+  function runCmp() {
+    var m = mainInputs();
+    var commuteA = parseFloat(document.getElementById("adv-commute").value);
+    if (isNaN(commuteA)) commuteA = 0;
+    var hourlyB = parseFloat(document.getElementById("adv-hourly-b").value);
+    var commuteB = parseFloat(document.getElementById("adv-commute-b").value);
+    if (isNaN(commuteB)) commuteB = 0;
+    var a = JikyuCalc.effectiveHourly(m.hourly, m.hours, m.days, commuteA);
+    if (!a.ok) { advError(advBox, a.code); return; }
+    var b = JikyuCalc.effectiveHourly(hourlyB, m.hours, m.days, commuteB);
+    if (!b.ok) {
+      if (b.code === "invalid_hourly") {
+        advBox.innerHTML = '<p class="result-error">Enter an hourly wage between 100 and 100,000 yen for job B.</p>';
+        advBox.hidden = false;
+      } else {
+        advError(advBox, b.code);
+      }
+      return;
+    }
+    var verdict;
+    if (a.effectiveHourlyYen > b.effectiveHourlyYen) {
+      verdict = "On effective hourly wage, <strong>your current conditions (A)</strong> come out better.";
+    } else if (a.effectiveHourlyYen < b.effectiveHourlyYen) {
+      verdict = "On effective hourly wage, <strong>job B</strong> comes out better.";
+    } else {
+      verdict = "The two effective hourly wages are <strong>about the same</strong>.";
+    }
+    advBox.innerHTML =
+      '<div class="result-main">' + verdict + '</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead>' +
+      '<tr><th></th><th>A (form above)</th><th>Job B</th></tr></thead><tbody>' +
+      '<tr><td>Nominal hourly wage</td><td>' + m.hourly.toLocaleString() + ' yen</td><td>' + hourlyB.toLocaleString() + ' yen</td></tr>' +
+      '<tr><td>One-way commute</td><td>' + commuteA.toLocaleString() + ' min</td><td>' + commuteB.toLocaleString() + ' min</td></tr>' +
+      '<tr><td>Effective hourly wage</td><td><strong>' + a.effectiveHourlyYen.toLocaleString() + ' yen</strong></td><td><strong>' + b.effectiveHourlyYen.toLocaleString() + ' yen</strong></td></tr>' +
+      '<tr><td>Gross monthly pay</td><td>' + a.monthlyYen.toLocaleString() + ' yen</td><td>' + b.monthlyYen.toLocaleString() + ' yen</td></tr>' +
+      '</tbody></table></div>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-eff-run").addEventListener("click", runEff);
+  document.getElementById("adv-cmp-run").addEventListener("click", runCmp);
+  function autoEff() {
+    if (mainFilled() && filled("adv-commute")) { runEff(); } else { effBox.hidden = true; }
+  }
+  function autoCmp() {
+    if (mainFilled() && filled("adv-hourly-b")) { runCmp(); } else { advBox.hidden = true; }
+  }
+  document.getElementById("adv-commute").addEventListener("input", function () { autoEff(); if (!advBox.hidden) autoCmp(); });
+  document.getElementById("adv-hourly-b").addEventListener("input", autoCmp);
+  document.getElementById("adv-commute-b").addEventListener("input", function () { if (filled("adv-hourly-b")) autoCmp(); });
+  ["hourly", "hours", "days"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (!effBox.hidden || filled("adv-commute")) autoEff();
+      if (!advBox.hidden || filled("adv-hourly-b")) autoCmp();
+    });
+  });
+})();
+</script>
+</body>
+</html>

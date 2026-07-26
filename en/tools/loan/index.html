@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Loan Repayment Calculator (Equal Monthly Payment) | Quick Calc</title>
+  <meta name="description" content="Get your monthly payment, total repayment and total interest for free from the loan amount, interest rate and term, using the equal-payment (元利均等) method standard in Japan. Useful as a guide for a Japanese home loan or car loan, with the formula shown.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/loan/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Loan Repayment Calculator (Equal Monthly Payment) | Quick Calc">
+  <meta property="og:description" content="Get your monthly payment, total repayment and total interest for free from the loan amount, interest rate and term, using the equal-payment (元利均等) method standard in Japan. Useful as a guide for a Japanese home loan or car loan, with the formula shown.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/loan/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Loan Repayment Calculator (Equal Monthly Payment)","item":"https://quick-calc.site/en/tools/loan/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/loan/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/loan/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/loan/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/loan/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/loan/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Loan Repayment Calculator (Equal Monthly Payment)</h1>
+  <form class="tool-form" id="loan-form">
+    <label>Loan amount (man-yen — units of 10,000 yen)
+      <span class="field-note">e.g. 3000 (= 3,000 man-yen = 30,000,000 yen). Supported range: 10–50,000 man-yen. In Japan loan amounts are normally written this way; 1 man-yen = 10,000 yen.</span>
+      <input type="number" id="principal" inputmode="numeric" step="1" min="10" max="50000" placeholder="3000" required>
+    </label>
+    <label>Annual interest rate (%)
+      <span class="field-note">e.g. 1.5 (supported range: 0–20%)</span>
+      <input type="number" id="rate" inputmode="decimal" step="0.01" min="0" max="20" value="1.5" required>
+    </label>
+    <label>Repayment term (years)
+      <span class="field-note">Supported range: 1–50 years (whole numbers)</span>
+      <input type="number" id="years" inputmode="numeric" step="1" min="1" max="50" value="35" required>
+    </label>
+    <span class="field-note">The result is calculated automatically as you type</span>
+    <button type="submit">Calculate</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: prepayment and a comparison of repayment methods</summary>
+    <div class="adv-inner">
+      <p class="adv-note">Both use the loan terms from the form above (amount, rate and term) as they are.</p>
+      <h3 class="adv-h">Prepayment simulation (term-shortening type)</h3>
+      <p class="adv-note">Keeps the monthly payment the same and calculates how much interest you save by paying a lump sum after a given number of years, finishing the loan earlier.</p>
+      <label>When to prepay (years from now)
+        <input type="number" id="adv-after" inputmode="numeric" step="1" min="1" max="49" placeholder="5">
+      </label>
+      <label>Prepayment amount (man-yen — units of 10,000 yen)
+        <input type="number" id="adv-prepay" inputmode="numeric" step="any" min="1" placeholder="100">
+      </label>
+      <button type="button" id="adv-prepay-run">Calculate the interest saved</button>
+      <div class="tool-result" id="adv-prepay-result" hidden aria-live="polite"></div>
+      <h3 class="adv-h">If you chose equal-principal repayment instead</h3>
+      <p class="adv-note">Compares with “equal-principal repayment” (元金均等), where the first payments are larger but the total interest is smaller.</p>
+      <button type="button" id="adv-gankin-run">Calculate and compare equal-principal</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    The results are an <strong>approximation</strong>. A real loan in Japan also involves a guarantee fee, an administrative fee, group credit life insurance, rate changes and rounding adjustments, so confirm the exact payment with the estimate from your financial institution.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Just enter the amount, rate and term to see <strong>how much you would repay each month</strong> on a home loan or car loan in Japan, along with the total repayment and total interest. It uses the equal-payment method (元利均等返済) that Japanese banks use by default, so it is a quick check of “how heavy would the monthly payment be?” before you borrow.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter the loan amount in man-yen (for 30,000,000 yen, enter “3000”).</li>
+    <li>Enter the annual interest rate (%) and the repayment term (years).</li>
+    <li>The monthly payment, total repayment and total interest appear as you type — no button needed.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <p>It uses the standard formula for equal-payment repayment (元利均等返済) — the most common method in Japan, where the monthly payment stays constant.</p>
+  <ul class="method">
+    <li><strong>Monthly payment = loan amount × r × (1+r)ⁿ ÷ ((1+r)ⁿ − 1)</strong><br>
+      r = annual rate ÷ 12 (monthly rate), n = term × 12 (number of payments). At 0% it is loan amount ÷ n.</li>
+    <li>Total repayment = monthly payment × number of payments / Total interest = total repayment − loan amount</li>
+    <li>Example: 30,000,000 yen (3,000 man-yen) at 1.5% a year over 35 years → about 91,855 yen a month, about 38,580,000 yen in total</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>The above is the general mathematical definition of equal-payment repayment (the monthly payment is rounded to the nearest yen, and the total is that monthly payment × the number of payments).</li>
+    <li>For the basics of a loan, such as the difference between equal-payment and equal-principal repayment, see the explanations from financial institutions and public bodies.</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>It assumes a fixed rate, no bonus-month payments and no prepayment. With a variable rate, future payments will change.</li>
+    <li>If you choose equal-principal repayment (a constant principal each month), the first payment is larger than this calculation and then decreases.</li>
+    <li>For how much you can borrow and for screening, consult your financial institution.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">What is the difference between equal-payment and equal-principal repayment?</h3>
+  <p class="faq-a">Equal payment (this tool) keeps the monthly payment constant, which makes household budgeting easier. Equal principal keeps the principal portion constant: the early payments are larger, but the total interest is smaller.</p>
+  <h3 class="faq-q">How much difference does 0.1% in the rate make?</h3>
+  <p class="faq-a">For 30,000,000 yen over 35 years, 1.5% a year (91,855 yen a month) versus 1.6% a year (93,332 yen a month) is about 1,500 yen a month and about 620,000 yen over the whole term. You can calculate both here and compare.</p>
+  <h3 class="faq-q">Can it handle bonus-month payments or prepayment?</h3>
+  <p class="faq-a">Bonus-month payments are not supported. For simulations with bonus payments, prepayment or variable rates, use the estimate tool of your financial institution.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/loan/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/loan/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/loan/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=loan">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/loan/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_principal: "Enter a loan amount between 10 and 50,000 man-yen (100,000 to 500,000,000 yen).",
+    invalid_rate: "Enter an annual rate between " + LoanCalc.RATE_MIN + " and " + LoanCalc.RATE_MAX + " %.",
+    invalid_years: "Enter a whole number of repayment years between " + LoanCalc.YEARS_MIN + " and " + LoanCalc.YEARS_MAX + "."
+  };
+  var box = document.getElementById("result");
+  function runMain() {
+    var pv = document.getElementById("principal").value;
+    var rv = document.getElementById("rate").value;
+    var yv = document.getElementById("years").value;
+    if (pv === "" || rv === "" || yv === "") { box.hidden = true; return; }
+    var years = parseFloat(yv);
+    var result = LoanCalc.calculate(parseFloat(pv) * 10000, parseFloat(rv), years);
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">' + result.monthlyPayment.toLocaleString() + " yen a month</div>" +
+        "<p>Total repayment: <strong>" + result.totalPayment.toLocaleString() + " yen</strong><br>" +
+        "Of which interest: <strong>" + result.totalInterest.toLocaleString() + " yen</strong> (" + (years * 12) + " payments)</p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "Check the entered values.") + "</p>";
+    }
+    box.hidden = false;
+  }
+  document.getElementById("loan-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
+  });
+  ["principal", "rate", "years"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runMain);
+  });
+  runMain();
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var prepayBox = document.getElementById("adv-prepay-result");
+  var advBox = document.getElementById("adv-result");
+  var MAN = 10000;
+  function readBase() {
+    var p = parseFloat(document.getElementById("principal").value);
+    var r = parseFloat(document.getElementById("rate").value);
+    var y = parseFloat(document.getElementById("years").value);
+    if (isNaN(p) || isNaN(r) || isNaN(y)) return null;
+    return { principal: p * MAN, rate: r, years: y };
+  }
+  function fmtMonths(m) {
+    var y = Math.floor(m / 12);
+    var mm = m % 12;
+    if (y > 0 && mm > 0) return y + " years " + mm + " months";
+    if (y > 0) return y + " years";
+    return mm + " months";
+  }
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
+  }
+  var ADV_MSG = {
+    invalid_principal: "In the form above, enter a loan amount between 10 and 50,000 man-yen.",
+    invalid_rate: "In the form above, enter an annual rate between 0 and 20%.",
+    invalid_years: "In the form above, enter a whole number of repayment years between 1 and 50.",
+    invalid_after: "Enter the prepayment timing as a whole number from 1 year to (term − 1) years from now.",
+    invalid_prepay: "Enter a prepayment of at least 1 man-yen and no more than the loan amount.",
+    prepay_too_large: "The prepayment is larger than the loan balance at that point. Reduce the amount."
+  };
+  function runPrepay() {
+    var base = readBase();
+    if (!base) { showError(prepayBox, "First enter the loan amount, annual rate and repayment term in the form above."); return; }
+    var after = parseFloat(document.getElementById("adv-after").value);
+    var prepayMan = parseFloat(document.getElementById("adv-prepay").value);
+    if (isNaN(after) || isNaN(prepayMan)) { showError(prepayBox, "Enter when to prepay (years from now) and the amount (man-yen)."); return; }
+    var r = LoanCalc.prepayment(base.principal, base.rate, base.years, after, prepayMan * MAN);
+    if (!r.ok) { showError(prepayBox, ADV_MSG[r.code] || "Check the entered values."); return; }
+    prepayBox.innerHTML =
+      '<div class="result-main">Interest falls by about ' + r.interestSaved.toLocaleString() + " yen</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>Term shortened by</td><td>" + fmtMonths(r.shortenedMonths) + " (" + r.shortenedMonths + " payments)</td></tr>" +
+      "<tr><td>Time to full repayment</td><td>" + fmtMonths(r.baseMonths) + " → " + fmtMonths(r.newMonths) + "</td></tr>" +
+      "<tr><td>Total interest</td><td>" + r.baseInterest.toLocaleString() + " yen → " + r.newInterest.toLocaleString() + " yen</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">An approximation that assumes the monthly payment of ' + r.monthlyPayment.toLocaleString() + " yen stays unchanged; prepayment fees are not included.</p>";
+    prepayBox.hidden = false;
+  }
+  function maybeRunPrepay() {
+    if (document.getElementById("adv-after").value === "" ||
+        document.getElementById("adv-prepay").value === "") { prepayBox.hidden = true; return; }
+    runPrepay();
+  }
+  document.getElementById("adv-prepay-run").addEventListener("click", runPrepay);
+  ["adv-after", "adv-prepay"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", maybeRunPrepay);
+  });
+  var gankinShown = false;
+  function runGankin() {
+    var base = readBase();
+    if (!base) { showError(advBox, "First enter the loan amount, annual rate and repayment term in the form above."); return; }
+    gankinShown = true;
+    var r = LoanCalc.gankinKinto(base.principal, base.rate, base.years);
+    if (!r.ok) { showError(advBox, ADV_MSG[r.code] || "Check the entered values."); return; }
+    var ganri = LoanCalc.calculate(base.principal, base.rate, base.years);
+    advBox.innerHTML =
+      '<div class="result-main">With equal principal, interest is ' + r.totalInterest.toLocaleString() + " yen</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>First payment</td><td>" + r.firstPayment.toLocaleString() + " yen (decreasing little by little after that)</td></tr>" +
+      "<tr><td>Final payment</td><td>" + r.lastPayment.toLocaleString() + " yen</td></tr>" +
+      "<tr><td>Monthly payment with equal payment</td><td>" + ganri.monthlyPayment.toLocaleString() + " yen (constant)</td></tr>" +
+      "<tr><td>Difference in interest</td><td>Equal principal is " + r.interestDiff.toLocaleString() + " yen cheaper</td></tr>" +
+      "</tbody></table></div>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-gankin-run").addEventListener("click", runGankin);
+  ["principal", "rate", "years"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      maybeRunPrepay();
+      if (gankinShown) runGankin();
+    });
+  });
+})();
+</script>
+</body>
+</html>

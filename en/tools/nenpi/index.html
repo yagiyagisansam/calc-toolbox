@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Fuel Economy Calculator — km/L, L/100km and Fuel Cost | Quick Calc</title>
+  <meta name="description" content="Work out your real fuel economy in km/L from the distance driven and the litres you put in (tank-full method). Also shows the European L/100km figure, the cost of the fill-up and the fuel cost per kilometre. Free, no sign-up.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/nenpi/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Fuel Economy Calculator — km/L, L/100km and Fuel Cost | Quick Calc">
+  <meta property="og:description" content="Work out your real fuel economy in km/L from the distance driven and the litres you put in (tank-full method). Also shows the European L/100km figure, the cost of the fill-up and the fuel cost per kilometre. Free, no sign-up.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/nenpi/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Fuel Economy Calculator — km/L, L/100km and Fuel Cost","item":"https://quick-calc.site/en/tools/nenpi/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/nenpi/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/nenpi/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/nenpi/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/nenpi/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/nenpi/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Fuel Economy Calculator (Tank-Full Method)</h1>
+  <form class="tool-form" id="nenpi-form">
+    <label>Distance driven (km)
+      <span class="field-note">Distance since the last full tank (your trip meter)</span>
+      <input type="number" id="distance" inputmode="decimal" min="0" max="10000" step="0.1" required placeholder="e.g. 400">
+    </label>
+    <label>Fuel added (L)
+      <span class="field-note">The amount that filled the tank this time (on your receipt)</span>
+      <input type="number" id="liters" inputmode="decimal" min="0" max="500" step="0.01" required placeholder="e.g. 25.5">
+    </label>
+    <label>Fuel price (yen per litre)
+      <span class="field-note">Optional. Add it to also get the cost of the fill-up and the cost per km</span>
+      <input type="number" id="price" inputmode="decimal" min="0" max="1000" step="0.1" placeholder="e.g. 170">
+    </label>
+    <button type="submit">Calculate fuel economy</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: compare with the catalogue figure, compare two cars over a year</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">What percentage of the catalogue figure are you getting?</h3>
+      <p class="adv-note">Checks how your real fuel economy compares with the catalogue figure (WLTC mode and similar). Around 70–80% is the usual range.</p>
+      <label>Real fuel economy (km/L)
+        <span class="field-note">Filled in automatically if you calculated with the form above</span>
+        <input type="number" id="adv-actual" inputmode="decimal" step="any" min="1" max="60" placeholder="15.2">
+      </label>
+      <label>Catalogue fuel economy (km/L)
+        <input type="number" id="adv-catalog" inputmode="decimal" step="any" min="1" max="60" placeholder="20.4">
+      </label>
+      <button type="button" id="adv-ratio-run">Calculate the ratio</button>
+      <div class="tool-result" id="adv-result-ratio" hidden aria-live="polite"></div>
+      <h3 class="adv-h">Two cars compared: yearly fuel cost difference (is it worth changing car?)</h3>
+      <p class="adv-note">From your current car (real fuel economy), the fuel economy of the car you are considering and your yearly mileage, this shows how much your fuel bill would change in a year.</p>
+      <label>Fuel economy of your current car (km/L)
+        <input type="number" id="adv-car-a" inputmode="decimal" step="any" min="1" max="60" placeholder="12">
+      </label>
+      <label>Fuel economy of the car you are considering (km/L)
+        <input type="number" id="adv-car-b" inputmode="decimal" step="any" min="1" max="60" placeholder="22">
+      </label>
+      <label>Yearly distance driven (km)
+        <span class="field-note">Mostly commuting and shopping is typically 5,000–10,000 km</span>
+        <input type="number" id="adv-annual" inputmode="numeric" step="any" min="100" max="100000" placeholder="8000">
+      </label>
+      <label>Fuel price (yen per litre)
+        <span class="field-note">You can leave this out if you already entered it in the form above</span>
+        <input type="number" id="adv-price2" inputmode="decimal" step="any" min="1" max="1000" placeholder="170">
+      </label>
+      <button type="button" id="adv-cmp-run">Calculate the yearly difference</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Enter the distance you drove since your last fill-up and the amount of fuel you put in, and you get your <strong>real fuel economy in km/L</strong> — the unit used on Japanese car catalogues and at Japanese petrol stations. Add the price per litre and it also shows the cost of the fill-up and the fuel cost per kilometre. Handy for checking the health of your car or keeping a fuel log.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Fill the tank right up every time you refuel, and reset the trip meter.</li>
+    <li>At the next fill-up, enter the distance you drove and the number of litres that went in.</li>
+    <li>As soon as both are entered, your real fuel economy appears just below — no button needed. Add the price per litre to get the costs too.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Fuel economy (km/L) = distance driven (km) ÷ fuel added (L)</strong> (tank-full method)</li>
+    <li>The tank-full method treats the fuel you add now as exactly the fuel used between one full tank and the next. It is the most reliable way to measure real-world fuel economy.</li>
+    <li>It also shows the European style <strong>L/100km = 100 ÷ fuel economy (km/L)</strong> (the litres needed to drive 100 km).</li>
+    <li>Example: 400 km driven on 25 L → 400 ÷ 25 = <strong>16.0 km/L</strong> (6.25 L/100km). At 170 yen per litre, the fill-up costs 4,250 yen and driving costs about 10.6 yen per km.</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>Arithmetic based on distance, volume and unit price.</li>
+    <li>For how the catalogue figure (WLTC mode) is measured, see the <a href="https://www.mlit.go.jp/jidosha/jidosha_fr10_000010.html" target="_blank" rel="noopener">Ministry of Land, Infrastructure, Transport and Tourism (Japan), “Fuel economy performance of motor vehicles”</a> (in Japanese).</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>With the tank-full method, the point at which the pump nozzle clicks off varies, so a single measurement carries some error. Averaging several fill-ups gives a more accurate picture.</li>
+    <li>Real fuel economy is typically 20–30% below the catalogue figure (WLTC mode). Air conditioning, traffic jams and lots of short trips make it worse.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">My real fuel economy is much worse than the catalogue figure. Is something broken?</h3>
+  <p class="faq-a">The catalogue value (WLTC mode) is measured on a fixed driving pattern, and on real roads it is normal to come out 20–30% lower. But if your fuel economy dropped suddenly, it is worth checking things like tyre pressure and engine oil.</p>
+  <h3 class="faq-q">What is L/100km?</h3>
+  <p class="faq-a">It means “how many litres you use to drive 100 km”, the common way of quoting fuel economy in Europe. It works the opposite way to km/L: the smaller the number, the more efficient the car. 16 km/L equals 6.25 L/100km.</p>
+  <h3 class="faq-q">Can I use this for a hybrid or a kei car?</h3>
+  <p class="faq-a">Yes. The calculation is the same for any petrol-powered car, whatever the model. (Fully electric vehicles use a different measure, km/kWh.)</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/nenpi/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/nenpi/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/nenpi/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=nenpi">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/nenpi/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var ERROR_MESSAGES = {
+    invalid_distance: "Enter a distance greater than 0 (up to 10,000 km).",
+    invalid_liters: "Enter a fuel amount greater than 0 (up to 500 L).",
+    invalid_price: "Enter a fuel price greater than 0 (up to 1,000 yen per litre)."
+  };
+  function run(showErrors) {
+    var distRaw = document.getElementById("distance").value;
+    var litersRaw = document.getElementById("liters").value;
+    if (distRaw === "" || litersRaw === "") {
+      if (showErrors) {
+        box.innerHTML = '<p class="result-error">' + ERROR_MESSAGES[distRaw === "" ? "invalid_distance" : "invalid_liters"] + "</p>";
+        box.hidden = false;
+      } else {
+        box.hidden = true;
+      }
+      return;
+    }
+    var d = parseFloat(distRaw);
+    var l = parseFloat(litersRaw);
+    var priceRaw = document.getElementById("price").value;
+    var r = priceRaw === "" ? NenpiCalc.calc(d, l) : NenpiCalc.calc(d, l, parseFloat(priceRaw));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "Check the entered values.") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var rows =
+      "<tr><td>Fuel economy</td><td>" + r.kmPerL.toLocaleString() + " km/L</td></tr>" +
+      "<tr><td>European style</td><td>" + r.lPer100km.toLocaleString() + " L/100km</td></tr>";
+    if (r.fuelCost !== undefined) {
+      rows +=
+        "<tr><td>Cost of this fill-up</td><td>" + r.fuelCost.toLocaleString() + " yen</td></tr>" +
+        "<tr><td>Fuel cost per km</td><td>" + r.costPerKm.toLocaleString() + " yen</td></tr>";
+    }
+    box.innerHTML =
+      '<div class="result-main">Real fuel economy ' + r.kmPerL.toLocaleString() + " km/L</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Item</th><th>Value</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+    box.hidden = false;
+  }
+  ["distance", "liters", "price"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { run(false); });
+  });
+  document.getElementById("nenpi-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var ratioBox = document.getElementById("adv-result-ratio");
+  var ADV_ERRORS = {
+    invalid_actual: "Enter a real fuel economy between 1 and 60 km/L.",
+    invalid_catalog: "Enter a catalogue fuel economy between 1 and 60 km/L.",
+    invalid_efficiency_a: "Enter a fuel economy between 1 and 60 km/L for your current car.",
+    invalid_efficiency_b: "Enter a fuel economy between 1 and 60 km/L for the car you are considering.",
+    invalid_distance: "Enter a yearly distance between 100 and 100,000 km.",
+    invalid_price: "Enter a fuel price between 1 and 1,000 yen per litre."
+  };
+  function advError(box, code) {
+    box.innerHTML = '<p class="result-error">' + (ADV_ERRORS[code] || "Check the entered values.") + "</p>";
+    box.hidden = false;
+  }
+  function prefillActual() {
+    var d = parseFloat(document.getElementById("distance").value);
+    var l = parseFloat(document.getElementById("liters").value);
+    var input = document.getElementById("adv-actual");
+    if (input.value === "" && !isNaN(d) && !isNaN(l)) {
+      var r = NenpiCalc.calc(d, l);
+      if (r.ok) input.value = r.kmPerL;
+    }
+  }
+  document.querySelector(".adv-box").addEventListener("toggle", prefillActual);
+  function runRatio() {
+    prefillActual();
+    var actual = parseFloat(document.getElementById("adv-actual").value);
+    var catalog = parseFloat(document.getElementById("adv-catalog").value);
+    var r = NenpiCalc.catalogRatio(actual, catalog);
+    if (!r.ok) { advError(ratioBox, r.code); return; }
+    var note;
+    if (r.percent >= 100) {
+      note = "You are beating the catalogue figure. That is very good fuel economy.";
+    } else if (r.percent >= 70) {
+      note = "This is the usual range (roughly 70–80% is typical).";
+    } else {
+      note = "This is below the usual 70–80%. Tyre pressure, hard acceleration or lots of short trips may be to blame.";
+    }
+    ratioBox.innerHTML =
+      '<div class="result-main">' + r.percent.toLocaleString(undefined, { maximumFractionDigits: 1 }) + '% of the catalogue figure</div>' +
+      '<p>' + note + '</p>';
+    ratioBox.hidden = false;
+  }
+  function runCmp() {
+    var a = parseFloat(document.getElementById("adv-car-a").value);
+    var b = parseFloat(document.getElementById("adv-car-b").value);
+    var annual = parseFloat(document.getElementById("adv-annual").value);
+    var price = parseFloat(document.getElementById("adv-price2").value);
+    if (isNaN(price)) price = parseFloat(document.getElementById("price").value);
+    var r = NenpiCalc.compareCars(a, b, annual, price);
+    if (!r.ok) { advError(advBox, r.code); return; }
+    var head;
+    if (r.diffYen > 0) {
+      head = 'Changing car would save about ' + r.diffYen.toLocaleString() + ' yen a year';
+    } else if (r.diffYen < 0) {
+      head = 'Changing car would cost about ' + Math.abs(r.diffYen).toLocaleString() + ' yen more a year';
+    } else {
+      head = 'The yearly fuel cost is about the same';
+    }
+    advBox.innerHTML =
+      '<div class="result-main">' + head + '</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead>' +
+      '<tr><th></th><th>Current car</th><th>Car considered</th></tr></thead><tbody>' +
+      '<tr><td>Fuel economy</td><td>' + a.toLocaleString() + ' km/L</td><td>' + b.toLocaleString() + ' km/L</td></tr>' +
+      '<tr><td>Fuel used per year</td><td>' + r.fuelLA.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' L</td><td>' + r.fuelLB.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' L</td></tr>' +
+      '<tr><td>Fuel cost per year</td><td>' + r.costA.toLocaleString() + ' yen</td><td><strong>' + r.costB.toLocaleString() + ' yen</strong></td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">Differences in vehicle price, tax and insurance are not included. Use “difference × the number of years you will drive it” as a rough guide to whether changing car pays off.</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-ratio-run").addEventListener("click", runRatio);
+  document.getElementById("adv-cmp-run").addEventListener("click", runCmp);
+  function filled(id) { return document.getElementById(id).value !== ""; }
+  function autoRatio() {
+    if (filled("adv-actual") && filled("adv-catalog")) { runRatio(); } else { ratioBox.hidden = true; }
+  }
+  function autoCmp() {
+    if (filled("adv-car-a") && filled("adv-car-b") && filled("adv-annual") &&
+        (filled("adv-price2") || filled("price"))) {
+      runCmp();
+    } else {
+      advBox.hidden = true;
+    }
+  }
+  ["adv-actual", "adv-catalog"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoRatio);
+  });
+  ["adv-car-a", "adv-car-b", "adv-annual", "adv-price2"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoCmp);
+  });
+  document.getElementById("price").addEventListener("input", function () {
+    if (!advBox.hidden) autoCmp();
+  });
+})();
+</script>
+</body>
+</html>

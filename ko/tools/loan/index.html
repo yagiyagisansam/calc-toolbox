@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>대출 상환 계산기(원리금균등·매달 상환액) | Quick Calc</title>
+  <meta name="description" content="대출금·금리·상환 기간을 넣으면 매달 상환액·총상환액·이자 총액을 무료로 계산합니다(원리금균등상환). 일본의 주택담보대출·자동차 대출 가늠에 좋고 계산식도 명시했습니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/loan/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="대출 상환 계산기(원리금균등·매달 상환액) | Quick Calc">
+  <meta property="og:description" content="대출금·금리·상환 기간을 넣으면 매달 상환액·총상환액·이자 총액을 무료로 계산합니다(원리금균등상환). 일본의 주택담보대출·자동차 대출 가늠에 좋고 계산식도 명시했습니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/loan/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"대출 상환 계산기(원리금균등·매달 상환액)","item":"https://quick-calc.site/ko/tools/loan/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/loan/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/loan/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/loan/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/loan/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/loan/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>대출 상환 계산기(원리금균등상환)</h1>
+  <form class="tool-form" id="loan-form">
+    <label>대출금(만 엔)
+      <span class="field-note">예: 3000(=3,000만 엔). 지원 범위: 10〜50,000만 엔. 1만 엔=10,000엔</span>
+      <input type="number" id="principal" inputmode="numeric" step="1" min="10" max="50000" placeholder="3000" required>
+    </label>
+    <label>연이율(%)
+      <span class="field-note">예: 1.5(지원 범위: 0〜20%)</span>
+      <input type="number" id="rate" inputmode="decimal" step="0.01" min="0" max="20" value="1.5" required>
+    </label>
+    <label>상환 기간(년)
+      <span class="field-note">지원 범위: 1〜50년(정수)</span>
+      <input type="number" id="years" inputmode="numeric" step="1" min="1" max="50" value="35" required>
+    </label>
+    <span class="field-note">입력하면 자동으로 계산됩니다</span>
+    <button type="submit">계산하기</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 중도 상환과 상환 방식 비교</summary>
+    <div class="adv-inner">
+      <p class="adv-note">둘 다 위 폼의 대출 조건(대출금·연이율·상환 기간)을 그대로 사용합니다.</p>
+      <h3 class="adv-h">중도 상환 시뮬레이션(기간 단축형)</h3>
+      <p class="adv-note">매달 상환액은 그대로 두고, ○년 뒤에 목돈을 갚아 완제를 앞당겼을 때 줄어드는 이자를 계산합니다.</p>
+      <label>중도 상환 시점(○년 뒤)
+        <input type="number" id="adv-after" inputmode="numeric" step="1" min="1" max="49" placeholder="5">
+      </label>
+      <label>중도 상환액(만 엔)
+        <input type="number" id="adv-prepay" inputmode="numeric" step="any" min="1" placeholder="100">
+      </label>
+      <button type="button" id="adv-prepay-run">이자 절감액 계산</button>
+      <div class="tool-result" id="adv-prepay-result" hidden aria-live="polite"></div>
+      <h3 class="adv-h">원금균등상환으로 했을 경우</h3>
+      <p class="adv-note">초기 상환액이 큰 대신 이자 총액이 적어지는 「원금균등상환」과 비교합니다.</p>
+      <button type="button" id="adv-gankin-run">원금균등으로 계산해 비교</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    이 도구의 계산 결과는 <strong>대략적인 값</strong>입니다. 일본의 실제 대출에는 보증료·사무 수수료·단체신용생명보험료·금리 변동·단수 조정 등이 있으므로 정확한 상환액은 금융기관의 시산으로 확인해 주세요.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>대출금·금리·기간만 넣으면 일본에서 주택담보대출이나 자동차 대출을 <strong>매달 얼마씩 갚게 되는지</strong> 바로 알 수 있습니다. 총상환액과 이자 합계도 함께 표시합니다. 일본 금융기관에서 가장 일반적인 원리금균등상환(元利均等返済) 방식이므로, 빌리기 전 「월 부담이 어느 정도인지」 확인하는 데 좋습니다.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>대출금을 만 엔 단위로 입력합니다(3,000만 엔이면 「3000」).</li>
+    <li>연이율(%)과 상환 기간(년)을 입력합니다.</li>
+    <li>입력과 동시에 매달 상환액·총상환액·이자 총액이 표시됩니다(버튼을 누를 필요 없음).</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <p>원리금균등상환(매달 상환액이 일정한, 일본에서 가장 일반적인 상환 방식)의 표준 계산식을 사용합니다.</p>
+  <ul class="method">
+    <li><strong>매달 상환액 = 대출금 × r × (1+r)ⁿ ÷ ((1+r)ⁿ − 1)</strong><br>
+      r = 연이율 ÷ 12(월이율), n = 상환 기간 × 12(상환 횟수). 금리 0%일 때는 대출금 ÷ n.</li>
+    <li>총상환액 = 매달 상환액 × 상환 횟수 / 이자 총액 = 총상환액 − 대출금</li>
+    <li>계산 예: 3,000만 엔·연이율 1.5%·35년 → 매달 상환액 약 91,855엔, 총상환액 약 3,858만 엔</li>
+  </ul>
+
+  <h3>출처·전제 명시</h3>
+  <ul class="sources">
+    <li>위는 원리금균등상환의 일반적인 수학적 정의에 따른 계산입니다(매달 상환액은 1엔 미만 반올림, 총상환액은 그 매달 상환액×횟수).</li>
+    <li>상환 방식(원리금균등·원금균등)의 차이 등 대출의 기본은 금융기관·공공기관의 설명을 참고해 주세요.</li>
+  </ul>
+
+  <h2>계산의 전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>고정금리·보너스 상환 없음·중도 상환 없음을 전제로 합니다. 변동금리라면 장래의 상환액이 달라집니다.</li>
+    <li>원금균등상환(매달 원금이 일정)을 고르면 첫 회 상환액은 이 계산보다 크고, 이후 점차 줄어듭니다.</li>
+    <li>대출 가능액과 심사에 대해서는 금융기관에 상담해 주세요.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">원리금균등과 원금균등의 차이는?</h3>
+  <p class="faq-a">원리금균등(이 도구)은 매달 상환액이 일정해 가계 관리가 쉬운 방식입니다. 원금균등은 매달 원금이 일정해 초기 상환액은 크지만 이자 총액은 적어집니다.</p>
+  <h3 class="faq-q">금리가 0.1% 다르면 얼마나 차이가 나나요?</h3>
+  <p class="faq-a">예를 들어 3,000만 엔·35년이면 연 1.5%(매달 91,855엔)와 연 1.6%(매달 93,332엔)가 매달 약 1,500엔, 총상환액으로는 약 62만 엔 차이가 납니다. 이 도구로 양쪽을 계산해 비교할 수 있습니다.</p>
+  <h3 class="faq-q">보너스 상환이나 중도 상환도 계산되나요?</h3>
+  <p class="faq-a">보너스 상환은 지원하지 않습니다. 보너스 병용·중도 상환·변동금리 시뮬레이션은 금융기관의 시산 도구를 이용해 주세요.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/loan/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/loan/" lang="en" hreflang="en">English</a><a href="/zh/tools/loan/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=loan">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/loan/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_principal: "대출금은 10〜50,000만 엔 범위로 입력해 주세요.",
+    invalid_rate: "연이율은 " + LoanCalc.RATE_MIN + "〜" + LoanCalc.RATE_MAX + " % 범위로 입력해 주세요.",
+    invalid_years: "상환 기간은 " + LoanCalc.YEARS_MIN + "〜" + LoanCalc.YEARS_MAX + " 년의 정수로 입력해 주세요."
+  };
+  var box = document.getElementById("result");
+  function runMain() {
+    var pv = document.getElementById("principal").value;
+    var rv = document.getElementById("rate").value;
+    var yv = document.getElementById("years").value;
+    if (pv === "" || rv === "" || yv === "") { box.hidden = true; return; }
+    var years = parseFloat(yv);
+    var result = LoanCalc.calculate(parseFloat(pv) * 10000, parseFloat(rv), years);
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">매달 ' + result.monthlyPayment.toLocaleString() + " 엔</div>" +
+        "<p>총상환액: <strong>" + result.totalPayment.toLocaleString() + " 엔</strong><br>" +
+        "그중 이자: <strong>" + result.totalInterest.toLocaleString() + " 엔</strong>(" + (years * 12) + "회 상환)</p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "입력값을 확인해 주세요.") + "</p>";
+    }
+    box.hidden = false;
+  }
+  document.getElementById("loan-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
+  });
+  ["principal", "rate", "years"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runMain);
+  });
+  runMain();
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var prepayBox = document.getElementById("adv-prepay-result");
+  var advBox = document.getElementById("adv-result");
+  var MAN = 10000;
+  function readBase() {
+    var p = parseFloat(document.getElementById("principal").value);
+    var r = parseFloat(document.getElementById("rate").value);
+    var y = parseFloat(document.getElementById("years").value);
+    if (isNaN(p) || isNaN(r) || isNaN(y)) return null;
+    return { principal: p * MAN, rate: r, years: y };
+  }
+  function fmtMonths(m) {
+    var y = Math.floor(m / 12);
+    var mm = m % 12;
+    if (y > 0 && mm > 0) return y + "년 " + mm + "개월";
+    if (y > 0) return y + "년";
+    return mm + "개월";
+  }
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
+  }
+  var ADV_MSG = {
+    invalid_principal: "위 폼의 대출금은 10〜50,000만 엔 범위로 입력해 주세요.",
+    invalid_rate: "위 폼의 연이율은 0〜20% 범위로 입력해 주세요.",
+    invalid_years: "위 폼의 상환 기간은 1〜50년의 정수로 입력해 주세요.",
+    invalid_after: "중도 상환 시점은 1년 뒤〜(상환 기간−1)년 뒤의 정수로 입력해 주세요.",
+    invalid_prepay: "중도 상환액은 1만 엔 이상·대출금 이하로 입력해 주세요.",
+    prepay_too_large: "그 시점의 대출 잔액보다 중도 상환액이 큽니다. 금액을 줄여 주세요."
+  };
+  function runPrepay() {
+    var base = readBase();
+    if (!base) { showError(prepayBox, "먼저 위 폼에 대출금·연이율·상환 기간을 입력해 주세요."); return; }
+    var after = parseFloat(document.getElementById("adv-after").value);
+    var prepayMan = parseFloat(document.getElementById("adv-prepay").value);
+    if (isNaN(after) || isNaN(prepayMan)) { showError(prepayBox, "중도 상환 시점(○년 뒤)과 금액(만 엔)을 입력해 주세요."); return; }
+    var r = LoanCalc.prepayment(base.principal, base.rate, base.years, after, prepayMan * MAN);
+    if (!r.ok) { showError(prepayBox, ADV_MSG[r.code] || "입력값을 확인해 주세요."); return; }
+    prepayBox.innerHTML =
+      '<div class="result-main">이자가 약 ' + r.interestSaved.toLocaleString() + " 엔 줄어듭니다</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>단축되는 기간</td><td>" + fmtMonths(r.shortenedMonths) + "(" + r.shortenedMonths + "회분)</td></tr>" +
+      "<tr><td>완제까지의 기간</td><td>" + fmtMonths(r.baseMonths) + " → " + fmtMonths(r.newMonths) + "</td></tr>" +
+      "<tr><td>이자 합계</td><td>" + r.baseInterest.toLocaleString() + " 엔 → " + r.newInterest.toLocaleString() + " 엔</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">매달 ' + r.monthlyPayment.toLocaleString() + " 엔의 상환액을 바꾸지 않는다는 전제의 대략적인 값이며, 중도 상환 수수료는 포함하지 않습니다.</p>";
+    prepayBox.hidden = false;
+  }
+  function maybeRunPrepay() {
+    if (document.getElementById("adv-after").value === "" ||
+        document.getElementById("adv-prepay").value === "") { prepayBox.hidden = true; return; }
+    runPrepay();
+  }
+  document.getElementById("adv-prepay-run").addEventListener("click", runPrepay);
+  ["adv-after", "adv-prepay"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", maybeRunPrepay);
+  });
+  var gankinShown = false;
+  function runGankin() {
+    var base = readBase();
+    if (!base) { showError(advBox, "먼저 위 폼에 대출금·연이율·상환 기간을 입력해 주세요."); return; }
+    gankinShown = true;
+    var r = LoanCalc.gankinKinto(base.principal, base.rate, base.years);
+    if (!r.ok) { showError(advBox, ADV_MSG[r.code] || "입력값을 확인해 주세요."); return; }
+    var ganri = LoanCalc.calculate(base.principal, base.rate, base.years);
+    advBox.innerHTML =
+      '<div class="result-main">원금균등이면 이자는 ' + r.totalInterest.toLocaleString() + " 엔</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>첫 회 상환액</td><td>" + r.firstPayment.toLocaleString() + " 엔(이후 조금씩 감소)</td></tr>" +
+      "<tr><td>마지막 회 상환액</td><td>" + r.lastPayment.toLocaleString() + " 엔</td></tr>" +
+      "<tr><td>원리금균등의 매달 상환액</td><td>" + ganri.monthlyPayment.toLocaleString() + " 엔(일정)</td></tr>" +
+      "<tr><td>이자의 차이</td><td>원금균등 쪽이 " + r.interestDiff.toLocaleString() + " 엔 적음</td></tr>" +
+      "</tbody></table></div>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-gankin-run").addEventListener("click", runGankin);
+  ["principal", "rate", "years"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      maybeRunPrepay();
+      if (gankinShown) runGankin();
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>定期券(月票)划算吗? 计算器 — 一个月坐几天回本 | Quick Calc</title>
+  <meta name="description" content="输入日本定期券(通勤·通学月票)的价格和单程车费,算出一个月要坐几天才能回本。同时显示与每次刷交通IC卡付费的差额,方便判断一周去几天公司买定期券才划算。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/teiki/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="定期券(月票)划算吗? 计算器 — 一个月坐几天回本 | Quick Calc">
+  <meta property="og:description" content="输入日本定期券(通勤·通学月票)的价格和单程车费,算出一个月要坐几天才能回本。同时显示与每次刷交通IC卡付费的差额,方便判断一周去几天公司买定期券才划算。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/teiki/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"定期券(月票)划算吗? 计算器","item":"https://quick-calc.site/zh/tools/teiki/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/teiki/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/teiki/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/teiki/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/teiki/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/teiki/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>定期券(月票)划算吗? 计算器</h1>
+  <form class="tool-form" id="teiki-form">
+    <label>定期券的价格(1个月·日元)
+      <input type="number" id="pass" inputmode="numeric" min="1" step="any" required placeholder="例: 10000">
+    </label>
+    <label>单程车费(日元)
+      <span class="field-note">请填交通IC卡的车费</span>
+      <input type="number" id="fare" inputmode="numeric" min="1" step="1" required placeholder="例: 200">
+    </label>
+    <label>每月乘车天数(往返)
+      <span class="field-note">一周去5天约20〜22天,一周3天约12〜13天</span>
+      <input type="number" id="days" inputmode="numeric" min="1" max="31" step="1" value="20" required>
+    </label>
+    <button type="submit">计算能不能回本</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 3个月·6个月定期券一起比较</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">与3个月·6个月定期券比较</h3>
+      <p class="adv-note">补充3个月·6个月定期券的价格,即可用表格比较每月金额、回本天数和年度金额(1个月定期券·车费·天数使用上面表单的值)。</p>
+      <label>3个月定期券的价格(日元)
+        <input type="number" id="adv-pass3" inputmode="numeric" min="1" max="3000000" step="any" placeholder="例: 28500">
+      </label>
+      <label>6个月定期券的价格(日元)
+        <input type="number" id="adv-pass6" inputmode="numeric" min="1" max="6000000" step="any" placeholder="例: 54000">
+      </label>
+      <button type="button" id="adv-run">一起比较</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>输入定期券的价格和单程车费,就能知道<strong>一个月坐几天买定期券才更划算</strong>,并显示与每次买票或刷IC卡付费的差额。在日本,通勤交通费一般由公司按定期券(定期券·ていきけん)报销,居家办公变多、犹豫要不要买定期券时很有用。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>输入定期券1个月的价格(6个月定期券就填价格除以6的金额)。</li>
+    <li>输入单程车费(刷交通IC卡时扣的金额)。</li>
+    <li>填入每月乘车天数后,哪种更划算以及差额会自动显示在下方。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>每次付费的月额 = 单程车费 × 2(往返)× 乘车天数</strong></li>
+    <li><strong>回本天数 = 定期券价格 ÷(单程车费 × 2)</strong>,向上取整。坐够这个天数,定期券就更划算。</li>
+    <li>计算例: 定期券1万日元·单程200日元 → 分界点是25天。即使一周去5天(每月20〜22天),也可能是每次付费更便宜。</li>
+  </ul>
+
+  <h3>出处(一次信息)</h3>
+  <ul class="sources">
+    <li>本工具是基于车费和天数的算术计算。车费和定期券价格请以各铁路·巴士公司公布的金额为准。</li>
+  </ul>
+
+  <h2>前提与注意</h2>
+  <ul class="cautions">
+    <li>定期券还有金额以外的好处: 区间内可以随便乘坐、可以中途下车。经常在区间内购物或顺路办事的人,其价值可能超过差额。</li>
+    <li>公司通勤补贴的规则(按定期券支付还是按实际支出报销)不同,个人的划算与否也会改变。</li>
+    <li>部分线路有错峰(off-peak)定期券或类似回数券的折扣(如巴士的优惠回数券),这些也值得一并比较。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">一周去几天公司买定期券才划算?</h3>
+  <p class="faq-a">很多铁路公司的1个月定期券,分界点大致设定在「每月15〜18天」附近。一周去4天(每月16〜18天)多半是定期券划算,一周3天以下(每月13天以下)多半是每次付费划算,但因线路而异,请用本工具确认。</p>
+  <h3 class="faq-q">能和6个月定期券比较吗?</h3>
+  <p class="faq-a">把6个月定期券的价格除以6,填进「定期券的价格」即可。6个月定期券通常比1个月定期券便宜1〜2成。</p>
+  <h3 class="faq-q">周末也用的话怎么填?</h3>
+  <p class="faq-a">把通勤以外乘车的日子也加进「每月乘车天数」。在定期券区间内的休息日使用越多,定期券越有利。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/teiki/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/teiki/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/teiki/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=teiki">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/teiki/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var MSG = {
+    invalid_pass: "定期券的价格请填1日元以上。",
+    invalid_fare: "单程车费请填1日元以上。",
+    invalid_days: "天数请填1〜31的整数。"
+  };
+  function raw(id) { return document.getElementById(id).value; }
+  function run(showErrors) {
+    if (raw("pass") === "" || raw("fare") === "" || raw("days") === "") {
+      if (showErrors) {
+        var code = raw("pass") === "" ? "invalid_pass" : raw("fare") === "" ? "invalid_fare" : "invalid_days";
+        box.innerHTML = '<p class="result-error">' + MSG[code] + "</p>";
+        box.hidden = false;
+      } else {
+        box.hidden = true;
+      }
+      return;
+    }
+    var r = TeikiCalc.compare(
+      parseFloat(raw("pass")),
+      parseFloat(raw("fare")),
+      parseInt(raw("days"), 10)
+    );
+    if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "请确认输入的数值。") + "</p>"; box.hidden = false; return; }
+    var verdict = r.better === "pass" ? "定期券更划算" : r.better === "payg" ? "每次付费更划算" : "几乎相同";
+    box.innerHTML =
+      '<div class="result-main">' + verdict + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>每次付费的月额</td><td>" + r.payg.toLocaleString() + " 日元</td></tr>" +
+      "<tr><td>差额</td><td>" + (r.diff >= 0 ? "定期券便宜 " + r.diff.toLocaleString() + " 日元" : "每次付费便宜 " + Math.abs(r.diff).toLocaleString() + " 日元") + "</td></tr>" +
+      "<tr><td>回本天数</td><td>每月 <strong>" + r.breakEvenDays + "天</strong> 以上</td></tr>" +
+      "</tbody></table></div>";
+    box.hidden = false;
+  }
+  ["pass", "fare", "days"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { run(false); });
+  });
+  document.getElementById("teiki-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var ADV_ERRORS = {
+    invalid_pass1: "请在上面的表单填写1个月定期券的价格。",
+    invalid_pass3: "3个月定期券的价格请填1日元以上。",
+    invalid_pass6: "6个月定期券的价格请填1日元以上。",
+    invalid_fare: "请在上面的表单填写单程车费。",
+    invalid_days: "上面表单的每月乘车天数请填1〜31的整数。"
+  };
+  var BEST_LABELS = { payg: "每次付费(不买定期券)", m1: "1个月定期券", m3: "3个月定期券", m6: "6个月定期券" };
+  function runAdv() {
+    var pass1 = parseFloat(document.getElementById("pass").value);
+    var fare = parseFloat(document.getElementById("fare").value);
+    var days = parseFloat(document.getElementById("days").value);
+    var pass3 = parseFloat(document.getElementById("adv-pass3").value);
+    var pass6 = parseFloat(document.getElementById("adv-pass6").value);
+    var r = TeikiCalc.comparePasses(pass1, pass3, pass6, fare, days);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + (ADV_ERRORS[r.code] || "请确认输入的数值。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    var html =
+      '<div class="result-main">每月坐' + days.toLocaleString() + '天的话,<strong>' + BEST_LABELS[r.best] + '</strong> 最便宜</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead>' +
+      '<tr><th></th><th>每月</th><th>回本天数</th><th>每年</th></tr></thead><tbody>' +
+      '<tr><td>每次付费</td><td>' + r.payg.toLocaleString() + ' 日元</td><td>-</td><td>' + (r.payg * 12).toLocaleString() + ' 日元</td></tr>' +
+      '<tr><td>1个月定期券</td><td>' + r.perMonth1.toLocaleString() + ' 日元</td><td>每月' + r.breakEven1 + '天以上</td><td>' + r.year1.toLocaleString() + ' 日元</td></tr>' +
+      '<tr><td>3个月定期券</td><td>' + r.perMonth3.toLocaleString() + ' 日元</td><td>每月' + r.breakEven3 + '天以上</td><td>' + r.year3.toLocaleString() + ' 日元</td></tr>' +
+      '<tr><td>6个月定期券</td><td>' + r.perMonth6.toLocaleString() + ' 日元</td><td>每月' + r.breakEven6 + '天以上</td><td>' + r.year6.toLocaleString() + ' 日元</td></tr>' +
+      '</tbody></table></div>';
+    var lines = [];
+    var prevBest = null;
+    for (var d = 1; d <= 31; d++) {
+      var t = TeikiCalc.comparePasses(pass1, pass3, pass6, fare, d);
+      if (t.ok && t.best !== prevBest) {
+        lines.push({ from: d, best: t.best });
+        prevBest = t.best;
+      }
+    }
+    html += '<p><strong>按乘车天数看最便宜的选择</strong></p><ul>';
+    for (var i = 0; i < lines.length; i++) {
+      var to = i + 1 < lines.length ? "〜" + (lines[i + 1].from - 1) + "天" : "天以上";
+      html += '<li>每月' + lines[i].from + (i + 1 < lines.length ? to : "天以上") + ': ' + BEST_LABELS[lines[i].best] + '</li>';
+    }
+    html += '</ul><p class="adv-note">定期券中途不再使用时,退款要收手续费。有长假或调动计划时请注意。</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", runAdv);
+  function autoAdv() {
+    var filled = function (id) { return document.getElementById(id).value !== ""; };
+    if (filled("adv-pass3") && filled("adv-pass6") && filled("pass") && filled("fare") && filled("days")) {
+      runAdv();
+    } else {
+      advBox.hidden = true;
+    }
+  }
+  ["adv-pass3", "adv-pass6", "pass", "fare", "days"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoAdv);
+  });
+})();
+</script>
+</body>
+</html>

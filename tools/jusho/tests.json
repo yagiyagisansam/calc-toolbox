@@ -1,0 +1,22 @@
+{
+  "tool": "jusho",
+  "module": "calc.js",
+  "global": "JushoCalc",
+  "cases": [
+    { "name": "郵便番号: ハイフンなし7桁", "func": "normalizeZip", "args": ["1000014"], "expect": { "ok": true, "zip3": "100", "zip4": "0014", "zip": "100-0014" } },
+    { "name": "郵便番号: 〒とハイフン付き", "func": "normalizeZip", "args": ["〒100-0014"], "expect": { "ok": true, "zip": "100-0014" } },
+    { "name": "郵便番号: 全角数字", "func": "normalizeZip", "args": ["１００−００１４"], "expect": { "ok": true, "zip": "100-0014" } },
+    { "name": "郵便番号: 桁不足はエラー", "func": "normalizeZip", "args": ["100-001"], "expect": { "ok": false, "code": "invalid_zip" } },
+    { "name": "郵便番号: 数字以外はエラー", "func": "normalizeZip", "args": ["abcdefg"], "expect": { "ok": false, "code": "invalid_zip" } },
+    { "name": "番地: 1丁目2番3号 → 1-2-3", "func": "normalizeBanchi", "args": ["1丁目2番3号"], "expect": { "ok": true, "banchi": "1-2-3" } },
+    { "name": "番地: 全角 １−２−３ → 1-2-3", "func": "normalizeBanchi", "args": ["１−２−３"], "expect": { "ok": true, "banchi": "1-2-3" } },
+    { "name": "番地: 2丁目3-4 → 2-3-4", "func": "normalizeBanchi", "args": ["2丁目3-4"], "expect": { "ok": true, "banchi": "2-3-4" } },
+    { "name": "番地: 空は空のままOK", "func": "normalizeBanchi", "args": [""], "expect": { "ok": true, "banchi": "" } },
+    { "name": "番地: 数字以外はエラー", "func": "normalizeBanchi", "args": ["永田町1"], "expect": { "ok": false, "code": "invalid_banchi" } },
+    { "name": "英語住所: 基本形(建物なし)", "func": "englishAddress", "args": [{ "zip": "100-0014", "pref": "Tokyo", "city": "Chiyoda-ku", "neighborhood": "Nagatacho", "banchi": "1-2-3", "building": "" }], "expect": { "ok": true, "single": "1-2-3 Nagatacho, Chiyoda-ku, Tokyo 100-0014, JAPAN" } },
+    { "name": "英語住所: 建物・部屋つき", "func": "englishAddress", "args": [{ "zip": "100-0014", "pref": "Tokyo", "city": "Chiyoda-ku", "neighborhood": "Nagatacho", "banchi": "1-2-3", "building": "Sakura Bldg. 201" }], "expect": { "ok": true, "single": "Sakura Bldg. 201, 1-2-3 Nagatacho, Chiyoda-ku, Tokyo 100-0014, JAPAN" } },
+    { "name": "英語住所: 政令市(区,市の順)", "func": "englishAddress", "args": [{ "zip": "060-0001", "pref": "Hokkaido", "city": "Chuo-ku, Sapporo", "neighborhood": "Kita 1 Jonishi", "banchi": "2-1", "building": "" }], "expect": { "ok": true, "single": "2-1 Kita 1 Jonishi, Chuo-ku, Sapporo, Hokkaido 060-0001, JAPAN" } },
+    { "name": "英語住所: 町域なしでも組める", "func": "englishAddress", "args": [{ "zip": "100-0014", "pref": "Tokyo", "city": "Chiyoda-ku", "neighborhood": "", "banchi": "1-2-3", "building": "" }], "expect": { "ok": true, "single": "1-2-3, Chiyoda-ku, Tokyo 100-0014, JAPAN" } },
+    { "name": "英語住所: 市区町村なしはエラー", "func": "englishAddress", "args": [{ "zip": "100-0014", "pref": "Tokyo", "city": "", "neighborhood": "", "banchi": "", "building": "" }], "expect": { "ok": false, "code": "missing_area" } }
+  ]
+}

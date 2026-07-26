@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>걷기 소모 칼로리 계산기(METs 방식·지방 환산 포함) | Quick Calc</title>
+  <meta name="description" content="몸무게·시간·걷는 속도로 걷기의 소모 칼로리를 METs 방식(일본 후생노동성 공식)으로 계산합니다. 지방 몇 g에 해당하는지도 표시. 산책·빠르게 걷기·다이어트의 참고용. 무료·가입 불필요.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/walking/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="걷기 소모 칼로리 계산기(METs 방식·지방 환산 포함) | Quick Calc">
+  <meta property="og:description" content="몸무게·시간·걷는 속도로 걷기의 소모 칼로리를 METs 방식(일본 후생노동성 공식)으로 계산합니다. 지방 몇 g에 해당하는지도 표시. 산책·빠르게 걷기·다이어트의 참고용. 무료·가입 불필요.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/walking/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"걷기 소모 칼로리 계산기(METs 방식·지방 환산 포함)","item":"https://quick-calc.site/ko/tools/walking/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/walking/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/walking/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/walking/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/walking/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/walking/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>걷기 소모 칼로리 계산기</h1>
+  <form class="tool-form" id="walking-form">
+    <span class="field-note">몸무게와 시간을 입력하면 바로 아래에 결과가 표시됩니다</span>
+    <label>몸무게(kg)
+      <input type="number" id="weight" inputmode="decimal" min="20" max="300" step="0.1" required placeholder="예: 60">
+    </label>
+    <label>걸은 시간(분)
+      <input type="number" id="minutes" inputmode="numeric" min="1" max="1440" step="1" required placeholder="예: 30">
+    </label>
+    <label>걷는 속도
+      <select id="speed">
+        <option value="slow">천천히(약 3.2km/h·산책)</option>
+        <option value="normal" selected>보통(약 4.0km/h)</option>
+        <option value="brisk">약간 빠르게(약 4.8km/h)</option>
+        <option value="fast">빠른 걸음(약 5.6km/h·종종걸음)</option>
+        <option value="veryfast">상당히 빠르게(약 6.4km/h)</option>
+      </select>
+    </label>
+    <button type="submit">소모 칼로리 계산하기</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 목표 칼로리 역산·거리나 습관으로 계산</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">목표 칼로리를 소모하려면 몇 분 걸어야 하나?</h3>
+      <p class="adv-note">소모하고 싶은 칼로리를 입력하면 필요한 걷기 시간을 역산합니다(몸무게와 속도는 위 값을 사용).</p>
+      <label>목표 소모 칼로리(kcal)
+        <input type="number" id="adv-target-kcal" inputmode="numeric" step="1" min="1" max="5000" placeholder="예: 200">
+      </label>
+      <button type="button" id="adv-target-run">필요한 시간 역산하기</button>
+
+      <h3 class="adv-h">거리로 계산하기(시간을 모를 때)</h3>
+      <p class="adv-note">거리만 알 때는 속도 구분의 대표 속도로 걸리는 시간과 소모 칼로리를 계산합니다.</p>
+      <label>걸은 거리(km)
+        <input type="number" id="adv-km" inputmode="decimal" step="any" min="0.1" max="100" placeholder="예: 2">
+      </label>
+      <button type="button" id="adv-km-run">거리로 계산하기</button>
+
+      <h3 class="adv-h">매일 계속하면 어떻게 될까?</h3>
+      <p class="adv-note">위 내용의 걷기를 매일 계속했을 때의 합계를 체지방 환산(1kg≒7,200kcal)으로 표시합니다.</p>
+      <label>계속하는 일수
+        <select id="adv-days">
+          <option value="7">1주(7일)</option>
+          <option value="30" selected>1개월(30일)</option>
+          <option value="90">3개월(90일)</option>
+          <option value="365">1년(365일)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-habit-run">계속했을 때의 합계 계산하기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>몸무게와 걸은 시간만 입력하면 <strong>걷기로 소모한 칼로리</strong>를 알 수 있는 도구입니다. 계산은 일본 후생노동성 운동 지침의 METs 공식을 사용하며, 지방 몇 g에 해당하는지의 기준도 함께 표시합니다. 매일 산책 기록이나 다이어트의 동기 부여에 활용해 보세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>몸무게와 걸은 시간을 입력합니다.</li>
+    <li>걷는 속도를 5단계 중에서 선택합니다(신호 대기 등 멈춘 시간은 빼면 더 정확합니다).</li>
+    <li>입력과 동시에 소모 칼로리와 지방 환산 기준이 바로 아래에 표시됩니다. 버튼은 누를 필요 없습니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>소모 에너지(kcal) = 1.05 × METs × 시간(h) × 몸무게(kg)</strong>(일본 후생노동성 운동 지침에서 쓰이는 공식)</li>
+    <li>METs(메츠)는 안정 시를 1로 한 운동 강도 지표입니다. 이 도구의 값은 「신체활동 METs표」 기준: 천천히=2.8 / 보통=3.0 / 약간 빠르게=3.5 / 빠른 걸음=4.3 / 상당히 빠르게=5.0</li>
+    <li>계산 예: 몸무게 60kg인 사람이 「보통」 속도로 30분 → 1.05 × 3.0 × 0.5 × 60 = <strong>약 95kcal</strong></li>
+    <li>지방 환산은 체지방 1kg≒7,200kcal의 기준으로 나눈 값입니다.</li>
+  </ul>
+
+  <h3>출처·전제 명시</h3>
+  <ul class="sources">
+    <li>계산식·METs 설명: <a href="https://www.e-healthnet.mhlw.go.jp/information/exercise/s-02-004.html" target="_blank" rel="noopener">일본 후생노동성 e-헬스넷 「METs」</a>(일본어)</li>
+    <li>걷기 속도별 METs 값: <a href="https://www.nibiohn.go.jp/eiken/programs/2011mets.pdf" target="_blank" rel="noopener">일본 국립건강·영양연구소 「신체활동 METs표」</a>(일본어)</li>
+  </ul>
+
+  <h2>계산 전제와 주의</h2>
+  <ul class="cautions">
+    <li>이 공식에는 가만히 있어도 소모되는 분량(기초대사)이 포함되어 있습니다. 「걷기로 추가된 분량」만 알고 싶다면 METs에서 1을 뺀 값으로 어림합니다(예: 보통 걷기 30분·60kg이면 추가분은 약 63kcal).</li>
+    <li>오르막길·짐·기온 등에 따라 실제 소모량은 달라집니다. 결과는 대략적인 기준으로 활용해 주세요.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">1만 보 걸으면 몇 kcal 소모되나요?</h3>
+  <p class="faq-a">보폭 70cm라면 1만 보는 약 7km입니다. 몸무게 60kg인 사람이 「보통」 속도(4km/h)로 걸으면 약 105분이 걸리고, 소모 칼로리는 약 330kcal입니다. 주먹밥 약 2개 분량입니다.</p>
+  <h3 class="faq-q">지방 1kg을 빼려면 얼마나 걸어야 하나요?</h3>
+  <p class="faq-a">체지방 1kg≒7,200kcal 기준으로 계산하면, 몸무게 60kg인 사람이 매일 30분 「보통」 속도로 걷는 경우(약 95kcal/일) 단순 계산으로 약 2.5개월이 걸립니다. 식사 관리와 병행하는 것이 현실적입니다.</p>
+  <h3 class="faq-q">빨리 걸으면 효과가 얼마나 다른가요?</h3>
+  <p class="faq-a">「보통」(3.0METs)과 「빠른 걸음」(4.3METs)은 같은 시간에 약 1.4배의 소모량 차이가 납니다. 일본의 건강 지침에서도 숨이 약간 차는 정도의 「빠른 걸음」을 권장합니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/walking/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/walking/" lang="en" hreflang="en">English</a><a href="/zh/tools/walking/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=walking">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/walking/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var ERROR_MESSAGES = {
+    invalid_weight: "몸무게는 20〜300kg 범위로 입력해 주세요.",
+    invalid_minutes: "시간은 1분〜24시간 범위로 입력해 주세요.",
+    invalid_speed: "걷는 속도를 선택해 주세요."
+  };
+  var weightEl = document.getElementById("weight");
+  var minutesEl = document.getElementById("minutes");
+  function run() {
+    if (weightEl.value === "" || minutesEl.value === "") { box.hidden = true; return; }
+    var r = WalkingCalc.calories(
+      parseFloat(weightEl.value),
+      parseFloat(minutesEl.value),
+      document.getElementById("speed").value
+    );
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "입력값을 확인해 주세요.") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">약 ' + r.kcal.toLocaleString() + " kcal</div>" +
+      "<p>지방으로 환산하면 약 <strong>" + r.fatG.toLocaleString() + "g</strong> 분량(체지방 1kg≒7,200kcal 기준)/ 사용한 METs 값: " + r.mets + "</p>";
+    box.hidden = false;
+  }
+  weightEl.addEventListener("input", run);
+  minutesEl.addEventListener("input", run);
+  document.getElementById("speed").addEventListener("change", run);
+  document.getElementById("walking-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var lastAdv = null;
+  var SPEED_LABEL = { slow: "천천히", normal: "보통", brisk: "약간 빠르게", fast: "빠른 걸음", veryfast: "상당히 빠르게" };
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function fmtMinutes(min) {
+    if (min < 60) return min + " 분";
+    return Math.floor(min / 60) + " 시간 " + (min % 60) + " 분";
+  }
+  function runTarget(fromButton) {
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(w)) { if (fromButton) advErr("먼저 위 폼에 몸무게를 입력해 주세요."); return; }
+    var kEl = document.getElementById("adv-target-kcal");
+    if (kEl.value === "") { if (fromButton) advErr("목표 소모 칼로리를 입력해 주세요."); return; }
+    var speed = document.getElementById("speed").value;
+    var r = WalkingCalc.minutesForKcal(w, parseFloat(kEl.value), speed);
+    if (!r.ok) {
+      advErr(r.code === "invalid_kcal" ? "목표 소모 칼로리는 1〜5,000kcal 범위로 입력해 주세요."
+        : "몸무게는 20〜300kg 범위로 입력해 주세요.");
+      return;
+    }
+    lastAdv = runTarget;
+    advBox.innerHTML =
+      '<div class="result-main">약 ' + fmtMinutes(r.minutes) + "</div>" +
+      "<p>「" + SPEED_LABEL[speed] + "」(" + r.mets + "METs)로 걸을 경우 1시간에 약 " +
+      r.kcalPerHour.toLocaleString() + " kcal을 소모하는 계산입니다. 분은 올림으로 표시합니다.</p>";
+    advBox.hidden = false;
+  }
+  function runKm(fromButton) {
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(w)) { if (fromButton) advErr("먼저 위 폼에 몸무게를 입력해 주세요."); return; }
+    var kmEl = document.getElementById("adv-km");
+    if (kmEl.value === "") { if (fromButton) advErr("걸은 거리를 입력해 주세요."); return; }
+    var speed = document.getElementById("speed").value;
+    var r = WalkingCalc.caloriesByDistance(w, parseFloat(kmEl.value), speed);
+    if (!r.ok) {
+      advErr(r.code === "invalid_distance" ? "거리는 0.1〜100km 범위로 입력해 주세요."
+        : "몸무게는 20〜300kg 범위로 입력해 주세요.");
+      return;
+    }
+    lastAdv = runKm;
+    advBox.innerHTML =
+      '<div class="result-main">약 ' + r.kcal.toLocaleString() + " kcal</div>" +
+      "<p>「" + SPEED_LABEL[speed] + "」(약 " + r.kmh + "km/h)라면 약 <strong>" + fmtMinutes(r.minutes) +
+      "</strong>, 지방 환산 약 " + r.fatG.toLocaleString() + "g 분량입니다.</p>";
+    advBox.hidden = false;
+  }
+  function runHabit(fromButton) {
+    var w = parseFloat(document.getElementById("weight").value);
+    var min = parseFloat(document.getElementById("minutes").value);
+    if (!isFinite(w) || !isFinite(min)) { if (fromButton) advErr("먼저 위 폼에 몸무게와 걸은 시간을 입력해 주세요."); return; }
+    var days = parseInt(document.getElementById("adv-days").value, 10);
+    var speed = document.getElementById("speed").value;
+    var r = WalkingCalc.habitTotal(w, min, speed, days);
+    if (!r.ok) { advErr("위 폼의 몸무게(20〜300kg)와 시간(1〜1440분)을 확인해 주세요."); return; }
+    var fatText = r.fatG >= 1000
+      ? (r.fatG / 1000).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " kg"
+      : r.fatG.toLocaleString() + " g";
+    lastAdv = runHabit;
+    advBox.innerHTML =
+      '<div class="result-main">' + days + "일에 약 " + r.totalKcal.toLocaleString() + " kcal</div>" +
+      "<p>하루 약 " + r.kcalPerDay.toLocaleString() + " kcal × " + days + "일 = 체지방 약 <strong>" + fatText +
+      "</strong> 분량(1kg≒7,200kcal 기준).</p>" +
+      '<p class="adv-note">식사량이 변하지 않는다는 전제의 어림 계산입니다. 실제 체중 변화에는 개인차가 있습니다.</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-target-run").addEventListener("click", function () { runTarget(true); });
+  document.getElementById("adv-km-run").addEventListener("click", function () { runKm(true); });
+  document.getElementById("adv-habit-run").addEventListener("click", function () { runHabit(true); });
+  document.getElementById("adv-target-kcal").addEventListener("input", function () { runTarget(false); });
+  document.getElementById("adv-km").addEventListener("input", function () { runKm(false); });
+  document.getElementById("adv-days").addEventListener("change", function () { runHabit(false); });
+  ["weight", "minutes"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { if (lastAdv) lastAdv(false); });
+  });
+  document.getElementById("speed").addEventListener("change", function () { if (lastAdv) lastAdv(false); });
+})();
+</script>
+</body>
+</html>

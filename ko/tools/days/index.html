@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>일수 계산기(날짜 차이·○일 후 날짜와 요일) | Quick Calc</title>
+  <meta name="description" content="두 날짜 사이의 일수와 기준일에서 ○일 후(○일 전)의 날짜·요일을 무료로 계산합니다. 마감일·기념일·납부 기한·제출 기한 확인에 편리합니다. 윤년에도 대응합니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/days/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="일수 계산기(날짜 차이·○일 후 날짜와 요일) | Quick Calc">
+  <meta property="og:description" content="두 날짜 사이의 일수와 기준일에서 ○일 후(○일 전)의 날짜·요일을 무료로 계산합니다. 마감일·기념일·납부 기한·제출 기한 확인에 편리합니다. 윤년에도 대응합니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/days/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"일수 계산기(날짜 차이·○일 후)","item":"https://quick-calc.site/ko/tools/days/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/days/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/days/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/days/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/days/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/days/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>일수 계산기(날짜 차이·○일 후)</h1>
+  <form class="tool-form" id="between-form">
+    <span class="field-note">시작일과 종료일을 선택하면 바로 아래에 일수가 표시됩니다</span>
+    <div class="field-row">
+      <label>시작일(년)
+        <select id="from-year"></select>
+      </label>
+      <label>월
+        <select id="from-month"></select>
+      </label>
+      <label>일
+        <select id="from-day"></select>
+      </label>
+    </div>
+    <div class="field-row">
+      <label>종료일(년)
+        <select id="to-year"></select>
+      </label>
+      <label>월
+        <select id="to-month"></select>
+      </label>
+      <label>일
+        <select id="to-day"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="add-form">
+    <span class="field-note">「100일 후는 몇 월 며칠?」은 여기서(이전은 마이너스)</span>
+    <div class="field-row">
+      <label>기준일(년)
+        <select id="base-year"></select>
+      </label>
+      <label>월
+        <select id="base-month"></select>
+      </label>
+      <label>일
+        <select id="base-day"></select>
+      </label>
+    </div>
+    <label>며칠 후?(이전은 마이너스)
+      <span class="field-note">예: 100 / -30(지원 범위: ±36,500일)</span>
+      <input type="number" id="offset" inputmode="numeric" step="1" min="-36500" max="36500" placeholder="100" required>
+    </label>
+    <div class="tool-result" id="result-b" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 주 수·개월 수 내역과 ○개월 후 날짜</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">주 수·개월 수를 함께 보는 내역</h3>
+      <p class="adv-note">위 「시작일」「종료일」의 차이를 주 수+나머지 일수, 대략적인 개월 수로도 표시합니다(첫날을 포함하면 입원 일수 등의 계산 방식이 됩니다).</p>
+      <label><input type="checkbox" id="adv-include"> 첫날을 포함해서 세기(양끝 포함)</label>
+      <div class="tool-result" id="adv-bd-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">○개월 후(○개월 전) 날짜</h3>
+      <p class="adv-note">위 「기준일」에서 지정한 개월 수만큼 뒤(마이너스면 앞)의 날짜와 요일을 구합니다.</p>
+      <label>몇 개월 후?
+        <input type="number" id="adv-months" inputmode="numeric" min="-1200" max="1200" step="1" placeholder="예: 3">
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    일수를 세는 방법에는 「첫날을 포함하지 않는(경과 일수)」 방식과 「첫날을 포함하는(양끝 포함 일수)」 방식이 있습니다. 이 도구는 <strong>둘 다 표시</strong>합니다. 계약·법률상 기간 계산은 세는 방법이 다르게 정해져 있을 수 있으니 주의하세요.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>두 날짜 사이가 <strong>며칠인지</strong> 바로 알 수 있는 도구입니다. 「100일 후는 몇 월 며칠?」 같은 앞날의 날짜 계산도 가능합니다. 이벤트까지 남은 날을 세거나 서류의 기간 계산에 활용하세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>일수 계산: 시작일과 종료일을 선택하면 선택한 순간 사이의 일수가 표시됩니다. 버튼은 필요 없습니다.</li>
+    <li>○일 후 계산: 기준일을 선택하고 일수(과거는 마이너스)를 입력하면 해당 날짜와 요일이 자동으로 표시됩니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li>그레고리력(현행 달력)에 따라 날짜를 통산 일수로 변환해 차이·가산을 계산합니다. 윤년(4년에 1번, 단 100으로 나누어떨어지고 400으로 나누어떨어지지 않는 해는 평년)에도 대응합니다.</li>
+    <li><strong>경과 일수</strong>는 첫날을 포함하지 않습니다(7월 18일→7월 19일은 「1일」). <strong>양끝 포함 일수</strong>는 여기에 1을 더한 값입니다.</li>
+    <li>계산 예: 2026-07-18 → 2026-08-01 은 14일(양끝 포함 15일)</li>
+  </ul>
+
+  <h3>출처·전제 명시</h3>
+  <ul class="sources">
+    <li>그레고리력의 역법(윤년 규칙)에 기반한 산술 계산입니다.</li>
+    <li>공휴일·영업일은 고려하지 않습니다(달력일 기준 계산입니다).</li>
+  </ul>
+
+  <h2>계산의 전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>「영업일」로 세고 싶은 경우(주말·공휴일 제외)는 이 도구의 결과에서 휴일 수를 빼 주세요.</li>
+    <li>법률상 기간 계산(일본 민법의 초일 불산입 원칙 등)은 개별 규정에 따릅니다. 중요한 기한은 근거 규정에서 확인하세요.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">「○일 후」에 당일이 포함되나요?</h3>
+  <p class="faq-a">포함되지 않습니다. 「7월 18일의 1일 후」는 7월 19일입니다. 당일을 1일째로 세고 싶다면 입력하는 일수에서 1을 빼 주세요.</p>
+  <h3 class="faq-q">몇 개월 후·몇 년 후 계산도 되나요?</h3>
+  <p class="faq-a">이 도구는 일수 전용입니다. 월마다 일수(28〜31일)가 다르므로 일수로 환산해 입력해 주세요(참고: 1개월≒30일, 1년=365일 또는 366일).</p>
+  <h3 class="faq-q">과거 날짜에도 쓸 수 있나요?</h3>
+  <p class="faq-a">1600년부터 2500년까지 지원합니다. 일수에 마이너스를 입력하면 「○일 전」 날짜도 계산할 수 있습니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/days/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/days/" lang="en" hreflang="en">English</a><a href="/zh/tools/days/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=days">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/days/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var today = new Date();
+  var WD_KO = { "月": "월", "火": "화", "水": "수", "木": "목", "金": "금", "土": "토", "日": "일" };
+
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, "일", Math.min(keep, max));
+  }
+  function isoOf(prefix) {
+    adjustDays(prefix + "-year", prefix + "-month", prefix + "-day");
+    return val(prefix + "-year") + "-" +
+      String(val(prefix + "-month")).padStart(2, "0") + "-" +
+      String(val(prefix + "-day")).padStart(2, "0");
+  }
+  function koDate(iso) {
+    var p = iso.split("-");
+    return parseInt(p[0], 10) + "년 " + parseInt(p[1], 10) + "월 " + parseInt(p[2], 10) + "일";
+  }
+  function initDate(prefix) {
+    fillSelect(document.getElementById(prefix + "-year"), 1600, 2500, "년", today.getFullYear());
+    fillSelect(document.getElementById(prefix + "-month"), 1, 12, "월", today.getMonth() + 1);
+    fillSelect(document.getElementById(prefix + "-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), "일", today.getDate());
+  }
+  initDate("from");
+  initDate("to");
+  initDate("base");
+
+  var box = document.getElementById("result");
+  var boxB = document.getElementById("result-b");
+  var bdBox = document.getElementById("adv-bd-result");
+  var moBox = document.getElementById("adv-result");
+
+  var ERROR_MESSAGES = {
+    from_after_to: "시작일이 종료일보다 뒤에 있습니다.",
+    invalid_offset: "일수는 ±36,500 범위의 정수로 입력해 주세요.",
+    out_of_range: "계산 결과가 지원 범위(1600〜2500년)를 벗어났습니다."
+  };
+
+  // ---- 날짜 차이(즉시) ----
+  function runBetween() {
+    var result = DaysCalc.between(isoOf("from"), isoOf("to"));
+    if (!result.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "입력값을 확인해 주세요.") + "</p>";
+    } else {
+      box.innerHTML =
+        '<div class="result-main">' + result.days.toLocaleString() + " 일</div>" +
+        "<p>양끝(첫날·마지막 날)을 포함하면: <strong>" + result.inclusiveDays.toLocaleString() + " 일</strong></p>";
+    }
+    box.hidden = false;
+    runBreakdown();
+  }
+
+  // ---- ○일 후 날짜(즉시) ----
+  function runAdd() {
+    var offset = document.getElementById("offset").value;
+    var base = isoOf("base");
+    if (offset === "") { boxB.hidden = true; runMonths(); return; }
+    var result = DaysCalc.addDays(base, parseFloat(offset));
+    if (!result.ok) {
+      boxB.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "입력값을 확인해 주세요.") + "</p>";
+    } else {
+      boxB.innerHTML = '<div class="result-main">' + koDate(result.date) + "(" + WD_KO[result.weekday] + "요일)</div>";
+    }
+    boxB.hidden = false;
+    runMonths();
+  }
+
+  // ---- 상세 기능: 주 수·개월 수 내역(즉시) ----
+  function runBreakdown() {
+    var inc = document.getElementById("adv-include").checked;
+    var r = DaysCalc.breakdown(isoOf("from"), isoOf("to"), inc);
+    if (!r.ok) { bdBox.hidden = true; return; }
+    bdBox.innerHTML =
+      '<div class="result-main">' + r.days.toLocaleString() + " 일(" +
+      (inc ? "첫날 포함" : "첫날 미포함") + ")</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>주 단위로는</td><td>" + r.weeks.toLocaleString() + "주" +
+      (r.weekDays > 0 ? " " + r.weekDays + "일" : "") + "</td></tr>" +
+      "<tr><td>개월 수(대략)</td><td>" + r.months.toLocaleString() + "개월" +
+      (r.monthDays > 0 ? " " + r.monthDays + "일" : "") + "</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">개월 수는 달력상의 차이(첫날을 포함하지 않는 계산)입니다.</p>';
+    bdBox.hidden = false;
+  }
+
+  // ---- 상세 기능: ○개월 후 날짜(즉시) ----
+  function runMonths() {
+    var mo = document.getElementById("adv-months");
+    if (mo.value === "") { moBox.hidden = true; return; }
+    var base = isoOf("base");
+    var r = DaysCalc.addMonths(base, parseFloat(mo.value));
+    if (!r.ok) {
+      var msg = r.code === "invalid_months" ? "개월 수는 -1,200〜1,200의 정수로 입력해 주세요."
+        : r.code === "out_of_range" ? "계산 결과가 지원 범위(1600〜2500년)를 벗어났습니다."
+        : "기준일을 정확히 입력해 주세요.";
+      moBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+      moBox.hidden = false;
+      return;
+    }
+    var n = parseFloat(mo.value);
+    moBox.innerHTML =
+      '<div class="result-main">' + koDate(r.date) + "(" + WD_KO[r.weekday] + "요일)</div>" +
+      "<p>" + koDate(base) + "의 " + Math.abs(n).toLocaleString() + "개월 " + (n < 0 ? "전" : "후") + "</p>" +
+      '<p class="adv-note">해당 월에 같은 날짜가 없으면 월말로 조정합니다(1월 31일의 1개월 후는 2월 28일).</p>';
+    moBox.hidden = false;
+  }
+
+  ["from-year", "from-month", "from-day", "to-year", "to-month", "to-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runBetween);
+  });
+  ["base-year", "base-month", "base-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runAdd);
+  });
+  document.getElementById("offset").addEventListener("input", runAdd);
+  document.getElementById("adv-include").addEventListener("change", runBreakdown);
+  document.getElementById("adv-months").addEventListener("input", runMonths);
+  document.getElementById("between-form").addEventListener("submit", function (e) { e.preventDefault(); runBetween(); });
+  document.getElementById("add-form").addEventListener("submit", function (e) { e.preventDefault(); runAdd(); });
+
+  runBetween();
+})();
+</script>
+</body>
+</html>

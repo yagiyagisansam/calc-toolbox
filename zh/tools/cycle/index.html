@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>睡眠周期计算器(几点睡才能睡醒不困?) | Quick Calc</title>
+  <meta name="description" content="从起床时间倒推,列出符合约90分钟睡眠周期的就寝时间候选。可设定入睡所需时间,一键回答「明天6点半起床,今晚几点睡?」。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/cycle/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="睡眠周期计算器(几点睡才能睡醒不困?) | Quick Calc">
+  <meta property="og:description" content="从起床时间倒推,列出符合约90分钟睡眠周期的就寝时间候选。可设定入睡所需时间,一键回答「明天6点半起床,今晚几点睡?」。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/cycle/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"睡眠周期计算器","item":"https://quick-calc.site/zh/tools/cycle/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/cycle/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/cycle/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/cycle/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/cycle/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/cycle/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>睡眠周期计算器</h1>
+  <form class="tool-form" id="cycle-form">
+    <span class="field-note">修改时间后,下方的候选会自动更新</span>
+    <label>计算方式
+      <select id="mode">
+        <option value="bed" selected>从起床时间倒推「几点睡」</option>
+        <option value="wake">从就寝时间计算「几点起」</option>
+      </select>
+    </label>
+    <label id="time-label">起床时间
+      <input type="time" id="time" value="06:30" required>
+    </label>
+    <label>入睡所需时间(分钟)
+      <span class="field-note">一般按15分钟估算;入睡快的人可填5分钟</span>
+      <input type="number" id="fall" inputmode="numeric" min="0" max="60" step="5" value="15">
+    </label>
+    <button type="submit">计算时间候选</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 按自己的周期重算·现在就睡</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">按自己的周期长度重新计算</h3>
+      <p class="adv-note">周期存在70〜110分钟左右的个体差异,如果90分钟不合适,可以改用80分钟或100分钟重算(时间等使用上方表单的数值)。</p>
+      <label>周期长度
+        <select id="adv-cycle-len">
+          <option value="80">80分钟(偏短)</option>
+          <option value="90" selected>90分钟(平均)</option>
+          <option value="100">100分钟(偏长)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-cycle-run">按此周期重新计算</button>
+      <h3 class="adv-h">现在就睡的话,几点起床好?</h3>
+      <p class="adv-note">以当前时刻为基准,列出符合周期分界的起床时间候选(周期长度和入睡所需时间使用上方的设定)。</p>
+      <button type="button" id="adv-now-run">查看现在就睡的起床候选</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>只要输入想起床的时间,就能立刻得到<strong>3个容易醒来的就寝时间候选</strong>。睡眠以约90分钟为一个周期反复进行,本工具的思路就是让你在周期的分界处醒来。「明天6点起床,今晚几点睡?」的夜晚很好用。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>输入想起床的时间(或打算入睡的时间)。</li>
+    <li>输入大致的入睡所需时间(一般按15分钟)。</li>
+    <li>输入的同时,相当于6小时·7.5小时·9小时睡眠的时间候选会显示在下方,无需点击按钮。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>就寝时间候选 = 起床时间 −(90分钟 × 周期数)− 入睡所需时间</strong></li>
+    <li>周期数显示4次(6小时)·5次(7.5小时)·6次(9小时)三种方案。成人建议的睡眠时间为6小时以上。</li>
+    <li>计算示例: 6:30起床·入睡需15分钟,则5个周期(7.5小时)的就寝候选为 <strong>22:45</strong>。</li>
+  </ul>
+
+  <h3>出处与前提</h3>
+  <ul class="sources">
+    <li>关于睡眠周期(非快速眼动睡眠与快速眼动睡眠以约90分钟为周期反复)的说明: <a href="https://www.e-healthnet.mhlw.go.jp/information/heart" target="_blank" rel="noopener">日本厚生劳动省 e-健康网(休养·心理健康)</a>(日文)。90分钟为平均值,个体差异约在70〜110分钟之间。</li>
+  </ul>
+
+  <h2>计算的前提与注意</h2>
+  <ul class="cautions">
+    <li>周期长度的个体差异很大,并不能保证「按90分钟的倍数就一定能清爽醒来」。请作为参考值使用。</li>
+    <li>最重要的是<strong>保证充足的睡眠时间,并让每天的就寝·起床时间保持一致</strong>。</li>
+    <li>如果持续出现严重困倦或失眠,请咨询医疗机构。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">90分钟周期是真的吗?</h3>
+  <p class="faq-a">非快速眼动睡眠与快速眼动睡眠以约90分钟为周期反复,这本身是广为人知的生理现象。但周期因人而异,大约在70〜110分钟之间,同一个人在一夜之中也会变化。本工具的候选只是「若按平均90分钟计算则为此时刻」的参考。</p>
+  <h3 class="faq-q">睡6小时够吗?</h3>
+  <p class="faq-a">多数成人以6〜8小时左右为宜,所需睡眠量存在个体差异。白天有强烈困意就是睡眠不足的信号。条件允许的话,建议选择5个周期(7.5小时)以上的候选。</p>
+  <h3 class="faq-q">按候选时间躺下也睡不着。</h3>
+  <p class="faq-a">睡前玩手机、摄入咖啡因、洗过热的澡都会影响入睡。此外「不困却硬躺在床上」有时反而适得其反。有困意后再上床,并把起床时间固定下来,才是常见的做法。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/cycle/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/cycle/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/cycle/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=cycle">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/cycle/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var timeLabel = document.getElementById("time-label");
+  mode.addEventListener("change", function () {
+    timeLabel.childNodes[0].textContent = mode.value === "bed" ? "起床时间" : "就寝时间";
+    document.getElementById("time").value = mode.value === "bed" ? "06:30" : "23:00";
+    run(false);
+  });
+  function run(fromSubmit) {
+    var t = document.getElementById("time").value;
+    if (!fromSubmit && t === "") { box.hidden = true; return; }
+    var fall = parseFloat(document.getElementById("fall").value || "15");
+    var isBed = mode.value === "bed";
+    var r = isBed ? CycleCalc.bedTimes(t, fall) : CycleCalc.wakeTimes(t, fall);
+    if (!r.ok) { box.innerHTML = '<p class="result-error">请正确输入时间和入睡所需时间(0〜60分钟)。</p>'; box.hidden = false; return; }
+    var rows = r.options.map(function (o) {
+      var time = isBed ? o.bedTime : o.wakeTime;
+      var star = o.cycles === 5 ? ' <span class="mark-rec">推荐</span>' : "";
+      return "<tr><td><strong>" + time + "</strong>" + star + "</td><td>" + o.sleepHours + "小时(" + o.cycles + "个周期)</td></tr>";
+    }).join("");
+    box.innerHTML =
+      '<div class="result-main">' + (isBed ? "就寝" : "起床") + "候选 " + (isBed ? r.options[1].bedTime : r.options[1].wakeTime) + " 等</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>' + (isBed ? "入睡时间" : "起床时间") + "</th><th>睡眠时间</th></tr></thead><tbody>" +
+      rows + '</tbody></table></div><p><span class="mark-rec">推荐</span>=7.5小时。周期存在个体差异。</p>';
+    box.hidden = false;
+    if (window.__cycleAdvRefresh) { window.__cycleAdvRefresh(); }
+  }
+  document.getElementById("cycle-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+  document.getElementById("time").addEventListener("change", function () { run(false); });
+  document.getElementById("time").addEventListener("input", function () { run(false); });
+  document.getElementById("fall").addEventListener("input", function () { run(false); });
+  run(false);
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advRender(r, headline, timeHead) {
+    if (!r.ok) {
+      var msg = r.code === "invalid_time" ? "请在上方表单中输入时间。"
+        : r.code === "invalid_fall" ? "入睡所需时间请填写0〜60分钟。"
+        : "请确认输入的数值。";
+      advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    var html = '<div class="result-main">' + headline + '</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>周期数</th><th>睡眠时间</th><th>' +
+      timeHead + '</th></tr></thead><tbody>';
+    for (var i = 0; i < r.options.length; i++) {
+      var o = r.options[i];
+      html += "<tr><td>" + o.cycles + "个</td><td>约" +
+        o.sleepHours.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "小时</td><td>" + o.time + "</td></tr>";
+    }
+    html += "</tbody></table></div>" +
+      '<p class="adv-note">周期长度存在个体差异,候选时间仅供参考。</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  function runCustom() {
+    var mode = document.getElementById("mode").value;
+    var time = document.getElementById("time").value;
+    var fall = parseFloat(document.getElementById("fall").value);
+    if (isNaN(fall)) fall = 15;
+    var len = parseInt(document.getElementById("adv-cycle-len").value, 10);
+    var r = CycleCalc.customOptions(mode, time, fall, len);
+    advRender(r, "周期" + len + "分钟的候选",
+      mode === "bed" ? "就寝时间候选" : "起床时间候选");
+  }
+  document.getElementById("adv-cycle-run").addEventListener("click", runCustom);
+  document.getElementById("adv-cycle-len").addEventListener("change", runCustom);
+  window.__cycleAdvRefresh = function () {
+    if (!advBox.hidden) { runCustom(); }
+  };
+  document.getElementById("adv-now-run").addEventListener("click", function () {
+    var now = new Date();
+    var hm = now.getHours() + ":" + (now.getMinutes() < 10 ? "0" : "") + now.getMinutes();
+    var fall = parseFloat(document.getElementById("fall").value);
+    if (isNaN(fall)) fall = 15;
+    var len = parseInt(document.getElementById("adv-cycle-len").value, 10);
+    var r = CycleCalc.customOptions("wake", hm, fall, len);
+    advRender(r, "现在(" + hm + ")入睡时的起床候选", "起床时间候选");
+  });
+})();
+</script>
+</body>
+</html>

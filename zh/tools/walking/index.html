@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>步行消耗卡路里计算器(METs法·含脂肪换算) | Quick Calc</title>
+  <meta name="description" content="根据体重·时间·步行速度,按METs法(日本厚生劳动省的公式)计算步行消耗的卡路里,并显示相当于多少克脂肪。散步·快走·减肥的参考。免费·无需注册。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/walking/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="步行消耗卡路里计算器(METs法·含脂肪换算) | Quick Calc">
+  <meta property="og:description" content="根据体重·时间·步行速度,按METs法(日本厚生劳动省的公式)计算步行消耗的卡路里,并显示相当于多少克脂肪。散步·快走·减肥的参考。免费·无需注册。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/walking/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"步行消耗卡路里计算器(METs法·含脂肪换算)","item":"https://quick-calc.site/zh/tools/walking/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/walking/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/walking/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/walking/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/walking/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/walking/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>步行消耗卡路里计算器</h1>
+  <form class="tool-form" id="walking-form">
+    <span class="field-note">输入体重和时间,结果立即显示在下方</span>
+    <label>体重(kg)
+      <input type="number" id="weight" inputmode="decimal" min="20" max="300" step="0.1" required placeholder="例: 60">
+    </label>
+    <label>步行时间(分钟)
+      <input type="number" id="minutes" inputmode="numeric" min="1" max="1440" step="1" required placeholder="例: 30">
+    </label>
+    <label>步行速度
+      <select id="speed">
+        <option value="slow">慢速(约3.2km/h·散步)</option>
+        <option value="normal" selected>正常(约4.0km/h)</option>
+        <option value="brisk">稍快(约4.8km/h)</option>
+        <option value="fast">快走(约5.6km/h·赶路)</option>
+        <option value="veryfast">相当快(约6.4km/h)</option>
+      </select>
+    </label>
+    <button type="submit">计算消耗卡路里</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 反算目标卡路里·按距离或习惯计算</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">消耗目标卡路里需要走多少分钟?</h3>
+      <p class="adv-note">输入想消耗的卡路里,反算所需的步行时间(体重和速度使用上面的值)。</p>
+      <label>目标消耗卡路里(kcal)
+        <input type="number" id="adv-target-kcal" inputmode="numeric" step="1" min="1" max="5000" placeholder="例: 200">
+      </label>
+      <button type="button" id="adv-target-run">反算所需时间</button>
+
+      <h3 class="adv-h">按距离计算(不知道时间时)</h3>
+      <p class="adv-note">只知道距离时,按所选速度档的代表速度计算所需时间和消耗卡路里。</p>
+      <label>步行距离(km)
+        <input type="number" id="adv-km" inputmode="decimal" step="any" min="0.1" max="100" placeholder="例: 2">
+      </label>
+      <button type="button" id="adv-km-run">按距离计算</button>
+
+      <h3 class="adv-h">每天坚持会怎样?</h3>
+      <p class="adv-note">显示按上面的内容每天坚持步行时的总计,并换算成体脂肪(1kg≒7,200kcal)。</p>
+      <label>坚持天数
+        <select id="adv-days">
+          <option value="7">1周(7天)</option>
+          <option value="30" selected>1个月(30天)</option>
+          <option value="90">3个月(90天)</option>
+          <option value="365">1年(365天)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-habit-run">计算坚持后的总计</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>只需输入体重和步行时间,就能知道<strong>步行消耗了多少卡路里</strong>。计算采用日本厚生劳动省运动指南的METs公式,并同时显示约相当于多少克脂肪。适合记录每天的散步,或作为减肥的鼓励。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>输入体重和步行时间。</li>
+    <li>从5档中选择步行速度(除去等红灯等停止时间会更准确)。</li>
+    <li>输入的同时,消耗卡路里和脂肪换算立即显示在下方,无需点击按钮。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>消耗能量(kcal)= 1.05 × METs × 时间(h)× 体重(kg)</strong>(日本厚生劳动省运动指南使用的公式)</li>
+    <li>METs(梅脱)是以静息状态为1的运动强度指标。本工具的数值来自「身体活动METs表」: 慢速=2.8 / 正常=3.0 / 稍快=3.5 / 快走=4.3 / 相当快=5.0</li>
+    <li>计算例: 体重60kg的人以「正常」速度走30分钟 → 1.05 × 3.0 × 0.5 × 60 = <strong>约95kcal</strong></li>
+    <li>脂肪换算按体脂肪1kg≒7,200kcal的大致标准折算。</li>
+  </ul>
+
+  <h3>出处与前提</h3>
+  <ul class="sources">
+    <li>计算公式·METs的说明: <a href="https://www.e-healthnet.mhlw.go.jp/information/exercise/s-02-004.html" target="_blank" rel="noopener">日本厚生劳动省 e-健康网「METs」</a>(日文)</li>
+    <li>不同步行速度的METs值: <a href="https://www.nibiohn.go.jp/eiken/programs/2011mets.pdf" target="_blank" rel="noopener">日本国立健康·营养研究所「身体活动METs表」</a>(日文)</li>
+  </ul>
+
+  <h2>前提与注意</h2>
+  <ul class="cautions">
+    <li>该公式包含静息时也会消耗的部分(基础代谢)。如果只想知道「因步行额外增加的消耗」,请用METs减1来估算(例: 正常速度步行30分钟·60kg时,额外部分约63kcal)。</li>
+    <li>坡道·负重·气温等会影响实际消耗量,结果仅供参考。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">走1万步消耗多少千卡?</h3>
+  <p class="faq-a">步幅70cm时,1万步约为7km。体重60kg的人以「正常」速度(4km/h)步行约需105分钟,消耗约330kcal,大约相当于2个饭团。</p>
+  <h3 class="faq-q">减掉1kg脂肪需要走多久?</h3>
+  <p class="faq-a">按体脂肪1kg≒7,200kcal计算,体重60kg的人每天以「正常」速度走30分钟(约95kcal/天),单纯计算约需2.5个月。与饮食管理结合更为现实。</p>
+  <h3 class="faq-q">走得快效果能差多少?</h3>
+  <p class="faq-a">「正常」(3.0METs)和「快走」(4.3METs)相比,相同时间内消耗约为1.4倍。日本的健康指南也推荐稍微有点气喘程度的「快走」。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/walking/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/walking/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/walking/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=walking">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/walking/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var ERROR_MESSAGES = {
+    invalid_weight: "体重请在20〜300kg范围内输入。",
+    invalid_minutes: "时间请在1分钟〜24小时范围内输入。",
+    invalid_speed: "请选择步行速度。"
+  };
+  var weightEl = document.getElementById("weight");
+  var minutesEl = document.getElementById("minutes");
+  function run() {
+    if (weightEl.value === "" || minutesEl.value === "") { box.hidden = true; return; }
+    var r = WalkingCalc.calories(
+      parseFloat(weightEl.value),
+      parseFloat(minutesEl.value),
+      document.getElementById("speed").value
+    );
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "请检查输入的数值。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">约 ' + r.kcal.toLocaleString() + " kcal</div>" +
+      "<p>换算成脂肪约为 <strong>" + r.fatG.toLocaleString() + "g</strong>(按体脂肪1kg≒7,200kcal的大致标准)/ 使用的METs值: " + r.mets + "</p>";
+    box.hidden = false;
+  }
+  weightEl.addEventListener("input", run);
+  minutesEl.addEventListener("input", run);
+  document.getElementById("speed").addEventListener("change", run);
+  document.getElementById("walking-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var lastAdv = null;
+  var SPEED_LABEL = { slow: "慢速", normal: "正常", brisk: "稍快", fast: "快走", veryfast: "相当快" };
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function fmtMinutes(min) {
+    if (min < 60) return min + " 分钟";
+    return Math.floor(min / 60) + " 小时 " + (min % 60) + " 分钟";
+  }
+  function runTarget(fromButton) {
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(w)) { if (fromButton) advErr("请先在上面的表单中输入体重。"); return; }
+    var kEl = document.getElementById("adv-target-kcal");
+    if (kEl.value === "") { if (fromButton) advErr("请输入目标消耗卡路里。"); return; }
+    var speed = document.getElementById("speed").value;
+    var r = WalkingCalc.minutesForKcal(w, parseFloat(kEl.value), speed);
+    if (!r.ok) {
+      advErr(r.code === "invalid_kcal" ? "目标消耗卡路里请在1〜5,000kcal范围内输入。"
+        : "体重请在20〜300kg范围内输入。");
+      return;
+    }
+    lastAdv = runTarget;
+    advBox.innerHTML =
+      '<div class="result-main">约 ' + fmtMinutes(r.minutes) + "</div>" +
+      "<p>以「" + SPEED_LABEL[speed] + "」(" + r.mets + "METs)步行时,每小时约消耗 " +
+      r.kcalPerHour.toLocaleString() + " kcal。分钟数向上取整显示。</p>";
+    advBox.hidden = false;
+  }
+  function runKm(fromButton) {
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(w)) { if (fromButton) advErr("请先在上面的表单中输入体重。"); return; }
+    var kmEl = document.getElementById("adv-km");
+    if (kmEl.value === "") { if (fromButton) advErr("请输入步行距离。"); return; }
+    var speed = document.getElementById("speed").value;
+    var r = WalkingCalc.caloriesByDistance(w, parseFloat(kmEl.value), speed);
+    if (!r.ok) {
+      advErr(r.code === "invalid_distance" ? "距离请在0.1〜100km范围内输入。"
+        : "体重请在20〜300kg范围内输入。");
+      return;
+    }
+    lastAdv = runKm;
+    advBox.innerHTML =
+      '<div class="result-main">约 ' + r.kcal.toLocaleString() + " kcal</div>" +
+      "<p>以「" + SPEED_LABEL[speed] + "」(约" + r.kmh + "km/h)约需 <strong>" + fmtMinutes(r.minutes) +
+      "</strong>,换算成脂肪约" + r.fatG.toLocaleString() + "g。</p>";
+    advBox.hidden = false;
+  }
+  function runHabit(fromButton) {
+    var w = parseFloat(document.getElementById("weight").value);
+    var min = parseFloat(document.getElementById("minutes").value);
+    if (!isFinite(w) || !isFinite(min)) { if (fromButton) advErr("请先在上面的表单中输入体重和步行时间。"); return; }
+    var days = parseInt(document.getElementById("adv-days").value, 10);
+    var speed = document.getElementById("speed").value;
+    var r = WalkingCalc.habitTotal(w, min, speed, days);
+    if (!r.ok) { advErr("请检查上面表单中的体重(20〜300kg)和时间(1〜1440分钟)。"); return; }
+    var fatText = r.fatG >= 1000
+      ? (r.fatG / 1000).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " kg"
+      : r.fatG.toLocaleString() + " g";
+    lastAdv = runHabit;
+    advBox.innerHTML =
+      '<div class="result-main">' + days + "天共 约 " + r.totalKcal.toLocaleString() + " kcal</div>" +
+      "<p>每天约 " + r.kcalPerDay.toLocaleString() + " kcal × " + days + "天 = 约相当于体脂肪 <strong>" + fatText +
+      "</strong>(按1kg≒7,200kcal的大致标准)。</p>" +
+      '<p class="adv-note">以饮食量不变为前提的估算,实际体重变化因人而异。</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-target-run").addEventListener("click", function () { runTarget(true); });
+  document.getElementById("adv-km-run").addEventListener("click", function () { runKm(true); });
+  document.getElementById("adv-habit-run").addEventListener("click", function () { runHabit(true); });
+  document.getElementById("adv-target-kcal").addEventListener("input", function () { runTarget(false); });
+  document.getElementById("adv-km").addEventListener("input", function () { runKm(false); });
+  document.getElementById("adv-days").addEventListener("change", function () { runHabit(false); });
+  ["weight", "minutes"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { if (lastAdv) lastAdv(false); });
+  });
+  document.getElementById("speed").addEventListener("change", function () { if (lastAdv) lastAdv(false); });
+})();
+</script>
+</body>
+</html>

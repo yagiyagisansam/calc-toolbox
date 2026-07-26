@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>时薪⇔月薪·年薪 换算器(税前) | Quick Calc</title>
+  <meta name="description" content="输入时薪、每天工时和每月出勤天数,免费即时算出税前的月薪和年薪。也能从月薪反推时薪,方便比较日本的兼职·派遣招聘条件,核对工资条上的金额。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/jikyu/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="时薪⇔月薪·年薪 换算器(税前) | Quick Calc">
+  <meta property="og:description" content="输入时薪、每天工时和每月出勤天数,免费即时算出税前的月薪和年薪。也能从月薪反推时薪,方便比较日本的兼职·派遣招聘条件,核对工资条上的金额。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/jikyu/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"时薪⇔月薪·年薪 换算器","item":"https://quick-calc.site/zh/tools/jikyu/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/jikyu/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/jikyu/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/jikyu/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/jikyu/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/jikyu/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>时薪⇔月薪·年薪 换算器</h1>
+  <form class="tool-form" id="to-monthly-form">
+    <label>时薪(日元)
+      <span class="field-note">例: 1200(对应范围: 100〜100,000日元)</span>
+      <input type="number" id="hourly" inputmode="numeric" step="1" min="100" max="100000" placeholder="1200" required>
+    </label>
+    <label>每天的工作时间(小时)
+      <span class="field-note">例: 8、7.5(对应范围: 0.5〜24)</span>
+      <input type="number" id="hours" inputmode="decimal" step="any" min="0.5" max="24" placeholder="8" required>
+    </label>
+    <label>每月的出勤天数(天)
+      <span class="field-note">例: 20(对应范围: 1〜31、整数)</span>
+      <input type="number" id="days" inputmode="numeric" step="1" min="1" max="31" placeholder="20" required>
+    </label>
+    <button type="submit">计算月薪·年薪</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="to-hourly-form">
+    <label>从月薪(日元)反推时薪
+      <span class="field-note">使用上面输入的工作时间和出勤天数</span>
+      <input type="number" id="monthly" inputmode="numeric" step="1" min="10000" max="100000000" placeholder="200000">
+    </label>
+    <button type="submit">反推时薪</button>
+    <div class="tool-result" id="result-b" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>详细功能: 含通勤时间的实际时薪·比较两份工作</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">把通勤时间也算进去的「实际时薪」</h3>
+      <p class="adv-note">在上面表单的条件上加入通勤时间,按「从出门到回家」的全部时间重新计算时薪。</p>
+      <label>单程通勤时间(分钟)
+        <input type="number" id="adv-commute" inputmode="numeric" step="1" min="0" max="300" placeholder="30">
+      </label>
+      <button type="button" id="adv-eff-run">计算实际时薪</button>
+      <div class="tool-result" id="adv-result-eff" hidden aria-live="polite"></div>
+      <h3 class="adv-h">和另一份工作比一比</h3>
+      <p class="adv-note">在相同的工作时间和出勤天数下,比较哪份工作按实际时薪更划算。</p>
+      <label>工作B的时薪(日元)
+        <input type="number" id="adv-hourly-b" inputmode="numeric" step="1" min="100" max="100000" placeholder="1300">
+      </label>
+      <label>工作B的单程通勤时间(分钟)
+        <input type="number" id="adv-commute-b" inputmode="numeric" step="1" min="0" max="300" placeholder="60">
+      </label>
+      <button type="button" id="adv-cmp-run">比较两份工作</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    计算结果全部是<strong>税前(扣除税金·社会保险费之前的金额)</strong>的约数。实际到手金额会因抚养情况、是否加入社会保险、住民税等有很大差异。也不包含加班费、奖金和交通费。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>输入时薪和工作方式,立即知道<strong>月薪和年薪各是多少</strong>(扣税前的金额,日本的工资条上写作「額面」)。也能从月薪反推时薪。在日本比较兼职·派遣的招聘条件,或核对工资条(給与明細)上的金额时,用它很方便。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>输入时薪、每天的工作时间、每月的出勤天数。三项填齐后,月薪·年薪会立即自动显示在下方。</li>
+    <li>想从月薪知道时薪时,先填好工作时间和出勤天数,再在下面的栏位输入月薪(同样自动计算)。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>月薪(税前) = 时薪 × 每天的工作时间 × 每月的出勤天数</strong></li>
+    <li><strong>年薪(税前) = 月薪 × 12</strong></li>
+    <li><strong>时薪(反推) = 月薪 ÷ (每天的工作时间 × 每月的出勤天数)</strong></li>
+    <li>计算示例: 时薪1,200日元 × 8小时 × 20天 = 月薪192,000日元(年薪约230万日元)</li>
+  </ul>
+
+  <h3>出处·前提说明</h3>
+  <ul class="sources">
+    <li>以上是对时薪、时间、天数所做的乘除算术计算(不足1日元四舍五入)。</li>
+    <li>最低工资由日本各都道府县每年修订。最新的最低工资请在日本厚生劳动省的「地域别最低工资」页面确认。</li>
+  </ul>
+
+  <h2>前提与注意</h2>
+  <ul class="cautions">
+    <li>从税前金额中扣除的部分(所得税、住民税、社会保险费等)会因工作条件和抚养情况而异,因此实际到手金额会少于本计算结果。</li>
+    <li>每周的工作时间和天数不同,加入社会保险·雇用保险的条件也不同。详情请向工作单位或年金事务所确认。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">到手能拿多少?</h3>
+  <p class="faq-a">本工具只计算税前金额。一般说到手大约是税前的75〜85%,但会因抚养、保险加入情况和所在自治体有很大差异,准确金额请以工资条或工作单位的说明为准。</p>
+  <h3 class="faq-q">按周发薪或按日计薪时怎么算?</h3>
+  <p class="faq-a">按日计薪时,先用「日薪÷每天的工作时间」换算成时薪再输入。按周计算时,可用「每周天数×4.33」作为大致标准换算成每月的出勤天数(1个月≈4.33周)。</p>
+  <h3 class="faq-q">包含加班费吗?</h3>
+  <p class="faq-a">不包含。超过法定工作时间的加班需要支付加班费(25%以上)。加班多时,实际的税前金额会高于本计算结果。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/jikyu/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/jikyu/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/jikyu/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=jikyu">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/jikyu/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var boxB = document.getElementById("result-b");
+  var ERROR_MESSAGES = {
+    invalid_hourly: "时薪请输入 100〜100,000日元 范围内的数值。",
+    invalid_monthly: "月薪请输入 10,000〜100,000,000日元 范围内的数值。",
+    invalid_hours: "工作时间请输入 0.5〜24小时 范围内的数值。",
+    invalid_days: "出勤天数请输入 1〜31天 的整数。"
+  };
+  function raw(id) { return document.getElementById(id).value; }
+  function workInputs() {
+    return {
+      hours: parseFloat(raw("hours")),
+      days: parseFloat(raw("days"))
+    };
+  }
+  function showError(target, code) {
+    target.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "请检查输入的数值。") + "</p>";
+    target.hidden = false;
+  }
+  function runMonthly() {
+    if (raw("hourly") === "" || raw("hours") === "" || raw("days") === "") {
+      box.hidden = true;
+      return;
+    }
+    var w = workInputs();
+    var result = JikyuCalc.toMonthly(parseFloat(raw("hourly")), w.hours, w.days);
+    if (!result.ok) { showError(box, result.code); return; }
+    box.innerHTML =
+      '<div class="result-main">月薪(税前) 约' + result.monthlyYen.toLocaleString() + " 日元</div>" +
+      "<p>年薪(税前): <strong>约" + result.yearlyYen.toLocaleString() + " 日元</strong></p>";
+    box.hidden = false;
+  }
+  function runHourly() {
+    if (raw("monthly") === "" || raw("hours") === "" || raw("days") === "") {
+      boxB.hidden = true;
+      return;
+    }
+    var w = workInputs();
+    var result = JikyuCalc.toHourly(parseFloat(raw("monthly")), w.hours, w.days);
+    if (!result.ok) { showError(boxB, result.code); return; }
+    boxB.innerHTML = '<div class="result-main">换算时薪 约' + result.hourlyYen.toLocaleString() + " 日元</div>";
+    boxB.hidden = false;
+  }
+  ["hourly", "hours", "days"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runMonthly(); runHourly(); });
+  });
+  document.getElementById("monthly").addEventListener("input", runHourly);
+  document.getElementById("to-monthly-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMonthly();
+    if (raw("hourly") === "" || raw("hours") === "" || raw("days") === "") {
+      showError(box, raw("hourly") === "" ? "invalid_hourly" : raw("hours") === "" ? "invalid_hours" : "invalid_days");
+    }
+  });
+  document.getElementById("to-hourly-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runHourly();
+    if (raw("monthly") === "" || raw("hours") === "" || raw("days") === "") {
+      showError(boxB, raw("monthly") === "" ? "invalid_monthly" : raw("hours") === "" ? "invalid_hours" : "invalid_days");
+    }
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var effBox = document.getElementById("adv-result-eff");
+  function mainInputs() {
+    return {
+      hourly: parseFloat(document.getElementById("hourly").value),
+      hours: parseFloat(document.getElementById("hours").value),
+      days: parseFloat(document.getElementById("days").value)
+    };
+  }
+  var ADV_ERRORS = {
+    invalid_hourly: "时薪(上面的表单)请输入 100〜100,000日元 范围内的数值。",
+    invalid_hours: "工作时间(上面的表单)请输入 0.5〜24小时 范围内的数值。",
+    invalid_days: "出勤天数(上面的表单)请输入 1〜31天 的整数。",
+    invalid_commute: "通勤时间请输入 0〜300分钟 范围内的数值。"
+  };
+  function advError(box, code) {
+    box.innerHTML = '<p class="result-error">' + (ADV_ERRORS[code] || "请检查输入的数值。") + "</p>";
+    box.hidden = false;
+  }
+  function filled(id) { return document.getElementById(id).value !== ""; }
+  function mainFilled() { return filled("hourly") && filled("hours") && filled("days"); }
+  function runEff() {
+    var m = mainInputs();
+    var commute = parseFloat(document.getElementById("adv-commute").value);
+    if (isNaN(commute)) commute = 0;
+    var r = JikyuCalc.effectiveHourly(m.hourly, m.hours, m.days, commute);
+    if (!r.ok) { advError(effBox, r.code); return; }
+    effBox.innerHTML =
+      '<div class="result-main">实际时薪 约' + r.effectiveHourlyYen.toLocaleString() + ' 日元</div>' +
+      '<p>比税前时薪缩水 <strong>' + r.dropYen.toLocaleString() + ' 日元</strong><br>' +
+      '每月的通勤时间: ' + r.commuteHoursPerMonth.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' 小时(月薪 ' + r.monthlyYen.toLocaleString() + ' 日元不变)</p>';
+    effBox.hidden = false;
+  }
+  function runCmp() {
+    var m = mainInputs();
+    var commuteA = parseFloat(document.getElementById("adv-commute").value);
+    if (isNaN(commuteA)) commuteA = 0;
+    var hourlyB = parseFloat(document.getElementById("adv-hourly-b").value);
+    var commuteB = parseFloat(document.getElementById("adv-commute-b").value);
+    if (isNaN(commuteB)) commuteB = 0;
+    var a = JikyuCalc.effectiveHourly(m.hourly, m.hours, m.days, commuteA);
+    if (!a.ok) { advError(advBox, a.code); return; }
+    var b = JikyuCalc.effectiveHourly(hourlyB, m.hours, m.days, commuteB);
+    if (!b.ok) {
+      if (b.code === "invalid_hourly") {
+        advBox.innerHTML = '<p class="result-error">工作B的时薪请输入 100〜100,000日元 范围内的数值。</p>';
+        advBox.hidden = false;
+      } else {
+        advError(advBox, b.code);
+      }
+      return;
+    }
+    var verdict;
+    if (a.effectiveHourlyYen > b.effectiveHourlyYen) {
+      verdict = "按实际时薪,<strong>目前的条件(A)</strong>更划算。";
+    } else if (a.effectiveHourlyYen < b.effectiveHourlyYen) {
+      verdict = "按实际时薪,<strong>工作B</strong>更划算。";
+    } else {
+      verdict = "两者的实际时薪<strong>基本相同</strong>。";
+    }
+    advBox.innerHTML =
+      '<div class="result-main">' + verdict + '</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead>' +
+      '<tr><th></th><th>A(上面的表单)</th><th>工作B</th></tr></thead><tbody>' +
+      '<tr><td>税前时薪</td><td>' + m.hourly.toLocaleString() + ' 日元</td><td>' + hourlyB.toLocaleString() + ' 日元</td></tr>' +
+      '<tr><td>单程通勤</td><td>' + commuteA.toLocaleString() + ' 分钟</td><td>' + commuteB.toLocaleString() + ' 分钟</td></tr>' +
+      '<tr><td>实际时薪</td><td><strong>' + a.effectiveHourlyYen.toLocaleString() + ' 日元</strong></td><td><strong>' + b.effectiveHourlyYen.toLocaleString() + ' 日元</strong></td></tr>' +
+      '<tr><td>月薪(税前)</td><td>' + a.monthlyYen.toLocaleString() + ' 日元</td><td>' + b.monthlyYen.toLocaleString() + ' 日元</td></tr>' +
+      '</tbody></table></div>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-eff-run").addEventListener("click", runEff);
+  document.getElementById("adv-cmp-run").addEventListener("click", runCmp);
+  function autoEff() {
+    if (mainFilled() && filled("adv-commute")) { runEff(); } else { effBox.hidden = true; }
+  }
+  function autoCmp() {
+    if (mainFilled() && filled("adv-hourly-b")) { runCmp(); } else { advBox.hidden = true; }
+  }
+  document.getElementById("adv-commute").addEventListener("input", function () { autoEff(); if (!advBox.hidden) autoCmp(); });
+  document.getElementById("adv-hourly-b").addEventListener("input", autoCmp);
+  document.getElementById("adv-commute-b").addEventListener("input", function () { if (filled("adv-hourly-b")) autoCmp(); });
+  ["hourly", "hours", "days"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (!effBox.hidden || filled("adv-commute")) autoEff();
+      if (!advBox.hidden || filled("adv-hourly-b")) autoCmp();
+    });
+  });
+})();
+</script>
+</body>
+</html>

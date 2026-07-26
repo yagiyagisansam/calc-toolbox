@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>편차치 계산기(일본 입시의 표준화 점수, 점수 목록도 가능) | Quick Calc</title>
+  <meta name="description" content="일본 입시에서 쓰이는 「편차치」(평균 50·표준편차 10으로 환산한 표준화 점수)를 무료로 계산합니다. 점수·평균점·표준편차로 계산하거나, 점수 목록을 붙여넣어 전원의 편차치를 한 번에 계산할 수 있습니다. 계산식 명시.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/hensachi/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="편차치 계산기(일본 입시의 표준화 점수, 점수 목록도 가능) | Quick Calc">
+  <meta property="og:description" content="일본 입시에서 쓰이는 「편차치」(평균 50·표준편차 10으로 환산한 표준화 점수)를 무료로 계산합니다. 점수·평균점·표준편차로 계산하거나, 점수 목록을 붙여넣어 전원의 편차치를 한 번에 계산할 수 있습니다. 계산식 명시.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/hensachi/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"편차치 계산기(일본 입시의 표준화 점수, 점수 목록도 가능)","item":"https://quick-calc.site/ko/tools/hensachi/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/hensachi/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/hensachi/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/hensachi/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/hensachi/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/hensachi/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>편차치 계산기</h1>
+  <form class="tool-form" id="stats-form">
+    <label>① 점수·평균점·표준편차로 계산
+      <span class="field-note">3개를 입력하면 바로 아래에 편차치가 표시됩니다</span>
+    </label>
+    <label>나의 점수
+      <input type="number" id="s-score" inputmode="decimal" step="any" min="0" max="1000" placeholder="80" required>
+    </label>
+    <label>평균점
+      <input type="number" id="s-mean" inputmode="decimal" step="any" min="0" max="1000" placeholder="60" required>
+    </label>
+    <label>표준편차
+      <span class="field-note">일본 모의고사 성적표에 기재되어 있습니다(예: 15)</span>
+      <input type="number" id="s-sd" inputmode="decimal" step="any" min="0.01" max="500" placeholder="15" required>
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="list-form">
+    <label>② 점수 목록으로 한 번에 계산
+      <span class="field-note">쉼표·공백·줄바꿈 구분으로 2〜1000개(예: 80, 65, 70, 90, 55)</span>
+      <input type="text" id="scores" placeholder="80, 65, 70, 90, 55">
+    </label>
+    <div class="tool-result" id="result-b" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 편차치로 순위, 순위로 편차치</summary>
+    <div class="adv-inner">
+      <p class="adv-note">둘 다 「점수 분포가 정규분포에 가깝다」고 보는 <strong>근사 계산</strong>입니다.</p>
+      <h3 class="adv-h">이 편차치는 상위 몇 %·몇 등쯤일까?</h3>
+      <label>편차치
+        <input type="number" id="adv-t" inputmode="decimal" min="0" max="100" step="any" value="60" placeholder="예: 60">
+      </label>
+      <label>응시자 수(명)
+        <input type="number" id="adv-n" inputmode="numeric" min="1" max="10000000" step="1" value="10000" placeholder="예: 10000">
+      </label>
+      <button type="button" id="adv-rank-run">상위 %와 순위 계산하기</button>
+      <h3 class="adv-h">순위로 편차치 역산하기</h3>
+      <p class="adv-note">「1,200명 중 300등」 같은 결과에서 편차치의 대략값을 구합니다(응시자 수는 위 칸의 값을 사용).</p>
+      <label>나의 순위(등)
+        <input type="number" id="adv-rank" inputmode="numeric" min="1" max="10000000" step="1" placeholder="예: 300">
+      </label>
+      <button type="button" id="adv-t-run">편차치 역산하기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    편차치는 <strong>시험을 치른 집단 안에서의 상대적 위치</strong>를 나타내는 값입니다. 집단(모의고사 응시자층)이 바뀌면 같은 실력이라도 편차치는 달라집니다. 서로 다른 모의고사의 편차치를 직접 비교할 수는 없습니다.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p><strong>편차치(偏差値)는 일본 입시에서 널리 쓰이는 표준화 점수로, 평균을 50, 표준편차를 10으로 환산한 값입니다.</strong> 시험 점수·평균점·표준편차만 입력하면 <strong>나의 편차치</strong>를 바로 알 수 있습니다. 표준편차를 몰라도 반 전체의 점수 목록을 붙여넣으면 평균·표준편차와 함께 전원의 편차치를 한 번에 계산합니다. 모의고사 결과 확인이나 성적 처리에 활용하세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>모의고사 성적표에 「평균점」「표준편차」가 있으면 ①에 입력하세요.</li>
+    <li>반 쪽지시험처럼 전원의 점수를 알 때는 ②에 점수를 나열해 입력하면 전원 몫을 한 번에 계산할 수 있습니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>편차치 = 50 + 10 × (점수 − 평균점) ÷ 표준편차</strong></li>
+    <li>점수 목록 계산에서는 평균 = 합계÷인원, 표준편차 = 평균과의 차이를 제곱한 값의 평균의 제곱근(모표준편차)을 사용합니다.</li>
+    <li>계산 예: 평균 60점·표준편차 15인 시험에서 80점 → 50 + 10×(80−60)÷15 = <strong>편차치 63.3</strong></li>
+  </ul>
+
+  <h3>출처와 전제</h3>
+  <ul class="sources">
+    <li>통계학의 표준적인 정의(편차치=평균 50·표준편차 10으로 규격화한 점수)에 따른 계산입니다.</li>
+  </ul>
+
+  <h2>전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>점수 목록 계산은 「입력한 점수 집단=전체」로 보는 모표준편차를 씁니다. 표본표준편차(n−1로 나누는 방식)를 쓰는 경우와는 값이 약간 다릅니다.</li>
+    <li>인원이 적은 집단(반 단위 등)의 편차치는 변동 폭이 크므로 참고용으로만 보세요.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">편차치는 어디까지 올라가나요(내려가나요)?</h3>
+  <p class="faq-a">이론상 상한·하한은 없습니다. 집단 안에서 극단적으로 높은(낮은) 점수를 받으면 편차치 80 초과나 20 미만도 나올 수 있습니다(만점자가 많은 시험 등에서 일어납니다).</p>
+  <h3 class="faq-q">성적표에 표준편차가 없습니다.</h3>
+  <p class="faq-a">평균점만으로는 편차치를 계산할 수 없습니다. 전원의 점수를 알면 ②의 목록 계산을, 모의고사라면 주최 측의 성적 자료를 확인해 주세요.</p>
+  <h3 class="faq-q">5과목 합계의 편차치는 각 과목 편차치의 평균인가요?</h3>
+  <p class="faq-a">아닙니다. 합계 점수의 편차치는 「합계 점수의 분포」로 계산하는 것으로, 각 과목 편차치의 평균과 일반적으로 일치하지 않습니다(가까운 값이 되는 경우는 많습니다).</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/hensachi/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/hensachi/" lang="en" hreflang="en">English</a><a href="/zh/tools/hensachi/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=hensachi">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/hensachi/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var boxB = document.getElementById("result-b");
+  var ERROR_MESSAGES = {
+    invalid_score: "점수는 0〜1000 범위로 입력해 주세요.",
+    invalid_mean: "평균점은 0〜1000 범위로 입력해 주세요.",
+    invalid_sd: "표준편차는 0.01〜500 범위로 입력해 주세요.",
+    invalid_list: "점수는 2〜1000개 입력해 주세요.",
+    zero_sd: "전원이 같은 점수라서 편차치를 계산할 수 없습니다(흩어짐이 0)."
+  };
+  function showError(el, code) {
+    el.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "입력값을 확인해 주세요.") + "</p>";
+    el.hidden = false;
+  }
+  function runStats(fromSubmit) {
+    if (document.getElementById("s-score").value === "" ||
+        document.getElementById("s-mean").value === "" ||
+        document.getElementById("s-sd").value === "") {
+      if (fromSubmit) { showError(box, null); } else { box.hidden = true; }
+      return;
+    }
+    var r = HensachiCalc.fromStats(
+      parseFloat(document.getElementById("s-score").value),
+      parseFloat(document.getElementById("s-mean").value),
+      parseFloat(document.getElementById("s-sd").value));
+    if (!r.ok) { showError(box, r.code); return; }
+    box.innerHTML = '<div class="result-main">편차치 ' + r.t.toFixed(1) + "</div>";
+    box.hidden = false;
+  }
+  function runList(fromSubmit) {
+    var scores = document.getElementById("scores").value
+      .split(/[\s,、]+/).filter(function (s) { return s !== ""; })
+      .map(function (s) { return parseFloat(s); });
+    if (!fromSubmit && scores.length < 2) { boxB.hidden = true; return; }
+    var r = HensachiCalc.analyze(scores);
+    if (!r.ok) { showError(boxB, r.code); return; }
+    var rows = r.results.map(function (x) {
+      return "<tr><td>" + x.score + "</td><td>" + x.t.toFixed(1) + "</td></tr>";
+    }).join("");
+    boxB.innerHTML =
+      '<div class="result-main">평균 ' + r.mean.toLocaleString() + "점 / 표준편차 " + r.sd.toLocaleString() + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>점수</th><th>편차치</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+    boxB.hidden = false;
+  }
+  document.getElementById("stats-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runStats(true);
+  });
+  document.getElementById("list-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runList(true);
+  });
+  ["s-score", "s-mean", "s-sd"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runStats(false); });
+  });
+  document.getElementById("scores").addEventListener("input", function () { runList(false); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advFail(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function runRank(fromButton) {
+    if (!fromButton &&
+        (document.getElementById("adv-t").value === "" ||
+         document.getElementById("adv-n").value === "")) { return; }
+    var t = parseFloat(document.getElementById("adv-t").value);
+    var n = parseInt(document.getElementById("adv-n").value, 10);
+    var r = HensachiCalc.toRank(t, n);
+    if (!r.ok) {
+      advFail(r.code === "invalid_t" ? "편차치는 0〜100 범위로 입력해 주세요." : "응시자 수는 1 이상의 정수로 입력해 주세요.");
+      return;
+    }
+    var html = '<div class="result-main">편차치 ' + t.toLocaleString() + ' → 상위 ' +
+      r.topPct.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '%</div>' +
+      "<p>" + n.toLocaleString() + "명 중 <strong>약 " + r.rank.toLocaleString() + "등</strong>에 해당합니다(정규분포 근사).</p>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>편차치</th><th>상위 %</th><th>' +
+      n.toLocaleString() + '명 중 순위</th></tr></thead><tbody>';
+    var list = [70, 65, 60, 55, 50, 45, 40];
+    for (var i = 0; i < list.length; i++) {
+      var row = HensachiCalc.toRank(list[i], n);
+      html += "<tr><td>" + list[i] + "</td><td>" +
+        row.topPct.toLocaleString(undefined, { maximumFractionDigits: 2 }) + "%</td><td>약 " +
+        row.rank.toLocaleString() + "등</td></tr>";
+    }
+    html += "</tbody></table></div>";
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  function runFromRank(fromButton) {
+    if (!fromButton &&
+        (document.getElementById("adv-rank").value === "" ||
+         document.getElementById("adv-n").value === "")) { return; }
+    var rank = parseInt(document.getElementById("adv-rank").value, 10);
+    var n = parseInt(document.getElementById("adv-n").value, 10);
+    var r = HensachiCalc.fromRank(rank, n);
+    if (!r.ok) {
+      advFail(r.code === "invalid_rank" ? "순위는 1〜응시자 수 범위의 정수로 입력해 주세요." : "응시자 수는 1 이상의 정수로 입력해 주세요.");
+      return;
+    }
+    advBox.innerHTML = '<div class="result-main">편차치 대략값: ' +
+      r.t.toLocaleString(undefined, { maximumFractionDigits: 1 }) + '</div>' +
+      "<p>" + n.toLocaleString() + "명 중 " + rank.toLocaleString() +
+      "등은 편차치 <strong>약 " + r.t.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      "</strong>에 해당합니다(정규분포 근사).</p>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-rank-run").addEventListener("click", function () { runRank(true); });
+  document.getElementById("adv-t-run").addEventListener("click", function () { runFromRank(true); });
+  document.getElementById("adv-t").addEventListener("input", function () { runRank(false); });
+  document.getElementById("adv-n").addEventListener("input", function () {
+    if (document.getElementById("adv-rank").value !== "" && !advBox.hidden) { runFromRank(false); }
+    else { runRank(false); }
+  });
+  document.getElementById("adv-rank").addEventListener("input", function () { runFromRank(false); });
+})();
+</script>
+</body>
+</html>

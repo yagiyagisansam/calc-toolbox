@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Data Size Converter — KB, MB, GB, TB (1024 and 1000) | Quick Calc</title>
+  <meta name="description" content="Convert a data size between KB, MB, GB and TB at once, for free. Switch between the 1024 counting used by your computer and the 1000 counting printed on storage products, so you can see why a 500 GB drive shows up as 465 GB. Handy for phone storage and file sizes.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/byte/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Data Size Converter — KB, MB, GB, TB (1024 and 1000) | Quick Calc">
+  <meta property="og:description" content="Convert a data size between KB, MB, GB and TB at once, for free. Switch between the 1024 counting used by your computer and the 1000 counting printed on storage products, so you can see why a 500 GB drive shows up as 465 GB. Handy for phone storage and file sizes.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/byte/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Data Size Converter (KB, MB, GB, TB)","item":"https://quick-calc.site/en/tools/byte/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/byte/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/byte/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/byte/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/byte/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/byte/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Data Size Converter (KB, MB, GB, TB)</h1>
+  <form class="tool-form" id="byte-form">
+    <label>Size
+      <span class="field-note">Type a number and every unit appears right below</span>
+      <input type="number" id="value" inputmode="decimal" min="0" step="any" required placeholder="e.g. 500">
+    </label>
+    <label>Unit
+      <select id="unit">
+        <option value="b">B (bytes)</option>
+        <option value="kb">KB</option>
+        <option value="mb">MB</option>
+        <option value="gb" selected>GB</option>
+        <option value="tb">TB</option>
+      </select>
+    </label>
+    <label>Counting method
+      <select id="base">
+        <option value="1024" selected>1024 (how your OS shows file sizes)</option>
+        <option value="1000">1000 (how storage products are labelled)</option>
+      </select>
+    </label>
+    <button type="submit">Convert</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: download time and what fits in this space</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Estimated download time</h3>
+      <p class="adv-note">Enter a file size and your line speed (Mbps) to get both the theoretical time and a realistic estimate at an effective speed (70% of theoretical).</p>
+      <label>File size
+        <input type="number" id="adv-size" inputmode="decimal" min="0" step="any" placeholder="e.g. 5">
+      </label>
+      <label>Unit
+        <select id="adv-unit">
+          <option value="mb">MB</option>
+          <option value="gb" selected>GB</option>
+          <option value="tb">TB</option>
+        </select>
+      </label>
+      <label>Line speed (Mbps)
+        <input type="number" id="adv-mbps" inputmode="decimal" min="0" step="any" placeholder="e.g. 100">
+      </label>
+      <button type="button" id="adv-dl-run">Calculate the time</button>
+      <div class="tool-result" id="adv-dl-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">What fits in this much space</h3>
+      <p class="adv-note">Uses the size entered in the form above to estimate how many photos, songs and hours of video it holds.</p>
+      <button type="button" id="adv-usage-run">Show what fits</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Type a number and see <strong>the same size expressed in KB, MB, GB and TB all at once</strong>. Computers count in steps of 1024 while product packaging counts in steps of 1000, so you can switch between the two and compare. Useful when the 500 GB drive you bought shows up as 465 GB, or when you are checking how much data your phone plan and storage actually give you.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter the number and its unit.</li>
+    <li>Choose the counting method (if in doubt, use 1024).</li>
+    <li>Every unit is listed as soon as you type — no button needed.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>1024 counting</strong>: 1 KB = 1024 B, 1 MB = 1024 KB, and so on. This is what Windows and phone operating systems use to show file sizes (strictly speaking these units are called KiB and MiB).</li>
+    <li><strong>1000 counting</strong>: 1 KB = 1000 B, 1 GB = one billion B, and so on. This follows the SI prefixes and is used for the capacity printed on HDDs, SSDs and USB drives.</li>
+    <li>Worked example: a “500 GB” product (1000 counting) is 500,000,000,000 B. Shown by an OS in 1024 counting, that is about 465.7 GB — the difference between the two methods is the main reason capacity looks like it “shrank”.</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>Arithmetic based on the definitions of the SI prefixes (×1000) and the binary prefixes (×1024).</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>Real storage also uses space for system areas, so the usable capacity can be smaller still, beyond the difference between the two counting methods.</li>
+    <li>The “1 GB” of a mobile data allowance is normally counted with 1000.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">The 500 GB SSD I bought shows as 465 GB on my computer. Is it faulty?</h3>
+  <p class="faq-a">No. The product label uses 1000 counting (500,000,000,000 bytes) while your computer displays 1024 counting, so the same capacity reads as about 465.7 GB. Switch between the two methods in this tool to check.</p>
+  <h3 class="faq-q">How many MB is 1 GB?</h3>
+  <p class="faq-a">1,024 MB with 1024 counting, and 1,000 MB with 1000 counting. In practice both are used, depending on the context.</p>
+  <h3 class="faq-q">Which counting does my phone data allowance use?</h3>
+  <p class="faq-a">Mobile carriers normally count data with 1000 (1 GB = 1,000 MB). As a rough guide, one hour of video uses about 0.5 to 2 GB depending on quality.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/byte/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/byte/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/byte/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=byte">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/byte/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var LABELS = { b: "B (bytes)", kb: "KB", mb: "MB", gb: "GB", tb: "TB" };
+  var valueEl = document.getElementById("value");
+  function run() {
+    if (valueEl.value.trim() === "") { box.hidden = true; return; }
+    var unit = document.getElementById("unit").value;
+    var r = ByteCalc.convert(parseFloat(valueEl.value), unit, parseInt(document.getElementById("base").value, 10));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">Enter a size greater than 0.</p>';
+      box.hidden = false;
+      return;
+    }
+    var rows = ByteCalc.UNITS.map(function (u) {
+      return "<tr><td>" + LABELS[u] + "</td><td>" + r[u].toLocaleString(undefined, { maximumFractionDigits: 4 }) + "</td></tr>";
+    }).join("");
+    box.innerHTML =
+      '<div class="result-main">' + r.gb.toLocaleString(undefined, { maximumFractionDigits: 4 }) + " GB</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Unit</th><th>Value</th></tr></thead><tbody>' + rows + "</tbody></table></div>";
+    box.hidden = false;
+  }
+  valueEl.addEventListener("input", run);
+  document.getElementById("unit").addEventListener("change", run);
+  document.getElementById("base").addEventListener("change", run);
+  document.getElementById("byte-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function fmtDur(sec) {
+    if (sec < 60) return sec.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " sec";
+    if (sec < 3600) {
+      var m = Math.floor(sec / 60);
+      var s = Math.round(sec % 60);
+      return m + " min " + s + " sec";
+    }
+    var h = Math.floor(sec / 3600);
+    var mm = Math.round((sec % 3600) / 60);
+    return h.toLocaleString() + " hr " + mm + " min";
+  }
+  var dlBox = document.getElementById("adv-dl-result");
+  function runDl(force) {
+    var sizeRaw = document.getElementById("adv-size").value;
+    var mbpsRaw = document.getElementById("adv-mbps").value;
+    if ((sizeRaw.trim() === "" || mbpsRaw.trim() === "") && !force) { dlBox.hidden = true; return; }
+    var size = parseFloat(sizeRaw);
+    var mbps = parseFloat(mbpsRaw);
+    var unit = document.getElementById("adv-unit").value;
+    var base = parseInt(document.getElementById("base").value, 10) || 1000;
+    var r = ByteCalc.downloadTime(size, unit, mbps, base);
+    if (!r.ok) {
+      dlBox.innerHTML = '<p class="result-error">Enter a size and a line speed greater than 0.</p>';
+      dlBox.hidden = false;
+      return;
+    }
+    dlBox.innerHTML =
+      '<div class="result-main">About ' + fmtDur(r.secondsEffective) + '</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>Theoretical (full ' + mbps.toLocaleString() + ' Mbps)</td><td>' + fmtDur(r.seconds) + '</td></tr>' +
+      '<tr><td>Realistic estimate (70% of theoretical)</td><td>' + fmtDur(r.secondsEffective) + '</td></tr>' +
+      '<tr><td>Speed conversion</td><td>' + mbps.toLocaleString() + ' Mbps = about ' + r.mbPerSec.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' MB/sec</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">Sizes are counted with the method (1024 or 1000) selected in the form above.</p>';
+    dlBox.hidden = false;
+  }
+  ["adv-size", "adv-mbps"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runDl(false); });
+  });
+  document.getElementById("adv-unit").addEventListener("change", function () { runDl(false); });
+  document.getElementById("base").addEventListener("change", function () { runDl(false); });
+  document.getElementById("adv-dl-run").addEventListener("click", function () { runDl(true); });
+  function runUsage(force) {
+    var raw = document.getElementById("value").value;
+    if (raw.trim() === "" && !force) { advBox.hidden = true; return; }
+    var value = parseFloat(raw);
+    var unit = document.getElementById("unit").value;
+    var base = parseInt(document.getElementById("base").value, 10);
+    var r = ByteCalc.capacityUsage(value, unit, base);
+    if (!r.ok) {
+      if (!force) { advBox.hidden = true; return; }
+      advBox.innerHTML = '<p class="result-error">Enter a size greater than 0 in the form above.</p>';
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Content</th><th>Roughly</th></tr></thead><tbody>' +
+      '<tr><td>Photos (about 4 MB each)</td><td>about ' + r.photos.toLocaleString() + '</td></tr>' +
+      '<tr><td>Songs (about 8 MB each)</td><td>about ' + r.songs.toLocaleString() + '</td></tr>' +
+      '<tr><td>Full HD video (about 2 GB per hour)</td><td>about ' + r.videoHours.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' hours</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">A rough guide only — the real figures vary a lot with quality and settings.</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("value").addEventListener("input", function () { runUsage(false); });
+  document.getElementById("unit").addEventListener("change", function () { runUsage(false); });
+  document.getElementById("base").addEventListener("change", function () { runUsage(false); });
+  document.getElementById("adv-usage-run").addEventListener("click", function () { runUsage(true); });
+  runUsage(false);
+})();
+</script>
+</body>
+</html>

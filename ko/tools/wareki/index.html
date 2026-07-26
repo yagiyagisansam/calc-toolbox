@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>서기·일본 연호(와레키) 변환기 — 레이와·헤이세이·쇼와 | Quick Calc</title>
+  <meta name="description" content="서기⇔일본 연호(메이지·다이쇼·쇼와·헤이세이·레이와)를 무료로 즉시 변환. 서류에 그대로 옮겨 적을 수 있는 한자 표기를 함께 표시하고, 개원(연호가 바뀐) 해는 신구 연호를 모두 보여줍니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/wareki/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="서기·일본 연호(와레키) 변환기 — 레이와·헤이세이·쇼와 | Quick Calc">
+  <meta property="og:description" content="서기⇔일본 연호(메이지·다이쇼·쇼와·헤이세이·레이와)를 무료로 즉시 변환. 서류에 그대로 옮겨 적을 수 있는 한자 표기를 함께 표시하고, 개원(연호가 바뀐) 해는 신구 연호를 모두 보여줍니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/wareki/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"서기·일본 연호(와레키) 변환기","item":"https://quick-calc.site/ko/tools/wareki/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/wareki/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/wareki/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/wareki/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/wareki/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/wareki/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>서기·일본 연호(와레키) 변환기</h1>
+  <form class="tool-form" id="to-wareki-form">
+    <label>서기 → 일본 연호
+      <span class="field-note">연도를 입력하면 바로 결과가 표시됩니다</span>
+      <input type="number" id="year" inputmode="numeric" step="1" min="1868" max="2100" placeholder="예: 1980" required>
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="to-seireki-form">
+    <span class="field-note">일본 연호에서 서기 찾기</span>
+    <div class="field-row">
+      <label>연호
+        <select id="era">
+          <option value="令和">레이와 令和</option>
+          <option value="平成">헤이세이 平成</option>
+          <option value="昭和">쇼와 昭和</option>
+          <option value="大正">다이쇼 大正</option>
+          <option value="明治">메이지 明治</option>
+        </select>
+      </label>
+      <label>연호 연도
+        <select id="era-year"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result-b" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 월·일까지 정확한 변환, 일본 회계연도, 만 나이</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">월·일까지 넣어 정확하게 변환</h3>
+      <p class="adv-note">연호가 바뀐 해(예: 1989년 1월 8일)도 정확한 연호·요일·일본 연도(年度)를 알 수 있습니다.</p>
+      <div class="field-row">
+        <label>서기(년)
+          <select id="sel-year"></select>
+        </label>
+        <label>월
+          <select id="sel-month"></select>
+        </label>
+        <label>일
+          <select id="sel-day"></select>
+        </label>
+      </div>
+      <div class="tool-result" id="adv-date-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">기준일 시점의 만 나이</h3>
+      <p class="adv-note">위 날짜를 생년월일로 하여, 지정한 날짜(입사일 등) 시점의 만 나이를 계산합니다.</p>
+      <div class="field-row">
+        <label>기준일(년)
+          <select id="ref-year"></select>
+        </label>
+        <label>월
+          <select id="ref-month"></select>
+        </label>
+        <label>일
+          <select id="ref-day"></select>
+        </label>
+      </div>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    이 도구는 <strong>연 단위</strong> 변환입니다. 연호가 바뀐 해(1912·1926·1989·2019년)는 월·일에 따라 연호가 다르므로 신구 연호를 모두 표시합니다.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>서기 연도를 입력하면 <strong>일본 연호(예: 레이와 8년)와 서류에 그대로 옮겨 적을 수 있는 한자 표기(令和8年)</strong>를 바로 확인할 수 있습니다(반대 방향 변환도 가능). 일본의 구청·은행·비자 서류는 날짜를 일본 연호(와레키)로 적게 하는 경우가 많아, 그럴 때 유용합니다.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>서기 연도(예: 1980)를 입력하면 그 순간 아래에 일본 연호가 표시됩니다. 버튼은 누를 필요 없습니다.</li>
+    <li>일본 연호에서 서기를 찾을 때는 두 번째 폼에서 연호와 연도를 선택합니다.</li>
+    <li>연호가 바뀐 해의 정확한 연호·일본 연도(年度)·만 나이는 「＋상세 기능」에서 확인하세요.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <p>각 연호의 원년을 기준으로 「서기 = 원년의 서기 + 연호 연도 − 1」로 계산합니다.</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>일본 연호와 서기 대조표</caption>
+      <thead><tr><th>연호</th><th>기간(연 단위)</th><th>빠른 공식</th></tr></thead>
+      <tbody>
+        <tr><td>메이지 明治</td><td>1868〜1912년(메이지 45년까지)</td><td>서기 = 1867 + 메이지 N년</td></tr>
+        <tr><td>다이쇼 大正</td><td>1912〜1926년(다이쇼 15년까지)</td><td>서기 = 1911 + 다이쇼 N년</td></tr>
+        <tr><td>쇼와 昭和</td><td>1926〜1989년(쇼와 64년까지)</td><td>서기 = 1925 + 쇼와 N년</td></tr>
+        <tr><td>헤이세이 平成</td><td>1989〜2019년(헤이세이 31년까지)</td><td>서기 = 1988 + 헤이세이 N년</td></tr>
+        <tr><td>레이와 令和</td><td>2019년〜</td><td>서기 = 2018 + 레이와 N년</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>출처(1차 정보)</h3>
+  <ul class="sources">
+    <li>원호법(元号法, 1979년 법률 제43호) — 일본 공식 법령 원문(일본어)<br>
+      <a href="https://laws.e-gov.go.jp/law/354AC0000000043" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/354AC0000000043</a>(2026년 7월 26일 열람)</li>
+    <li>연호를 정하는 정령(2019년 정령 제143호·「레이와」 제정) — 일본 공식 법령 원문(일본어)<br>
+      <a href="https://laws.e-gov.go.jp/law/431CO0000000143" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/431CO0000000143</a>(2026년 7월 26일 열람)</li>
+  </ul>
+
+  <h2>전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>연호가 바뀐 날짜: 메이지→다이쇼 1912년 7월 30일 / 다이쇼→쇼와 1926년 12월 25일 / 쇼와→헤이세이 1989년 1월 8일 / 헤이세이→레이와 2019년 5월 1일. 해당 연도는 월·일로 정확한 연호를 확인하세요.</li>
+    <li>메이지 이전의 연호(게이오 및 그 이전)는 지원하지 않습니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">레이와는 서기 몇 년부터인가요?</h3>
+  <p class="faq-a">2019년(레이와 원년) 5월 1일부터입니다. 2019년 4월 30일까지는 헤이세이 31년이었습니다.</p>
+  <h3 class="faq-q">일본 서류에 출생 연도를 어떻게 적나요?</h3>
+  <p class="faq-a">이 도구로 변환한 한자 표기를 그대로 옮겨 적으면 됩니다. 예를 들어 1995년생이면 「平成7年」(헤이세이 7년)입니다. 연호의 첫해는 「1年」이 아니라 「元年(원년)」이라고 씁니다.</p>
+  <h3 class="faq-q">연호가 바뀐 해에 태어났다면 어느 연호인가요?</h3>
+  <p class="faq-a">정확한 생년월일로 판단합니다. 연호가 바뀐 날 전이면 옛 연호, 당일부터는 새 연호입니다(예: 1989년 1월 7일까지는 쇼와 64년, 1월 8일부터는 헤이세이 원년). 「＋상세 기능」에서 월·일로 확인할 수 있습니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/wareki/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/wareki/" lang="en" hreflang="en">English</a><a href="/zh/tools/wareki/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=wareki">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/wareki/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var today = new Date();
+  var ERA_KO = { "明治": "메이지", "大正": "다이쇼", "昭和": "쇼와", "平成": "헤이세이", "令和": "레이와" };
+  var WD_KO = { "日": "일", "月": "월", "火": "화", "水": "수", "木": "목", "金": "금", "土": "토" };
+
+  function eraLabelKo(r) {
+    return ERA_KO[r.era] + " " + (r.eraYear === 1 ? "원년" : r.eraYear + "년") + " (" + r.label + ")";
+  }
+
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, "일", Math.min(keep, max));
+  }
+
+  // ---- 서기 → 일본 연호(즉시) ----
+  var box = document.getElementById("result");
+  var yearEl = document.getElementById("year");
+  function runA() {
+    var y = parseInt(yearEl.value, 10);
+    if (yearEl.value === "" || isNaN(y)) { box.hidden = true; return; }
+    var r = WarekiCalc.toWareki(y);
+    if (!r.ok) { box.hidden = true; return; }
+    var labels = r.results.map(eraLabelKo).join(" / ");
+    box.innerHTML = '<div class="result-main">' + labels + "</div>" +
+      (r.results.length > 1 ? "<p>이 해에 연호가 바뀌었습니다. 「＋상세 기능」에서 월·일로 정확한 연호를 확인할 수 있습니다.</p>" : "");
+    box.hidden = false;
+  }
+  yearEl.addEventListener("input", runA);
+  document.getElementById("to-wareki-form").addEventListener("submit", function (e) { e.preventDefault(); runA(); });
+
+  // ---- 일본 연호 → 서기(즉시) ----
+  var boxB = document.getElementById("result-b");
+  var eraEl = document.getElementById("era");
+  var eraYearEl = document.getElementById("era-year");
+  var ERA_MAX = { "令和": 82, "平成": 31, "昭和": 64, "大正": 15, "明治": 45 };
+  function fillEraYears() {
+    var keep = parseInt(eraYearEl.value, 10) || 1;
+    var max = ERA_MAX[eraEl.value];
+    var html = "";
+    for (var v = 1; v <= max; v++) {
+      html += '<option value="' + v + '"' + (v === Math.min(keep, max) ? " selected" : "") + ">" +
+        (v === 1 ? "원년" : v + "년") + "</option>";
+    }
+    eraYearEl.innerHTML = html;
+  }
+  function runB() {
+    var r = WarekiCalc.toSeireki(eraEl.value, parseInt(eraYearEl.value, 10));
+    if (!r.ok) { boxB.hidden = true; return; }
+    boxB.innerHTML = '<div class="result-main">서기 ' + r.year + "년</div>";
+    boxB.hidden = false;
+  }
+  fillEraYears();
+  eraEl.addEventListener("change", function () { fillEraYears(); runB(); });
+  eraYearEl.addEventListener("change", runB);
+
+  // ---- 상세 기능1: 월·일까지 정확한 변환(즉시) ----
+  var advDateBox = document.getElementById("adv-date-result");
+  fillSelect(document.getElementById("sel-year"), 1868, 2100, "년", today.getFullYear());
+  fillSelect(document.getElementById("sel-month"), 1, 12, "월", today.getMonth() + 1);
+  fillSelect(document.getElementById("sel-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), "일", today.getDate());
+  function runDate() {
+    adjustDays("sel-year", "sel-month", "sel-day");
+    var y = val("sel-year"), m = val("sel-month"), d = val("sel-day");
+    var r = WarekiCalc.toWarekiExact(y, m, d);
+    if (!r.ok) { advDateBox.hidden = true; return; }
+    var fy = WarekiCalc.fiscalYear(y, m);
+    advDateBox.innerHTML =
+      '<div class="result-main">' + y + "년 " + m + "월 " + d + "일(" + WD_KO[r.youbi] + ") = " + eraLabelKo(r) + "</div>" +
+      (fy.ok ? "<p>일본 연도(年度·4월〜다음해 3월): " + fy.fiscalYear + "년도(" + fy.labels.join(" / ") + ")</p>" : "");
+    advDateBox.hidden = false;
+    runRef();
+  }
+  ["sel-year", "sel-month", "sel-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runDate);
+  });
+
+  // ---- 상세 기능2: 기준일 시점의 만 나이(즉시) ----
+  var advBox = document.getElementById("adv-result");
+  fillSelect(document.getElementById("ref-year"), 1868, 2100, "년", today.getFullYear());
+  fillSelect(document.getElementById("ref-month"), 1, 12, "월", today.getMonth() + 1);
+  fillSelect(document.getElementById("ref-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), "일", today.getDate());
+  function runRef() {
+    adjustDays("ref-year", "ref-month", "ref-day");
+    var r = WarekiCalc.ageOn(
+      val("sel-year"), val("sel-month"), val("sel-day"),
+      val("ref-year"), val("ref-month"), val("ref-day")
+    );
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">기준일이 생년월일(위에서 선택한 날짜)보다 앞서 있습니다.</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var w = WarekiCalc.toWarekiExact(val("ref-year"), val("ref-month"), val("ref-day"));
+    advBox.innerHTML =
+      '<div class="result-main">기준일 시점 만 ' + r.age + "세</div>" +
+      (w.ok ? "<p>기준일: " + val("ref-year") + "년 " + val("ref-month") + "월 " + val("ref-day") + "일(" + WD_KO[w.youbi] + ") = " + eraLabelKo(w) + "</p>" : "");
+    advBox.hidden = false;
+  }
+  ["ref-year", "ref-month", "ref-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runRef);
+  });
+
+  runDate();
+})();
+</script>
+</body>
+</html>

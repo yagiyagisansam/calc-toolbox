@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>일본 부동산 투자 수지·손익분기 계산기(장기 그래프·몇 년째에 팔면 흑자?) | Quick Calc</title>
+  <meta name="description" content="5개 항목만 입력하면 일본 투자용 부동산을 「몇 년째에 팔아야 통산 손익이 플러스가 되는지」 알 수 있습니다. 대출 잔액·예상 매각가·절세 효과·누적 수지를 최장 50년 그래프로 보여주고, 일본의 단기·장기 양도소득세율까지 반영합니다. 상세 설정에서 전제도 바꿀 수 있습니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/fudosan/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="일본 부동산 투자 수지·손익분기 계산기(장기 그래프·몇 년째에 팔면 흑자?) | Quick Calc">
+  <meta property="og:description" content="5개 항목만 입력하면 일본 투자용 부동산을 「몇 년째에 팔아야 통산 손익이 플러스가 되는지」 알 수 있습니다. 대출 잔액·예상 매각가·절세 효과·누적 수지를 최장 50년 그래프로 보여주고, 일본의 단기·장기 양도소득세율까지 반영합니다. 상세 설정에서 전제도 바꿀 수 있습니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/fudosan/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"일본 부동산 투자 수지·손익분기 계산기","item":"https://quick-calc.site/ko/tools/fudosan/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/fudosan/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/fudosan/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/fudosan/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/fudosan/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/fudosan/">
+  <!-- @hreflang end -->
+  <style>
+    .chart-wrap { position: relative; margin: 20px 0 4px; }
+    .chart-wrap svg { width: 100%; height: auto; display: block; }
+    .chart-title { font-weight: 700; font-size: 1rem; margin: 24px 0 0; }
+    .chart-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 0.82rem; color: var(--color-muted); margin: 4px 0 0; }
+    .chart-legend .chip { display: inline-block; width: 14px; height: 4px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+    .chart-tip {
+      position: absolute; pointer-events: none; background: var(--color-bg);
+      border: 1px solid var(--color-border); border-radius: 8px; padding: 6px 10px;
+      font-size: 0.78rem; line-height: 1.5; box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      white-space: nowrap; display: none; z-index: 2;
+    }
+    .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+    .stat { border: 1px solid var(--color-border); border-radius: 10px; padding: 8px 12px; }
+    .stat .k { font-size: 0.75rem; color: var(--color-muted); }
+    .stat .v { font-weight: 700; font-size: 1.02rem; }
+    #result .data-table th, #result .data-table td { white-space: nowrap; }
+  </style>
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>일본 부동산 투자 수지·손익분기 계산기</h1>
+  <form class="tool-form" id="fudosan-form">
+    <label>부동산 가격(만 엔)
+      <span class="field-note">단위는 만 엔(1만 엔 = 10,000엔)입니다. 2000이라고 넣으면 2,000만 엔입니다.</span>
+      <input type="number" id="price" inputmode="decimal" min="100" max="100000" step="any" required placeholder="예: 2000">
+    </label>
+    <label>건물 구조와 건축 연수
+      <span style="display:flex;gap:.5em;align-items:center;">
+        <select id="structure" aria-label="구조">
+          <option value="rc" selected>RC 철근콘크리트(맨션)</option>
+          <option value="steel">철골</option>
+          <option value="wood">목조</option>
+        </select>
+        건축 <input type="number" id="age" inputmode="numeric" min="0" max="80" step="1" value="10" style="width:5em;" aria-label="건축 경과 연수"> 년
+      </span>
+    </label>
+    <label>월세(엔)
+      <input type="number" id="rentm" inputmode="decimal" min="1000" max="10000000" step="any" required placeholder="예: 85000">
+    </label>
+    <label>본업 급여 연봉(만 엔·세전)
+      <span class="field-note">절세(손익통산: 부동산 적자를 급여소득과 상계) 계산에 사용합니다. 단위는 만 엔입니다.</span>
+      <input type="number" id="salary" inputmode="decimal" min="0" max="100000" step="any" required placeholder="예: 600">
+    </label>
+    <details class="adv-box" id="adv">
+      <summary><span class="plus">＋</span>상세 기능: 자동 추정값을 직접 설정하기</summary>
+      <div class="adv-inner">
+        <label>계약금·자기자금(만 엔)<input type="number" id="down" inputmode="decimal" min="0" step="any" value="0"></label>
+        <label>구입 부대비용률(%)<span class="field-note">등기·세금·중개수수료 등. 기본값 7%</span><input type="number" id="costrate" inputmode="decimal" min="0" max="20" step="0.1" value="7"></label>
+        <label>금리(연 %)<input type="number" id="rate" inputmode="decimal" min="0" max="20" step="0.01" value="2"></label>
+        <label>상환 기간(년)<input type="number" id="years" inputmode="numeric" min="1" max="50" step="1" value="35"></label>
+        <label>부동산 가격 중 건물이 차지하는 비율(%)<span class="field-note">감가상각과 토지분 이자 제한에 영향을 줍니다. 기본값 50%</span><input type="number" id="bratio" inputmode="numeric" min="0" max="100" step="1" value="50"></label>
+        <label>공실률(%)<input type="number" id="vacancy" inputmode="numeric" min="0" max="90" step="1" value="5"></label>
+        <label>임대료 하락률(%/년)<input type="number" id="decline" inputmode="decimal" min="-5" max="10" step="0.1" value="1"></label>
+        <label>운영 경비율(만실 임대료 대비 %)<span class="field-note">관리비·수선적립금·고정자산세 및 도시계획세·임대관리비 등. 기본값 20%</span><input type="number" id="opex" inputmode="numeric" min="0" max="90" step="1" value="20"></label>
+        <label>매각 시 표면 수익률(%)<span class="field-note">비우면 구입 시와 같은 수익률로 팔린다고 가정. 높게 넣을수록 보수적</span><input type="number" id="saleyield" inputmode="decimal" min="0.1" max="30" step="0.1" placeholder="비우면 구입 시와 동일"></label>
+        <label>매각 비용률(%)<span class="field-note">중개수수료 등. 기본값 4%</span><input type="number" id="salecost" inputmode="decimal" min="0" max="20" step="0.1" value="4"></label>
+        <label>사회보험료(엔/년)<span class="field-note">비우면 연봉의 15%로 개산</span><input type="number" id="socialins" inputmode="decimal" min="0" step="any" placeholder="비우면 연봉의 15%"></label>
+        <label>그 밖의 소득공제(엔/년)<input type="number" id="otherded" inputmode="decimal" min="0" step="any" value="0"></label>
+      </div>
+    </details>
+    <button type="submit">장기 수지를 그래프로 보기</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <div class="note-box">
+    이 도구는 <strong>개략적인 시뮬레이션</strong>입니다. 세액은 일본의 속산표에 따른 간이 계산이며(청색신고 특별공제·조정공제 등은 미반영), 미래의 임대료·매각가·금리는 가정에 근거한 추정입니다. 실제 신고나 매매 판단은 <strong>일본의 세무사(税理士)나 부동산 전문가</strong>에게 확인하세요.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>부동산 가격과 임대료 등 5개 항목만 넣으면, 일본의 투자용 부동산을 <strong>몇 년째에 팔아야 통산 손익이 플러스가 되는지</strong>를 그래프로 알 수 있습니다. 대출 잔액·세금·매년 실수령 현금까지 자동으로 계산하며, 세부 전제는 나중에 상세 설정에서 바꿀 수 있습니다. 이 계산은 <strong>일본의 부동산 세제</strong>를 기준으로 합니다: 중고 건물의 감가상각, 부동산 적자를 급여소득과 상계하는 손익통산, 매각 시의 양도소득세. 일본에서 투자용 맨션 구입을 망설이고 있을 때 대략적인 판단에 사용해 보세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>부동산 가격·구조와 건축 연수·월세·급여 연봉을 입력합니다(나머지는 도구가 추정합니다).</li>
+    <li>이 4개 항목이 채워지면 손익분기 연도와 그래프 2개, 연도별 표가 자동으로 표시됩니다(버튼으로도 계산할 수 있습니다).</li>
+    <li>전제를 바꾸고 싶을 때는 「상세 설정」을 열어 금리·공실률·매각 수익률 등을 조정하세요(바꾸면 자동으로 다시 계산됩니다).</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>대출</strong>: 원리금 균등 상환. 매월 잔액에서 연도별 이자·원금·잔액을 적산합니다(기본값: 풀론·금리 2%·35년).</li>
+    <li><strong>감가상각</strong>: 건물 가격(기본값은 부동산 가격의 50%)을 일본의 중고자산 간편법에 따른 내용연수로 정액 상각합니다. 법정 내용연수 RC 47년·철골 34년·목조 22년을 기준으로 「(법정 − 경과) + 경과×20%」로 계산합니다. <strong>상각이 끝나는 해부터 절세 효과가 줄고 세 부담이 늘어나는 시점(데드크로스)까지 재현</strong>합니다.</li>
+    <li><strong>임대료·공실</strong>: 임대료는 연 1% 하락, 공실률 5%(기본값). 운영 경비는 만실 임대료의 20%(관리비·수선적립금·고정자산세 및 도시계획세·임대관리비 등의 합계 기준).</li>
+    <li><strong>절세(손익통산)</strong>: 각 연도의 부동산 소득이 적자이면 급여소득과 통산하여 소득세(속산표+부흥특별소득세)와 주민세의 경감액을 계산합니다. 토지 취득분 차입 이자에 해당하는 적자는 통산할 수 없다는 일본 조세특별조치법의 규정도 반영합니다.</li>
+    <li><strong>예상 매각가</strong>: 「그 해의 만실 임대료 ÷ 표면 수익률」의 수익환원법으로 역산합니다(기본값은 구입 시와 같은 수익률이므로, 임대료가 내려가면 매각가도 내려가는 전제). 참고로 장부가 기준(토지+건물 잔존가액) 선도 함께 표시합니다.</li>
+    <li><strong>양도소득세</strong>: 양도차익 =(매각가 − 매각비용)−(취득가액 − 누적 감가상각). 보유 기간에 따라 <strong>단기 39.63% / 장기 20.315%</strong>가 자동 적용됩니다(연초 구입·연말 매각 전제로 7년째부터 장기. 정확히는 양도한 해의 1월 1일 시점에 보유 5년 초과).</li>
+    <li><strong>통산 손익(그 해에 팔았을 경우)= 누적 현금흐름 + 매각 실수령액(잔액·비용·세금 공제 후)− 초기 자기자금(계약금+부대비용)</strong>. 이 값이 처음으로 0 이상이 되는 해가 손익분기입니다.</li>
+  </ul>
+
+  <h3>출처·전제 명시</h3>
+  <ul class="sources">
+    <li>감가상각(중고자산 간편법·법정 내용연수): <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2108.htm" target="_blank" rel="noopener">일본 국세청 택스앤서 No.2108(중고자산의 내용연수)</a>(일본어)</li>
+    <li>양도소득의 세율(단기·장기): <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/joto/3208.htm" target="_blank" rel="noopener">일본 국세청 택스앤서 No.3208(장기 양도소득의 세액 계산)</a>·No.3211(단기)(일본어)</li>
+    <li>손익통산과 토지 이자의 제한: <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1391.htm" target="_blank" rel="noopener">일본 국세청 택스앤서 No.1391</a> / 소득세율: No.2260(일본어)</li>
+  </ul>
+
+  <h2>계산의 전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>대규모 수선·설비 교체·금리 상승·매각 시점의 시황은 반영하지 않았습니다. 매각 수익률을 구입 시보다 1〜2%p 높게 설정해 「싸게밖에 못 파는 경우」도 확인해 보기를 권합니다.</li>
+    <li>취득비는 「부동산 가격 − 누적 상각」으로 개산합니다(실제로는 구입 부대비용의 일부를 취득비에 산입할 수 있어 세금이 그만큼 가벼워지므로, 이 도구는 다소 보수적입니다).</li>
+    <li>급여 연봉은 전 기간 동안 일정하다고 가정합니다.</li>
+    <li>신축이나 준신축은 부동산취득세·첫해 등기비용 등이 별도로 듭니다(부대비용률로 조정할 수 있습니다).</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">「통산 손익」이 플러스가 되는 해가 나오지 않습니다.</h3>
+  <p class="faq-a">임대 수입에 비해 가격·차입·경비가 너무 무겁다는 신호입니다. 상세 설정에서 「자기자금을 늘린다」 「금리를 낮춘다(대환)」 「경비율을 낮춘다」를 시도해 손익분기가 어떻게 움직이는지 확인해 보세요. 그래도 플러스가 되지 않는 조건이라면, 투자로 성립하기 어려운 전제라는 뜻입니다.</p>
+  <h3 class="faq-q">왜 6년째와 7년째의 결과가 크게 달라지나요?</h3>
+  <p class="faq-a">양도소득 세율이 단기(39.63%)에서 장기(20.315%)로 바뀌기 때문입니다. 매각 차익이 나는 물건이라면 장기가 될 때까지 기다렸다가 파는 편이 실수령액에서 큰 차이가 납니다. 정확한 판정 기준은 「양도한 해의 1월 1일 시점에 보유 5년 초과」이므로, 실제 매각 시기는 전문가에게 확인하세요.</p>
+  <h3 class="faq-q">데드크로스란 무엇인가요?</h3>
+  <p class="faq-a">경비로 인정되지 않는 대출 원금 상환액이, 현금이 나가지 않는 경비인 감가상각비를 넘어선 상태입니다. 이 상태가 되면 「장부상은 흑자라서 세금은 늘어나는데 손에 남는 현금은 줄어드는」 일이 벌어지기 쉽습니다. 이 도구는 해당하는 해를 표시합니다.</p>
+  <h3 class="faq-q">숫자는 정확한가요?</h3>
+  <p class="faq-a">대출·감가상각·세율표·양도소득세의 계산식은 일본 공식 자료 그대로 구현하고 테스트로 검증했습니다. 다만 미래의 임대료·공실·매각가는 가정에 근거한 추정이므로, 결과는 「이 전제라면 이렇게 된다」는 시나리오로 활용해 주세요.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/fudosan/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/fudosan/" lang="en" hreflang="en">English</a><a href="/zh/tools/fudosan/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=fudosan">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/fudosan/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var COLORS = { green: "#12915f", orange: "#c2661f", blue: "#5b7fbf" };
+
+  function man(v) { return Math.round(v / 10000).toLocaleString(); }
+  function manSigned(v) { return (v >= 0 ? "+" : "−") + Math.abs(Math.round(v / 10000)).toLocaleString(); }
+
+  function val(id) { var v = document.getElementById(id).value; return v === "" ? null : parseFloat(v); }
+
+  // ===== SVG 선 그래프(외부 라이브러리 없음) =====
+  function drawChart(series, opts) {
+    var W = 640, H = 300, L = 60, R = 14, T = 14, B = 30;
+    var n = series[0].values.length;
+    var min = 0, max = 0;
+    series.forEach(function (s) { s.values.forEach(function (v) { if (v < min) min = v; if (v > max) max = v; }); });
+    if (max === min) max = min + 1;
+    var span = max - min;
+    max += span * 0.06; min -= span * 0.06;
+    function sx(i) { return L + (W - L - R) * (n === 1 ? 0.5 : i / (n - 1)); }
+    function sy(v) { return T + (H - T - B) * (1 - (v - min) / (max - min)); }
+    // y축 눈금(만 엔): 깔끔한 간격으로
+    var rawStep = (max - min) / 5;
+    var pow = Math.pow(10, Math.floor(Math.log(rawStep) / Math.LN10));
+    var step = [1, 2, 2.5, 5, 10].map(function (m) { return m * pow; }).filter(function (s) { return s >= rawStep; })[0] || 10 * pow;
+    var g = "";
+    for (var yv = Math.ceil(min / step) * step; yv <= max; yv += step) {
+      var yy = sy(yv);
+      g += '<line x1="' + L + '" y1="' + yy + '" x2="' + (W - R) + '" y2="' + yy + '" stroke="var(--color-border)" stroke-width="1"/>' +
+        '<text x="' + (L - 6) + '" y="' + (yy + 4) + '" text-anchor="end" font-size="11" fill="var(--color-muted)">' + man(yv) + "</text>";
+    }
+    if (min < 0 && max > 0) {
+      g += '<line x1="' + L + '" y1="' + sy(0) + '" x2="' + (W - R) + '" y2="' + sy(0) + '" stroke="var(--color-muted)" stroke-width="1.5"/>';
+    }
+    for (var xi = 0; xi < n; xi++) {
+      var year = xi + 1;
+      if (year === 1 || year % 5 === 0) {
+        g += '<text x="' + sx(xi) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="11" fill="var(--color-muted)">' + year + "년</text>";
+      }
+    }
+    series.forEach(function (s) {
+      var pts = s.values.map(function (v, i) { return sx(i).toFixed(1) + "," + sy(v).toFixed(1); }).join(" ");
+      g += '<polyline points="' + pts + '" fill="none" stroke="' + s.color + '" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"' + (s.dash ? ' stroke-dasharray="6 5"' : "") + "/>";
+    });
+    if (opts && opts.marker != null) {
+      var mi = opts.marker - 1;
+      g += '<circle cx="' + sx(mi) + '" cy="' + sy(series[0].values[mi]) + '" r="5.5" fill="' + series[0].color + '" stroke="var(--color-bg)" stroke-width="2"/>';
+    }
+    var legend = series.map(function (s) {
+      return '<span><span class="chip" style="background:' + s.color + (s.dash ? ";height:0;border-top:3px dashed " + s.color + ";background:none" : "") + '"></span>' + s.name + "</span>";
+    }).join("");
+    return '<p class="chart-title">' + opts.title + "</p>" +
+      '<div class="chart-wrap"><svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + opts.title + '">' + g + "</svg>" +
+      '<div class="chart-tip"></div></div>' +
+      '<div class="chart-legend">' + legend + "</div>";
+  }
+
+  // 탭/호버로 연도별 툴팁
+  function attachTips(root, data) {
+    root.querySelectorAll(".chart-wrap").forEach(function (wrap, ci) {
+      var svg = wrap.querySelector("svg");
+      var tip = wrap.querySelector(".chart-tip");
+      function onMove(ev) {
+        var rect = svg.getBoundingClientRect();
+        var x = (ev.touches ? ev.touches[0].clientX : ev.clientX) - rect.left;
+        var frac = (x / rect.width * 640 - 60) / (640 - 60 - 14);
+        var i = Math.round(frac * (data.years.length - 1));
+        if (i < 0) i = 0;
+        if (i >= data.years.length) i = data.years.length - 1;
+        var d = data.years[i];
+        tip.innerHTML = ci === 0
+          ? "<strong>" + d.y + "년째</strong><br>예상 매각가 " + man(d.valueIncome) + "만 엔<br>대출 잔액 " + man(d.loanBalance) + "만 엔<br>장부가 기준 " + man(d.valueCost) + "만 엔"
+          : "<strong>" + d.y + "년째</strong>에 팔면<br>통산 손익 <strong>" + manSigned(d.totalIfSold) + "만 엔</strong><br>누적 CF " + manSigned(d.cumCF) + "만 엔 / 세효과 누계 " + manSigned(d.cumTax) + "만 엔";
+        tip.style.display = "block";
+        var tx = x + 12;
+        if (tx > rect.width - 170) tx = x - 175;
+        tip.style.left = tx + "px";
+        tip.style.top = "10px";
+      }
+      wrap.addEventListener("pointermove", onMove);
+      wrap.addEventListener("touchstart", onMove, { passive: true });
+      wrap.addEventListener("pointerleave", function () { tip.style.display = "none"; });
+    });
+  }
+
+  function runSim(auto) {
+    var input = {
+      price: val("price") * 10000,
+      structure: document.getElementById("structure").value,
+      age: parseInt(document.getElementById("age").value, 10),
+      rentMonthly: val("rentm"),
+      salary: val("salary") * 10000,
+      downPayment: (val("down") || 0) * 10000,
+      costRatePct: val("costrate"),
+      ratePct: val("rate"),
+      years: val("years"),
+      buildingRatioPct: val("bratio"),
+      vacancyPct: val("vacancy"),
+      rentDeclinePct: val("decline"),
+      opexRatePct: val("opex"),
+      saleYieldPct: val("saleyield"),
+      saleCostPct: val("salecost"),
+      socialIns: val("socialins"),
+      otherDeduction: val("otherded")
+    };
+    var r = FudosanCalc.simulateLongTerm(input);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">입력값을 확인해 주세요(' + r.code + '). 부동산 가격 100만 엔 이상·임대료 1,000엔 이상 등의 범위가 있습니다.</p>';
+      box.hidden = false;
+      return;
+    }
+    var thisYear = new Date().getFullYear();
+    var headline = r.breakEvenYear
+      ? '<div class="result-main">' + r.breakEvenYear + "년째(" + (thisYear + r.breakEvenYear - 1) + "년 무렵) 이후에 팔면 통산 플러스</div>"
+      : '<div class="result-main" style="color:#b3261e;">' + r.horizon + "년 이내에는 통산 플러스가 되지 않습니다</div>";
+    var last = r.years[r.years.length - 1];
+    var stats =
+      '<div class="stat-row">' +
+      '<div class="stat"><div class="k">표면 수익률</div><div class="v">' + r.grossYieldPct.toLocaleString() + '%</div></div>' +
+      '<div class="stat"><div class="k">매월 대출 상환액</div><div class="v">' + r.monthly.toLocaleString() + '엔</div></div>' +
+      '<div class="stat"><div class="k">초기 자기자금(계약금+부대비용)</div><div class="v">' + man(r.initialOutlay) + '만 엔</div></div>' +
+      '<div class="stat"><div class="k">감가상각 기간 / 데드크로스</div><div class="v">' + r.usefulLifeYears + "년 / " + (r.deadCrossYear ? r.deadCrossYear + "년째〜" : "기간 내 없음") + "</div></div>" +
+      "</div>";
+    var chart1 = drawChart([
+      { name: "예상 매각가(수익환원법)", color: COLORS.green, values: r.years.map(function (d) { return d.valueIncome; }) },
+      { name: "대출 잔액", color: COLORS.orange, values: r.years.map(function (d) { return d.loanBalance; }) },
+      { name: "참고: 장부가 기준(토지+건물 잔존가액)", color: COLORS.blue, dash: true, values: r.years.map(function (d) { return d.valueCost; }) }
+    ], { title: "자산 가치와 대출 잔액의 추이(만 엔)" });
+    var chart2 = drawChart([
+      { name: "통산 손익(그 해에 팔았을 경우)", color: COLORS.green, values: r.years.map(function (d) { return d.totalIfSold; }) },
+      { name: "누적 현금흐름", color: COLORS.orange, values: r.years.map(function (d) { return d.cumCF; }) },
+      { name: "누적 세효과(절세+/증세−)", color: COLORS.blue, dash: true, values: r.years.map(function (d) { return d.cumTax; }) }
+    ], { title: "지금 팔면? 통산 손익의 추이(만 엔)", marker: r.breakEvenYear });
+    var rows = "";
+    var keyYears = [1, 2, 3, 5, 7, 10, 15, 20, 25, 30, 35, 40, 45, 50];
+    if (r.breakEvenYear && keyYears.indexOf(r.breakEvenYear) === -1) {
+      keyYears.push(r.breakEvenYear);
+      keyYears.sort(function (a, b) { return a - b; });
+    }
+    keyYears.forEach(function (y) {
+      if (y > r.horizon) return;
+      var d = r.years[y - 1];
+      var hl = y === r.breakEvenYear ? ' style="background:var(--color-accent-weak);font-weight:700;"' : "";
+      rows += "<tr" + hl + "><td>" + y + "년째" + (d.longTerm ? "" : "※") + "</td><td>" + man(d.loanBalance) + "</td><td>" + man(d.valueIncome) + "</td><td>" + manSigned(d.cf) + "</td><td>" + manSigned(d.cumCF) + "</td><td><strong>" + manSigned(d.totalIfSold) + "</strong></td></tr>";
+    });
+    var assumptions = "금리 " + (input.ratePct == null ? 2 : input.ratePct) + "%·" + (input.years == null ? 35 : input.years) + "년 상환 / 자기자금 " + man(input.downPayment) + "만 엔+부대비용 " + (input.costRatePct == null ? 7 : input.costRatePct) + "% / 건물 비율 " + (input.buildingRatioPct == null ? 50 : input.buildingRatioPct) + "% / 공실률 " + (input.vacancyPct == null ? 5 : input.vacancyPct) + "%·임대료 하락 " + (input.rentDeclinePct == null ? 1 : input.rentDeclinePct) + "%/년 / 경비율 " + (input.opexRatePct == null ? 20 : input.opexRatePct) + "% / 매각 수익률 " + (input.saleYieldPct == null ? "구입 시와 동일" : input.saleYieldPct + "%") + "·매각 비용 " + (input.saleCostPct == null ? 4 : input.saleCostPct) + "%";
+    box.innerHTML = headline + stats + chart1 + chart2 +
+      '<div class="table-scroll" style="margin-top:20px;"><table class="data-table"><thead><tr><th>연차</th><th>대출 잔액<br>(만 엔)</th><th>예상 매각가<br>(만 엔)</th><th>연 CF<br>(만 엔)</th><th>누적 CF<br>(만 엔)</th><th>매각 시<br>통산 손익</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>" +
+      '<p style="font-size:0.8rem;color:var(--color-muted);">※ 표시가 있는 해는 단기 양도(세율 39.63%)입니다. 7년째부터는 장기(20.315%)입니다. 손익분기 연도는 색으로 표시됩니다.<br>사용한 전제: ' + assumptions + "</p>";
+    box.hidden = false;
+    attachTips(box, r);
+    if (!auto) box.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  document.getElementById("fudosan-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runSim(false);
+  });
+  // 필수 4개 항목(부동산 가격·건축 연수·임대료·연봉)이 채워져 있으면 입력 변경 후 300ms에 자동 재계산
+  var debounceTimer = null;
+  function requiredFilled() {
+    return ["price", "age", "rentm", "salary"].every(function (id) {
+      return document.getElementById(id).value !== "";
+    });
+  }
+  function scheduleAuto() {
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(function () {
+      debounceTimer = null;
+      if (requiredFilled()) runSim(true);
+    }, 300);
+  }
+  var form = document.getElementById("fudosan-form");
+  form.addEventListener("input", scheduleAuto);
+  form.addEventListener("change", scheduleAuto);
+})();
+</script>
+</body>
+</html>

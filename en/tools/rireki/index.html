@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>School Entry &amp; Graduation Year Calculator (Japanese Résumé) | Quick Calc</title>
+  <meta name="description" content="Enter your date of birth to get the years you entered and graduated from elementary school through university under the Japanese school system, ready for the education section of a Japanese résumé (rirekisho). Shows both Western and Japanese era years, handles hayaumare (born January 1 to April 1), and adjusts for ronin, repeated and leave years.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/rireki/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="School Entry &amp; Graduation Year Calculator (Japanese Résumé) | Quick Calc">
+  <meta property="og:description" content="Enter your date of birth to get the years you entered and graduated from elementary school through university under the Japanese school system, ready for the education section of a Japanese résumé (rirekisho). Shows both Western and Japanese era years, handles hayaumare (born January 1 to April 1), and adjusts for ronin, repeated and leave years.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/rireki/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"School Entry &amp; Graduation Year Calculator (Japanese Résumé)","item":"https://quick-calc.site/en/tools/rireki/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/rireki/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/rireki/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/rireki/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/rireki/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/rireki/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>School Entry &amp; Graduation Year Calculator</h1>
+  <form class="tool-form" id="rireki-form">
+    <span class="field-note">Pick your date of birth — the table appears right below</span>
+    <div class="field-row">
+      <label>Date of birth (year)
+        <select id="birth-year"></select>
+      </label>
+      <label>Month
+        <select id="birth-month"></select>
+      </label>
+      <label>Day
+        <select id="birth-day"></select>
+      </label>
+    </div>
+    <label>Extra years before or during university (optional)
+      <span class="field-note">Enter 1 if you spent one year as a ronin after high school</span>
+      <input type="number" id="gap" inputmode="numeric" min="0" max="10" step="1" value="0">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: adjust for ronin, repeated and leave years, and build the education section</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Adjust separately for ronin, repeated years and leave of absence</h3>
+      <p class="adv-note">Builds the table with ronin years, repeated years, leave of absence and graduate school applied separately (it uses the date of birth from the form above).</p>
+      <label>Years as a ronin
+        <input type="number" id="adv-ronin" inputmode="numeric" min="0" max="10" step="1" value="0">
+      </label>
+      <label>Years repeated at university
+        <input type="number" id="adv-ryunen" inputmode="numeric" min="0" max="10" step="1" value="0">
+      </label>
+      <label>Years on leave of absence at university
+        <input type="number" id="adv-kyugaku" inputmode="numeric" min="0" max="10" step="1" value="0">
+      </label>
+      <label>Graduate school
+        <select id="adv-grad">
+          <option value="none" selected>None (up to a bachelor's degree)</option>
+          <option value="master">Through a master's degree (2 years)</option>
+          <option value="doctor">Through a doctorate (master's 2 years + doctorate 3 years)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-detail-run">Build the adjusted table</button>
+      <h3 class="adv-h">Build the education section</h3>
+      <p class="adv-note">Enter your school names and this writes the education section of a Japanese résumé, in the Japanese format you can copy straight onto the form, with the adjustments above applied.</p>
+      <label>Junior high school name
+        <input type="text" id="adv-jhs-name" placeholder="e.g. 品川区立◯◯中学校">
+      </label>
+      <label>High school name
+        <input type="text" id="adv-hs-name" placeholder="e.g. ◯◯高等学校">
+      </label>
+      <label>University and faculty
+        <input type="text" id="adv-uni-name" placeholder="e.g. ◯◯大学◯◯学部">
+      </label>
+      <button type="button" id="adv-text-run">Write the education section</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Just enter your date of birth and see the <strong>years you entered and graduated</strong> from each school, in both Western years and Japanese era years, ready for the education section of a Japanese résumé (履歴書 rirekisho). This follows <strong>the Japanese school system</strong>, where the school year starts in April and ends in March, so it also handles hayaumare (born January 1 to April 1) correctly. Useful if you studied in Japan and are writing a rirekisho or an entry sheet.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Pick your date of birth.</li>
+    <li>If you had ronin or repeated years, enter how many (they are added to the university entry and graduation years).</li>
+    <li>The table appears below in Western and Japanese era years as soon as you choose — no button needed.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li>In Japan, one school year runs from <strong>April 2 to April 1 of the next year</strong>: everyone born in that window is in the same grade. Someone born on April 1 legally turns 6 on the previous day (March 31), so they belong to the earlier (upper) grade.</li>
+    <li><strong>Year of entering elementary school</strong>: born April 2 to December 31 → April of the birth year + 7 / born January 1 to April 1 (hayaumare) → April of the birth year + 6.</li>
+    <li>After that the tool counts 6 years of elementary school, 3 years of junior high school, 3 years of high school and 4 years of university (entrance in April, graduation in March).</li>
+  </ul>
+
+  <h3>Sources (primary information)</h3>
+  <ul class="sources">
+    <li>The rule for when a child starts school is based on Article 17 of the <a href="https://elaws.e-gov.go.jp/document?lawid=322AC0000000026" target="_blank" rel="noopener">School Education Act (Act No. 26 of 1947)</a> — school starts from the first school year beginning on or after the day following the day the child turns 6 — together with how the Act on Calculation of Ages is applied. (in Japanese)</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>University is counted as 4 years. For junior colleges and vocational schools (2 years) and 6-year faculties (medicine, dentistry, pharmacy and so on), read the graduation year accordingly.</li>
+    <li>If you had ronin, repeated or leave years, enter the total in the adjustment field (it is added to the university entry and graduation years).</li>
+    <li>Special cases such as September entry are not supported.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">Why is someone born on April 1 counted as hayaumare?</h3>
+  <p class="faq-a">Under Japanese law, your age increases at the end of the day before your birthday. A person born on April 1 therefore turns 6 on March 31, which meets the “turned 6 by April 1” condition, so they join the earlier (upper) grade.</p>
+  <h3 class="faq-q">Should a Japanese résumé use Western years or Japanese era years?</h3>
+  <p class="faq-a">Either is fine, but it is expected that you keep one style throughout the whole document. This tool shows both, so match the format of the employer's form.</p>
+  <h3 class="faq-q">How do I write it if I left school without graduating?</h3>
+  <p class="faq-a">The usual wording is “◯年◯月 △△大学□□学部 中途退学” (year, month, school and faculty, then 中途退学 = withdrew), giving the last period you were enrolled. You can take the entry year from this tool.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/rireki/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/rireki/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/rireki/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=rireki">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/rireki/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  var ERA_EN = { "明治": "Meiji", "大正": "Taisho", "昭和": "Showa", "平成": "Heisei", "令和": "Reiwa" };
+  window.__rirekiMonths = MONTHS;
+  window.__rirekiWarekiEn = function (y) {
+    var s = RirekiCalc.wareki(y);
+    var m = /^(明治|大正|昭和|平成|令和)(元|[0-9]+)年$/.exec(s);
+    if (!m) return s;
+    return (ERA_EN[m[1]] || m[1]) + " " + (m[2] === "元" ? "1" : m[2]);
+  };
+
+  function fillSelect(el, from, to, selected, texts) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + (texts ? texts[v - from] : v) + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, Math.min(keep, max));
+  }
+  fillSelect(document.getElementById("birth-year"), 1900, 2100, 2000);
+  fillSelect(document.getElementById("birth-month"), 1, 12, 4, MONTHS);
+  fillSelect(document.getElementById("birth-day"), 1, daysInMonth(2000, 4), 2);
+  function pad2(n) { return (n < 10 ? "0" : "") + n; }
+  window.__rirekiBirthISO = function () {
+    adjustDays("birth-year", "birth-month", "birth-day");
+    return val("birth-year") + "-" + pad2(val("birth-month")) + "-" + pad2(val("birth-day"));
+  };
+
+  function run() {
+    var r = RirekiCalc.schoolYears(window.__rirekiBirthISO());
+    if (!r.ok) { box.innerHTML = '<p class="result-error">Enter a valid date of birth.</p>'; box.hidden = false; return; }
+    var gap = parseInt(document.getElementById("gap").value || "0", 10);
+    if (!(gap >= 0 && gap <= 10)) gap = 0;
+    var w = RirekiCalc.wareki;
+    var we = window.__rirekiWarekiEn;
+    function row(label, inY, outY) {
+      return "<tr><td>" + label + "</td><td>April " + inY + "<br><span style=\"color:var(--color-muted);font-size:0.85em;\">" + we(inY) + " (" + w(inY) + ")</span></td><td>March " + outY + "<br><span style=\"color:var(--color-muted);font-size:0.85em;\">" + we(outY) + " (" + w(outY) + ")</span></td></tr>";
+    }
+    box.innerHTML =
+      '<div class="result-main">' + (r.hayaumare ? "Hayaumare (born January 1 – April 1: the earlier grade)" : "Osoumare (born April 2 – December 31: the later grade)") + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>School</th><th>Entered</th><th>Graduated</th></tr></thead><tbody>' +
+      row("Elementary school", r.elemIn, r.elemOut) +
+      row("Junior high school", r.jhsIn, r.jhsOut) +
+      row("High school", r.hsIn, r.hsOut) +
+      row("University (4-year)", r.uniIn + gap, r.uniOut + gap) +
+      "</tbody></table></div>" +
+      (gap > 0 ? "<p>The university years include " + gap + " adjustment year(s).</p>" : "");
+    box.hidden = false;
+    if (window.__rirekiAdvRefresh) { window.__rirekiAdvRefresh(); }
+  }
+  document.getElementById("rireki-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run();
+  });
+  ["birth-year", "birth-month", "birth-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", run);
+  });
+  document.getElementById("gap").addEventListener("input", run);
+  run();
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var lastAdv = "";
+  function advCalc() {
+    var birth = window.__rirekiBirthISO();
+    var ronin = parseInt(document.getElementById("adv-ronin").value, 10) || 0;
+    var ryunen = parseInt(document.getElementById("adv-ryunen").value, 10) || 0;
+    var kyugaku = parseInt(document.getElementById("adv-kyugaku").value, 10) || 0;
+    var grad = document.getElementById("adv-grad").value;
+    return RirekiCalc.detailedYears(birth, ronin, ryunen, kyugaku, grad);
+  }
+  function advFail(code) {
+    var msg = code === "invalid_years" ? "Enter the ronin, repeated and leave years as whole numbers from 0 to 10."
+      : "Enter your date of birth in the form above.";
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function advYm(y, m) {
+    return window.__rirekiMonths[m - 1] + " " + y + " — " + RirekiCalc.wareki(y) + m + "月 (" + window.__rirekiWarekiEn(y) + ")";
+  }
+  function advYmJa(y, m) {
+    return y + "年" + m + "月(" + RirekiCalc.wareki(y) + m + "月)";
+  }
+  function runDetail() {
+    lastAdv = "detail";
+    var r = advCalc();
+    if (!r.ok) { advFail(r.code); return; }
+    var rows = [
+      ["Elementary school — entered", r.elemIn], ["Elementary school — graduated", r.elemOut, true],
+      ["Junior high school — graduated", r.jhsOut, true],
+      ["High school — entered", r.hsIn], ["High school — graduated", r.hsOut, true],
+      ["University — entered", r.uniIn], ["University — graduated", r.uniOut, true]
+    ];
+    if (r.msIn !== null) rows.push(["Graduate school (master's) — entered", r.msIn], ["Graduate school (master's) — completed", r.msOut, true]);
+    if (r.drIn !== null) rows.push(["Graduate school (doctorate) — entered", r.drIn], ["Graduate school (doctorate) — completed", r.drOut, true]);
+    var html = '<div class="result-main">Adjusted school year table</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Event</th><th>Year and month</th></tr></thead><tbody>';
+    for (var i = 0; i < rows.length; i++) {
+      html += "<tr><td>" + rows[i][0] + "</td><td>" + advYm(rows[i][1], rows[i][2] ? 3 : 4) + "</td></tr>";
+    }
+    html += "</tbody></table></div>" +
+      '<p class="adv-note">Graduation and completion are shown in March and entrance in April, and graduate school uses the standard length (master\'s 2 years, doctorate 3 years).</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  function runText() {
+    lastAdv = "text";
+    var r = advCalc();
+    if (!r.ok) { advFail(r.code); return; }
+    function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+    var jhs = esc(document.getElementById("adv-jhs-name").value) || "◯◯中学校";
+    var hs = esc(document.getElementById("adv-hs-name").value) || "◯◯高等学校";
+    var uni = esc(document.getElementById("adv-uni-name").value) || "◯◯大学◯◯学部";
+    var lines = [
+      advYmJa(r.jhsOut, 3) + " " + jhs + " 卒業",
+      advYmJa(r.hsIn, 4) + " " + hs + " 入学",
+      advYmJa(r.hsOut, 3) + " " + hs + " 卒業",
+      advYmJa(r.uniIn, 4) + " " + uni + " 入学",
+      advYmJa(r.uniOut, 3) + " " + uni + " 卒業"
+    ];
+    if (r.msIn !== null) {
+      lines.push(advYmJa(r.msIn, 4) + " ◯◯大学大学院◯◯研究科(修士課程) 入学");
+      lines.push(advYmJa(r.msOut, 3) + " ◯◯大学大学院◯◯研究科(修士課程) 修了");
+    }
+    if (r.drIn !== null) {
+      lines.push(advYmJa(r.drIn, 4) + " ◯◯大学大学院◯◯研究科(博士課程) 入学");
+      lines.push(advYmJa(r.drOut, 3) + " ◯◯大学大学院◯◯研究科(博士課程) 修了");
+    }
+    advBox.innerHTML = '<div class="result-main">Sample education section</div>' +
+      '<textarea rows="' + (lines.length + 1) + '" readonly style="width:100%;" aria-label="Sample education section">' +
+      lines.join("\n").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</textarea>" +
+      '<p class="adv-note">The lines are written in Japanese so you can copy them onto a rirekisho: 入学 = entered, 卒業 = graduated, 修了 = completed. Each line shows the Western year first and the Japanese era year in brackets — keep only one of the two, and use the same style throughout the document.</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-detail-run").addEventListener("click", runDetail);
+  document.getElementById("adv-text-run").addEventListener("click", runText);
+  function refreshLast() {
+    if (advBox.hidden) { return; }
+    if (lastAdv === "detail") { runDetail(); }
+    else if (lastAdv === "text") { runText(); }
+  }
+  function onDetailParam() {
+    if (!advBox.hidden && lastAdv === "text") { runText(); } else { runDetail(); }
+  }
+  ["adv-ronin", "adv-ryunen", "adv-kyugaku"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", onDetailParam);
+  });
+  document.getElementById("adv-grad").addEventListener("change", onDetailParam);
+  ["adv-jhs-name", "adv-hs-name", "adv-uni-name"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runText);
+  });
+  window.__rirekiAdvRefresh = refreshLast;
+})();
+</script>
+</body>
+</html>

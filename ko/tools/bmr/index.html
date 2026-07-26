@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>기초대사량 계산기(일본 후생노동성 기준값) | Quick Calc</title>
+  <meta name="description" content="나이·성별·몸무게만 입력하면 하루 기초대사량(kcal)을 무료로 계산합니다. 일본 후생노동성 「일본인 식사섭취기준」의 기초대사 기준값에 근거하며, 계산식과 출처를 명시합니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/bmr/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="기초대사량 계산기(일본 후생노동성 기준값) | Quick Calc">
+  <meta property="og:description" content="나이·성별·몸무게만 입력하면 하루 기초대사량(kcal)을 무료로 계산합니다. 일본 후생노동성 「일본인 식사섭취기준」의 기초대사 기준값에 근거하며, 계산식과 출처를 명시합니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/bmr/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"기초대사량 계산기(일본 후생노동성 기준값)","item":"https://quick-calc.site/ko/tools/bmr/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/bmr/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/bmr/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/bmr/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/bmr/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/bmr/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>기초대사량 계산기</h1>
+  <form class="tool-form" id="bmr-form">
+    <span class="field-note">나이·성별·몸무게를 입력하면 바로 아래에 결과가 표시됩니다</span>
+    <label>나이(세)
+      <span class="field-note">지원 범위: 1〜120세(정수)</span>
+      <input type="number" id="age" inputmode="numeric" step="1" min="1" max="120" placeholder="30" required>
+    </label>
+    <label>성별
+      <select id="sex">
+        <option value="male">남성</option>
+        <option value="female">여성</option>
+      </select>
+    </label>
+    <label>몸무게(kg)
+      <span class="field-note">지원 범위: 5〜300kg</span>
+      <input type="number" id="weight" inputmode="decimal" step="0.1" min="5" max="300" placeholder="60" required>
+    </label>
+    <button type="submit">계산하기</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 체지방률로 계산, 연령대별 변화</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">체지방률을 아는 분은 이쪽(2가지 방식 비교)</h3>
+      <p class="adv-note">체성분 측정기의 체지방률을 입력하면 제지방체중 기반의 Katch-McArdle 식으로도 계산해 위 방식과 비교할 수 있습니다(몸무게 등은 위 값을 사용).</p>
+      <label>체지방률(%)
+        <input type="number" id="adv-fat" inputmode="decimal" step="any" min="1" max="70" placeholder="예: 25">
+      </label>
+      <button type="button" id="adv-fat-run">2가지 방식으로 계산하기</button>
+
+      <h3 class="adv-h">나이가 들면 얼마나 떨어질까?</h3>
+      <p class="adv-note">위의 성별·몸무게는 그대로 두고, 연령대만 바꾸었을 때의 기초대사량을 한눈에 보여줍니다.</p>
+      <button type="button" id="adv-age-run">연령대별 목록 보기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    이 도구의 계산 결과는 <strong>대략적인 값</strong>입니다. 기초대사 기준값은 각 연령 구분의 평균적인 체격에 근거한 값이므로, 근육량이 많거나 적은 분은 실제 기초대사량과 차이가 납니다.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>나이·성별·몸무게만 입력하면 <strong>가만히 있어도 하루에 쓰는 칼로리(기초대사량)</strong>를 알 수 있습니다. 계산에는 일본 후생노동성의 공식 기준값, 즉 일본의 영양 지도에서 쓰이는 근거를 사용합니다. 다이어트에서 「최소한 얼마나 먹어도 되는지」를 생각하는 토대가 되는 숫자이니, 식사 관리를 시작하는 첫걸음으로 활용해 보세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>나이를 정수로 입력합니다.</li>
+    <li>성별을 선택합니다.</li>
+    <li>몸무게를 kg 단위로 입력하는 동시에 기초대사량이 바로 아래에 표시됩니다. 버튼은 누를 필요 없습니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <p><strong>기초대사량(kcal/일) = 기초대사 기준값(kcal/kg체중/일) × 몸무게(kg)</strong></p>
+  <p>기초대사 기준값은 일본 후생노동성 「일본인 식사섭취기준(2015년판)」의 연령 구분별·남녀별 값을 사용합니다.</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>기초대사 기준값(kcal/kg체중/일)</caption>
+      <thead><tr><th>나이</th><th>남성</th><th>여성</th></tr></thead>
+      <tbody>
+        <tr><td>1〜2세</td><td>61.0</td><td>59.7</td></tr>
+        <tr><td>3〜5세</td><td>54.8</td><td>52.2</td></tr>
+        <tr><td>6〜7세</td><td>44.3</td><td>41.9</td></tr>
+        <tr><td>8〜9세</td><td>40.8</td><td>38.3</td></tr>
+        <tr><td>10〜11세</td><td>37.4</td><td>34.8</td></tr>
+        <tr><td>12〜14세</td><td>31.0</td><td>29.6</td></tr>
+        <tr><td>15〜17세</td><td>27.0</td><td>25.3</td></tr>
+        <tr><td>18〜29세</td><td>24.0</td><td>22.1</td></tr>
+        <tr><td>30〜49세</td><td>22.3</td><td>21.7</td></tr>
+        <tr><td>50〜69세</td><td>21.5</td><td>20.7</td></tr>
+        <tr><td>70세 이상</td><td>21.5</td><td>20.7</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>출처(1차 정보)</h3>
+  <ul class="sources">
+    <li>일본 후생노동성 e-헬스넷 「가령과 에너지 대사」(기초대사 기준값 표, 「일본인 식사섭취기준(2015년판)」에 근거)(일본어)<br>
+      <a href="https://kennet.mhlw.go.jp/information/information/food/e-07-002.html" rel="noopener" target="_blank">https://kennet.mhlw.go.jp/information/information/food/e-07-002.html</a>(2026년 7월 18일 열람)</li>
+  </ul>
+
+  <h2>전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>기초대사량은 「안정 상태에서 소비되는 최소한의 에너지」입니다. 하루 전체 소비 에너지는 활동량에 따라 이보다 커집니다(대략 기초대사량×신체활동수준으로 추산).</li>
+    <li>기준값은 평균적인 체격(참조체중)에 근거하므로 근육량·체성분에 따른 개인차가 있습니다.</li>
+    <li>식사 제한 등 건강 관리는 수치만으로 판단하지 말고 의사·영양사와 상담해 주세요.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">기초대사량만큼만 먹으면 체중이 유지되나요?</h3>
+  <p class="faq-a">아니요. 하루 총 소비 에너지는 기초대사량에 활동으로 쓰는 몫이 더해지므로 기초대사량보다 큽니다(기준: 기초대사량×신체활동수준 1.5〜2.0).</p>
+  <h3 class="faq-q">계산 결과가 다른 사이트와 다릅니다.</h3>
+  <p class="faq-a">기초대사 추정식은 여러 가지가 있습니다(해리스-베네딕트 식 등). 이 도구는 일본 후생노동성 「일본인 식사섭취기준」의 기초대사 기준값×몸무게로 계산하며, 식이 다르면 결과도 수십〜백 kcal 정도 달라집니다.</p>
+  <h3 class="faq-q">기초대사를 올리려면 어떻게 해야 하나요?</h3>
+  <p class="faq-a">나이에 따른 기초대사 저하는 근육 등 제지방량의 감소가 주된 요인으로 알려져 있어, 근육량을 유지·늘리는 운동 습관이 일반적인 대책으로 꼽힙니다(출처 페이지 참조).</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/bmr/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/bmr/" lang="en" hreflang="en">English</a><a href="/zh/tools/bmr/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=bmr">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/bmr/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_age: "나이는 " + BmrCalc.AGE_MIN + "〜" + BmrCalc.AGE_MAX + "세 범위의 정수로 입력해 주세요.",
+    invalid_sex: "성별을 선택해 주세요.",
+    invalid_weight: "몸무게는 " + BmrCalc.WEIGHT_MIN_KG + "〜" + BmrCalc.WEIGHT_MAX_KG + " kg 범위로 입력해 주세요."
+  };
+  var box = document.getElementById("result");
+  var ageEl = document.getElementById("age");
+  var weightEl = document.getElementById("weight");
+  function run() {
+    if (ageEl.value === "" || weightEl.value === "") { box.hidden = true; return; }
+    var result = BmrCalc.calculate(
+      parseFloat(ageEl.value),
+      document.getElementById("sex").value,
+      parseFloat(weightEl.value)
+    );
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">기초대사량 약 ' + result.bmrKcal.toLocaleString() + " kcal/일</div>" +
+        "<p>적용한 기초대사 기준값: <strong>" + result.standardValue.toFixed(1) + " kcal/kg체중/일</strong></p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "입력값을 확인해 주세요.") + "</p>";
+    }
+    box.hidden = false;
+  }
+  ageEl.addEventListener("input", run);
+  weightEl.addEventListener("input", run);
+  document.getElementById("sex").addEventListener("change", run);
+  document.getElementById("bmr-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var AGE_LABEL_KO = {
+    "18〜29歳": "18〜29세",
+    "30〜49歳": "30〜49세",
+    "50〜69歳": "50〜69세",
+    "70歳以上": "70세 이상"
+  };
+  var advBox = document.getElementById("adv-result");
+  var lastAdv = null;
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function runFat(fromButton) {
+    var w = parseFloat(document.getElementById("weight").value);
+    var fatEl = document.getElementById("adv-fat");
+    if (!isFinite(w)) { if (fromButton) advErr("먼저 위 폼에 몸무게를 입력해 주세요."); return; }
+    if (fatEl.value === "") { if (fromButton) advErr("체지방률을 입력해 주세요."); return; }
+    var km = BmrCalc.katchMcArdle(w, parseFloat(fatEl.value));
+    if (!km.ok) {
+      advErr(km.code === "invalid_body_fat"
+        ? "체지방률은 1〜70% 범위로 입력해 주세요."
+        : "몸무게는 5〜300kg 범위로 입력해 주세요.");
+      return;
+    }
+    var html =
+      '<div class="result-main">제지방체중 기준 약 ' + km.bmrKcal.toLocaleString() + " kcal/일</div>" +
+      "<p>제지방체중(지방을 뺀 무게)은 약 <strong>" + km.lbmKg.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      " kg</strong>, 체지방량은 약 " + km.fatKg.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " kg입니다.</p>";
+    var age = parseInt(document.getElementById("age").value, 10);
+    var std = isFinite(age)
+      ? BmrCalc.calculate(age, document.getElementById("sex").value, w)
+      : { ok: false };
+    if (std.ok) {
+      var diff = km.bmrKcal - std.bmrKcal;
+      html +=
+        '<div class="table-scroll"><table class="data-table"><thead><tr><th>계산 방식</th><th>기초대사량</th></tr></thead><tbody>' +
+        "<tr><td>나이·몸무게 기준(위의 결과)</td><td>" + std.bmrKcal.toLocaleString() + " kcal/일</td></tr>" +
+        "<tr><td>제지방체중 기준(Katch-McArdle)</td><td>" + km.bmrKcal.toLocaleString() + " kcal/일</td></tr>" +
+        "</tbody></table></div>" +
+        '<p class="adv-note">두 방식의 차이는 ' + (diff >= 0 ? "+" : "") + diff.toLocaleString() +
+        " kcal/일. 체지방률 측정 오차로도 달라지므로 폭을 두고 보시기 바랍니다.</p>";
+    } else {
+      html += '<p class="adv-note">위 폼에 나이·성별도 입력하면 두 방식을 나란히 비교할 수 있습니다.</p>';
+    }
+    lastAdv = runFat;
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  function runAges(fromButton) {
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(w)) { if (fromButton) advErr("먼저 위 폼에 몸무게를 입력해 주세요."); return; }
+    var sexEl = document.getElementById("sex");
+    var r = BmrCalc.byAgeGroups(sexEl.value, w);
+    if (!r.ok) { advErr("몸무게는 5〜300kg 범위로 입력해 주세요."); return; }
+    var rows = "";
+    for (var i = 0; i < r.rows.length; i++) {
+      rows += "<tr><td>" + (AGE_LABEL_KO[r.rows[i].ageLabel] || r.rows[i].ageLabel) + "</td><td>" + r.rows[i].bmrKcal.toLocaleString() + " kcal/일</td></tr>";
+    }
+    advBox.innerHTML =
+      '<div class="result-main">연령대별 기초대사량(' + (sexEl.value === "male" ? "남성" : "여성") + "·" +
+      w.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " kg)</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>연령대</th><th>기초대사량</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>" +
+      '<p class="adv-note">몸무게가 같아도 기초대사는 나이와 함께 떨어집니다. 젊을 때와 같은 식사량이면 남기 쉬워진다는 기준입니다.</p>';
+    lastAdv = runAges;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-fat-run").addEventListener("click", function () { runFat(true); });
+  document.getElementById("adv-age-run").addEventListener("click", function () { runAges(true); });
+  document.getElementById("adv-fat").addEventListener("input", function () { runFat(false); });
+  ["age", "weight"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { if (lastAdv) lastAdv(false); });
+  });
+  document.getElementById("sex").addEventListener("change", function () { if (lastAdv) lastAdv(false); });
+})();
+</script>
+</body>
+</html>

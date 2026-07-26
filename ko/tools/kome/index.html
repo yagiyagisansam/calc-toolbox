@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>쌀 합(合)·그램 환산 계산기(1합은 몇 g? 물은 얼마나?) | Quick Calc</title>
+  <meta name="description" content="쌀 1합(合)=약 150g, 물은 1합당 약 200ml 기준으로, 합 수에서 쌀 무게·물 양·밥이 되는 양·밥공기 수를 한 번에 계산. 그램에서 합 수로의 역산도 지원. 「합」은 일본 밥솥 계량컵에 쓰이는 단위입니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/kome/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="쌀 합(合)·그램 환산 계산기(1합은 몇 g? 물은 얼마나?) | Quick Calc">
+  <meta property="og:description" content="쌀 1합(合)=약 150g, 물은 1합당 약 200ml 기준으로, 합 수에서 쌀 무게·물 양·밥이 되는 양·밥공기 수를 한 번에 계산. 그램에서 합 수로의 역산도 지원. 「합」은 일본 밥솥 계량컵에 쓰이는 단위입니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/kome/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"쌀 합(合)·그램 환산 계산기","item":"https://quick-calc.site/ko/tools/kome/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/kome/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/kome/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/kome/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/kome/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/kome/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>쌀 합(合)·그램 환산 계산기</h1>
+  <form class="tool-form" id="kome-form">
+    <label>계산 종류
+      <select id="mode">
+        <option value="fromGo" selected>합 수로 계산(물 양·밥이 되는 양)</option>
+        <option value="fromGram">그램에서 합 수 역산</option>
+      </select>
+    </label>
+    <label id="value-label-go">쌀의 양(합)
+      <span class="field-note">고르는 순간 물 양과 밥이 되는 양이 아래에 표시됩니다</span>
+      <select id="value-go"></select>
+    </label>
+    <label id="value-label-gram" style="display:none;">쌀의 무게(g)
+      <input type="number" id="value" inputmode="decimal" min="0" step="any" placeholder="예: 300">
+    </label>
+    <button type="submit">계산하기</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 먹고 싶은 양에서 역산하기</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">밥이 되는 양에서 역산</h3>
+      <p class="adv-note">「카레에 밥 600g을 쓰고 싶다」처럼 완성된 밥의 양이 정해져 있을 때, 필요한 합 수와 물 양을 역산합니다.</p>
+      <label>완성된 밥의 양(g)
+        <input type="number" id="adv-cooked" inputmode="numeric" step="any" min="1" max="6600" placeholder="600">
+      </label>
+      <button type="button" id="adv-cooked-run">합 수와 물 역산하기</button>
+      <div class="tool-result" id="adv-result-cooked" hidden aria-live="polite"></div>
+      <h3 class="adv-h">인원수로 「몇 합 지으면 될까?」</h3>
+      <p class="adv-note">밥공기 1공기 ≒ 밥 150g으로 하여, 인원수와 1인당 공기 수에서 필요한 합 수를 구합니다.</p>
+      <label>먹는 인원(명)
+        <input type="number" id="adv-people" inputmode="numeric" step="1" min="1" max="20" placeholder="4">
+      </label>
+      <label>1인당 공기 수(공기)
+        <span class="field-note">보통 = 1공기, 곱빼기 = 1.5공기가 기준</span>
+        <input type="number" id="adv-bowls-each" inputmode="decimal" step="any" min="0.5" max="5" value="1">
+      </label>
+      <button type="button" id="adv-people-run">필요한 합 수 계산하기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>쌀의 합 수만 고르면 <strong>쌀의 무게·물의 양·밥이 되는 양</strong>을 알 수 있는 도구입니다. 「합(合)」은 일본 밥솥의 계량컵에 쓰이는 전통 단위입니다(1합=180ml≈150g). 「밥을 500g 먹고 싶다」 「4인분을 짓고 싶다」에서의 역산도 가능합니다. 밥물 양이 헷갈릴 때 이용해 보세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>짓고 싶은 합 수를 고릅니다(0.5합 단위). 고르는 순간 쌀 무게·물 양·밥이 되는 양이 표시됩니다.</li>
+    <li>봉지에 남은 쌀을 그램으로 쟀을 때는 「그램에서 합 수 역산」으로 거꾸로 계산할 수 있습니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>1합 = 180ml</strong>(일본 쌀 계량컵 1컵. 일본 전통 단위 1되(升)=약 1.8L의 1/10)≒ <strong>백미 약 150g</strong></li>
+    <li><strong>물 양의 기준 = 1합당 약 200ml</strong>(쌀 부피의 1.1〜1.2배). 전기밥솥은 내솥의 눈금이 우선입니다.</li>
+    <li><strong>밥이 되면 쌀 무게의 약 2.2배</strong>(1합→약 330g의 밥). 밥공기 1공기 150g으로 치면 약 2.2공기입니다.</li>
+  </ul>
+
+  <h3>출처(1차 정보)</h3>
+  <ul class="sources">
+    <li>1합=180ml는 일본 계량법의 전통 단위(되, 升)에서 유래한 용량입니다. 무게·물 양·밥이 되는 양은 일본에서 통용되는 일반적인 기준(쌀 품종·햅쌀인지 묵은쌀인지·씻는 방법에 따라 달라집니다)입니다.</li>
+  </ul>
+
+  <h2>전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>씻지 않아도 되는 쌀(무세미)은 같은 부피라도 쌀이 더 많이 들어가므로, 물을 약간 많이(1합당 +10〜20ml) 잡는 것이 기준입니다.</li>
+    <li>햅쌀은 수분이 많아 물을 약간 적게, 묵은쌀은 약간 많게 하면 취향에 가까워집니다.</li>
+    <li>전기밥솥으로 지을 때는 내솥의 물 눈금에 맞추는 것이 가장 확실합니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">1합이면 몇 인분인가요?</h3>
+  <p class="faq-a">밥공기 약 2.2공기 분량이므로 성인 2명의 한 끼가 기준입니다. 도시락을 싸거나 많이 먹는 사람이 있으면 1인당 1합으로 짓는 가정도 많습니다.</p>
+  <h3 class="faq-q">계량컵이 없을 때 1합을 재려면?</h3>
+  <p class="faq-a">주방 저울로 150g을 재는 것이 정확합니다. 종이컵(200ml)이라면 9할이 조금 안 되게 채우면 약 180ml가 됩니다.</p>
+  <h3 class="faq-q">쌀 5kg은 몇 합이고 며칠 먹을 수 있나요?</h3>
+  <p class="faq-a">5,000g ÷ 150g = 약 33합입니다. 매일 2합을 짓는 가정이라면 약 16일분입니다. 이 도구의 역산 모드로 확인할 수 있습니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/kome/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/kome/" lang="en" hreflang="en">English</a><a href="/zh/tools/kome/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=kome">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/kome/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var goSelect = document.getElementById("value-go");
+  var input = document.getElementById("value");
+  var labelGo = document.getElementById("value-label-go");
+  var labelGram = document.getElementById("value-label-gram");
+  (function fillGo() {
+    var html = "";
+    for (var v = 0.5; v <= 10; v += 0.5) {
+      html += '<option value="' + v + '"' + (v === 2 ? " selected" : "") + ">" +
+        v.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "합</option>";
+    }
+    goSelect.innerHTML = html;
+  })();
+  function run(showErrors) {
+    if (mode.value === "fromGo") {
+      var r = KomeCalc.fromGo(parseFloat(goSelect.value));
+      if (!r.ok) { box.innerHTML = '<p class="result-error">합 수는 0보다 크고 20 이하로 입력해 주세요.</p>'; box.hidden = false; return; }
+      box.innerHTML =
+        '<div class="result-main">쌀 ' + r.riceG.toLocaleString() + "g·물 약 " + r.waterMl.toLocaleString() + "ml</div>" +
+        '<div class="table-scroll"><table class="data-table"><tbody>' +
+        "<tr><td>쌀의 무게</td><td>약 " + r.riceG.toLocaleString() + " g</td></tr>" +
+        "<tr><td>물 양의 기준</td><td>약 " + r.waterMl.toLocaleString() + " ml</td></tr>" +
+        "<tr><td>밥이 되는 양</td><td>약 " + r.cookedG.toLocaleString() + " g</td></tr>" +
+        "<tr><td>밥공기(150g)</td><td>약 " + r.bowls.toLocaleString() + " 공기</td></tr>" +
+        "</tbody></table></div><p>전기밥솥에서는 내솥의 눈금을 우선해 주세요.</p>";
+    } else {
+      if (input.value === "") {
+        if (showErrors) {
+          box.innerHTML = '<p class="result-error">쌀의 무게(g)를 입력해 주세요.</p>';
+          box.hidden = false;
+        } else {
+          box.hidden = true;
+        }
+        return;
+      }
+      var r2 = KomeCalc.fromGram(parseFloat(input.value));
+      if (!r2.ok) { box.innerHTML = '<p class="result-error">무게는 0보다 크고 30,000g 이하로 입력해 주세요.</p>'; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">약 ' + r2.go.toLocaleString() + " 합</div><p>1합=약 150g으로 계산했습니다.</p>";
+    }
+    box.hidden = false;
+  }
+  mode.addEventListener("change", function () {
+    var isGo = mode.value === "fromGo";
+    labelGo.style.display = isGo ? "" : "none";
+    labelGram.style.display = isGo ? "none" : "";
+    run(false);
+  });
+  goSelect.addEventListener("change", function () { run(false); });
+  input.addEventListener("input", function () { run(false); });
+  document.getElementById("kome-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+  run(false);
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var cookedBox = document.getElementById("adv-result-cooked");
+  function goSuggest(go) {
+    var s = Math.ceil(go * 2) / 2;
+    return s.toLocaleString(undefined, { maximumFractionDigits: 1 });
+  }
+  function renderResult(box, r, headNote) {
+    box.innerHTML =
+      '<div class="result-main">' + headNote + '쌀 약 ' + r.go.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' 합</div>' +
+      '<p>딱 떨어지게 짓는다면 <strong>' + goSuggest(r.go) + ' 합</strong>을 추천합니다.</p>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>쌀의 무게</td><td>약 ' + r.riceG.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' g</td></tr>' +
+      '<tr><td>물의 양</td><td>약 ' + r.waterMl.toLocaleString() + ' ml</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">물의 양은 백미 기준(1합당 약 200ml)입니다. 밥솥에 눈금이 있으면 그쪽을 우선해 주세요.</p>';
+    box.hidden = false;
+  }
+  function runCooked() {
+    var cooked = parseFloat(document.getElementById("adv-cooked").value);
+    var r = KomeCalc.fromCooked(cooked);
+    if (!r.ok) {
+      cookedBox.innerHTML = '<p class="result-error">완성된 밥의 양은 1〜6,600g(20합분까지) 범위로 입력해 주세요.</p>';
+      cookedBox.hidden = false;
+      return;
+    }
+    renderResult(cookedBox, r, "");
+  }
+  function runPeople() {
+    var people = parseFloat(document.getElementById("adv-people").value);
+    var each = parseFloat(document.getElementById("adv-bowls-each").value);
+    if (isNaN(people) || people !== Math.floor(people) || people < 1 || people > 20 || isNaN(each)) {
+      advBox.innerHTML = '<p class="result-error">인원은 1〜20명의 정수, 공기 수는 0.5〜5공기로 입력해 주세요.</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var r = KomeCalc.fromBowls(people * each);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">합계 공기 수가 너무 많습니다(40공기까지). 공기 수를 확인해 주세요.</p>';
+      advBox.hidden = false;
+      return;
+    }
+    renderResult(advBox, r, '밥 약 ' + r.cookedG.toLocaleString() + ' g = ');
+  }
+  document.getElementById("adv-cooked-run").addEventListener("click", runCooked);
+  document.getElementById("adv-people-run").addEventListener("click", runPeople);
+  document.getElementById("adv-cooked").addEventListener("input", function () {
+    if (document.getElementById("adv-cooked").value !== "") { runCooked(); } else { cookedBox.hidden = true; }
+  });
+  function autoPeople() {
+    if (document.getElementById("adv-people").value !== "" &&
+        document.getElementById("adv-bowls-each").value !== "") {
+      runPeople();
+    } else {
+      advBox.hidden = true;
+    }
+  }
+  document.getElementById("adv-people").addEventListener("input", autoPeople);
+  document.getElementById("adv-bowls-each").addEventListener("input", autoPeople);
+})();
+</script>
+</body>
+</html>

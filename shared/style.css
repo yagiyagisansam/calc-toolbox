@@ -118,6 +118,8 @@ a { color: var(--color-accent); }
 }
 .site-footer nav { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-bottom: 8px; }
 .site-footer a { color: var(--color-muted); }
+.lang-switch { display: flex; flex-wrap: wrap; gap: 4px 14px; padding-bottom: 10px; margin-bottom: 12px; border-bottom: 1px solid var(--color-border); }
+.lang-switch .lang-current { font-weight: 600; color: var(--color-text); }
 
 /* サイト内検索(トップページ) */
 .tool-search {

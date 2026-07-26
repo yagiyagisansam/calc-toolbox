@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Daily Protein Intake Calculator (How Much You Need Per Day) | Quick Calc</title>
+  <meta name="description" content="Calculate a daily protein guide from your weight and activity level, with food equivalents — how much chicken breast, eggs, milk or natto it corresponds to. For training, dieting and meal planning.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/protein/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Daily Protein Intake Calculator (How Much You Need Per Day) | Quick Calc">
+  <meta property="og:description" content="Calculate a daily protein guide from your weight and activity level, with food equivalents — how much chicken breast, eggs, milk or natto it corresponds to. For training, dieting and meal planning.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/protein/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Daily Protein Intake Calculator (How Much You Need Per Day)","item":"https://quick-calc.site/en/tools/protein/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/protein/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/protein/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/protein/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/protein/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/protein/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Daily Protein Intake Calculator</h1>
+  <form class="tool-form" id="protein-form">
+    <span class="field-note">Enter your weight — the result appears right below</span>
+    <label>Weight (kg)
+      <input type="number" id="weight" inputmode="decimal" min="20" max="300" step="0.1" required placeholder="e.g. 60">
+    </label>
+    <label>Activity level
+      <select id="level">
+        <option value="normal" selected>Normal daily life (mostly desk work)</option>
+        <option value="active">Regular exercise (2–3 times a week)</option>
+        <option value="training">Strength training / competitive sports</option>
+      </select>
+    </label>
+    <button type="submit">Calculate what you need</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: convert into foods, check today's intake</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Convert the amount into everyday foods</h3>
+      <p class="adv-note">Converts an amount of protein (g) into how much of a single food it would take to cover it (leave blank to use the amount calculated above).</p>
+      <label>Protein amount (g)
+        <input type="number" id="adv-grams" inputmode="decimal" step="any" min="1" max="500" placeholder="Blank = use the result above">
+      </label>
+      <button type="button" id="adv-conv-run">Convert into foods</button>
+
+      <h3 class="adv-h">How much did you get today? (total from what you ate)</h3>
+      <p class="adv-note">Enter what you ate today to total your protein and see the gap to your daily need (leave unused fields blank).</p>
+      <label>Chicken breast (g)
+        <input type="number" id="adv-f-chicken" inputmode="decimal" step="any" min="0" max="2000" placeholder="e.g. 100">
+      </label>
+      <label>Eggs (count)
+        <input type="number" id="adv-f-egg" inputmode="decimal" step="any" min="0" max="30" placeholder="e.g. 2">
+      </label>
+      <label>Natto (packs)
+        <input type="number" id="adv-f-natto" inputmode="decimal" step="any" min="0" max="20" placeholder="e.g. 1">
+      </label>
+      <label>Milk (ml)
+        <input type="number" id="adv-f-milk" inputmode="decimal" step="any" min="0" max="3000" placeholder="e.g. 200">
+      </label>
+      <label>Protein powder (scoops)
+        <input type="number" id="adv-f-powder" inputmode="decimal" step="any" min="0" max="10" placeholder="e.g. 1">
+      </label>
+      <button type="button" id="adv-intake-run">Calculate today's total</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Enter just your weight to find out <strong>how much protein to aim for per day</strong>, based on the approach of Japan's Dietary Reference Intakes and common sports-nutrition guidance. It also shows what that amount looks like in familiar foods such as chicken breast and eggs. Handy for checking your meals while training or dieting.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter your weight.</li>
+    <li>Choose your activity level (normal / regular exercise / strength training).</li>
+    <li>As you type, the daily guide and its food equivalents appear below — no button needed.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Normal daily life: weight × 0.9 g/day</strong> (a round figure based on the approach used to set the recommended protein intake in the Dietary Reference Intakes for Japanese; the recommended amounts for adults in Japan are 65 g/day for men and 50 g/day for women)</li>
+    <li><strong>Regular exercise: weight × 1.2 g / strength training and athletes: weight × 1.6 g</strong> (representative values within the 1.2–2.0 g/kg range commonly recommended in sports nutrition)</li>
+    <li>Example: 60 kg, normal daily life → <strong>about 54 g/day</strong>. That is roughly 230 g of skinless chicken breast, or 9 eggs.</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>Recommended amounts: <a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/kenkou/eiyou/syokuji_kijyun.html" target="_blank" rel="noopener">Ministry of Health, Labour and Welfare (Japan), “Dietary Reference Intakes for Japanese”</a> (in Japanese) / protein content of foods: <a href="https://fooddb.mext.go.jp/" target="_blank" rel="noopener">MEXT Food Composition Database</a> (in Japanese) (skinless chicken breast about 23 g per 100 g, one egg about 6 g, 200 ml of milk about 7 g, one pack of natto about 8 g)</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>If you are under protein restriction, for example for kidney disease, follow your doctor's or registered dietitian's instructions first.</li>
+    <li>Spreading protein across three meals is considered more effective than taking a large amount at once.</li>
+    <li>No benefit has been confirmed for sustained intake far above weight × 2 g.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">Do I need protein powder (supplements)?</h3>
+  <p class="faq-a">Not if you already get the guide amount from meals. A sensible way to use it is to review your day's meals and top up what is missing (for example 20 g). One scoop of protein powder is roughly 15–25 g.</p>
+  <h3 class="faq-q">Which foods are easy protein sources?</h3>
+  <p class="faq-a">As a guide: 100 g of chicken breast = about 23 g, one egg = about 6 g, a glass of milk = about 7 g, one pack of natto = about 8 g, half a block of firm tofu = about 10 g, one can of mackerel = about 26 g. Combine them to get close to your daily guide.</p>
+  <h3 class="faq-q">Do I still need protein while dieting?</h3>
+  <p class="faq-a">It matters even more. Cutting calories makes it easier to lose muscle too, so the standard approach is to secure about weight × 1.2 g of protein while adjusting calories.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/protein/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/protein/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/protein/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=protein">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/protein/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var LEVEL_EN = {
+    "ふつうの生活": "normal daily life",
+    "運動習慣あり(週2〜3回)": "regular exercise (2–3 times a week)",
+    "筋トレ・スポーツ選手": "strength training / athletes"
+  };
+  var FOODS = [
+    ["Chicken breast (skinless)", 23, " g", 100],
+    ["Eggs", 6.1, " eggs", 1],
+    ["Milk (200 ml)", 6.8, " glasses", 1],
+    ["Natto (1 pack)", 8.3, " packs", 1]
+  ];
+  var weightEl = document.getElementById("weight");
+  function run() {
+    if (weightEl.value === "") { box.hidden = true; return; }
+    var r = ProteinCalc.needs(parseFloat(weightEl.value), document.getElementById("level").value);
+    if (!r.ok) { box.innerHTML = '<p class="result-error">Enter a weight between 20 and 300 kg.</p>'; box.hidden = false; return; }
+    var rows = FOODS.map(function (f) {
+      var amount = f[0] === "Chicken breast (skinless)" ? Math.round(r.grams / f[1] * f[3] / 10) * 10 + "g" : Math.round(r.grams / f[1] * 10) / 10 + f[2];
+      return "<tr><td>If only " + f[0] + "</td><td>about " + amount + "</td></tr>";
+    }).join("");
+    box.innerHTML =
+      '<div class="result-main">About ' + r.grams.toLocaleString() + " g per day</div>" +
+      "<p>Guide for " + (LEVEL_EN[r.label] || r.label) + " (weight × " + r.rate + " g).</p>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Food equivalent</th><th>Amount</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div><p>In practice you combine several foods.</p>";
+    box.hidden = false;
+  }
+  weightEl.addEventListener("input", run);
+  document.getElementById("level").addEventListener("change", run);
+  document.getElementById("protein-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var LEVEL_EN = {
+    "ふつうの生活": "normal daily life",
+    "運動習慣あり(週2〜3回)": "regular exercise (2–3 times a week)",
+    "筋トレ・スポーツ選手": "strength training / athletes"
+  };
+  var advBox = document.getElementById("adv-result");
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function currentNeeds() {
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(w)) return null;
+    var r = ProteinCalc.needs(w, document.getElementById("level").value);
+    return r.ok ? r : null;
+  }
+  var lastAdv = null;
+  function runConv(fromButton) {
+    var gEl = document.getElementById("adv-grams");
+    var grams;
+    if (gEl.value === "") {
+      var n = currentNeeds();
+      if (!n) { if (fromButton) advErr("Enter a number of grams, or enter your weight in the form above."); return; }
+      grams = n.grams;
+    } else {
+      grams = parseFloat(gEl.value);
+    }
+    var r = ProteinCalc.foodEquivalents(grams);
+    if (!r.ok) { advErr("Enter a protein amount between 1 and 500 g."); return; }
+    var fmt1 = function (v) { return v.toLocaleString(undefined, { maximumFractionDigits: 1 }); };
+    advBox.innerHTML =
+      '<div class="result-main">' + fmt1(r.grams) + " g of protein is…</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>If only that food</th><th>Amount</th></tr></thead><tbody>' +
+      "<tr><td>Chicken breast (100 g ≈ 22 g)</td><td>about " + r.chickenG.toLocaleString() + " g</td></tr>" +
+      "<tr><td>Eggs (1 ≈ 6 g)</td><td>about " + fmt1(r.eggs) + "</td></tr>" +
+      "<tr><td>Natto (1 pack ≈ 8 g)</td><td>about " + fmt1(r.natto) + " packs</td></tr>" +
+      "<tr><td>Milk (200 ml ≈ 7 g)</td><td>about " + fmt1(r.milkCups) + " glasses (200 ml)</td></tr>" +
+      "<tr><td>Protein powder (1 scoop ≈ 20 g)</td><td>about " + fmt1(r.scoops) + " scoops</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">All protein contents are approximate. In practice, combine a variety of foods.</p>';
+    lastAdv = runConv;
+    advBox.hidden = false;
+  }
+  function runIntake(fromButton) {
+    function val(id) {
+      var v = document.getElementById(id).value;
+      return v === "" ? undefined : parseFloat(v);
+    }
+    var r = ProteinCalc.intakeFromFoods({
+      chickenG: val("adv-f-chicken"),
+      eggs: val("adv-f-egg"),
+      natto: val("adv-f-natto"),
+      milkMl: val("adv-f-milk"),
+      scoops: val("adv-f-powder")
+    });
+    if (!r.ok) {
+      if (fromButton || r.code !== "invalid_foods") {
+        advErr(r.code === "invalid_foods" ? "Enter an amount for at least one food."
+          : "Enter values within the range of each field.");
+      }
+      return;
+    }
+    lastAdv = runIntake;
+    var html = '<div class="result-main">Today\'s total: about ' +
+      r.totalG.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " g</div>";
+    var n = currentNeeds();
+    if (n) {
+      var diff = Math.round((n.grams - r.totalG) * 10) / 10;
+      if (diff > 0) {
+        html += "<p>About <strong>" + diff.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " g</strong> to go to your daily need (about " +
+          n.grams.toLocaleString() + " g, " + (LEVEL_EN[n.label] || n.label) + ").</p>";
+      } else {
+        html += "<p><strong>You have reached your daily need (about " + n.grams.toLocaleString() + " g).</strong></p>";
+      }
+    } else {
+      html += '<p class="adv-note">Enter your weight in the form above to also see the gap to your daily need.</p>';
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-conv-run").addEventListener("click", function () { runConv(true); });
+  document.getElementById("adv-intake-run").addEventListener("click", function () { runIntake(true); });
+  document.getElementById("adv-grams").addEventListener("input", function () { runConv(false); });
+  ["adv-f-chicken", "adv-f-egg", "adv-f-natto", "adv-f-milk", "adv-f-powder"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runIntake(false); });
+  });
+  document.getElementById("weight").addEventListener("input", function () { if (lastAdv) lastAdv(false); });
+  document.getElementById("level").addEventListener("change", function () { if (lastAdv) lastAdv(false); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Japanese Public Holiday Calendar (2026–2027) — Days Until the Next Holiday | Quick Calc</title>
+  <meta name="description" content="See every Japanese public holiday in 2026 and 2027, and how many days are left until the next one. Also lists all long weekends of three days or more, so you can plan trips, city-hall visits and bank errands around Japan's holiday calendar.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/shukujitsu/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Japanese Public Holiday Calendar (2026–2027) — Days Until the Next Holiday | Quick Calc">
+  <meta property="og:description" content="See every Japanese public holiday in 2026 and 2027, and how many days are left until the next one. Also lists all long weekends of three days or more, so you can plan trips, city-hall visits and bank errands around Japan's holiday calendar.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/shukujitsu/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Japanese Public Holiday Calendar (2026–2027)","item":"https://quick-calc.site/en/tools/shukujitsu/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/shukujitsu/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/shukujitsu/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/shukujitsu/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/shukujitsu/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/shukujitsu/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Japanese Public Holiday Calendar</h1>
+  <div class="tool-result" id="next-result" aria-live="polite"></div>
+  <form class="tool-form" id="shukujitsu-form">
+    <label>Year to show
+      <select id="year"></select>
+    </label>
+    <div class="tool-result" id="list-result" aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: long weekends of three days or more</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Long weekends in that year (three or more days of weekend plus holidays in a row)</h3>
+      <p class="adv-note">Useful when planning a trip or a visit home. Only stretches where Saturdays, Sundays and public holidays run together are listed.</p>
+      <div class="tool-result" id="renkyu-result" aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    This calendar shows <strong>Japan's national public holidays, plus the substitute holidays and “citizens' holidays” that go with them</strong>. Company and school breaks (the New Year period, Obon and so on) are not public holidays and are not included.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Japan's public holidays are <strong>not the same as the ones in your home country</strong>, and several of them move every year (Coming-of-Age Day, Vernal Equinox Day and others), with substitute holidays added on top. This tool shows <strong>when each Japanese holiday falls and how many days are left until the next one</strong>, so you know which days city halls, banks and clinics will be closed, and when the country's long weekends are.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>When you open the page, the next public holiday and the number of days until it appear at the top.</li>
+    <li>Choose a year to see the full list of that year's public holidays.</li>
+    <li>To find long weekends of three days or more, open “＋More features”.</li>
+  </ol>
+
+  <h2>How the holidays are decided</h2>
+  <ul class="method">
+    <li><strong>Holidays on a fixed date</strong>: New Year's Day (January 1), National Foundation Day (February 11), The Emperor's Birthday (February 23), Shōwa Day (April 29), Constitution Memorial Day (May 3), Greenery Day (May 4), Children's Day (May 5), Mountain Day (August 11), Culture Day (November 3), Labor Thanksgiving Day (November 23)</li>
+    <li><strong>Holidays that move</strong>: Coming-of-Age Day (2nd Monday of January), Marine Day (3rd Monday of July), Respect for the Aged Day (3rd Monday of September), Sports Day (2nd Monday of October). Vernal Equinox Day and Autumnal Equinox Day are fixed year by year from astronomical calculations</li>
+    <li><strong>Substitute Holiday</strong>: when a public holiday falls on a Sunday, the nearest following weekday becomes a holiday</li>
+    <li><strong>Citizens' Holiday</strong>: a weekday sandwiched between two public holidays becomes a holiday (for example September 22, 2026)</li>
+  </ul>
+
+  <h3>Sources (primary information)</h3>
+  <ul class="sources">
+    <li>Cabinet Office, “National Holidays” (list of holidays, substitute holidays and citizens' holidays) — official page, in Japanese<br>
+      <a href="https://www8.cao.go.jp/chosei/shukujitsu/gaiyou.html" rel="noopener" target="_blank">https://www8.cao.go.jp/chosei/shukujitsu/gaiyou.html</a> (accessed July 26, 2026)</li>
+    <li>Act on National Holidays (Act No. 178 of 1948) — official text, in Japanese<br>
+      <a href="https://laws.e-gov.go.jp/law/323AC1000000178" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/323AC1000000178</a> (accessed July 26, 2026)</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>The supported range is 2026 and 2027. The Cabinet Office normally announces the following year's holidays around February, and they are added here once published.</li>
+    <li>The New Year period (December 29 – January 3) and Obon are not public holidays. Government offices are nevertheless closed over the New Year period as an administrative holiday, and most companies follow the same pattern.</li>
+    <li>Holidays can be changed by amendments to the law or by special legislation (in the past, dates were moved for the Olympic Games).</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">Are city halls and banks open on public holidays?</h3>
+  <p class="faq-a">No. Municipal offices and bank branches are closed on Saturdays, Sundays and public holidays. ATMs and convenience-store certificate services may still be available.</p>
+  <h3 class="faq-q">Why do some holidays fall on a different date every year?</h3>
+  <p class="faq-a">Coming-of-Age Day, Marine Day, Respect for the Aged Day and Sports Day are defined as “the Nth Monday” of their month, so they move each year to create a long weekend. Vernal Equinox Day and Autumnal Equinox Day are set from astronomical observation.</p>
+  <h3 class="faq-q">What happens if a holiday falls on a Sunday?</h3>
+  <p class="faq-a">The nearest following weekday becomes a day off as a “Substitute Holiday” (usually the Monday). Substitute holidays are included in the list on this page.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/shukujitsu/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/shukujitsu/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/shukujitsu/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=shukujitsu">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/shukujitsu/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var yearEl = document.getElementById("year");
+  var nextBox = document.getElementById("next-result");
+  var listBox = document.getElementById("list-result");
+  var renkyuBox = document.getElementById("renkyu-result");
+
+  var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  var WD_EN = { "日": "Sun", "月": "Mon", "火": "Tue", "水": "Wed", "木": "Thu", "金": "Fri", "土": "Sat" };
+  var HOL_EN = {
+    "元日": "New Year's Day",
+    "成人の日": "Coming-of-Age Day",
+    "建国記念の日": "National Foundation Day",
+    "天皇誕生日": "The Emperor's Birthday",
+    "春分の日": "Vernal Equinox Day",
+    "昭和の日": "Shōwa Day",
+    "憲法記念日": "Constitution Memorial Day",
+    "みどりの日": "Greenery Day",
+    "こどもの日": "Children's Day",
+    "振替休日": "Substitute Holiday",
+    "海の日": "Marine Day",
+    "山の日": "Mountain Day",
+    "敬老の日": "Respect for the Aged Day",
+    "国民の休日": "Citizens' Holiday",
+    "秋分の日": "Autumnal Equinox Day",
+    "スポーツの日": "Sports Day",
+    "文化の日": "Culture Day",
+    "勤労感謝の日": "Labor Thanksgiving Day"
+  };
+  function hol(name) { return HOL_EN[name] || name; }
+  function wd(y) { return WD_EN[y] || y; }
+
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function todayIso() {
+    var d = new Date();
+    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  }
+  function fmt(iso) {
+    return MONTHS[parseInt(iso.slice(5, 7), 10) - 1] + " " + parseInt(iso.slice(8, 10), 10);
+  }
+  function fmtFull(iso) {
+    return fmt(iso) + ", " + iso.slice(0, 4);
+  }
+
+  // Next public holiday
+  var today = todayIso();
+  var n = ShukujitsuCalc.nextHoliday(today);
+  if (n.ok) {
+    nextBox.innerHTML =
+      '<div class="result-main">Next holiday: ' + hol(n.name) + " — " + fmtFull(n.date) + " (" + wd(n.youbi) + ")</div>" +
+      "<p>" + (n.daysUntil === 0
+        ? "<strong>That is today.</strong>"
+        : "In <strong>" + n.daysUntil + (n.daysUntil === 1 ? " day" : " days") + "</strong>.") + "</p>";
+  } else {
+    nextBox.innerHTML = "<p>The next public holiday falls outside the supported range (" +
+      ShukujitsuCalc.YEAR_MIN + "–" + ShukujitsuCalc.YEAR_MAX + "), so it cannot be shown.</p>";
+  }
+
+  // Year options
+  var thisYear = parseInt(today.slice(0, 4), 10);
+  var html = "";
+  for (var y = ShukujitsuCalc.YEAR_MIN; y <= ShukujitsuCalc.YEAR_MAX; y++) {
+    html += '<option value="' + y + '"' + (y === thisYear ? " selected" : "") + ">" + y + "</option>";
+  }
+  yearEl.innerHTML = html;
+  if (thisYear < ShukujitsuCalc.YEAR_MIN || thisYear > ShukujitsuCalc.YEAR_MAX) {
+    yearEl.value = String(ShukujitsuCalc.YEAR_MIN);
+  }
+
+  function run() {
+    var y = parseInt(yearEl.value, 10);
+    var r = ShukujitsuCalc.listHolidays(y);
+    if (!r.ok) { listBox.innerHTML = ""; return; }
+    var rows = r.holidays.map(function (h) {
+      var isPast = h.date < today;
+      return "<tr" + (isPast ? ' style="opacity:.55"' : "") + "><td>" + fmt(h.date) +
+        " (" + wd(h.youbi) + ")</td><td>" + hol(h.name) + "</td></tr>";
+    }).join("");
+    listBox.innerHTML =
+      '<div class="result-main">Public holidays in ' + y + ": " + r.holidays.length + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Date</th><th>Holiday</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+
+    var lw = ShukujitsuCalc.longWeekends(y);
+    if (!lw.ok) { renkyuBox.innerHTML = ""; return; }
+    if (lw.runs.length === 0) {
+      renkyuBox.innerHTML = "<p>There is no long weekend of three days or more in " + y + ".</p>";
+      return;
+    }
+    var lwRows = lw.runs.map(function (x) {
+      return "<tr><td>" + fmt(x.start) + " – " + fmt(x.end) + "</td><td>" + x.days +
+        " days</td><td>" + (x.names.map(hol).join(", ") || "-") + "</td></tr>";
+    }).join("");
+    renkyuBox.innerHTML =
+      '<div class="result-main">Long weekends in ' + y + ": " + lw.runs.length + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Period</th><th>Length</th><th>Holidays included</th></tr></thead><tbody>' +
+      lwRows + "</tbody></table></div>";
+  }
+
+  yearEl.addEventListener("change", run);
+  document.getElementById("shukujitsu-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
+})();
+</script>
+</body>
+</html>

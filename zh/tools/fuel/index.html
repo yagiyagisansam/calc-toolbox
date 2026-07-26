@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>油费计算器(按行驶距离·油耗·油价计算) | Quick Calc</title>
+  <meta name="description" content="根据行驶距离、油耗(km/L)和汽油单价,免费计算兜风或通勤所需的油费和耗油量。金额以日元计算,油耗按日本常用的km/L填写,方便估算旅行·回乡的费用和通勤成本。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/fuel/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="油费计算器(按行驶距离·油耗·油价计算) | Quick Calc">
+  <meta property="og:description" content="根据行驶距离、油耗(km/L)和汽油单价,免费计算兜风或通勤所需的油费和耗油量。金额以日元计算,油耗按日本常用的km/L填写,方便估算旅行·回乡的费用和通勤成本。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/fuel/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"油费计算器","item":"https://quick-calc.site/zh/tools/fuel/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/fuel/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/fuel/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/fuel/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/fuel/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/fuel/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>油费计算器</h1>
+  <form class="tool-form" id="fuel-form">
+    <label>行驶距离(km)
+      <span class="field-note">例: 100(对应范围: 0.1〜10,000km)</span>
+      <input type="number" id="distance" inputmode="decimal" step="0.1" min="0.1" max="10000" placeholder="100" required>
+    </label>
+    <label>油耗(km/L)
+      <span class="field-note">例: 15(对应范围: 1〜60km/L)</span>
+      <input type="number" id="efficiency" inputmode="decimal" step="0.1" min="1" max="60" placeholder="15" required>
+    </label>
+    <label>汽油单价(日元/L)
+      <span class="field-note">例: 170(对应范围: 50〜500日元/L)</span>
+      <input type="number" id="price" inputmode="decimal" step="0.1" min="50" max="500" placeholder="170" required>
+    </label>
+    <button type="submit">计算</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: AA制分摊·通勤油费</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">大家一起AA(含高速费)</h3>
+      <p class="adv-note">输入人数和高速费,即可得出每人的分摊金额(距离·油耗·单价使用上方表单的值)。</p>
+      <label>人数(含驾驶者)
+        <input type="number" id="adv-people" inputmode="numeric" step="1" min="1" max="20" placeholder="4">
+      </label>
+      <label>高速公路等的通行费(日元·没有则填0)
+        <input type="number" id="adv-toll" inputmode="numeric" step="1" min="0" max="200000" value="0">
+      </label>
+      <button type="button" id="adv-split-run">计算每人金额</button>
+      <div class="tool-result" id="adv-result-split" hidden aria-live="polite"></div>
+      <h3 class="adv-h">通勤油费(每月·每年)</h3>
+      <p class="adv-note">根据单程距离和每月出勤天数,算出每月·每年的油费(油耗·单价使用上方表单的值)。</p>
+      <label>单程通勤距离(km)
+        <input type="number" id="adv-oneway" inputmode="decimal" step="any" min="0.1" max="500" placeholder="12">
+      </label>
+      <label>每月出勤天数(天)
+        <input type="number" id="adv-days" inputmode="numeric" step="1" min="1" max="31" placeholder="20">
+      </label>
+      <button type="button" id="adv-commute-run">计算每月·每年的通勤成本</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    本工具的计算结果为<strong>约值</strong>。实际油耗会因路况、空调使用、载重等而变化,通常比产品目录上的油耗数值差。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>输入行驶距离和车辆油耗,就能知道<strong>需要花多少油费</strong>。还能算出加上高速费后每人的AA金额,以及通勤每月要花多少。金额以日元计算,油耗按日本常用的km/L填写。适合用来估算旅行·回乡的费用。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>以km为单位输入将要(或已经)行驶的距离。用地图App路线搜索出的距离很方便。</li>
+    <li>输入车辆的油耗(km/L)。若知道实际油耗,建议填写实测值。</li>
+    <li>输入汽油单价(日元/L)后,金额会自动显示在下方。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>耗油量(L) = 行驶距离(km) ÷ 油耗(km/L)</strong></li>
+    <li><strong>油费(日元) = 耗油量(L) × 汽油单价(日元/L)</strong></li>
+    <li>计算示例: 100km·油耗15km/L·单价170日元/L → 6.67L·约1,133日元</li>
+  </ul>
+
+  <h3>出处与前提</h3>
+  <ul class="sources">
+    <li>以上是由距离·油耗·单价的定义推导出的算术计算(燃料保留小数点后2位,金额四舍五入到日元)。</li>
+    <li>产品目录油耗(WLTC模式等)是在固定条件下的测定值,与实际油耗存在差异。往返时请把距离乘以2再计算。</li>
+  </ul>
+
+  <h2>计算的前提与注意</h2>
+  <ul class="cautions">
+    <li>主计算不含高速公路通行费和停车费。</li>
+    <li>混合动力车·轻自动车等的油耗差异较大,根据自己的加油记录求出实际油耗(行驶距离÷加油量)可以提高精度。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">怎样查自己车的实际油耗?</h3>
+  <p class="faq-a">加满法最简单。加满油后行驶,用行驶距离除以下一次加满时的加油量,就能得出实际油耗(km/L)。</p>
+  <h3 class="faq-q">想计算往返费用时怎么办?</h3>
+  <p class="faq-a">请把行驶距离乘以2后输入(单程100km则输入200km)。</p>
+  <h3 class="faq-q">用目录油耗计算是不是会算得太便宜?</h3>
+  <p class="faq-a">实际油耗通常比目录值(WLTC模式等)差。若想留有余地,填写目录油耗的7〜8成左右会更接近实际情况。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/fuel/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/fuel/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/fuel/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=fuel">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/fuel/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_distance: "行驶距离请在 " + FuelCalc.DISTANCE_MIN_KM + "〜" + FuelCalc.DISTANCE_MAX_KM + " km 的范围内输入。",
+    invalid_efficiency: "油耗请在 " + FuelCalc.EFFICIENCY_MIN + "〜" + FuelCalc.EFFICIENCY_MAX + " km/L 的范围内输入。",
+    invalid_price: "单价请在 " + FuelCalc.PRICE_MIN + "〜" + FuelCalc.PRICE_MAX + " 日元/L 的范围内输入。"
+  };
+  var box = document.getElementById("result");
+  function raw(id) { return document.getElementById(id).value; }
+  function run(showErrors) {
+    if (raw("distance") === "" || raw("efficiency") === "" || raw("price") === "") {
+      if (showErrors) {
+        var code = raw("distance") === "" ? "invalid_distance" : raw("efficiency") === "" ? "invalid_efficiency" : "invalid_price";
+        box.innerHTML = '<p class="result-error">' + ERROR_MESSAGES[code] + "</p>";
+        box.hidden = false;
+      } else {
+        box.hidden = true;
+      }
+      return;
+    }
+    var result = FuelCalc.calculate(parseFloat(raw("distance")), parseFloat(raw("efficiency")), parseFloat(raw("price")));
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">约 ' + result.costYen.toLocaleString() + " 日元</div>" +
+        "<p>耗油量: <strong>" + result.fuelL.toLocaleString() + " L</strong></p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "请确认输入的数值。") + "</p>";
+    }
+    box.hidden = false;
+  }
+  ["distance", "efficiency", "price"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { run(false); });
+  });
+  document.getElementById("fuel-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var splitBox = document.getElementById("adv-result-split");
+  var ADV_ERRORS = {
+    invalid_distance: "请正确输入距离(上方表单或单程距离)。",
+    invalid_efficiency: "油耗(上方表单)请在 1〜60km/L 的范围内输入。",
+    invalid_price: "汽油单价(上方表单)请在 50〜500日元/L 的范围内输入。",
+    invalid_people: "人数请输入 1〜20人 的整数。",
+    invalid_toll: "高速费请在 0〜200,000日元 的范围内输入。",
+    invalid_days: "出勤天数请输入 1〜31天 的整数。"
+  };
+  function advError(box, code) {
+    box.innerHTML = '<p class="result-error">' + (ADV_ERRORS[code] || "请确认输入的数值。") + "</p>";
+    box.hidden = false;
+  }
+  function mainInputs() {
+    return {
+      distance: parseFloat(document.getElementById("distance").value),
+      efficiency: parseFloat(document.getElementById("efficiency").value),
+      price: parseFloat(document.getElementById("price").value)
+    };
+  }
+  function runSplit() {
+    var m = mainInputs();
+    var people = parseFloat(document.getElementById("adv-people").value);
+    var toll = parseFloat(document.getElementById("adv-toll").value);
+    if (isNaN(toll)) toll = 0;
+    var r = FuelCalc.splitCost(m.distance, m.efficiency, m.price, people, toll);
+    if (!r.ok) { advError(splitBox, r.code); return; }
+    splitBox.innerHTML =
+      '<div class="result-main">每人 约' + r.perPersonYen.toLocaleString() + ' 日元</div>' +
+      '<p>油费 ' + r.fuelYen.toLocaleString() + ' 日元 + 高速费 ' + r.tollYen.toLocaleString() +
+      ' 日元 = 合计 <strong>' + r.totalYen.toLocaleString() + ' 日元</strong></p>';
+    splitBox.hidden = false;
+  }
+  function runCommute() {
+    var m = mainInputs();
+    var oneWay = parseFloat(document.getElementById("adv-oneway").value);
+    var days = parseFloat(document.getElementById("adv-days").value);
+    var r = FuelCalc.commuteCost(oneWay, days, m.efficiency, m.price);
+    if (!r.ok) { advError(advBox, r.code); return; }
+    advBox.innerHTML =
+      '<div class="result-main">通勤油费 约' + r.costPerMonth.toLocaleString() + ' 日元/月</div>' +
+      '<p>1年: <strong>约' + r.costPerYear.toLocaleString() + ' 日元</strong><br>' +
+      '每月行驶距离 ' + r.monthlyKm.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' km / 耗油量 约' +
+      r.fuelLPerMonth.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' L</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-split-run").addEventListener("click", runSplit);
+  document.getElementById("adv-commute-run").addEventListener("click", runCommute);
+  function filled(id) { return document.getElementById(id).value !== ""; }
+  function mainFilled() { return filled("distance") && filled("efficiency") && filled("price"); }
+  function autoSplit() {
+    if (mainFilled() && filled("adv-people")) { runSplit(); } else { splitBox.hidden = true; }
+  }
+  function autoCommute() {
+    if (filled("efficiency") && filled("price") && filled("adv-oneway") && filled("adv-days")) {
+      runCommute();
+    } else {
+      advBox.hidden = true;
+    }
+  }
+  ["adv-people", "adv-toll"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoSplit);
+  });
+  ["adv-oneway", "adv-days"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoCommute);
+  });
+  ["distance", "efficiency", "price"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (filled("adv-people")) autoSplit();
+      if (filled("adv-oneway") && filled("adv-days")) autoCommute();
+    });
+  });
+})();
+</script>
+</body>
+</html>

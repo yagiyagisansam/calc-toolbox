@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Discount Calculator — How Much Is X% Off? | Quick Calc</title>
+  <meta name="description" content="Find out instantly how much you pay after a 30% discount, and how much you save. Also works backwards from the sale price to the discount rate. Free, for supermarkets, sales and outlet shopping.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/waribiki/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Discount Calculator — How Much Is X% Off? | Quick Calc">
+  <meta property="og:description" content="Find out instantly how much you pay after a 30% discount, and how much you save. Also works backwards from the sale price to the discount rate. Free, for supermarkets, sales and outlet shopping.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/waribiki/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Discount Calculator — How Much Is X% Off?","item":"https://quick-calc.site/en/tools/waribiki/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/waribiki/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/waribiki/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/waribiki/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/waribiki/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/waribiki/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Discount Calculator (How much is X% off?)</h1>
+  <form class="tool-form" id="waribiki-form">
+    <label>What to calculate
+      <select id="mode">
+        <option value="off" selected>Price after X% off</option>
+        <option value="rate">Work back the discount rate (list price → sale price)</option>
+      </select>
+    </label>
+    <label>List price (yen)
+      <input type="number" id="price" inputmode="decimal" min="1" step="any" required placeholder="e.g. 2980">
+    </label>
+    <label id="second-label">Discount rate (%)
+      <input type="number" id="second" inputmode="decimal" min="0" max="100000000" step="any" required placeholder="e.g. 30">
+    </label>
+    <span class="field-note">Fill in both fields and the result appears automatically</span>
+    <button type="submit">Calculate</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: stacked discounts and coupon comparison</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Stacked discounts (an extra X% off)</h3>
+      <p class="adv-note">Calculates the final price of a double discount such as “30% off, then an extra 20% off at the register”.</p>
+      <label>List price (yen)
+        <input type="number" id="adv-dprice" inputmode="numeric" step="any" min="1" placeholder="10000">
+      </label>
+      <label>First discount rate (%)
+        <input type="number" id="adv-p1" inputmode="decimal" step="any" min="0" max="100" placeholder="20">
+      </label>
+      <label>Extra discount (%)
+        <input type="number" id="adv-p2" inputmode="decimal" step="any" min="0" max="100" placeholder="10">
+      </label>
+      <button type="button" id="adv-double-run">Calculate the final price</button>
+      <div class="tool-result" id="adv-double-result" hidden aria-live="polite"></div>
+      <h3 class="adv-h">Which saves more: “X yen off” or “X% off”?</h3>
+      <p class="adv-note">When you can choose between two coupons, this compares which one makes your payment lower.</p>
+      <label>List price (yen)
+        <input type="number" id="adv-cprice" inputmode="numeric" step="any" min="1" placeholder="3000">
+      </label>
+      <label>Coupon A: amount off (yen)
+        <input type="number" id="adv-cyen" inputmode="numeric" step="any" min="0" placeholder="500">
+      </label>
+      <label>Coupon B: discount rate (%)
+        <input type="number" id="adv-cpct" inputmode="decimal" step="any" min="0" max="100" placeholder="20">
+      </label>
+      <button type="button" id="adv-coupon-run">Compare the coupons</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Instantly find out <strong>what you actually pay</strong> when something is “30% off”. It also works backwards: enter the list price and the sale price to see what percentage was taken off. Handy for sale-season shopping in Japan.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Choose “Price after X% off” or “Work back the discount rate”.</li>
+    <li>Enter the list price and the discount rate (or the sale price).</li>
+    <li>The discounted price and the amount saved (or the discount rate) appear as you type — no button needed.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Discounted price = list price × (1 − discount rate ÷ 100)</strong> (rounded to the nearest yen)</li>
+    <li><strong>Discount rate = (1 − sale price ÷ list price) × 100</strong></li>
+    <li>Example: 30% off 2,980 yen → 2,980 × 0.7 = <strong>2,086 yen</strong> (894 yen saved)</li>
+    <li>On Japanese price tags, “2割引” (2-wari-biki) means 20% off and “半額” (hangaku) means half price, i.e. 50% off.</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>This is an arithmetic calculation based on the price and the discount rate.</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>Some shops round fractions down or up instead, so the register total may differ by a yen or so.</li>
+    <li>For stacked discounts such as “an extra 20% off the displayed price”, use this tool in two steps (30% off plus 20% off is not 50% off).</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">Is “30% off, then an extra 20% off” the same as 50% off?</h3>
+  <p class="faq-a">No. The discounts apply one after another: 0.7 × 0.8 = 0.56, which is equivalent to 44% off. A 1,000-yen item becomes 560 yen. You can confirm this by running the tool twice.</p>
+  <h3 class="faq-q">Should I calculate on the tax-included or tax-excluded price?</h3>
+  <p class="faq-a">A discount normally applies to the displayed price (in Japan, usually tax-included). The rate is applied directly to whatever amount you enter as the list price.</p>
+  <h3 class="faq-q">Which saves more, a discount or point rewards?</h3>
+  <p class="faq-a">At the same percentage, the discount saves you more, because with points you still pay the full price first and the points only count when you use them later.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/waribiki/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/waribiki/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/waribiki/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=waribiki">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/waribiki/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var label = document.getElementById("second-label");
+  var second = document.getElementById("second");
+  var MSG = {
+    invalid_price: "Enter a list price of at least 1 yen.",
+    invalid_pct: "Enter a discount rate between 0 and 100%.",
+    invalid_sale: "Enter a sale price between 0 yen and the list price."
+  };
+  var priceEl = document.getElementById("price");
+  mode.addEventListener("change", function () {
+    var isOff = mode.value === "off";
+    label.childNodes[0].textContent = isOff ? "Discount rate (%)" : "Sale price (yen)";
+    second.placeholder = isOff ? "e.g. 30" : "e.g. 1480";
+    runMain();
+  });
+  function runMain() {
+    if (priceEl.value === "" || second.value === "") { box.hidden = true; return; }
+    var price = parseFloat(priceEl.value);
+    var v = parseFloat(second.value);
+    if (mode.value === "off") {
+      var r = WaribikiCalc.off(price, v);
+      if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "Check the entered values.") + "</p>"; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">' + r.sale.toLocaleString() + " yen</div>" +
+        "<p>You save: <strong>" + r.saved.toLocaleString() + " yen</strong> (" + v.toLocaleString() + "% off)</p>";
+    } else {
+      var r2 = WaribikiCalc.rate(price, v);
+      if (!r2.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r2.code] || "Check the entered values.") + "</p>"; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">About ' + r2.pct.toLocaleString() + "% off</div>" +
+        "<p>You save: " + (price - v).toLocaleString() + " yen</p>";
+    }
+    box.hidden = false;
+  }
+  document.getElementById("waribiki-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
+  });
+  [priceEl, second].forEach(function (el) {
+    el.addEventListener("input", runMain);
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var doubleBox = document.getElementById("adv-double-result");
+  var advBox = document.getElementById("adv-result");
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
+  }
+  function runDouble() {
+    var price = parseFloat(document.getElementById("adv-dprice").value);
+    var p1 = parseFloat(document.getElementById("adv-p1").value);
+    var p2 = parseFloat(document.getElementById("adv-p2").value);
+    if (isNaN(price) || isNaN(p1) || isNaN(p2)) { showError(doubleBox, "Enter the list price and both discount rates."); return; }
+    var r = WaribikiCalc.doubleOff(price, p1, p2);
+    if (!r.ok) { showError(doubleBox, "Enter a list price of at least 1 yen and discount rates between 0 and 100%."); return; }
+    doubleBox.innerHTML =
+      '<div class="result-main">' + r.sale.toLocaleString() + " yen</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>Total saved</td><td>" + r.saved.toLocaleString() + " yen</td></tr>" +
+      "<tr><td>Effective discount rate</td><td><strong>" + r.effectivePct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "% off</strong></td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">' + p1.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "% off plus " + p2.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "% off is not the simple sum of " + r.naivePct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "% off but <strong>" + r.effectivePct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "% off</strong>, because the second discount applies to the already reduced price.</p>";
+    doubleBox.hidden = false;
+  }
+  function runCoupon() {
+    var price = parseFloat(document.getElementById("adv-cprice").value);
+    var yen = parseFloat(document.getElementById("adv-cyen").value);
+    var pct = parseFloat(document.getElementById("adv-cpct").value);
+    if (isNaN(price) || isNaN(yen) || isNaN(pct)) { showError(advBox, "Enter the list price, the amount off and the discount rate."); return; }
+    var r = WaribikiCalc.couponCompare(price, yen, pct);
+    if (!r.ok) { showError(advBox, "Enter a list price of at least 1 yen, an amount off of 0 yen or more, and a discount rate between 0 and 100%."); return; }
+    var verdict = r.better === "even"
+      ? "Both lead to the same payment"
+      : r.better === "yen"
+        ? yen.toLocaleString() + " yen off saves you " + r.diff.toLocaleString() + " yen more"
+        : pct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "% off saves you " + r.diff.toLocaleString() + " yen more";
+    advBox.innerHTML =
+      '<div class="result-main">' + verdict + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>Coupon A (" + yen.toLocaleString() + " yen off)</td><td>" + r.byYen.toLocaleString() + " yen</td></tr>" +
+      "<tr><td>Coupon B (" + pct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "% off)</td><td>" + r.byPct.toLocaleString() + " yen</td></tr>" +
+      "</tbody></table></div>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-double-run").addEventListener("click", runDouble);
+  document.getElementById("adv-coupon-run").addEventListener("click", runCoupon);
+  ["adv-dprice", "adv-p1", "adv-p2"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-dprice").value !== "" &&
+          document.getElementById("adv-p1").value !== "" &&
+          document.getElementById("adv-p2").value !== "") runDouble();
+    });
+  });
+  ["adv-cprice", "adv-cyen", "adv-cpct"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-cprice").value !== "" &&
+          document.getElementById("adv-cyen").value !== "" &&
+          document.getElementById("adv-cpct").value !== "") runCoupon();
+    });
+  });
+})();
+</script>
+</body>
+</html>

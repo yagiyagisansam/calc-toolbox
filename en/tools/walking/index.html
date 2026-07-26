@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Walking Calorie Burn Calculator (METs Formula, Fat Equivalent) | Quick Calc</title>
+  <meta name="description" content="Calculate the calories you burn walking from your weight, time and pace, using the METs formula from Japan's Ministry of Health guidelines. Also shows the equivalent in grams of body fat. Free, no sign-up.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/walking/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Walking Calorie Burn Calculator (METs Formula, Fat Equivalent) | Quick Calc">
+  <meta property="og:description" content="Calculate the calories you burn walking from your weight, time and pace, using the METs formula from Japan's Ministry of Health guidelines. Also shows the equivalent in grams of body fat. Free, no sign-up.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/walking/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Walking Calorie Burn Calculator (METs Formula, Fat Equivalent)","item":"https://quick-calc.site/en/tools/walking/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/walking/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/walking/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/walking/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/walking/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/walking/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Walking Calorie Burn Calculator</h1>
+  <form class="tool-form" id="walking-form">
+    <span class="field-note">Enter your weight and time — the result appears right below</span>
+    <label>Weight (kg)
+      <input type="number" id="weight" inputmode="decimal" min="20" max="300" step="0.1" required placeholder="e.g. 60">
+    </label>
+    <label>Time walked (minutes)
+      <input type="number" id="minutes" inputmode="numeric" min="1" max="1440" step="1" required placeholder="e.g. 30">
+    </label>
+    <label>Walking speed
+      <select id="speed">
+        <option value="slow">Slow (about 3.2 km/h, stroll)</option>
+        <option value="normal" selected>Normal (about 4.0 km/h)</option>
+        <option value="brisk">Somewhat brisk (about 4.8 km/h)</option>
+        <option value="fast">Fast walk (about 5.6 km/h, hurried)</option>
+        <option value="veryfast">Very fast (about 6.4 km/h)</option>
+      </select>
+    </label>
+    <button type="submit">Calculate calories burned</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: work back from a target, calculate from distance or as a daily habit</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">How many minutes to burn a target amount?</h3>
+      <p class="adv-note">Enter the calories you want to burn, and this works out the walking time you need (using the weight and speed above).</p>
+      <label>Target calories to burn (kcal)
+        <input type="number" id="adv-target-kcal" inputmode="numeric" step="1" min="1" max="5000" placeholder="e.g. 200">
+      </label>
+      <button type="button" id="adv-target-run">Calculate the time needed</button>
+
+      <h3 class="adv-h">Calculate from distance (when you do not know the time)</h3>
+      <p class="adv-note">If you only know the distance, this estimates the time taken and calories burned from the typical speed of the selected pace.</p>
+      <label>Distance walked (km)
+        <input type="number" id="adv-km" inputmode="decimal" step="any" min="0.1" max="100" placeholder="e.g. 2">
+      </label>
+      <button type="button" id="adv-km-run">Calculate from distance</button>
+
+      <h3 class="adv-h">What if you keep it up every day?</h3>
+      <p class="adv-note">Shows the total for repeating the walk above every day, converted to body fat (1 kg ≈ 7,200 kcal).</p>
+      <label>Number of days
+        <select id="adv-days">
+          <option value="7">1 week (7 days)</option>
+          <option value="30" selected>1 month (30 days)</option>
+          <option value="90">3 months (90 days)</option>
+          <option value="365">1 year (365 days)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-habit-run">Calculate the total</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Just enter your weight and how long you walked to see <strong>the calories you burned walking</strong>, using the METs formula from the exercise guidelines of Japan's Ministry of Health, Labour and Welfare. It also shows roughly how many grams of body fat that corresponds to. Handy for logging your daily walks or staying motivated on a diet.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter your weight and the time you walked.</li>
+    <li>Choose one of the five walking speeds (excluding stops such as waiting at traffic lights makes it more accurate).</li>
+    <li>The calories burned and the body-fat equivalent appear right below as you type — no button needed.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Energy burned (kcal) = 1.05 × METs × time (h) × weight (kg)</strong> (the formula used in the exercise guidelines of Japan's Ministry of Health, Labour and Welfare)</li>
+    <li>METs is a measure of exercise intensity where resting = 1. The values in this tool come from the “METs table of physical activities”: Slow = 2.8 / Normal = 3.0 / Somewhat brisk = 3.5 / Fast walk = 4.3 / Very fast = 5.0</li>
+    <li>Example: a 60 kg person walking at “Normal” speed for 30 minutes → 1.05 × 3.0 × 0.5 × 60 = <strong>about 95 kcal</strong></li>
+    <li>The fat equivalent is based on 1 kg of body fat ≈ 7,200 kcal.</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>Formula and explanation of METs: <a href="https://www.e-healthnet.mhlw.go.jp/information/exercise/s-02-004.html" target="_blank" rel="noopener">Ministry of Health, Labour and Welfare (Japan), e-Health Net “METs”</a> (in Japanese)</li>
+    <li>METs values by walking speed: <a href="https://www.nibiohn.go.jp/eiken/programs/2011mets.pdf" target="_blank" rel="noopener">National Institute of Health and Nutrition (Japan), “METs table of physical activities”</a> (in Japanese)</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>This formula includes the energy you burn even at rest (basal metabolism). If you want only the extra amount added by walking, estimate with METs minus 1 (for example, 30 minutes of normal walking at 60 kg adds about 63 kcal).</li>
+    <li>Slopes, luggage, temperature and other factors change the actual amount burned. Treat the results as a guide.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">How many calories does walking 10,000 steps burn?</h3>
+  <p class="faq-a">With a 70 cm stride, 10,000 steps is about 7 km. A 60 kg person walking at “Normal” speed (4 km/h) takes about 105 minutes and burns about 330 kcal — roughly two onigiri rice balls.</p>
+  <h3 class="faq-q">How much walking does it take to lose 1 kg of fat?</h3>
+  <p class="faq-a">Using 1 kg of body fat ≈ 7,200 kcal, a 60 kg person walking 30 minutes a day at “Normal” speed (about 95 kcal/day) would need about 2.5 months by simple arithmetic. Combining it with managing your diet is more realistic.</p>
+  <h3 class="faq-q">How much difference does walking faster make?</h3>
+  <p class="faq-a">Comparing “Normal” (3.0 METs) with “Fast walk” (4.3 METs), you burn about 1.4 times as much in the same time. Japan's health-promotion guidelines also recommend a “fast walk” that leaves you slightly out of breath.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/walking/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/walking/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/walking/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=walking">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/walking/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var ERROR_MESSAGES = {
+    invalid_weight: "Enter a weight between 20 and 300 kg.",
+    invalid_minutes: "Enter a time between 1 minute and 24 hours.",
+    invalid_speed: "Choose a walking speed."
+  };
+  var weightEl = document.getElementById("weight");
+  var minutesEl = document.getElementById("minutes");
+  function run() {
+    if (weightEl.value === "" || minutesEl.value === "") { box.hidden = true; return; }
+    var r = WalkingCalc.calories(
+      parseFloat(weightEl.value),
+      parseFloat(minutesEl.value),
+      document.getElementById("speed").value
+    );
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "Check the entered values.") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">About ' + r.kcal.toLocaleString() + " kcal</div>" +
+      "<p>Equivalent to about <strong>" + r.fatG.toLocaleString() + " g</strong> of body fat (based on 1 kg ≈ 7,200 kcal) / METs value used: " + r.mets + "</p>";
+    box.hidden = false;
+  }
+  weightEl.addEventListener("input", run);
+  minutesEl.addEventListener("input", run);
+  document.getElementById("speed").addEventListener("change", run);
+  document.getElementById("walking-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var lastAdv = null;
+  var SPEED_LABEL = { slow: "Slow", normal: "Normal", brisk: "Somewhat brisk", fast: "Fast walk", veryfast: "Very fast" };
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function fmtMinutes(min) {
+    if (min < 60) return min + " min";
+    return Math.floor(min / 60) + " h " + (min % 60) + " min";
+  }
+  function runTarget(fromButton) {
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(w)) { if (fromButton) advErr("First enter your weight in the form above."); return; }
+    var kEl = document.getElementById("adv-target-kcal");
+    if (kEl.value === "") { if (fromButton) advErr("Enter the target calories to burn."); return; }
+    var speed = document.getElementById("speed").value;
+    var r = WalkingCalc.minutesForKcal(w, parseFloat(kEl.value), speed);
+    if (!r.ok) {
+      advErr(r.code === "invalid_kcal" ? "Enter a target between 1 and 5,000 kcal."
+        : "Enter a weight between 20 and 300 kg.");
+      return;
+    }
+    lastAdv = runTarget;
+    advBox.innerHTML =
+      '<div class="result-main">About ' + fmtMinutes(r.minutes) + "</div>" +
+      "<p>Walking at “" + SPEED_LABEL[speed] + "” pace (" + r.mets + " METs), you burn about " +
+      r.kcalPerHour.toLocaleString() + " kcal per hour. Minutes are rounded up.</p>";
+    advBox.hidden = false;
+  }
+  function runKm(fromButton) {
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(w)) { if (fromButton) advErr("First enter your weight in the form above."); return; }
+    var kmEl = document.getElementById("adv-km");
+    if (kmEl.value === "") { if (fromButton) advErr("Enter the distance you walked."); return; }
+    var speed = document.getElementById("speed").value;
+    var r = WalkingCalc.caloriesByDistance(w, parseFloat(kmEl.value), speed);
+    if (!r.ok) {
+      advErr(r.code === "invalid_distance" ? "Enter a distance between 0.1 and 100 km."
+        : "Enter a weight between 20 and 300 kg.");
+      return;
+    }
+    lastAdv = runKm;
+    advBox.innerHTML =
+      '<div class="result-main">About ' + r.kcal.toLocaleString() + " kcal</div>" +
+      "<p>At “" + SPEED_LABEL[speed] + "” pace (about " + r.kmh + " km/h) it takes about <strong>" + fmtMinutes(r.minutes) +
+      "</strong>, equivalent to about " + r.fatG.toLocaleString() + " g of body fat.</p>";
+    advBox.hidden = false;
+  }
+  function runHabit(fromButton) {
+    var w = parseFloat(document.getElementById("weight").value);
+    var min = parseFloat(document.getElementById("minutes").value);
+    if (!isFinite(w) || !isFinite(min)) { if (fromButton) advErr("First enter your weight and walking time in the form above."); return; }
+    var days = parseInt(document.getElementById("adv-days").value, 10);
+    var speed = document.getElementById("speed").value;
+    var r = WalkingCalc.habitTotal(w, min, speed, days);
+    if (!r.ok) { advErr("Check the weight (20–300 kg) and time (1–1440 minutes) in the form above."); return; }
+    var fatText = r.fatG >= 1000
+      ? (r.fatG / 1000).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " kg"
+      : r.fatG.toLocaleString() + " g";
+    lastAdv = runHabit;
+    advBox.innerHTML =
+      '<div class="result-main">About ' + r.totalKcal.toLocaleString() + " kcal in " + days + " days</div>" +
+      "<p>About " + r.kcalPerDay.toLocaleString() + " kcal/day × " + days + " days = about <strong>" + fatText +
+      "</strong> of body fat (based on 1 kg ≈ 7,200 kcal).</p>" +
+      '<p class="adv-note">A rough estimate assuming your diet stays the same. Actual weight change varies from person to person.</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-target-run").addEventListener("click", function () { runTarget(true); });
+  document.getElementById("adv-km-run").addEventListener("click", function () { runKm(true); });
+  document.getElementById("adv-habit-run").addEventListener("click", function () { runHabit(true); });
+  document.getElementById("adv-target-kcal").addEventListener("input", function () { runTarget(false); });
+  document.getElementById("adv-km").addEventListener("input", function () { runKm(false); });
+  document.getElementById("adv-days").addEventListener("change", function () { runHabit(false); });
+  ["weight", "minutes"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { if (lastAdv) lastAdv(false); });
+  });
+  document.getElementById("speed").addEventListener("change", function () { if (lastAdv) lastAdv(false); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Commuter Pass Break-Even Calculator (Is a Teiki Worth It?) | Quick Calc</title>
+  <meta name="description" content="Enter the price of a Japanese commuter pass (teiki) and your one-way fare to see how many days a month you have to travel before the pass pays for itself. Also shows the difference against paying each ride with an IC card, so you can decide how many office days a week make a pass worth buying.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/teiki/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Commuter Pass Break-Even Calculator (Is a Teiki Worth It?) | Quick Calc">
+  <meta property="og:description" content="Enter the price of a Japanese commuter pass (teiki) and your one-way fare to see how many days a month you have to travel before the pass pays for itself. Also shows the difference against paying each ride with an IC card, so you can decide how many office days a week make a pass worth buying.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/teiki/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Commuter Pass Break-Even Calculator (Is a Teiki Worth It?)","item":"https://quick-calc.site/en/tools/teiki/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/teiki/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/teiki/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/teiki/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/teiki/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/teiki/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Commuter Pass Break-Even Calculator</h1>
+  <form class="tool-form" id="teiki-form">
+    <label>Commuter pass price (1 month, yen)
+      <input type="number" id="pass" inputmode="numeric" min="1" step="any" required placeholder="e.g. 10000">
+    </label>
+    <label>One-way fare (yen)
+      <span class="field-note">Use the IC card fare</span>
+      <input type="number" id="fare" inputmode="numeric" min="1" step="1" required placeholder="e.g. 200">
+    </label>
+    <label>Days you travel per month (round trips)
+      <span class="field-note">5 office days a week is about 20–22 days, 3 days a week about 12–13</span>
+      <input type="number" id="days" inputmode="numeric" min="1" max="31" step="1" value="20" required>
+    </label>
+    <button type="submit">Check if the pass pays off</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: compare 3-month and 6-month passes too</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Compare with 3-month and 6-month passes</h3>
+      <p class="adv-note">Add the prices of the 3-month and 6-month passes to compare the monthly cost, break-even days and yearly cost in one table (the 1-month price, fare and days come from the form above).</p>
+      <label>3-month pass price (yen)
+        <input type="number" id="adv-pass3" inputmode="numeric" min="1" max="3000000" step="any" placeholder="e.g. 28500">
+      </label>
+      <label>6-month pass price (yen)
+        <input type="number" id="adv-pass6" inputmode="numeric" min="1" max="6000000" step="any" placeholder="e.g. 54000">
+      </label>
+      <button type="button" id="adv-run">Compare them all</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Enter the price of your commuter pass and your one-way fare, and see <strong>how many days a month you need to travel before the pass is cheaper</strong>. It also shows the difference against paying for every ride with a ticket or IC card. Handy in Japan, where employers usually cover commuting costs through a 定期券 (teiki-ken, commuter pass), and useful when you work from home part of the week and are unsure whether to buy one.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter the price of the pass for one month (for a 6-month pass, divide the price by 6).</li>
+    <li>Enter the one-way fare (the amount charged to your IC card).</li>
+    <li>Enter how many days a month you travel, and which option is cheaper — plus the difference — appears right below automatically.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Monthly cost of paying per ride = one-way fare × 2 (round trip) × days used</strong></li>
+    <li><strong>Break-even days = pass price ÷ (one-way fare × 2)</strong>, rounded up. Travel at least that many days and the pass is cheaper.</li>
+    <li>Example: a 10,000 yen pass with a 200 yen one-way fare breaks even at 25 days. So even at 5 office days a week (20–22 days a month), paying per ride can still be cheaper.</li>
+  </ul>
+
+  <h3>Sources (primary information)</h3>
+  <ul class="sources">
+    <li>This is plain arithmetic based on the fare and the number of days. Check the fares and pass prices published by your railway or bus operator.</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>A commuter pass has benefits beyond the price: you can ride as often as you like within the section, and get off at any station along it. If you often shop or stop off inside that section, the pass can be worth more than the difference shown here.</li>
+    <li>Your employer's commuting allowance rules (paying for the pass versus reimbursing actual fares) change what is best for you personally.</li>
+    <li>On lines that offer off-peak commuter passes or ride-count discounts (such as discounted bus ride tickets), those are worth comparing too.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">How many office days a week make a pass worth it?</h3>
+  <p class="faq-a">Many railways price their 1-month passes so that the break-even point falls around 15–18 days a month. Four office days a week (16–18 days) often favours the pass, and three or fewer (13 days or less) often favours paying per ride — but it depends on the line, so check with this tool.</p>
+  <h3 class="faq-q">Can I compare it against a 6-month pass?</h3>
+  <p class="faq-a">Divide the 6-month price by 6 and enter that as the pass price. A 6-month pass is often priced roughly 10–20% below the 1-month pass.</p>
+  <h3 class="faq-q">What if I also use the line at weekends?</h3>
+  <p class="faq-a">Add those days to “days you travel per month”. The more you use the section on days off, the better the pass looks.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/teiki/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/teiki/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/teiki/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=teiki">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/teiki/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var MSG = {
+    invalid_pass: "Enter a pass price of 1 yen or more.",
+    invalid_fare: "Enter a one-way fare of 1 yen or more.",
+    invalid_days: "Enter the number of days as a whole number from 1 to 31."
+  };
+  function raw(id) { return document.getElementById(id).value; }
+  function run(showErrors) {
+    if (raw("pass") === "" || raw("fare") === "" || raw("days") === "") {
+      if (showErrors) {
+        var code = raw("pass") === "" ? "invalid_pass" : raw("fare") === "" ? "invalid_fare" : "invalid_days";
+        box.innerHTML = '<p class="result-error">' + MSG[code] + "</p>";
+        box.hidden = false;
+      } else {
+        box.hidden = true;
+      }
+      return;
+    }
+    var r = TeikiCalc.compare(
+      parseFloat(raw("pass")),
+      parseFloat(raw("fare")),
+      parseInt(raw("days"), 10)
+    );
+    if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "Check the entered values.") + "</p>"; box.hidden = false; return; }
+    var verdict = r.better === "pass" ? "The commuter pass is cheaper" : r.better === "payg" ? "Paying per ride is cheaper" : "Almost exactly the same";
+    box.innerHTML =
+      '<div class="result-main">' + verdict + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>Monthly cost of paying per ride</td><td>" + r.payg.toLocaleString() + " yen</td></tr>" +
+      "<tr><td>Difference</td><td>" + (r.diff >= 0 ? "Pass saves " + r.diff.toLocaleString() + " yen" : "Paying per ride saves " + Math.abs(r.diff).toLocaleString() + " yen") + "</td></tr>" +
+      "<tr><td>Break-even days</td><td><strong>" + r.breakEvenDays + " days</strong> a month or more</td></tr>" +
+      "</tbody></table></div>";
+    box.hidden = false;
+  }
+  ["pass", "fare", "days"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { run(false); });
+  });
+  document.getElementById("teiki-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var ADV_ERRORS = {
+    invalid_pass1: "Enter the 1-month pass price in the form above.",
+    invalid_pass3: "Enter a 3-month pass price of 1 yen or more.",
+    invalid_pass6: "Enter a 6-month pass price of 1 yen or more.",
+    invalid_fare: "Enter the one-way fare in the form above.",
+    invalid_days: "The days per month in the form above must be a whole number from 1 to 31."
+  };
+  var BEST_LABELS = { payg: "Paying per ride (no pass)", m1: "1-month pass", m3: "3-month pass", m6: "6-month pass" };
+  function runAdv() {
+    var pass1 = parseFloat(document.getElementById("pass").value);
+    var fare = parseFloat(document.getElementById("fare").value);
+    var days = parseFloat(document.getElementById("days").value);
+    var pass3 = parseFloat(document.getElementById("adv-pass3").value);
+    var pass6 = parseFloat(document.getElementById("adv-pass6").value);
+    var r = TeikiCalc.comparePasses(pass1, pass3, pass6, fare, days);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + (ADV_ERRORS[r.code] || "Check the entered values.") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    var html =
+      '<div class="result-main">At ' + days.toLocaleString() + ' days a month, <strong>' + BEST_LABELS[r.best] + '</strong> is the cheapest</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead>' +
+      '<tr><th></th><th>Per month</th><th>Break-even days</th><th>Per year</th></tr></thead><tbody>' +
+      '<tr><td>Paying per ride</td><td>' + r.payg.toLocaleString() + ' yen</td><td>-</td><td>' + (r.payg * 12).toLocaleString() + ' yen</td></tr>' +
+      '<tr><td>1-month pass</td><td>' + r.perMonth1.toLocaleString() + ' yen</td><td>' + r.breakEven1 + ' days a month or more</td><td>' + r.year1.toLocaleString() + ' yen</td></tr>' +
+      '<tr><td>3-month pass</td><td>' + r.perMonth3.toLocaleString() + ' yen</td><td>' + r.breakEven3 + ' days a month or more</td><td>' + r.year3.toLocaleString() + ' yen</td></tr>' +
+      '<tr><td>6-month pass</td><td>' + r.perMonth6.toLocaleString() + ' yen</td><td>' + r.breakEven6 + ' days a month or more</td><td>' + r.year6.toLocaleString() + ' yen</td></tr>' +
+      '</tbody></table></div>';
+    var lines = [];
+    var prevBest = null;
+    for (var d = 1; d <= 31; d++) {
+      var t = TeikiCalc.comparePasses(pass1, pass3, pass6, fare, d);
+      if (t.ok && t.best !== prevBest) {
+        lines.push({ from: d, best: t.best });
+        prevBest = t.best;
+      }
+    }
+    html += '<p><strong>Cheapest option by number of days used</strong></p><ul>';
+    for (var i = 0; i < lines.length; i++) {
+      var to = i + 1 < lines.length ? "–" + (lines[i + 1].from - 1) + " days" : " days or more";
+      html += '<li>' + lines[i].from + (i + 1 < lines.length ? to : " days or more") + ' a month: ' + BEST_LABELS[lines[i].best] + '</li>';
+    }
+    html += '</ul><p class="adv-note">If you stop using a pass part way through, a refund fee applies. Keep that in mind if you have a long break or a transfer coming up.</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", runAdv);
+  function autoAdv() {
+    var filled = function (id) { return document.getElementById(id).value !== ""; };
+    if (filled("adv-pass3") && filled("adv-pass6") && filled("pass") && filled("fare") && filled("days")) {
+      runAdv();
+    } else {
+      advBox.hidden = true;
+    }
+  }
+  ["adv-pass3", "adv-pass6", "pass", "fare", "days"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoAdv);
+  });
+})();
+</script>
+</body>
+</html>

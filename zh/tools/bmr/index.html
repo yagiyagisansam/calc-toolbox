@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>基础代谢量计算器(日本厚生劳动省基准值) | Quick Calc</title>
+  <meta name="description" content="输入年龄、性别和体重,免费计算一天的基础代谢量(kcal)。基于日本厚生劳动省《日本人饮食摄取基准》的基础代谢基准值,附计算依据和出处。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/bmr/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="基础代谢量计算器(日本厚生劳动省基准值) | Quick Calc">
+  <meta property="og:description" content="输入年龄、性别和体重,免费计算一天的基础代谢量(kcal)。基于日本厚生劳动省《日本人饮食摄取基准》的基础代谢基准值,附计算依据和出处。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/bmr/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"基础代谢量计算器(日本厚生劳动省基准值)","item":"https://quick-calc.site/zh/tools/bmr/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/bmr/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/bmr/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/bmr/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/bmr/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/bmr/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>基础代谢量计算器</h1>
+  <form class="tool-form" id="bmr-form">
+    <span class="field-note">输入年龄、性别和体重,结果立即显示在下方</span>
+    <label>年龄(岁)
+      <span class="field-note">支持范围: 1〜120岁(整数)</span>
+      <input type="number" id="age" inputmode="numeric" step="1" min="1" max="120" placeholder="30" required>
+    </label>
+    <label>性别
+      <select id="sex">
+        <option value="male">男性</option>
+        <option value="female">女性</option>
+      </select>
+    </label>
+    <label>体重(kg)
+      <span class="field-note">支持范围: 5〜300kg</span>
+      <input type="number" id="weight" inputmode="decimal" step="0.1" min="5" max="300" placeholder="60" required>
+    </label>
+    <button type="submit">计算</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 用体脂率计算·各年龄段的变化</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">知道自己体脂率的话(两种方式对比)</h3>
+      <p class="adv-note">输入体脂秤测得的体脂率,还会按去脂体重为基础的 Katch-McArdle 公式计算,并与上面的方式对比(体重等使用上面输入的值)。</p>
+      <label>体脂率(%)
+        <input type="number" id="adv-fat" inputmode="decimal" step="any" min="1" max="70" placeholder="例: 25">
+      </label>
+      <button type="button" id="adv-fat-run">按两种方式计算</button>
+
+      <h3 class="adv-h">随年龄会下降多少?</h3>
+      <p class="adv-note">保持上面的性别和体重不变,列出各年龄段的基础代谢量。</p>
+      <button type="button" id="adv-age-run">显示各年龄段一览</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    本工具的计算结果为<strong>约值</strong>。基础代谢基准值基于各年龄段的平均体格,肌肉量偏多或偏少的人,实际基础代谢量会与计算值有差距。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>只需输入年龄、性别和体重,就能知道<strong>即使一动不动、身体一天也要消耗的热量(基础代谢量)</strong>。计算采用日本厚生劳动省的官方基准值,即日本营养指导所使用的依据。这是减肥时考虑「最少该吃多少」的基础数字,适合作为饮食管理的第一步。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>以整数输入年龄。</li>
+    <li>选择性别。</li>
+    <li>以kg为单位输入体重的同时,基础代谢量立即显示在下方,无需点击按钮。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <p><strong>基础代谢量(kcal/日) = 基础代谢基准值(kcal/kg体重/日) × 体重(kg)</strong></p>
+  <p>基础代谢基准值采用日本厚生劳动省《日本人饮食摄取基准(2015年版)》按年龄段、男女分列的数值。</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>基础代谢基准值(kcal/kg体重/日)</caption>
+      <thead><tr><th>年龄</th><th>男性</th><th>女性</th></tr></thead>
+      <tbody>
+        <tr><td>1〜2岁</td><td>61.0</td><td>59.7</td></tr>
+        <tr><td>3〜5岁</td><td>54.8</td><td>52.2</td></tr>
+        <tr><td>6〜7岁</td><td>44.3</td><td>41.9</td></tr>
+        <tr><td>8〜9岁</td><td>40.8</td><td>38.3</td></tr>
+        <tr><td>10〜11岁</td><td>37.4</td><td>34.8</td></tr>
+        <tr><td>12〜14岁</td><td>31.0</td><td>29.6</td></tr>
+        <tr><td>15〜17岁</td><td>27.0</td><td>25.3</td></tr>
+        <tr><td>18〜29岁</td><td>24.0</td><td>22.1</td></tr>
+        <tr><td>30〜49岁</td><td>22.3</td><td>21.7</td></tr>
+        <tr><td>50〜69岁</td><td>21.5</td><td>20.7</td></tr>
+        <tr><td>70岁以上</td><td>21.5</td><td>20.7</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出处(一次信息)</h3>
+  <ul class="sources">
+    <li>日本厚生劳动省 e-健康网「加龄与能量代谢」(基础代谢基准值表,依据《日本人饮食摄取基准(2015年版)》)(日文)<br>
+      <a href="https://kennet.mhlw.go.jp/information/information/food/e-07-002.html" rel="noopener" target="_blank">https://kennet.mhlw.go.jp/information/information/food/e-07-002.html</a>(2026年7月18日查阅)</li>
+  </ul>
+
+  <h2>前提与注意</h2>
+  <ul class="cautions">
+    <li>基础代谢量是「安静状态下消耗的最低限度能量」。一天的总消耗能量会随活动量增大而更高(约按基础代谢量×身体活动水平估算)。</li>
+    <li>基准值基于平均体格(参照体重),肌肉量、体成分不同会产生个人差异。</li>
+    <li>控制饮食等健康管理请勿仅凭数字判断,请咨询医生或注册营养师。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">只吃和基础代谢量相同的热量,体重能维持吗?</h3>
+  <p class="faq-a">不能这样理解。一天的总消耗能量是在基础代谢量之上再加活动消耗,因此大于基础代谢量(参考: 基础代谢量×身体活动水平1.5〜2.0)。</p>
+  <h3 class="faq-q">计算结果和其他网站不一样。</h3>
+  <p class="faq-a">基础代谢的估算公式有多种(如 Harris-Benedict 公式等)。本工具按日本厚生劳动省《日本人饮食摄取基准》的基础代谢基准值×体重计算,公式不同,结果会相差几十到一百kcal左右。</p>
+  <h3 class="faq-q">怎样才能提高基础代谢?</h3>
+  <p class="faq-a">随年龄下降的基础代谢,主要原因被认为是肌肉等去脂体重的减少,因此保持、增加肌肉量的运动习惯是常见的对策(参见出处页面)。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/bmr/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/bmr/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/bmr/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=bmr">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/bmr/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_age: "年龄请在 " + BmrCalc.AGE_MIN + "〜" + BmrCalc.AGE_MAX + " 岁范围内以整数输入。",
+    invalid_sex: "请选择性别。",
+    invalid_weight: "体重请在 " + BmrCalc.WEIGHT_MIN_KG + "〜" + BmrCalc.WEIGHT_MAX_KG + " kg 范围内输入。"
+  };
+  var box = document.getElementById("result");
+  var ageEl = document.getElementById("age");
+  var weightEl = document.getElementById("weight");
+  function run() {
+    if (ageEl.value === "" || weightEl.value === "") { box.hidden = true; return; }
+    var result = BmrCalc.calculate(
+      parseFloat(ageEl.value),
+      document.getElementById("sex").value,
+      parseFloat(weightEl.value)
+    );
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">基础代谢量 约' + result.bmrKcal.toLocaleString() + " kcal/日</div>" +
+        "<p>所用基础代谢基准值: <strong>" + result.standardValue.toFixed(1) + " kcal/kg体重/日</strong></p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "请检查输入的数值。") + "</p>";
+    }
+    box.hidden = false;
+  }
+  ageEl.addEventListener("input", run);
+  weightEl.addEventListener("input", run);
+  document.getElementById("sex").addEventListener("change", run);
+  document.getElementById("bmr-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var AGE_LABEL_ZH = {
+    "18〜29歳": "18〜29岁",
+    "30〜49歳": "30〜49岁",
+    "50〜69歳": "50〜69岁",
+    "70歳以上": "70岁以上"
+  };
+  var advBox = document.getElementById("adv-result");
+  var lastAdv = null;
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function runFat(fromButton) {
+    var w = parseFloat(document.getElementById("weight").value);
+    var fatEl = document.getElementById("adv-fat");
+    if (!isFinite(w)) { if (fromButton) advErr("请先在上面的表单中输入体重。"); return; }
+    if (fatEl.value === "") { if (fromButton) advErr("请输入体脂率。"); return; }
+    var km = BmrCalc.katchMcArdle(w, parseFloat(fatEl.value));
+    if (!km.ok) {
+      advErr(km.code === "invalid_body_fat"
+        ? "体脂率请在1〜70%范围内输入。"
+        : "体重请在5〜300kg范围内输入。");
+      return;
+    }
+    var html =
+      '<div class="result-main">按去脂体重计算 约 ' + km.bmrKcal.toLocaleString() + " kcal/日</div>" +
+      "<p>去脂体重(除脂肪外的重量)约 <strong>" + km.lbmKg.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      " kg</strong>,体脂肪量约 " + km.fatKg.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " kg。</p>";
+    var age = parseInt(document.getElementById("age").value, 10);
+    var std = isFinite(age)
+      ? BmrCalc.calculate(age, document.getElementById("sex").value, w)
+      : { ok: false };
+    if (std.ok) {
+      var diff = km.bmrKcal - std.bmrKcal;
+      html +=
+        '<div class="table-scroll"><table class="data-table"><thead><tr><th>计算方式</th><th>基础代谢量</th></tr></thead><tbody>' +
+        "<tr><td>按年龄·体重(上面的结果)</td><td>" + std.bmrKcal.toLocaleString() + " kcal/日</td></tr>" +
+        "<tr><td>按去脂体重(Katch-McArdle)</td><td>" + km.bmrKcal.toLocaleString() + " kcal/日</td></tr>" +
+        "</tbody></table></div>" +
+        '<p class="adv-note">两种方式相差 ' + (diff >= 0 ? "+" : "") + diff.toLocaleString() +
+        " kcal/日。体脂率的测量误差也会影响结果,请把结果当作一个区间来看。</p>";
+    } else {
+      html += '<p class="adv-note">在上面的表单中再输入年龄和性别,即可并列对比两种方式。</p>';
+    }
+    lastAdv = runFat;
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  function runAges(fromButton) {
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(w)) { if (fromButton) advErr("请先在上面的表单中输入体重。"); return; }
+    var sexEl = document.getElementById("sex");
+    var r = BmrCalc.byAgeGroups(sexEl.value, w);
+    if (!r.ok) { advErr("体重请在5〜300kg范围内输入。"); return; }
+    var rows = "";
+    for (var i = 0; i < r.rows.length; i++) {
+      rows += "<tr><td>" + (AGE_LABEL_ZH[r.rows[i].ageLabel] || r.rows[i].ageLabel) + "</td><td>" + r.rows[i].bmrKcal.toLocaleString() + " kcal/日</td></tr>";
+    }
+    advBox.innerHTML =
+      '<div class="result-main">各年龄段的基础代谢量(' + (sexEl.value === "male" ? "男性" : "女性") + "·" +
+      w.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " kg)</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>年龄段</th><th>基础代谢量</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>" +
+      '<p class="adv-note">即使体重相同,基础代谢也会随年龄下降。这可以解释为什么饭量和年轻时一样却容易发胖。</p>';
+    lastAdv = runAges;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-fat-run").addEventListener("click", function () { runFat(true); });
+  document.getElementById("adv-age-run").addEventListener("click", function () { runAges(true); });
+  document.getElementById("adv-fat").addEventListener("input", function () { runFat(false); });
+  ["age", "weight"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { if (lastAdv) lastAdv(false); });
+  });
+  document.getElementById("sex").addEventListener("change", function () { if (lastAdv) lastAdv(false); });
+})();
+</script>
+</body>
+</html>

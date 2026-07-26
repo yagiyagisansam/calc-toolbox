@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>年龄计算器(周岁·生肖·早生判定) | Quick Calc</title>
+  <meta name="description" content="根据出生日期免费计算周岁年龄和生肖,并判断是否属于日本学年制度的「早生」(1月1日〜4月1日出生)。可指定基准日查询「当时几岁」,支持2月29日出生。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/age/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="年龄计算器(周岁·生肖·早生判定) | Quick Calc">
+  <meta property="og:description" content="根据出生日期免费计算周岁年龄和生肖,并判断是否属于日本学年制度的「早生」(1月1日〜4月1日出生)。可指定基准日查询「当时几岁」,支持2月29日出生。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/age/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"年龄计算器(周岁·生肖·早生判定)","item":"https://quick-calc.site/zh/tools/age/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/age/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/age/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/age/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/age/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/age/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>年龄计算器(周岁·生肖·早生判定)</h1>
+  <form class="tool-form" id="age-form">
+    <span class="field-note">选择出生日期后,下方立即显示今天时点的年龄</span>
+    <div class="field-row">
+      <label>出生日期(年)
+        <select id="birth-year"></select>
+      </label>
+      <label>月
+        <select id="birth-month"></select>
+      </label>
+      <label>日
+        <select id="birth-day"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 指定基准日计算·下次生日·纪念年龄一览</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">指定基准日计算(那一天时点的年龄)</h3>
+      <p class="adv-note">计算在指定日期(如入职日)时点的周岁年龄(出生日期使用上面选择的日期)。</p>
+      <div class="field-row">
+        <label>基准日(年)
+          <select id="asof-year"></select>
+        </label>
+        <label>月
+          <select id="asof-month"></select>
+        </label>
+        <label>日
+          <select id="asof-day"></select>
+        </label>
+      </div>
+      <div class="tool-result" id="adv-asof-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">下次生日和出生以来的天数</h3>
+      <p class="adv-note">根据上面选择的出生日期,显示距离下次生日的天数和出生以来的累计天数。</p>
+      <div class="tool-result" id="adv-nb-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">迎来纪念年龄的日期一览</h3>
+      <p class="adv-note">日本的成年(18岁)、还历(60岁)、米寿(88岁)等纪念年龄的到达日期一览。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    本工具按通俗的「生日当天加1岁」计算,结果为<strong>约值</strong>。按日本法律,年龄在<strong>生日前一天结束时</strong>增加,因此在边界情况下(如把基准日设为生日前一天),法律上的年龄可能相差1岁。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>只需输入出生日期,立即得到<strong>今天(或指定日期)时点的周岁年龄</strong>,同时显示生肖,并判断是否属于日本学年制度的「早生」(1月1日〜4月1日出生,编入上一学年)。在日本填写简历、申请表需要写年龄时,或想查「那年那天自己几岁」时都很方便。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>在上方3个下拉框中选择出生日期(初始为今天的日期)。</li>
+    <li>选择的瞬间即显示周岁年龄、生肖和早生判定,无需点击按钮。</li>
+    <li>「入职日时点几岁」和距下次生日的天数,可在「＋更多功能」中查询。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>周岁年龄</strong>: 基准日在生日(月日)当天或之后为「基准年−出生年」,在生日之前则再减1。</li>
+    <li><strong>早生</strong>: 指1月1日〜4月1日出生。日本的学年按「4月2日〜次年4月1日出生」划分,「早生」的孩子在同一公历年出生的人中被编入上一学年。4月1日出生也算「早生」,是因为日本法律规定年龄在生日前一天(3月31日)结束时增加。</li>
+    <li><strong>生肖(十二支)</strong>: 按出生年的公历年份计算(鼠·牛·虎·兔·龙·蛇·马·羊·猴·鸡·狗·猪的12年周期。日本的「亥」为野猪)。</li>
+    <li><strong>2月29日出生</strong>: 平年按3月1日加1岁处理。</li>
+  </ul>
+
+  <h3>出处(一次信息)</h3>
+  <ul class="sources">
+    <li>年龄计算相关法律(明治35年法律第50号)(周岁年龄的起算方法)— 日本官方法令原文(日文)<br>
+      <a href="https://laws.e-gov.go.jp/law/135AC1000000050" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/135AC1000000050</a>(2026年7月18日查阅)</li>
+    <li>学校教育法(昭和22年法律第26号)第17条(就学时期=学年划分的依据)— 日本官方法令原文(日文)<br>
+      <a href="https://laws.e-gov.go.jp/law/322AC0000000026" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/322AC0000000026</a>(2026年7月18日查阅)</li>
+  </ul>
+
+  <h2>前提与注意</h2>
+  <ul class="cautions">
+    <li>在日本办理合同、行政手续等需要法律上准确年龄的场合,请按「生日前一天加龄」的规定确认。</li>
+    <li>生肖按公历年(1月1日)划分显示。这与中国按农历新年划分的习惯不同,年初出生的人两种算法的生肖可能不一致。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">和「虚岁(数え年)」有什么不同?</h3>
+  <p class="faq-a">不同。虚岁是出生即算1岁、每过一个新年加1岁的传统数法。本工具按现在通用的「周岁(满年龄)」计算,日本的表格通常要求填周岁。</p>
+  <h3 class="faq-q">为什么4月1日出生算「早生」(上一学年)?</h3>
+  <p class="faq-a">日本法律规定年龄在生日前一天结束时增加,所以4月1日出生的人在3月31日加1岁。学年按4月1日时点的年龄划分,因此被编入上一学年。</p>
+  <h3 class="faq-q">简历上应该写哪一天时点的年龄?</h3>
+  <p class="faq-a">一般写提交日时点的周岁年龄。把本工具的基准日设为提交日,即可算出该时点的年龄。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/age/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/age/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/age/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=age">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/age/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var today = new Date();
+  var ETO_ZH = { "子": "鼠", "丑": "牛", "寅": "虎", "卯": "兔", "辰": "龙", "巳": "蛇", "午": "马", "未": "羊", "申": "猴", "酉": "鸡", "戌": "狗", "亥": "猪" };
+  var MILESTONE_ZH = {
+    "成年(成人年齢)": "成年(日本的成年年龄)",
+    "20歳(飲酒・喫煙が可能に)": "20岁(在日本可以饮酒·吸烟)",
+    "還暦・定年の目安": "还历(花甲)·退休年龄的大致标准",
+    "年金受給開始の目安": "日本养老金开始领取的大致年龄",
+    "古希": "古稀(70岁贺寿)",
+    "喜寿": "喜寿(77岁贺寿)",
+    "傘寿": "伞寿(80岁贺寿)",
+    "米寿": "米寿(88岁贺寿)",
+    "卒寿": "卒寿(90岁贺寿)",
+    "百寿": "百寿(100岁贺寿)"
+  };
+
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, "日", Math.min(keep, max));
+  }
+  function iso(y, m, d) {
+    return y + "-" + String(m).padStart(2, "0") + "-" + String(d).padStart(2, "0");
+  }
+  function fmtDate(isoStr) {
+    var p = isoStr.split("-");
+    return parseInt(p[0], 10) + "年" + parseInt(p[1], 10) + "月" + parseInt(p[2], 10) + "日";
+  }
+  var todayIso = iso(today.getFullYear(), today.getMonth() + 1, today.getDate());
+
+  var box = document.getElementById("result");
+  var asofBox = document.getElementById("adv-asof-result");
+  var nbBox = document.getElementById("adv-nb-result");
+  var advBox = document.getElementById("adv-result");
+
+  fillSelect(document.getElementById("birth-year"), 1868, today.getFullYear(), "年", today.getFullYear());
+  fillSelect(document.getElementById("birth-month"), 1, 12, "月", today.getMonth() + 1);
+  fillSelect(document.getElementById("birth-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), "日", today.getDate());
+  fillSelect(document.getElementById("asof-year"), 1868, 2100, "年", today.getFullYear());
+  fillSelect(document.getElementById("asof-month"), 1, 12, "月", today.getMonth() + 1);
+  fillSelect(document.getElementById("asof-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), "日", today.getDate());
+
+  function birthIso() {
+    return iso(val("birth-year"), val("birth-month"), val("birth-day"));
+  }
+
+  // ---- 主功能: 今天时点的年龄(即时) ----
+  function runMain() {
+    adjustDays("birth-year", "birth-month", "birth-day");
+    var b = birthIso();
+    var r = AgeCalc.calculate(b, todayIso);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' +
+        (r.code === "birth_after_asof" ? "出生日期晚于今天。" : "请确认出生日期。") + "</p>";
+    } else {
+      box.innerHTML =
+        '<div class="result-main">今天时点 周岁 ' + r.age + " 岁</div>" +
+        '<div class="table-scroll"><table class="data-table"><tbody>' +
+        "<tr><td>生肖</td><td>属<strong>" + (ETO_ZH[r.eto] || r.eto) + "(" + r.eto + ")</strong></td></tr>" +
+        "<tr><td>早生</td><td>" + (r.hayaumare ? "<strong>早生</strong>(1月1日〜4月1日出生,在日本编入上一学年)" : "不属于早生") + "</td></tr>" +
+        "</tbody></table></div>";
+    }
+    box.hidden = false;
+    runAsof();
+    runNextBirthday();
+    runMilestones();
+  }
+
+  // ---- 更多功能: 下次生日·出生以来的天数(即时) ----
+  function runNextBirthday() {
+    var nb = AgeCalc.nextBirthday(birthIso(), todayIso);
+    if (!nb.ok) { nbBox.hidden = true; return; }
+    nbBox.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>下次生日</td><td>" +
+      (nb.daysLeft === 0 ? "今天就是生日(满" + nb.turning + "岁)"
+        : fmtDate(nb.date) + "(还有" + nb.daysLeft.toLocaleString() + "天,满" + nb.turning + "岁)") + "</td></tr>" +
+      "<tr><td>出生以来</td><td>累计 " + nb.daysOld.toLocaleString() + " 天</td></tr>" +
+      "</tbody></table></div>";
+    nbBox.hidden = false;
+  }
+
+  // ---- 更多功能: 基准日时点的周岁(即时) ----
+  function runAsof() {
+    adjustDays("asof-year", "asof-month", "asof-day");
+    var a = iso(val("asof-year"), val("asof-month"), val("asof-day"));
+    var r = AgeCalc.calculate(birthIso(), a);
+    if (!r.ok) {
+      asofBox.innerHTML = '<p class="result-error">' +
+        (r.code === "birth_after_asof" ? "基准日早于出生日期(上面选择的日期)。" : "请确认日期。") + "</p>";
+    } else {
+      asofBox.innerHTML =
+        '<div class="result-main">基准日时点 周岁 ' + r.age + " 岁</div>" +
+        "<p>基准日: " + fmtDate(a) + "</p>";
+    }
+    asofBox.hidden = false;
+  }
+
+  // ---- 更多功能: 纪念年龄一览(即时) ----
+  function runMilestones() {
+    var r = AgeCalc.milestoneAges(birthIso());
+    if (!r.ok) { advBox.hidden = true; return; }
+    var rows = "";
+    for (var i = 0; i < r.rows.length; i++) {
+      var m = r.rows[i];
+      rows += "<tr><td>" + m.age + "岁</td><td>" + (MILESTONE_ZH[m.label] || m.label) + "</td><td>" + fmtDate(m.date) + "</td></tr>";
+    }
+    advBox.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>年龄</th><th>纪念</th><th>日期</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>" +
+      '<p class="adv-note">按通俗的「生日当天加1岁」计算,与日本法律上的周岁(前一天加龄)在书面上可能相差1天。</p>';
+    advBox.hidden = false;
+  }
+
+  ["birth-year", "birth-month", "birth-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runMain);
+  });
+  ["asof-year", "asof-month", "asof-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runAsof);
+  });
+  document.getElementById("age-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
+  });
+
+  runMain();
+})();
+</script>
+</body>
+</html>

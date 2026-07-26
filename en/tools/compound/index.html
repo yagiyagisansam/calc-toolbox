@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Compound Interest &amp; Monthly Savings Simulator | Quick Calc</title>
+  <meta name="description" content="See how much your monthly savings will be worth in the future from the amount you put aside and an assumed annual return, for free. Lump-sum compound interest is supported too, and the formulas and assumptions (before tax and fees) are shown.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/compound/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Compound Interest &amp; Monthly Savings Simulator | Quick Calc">
+  <meta property="og:description" content="See how much your monthly savings will be worth in the future from the amount you put aside and an assumed annual return, for free. Lump-sum compound interest is supported too, and the formulas and assumptions (before tax and fees) are shown.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/compound/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Compound Interest &amp; Monthly Savings Simulator","item":"https://quick-calc.site/en/tools/compound/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/compound/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/compound/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/compound/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/compound/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/compound/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Compound Interest &amp; Monthly Savings Simulator</h1>
+  <form class="tool-form" id="monthly-form">
+    <label>Monthly contribution (yen)
+      <span class="field-note">e.g. 30000 (supported range: 1,000–10,000,000 yen)</span>
+      <input type="number" id="m-amount" inputmode="numeric" step="1" min="1000" max="10000000" placeholder="30000" required>
+    </label>
+    <label>Assumed return (% per year)
+      <span class="field-note">e.g. 3–5 (supported range: 0–30%)</span>
+      <input type="number" id="m-rate" inputmode="decimal" step="any" min="0" max="30" placeholder="5" required>
+    </label>
+    <label>Saving period (years)
+      <input type="number" id="m-years" inputmode="numeric" step="1" min="1" max="50" placeholder="20" required>
+    </label>
+    <span class="field-note">Fill in all three and the result appears automatically</span>
+    <button type="submit">Calculate monthly savings</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="lump-form">
+    <label>Lump-sum investment (yen)
+      <span class="field-note">Supported range: 10,000–1,000,000,000 yen</span>
+      <input type="number" id="l-amount" inputmode="numeric" step="1" min="10000" max="1000000000" placeholder="1000000">
+    </label>
+    <label>Assumed return (% per year)
+      <input type="number" id="l-rate" inputmode="decimal" step="any" min="0" max="30" placeholder="5">
+    </label>
+    <label>Investment period (years)
+      <input type="number" id="l-years" inputmode="numeric" step="1" min="1" max="50" placeholder="10">
+    </label>
+    <button type="submit">Calculate lump sum</button>
+    <div class="tool-result" id="result-lump" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: work backwards from a target amount</summary>
+    <div class="adv-inner">
+      <p class="adv-note">Set the goal first — for example “20,000,000 yen by retirement”, which in Japan is usually written as 2,000 man-yen — and work backwards (the target amount and assumed return are shared by the two calculations below).</p>
+      <label>Target amount (man-yen — units of 10,000 yen)
+        <span class="field-note">1 man-yen = 10,000 yen, so 1000 means 10,000,000 yen</span>
+        <input type="number" id="adv-target" inputmode="numeric" step="any" min="10" max="1000000" placeholder="1000">
+      </label>
+      <label>Assumed return (% per year)
+        <input type="number" id="adv-rate" inputmode="decimal" step="any" min="0" max="30" placeholder="3">
+      </label>
+      <h3 class="adv-h">How much do I need to put aside each month?</h3>
+      <label>Saving period (years)
+        <input type="number" id="adv-years" inputmode="numeric" step="1" min="1" max="50" placeholder="10">
+      </label>
+      <button type="button" id="adv-monthly-run">Calculate the required monthly amount</button>
+      <div class="tool-result" id="adv-monthly-result" hidden aria-live="polite"></div>
+      <h3 class="adv-h">When will I reach the target?</h3>
+      <label>Monthly contribution (yen)
+        <input type="number" id="adv-monthly" inputmode="numeric" step="1" min="1000" max="10000000" placeholder="30000">
+      </label>
+      <button type="button" id="adv-when-run">Calculate the years to the target</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    This tool is an <strong>approximation that assumes a constant rate of return</strong>. Real investment results move up and down, and <strong>you can end up with less than you put in</strong>. Tax on gains and fees are not included. Nothing here is a solicitation or recommendation of any particular financial product.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Just enter how much you save each month and an assumed return, and you see <strong>how much you would have in the future</strong>. It also handles a single lump sum invested at once. Amounts are in Japanese yen, so it fits straight into planning around Japanese savings and investment accounts (such as NISA) while you live in Japan.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter your monthly contribution, the assumed return and the period — the future amount appears immediately.</li>
+    <li>For a single lump sum, use the “Lump-sum investment” form below.</li>
+    <li>It is worth calculating several times with different returns so you see a range rather than one number.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Monthly saving (monthly compounding, contribution at month end)</strong>: future value = monthly amount × ((1+i)ⁿ − 1) ÷ i (i = annual rate ÷ 12, n = years × 12)</li>
+    <li><strong>Lump sum (annual compounding)</strong>: future value = principal × (1 + annual rate)^years</li>
+    <li>Example: 30,000 yen a month at 5% a year for 20 years → 7,200,000 yen of contributions grows to <strong>about 12,330,000 yen</strong> (about 5,130,000 yen of gains)</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>The calculation uses the standard mathematical formulas for compound interest (future value and the future value of an annuity), rounded to the nearest yen.</li>
+    <li>Saving assumes “contribution at the end of each month with monthly compounding”. Simulators that assume a different contribution timing will differ by a few percent.</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>Past returns do not guarantee future ones. Check a conservative assumed return as well.</li>
+    <li>Investment decisions are your own responsibility. For the details of a scheme (such as NISA) or a product, check the information from the financial institution or the relevant public body.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">What return should I assume?</h3>
+  <p class="faq-a">Nobody knows future returns. The realistic approach is to calculate several optimistic and pessimistic cases (for example 1%, 3% and 5%) and think in terms of a range.</p>
+  <h3 class="faq-q">Is tax deducted?</h3>
+  <p class="faq-a">This tool shows figures before tax. In a taxable account in Japan, gains are taxed at about 20% (it depends on whether you use a tax-free scheme).</p>
+  <h3 class="faq-q">What is the difference between compound and simple interest?</h3>
+  <p class="faq-a">With simple interest only the principal earns interest; with compound interest “the interest earns interest” as well. The longer the period, the bigger the gap. This tool uses compound interest.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/compound/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/compound/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/compound/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=compound">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/compound/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var boxM = document.getElementById("result");
+  var boxL = document.getElementById("result-lump");
+  var ERROR_MESSAGES = {
+    invalid_principal: "Enter a lump-sum amount between 10,000 and 1,000,000,000 yen.",
+    invalid_monthly: "Enter a monthly contribution between 1,000 and 10,000,000 yen.",
+    invalid_rate: "Enter a return between 0 and 30%.",
+    invalid_years: "Enter a whole number of years between 1 and 50."
+  };
+  function showError(boxEl, code) {
+    boxEl.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "Check the entered values.") + "</p>";
+    boxEl.hidden = false;
+  }
+  function runMonthly() {
+    if (document.getElementById("m-amount").value === "" ||
+        document.getElementById("m-rate").value === "" ||
+        document.getElementById("m-years").value === "") { boxM.hidden = true; return; }
+    var r = CompoundCalc.monthlySaving(
+      parseFloat(document.getElementById("m-amount").value),
+      parseFloat(document.getElementById("m-rate").value),
+      parseFloat(document.getElementById("m-years").value));
+    if (!r.ok) { showError(boxM, r.code); return; }
+    boxM.innerHTML =
+      '<div class="result-main">About ' + r.futureValue.toLocaleString() + " yen</div>" +
+      "<p>Total contributions: <strong>" + r.totalDeposit.toLocaleString() + " yen</strong> / Gains (before tax): <strong>" + r.profit.toLocaleString() + " yen</strong></p>";
+    boxM.hidden = false;
+  }
+  function runLump() {
+    if (document.getElementById("l-amount").value === "" ||
+        document.getElementById("l-rate").value === "" ||
+        document.getElementById("l-years").value === "") { boxL.hidden = true; return; }
+    var r = CompoundCalc.lumpSum(
+      parseFloat(document.getElementById("l-amount").value),
+      parseFloat(document.getElementById("l-rate").value),
+      parseFloat(document.getElementById("l-years").value));
+    if (!r.ok) { showError(boxL, r.code); return; }
+    boxL.innerHTML =
+      '<div class="result-main">About ' + r.futureValue.toLocaleString() + " yen</div>" +
+      "<p>Gains (before tax): <strong>" + r.profit.toLocaleString() + " yen</strong></p>";
+    boxL.hidden = false;
+  }
+  document.getElementById("monthly-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMonthly();
+  });
+  document.getElementById("lump-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runLump();
+  });
+  ["m-amount", "m-rate", "m-years"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runMonthly);
+  });
+  ["l-amount", "l-rate", "l-years"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runLump);
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var monthlyBox = document.getElementById("adv-monthly-result");
+  var advBox = document.getElementById("adv-result");
+  var MAN = 10000;
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
+  }
+  function readCommon() {
+    var target = parseFloat(document.getElementById("adv-target").value);
+    var rate = parseFloat(document.getElementById("adv-rate").value);
+    if (isNaN(target) || isNaN(rate)) return null;
+    return { target: target * MAN, rate: rate };
+  }
+  var ADV_MSG = {
+    invalid_target: "Enter a target amount between 10 and 1,000,000 man-yen (100,000 to 10,000,000,000 yen).",
+    invalid_rate: "Enter an assumed return between 0 and 30%.",
+    invalid_years: "Enter a whole number of saving years between 1 and 50.",
+    invalid_monthly: "Enter a monthly contribution between 1,000 and 10,000,000 yen.",
+    too_long: "With these settings you do not reach the target even after 50 years. Try a larger contribution or a higher return."
+  };
+  function runRequired() {
+    var c = readCommon();
+    var years = parseFloat(document.getElementById("adv-years").value);
+    if (!c || isNaN(years)) { showError(monthlyBox, "Enter the target amount, the assumed return and the saving period."); return; }
+    var r = CompoundCalc.requiredMonthly(c.target, c.rate, years);
+    if (!r.ok) { showError(monthlyBox, ADV_MSG[r.code] || "Check the entered values."); return; }
+    monthlyBox.innerHTML =
+      '<div class="result-main">' + r.monthly.toLocaleString() + " yen a month</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>Total contributions</td><td>" + r.totalDeposit.toLocaleString() + " yen</td></tr>" +
+      "<tr><td>Gains (target minus contributions)</td><td>" + r.profit.toLocaleString() + " yen</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">An approximation before tax and fees, assuming the return stays constant.</p>';
+    monthlyBox.hidden = false;
+  }
+  function runWhen() {
+    var c = readCommon();
+    var monthly = parseFloat(document.getElementById("adv-monthly").value);
+    if (!c || isNaN(monthly)) { showError(advBox, "Enter the target amount, the assumed return and the monthly contribution."); return; }
+    var r = CompoundCalc.yearsToTarget(monthly, c.rate, c.target);
+    if (!r.ok) { showError(advBox, ADV_MSG[r.code] || "Check the entered values."); return; }
+    var label = r.years > 0 ? r.years + " years" + (r.remMonths > 0 ? " " + r.remMonths + " months" : "") : r.remMonths + " months";
+    advBox.innerHTML =
+      '<div class="result-main">Reached in about ' + label + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>Number of contributions</td><td>" + r.months.toLocaleString() + "</td></tr>" +
+      "<tr><td>Value at that point</td><td>About " + r.futureValue.toLocaleString() + " yen</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">An approximation before tax and fees, assuming the return stays constant.</p>';
+    advBox.hidden = false;
+  }
+  function maybeRunRequired() {
+    if (readCommon() && document.getElementById("adv-years").value !== "") runRequired();
+  }
+  function maybeRunWhen() {
+    if (readCommon() && document.getElementById("adv-monthly").value !== "") runWhen();
+  }
+  document.getElementById("adv-monthly-run").addEventListener("click", runRequired);
+  document.getElementById("adv-when-run").addEventListener("click", runWhen);
+  ["adv-target", "adv-rate"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      maybeRunRequired();
+      maybeRunWhen();
+    });
+  });
+  document.getElementById("adv-years").addEventListener("input", maybeRunRequired);
+  document.getElementById("adv-monthly").addEventListener("input", maybeRunWhen);
+})();
+</script>
+</body>
+</html>

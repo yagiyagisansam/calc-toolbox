@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Prorated Rent (Hiwari) Calculator for Japan — Move-in / Move-out | Quick Calc</title>
+  <meta name="description" content="Moving into or out of a Japanese rental mid-month? Calculate the prorated (hiwari) rent by both common methods — actual days in the month and the fixed 30-day method — and total your initial costs including shikikin and reikin. Free and instant.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/hiwari/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Prorated Rent (Hiwari) Calculator for Japan — Move-in / Move-out | Quick Calc">
+  <meta property="og:description" content="Moving into or out of a Japanese rental mid-month? Calculate the prorated (hiwari) rent by both common methods — actual days in the month and the fixed 30-day method — and total your initial costs including shikikin and reikin. Free and instant.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/hiwari/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Prorated Rent (Hiwari) Calculator","item":"https://quick-calc.site/en/tools/hiwari/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/hiwari/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/hiwari/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/hiwari/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/hiwari/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/hiwari/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Prorated Rent (Hiwari) Calculator</h1>
+  <form class="tool-form" id="hiwari-form">
+    <label>Monthly rent (yen)
+      <span class="field-note">If common-service or management fees are also prorated, enter the combined amount</span>
+      <input type="number" id="rent" inputmode="numeric" min="1" max="10000000" step="1" required placeholder="e.g. 80000">
+    </label>
+    <label>Move-in or move-out
+      <select id="mode">
+        <option value="movein" selected>Move-in (pay from the move-in date to the end of the month)</option>
+        <option value="moveout">Move-out (pay from the 1st to the move-out date)</option>
+      </select>
+    </label>
+    <div class="field-row">
+      <label><span id="date-label">Move-in date</span> (year)
+        <select id="date-year"></select>
+      </label>
+      <label>Month
+        <select id="date-month"></select>
+      </label>
+      <label>Day
+        <select id="date-day"></select>
+      </label>
+    </div>
+    <button type="submit">Calculate the prorated rent</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: total your initial move-in costs</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Get the total upfront payment including shikikin and reikin</h3>
+      <p class="adv-note">Enter the deposit and fees as “months of rent”, as written in your contract or quote (the rent and move-in date come from the form above; proration uses the actual-days method).</p>
+      <label>Security deposit — shikikin (months of rent)
+        <input type="number" id="adv-shikikin" inputmode="decimal" step="any" min="0" max="12" value="1">
+      </label>
+      <label>Key money — reikin (months of rent)
+        <input type="number" id="adv-reikin" inputmode="decimal" step="any" min="0" max="12" value="1">
+      </label>
+      <label>Agency fee (months of rent)
+        <span class="field-note">Capped at one month’s rent plus consumption tax — enter 1.1 if tax is included</span>
+        <input type="number" id="adv-chukai" inputmode="decimal" step="any" min="0" max="12" value="1">
+      </label>
+      <label>Advance rent (months)
+        <span class="field-note">Enter 1 if the next month’s rent is paid up front</span>
+        <input type="number" id="adv-mae" inputmode="decimal" step="any" min="0" max="12" value="1">
+      </label>
+      <label>Other costs (yen)
+        <span class="field-note">Guarantor-company fee, fire insurance, key exchange and so on; 0 if none</span>
+        <input type="number" id="adv-other" inputmode="numeric" step="1" min="0" max="10000000" value="0">
+      </label>
+      <button type="button" id="adv-run">Calculate the total initial cost</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    Which method applies (including how fractions of a yen are rounded) is <strong>determined by your lease agreement</strong>. This tool rounds down to the whole yen. For the exact amount, check with the management company or landlord.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>When you move into or out of a rental in Japan partway through a month, that month’s rent is prorated — <strong>hiwari</strong> in Japanese. This tool shows the two methods commonly used in Japanese leases side by side (dividing by the actual days of the month, or by a fixed 30 days), and can also total your initial move-in costs including Japan-specific fees such as shikikin (security deposit) and reikin (key money). Use it to check the figures on your contract or quote.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter the monthly rent (add the common-service fee if it is prorated too).</li>
+    <li>Choose move-in or move-out and pick the date (today’s date is preset).</li>
+    <li>The prorated amounts by both methods appear side by side the moment you choose. No button needed.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Actual-days method: prorated rent = monthly rent × days charged ÷ days in that month</strong> (28–31)</li>
+    <li><strong>Fixed 30-day method: prorated rent = monthly rent × days charged ÷ 30</strong> (always divided by 30 regardless of the month’s length)</li>
+    <li>For a move-in, the days charged run from the move-in date to the end of the month; for a move-out, from the 1st to the move-out date.</li>
+    <li>Example: rent 80,000 yen, moving in on July 20 (July has 31 days) → 12 days charged. Actual-days method: 80,000 × 12 ÷ 31 = <strong>30,967 yen</strong> / 30-day method: 80,000 × 12 ÷ 30 = <strong>32,000 yen</strong></li>
+    <li>If the 30-day method would exceed the monthly rent, it is capped at the monthly rent.</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>This is plain arithmetic. The proration method and rounding are not standardized by law in Japan — they follow the individual lease agreement.</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>February (28/29 days) shows the biggest gap between the methods. With the actual-days method the per-day price is higher in February and lower in 31-day months.</li>
+    <li>On top of the move-in month’s prorated rent, you are usually asked to pay the following month’s rent in advance as part of the initial costs. Plan your budget with both together.</li>
+    <li>For move-outs, some contracts do not prorate at all and charge the full month (for example with a one-month-notice clause).</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">Which is more common, the actual-days method or the 30-day method?</h3>
+  <p class="faq-a">Both are widely used in Japan. The rent-proration clause in your lease takes priority; if there is no such clause, ask the management company.</p>
+  <h3 class="faq-q">Are common-service and management fees prorated too?</h3>
+  <p class="faq-a">It depends on the contract. Many leases prorate them the same way as rent, but some charge the full amount. If they are prorated, calculate with the rent and fees combined.</p>
+  <h3 class="faq-q">Which move-in date works out cheapest?</h3>
+  <p class="faq-a">With a prorating contract, the closer your move-in date is to the start of the month, the more “prorated rent + advance rent” you pay up front; the closer to the end, the less. To be sure, compare including any free-rent period and the overlap with rent on the place you are leaving.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/hiwari/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/hiwari/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/hiwari/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=hiwari">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/hiwari/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var today = new Date();
+  var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  var ERROR_MESSAGES = {
+    invalid_rent: "Enter a monthly rent of at least 1 yen.",
+    invalid_date: "Enter a valid date.",
+    invalid_mode: "Choose move-in or move-out."
+  };
+  function fillSelect(el, from, to, selected, texts) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + (texts ? texts[v - from] : v) + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, Math.min(keep, max));
+  }
+  fillSelect(document.getElementById("date-year"), today.getFullYear() - 10, today.getFullYear() + 10, today.getFullYear());
+  fillSelect(document.getElementById("date-month"), 1, 12, today.getMonth() + 1, MONTHS);
+  fillSelect(document.getElementById("date-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), today.getDate());
+  function pad2(n) { return n < 10 ? "0" + n : String(n); }
+  function selectedIso() {
+    adjustDays("date-year", "date-month", "date-day");
+    return val("date-year") + "-" + pad2(val("date-month")) + "-" + pad2(val("date-day"));
+  }
+  function run(showErrors) {
+    var rentRaw = document.getElementById("rent").value;
+    if (rentRaw === "") {
+      if (showErrors) {
+        box.innerHTML = '<p class="result-error">' + ERROR_MESSAGES.invalid_rent + "</p>";
+        box.hidden = false;
+      } else {
+        box.hidden = true;
+      }
+      return;
+    }
+    var rent = parseInt(rentRaw, 10);
+    var mode = document.getElementById("mode").value;
+    var r = HiwariCalc.prorate(rent, selectedIso(), mode);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "Check the entered values.") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">Actual-days method: ' + r.actual.toLocaleString() + " yen</div>" +
+      "<p>Days charged: " + r.days + " (this month has " + r.daysInMonth + " days)</p>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Method</th><th>Calculation</th><th>Prorated rent</th></tr></thead><tbody>' +
+      "<tr><td>Actual days</td><td>monthly rent × " + r.days + " ÷ " + r.daysInMonth + "</td><td><strong>" + r.actual.toLocaleString() + " yen</strong></td></tr>" +
+      "<tr><td>Fixed 30 days</td><td>monthly rent × " + r.days + " ÷ 30</td><td><strong>" + r.by30.toLocaleString() + " yen</strong></td></tr>" +
+      "</tbody></table></div>" +
+      "<p>Rounded down to the whole yen. Check your lease to see which method applies.</p>";
+    box.hidden = false;
+  }
+  document.getElementById("mode").addEventListener("change", function () {
+    document.getElementById("date-label").textContent =
+      document.getElementById("mode").value === "movein" ? "Move-in date" : "Move-out date";
+    run(false);
+  });
+  ["date-year", "date-month", "date-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", function () { run(false); });
+  });
+  document.getElementById("rent").addEventListener("input", function () { run(false); });
+  document.getElementById("hiwari-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+  window.HiwariPage = { selectedIso: selectedIso, rerun: run };
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var ADV_ERRORS = {
+    invalid_rent: "Enter the monthly rent (form above) between 1 and 10,000,000 yen.",
+    invalid_date: "Enter the move-in date (form above).",
+    invalid_months: "Enter the months for the deposit, key money and the like between 0 and 12.",
+    invalid_other: "Enter other costs between 0 and 10,000,000 yen."
+  };
+  function runAdv() {
+    var rent = parseFloat(document.getElementById("rent").value);
+    var iso = window.HiwariPage.selectedIso();
+    function monthVal(id) {
+      var v = parseFloat(document.getElementById(id).value);
+      return isNaN(v) ? 0 : v;
+    }
+    var other = parseFloat(document.getElementById("adv-other").value);
+    if (isNaN(other)) other = 0;
+    var r = HiwariCalc.initialCost(rent, iso,
+      monthVal("adv-shikikin"), monthVal("adv-reikin"),
+      monthVal("adv-chukai"), monthVal("adv-mae"), other);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + (ADV_ERRORS[r.code] || "Check the entered values.") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">Total initial cost: about ' + r.total.toLocaleString() + ' yen</div>' +
+      '<p>That is about <strong>' + r.monthsOfRent.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' months of rent</strong>.</p>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>Prorated rent (' + r.days + ' days)</td><td>' + r.prorated.toLocaleString() + ' yen</td></tr>' +
+      '<tr><td>Security deposit (shikikin)</td><td>' + r.shikikin.toLocaleString() + ' yen</td></tr>' +
+      '<tr><td>Key money (reikin)</td><td>' + r.reikin.toLocaleString() + ' yen</td></tr>' +
+      '<tr><td>Agency fee</td><td>' + r.chukai.toLocaleString() + ' yen</td></tr>' +
+      '<tr><td>Advance rent</td><td>' + r.maeYachin.toLocaleString() + ' yen</td></tr>' +
+      '<tr><td>Other</td><td>' + r.other.toLocaleString() + ' yen</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">If your contract prorates with the fixed 30-day method, the total changes by the difference from the 30-day figure in the form above. Check your contract or quote for the exact amounts.</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", runAdv);
+  function autoAdv() {
+    if (document.getElementById("rent").value !== "") { runAdv(); } else { advBox.hidden = true; }
+  }
+  ["adv-shikikin", "adv-reikin", "adv-chukai", "adv-mae", "adv-other"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", autoAdv);
+  });
+  ["rent"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { if (!advBox.hidden) autoAdv(); });
+  });
+  ["date-year", "date-month", "date-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", function () { if (!advBox.hidden) autoAdv(); });
+  });
+})();
+</script>
+</body>
+</html>

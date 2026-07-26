@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>염분량 계산기(나트륨⇔식염상당량 환산) | Quick Calc</title>
+  <meta name="description" content="식품 표시의 나트륨(mg)을 식염상당량(g)으로 한 번에 환산, 무료. 하루 목표량(남성 7.5g·여성 6.5g 미만) 대비 비율도 표시합니다. 환산 계수는 일본 식품표시기준 준거. 저염·건강 관리에.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/shio/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="염분량 계산기(나트륨⇔식염상당량 환산) | Quick Calc">
+  <meta property="og:description" content="식품 표시의 나트륨(mg)을 식염상당량(g)으로 한 번에 환산, 무료. 하루 목표량(남성 7.5g·여성 6.5g 미만) 대비 비율도 표시합니다. 환산 계수는 일본 식품표시기준 준거. 저염·건강 관리에.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/shio/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"염분량 계산기(나트륨⇔식염상당량 환산)","item":"https://quick-calc.site/ko/tools/shio/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/shio/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/shio/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/shio/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/shio/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/shio/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>염분량 계산기(나트륨⇔식염상당량)</h1>
+  <form class="tool-form" id="shio-form">
+    <label>환산 방향
+      <select id="mode">
+        <option value="toSalt" selected>나트륨(mg)→ 식염상당량(g)</option>
+        <option value="toSodium">식염상당량(g)→ 나트륨(mg)</option>
+      </select>
+    </label>
+    <label id="value-label">나트륨량(mg)
+      <span class="field-note">숫자를 입력하면 바로 아래에 결과가 표시됩니다</span>
+      <input type="number" id="value" inputmode="decimal" min="0" step="any" required placeholder="예: 1200">
+    </label>
+    <button type="submit">환산하기</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 실제 먹는 양의 염분과 하루 합계 관리</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">「100g당」 표시에서 실제 먹는 양의 염분 계산</h3>
+      <p class="adv-note">영양성분 표시가 「100g당」인 식품에서, 실제 먹는 양에 들어 있는 식염상당량을 계산합니다.</p>
+      <label>100g당 식염상당량(g)
+        <input type="number" id="adv-per100" inputmode="decimal" min="0.01" max="100" step="any" placeholder="예: 1.4">
+      </label>
+      <label>실제 먹는 양(g)
+        <input type="number" id="adv-grams" inputmode="decimal" min="1" max="5000" step="any" placeholder="예: 250">
+      </label>
+      <button type="button" id="adv-portion-run">먹는 양의 염분 계산하기</button>
+      <h3 class="adv-h">하루 염분 합계 관리하기</h3>
+      <p class="adv-note">오늘 먹은 것(최대 6건)의 식염상당량(g)을 입력하면 합계와 하루 목표량까지 남은 양을 계산합니다.</p>
+      <div id="adv-rows">
+        <label>식품1 <span style="display:flex;gap:.5em;align-items:center;">
+          <input type="text" id="adv-name-1" placeholder="예: 미소된장국" style="flex:1;">
+          <input type="number" inputmode="decimal" id="adv-salt-1" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="식염상당량(g)"> g
+        </span></label>
+        <label>식품2 <span style="display:flex;gap:.5em;align-items:center;">
+          <input type="text" id="adv-name-2" placeholder="예: 자반연어" style="flex:1;">
+          <input type="number" inputmode="decimal" id="adv-salt-2" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="식염상당량(g)"> g
+        </span></label>
+        <label>식품3 <span style="display:flex;gap:.5em;align-items:center;">
+          <input type="text" id="adv-name-3" style="flex:1;">
+          <input type="number" inputmode="decimal" id="adv-salt-3" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="식염상당량(g)"> g
+        </span></label>
+        <label>식품4 <span style="display:flex;gap:.5em;align-items:center;">
+          <input type="text" id="adv-name-4" style="flex:1;">
+          <input type="number" inputmode="decimal" id="adv-salt-4" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="식염상당량(g)"> g
+        </span></label>
+        <label>식품5 <span style="display:flex;gap:.5em;align-items:center;">
+          <input type="text" id="adv-name-5" style="flex:1;">
+          <input type="number" inputmode="decimal" id="adv-salt-5" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="식염상당량(g)"> g
+        </span></label>
+        <label>식품6 <span style="display:flex;gap:.5em;align-items:center;">
+          <input type="text" id="adv-name-6" style="flex:1;">
+          <input type="number" inputmode="decimal" id="adv-salt-6" min="0" max="100" step="any" placeholder="g" style="width:6em;" aria-label="식염상당량(g)"> g
+        </span></label>
+      </div>
+      <label>성별(목표량 구분)
+        <select id="adv-sex">
+          <option value="male">남성(7.5g 미만)</option>
+          <option value="female">여성(6.5g 미만)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-run">합계 계산하기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>식품 포장에 적힌 「나트륨 〇mg」이 <strong>소금 몇 g에 해당하는지</strong> 바로 알 수 있는 도구입니다. 하루 목표량(남성 7.5g·여성 6.5g 미만)의 몇 %인지도 동시에 표시합니다. 환산 계수와 목표량은 <strong>일본의 식품 표시·건강 지도에 쓰이는 일본 기준</strong>이라, 일본에서 산 식품의 라벨을 읽거나 저염 식품을 고를 때 편리합니다.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>식품 포장의 영양성분 표시에서 「나트륨」의 양(mg)을 확인합니다.</li>
+    <li>숫자를 입력하는 동시에 식염상당량(g)과 하루 목표량 대비 비율이 아래에 표시됩니다. 버튼은 누를 필요 없습니다.</li>
+    <li>「식염상당량→나트륨」의 역환산도 드롭다운에서 선택할 수 있습니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>식염상당량(g)= 나트륨(mg)× 2.54 ÷ 1000</strong></li>
+    <li>계수 2.54는 소금(NaCl)의 분자량 58.5를 나트륨의 원자량 23으로 나눈 값으로, 일본 식품표시기준에 정해져 있습니다.</li>
+    <li>계산 예: 나트륨 1,200mg → 1,200 × 2.54 ÷ 1000 = <strong>약 3.0g</strong>(식염상당량)</li>
+    <li>일본의 하루 목표량(식염상당량)은 성인 남성 7.5g 미만·성인 여성 6.5g 미만입니다.</li>
+  </ul>
+
+  <h3>출처(1차 정보)</h3>
+  <ul class="sources">
+    <li>환산 계수(2.54): <a href="https://elaws.e-gov.go.jp/document?lawid=427M60000002010" target="_blank" rel="noopener">식품표시기준(2015년 내각부령 제10호)</a>(일본어)</li>
+    <li>하루 목표량: <a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/kenkou/eiyou/syokuji_kijyun.html" target="_blank" rel="noopener">일본 후생노동성 「일본인의 식사섭취기준」</a>(일본어)(성인 식염상당량 목표량: 남성 하루 7.5g 미만·여성 하루 6.5g 미만)</li>
+  </ul>
+
+  <h2>전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>일본의 현행 영양성분 표시는 「식염상당량」으로 적는 것이 기본이지만, 오래된 표시나 수입 식품에는 「나트륨」 표기가 남아 있습니다.</li>
+    <li>고혈압·신장병 등으로 의사에게 염분 제한을 받고 있는 분은 지시받은 수치를 우선해 주세요.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">나트륨과 소금은 같은 것인가요?</h3>
+  <p class="faq-a">다릅니다. 소금(염화나트륨)은 나트륨과 염소의 화합물로, 무게로 치면 나트륨은 소금의 약 40%입니다. 그래서 나트륨 표기의 수치는 식염상당량보다 작아 보입니다. 「나트륨 400mg」은 소금 약 1g입니다.</p>
+  <h3 class="faq-q">컵라면 1개로 하루 염분을 얼마나 섭취하나요?</h3>
+  <p class="faq-a">제품에 따라 다르지만, 국물까지 마시면 식염상당량 5g 전후인 제품이 많아 성인 여성의 하루 목표량(6.5g 미만)의 80% 가까이에 이르기도 합니다. 국물을 남기면 20〜30% 줄일 수 있습니다.</p>
+  <h3 class="faq-q">WHO 권장량과는 다른가요?</h3>
+  <p class="faq-a">WHO(세계보건기구)는 성인 하루 5g 미만을 권장하며, 일본의 목표량(남성 7.5g·여성 6.5g 미만)보다 엄격한 값입니다. 일본의 목표량은 현재 식생활에서의 실현 가능성을 고려해 설정된 것입니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/shio/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/shio/" lang="en" hreflang="en">English</a><a href="/zh/tools/shio/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=shio">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/shio/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var label = document.getElementById("value-label");
+  var input = document.getElementById("value");
+  mode.addEventListener("change", function () {
+    var toSalt = mode.value === "toSalt";
+    label.childNodes[0].textContent = toSalt ? "나트륨량(mg)" : "식염상당량(g)";
+    input.placeholder = toSalt ? "예: 1200" : "예: 3";
+    run(false);
+  });
+  function run(fromSubmit) {
+    if (input.value === "") {
+      if (!fromSubmit) { box.hidden = true; return; }
+      box.innerHTML = '<p class="result-error">숫자를 입력해 주세요.</p>';
+      box.hidden = false;
+      return;
+    }
+    var v = parseFloat(input.value);
+    if (mode.value === "toSalt") {
+      var r = ShioCalc.toSalt(v);
+      if (!r.ok) {
+        box.innerHTML = '<p class="result-error">나트륨량은 0보다 큰 값으로 입력해 주세요.</p>';
+        box.hidden = false;
+        return;
+      }
+      box.innerHTML =
+        '<div class="result-main">식염상당량 약 ' + r.saltG.toLocaleString() + " g</div>" +
+        "<p>하루 목표량 대비: 성인 남성(7.5g 미만)의 <strong>" + r.pctMale + "%</strong> / 성인 여성(6.5g 미만)의 <strong>" + r.pctFemale + "%</strong></p>";
+    } else {
+      var r2 = ShioCalc.toSodium(v);
+      if (!r2.ok) {
+        box.innerHTML = '<p class="result-error">식염상당량은 0보다 큰 값으로 입력해 주세요(100g 이하).</p>';
+        box.hidden = false;
+        return;
+      }
+      box.innerHTML = '<div class="result-main">나트륨 약 ' + r2.sodiumMg.toLocaleString() + " mg</div>";
+    }
+    box.hidden = false;
+  }
+  document.getElementById("shio-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+  input.addEventListener("input", function () { run(false); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function runPortion(fromButton) {
+    if (!fromButton &&
+        (document.getElementById("adv-per100").value === "" ||
+         document.getElementById("adv-grams").value === "")) { return; }
+    var per = parseFloat(document.getElementById("adv-per100").value);
+    var g = parseFloat(document.getElementById("adv-grams").value);
+    var r = ShioCalc.portionSalt(per, g);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">100g당 식염상당량(0〜100g)과 먹는 양(1〜5000g)을 숫자로 입력해 주세요.</p>';
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">식염상당량 ' + r.saltG.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' g</div>' +
+      "<p>" + g.toLocaleString() + "g을 먹으면 식염상당량은 <strong>" +
+      r.saltG.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " g</strong>. " +
+      "하루 목표량 대비 남성(7.5g 미만)의 " + r.pctMale.toLocaleString() + "% / 여성(6.5g 미만)의 " +
+      r.pctFemale.toLocaleString() + "%입니다.</p>";
+    advBox.hidden = false;
+  }
+  function runAdvTotal(fromButton) {
+    var items = [];
+    for (var i = 1; i <= 6; i++) {
+      var raw = document.getElementById("adv-salt-" + i).value;
+      if (raw === "") continue;
+      var g = parseFloat(raw);
+      var name = document.getElementById("adv-name-" + i).value || ("식품" + i);
+      items.push({ name: name, salt: g });
+    }
+    if (items.length === 0) {
+      if (!fromButton) { return; }
+      advBox.innerHTML = '<p class="result-error">식염상당량(g)을 1건 이상 입력해 주세요.</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var sex = document.getElementById("adv-sex").value;
+    var r = ShioCalc.dailyTotal(items, sex);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">식염상당량은 0〜100g의 숫자로 입력해 주세요.</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var html = '<div class="result-main">합계 ' +
+      r.totalG.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' g(목표량의 ' + r.pct.toLocaleString() + '%)</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>식품</th><th>식염상당량</th></tr></thead><tbody>';
+    for (var j = 0; j < items.length; j++) {
+      html += "<tr><td>" + items[j].name.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") +
+        "</td><td>" + items[j].salt.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " g</td></tr>";
+    }
+    html += "</tbody></table></div>";
+    if (r.over) {
+      html += '<p class="result-error">목표량(' + r.targetG + 'g 미만)을 ' +
+        Math.abs(r.remainingG).toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' g 초과했습니다.</p>';
+    } else {
+      html += "<p>목표량(" + r.targetG + "g 미만)까지 앞으로 <strong>" +
+        r.remainingG.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " g</strong> 남았습니다.</p>";
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-portion-run").addEventListener("click", function () { runPortion(true); });
+  document.getElementById("adv-run").addEventListener("click", function () { runAdvTotal(true); });
+  ["adv-per100", "adv-grams"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runPortion(false); });
+  });
+  for (var i = 1; i <= 6; i++) {
+    document.getElementById("adv-salt-" + i).addEventListener("input", function () { runAdvTotal(false); });
+    document.getElementById("adv-name-" + i).addEventListener("input", function () { runAdvTotal(false); });
+  }
+  document.getElementById("adv-sex").addEventListener("change", function () { runAdvTotal(false); });
+})();
+</script>
+</body>
+</html>

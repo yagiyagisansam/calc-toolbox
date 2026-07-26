@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>전각⇔반각 변환 도구(영숫자·기호·공백) | Quick Calc</title>
+  <meta name="description" content="전각 영숫자·기호·공백을 한 번에 반각으로 변환합니다(반대 방향도 가능). 일본 양식에서 「반각으로 입력해 주세요」라는 말을 들었을 때나, 명부·주소록의 표기를 통일할 때 붙여넣기만 하면 변환됩니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/zenkaku/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="전각⇔반각 변환 도구(영숫자·기호·공백) | Quick Calc">
+  <meta property="og:description" content="전각 영숫자·기호·공백을 한 번에 반각으로 변환합니다(반대 방향도 가능). 일본 양식에서 「반각으로 입력해 주세요」라는 말을 들었을 때나, 명부·주소록의 표기를 통일할 때 붙여넣기만 하면 변환됩니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/zenkaku/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"전각⇔반각 변환 도구(영숫자·기호·공백)","item":"https://quick-calc.site/ko/tools/zenkaku/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/zenkaku/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/zenkaku/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/zenkaku/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/zenkaku/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/zenkaku/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>전각⇔반각 변환 도구</h1>
+  <form class="tool-form" id="zenkaku-form">
+    <label>변환 방향
+      <select id="mode">
+        <option value="toHankaku" selected>전각 → 반각(영숫자·기호·공백)</option>
+        <option value="toZenkaku">반각 → 전각</option>
+      </select>
+    </label>
+    <label>텍스트
+      <span class="field-note">붙여넣으면 바로 아래에 변환 결과가 표시됩니다</span>
+      <textarea id="text" rows="5" placeholder="예: TEL:03-1234-5678"></textarea>
+    </label>
+    <button type="submit">변환하기</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 종류를 골라 변환·전각 혼입 검사</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">변환할 문자 종류 고르기</h3>
+      <p class="adv-note">「숫자만 반각으로 바꾸고 싶다」처럼 변환할 종류를 고를 수 있습니다(가타카나를 선택하면 반각 가나 ｱｲｳ와의 상호 변환도 가능합니다).</p>
+      <label>변환 방향
+        <select id="adv-mode">
+          <option value="toHankaku" selected>전각 → 반각</option>
+          <option value="toZenkaku">반각 → 전각</option>
+        </select>
+      </label>
+      <fieldset style="border:1px solid var(--color-border);border-radius:8px;padding:8px 12px;">
+        <legend>변환할 종류</legend>
+        <label style="display:inline-block;margin-right:12px;"><input type="checkbox" id="adv-alnum" checked> 영숫자</label>
+        <label style="display:inline-block;margin-right:12px;"><input type="checkbox" id="adv-kana"> 가타카나</label>
+        <label style="display:inline-block;margin-right:12px;"><input type="checkbox" id="adv-symbol" checked> 기호</label>
+        <label style="display:inline-block;"><input type="checkbox" id="adv-space" checked> 공백</label>
+      </fieldset>
+      <label>텍스트
+        <textarea id="adv-text" rows="5" placeholder="예: 회원번호Ａ１２３(가나: ｽｽﾞｷ)"></textarea>
+      </label>
+      <button type="button" id="adv-run">고른 종류만 변환하기</button>
+      <div class="tool-result" id="adv-sel-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">전각 문자·반각 가나가 섞여 있는지 검사</h3>
+      <p class="adv-note">위 「텍스트」 칸의 내용을 검사해, 섞여 있는 전각 영숫자·전각 기호·전각 공백·반각 가나의 위치를 목록으로 보여 줍니다.</p>
+      <button type="button" id="adv-check-run">위 텍스트 칸 검사하기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 할 수 있는 것</span><p>전각(全角)은 일본어 입력기에서 나오는 폭이 넓은 문자(ＡＢＣ１２３), 반각(半角)은 보통 폭의 문자(ABC123)로, 겉모습은 비슷해도 컴퓨터에서는 서로 완전히 다른 문자입니다. 이 도구는 붙여넣기만 하면 <strong>전각 영숫자·기호·공백을 반각으로 통일</strong>해 줍니다(반각에서 전각으로 되돌리는 것도 가능). 히라가나·가타카나·한자는 그대로 남습니다. 일본에서 「반각으로 입력해 주세요」라고 요구하는 신청 양식이나, 주소록·명부의 표기를 맞출 때 사용해 보세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>변환 방향(전각→반각 / 반각→전각)을 고릅니다.</li>
+    <li>텍스트를 붙여넣으면 그 순간 변환 결과가 표시됩니다. 버튼은 누를 필요 없습니다.</li>
+    <li>변환 결과의 「복사」 버튼으로 복사해 다시 붙여넣으세요.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li>전각 영숫자·기호(Ａ〜／, ！〜～)와 반각은 유니코드에서 규칙적으로 대응합니다(차이 0xFEE0). 이 대응 관계에 따라 한 글자씩 변환합니다.</li>
+    <li>전각 공백(U+3000) ⇔ 반각 공백(U+0020)도 변환합니다.</li>
+    <li>히라가나·가타카나·한자는 건드리지 않습니다(메인 폼에서는 이른바 반각 가나로의 변환을 하지 않습니다).</li>
+  </ul>
+
+  <h3>출처·전제</h3>
+  <ul class="sources">
+    <li>유니코드의 전각형·반각형(Halfwidth and Fullwidth Forms) 대응 관계에 따른 기계적인 변환입니다.</li>
+  </ul>
+
+  <h2>계산의 전제와 주의</h2>
+  <ul class="cautions">
+    <li>메인 폼은 반각 가나(ｱｲｳ) → 전각 가타카나 변환을 지원하지 않습니다.</li>
+    <li>주소나 이름 등, 제출처가 전각을 요구하는 항목도 있습니다. 양식의 지정에 맞춰 사용해 주세요.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">왜 일본 양식에서는 「반각으로 입력」하라고 하나요?</h3>
+  <p class="faq-a">시스템 내부에서 숫자나 영문자로 처리하기 위해서입니다. 전각 「１２３」은 겉모습은 비슷해도 다른 문자이므로, 그대로는 숫자로 다뤄지지 않는 경우가 있습니다.</p>
+  <h3 class="faq-q">가타카나도 반각(ｶﾀｶﾅ)으로 바꿀 수 있나요?</h3>
+  <p class="faq-a">메인 폼은 지원하지 않습니다. 반각 가나는 글자 깨짐의 원인이 되기 쉬워 현재는 사용을 피하는 것이 일반적이기 때문입니다(은행권 양식 등 특수한 경우 제외). 꼭 필요하면 「＋상세 기능」에서 「가타카나」를 체크하세요.</p>
+  <h3 class="faq-q">붙여넣은 내용이 전송되지는 않나요?</h3>
+  <p class="faq-a">전송되지 않습니다. 변환은 모두 사용 중인 기기 안에서 이루어집니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/zenkaku/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/zenkaku/" lang="en" hreflang="en">English</a><a href="/zh/tools/zenkaku/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=zenkaku">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/zenkaku/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var textEl = document.getElementById("text");
+  function run() {
+    if (textEl.value === "") { box.hidden = true; return; }
+    var mode = document.getElementById("mode").value;
+    var r = ZenkakuCalc[mode](textEl.value);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">텍스트가 너무 깁니다(10만 자까지).</p>';
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<p>변환 결과(' + r.changed.toLocaleString() + '자 변환):</p>' +
+      '<textarea id="out" rows="5" style="width:100%;font-size:1rem;padding:10px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-bg);color:var(--color-text);" readonly></textarea>' +
+      '<p><button type="button" id="copy-btn" style="font-size:0.95rem;padding:8px 16px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-bg);color:var(--color-text);cursor:pointer;">복사</button> <span id="copy-done"></span></p>';
+    document.getElementById("out").value = r.text;
+    document.getElementById("copy-btn").addEventListener("click", function () {
+      navigator.clipboard.writeText(r.text).then(function () {
+        document.getElementById("copy-done").textContent = "복사했습니다";
+      });
+    });
+    box.hidden = false;
+  }
+  textEl.addEventListener("input", run);
+  document.getElementById("mode").addEventListener("change", run);
+  document.getElementById("zenkaku-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var selBox = document.getElementById("adv-sel-result");
+  var TYPE_LABEL = { zen_alnum: "전각 영숫자", zen_symbol: "전각 기호", zen_space: "전각 공백", han_kana: "반각 가나" };
+  function runSel() {
+    if (document.getElementById("adv-text").value === "") { selBox.hidden = true; return; }
+    var targets = {
+      alnum: document.getElementById("adv-alnum").checked,
+      kana: document.getElementById("adv-kana").checked,
+      symbol: document.getElementById("adv-symbol").checked,
+      space: document.getElementById("adv-space").checked
+    };
+    var mode = document.getElementById("adv-mode").value;
+    var r = ZenkakuCalc.convertSelective(document.getElementById("adv-text").value, mode, targets);
+    if (!r.ok) {
+      selBox.innerHTML = '<p class="result-error">텍스트가 너무 깁니다(10만 자까지).</p>';
+      selBox.hidden = false;
+      return;
+    }
+    selBox.innerHTML =
+      '<p>변환 결과(' + r.changed.toLocaleString() + '자 변환):</p>' +
+      '<textarea id="adv-out" rows="5" style="width:100%;font-size:1rem;padding:10px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-bg);color:var(--color-text);" readonly></textarea>' +
+      '<p><button type="button" id="adv-copy" style="font-size:0.95rem;padding:8px 16px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-bg);color:var(--color-text);cursor:pointer;">복사</button> <span id="adv-copy-done"></span></p>';
+    document.getElementById("adv-out").value = r.text;
+    document.getElementById("adv-copy").addEventListener("click", function () {
+      navigator.clipboard.writeText(r.text).then(function () {
+        document.getElementById("adv-copy-done").textContent = "복사했습니다";
+      });
+    });
+    selBox.hidden = false;
+  }
+  document.getElementById("adv-text").addEventListener("input", runSel);
+  document.getElementById("adv-mode").addEventListener("change", runSel);
+  ["adv-alnum", "adv-kana", "adv-symbol", "adv-space"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runSel);
+  });
+  document.getElementById("adv-run").addEventListener("click", runSel);
+  function runCheck() {
+    var r = ZenkakuCalc.findMixed(document.getElementById("text").value);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">텍스트가 너무 깁니다(10만 자까지).</p>';
+      advBox.hidden = false;
+      return;
+    }
+    if (r.total === 0) {
+      advBox.innerHTML = '<div class="result-main">전각 문자·반각 가나는 발견되지 않았습니다</div>';
+      advBox.hidden = false;
+      return;
+    }
+    var rows = r.items.map(function (it) {
+      return "<tr><td>" + (it.index + 1).toLocaleString() + " 번째 글자</td><td>「" + it.ch + "」</td><td>" + TYPE_LABEL[it.type] + "</td></tr>";
+    }).join("");
+    advBox.innerHTML =
+      '<div class="result-main">' + r.total.toLocaleString() + ' 자 발견되었습니다</div>' +
+      '<p>내역: 전각 영숫자 ' + r.counts.zen_alnum.toLocaleString() + ' / 전각 기호 ' + r.counts.zen_symbol.toLocaleString() +
+      ' / 전각 공백 ' + r.counts.zen_space.toLocaleString() + ' / 반각 가나 ' + r.counts.han_kana.toLocaleString() + '</p>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>위치</th><th>문자</th><th>종류</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      (r.total > 50 ? '<p class="adv-note">앞에서부터 50건까지만 표시합니다.</p>' : '');
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-check-run").addEventListener("click", runCheck);
+  document.getElementById("text").addEventListener("input", function () {
+    if (!advBox.hidden) runCheck();
+  });
+})();
+</script>
+</body>
+</html>

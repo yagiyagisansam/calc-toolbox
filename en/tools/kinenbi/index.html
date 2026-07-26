@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Anniversary Day Counter (Days Together, Days Since Birth, 10,000-Day Milestones) | Quick Calc</title>
+  <meta name="description" content="Enter a birthday or anniversary to see what day number today is and the dates of milestones such as day 100, day 1,000 and day 10,000 — free. For couples' anniversaries, fan milestones and baby celebrations.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/kinenbi/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Anniversary Day Counter (Days Together, Days Since Birth, 10,000-Day Milestones) | Quick Calc">
+  <meta property="og:description" content="Enter a birthday or anniversary to see what day number today is and the dates of milestones such as day 100, day 1,000 and day 10,000 — free. For couples' anniversaries, fan milestones and baby celebrations.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/kinenbi/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Anniversary Day Counter","item":"https://quick-calc.site/en/tools/kinenbi/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/kinenbi/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/kinenbi/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/kinenbi/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/kinenbi/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/kinenbi/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Anniversary Day Counter</h1>
+  <form class="tool-form" id="kinenbi-form">
+    <span class="field-note">Pick the anniversary — what day number today is and the milestones appear right below</span>
+    <div class="field-row">
+      <label>Anniversary (year)
+        <select id="base-year"></select>
+      </label>
+      <label>Month
+        <select id="base-month"></select>
+      </label>
+      <label>Day
+        <select id="base-day"></select>
+      </label>
+    </div>
+    <label>Reference date (calculated as of this day)
+      <span class="field-note">Defaults to today</span>
+      <input type="date" id="asof" min="1900-01-01" max="2200-12-31" required>
+    </label>
+    <div class="tool-result" id="result" aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: anniversary list and every-100-day milestones</summary>
+    <div class="adv-inner">
+      <p class="adv-note">The anniversary and the reference date are taken from the form above.</p>
+
+      <h3 class="adv-h">Dates of the 1st to 10th anniversaries</h3>
+      <div class="tool-result" id="adv-anniv-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">Every-100-day milestones (day 100 to day 1,000)</h3>
+      <p class="adv-note">The first day counts as day 1 (the same counting used for Japan's 100th-day baby celebration, okuizome).</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    “Day N” counts <strong>the anniversary itself as day 1</strong> (the usual way of counting for Japan's okuizome “day 100” and for couples' day counts). If you count “N days elapsed” instead, the result is off by one day.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Just enter a birthday or an anniversary — such as the day you started dating — and instantly see <strong>what day number today is</strong>, plus milestone dates like day 1,000 and day 10,000. Great for planning a baby's 100th-day celebration or checking a couple's milestones.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Pick the anniversary (a birthday, the day you started dating, your favorite idol's debut day, and so on).</li>
+    <li>The moment you pick it, you see what day number today is, along with each milestone's date, weekday and days to go. No button needed.</li>
+    <li>Add future milestones to your calendar and use them to plan a celebration.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li>Days are counted on the Gregorian calendar, the current calendar (leap years handled).</li>
+    <li><strong>Date of day N = anniversary + (N−1) days</strong> (the anniversary itself is day 1)</li>
+    <li>Milestones shown: days 100, 200, 300, 365, 500, 777, 1,000, 2,000, 3,000, 5,000, 7,777, 10,000, 15,000, 20,000, 25,000 and 30,000.</li>
+    <li>Example: someone born on July 18, 1990 reaches <strong>day 13,150</strong> on July 18, 2026. Day 20,000 of their life is April 19, 2045.</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>Arithmetic based on the calendar system (Gregorian calendar).</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>Year-based anniversaries (such as a first anniversary) fall on the same month and day, which can differ from day 365/366 counted in days.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">Does “100 days together” include the day we started dating?</h3>
+  <p class="faq-a">There are two ways to count, and this tool counts the anniversary itself as day 1 (day 100 = 99 days later). Agreeing on the counting method with your partner avoids mix-ups.</p>
+  <h3 class="faq-q">How old is someone on their 10,000th day?</h3>
+  <p class="faq-a">About 27.4 years old (10,000 ÷ 365.25 ≈ 27.4 years). Day 20,000 comes at about age 54.8 and day 30,000 at about age 82.1. Celebrating these as major life milestones is becoming popular.</p>
+  <h3 class="faq-q">Can I use it for anniversaries still to come, such as a wedding anniversary?</h3>
+  <p class="faq-a">Yes. For past dates it shows what day number it is; for future milestones it shows how many days are left — handy for planning long-term anniversaries such as a silver wedding.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/kinenbi/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/kinenbi/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/kinenbi/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=kinenbi">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/kinenbi/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var today = new Date();
+  var WD_EN = { "月": "Mon", "火": "Tue", "水": "Wed", "木": "Thu", "金": "Fri", "土": "Sat", "日": "Sun" };
+  var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+  function fillSelect(el, from, to, selected, texts) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + (texts ? texts[v - from] : v) + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, Math.min(keep, max));
+  }
+  function fmtDate(iso) {
+    var p = iso.split("-");
+    return MONTHS[parseInt(p[1], 10) - 1] + " " + parseInt(p[2], 10) + ", " + parseInt(p[0], 10);
+  }
+  function ordinal(n) {
+    var v = n % 100;
+    if (v >= 11 && v <= 13) return n + "th";
+    return n + (["th", "st", "nd", "rd"][n % 10] || "th");
+  }
+  function plural(n, word) {
+    return n.toLocaleString() + " " + word + (n === 1 ? "" : "s");
+  }
+
+  var box = document.getElementById("result");
+  var annivBox = document.getElementById("adv-anniv-result");
+  var hundBox = document.getElementById("adv-result");
+  var asofInput = document.getElementById("asof");
+  asofInput.value = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + String(today.getDate()).padStart(2, "0");
+
+  fillSelect(document.getElementById("base-year"), 1900, 2200, today.getFullYear());
+  fillSelect(document.getElementById("base-month"), 1, 12, today.getMonth() + 1, MONTHS);
+  fillSelect(document.getElementById("base-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), today.getDate());
+
+  function baseIso() {
+    adjustDays("base-year", "base-month", "base-day");
+    return val("base-year") + "-" +
+      String(val("base-month")).padStart(2, "0") + "-" +
+      String(val("base-day")).padStart(2, "0");
+  }
+
+  var ERROR_MESSAGES = {
+    invalid_asof: "Enter a valid reference date.",
+    base_after_asof: "The anniversary is after the reference date."
+  };
+  function untilText(n) {
+    if (n === 0) return "Today";
+    if (n > 0) return "in " + plural(n, "day");
+    return plural(Math.abs(n), "day") + " ago";
+  }
+  function advTable(boxEl, r, headLabel, key, fmt) {
+    if (!r.ok) { boxEl.hidden = true; return; }
+    var rows = "";
+    for (var i = 0; i < r.rows.length; i++) {
+      var m = r.rows[i];
+      rows += "<tr><td>" + fmt(m[key]) + "</td><td>" + fmtDate(m.date) +
+        " (" + WD_EN[m.weekday] + ")</td><td>" + untilText(m.daysUntil) + "</td></tr>";
+    }
+    boxEl.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>' + headLabel +
+      "</th><th>Date</th><th>From the reference date</th></tr></thead><tbody>" + rows + "</tbody></table></div>";
+    boxEl.hidden = false;
+  }
+
+  function run() {
+    var base = baseIso();
+    var asof = asofInput.value;
+    if (asof === "") { box.hidden = true; return; }
+    var r = KinenbiCalc.milestones(base, asof);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "Check the entered values.") + "</p>";
+      box.hidden = false;
+      annivBox.hidden = true;
+      hundBox.hidden = true;
+      return;
+    }
+    var rows = r.milestones.map(function (m) {
+      var status = m.daysUntil === 0 ? "<strong>Today!</strong>" :
+        m.daysUntil > 0 ? "in <strong>" + plural(m.daysUntil, "day") + "</strong>" :
+        plural(Math.abs(m.daysUntil), "day") + " ago";
+      return "<tr><td>Day " + m.n.toLocaleString() + "</td><td>" + m.date + " (" + WD_EN[m.weekday] + ")</td><td>" + status + "</td></tr>";
+    }).join("");
+    box.innerHTML =
+      '<div class="result-main">Today is day ' + r.dayNumber.toLocaleString() + "</div>" +
+      "<p>(Elapsed days: " + r.elapsedDays.toLocaleString() + ")</p>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Milestone</th><th>Date</th><th>Countdown</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+    box.hidden = false;
+    advTable(annivBox, KinenbiCalc.anniversaries(base, asof), "Anniversary", "years", function (v) { return ordinal(v) + " anniversary"; });
+    advTable(hundBox, KinenbiCalc.hundredDays(base, asof), "Milestone", "n", function (v) { return "Day " + v.toLocaleString(); });
+  }
+
+  ["base-year", "base-month", "base-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", run);
+  });
+  asofInput.addEventListener("change", run);
+  asofInput.addEventListener("input", run);
+  document.getElementById("kinenbi-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+
+  run();
+})();
+</script>
+</body>
+</html>

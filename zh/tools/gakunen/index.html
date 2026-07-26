@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>日本学年(年级)计算器 — 按出生年月日查现在读几年级 | Quick Calc</title>
+  <meta name="description" content="输入出生年月日,立即知道在日本的学校现在是几年级(小学1年级〜高中3年级)。免费工具,同时显示该学段的入学·毕业年份、是否属于「早生まれ」,并可从年级反查出生年月日范围。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/gakunen/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="日本学年(年级)计算器 — 按出生年月日查现在读几年级 | Quick Calc">
+  <meta property="og:description" content="输入出生年月日,立即知道在日本的学校现在是几年级(小学1年级〜高中3年级)。免费工具,同时显示该学段的入学·毕业年份、是否属于「早生まれ」,并可从年级反查出生年月日范围。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/gakunen/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"日本学年(年级)计算器","item":"https://quick-calc.site/zh/tools/gakunen/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/gakunen/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/gakunen/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/gakunen/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/gakunen/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/gakunen/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>日本学年(年级)计算器</h1>
+  <form class="tool-form" id="gakunen-form">
+    <span class="field-note">选择出生年月日后,现在的年级立即显示在下方</span>
+    <div class="field-row">
+      <label>出生年(西历)
+        <select id="b-year"></select>
+      </label>
+      <label>月
+        <select id="b-month"></select>
+      </label>
+      <label>日
+        <select id="b-day"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 从年级反查出生年月日·该年度全部年级一览</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">从年级反查出生年月日</h3>
+      <p class="adv-note">用来查「小学1年级的孩子是哪段时间出生的」。学校发的通知上只写了年级时很方便。</p>
+      <div class="field-row">
+        <label>年度(4月开始)
+          <select id="r-year"></select>
+        </label>
+        <label>年级
+          <select id="r-grade"></select>
+        </label>
+      </div>
+      <div class="tool-result" id="adv-reverse" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">该年度的年级与出生年月日一览</h3>
+      <p class="adv-note">上面所选年度中,从小学1年级到高中3年级的对照表。</p>
+      <div class="tool-result" id="adv-table" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    这是按标准逐年升级计算的年级。留级、跳级、从海外转学等情况下,实际年级可能不同。<strong>关于入学·就学的事宜,请向您居住的市区町村教育委员会确认。</strong>
+  </div>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>只要输入出生年月日,就能知道<strong>在日本的学校现在是几年级</strong>。本工具依据日本的学制: 日本的学年从4月开始,<strong>4月2日〜次年4月1日出生</strong>的孩子属于同一个学年(1月1日〜4月1日出生的称为「早生まれ」,要上高一个年级)。办理学校手续、在表格上填写年级时很有用。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>按年·月·日选择出生日期,现在的年级立即显示在下方。</li>
+    <li>同时还会显示该学段的入学年份·毕业年份,以及是否属于「早生まれ」。</li>
+    <li>想从年级反查出生年月日时,请打开「＋更多功能」。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>学年的划分</strong>: 学年从4月1日开始,到次年3月31日结束(学校教育法施行规则第59条)。从年满6岁之日的次日以后的第一个学年开始就读小学(学校教育法第17条)。</li>
+    <li><strong>4月1日出生为何要上高一个年级</strong>: 由于年龄在生日前一天结束时增加(年龄计算相关法律·民法第143条),4月1日出生的人在3月31日就年满6岁,因此在当年4月入学。</li>
+    <li><strong>同一学年的范围</strong>: 4月2日〜次年4月1日出生。</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>学段与年级(按标准升级)</caption>
+      <thead><tr><th>学段</th><th>年级</th><th>入学时年龄</th></tr></thead>
+      <tbody>
+        <tr><td>小学</td><td>1年级〜6年级</td><td>6岁</td></tr>
+        <tr><td>初中</td><td>1年级〜3年级</td><td>12岁</td></tr>
+        <tr><td>高中</td><td>1年级〜3年级</td><td>15岁</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出处(一次信息)</h3>
+  <ul class="sources">
+    <li>学校教育法(昭和22年法律第26号)第17条(就学义务)— 日本官方法令原文(日文)<br>
+      <a href="https://laws.e-gov.go.jp/law/322AC0000000026" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/322AC0000000026</a>(2026年7月26日查阅)</li>
+    <li>学校教育法施行规则(昭和22年文部省令第11号)第59条(学年自4月1日开始,至次年3月31日结束)— 日本官方法令原文(日文)<br>
+      <a href="https://laws.e-gov.go.jp/law/322M40000080011" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/322M40000080011</a>(2026年7月26日查阅)</li>
+    <li>年龄计算相关法律(明治35年法律第50号)— 日本官方法令原文(日文)<br>
+      <a href="https://laws.e-gov.go.jp/law/135AC0000000050" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/135AC0000000050</a>(2026年7月26日查阅)</li>
+  </ul>
+
+  <h2>计算前提与注意</h2>
+  <ul class="cautions">
+    <li>这是按标准逐年升级计算的年级。有留级、跳级、休学时会不同。</li>
+    <li>义务教育为小学6年加初中3年,共9年。高中不属于义务教育。</li>
+    <li>从海外转学时,日本的学校不一定会按年龄编入对应年级。会结合日语掌握情况等,与学校·教育委员会商量后决定。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">「早生まれ」是什么意思?</h3>
+  <p class="faq-a">指1月1日〜4月1日出生。这些孩子比同一年4月2日以后出生的孩子高一个年级,因此在自己的学年中属于出生最晚的一批。</p>
+  <h3 class="faq-q">日本的学校为什么从4月开始?</h3>
+  <p class="faq-a">因为法令(学校教育法施行规则)规定学年自4月1日开始、至次年3月31日结束。从9月开学的国家来时会相差半年,因此需要就转学时期进行商量。</p>
+  <h3 class="faq-q">外国籍的孩子也能上日本的学校吗?</h3>
+  <p class="faq-a">可以。外国籍的孩子没有就学义务,但只要希望入学,公立中小学会免费接收(文部科学省的方针)。办理手续的窗口是您居住的市区町村教育委员会。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/gakunen/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/gakunen/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/gakunen/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=gakunen">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/gakunen/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var today = new Date();
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  var TODAY_ISO = today.getFullYear() + "-" + pad(today.getMonth() + 1) + "-" + pad(today.getDate());
+  var THIS_SY = today.getMonth() + 1 >= 4 ? today.getFullYear() : today.getFullYear() - 1;
+
+  var STAGE_ZH = { elementary: "小学", juniorhigh: "初中", highschool: "高中" };
+
+  // 由学段与该学段内的年级组合出显示用标签
+  function stageNameOf(overall) {
+    return overall <= 6 ? STAGE_ZH.elementary : (overall <= 9 ? STAGE_ZH.juniorhigh : STAGE_ZH.highschool);
+  }
+  function gradeLabelOf(overall) {
+    if (overall <= 6) return STAGE_ZH.elementary + overall + "年级";
+    if (overall <= 9) return STAGE_ZH.juniorhigh + (overall - 6) + "年级";
+    return STAGE_ZH.highschool + (overall - 9) + "年级";
+  }
+  function resultLabel(r) {
+    if (r.stage === "preschool") return "学龄前";
+    if (r.stage === "graduated") return "高中毕业后";
+    return gradeLabelOf(r.overallGrade);
+  }
+
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+
+  // ---- 基本: 出生年月日 → 现在的年级 ----
+  var box = document.getElementById("result");
+  fillSelect(document.getElementById("b-year"), 1950, today.getFullYear(), "年", today.getFullYear() - 10);
+  fillSelect(document.getElementById("b-month"), 1, 12, "月", 4);
+  fillSelect(document.getElementById("b-day"), 1, 31, "日", 1);
+
+  function run() {
+    var y = val("b-year"), m = val("b-month");
+    var keep = val("b-day");
+    var max = daysInMonth(y, m);
+    fillSelect(document.getElementById("b-day"), 1, max, "日", Math.min(keep, max));
+    var d = val("b-day");
+    var birth = y + "-" + pad(m) + "-" + pad(d);
+    var r = GakunenCalc.gradeOn(birth, TODAY_ISO);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' +
+        (r.code === "invalid_order" ? "这个日期还没有到来。" : "请确认日期。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var html = '<div class="result-main">' + r.schoolYear + "年度: " + resultLabel(r) + "</div>";
+    if (r.stage === "preschool") {
+      var c = (m > 4 || (m === 4 && d >= 2)) ? y : y - 1;
+      html += "<p>预计于 <strong>" + (c + 7) + "年4月</strong>入读小学。</p>";
+    } else if (r.stage === "graduated") {
+      html += "<p>已超过高中的年龄段。想查看各年级对应的出生年月日,请打开上面的「＋更多功能」。</p>";
+    } else {
+      var t = GakunenCalc.stageTerm(r.schoolYear, r.overallGrade);
+      html += "<p>" + stageNameOf(r.overallGrade) + "预计为 <strong>" + t.entryYear + "年4月入学·" + t.gradYear + "年3月毕业</strong>。</p>";
+    }
+    html += "<p>" + (r.hayaumare ? "这个出生日期属于<strong>「早生まれ」</strong>(1月1日〜4月1日出生)。" :
+      "不属于「早生まれ」(4月2日〜12月31日出生)。") + "</p>";
+    box.innerHTML = html;
+    box.hidden = false;
+  }
+  ["b-year", "b-month", "b-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", run);
+  });
+  document.getElementById("gakunen-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+
+  // ---- 更多功能: 反查+一览 ----
+  var revBox = document.getElementById("adv-reverse");
+  var tblBox = document.getElementById("adv-table");
+  fillSelect(document.getElementById("r-year"), THIS_SY - 10, THIS_SY + 10, "年度", THIS_SY);
+  var gHtml = "";
+  for (var g = 1; g <= 12; g++) {
+    gHtml += '<option value="' + g + '"' + (g === 1 ? " selected" : "") + ">" + gradeLabelOf(g) + "</option>";
+  }
+  document.getElementById("r-grade").innerHTML = gHtml;
+
+  function fmtIso(iso) {
+    return iso.slice(0, 4) + "年" + parseInt(iso.slice(5, 7), 10) + "月" + parseInt(iso.slice(8, 10), 10) + "日";
+  }
+  function runAdv() {
+    var sy = val("r-year"), g = val("r-grade");
+    var r = GakunenCalc.birthRangeOf(sy, g);
+    if (!r.ok) { revBox.hidden = true; tblBox.hidden = true; return; }
+    var t = GakunenCalc.stageTerm(sy, g);
+    revBox.innerHTML =
+      '<div class="result-main">' + sy + "年度的" + gradeLabelOf(g) + "</div>" +
+      "<p>出生年月日在 <strong>" + fmtIso(r.from) + "〜" + fmtIso(r.to) + "</strong> 之间。</p>" +
+      "<p>" + stageNameOf(g) + "预计为 " + t.entryYear + "年4月入学·" + t.gradYear + "年3月毕业。</p>";
+    revBox.hidden = false;
+
+    var rows = "";
+    for (var i = 1; i <= 12; i++) {
+      var x = GakunenCalc.birthRangeOf(sy, i);
+      rows += "<tr" + (i === g ? ' style="font-weight:600"' : "") + "><td>" + gradeLabelOf(i) +
+        "</td><td>" + fmtIso(x.from) + "〜" + fmtIso(x.to) + "</td></tr>";
+    }
+    tblBox.innerHTML =
+      '<div class="result-main">' + sy + "年度的年级与出生年月日</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>年级</th><th>出生年月日</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+    tblBox.hidden = false;
+  }
+  ["r-year", "r-grade"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runAdv);
+  });
+
+  run();
+  runAdv();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>전자레인지 가열시간 환산기(500W⇔600W⇔700W) | Quick Calc</title>
+  <meta name="description" content="포장에 적힌 가열시간을 우리 집 전자레인지 와트수에 맞는 시간으로 무료 즉시 환산합니다. 일본의 냉동식품 포장과 레시피는 「600W 1분 30초」처럼 와트수로 시간을 표시하기 때문에, 와트수가 다를 때 이 도구로 환산하세요. 10초 단위의 기준값도 함께 표시합니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/renji/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="전자레인지 가열시간 환산기(500W⇔600W⇔700W) | Quick Calc">
+  <meta property="og:description" content="포장에 적힌 가열시간을 우리 집 전자레인지 와트수에 맞는 시간으로 무료 즉시 환산합니다. 일본의 냉동식품 포장과 레시피는 「600W 1분 30초」처럼 와트수로 시간을 표시하기 때문에, 와트수가 다를 때 이 도구로 환산하세요. 10초 단위의 기준값도 함께 표시합니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/renji/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"전자레인지 가열시간 환산기","item":"https://quick-calc.site/ko/tools/renji/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/renji/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/renji/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/renji/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/renji/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/renji/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>전자레인지 가열시간 환산기</h1>
+  <form class="tool-form" id="renji-form">
+    <span class="field-note">입력·변경과 동시에 바로 아래에 환산 결과가 표시됩니다</span>
+    <label>포장에 적힌 가열시간
+      <span class="field-note">포장이나 레시피에 적혀 있는 시간</span>
+      <span style="display:flex;gap:.5em;align-items:center;">
+        <input type="number" id="min" inputmode="numeric" min="0" max="120" step="1" value="1" style="width:5em;" aria-label="분"> 분
+        <input type="number" id="sec" inputmode="numeric" min="0" max="59" step="1" value="30" style="width:5em;" aria-label="초"> 초
+      </span>
+    </label>
+    <label>포장에 적힌 와트수
+      <select id="from-w">
+        <option value="200">200W(해동)</option>
+        <option value="300">300W</option>
+        <option value="500">500W</option>
+        <option value="600" selected>600W</option>
+        <option value="700">700W</option>
+        <option value="800">800W</option>
+        <option value="1000">1000W</option>
+        <option value="1500">1500W</option>
+      </select>
+    </label>
+    <label>우리 집 전자레인지의 와트수
+      <select id="to-w">
+        <option value="200">200W(해동)</option>
+        <option value="300">300W</option>
+        <option value="500" selected>500W</option>
+        <option value="600">600W</option>
+        <option value="700">700W</option>
+        <option value="800">800W</option>
+        <option value="1000">1000W</option>
+        <option value="1500">1500W</option>
+      </select>
+    </label>
+    <button type="submit">환산하기</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 500〜1000W 일괄 환산표와 자유 와트수</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">500〜1000W 일괄 환산표</h3>
+      <p class="adv-note">포장의 시간과 와트수를 기준으로 500W·600W·700W·800W·1000W 각각의 가열시간을 한 번에 표로 만듭니다.</p>
+      <label>포장에 적힌 가열시간
+        <span style="display:flex;gap:.5em;align-items:center;">
+          <input type="number" id="adv-min" inputmode="numeric" min="0" max="120" step="1" value="1" style="width:5em;" aria-label="분"> 분
+          <input type="number" id="adv-sec" inputmode="numeric" min="0" max="59" step="1" value="30" style="width:5em;" aria-label="초"> 초
+        </span>
+      </label>
+      <label>포장에 적힌 와트수
+        <select id="adv-from-w">
+          <option value="200">200W(해동)</option>
+          <option value="300">300W</option>
+          <option value="500">500W</option>
+          <option value="600" selected>600W</option>
+          <option value="700">700W</option>
+          <option value="800">800W</option>
+          <option value="1000">1000W</option>
+          <option value="1500">1500W</option>
+        </select>
+      </label>
+      <button type="button" id="adv-run">일괄 환산표 만들기</button>
+      <h3 class="adv-h">목록에 없는 와트수로 환산하기</h3>
+      <p class="adv-note">850W처럼 선택지에 없는 와트수는 여기에 100〜2000W 범위로 자유롭게 입력할 수 있습니다(시간은 위 칸의 값을 사용합니다).</p>
+      <label>포장에 적힌 와트수(직접 입력)
+        <input type="number" id="adv-free-from" inputmode="numeric" min="100" max="2000" step="1" value="600" placeholder="예: 600">
+      </label>
+      <label>우리 집 전자레인지의 와트수(직접 입력)
+        <input type="number" id="adv-free-to" inputmode="numeric" min="100" max="2000" step="1" placeholder="예: 850">
+      </label>
+      <button type="button" id="adv-free-run">이 와트수로 환산하기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    환산 결과는 <strong>대략적인 기준</strong>입니다. 기종·음식의 양·냉동 상태에 따라 결과가 달라지므로 상태를 보면서 조금씩 가열해 주세요. 너무 오래 가열하면 터지거나 마르는 원인이 됩니다.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>일본의 냉동식품과 레시피는 「600W 1분 30초」처럼 와트수로 가열시간을 표시합니다. 이 도구는 <strong>우리 집 전자레인지에서 몇 분 몇 초로 맞추면 되는지</strong>를 바로 알려줍니다. 시간을 입력하고 와트수 두 개를 고르기만 하면 됩니다. 포장은 500W나 600W 기준인데 집 전자레인지가 700W 이상일 때 특히 유용합니다.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>포장에 적힌 가열시간과 와트수를 입력합니다(예: 600W 1분 30초).</li>
+    <li>우리 집 전자레인지의 와트수를 선택합니다.</li>
+    <li>선택하는 순간 환산된 시간과 10초 단위의 기준값이 아래에 표시됩니다. 버튼은 누를 필요 없습니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li>전자레인지가 음식에 주는 에너지는 「<strong>전력(W)×시간</strong>」으로 정해집니다. 같은 결과를 내려면 이 에너지가 같아지도록 시간을 조정합니다.</li>
+    <li><strong>환산 후 시간 = 포장의 시간 × 포장의 와트수 ÷ 우리 집 와트수</strong></li>
+    <li>계산 예: 600W 1분 30초(90초) → 500W에서는 90 × 600 ÷ 500 = <strong>108초(약 1분 50초)</strong></li>
+    <li>전자레인지 타이머는 10초 단위인 경우가 많아, 10초 단위로 올림한 기준값도 함께 표시합니다.</li>
+  </ul>
+
+  <h3>출처·전제 명시</h3>
+  <ul class="sources">
+    <li>에너지 등가(전력×시간이 일정)에 기반한 산술 계산입니다.</li>
+    <li>실제 가열 효율은 기종(인버터 방식 여부·내부 형태)이나 음식에 따라 달라지므로 결과는 어디까지나 기준값입니다.</li>
+  </ul>
+
+  <h2>계산의 전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>「500W⇔600W」처럼 가까운 와트수끼리의 환산은 오차가 작지만, 200W(해동)와 1000W처럼 크게 차이 나는 환산은 결과가 달라지기 쉽습니다.</li>
+    <li>음료나 기름이 많은 음식은 과가열 시 돌비(갑자기 끓어 넘침)의 위험이 있습니다. 짧게 설정하고 상태를 확인해 주세요.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">600W로 1분은 500W면 몇 초인가요?</h3>
+  <p class="faq-a">72초(약 1분 10초)입니다. 60초 × 600 ÷ 500 = 72초. 전자레인지 타이머에 맞춘다면 1분 10초〜1분 20초를 기준으로 하세요.</p>
+  <h3 class="faq-q">우리 집 전자레인지의 와트수는 어디서 확인하나요?</h3>
+  <p class="faq-a">문 안쪽이나 옆면 라벨에 적혀 있으며, 일본 기종에서는 「高周波出力」(고주파 출력)으로 표기됩니다. 「強・弱」(강·약) 표시만 있는 기종은 사용설명서에서 해당 와트수를 확인해 주세요. 많은 기종이 강=500〜600W, 약=150〜200W 정도입니다.</p>
+  <h3 class="faq-q">와트수를 바꾸면 맛이나 완성도도 달라지나요?</h3>
+  <p class="faq-a">총 에너지가 같아도 낮은 와트수로 천천히 가열하는 쪽이 열이 고르게 퍼지는 경향이 있습니다. 해동은 낮은 와트수(150〜200W)를 권장합니다. 높은 와트수로 짧게 가열하면 가운데가 차가운 채로 남을 수 있으니 도중에 섞거나 뒤집는 것이 확실합니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/renji/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/renji/" lang="en" hreflang="en">English</a><a href="/zh/tools/renji/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=renji">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/renji/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var ERROR_MESSAGES = {
+    invalid_time: "가열시간을 1초 이상으로 입력해 주세요.",
+    invalid_watt: "와트수는 100〜2000W 범위에서 선택해 주세요."
+  };
+  function fmt(sec) {
+    var m = Math.floor(sec / 60);
+    var s = sec % 60;
+    if (m > 0 && s > 0) return m + "분 " + s + "초";
+    if (m > 0) return m + "분";
+    return s + "초";
+  }
+  function run(fromSubmit) {
+    var minRaw = document.getElementById("min").value;
+    var secRaw = document.getElementById("sec").value;
+    if (!fromSubmit && minRaw === "" && secRaw === "") { box.hidden = true; return; }
+    var min = parseInt(minRaw || "0", 10);
+    var sec = parseInt(secRaw || "0", 10);
+    var fromW = parseInt(document.getElementById("from-w").value, 10);
+    var toW = parseInt(document.getElementById("to-w").value, 10);
+    var r = RenjiCalc.convert(min * 60 + sec, fromW, toW);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[r.code] || "입력값을 확인해 주세요.") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">' + toW + "W라면 약 " + fmt(r.rounded10) + "</div>" +
+      "<p>계산값: " + fmt(r.seconds) + "(" + r.seconds + "초)를 10초 단위로 올림한 기준값입니다. 상태를 보면서 가열해 주세요.</p>";
+    box.hidden = false;
+  }
+  document.getElementById("renji-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+  ["min", "sec"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { run(false); });
+  });
+  ["from-w", "to-w"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", function () { run(false); });
+  });
+  run(false);
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advFmt(sec) {
+    var m = Math.floor(sec / 60);
+    var s = sec % 60;
+    if (m === 0) return s + "초";
+    return m + "분" + (s > 0 ? " " + s + "초" : "");
+  }
+  function advReadTime() {
+    var mi = parseInt(document.getElementById("adv-min").value, 10);
+    var se = parseInt(document.getElementById("adv-sec").value, 10);
+    if (isNaN(mi)) mi = 0;
+    if (isNaN(se)) se = 0;
+    return mi * 60 + se;
+  }
+  function advShowError(code) {
+    advBox.innerHTML = '<p class="result-error">' +
+      (code === "invalid_time" ? "가열시간을 1초 이상으로 입력해 주세요." : "와트수는 100〜2000W 범위로 입력해 주세요.") + "</p>";
+    advBox.hidden = false;
+  }
+  function runMulti(fromButton) {
+    if (!fromButton &&
+        document.getElementById("adv-min").value === "" &&
+        document.getElementById("adv-sec").value === "") { return; }
+    var total = advReadTime();
+    var fromW = parseInt(document.getElementById("adv-from-w").value, 10);
+    var r = RenjiCalc.multiTable(total, fromW);
+    if (!r.ok) { advShowError(r.code); return; }
+    var html = '<div class="result-main">' + fromW + "W로 " + advFmt(total) + "인 경우</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>와트수</th><th>환산 시간</th><th>10초 단위 기준값</th></tr></thead><tbody>';
+    for (var i = 0; i < r.rows.length; i++) {
+      var row = r.rows[i];
+      html += "<tr><td>" + row.w + "W</td><td>" + advFmt(row.seconds) + "</td><td>" + advFmt(row.rounded10) + "</td></tr>";
+    }
+    html += "</tbody></table></div>" +
+      '<p class="adv-note">10초 단위 기준값은 올림입니다.</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  function runFree(fromButton) {
+    if (!fromButton &&
+        (document.getElementById("adv-free-from").value === "" ||
+         document.getElementById("adv-free-to").value === "")) { return; }
+    var total = advReadTime();
+    var fromW = parseFloat(document.getElementById("adv-free-from").value);
+    var toW = parseFloat(document.getElementById("adv-free-to").value);
+    var r = RenjiCalc.convert(total, fromW, toW);
+    if (!r.ok) { advShowError(r.code); return; }
+    advBox.innerHTML =
+      '<div class="result-main">' + toW.toLocaleString() + "W라면 " + advFmt(r.seconds) + "</div>" +
+      "<p>" + fromW.toLocaleString() + "W로 " + advFmt(total) + " → " + toW.toLocaleString() +
+      "W에서는 <strong>" + advFmt(r.seconds) + "</strong>(10초 단위 기준값: " + advFmt(r.rounded10) + ")입니다.</p>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-run").addEventListener("click", function () { runMulti(true); });
+  document.getElementById("adv-free-run").addEventListener("click", function () { runFree(true); });
+  ["adv-min", "adv-sec"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runMulti(false); });
+  });
+  document.getElementById("adv-from-w").addEventListener("change", function () { runMulti(false); });
+  ["adv-free-from", "adv-free-to"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runFree(false); });
+  });
+})();
+</script>
+</body>
+</html>

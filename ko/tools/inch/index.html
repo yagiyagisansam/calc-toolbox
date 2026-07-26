@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>인치⇔cm·파운드⇔kg 변환 계산기 | Quick Calc</title>
+  <meta name="description" content="인치와 센티미터, 파운드와 킬로그램을 무료로 바로 상호 변환합니다. 국제 정의값을 사용하므로 TV·모니터 크기 확인, 해외 직구 옷·신발 고르기, 덤벨 무게 환산에 편리합니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/inch/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="인치⇔cm·파운드⇔kg 변환 계산기 | Quick Calc">
+  <meta property="og:description" content="인치와 센티미터, 파운드와 킬로그램을 무료로 바로 상호 변환합니다. 국제 정의값을 사용하므로 TV·모니터 크기 확인, 해외 직구 옷·신발 고르기, 덤벨 무게 환산에 편리합니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/inch/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"인치⇔cm·파운드⇔kg 변환 계산기","item":"https://quick-calc.site/ko/tools/inch/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/inch/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/inch/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/inch/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/inch/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/inch/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>인치⇔cm·파운드⇔kg 변환 계산기</h1>
+  <form class="tool-form" id="length-form">
+    <label>길이 변환(인치⇔cm)</label>
+    <span class="field-note">숫자를 입력하면 바로 아래에 변환 결과가 표시됩니다</span>
+    <label>값
+      <input type="number" id="l-value" inputmode="decimal" step="any" min="0.001" max="1000000" placeholder="65" required>
+    </label>
+    <label>입력한 값의 단위
+      <select id="l-unit">
+        <option value="in">인치(in)</option>
+        <option value="cm">센티미터(cm)</option>
+      </select>
+    </label>
+    <div class="tool-result" id="result-l" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="weight-form">
+    <label>무게 변환(파운드⇔kg)</label>
+    <label>값
+      <input type="number" id="w-value" inputmode="decimal" step="any" min="0.001" max="1000000" placeholder="10">
+    </label>
+    <label>입력한 값의 단위
+      <select id="w-unit">
+        <option value="lb">파운드(lb)</option>
+        <option value="kg">킬로그램(kg)</option>
+      </select>
+    </label>
+    <div class="tool-result" id="result-w" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: TV·모니터의 실제 크기와 시청 거리·크기 비교</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">TV·모니터의 실제 크기와 시청 거리 기준</h3>
+      <p class="adv-note">「○인치」(=대각선 길이)에서 실제 가로·세로(cm)와 편하게 볼 수 있는 거리의 기준(풀HD: 높이×3, 4K: 높이×1.5)을 계산합니다.</p>
+      <label>화면 크기(인치)
+        <input type="number" id="adv-inch" inputmode="decimal" step="any" min="0.001" max="1000" placeholder="예: 65">
+      </label>
+      <label>화면비(가로:세로)
+        <select id="adv-ratio">
+          <option value="16:9" selected>16:9(TV·일반적인 모니터)</option>
+          <option value="16:10">16:10(일부 PC 모니터)</option>
+          <option value="21:9">21:9(울트라와이드)</option>
+          <option value="4:3">4:3(예전 TV·iPad)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-screen-run">크기와 거리 계산하기</button>
+      <div class="tool-result" id="adv-screen-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">교체 전후의 크기 비교</h3>
+      <p class="adv-note">「24인치에서 27인치로 바꾸면 얼마나 커질까?」를 위에서 선택한 화면비로 숫자화합니다.</p>
+      <label>지금의 크기(인치)
+        <input type="number" id="adv-inch-a" inputmode="decimal" step="any" min="0.001" max="1000" placeholder="예: 24">
+      </label>
+      <label>검토 중인 크기(인치)
+        <input type="number" id="adv-inch-b" inputmode="decimal" step="any" min="0.001" max="1000" placeholder="예: 27">
+      </label>
+      <button type="button" id="adv-compare-run">비교하기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    TV·모니터의 「◯인치」는 <strong>화면 대각선의 길이</strong>입니다. 가로 폭이 아니므로 주의해 주세요(예: 65인치=대각선 약 165cm, 가로 폭은 약 144cm 정도).
+  </div>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>숫자만 입력하면 <strong>인치를 cm로(cm를 인치로)</strong> 바로 바꿀 수 있고, 파운드와 kg의 무게 변환도 가능합니다. 일본은 일상에서 미터법을 쓰지만 TV·모니터는 인치로 표시되므로, 일본에서 가전을 살 때나 해외 쇼핑몰에서 옷을 고를 때, 파운드로 표시된 무게를 확인할 때 사용해 보세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>변환할 값을 입력하고 그 값의 단위를 선택합니다.</li>
+    <li>입력과 동시에 바로 아래에 두 단위의 값이 표시됩니다. 버튼은 누를 필요 없습니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>1인치 = 2.54cm</strong>(국제 인치의 정의값. 오차 없는 환산입니다)</li>
+    <li><strong>1파운드 = 0.45359237kg</strong>(국제 파운드의 정의값)</li>
+    <li>둘 다 1959년 야드·파운드법 국제 협정에 따른 정의값입니다. 결과는 소수 둘째 자리까지 표시합니다.</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>자주 쓰는 환산 조견표</caption>
+      <thead><tr><th>인치</th><th>cm</th><th></th><th>파운드</th><th>kg</th></tr></thead>
+      <tbody>
+        <tr><td>24</td><td>60.96</td><td></td><td>1</td><td>0.45</td></tr>
+        <tr><td>27</td><td>68.58</td><td></td><td>5</td><td>2.27</td></tr>
+        <tr><td>32</td><td>81.28</td><td></td><td>10</td><td>4.54</td></tr>
+        <tr><td>55</td><td>139.7</td><td></td><td>45</td><td>20.41</td></tr>
+        <tr><td>65</td><td>165.1</td><td></td><td>100</td><td>45.36</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>출처(1차 정보)</h3>
+  <ul class="sources">
+    <li>일본 계량법(헤이세이 4년 법률 제51호, 平成4年法律第51号) — 거래·증명에 비미터법 단위의 사용을 제한(일본어)<br>
+      <a href="https://laws.e-gov.go.jp/law/404AC0000000051" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/404AC0000000051</a>(2026년 7월 18일 열람)</li>
+    <li>환산 계수는 국제 협정(1959년)의 정의값입니다(1인치=25.4mm, 1파운드=0.45359237kg).</li>
+  </ul>
+
+  <h2>계산의 전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>신발·옷의 사이즈 표기(US·UK 사이즈 등)는 인치 그 자체가 아니라 각국의 규격입니다. 제조사의 사이즈표를 확인해 주세요.</li>
+    <li>귀금속에 쓰이는 「트로이온스·트로이파운드」는 상용 파운드와 다른 단위라 이 도구에서는 다루지 않습니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">65인치 TV의 가로 폭은 몇 cm인가요?</h3>
+  <p class="faq-a">65인치는 대각선 약 165.1cm이고, 16:9 화면이라면 가로 폭 약 144cm·높이 약 81cm입니다(베젤 제외). 설치 공간 확인에는 제조사의 외형 치수를 확인해 주세요.</p>
+  <h3 class="faq-q">피트도 환산할 수 있나요?</h3>
+  <p class="faq-a">1피트=12인치이므로 피트에 12를 곱해 인치로 입력해 주세요(예: 6피트=72인치=182.88cm).</p>
+  <h3 class="faq-q">헬스장 덤벨의 「45lb」는 몇 kg인가요?</h3>
+  <p class="faq-a">약 20.4kg입니다. 해외의 원판은 45lb(≒20.4kg)가 표준적이라 일본에서 흔한 20kg 원판과는 조금 다릅니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/inch/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/inch/" lang="en" hreflang="en">English</a><a href="/zh/tools/inch/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=inch">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/inch/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_value: "값은 0.001〜1,000,000 범위로 입력해 주세요.",
+    invalid_unit: "단위를 선택해 주세요."
+  };
+  function showError(box, code) {
+    box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "입력값을 확인해 주세요.") + "</p>";
+    box.hidden = false;
+  }
+  var lBox = document.getElementById("result-l");
+  var wBox = document.getElementById("result-w");
+  function runLength() {
+    if (document.getElementById("l-value").value.trim() === "") { lBox.hidden = true; return; }
+    var r = InchCalc.convertLength(parseFloat(document.getElementById("l-value").value), document.getElementById("l-unit").value);
+    if (!r.ok) { showError(lBox, r.code); return; }
+    lBox.innerHTML = '<div class="result-main">' + r.inch.toLocaleString() + " in = " + r.cm.toLocaleString() + " cm</div>";
+    lBox.hidden = false;
+  }
+  function runWeight() {
+    if (document.getElementById("w-value").value.trim() === "") { wBox.hidden = true; return; }
+    var r = InchCalc.convertWeight(parseFloat(document.getElementById("w-value").value), document.getElementById("w-unit").value);
+    if (!r.ok) { showError(wBox, r.code); return; }
+    wBox.innerHTML = '<div class="result-main">' + r.lb.toLocaleString() + " lb = " + r.kg.toLocaleString() + " kg</div>";
+    wBox.hidden = false;
+  }
+  document.getElementById("l-value").addEventListener("input", runLength);
+  document.getElementById("l-unit").addEventListener("change", runLength);
+  document.getElementById("length-form").addEventListener("submit", function (e) { e.preventDefault(); runLength(); });
+  document.getElementById("w-value").addEventListener("input", runWeight);
+  document.getElementById("w-unit").addEventListener("change", runWeight);
+  document.getElementById("weight-form").addEventListener("submit", function (e) { e.preventDefault(); runWeight(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function ratioParts() {
+    var v = document.getElementById("adv-ratio").value.split(":");
+    return [parseInt(v[0], 10), parseInt(v[1], 10)];
+  }
+  var screenBox = document.getElementById("adv-screen-result");
+  function runScreen(force) {
+    if (document.getElementById("adv-inch").value.trim() === "" && !force) { screenBox.hidden = true; return; }
+    var ratio = ratioParts();
+    var r = InchCalc.screenSize(parseFloat(document.getElementById("adv-inch").value), ratio[0], ratio[1]);
+    if (!r.ok) {
+      screenBox.innerHTML = '<p class="result-error">화면 크기를 0보다 큰 숫자(인치)로 입력해 주세요.</p>';
+      screenBox.hidden = false;
+      return;
+    }
+    screenBox.innerHTML =
+      '<div class="result-main">가로 ' + r.widthCm.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      ' cm × 세로 ' + r.heightCm.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>대각선</td><td>' + r.diagonalCm.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td></tr>' +
+      '<tr><td>시청 거리 기준(풀HD)</td><td>약 ' + r.distFullHdCm.toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' cm(높이×3)</td></tr>' +
+      '<tr><td>시청 거리 기준(4K)</td><td>약 ' + r.dist4kCm.toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' cm(높이×1.5)</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">화면 부분만의 치수입니다. 실제 제품은 베젤과 받침대만큼 조금 더 커집니다.</p>';
+    screenBox.hidden = false;
+  }
+  document.getElementById("adv-inch").addEventListener("input", function () { runScreen(false); });
+  document.getElementById("adv-ratio").addEventListener("change", function () { runScreen(false); });
+  document.getElementById("adv-screen-run").addEventListener("click", function () { runScreen(true); });
+  function runCompare(force) {
+    if ((document.getElementById("adv-inch-a").value.trim() === "" ||
+         document.getElementById("adv-inch-b").value.trim() === "") && !force) { advBox.hidden = true; return; }
+    var ratio = ratioParts();
+    var r = InchCalc.compareScreens(
+      parseFloat(document.getElementById("adv-inch-a").value),
+      parseFloat(document.getElementById("adv-inch-b").value),
+      ratio[0], ratio[1]
+    );
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">두 크기를 0보다 큰 숫자(인치)로 입력해 주세요.</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var up = r.areaRatePct >= 0 ? "넓어집니다" : "좁아집니다";
+    advBox.innerHTML =
+      '<div class="result-main">화면 면적이 약 ' + Math.abs(r.areaRatePct).toLocaleString(undefined, { maximumFractionDigits: 1 }) + '% ' + up + '</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th></th><th>가로</th><th>세로</th></tr></thead><tbody>' +
+      '<tr><td>지금</td><td>' + r.widthA.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td><td>' + r.heightA.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td></tr>' +
+      '<tr><td>검토 중</td><td>' + r.widthB.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td><td>' + r.heightB.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td></tr>' +
+      '<tr><td>차이</td><td>' + r.widthDiff.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td><td>' + r.heightDiff.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td></tr>' +
+      '</tbody></table></div>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-inch-a").addEventListener("input", function () { runCompare(false); });
+  document.getElementById("adv-inch-b").addEventListener("input", function () { runCompare(false); });
+  document.getElementById("adv-ratio").addEventListener("change", function () { runCompare(false); });
+  document.getElementById("adv-compare-run").addEventListener("click", function () { runCompare(true); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>큰술·작은술·컵 환산 계산기(ml 바로 변환) | Quick Calc</title>
+  <meta name="description" content="큰술 1=15ml, 작은술 1=5ml, 1컵=200ml(일본 기준)로 상호 환산. 「큰술 3은 몇 ml?」 「50ml는 큰술 몇 술?」에 바로 답합니다. 레시피 분량 조절, 계량스푼이 없을 때에.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/spoon/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="큰술·작은술·컵 환산 계산기(ml 바로 변환) | Quick Calc">
+  <meta property="og:description" content="큰술 1=15ml, 작은술 1=5ml, 1컵=200ml(일본 기준)로 상호 환산. 「큰술 3은 몇 ml?」 「50ml는 큰술 몇 술?」에 바로 답합니다. 레시피 분량 조절, 계량스푼이 없을 때에.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/spoon/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"큰술·작은술·컵 환산 계산기","item":"https://quick-calc.site/ko/tools/spoon/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/spoon/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/spoon/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/spoon/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/spoon/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/spoon/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>큰술·작은술·컵 환산 계산기</h1>
+  <form class="tool-form" id="spoon-form">
+    <label>분량
+      <span class="field-note">숫자를 입력하면 바로 아래에 환산 결과가 표시됩니다</span>
+      <input type="number" id="value" inputmode="decimal" min="0" step="any" required placeholder="예: 3">
+    </label>
+    <label>단위
+      <select id="unit">
+        <option value="tbsp" selected>큰술(大さじ)</option>
+        <option value="tsp">작은술(小さじ)</option>
+        <option value="cup">컵(200ml)</option>
+        <option value="ml">ml(cc)</option>
+      </select>
+    </label>
+    <button type="submit">환산하기</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 재료의 무게(그램)와의 환산</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">큰술·작은술 → 그램</h3>
+      <p class="adv-note">같은 큰술 1이라도 재료에 따라 무게가 다르므로(물 15g·설탕 9g·간장 18g 등), 술 수와 재료로 무게를 계산합니다.</p>
+      <label>큰술(술)
+        <input type="number" id="adv-tbsp" inputmode="decimal" min="0" step="any" value="1" placeholder="예: 2">
+      </label>
+      <label>작은술(술)
+        <input type="number" id="adv-tsp" inputmode="decimal" min="0" step="any" value="0" placeholder="예: 1">
+      </label>
+      <label>재료
+        <select id="adv-mat">
+          <option value="water">물</option>
+          <option value="sugar" selected>설탕(상백당)</option>
+          <option value="salt">소금(식염)</option>
+          <option value="flour">밀가루(박력분)</option>
+          <option value="oil">기름</option>
+          <option value="soy">간장</option>
+          <option value="miso">미소된장</option>
+        </select>
+      </label>
+      <button type="button" id="adv-grams-run">그램으로 환산하기</button>
+      <div class="tool-result" id="adv-grams-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">그램 → 큰술·작은술</h3>
+      <p class="adv-note">「설탕 30g」처럼 그램으로 적힌 레시피를, 저울 없이 스푼으로 재기 위한 역환산입니다.</p>
+      <label>무게(g)
+        <input type="number" id="adv-grams" inputmode="decimal" min="0" step="any" placeholder="예: 30">
+      </label>
+      <label>재료
+        <select id="adv-mat2">
+          <option value="water">물</option>
+          <option value="sugar" selected>설탕(상백당)</option>
+          <option value="salt">소금(식염)</option>
+          <option value="flour">밀가루(박력분)</option>
+          <option value="oil">기름</option>
+          <option value="soy">간장</option>
+          <option value="miso">미소된장</option>
+        </select>
+      </label>
+      <button type="button" id="adv-spoon-run">스푼 술 수로 바꾸기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>「큰술 3은 몇 ml?」 「50ml는 큰술 몇 술?」——숫자만 입력하면 일본 레시피에 나오는 <strong>큰술·작은술·컵·ml의 분량</strong>을 서로 바꿔 말할 수 있는 도구입니다. <strong>일본 계량스푼·계량컵 규격</strong>(큰술 15ml·작은술 5ml·1컵 200ml. 한국에서 흔한 종이컵이나 미국 컵과는 용량이 다릅니다)을 사용합니다. 계량스푼·컵이 없을 때, 분량을 늘리고 싶을 때 이용해 보세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>레시피의 분량(숫자)을 입력합니다.</li>
+    <li>그 단위(큰술·작은술·컵·ml)를 선택합니다.</li>
+    <li>입력하는 순간 모든 단위의 양이 표시됩니다. 버튼은 누를 필요 없습니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>작은술 1 = 5ml / 큰술 1 = 15ml / 1컵 = 200ml</strong>(일본 계량스푼·계량컵의 규격)</li>
+    <li>큰술 1 = 작은술 3술, 1컵 = 큰술 13술+작은술 1술입니다.</li>
+    <li>ml와 cc는 같은 양입니다(1ml = 1cc).</li>
+  </ul>
+
+  <h3>출처(1차 정보)</h3>
+  <ul class="sources">
+    <li>일본에서 표준적인 계량기구의 용량(작은술 5ml·큰술 15ml·컵 200ml)에 기반한 환산입니다.</li>
+  </ul>
+
+  <h2>전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>이것은 <strong>부피(용량)의 환산</strong>입니다. 무게(g)는 재료의 밀도에 따라 달라집니다(큰술 1은 물이면 15g이지만, 기름은 약 12g, 설탕(상백당)은 약 9g, 소금은 약 18g).</li>
+    <li>해외 레시피의 1컵은 다릅니다(미국 약 240ml, 호주 250ml). 일본 밥솥의 쌀 계량컵도 180ml로 별개입니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">큰술 1은 몇 그램인가요?</h3>
+  <p class="faq-a">재료에 따라 다릅니다. 물·식초·술이면 15g, 간장·미림은 약 18g, 기름·버터는 약 12g, 설탕(상백당)은 약 9g, 소금은 약 18g이 기준입니다. 이 도구의 환산은 부피(ml) 기준입니다.</p>
+  <h3 class="faq-q">계량스푼이 없을 때 대신 쓸 수 있는 것은?</h3>
+  <p class="faq-a">페트병 뚜껑이 약 7.5ml(큰술 1/2), 카레 스푼이 큰술 1이 조금 안 되는 양의 기준으로 쓸 수 있습니다. 정확함이 필요한 베이킹에는 계량기구를 추천합니다.</p>
+  <h3 class="faq-q">일본 레시피의 「한 꼬집」 「약간」은 어느 정도인가요?</h3>
+  <p class="faq-a">기준으로, 약간(少々)=엄지와 검지로 집은 양(약 작은술 1/8), 한 꼬집(ひとつまみ)=손가락 3개로 집은 양(약 작은술 1/5〜1/4)으로 봅니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/spoon/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/spoon/" lang="en" hreflang="en">English</a><a href="/zh/tools/spoon/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=spoon">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/spoon/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  function run() {
+    if (document.getElementById("value").value.trim() === "") { box.hidden = true; return; }
+    var r = SpoonCalc.convert(parseFloat(document.getElementById("value").value), document.getElementById("unit").value);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">분량은 0보다 큰 숫자로 입력해 주세요.</p>';
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">' + r.ml.toLocaleString() + " ml</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>큰술</td><td>" + r.tbsp.toLocaleString() + " 술</td></tr>" +
+      "<tr><td>작은술</td><td>" + r.tsp.toLocaleString() + " 술</td></tr>" +
+      "<tr><td>컵(200ml)</td><td>" + r.cup.toLocaleString() + " 컵</td></tr>" +
+      "</tbody></table></div>";
+    box.hidden = false;
+  }
+  document.getElementById("value").addEventListener("input", run);
+  document.getElementById("unit").addEventListener("change", run);
+  document.getElementById("spoon-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var MAT_KO = {
+    "水": "물",
+    "砂糖(上白糖)": "설탕(상백당)",
+    "塩(食塩)": "소금(식염)",
+    "小麦粉(薄力粉)": "밀가루(박력분)",
+    "油": "기름",
+    "しょうゆ": "간장",
+    "みそ": "미소된장"
+  };
+  var advBox = document.getElementById("adv-result");
+  var gramsBox = document.getElementById("adv-grams-result");
+  var fmt = function (x) { return x.toLocaleString(undefined, { maximumFractionDigits: 2 }); };
+  function runGrams(force) {
+    var tbspRaw = document.getElementById("adv-tbsp").value;
+    var tspRaw = document.getElementById("adv-tsp").value;
+    if (tbspRaw.trim() === "" && tspRaw.trim() === "" && !force) { gramsBox.hidden = true; return; }
+    var tbsp = parseFloat(tbspRaw) || 0;
+    var tsp = parseFloat(tspRaw) || 0;
+    var r = SpoonCalc.toGrams(tbsp, tsp, document.getElementById("adv-mat").value);
+    if (!r.ok) {
+      if (!force) { gramsBox.hidden = true; return; }
+      gramsBox.innerHTML = '<p class="result-error">큰술·작은술 중 하나에 0보다 큰 술 수를 입력해 주세요.</p>';
+      gramsBox.hidden = false;
+      return;
+    }
+    gramsBox.innerHTML =
+      '<div class="result-main">약 ' + fmt(r.grams) + ' g</div>' +
+      '<p>' + (MAT_KO[r.label] || r.label) + ': 큰술 1술 약 ' + r.gramsPerTbsp + 'g / 작은술 1술 약 ' + r.gramsPerTsp + 'g 기준으로 계산했습니다. 깎아서(수북이 담지 않고) 잰 양입니다.</p>';
+    gramsBox.hidden = false;
+  }
+  ["adv-tbsp", "adv-tsp"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runGrams(false); });
+  });
+  document.getElementById("adv-mat").addEventListener("change", function () { runGrams(false); });
+  document.getElementById("adv-grams-run").addEventListener("click", function () { runGrams(true); });
+  function runSpoon(force) {
+    if (document.getElementById("adv-grams").value.trim() === "" && !force) { advBox.hidden = true; return; }
+    var r = SpoonCalc.fromGrams(parseFloat(document.getElementById("adv-grams").value), document.getElementById("adv-mat2").value);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">무게는 0보다 큰 숫자(g)로 입력해 주세요.</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var combo = "";
+    if (r.tbspWhole > 0 && r.tspRest > 0) combo = "큰술 " + r.tbspWhole.toLocaleString() + " + 작은술 " + fmt(r.tspRest);
+    else if (r.tbspWhole > 0) combo = "딱 큰술 " + r.tbspWhole.toLocaleString();
+    else combo = "작은술 " + fmt(r.tsp);
+    advBox.innerHTML =
+      '<div class="result-main">' + combo + '</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>큰술만 쓰면</td><td>약 ' + fmt(r.tbsp) + ' 술</td></tr>' +
+      '<tr><td>작은술만 쓰면</td><td>약 ' + fmt(r.tsp) + ' 술</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">' + (MAT_KO[r.label] || r.label) + '의 기준값으로 계산한 대략적인 값입니다.</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-grams").addEventListener("input", function () { runSpoon(false); });
+  document.getElementById("adv-mat2").addEventListener("change", function () { runSpoon(false); });
+  document.getElementById("adv-spoon-run").addEventListener("click", function () { runSpoon(true); });
+  runGrams(false);
+})();
+</script>
+</body>
+</html>

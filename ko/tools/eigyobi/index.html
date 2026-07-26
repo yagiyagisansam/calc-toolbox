@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>일본 영업일 계산기(몇 영업일 후는 언제? 주말·일본 공휴일 제외) | Quick Calc</title>
+  <meta name="description" content="「3영업일 후는 언제?」를 주말과 일본 공휴일(대체공휴일 포함)을 빼고 즉시 계산. 기간 내 영업일 수도 셀 수 있습니다. 일본의 공휴일은 한국과 다르므로 납기·지불 기한·서류 처리일 확인에 편리합니다(2026〜2027년 지원).">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/eigyobi/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="일본 영업일 계산기(몇 영업일 후는 언제? 주말·일본 공휴일 제외) | Quick Calc">
+  <meta property="og:description" content="「3영업일 후는 언제?」를 주말과 일본 공휴일(대체공휴일 포함)을 빼고 즉시 계산. 기간 내 영업일 수도 셀 수 있습니다. 일본의 공휴일은 한국과 다르므로 납기·지불 기한·서류 처리일 확인에 편리합니다(2026〜2027년 지원).">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/eigyobi/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"일본 영업일 계산기","item":"https://quick-calc.site/ko/tools/eigyobi/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/eigyobi/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/eigyobi/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/eigyobi/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/eigyobi/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/eigyobi/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>일본 영업일 계산기(주말·공휴일 제외)</h1>
+  <form class="tool-form" id="eigyobi-form">
+    <span class="field-note">값을 선택하면 바로 아래에 결과가 표시됩니다</span>
+    <label>계산 종류
+      <select id="mode">
+        <option value="add" selected>N영업일 후의 날짜</option>
+        <option value="count">기간 내 영업일 수</option>
+      </select>
+    </label>
+    <div class="field-row">
+      <label>기산일(년)
+        <select id="start-year"></select>
+      </label>
+      <label>월
+        <select id="start-month"></select>
+      </label>
+      <label>일
+        <select id="start-day"></select>
+      </label>
+    </div>
+    <label id="n-label">몇 영업일 후?
+      <input type="number" id="n" inputmode="numeric" min="1" max="200" step="1" value="3">
+    </label>
+    <div class="field-row" id="end-row" hidden>
+      <label>종료일(년)
+        <select id="end-year"></select>
+      </label>
+      <label>월
+        <select id="end-month"></select>
+      </label>
+      <label>일
+        <select id="end-day"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 회사 휴업일·토요일 영업 반영</summary>
+    <div class="adv-inner">
+      <p class="adv-note">여름 휴가 등 회사 고유의 휴일을 넣거나 토요일 영업으로 전환하면, 같은 계산을 회사 달력 기준으로 다시 합니다.</p>
+      <label>회사 휴업일 목록(쉼표 또는 줄바꿈으로 구분)
+        <textarea id="adv-holidays" rows="3" placeholder="예: 2026-08-13, 2026-08-14, 2026-12-30"></textarea>
+      </label>
+      <label><input type="checkbox" id="adv-sat"> 토요일도 영업일로 계산(일요일·공휴일은 휴무)</label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    주말과 <strong>일본 공휴일(대체공휴일·국민의 휴일 포함)</strong>을 빼고 계산합니다. 연말연시·오봉 등 회사 고유의 휴업일은 포함하지 않습니다. 지원 범위는 2026년 1월〜2027년 12월입니다.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>기산일을 넣으면 「3영업일 후」가 언제인지, 주말과 <strong>일본 공휴일</strong>을 빼고 바로 알 수 있습니다. 일본의 공휴일은 한국과 다르기 때문에(설날·추석 연휴가 없는 대신 골든위크 등 일본 특유의 연휴가 있음) 납기·지불 기한을 세거나 은행·관공서가 언제 다시 여는지 확인할 때 착오가 생기기 쉽습니다. 기간 내 영업일이 며칠인지도 셀 수 있습니다.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>「N영업일 후의 날짜」와 「기간 내 영업일 수」 중 하나를 선택합니다.</li>
+    <li>기산일과 영업일 수(또는 종료일)를 입력합니다.</li>
+    <li>입력하는 순간 결과가 표시됩니다. 버튼은 필요 없습니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>영업일 = 토요일·일요일·일본 공휴일이 아닌 날</strong>로 계산합니다.</li>
+    <li>「N영업일 후」는 기산일의 다음 날부터 셉니다(금요일의 3영업일 후 = 다음 주 수요일).</li>
+    <li>공휴일에는 대체공휴일(공휴일이 일요일이면 다음 평일이 휴일)과 국민의 휴일(공휴일 사이에 낀 평일)을 포함합니다. 2026년에는 9월 21일 경로의 날과 9월 23일 추분의 날 사이에 낀 9월 22일이 국민의 휴일입니다.</li>
+    <li>기간의 영업일 수는 시작일과 종료일을 모두 포함해 셉니다.</li>
+  </ul>
+
+  <h3>출처·전제 명시</h3>
+  <ul class="sources">
+    <li>공휴일은 일본 「국민의 축일에 관한 법률」에 근거하며, 일본 내각부 <a href="https://www8.cao.go.jp/chosei/shukujitsu/gaiyou.html" target="_blank" rel="noopener">「국민의 축일에 대하여」</a>(일본어)에 공표된 2026년·2027년 목록을 사용합니다.</li>
+  </ul>
+
+  <h2>계산 전제와 주의</h2>
+  <ul class="cautions">
+    <li>은행 이체·증권 결제 등은 여기에 더해 연말연시(12/31〜1/3) 등 기관 고유의 휴업일이 있습니다. 정확한 기한은 각 기관에 확인해 주세요.</li>
+    <li>회사에 따라 토요일 영업·평일 휴무 등 영업일의 정의가 다를 수 있습니다.</li>
+    <li>공휴일은 법 개정 등으로 바뀔 수 있습니다(지원 범위: 2026〜2027년).</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">「3영업일 이내」는 당일을 포함하나요?</h3>
+  <p class="faq-a">관례적으로는 기산일(요청한 날)의 다음 영업일부터 세는 경우가 많지만, 계약이나 약관에 따라 정의가 다를 수 있습니다. 이 도구는 다음 날부터 세어 계산합니다. 중요한 기한은 상대방에게 확인하는 것이 확실합니다.</p>
+  <h3 class="faq-q">은행의 「다음 영업일 처리」란?</h3>
+  <p class="faq-a">주말·공휴일이나 15시 이후에 이체하면 실제 처리가 다음 영업일에 이루어진다는 뜻입니다. 금요일 15시 이후의 이체는 월요일(공휴일이면 화요일) 처리가 됩니다.</p>
+  <h3 class="faq-q">공휴일 데이터는 언제 것인가요?</h3>
+  <p class="faq-a">일본 내각부가 공표한 2026년·2027년 공휴일(대체공휴일 포함)을 사용합니다. 범위 밖의 날짜는 오류가 됩니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/eigyobi/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/eigyobi/" lang="en" hreflang="en">English</a><a href="/zh/tools/eigyobi/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=eigyobi">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/eigyobi/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var today = new Date();
+  var WD_KO = { "月": "월", "火": "화", "水": "수", "木": "목", "金": "금", "土": "토", "日": "일" };
+
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, "일", Math.min(keep, max));
+  }
+  function isoOf(prefix) {
+    adjustDays(prefix + "-year", prefix + "-month", prefix + "-day");
+    return val(prefix + "-year") + "-" +
+      String(val(prefix + "-month")).padStart(2, "0") + "-" +
+      String(val(prefix + "-day")).padStart(2, "0");
+  }
+  function koDate(iso) {
+    var p = iso.split("-");
+    return parseInt(p[0], 10) + "년 " + parseInt(p[1], 10) + "월 " + parseInt(p[2], 10) + "일";
+  }
+  // 지원 범위(2026〜2027년)에 맞춘 초기값
+  var initY = Math.min(Math.max(today.getFullYear(), 2026), 2027);
+  var initM = today.getFullYear() === initY ? today.getMonth() + 1 : 1;
+  var initD = today.getFullYear() === initY ? today.getDate() : 1;
+  function initDate(prefix) {
+    fillSelect(document.getElementById(prefix + "-year"), 2026, 2027, "년", initY);
+    fillSelect(document.getElementById(prefix + "-month"), 1, 12, "월", initM);
+    fillSelect(document.getElementById(prefix + "-day"), 1, daysInMonth(initY, initM), "일", initD);
+  }
+  initDate("start");
+  initDate("end");
+
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var mode = document.getElementById("mode");
+  var nLabel = document.getElementById("n-label");
+  var endRow = document.getElementById("end-row");
+
+  var MSG = {
+    invalid_date: "날짜를 올바르게 입력해 주세요.",
+    invalid_n: "영업일 수는 1〜200 사이의 정수로 입력해 주세요.",
+    invalid_holidays: "휴업일 목록에 날짜로 읽을 수 없는 항목이 있습니다. 「2026-08-13」 형식으로 입력해 주세요.",
+    out_of_range: "지원 범위는 2026년 1월 1일〜2027년 12월 31일입니다.",
+    date_order: "종료일은 시작일 이후로 지정해 주세요."
+  };
+  function err(boxEl, code) {
+    boxEl.innerHTML = '<p class="result-error">' + (MSG[code] || "입력값을 확인해 주세요.") + "</p>";
+    boxEl.hidden = false;
+  }
+
+  // ---- 메인: 주말+일본 공휴일 달력으로 즉시 계산 ----
+  function run() {
+    var start = isoOf("start");
+    if (mode.value === "add") {
+      var n = document.getElementById("n").value;
+      if (n === "") { box.hidden = true; runCustom(); return; }
+      var r = EigyobiCalc.addBusinessDays(start, parseInt(n, 10));
+      if (!r.ok) { err(box, r.code); runCustom(); return; }
+      box.innerHTML = '<div class="result-main">' + koDate(r.date) + "(" + WD_KO[r.weekday] + ")</div>" +
+        "<p>주말과 일본 공휴일을 빼고 센 날짜입니다.</p>";
+    } else {
+      var r2 = EigyobiCalc.countBusinessDays(start, isoOf("end"));
+      if (!r2.ok) { err(box, r2.code); runCustom(); return; }
+      box.innerHTML = '<div class="result-main">' + r2.businessDays + " 영업일</div>" +
+        "<p>달력 날수로는 " + r2.totalDays + "일간(양끝 포함)입니다.</p>";
+    }
+    box.hidden = false;
+    runCustom();
+  }
+
+  // ---- 상세 기능: 회사 달력으로 즉시 계산 ----
+  function customNote(r, satOpen) {
+    return '<p class="adv-note">회사 휴업일 ' + r.customCount.toLocaleString() + '건을 반영' +
+      (satOpen ? ", 토요일은 영업일로 계산" : "") + "했습니다.</p>";
+  }
+  function runCustom() {
+    var holidays = document.getElementById("adv-holidays").value;
+    var satOpen = document.getElementById("adv-sat").checked;
+    if (holidays.trim() === "" && !satOpen) { advBox.hidden = true; return; }
+    var start = isoOf("start");
+    if (mode.value === "add") {
+      var n = document.getElementById("n").value;
+      if (n === "") { advBox.hidden = true; return; }
+      var r = EigyobiCalc.addBusinessDaysCustom(start, parseInt(n, 10), holidays, satOpen);
+      if (!r.ok) { err(advBox, r.code); return; }
+      advBox.innerHTML =
+        '<div class="result-main">' + koDate(r.date) + "(" + WD_KO[r.weekday] + "요일)</div>" +
+        customNote(r, satOpen);
+    } else {
+      var r2 = EigyobiCalc.countBusinessDaysCustom(start, isoOf("end"), holidays, satOpen);
+      if (!r2.ok) { err(advBox, r2.code); return; }
+      advBox.innerHTML =
+        '<div class="result-main">영업일 수 ' + r2.businessDays.toLocaleString() + '일</div>' +
+        "<p>기간 전체: " + r2.totalDays.toLocaleString() + "일(시작일·종료일 포함)</p>" +
+        customNote(r2, satOpen);
+    }
+    advBox.hidden = false;
+  }
+
+  mode.addEventListener("change", function () {
+    var isAdd = mode.value === "add";
+    nLabel.hidden = !isAdd;
+    endRow.hidden = isAdd;
+    run();
+  });
+  ["start-year", "start-month", "start-day", "end-year", "end-month", "end-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", run);
+  });
+  document.getElementById("n").addEventListener("input", run);
+  document.getElementById("adv-holidays").addEventListener("input", runCustom);
+  document.getElementById("adv-sat").addEventListener("change", runCustom);
+  document.getElementById("eigyobi-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+
+  run();
+})();
+</script>
+</body>
+</html>

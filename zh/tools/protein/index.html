@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>蛋白质摄入量计算器(每日所需参考量) | Quick Calc</title>
+  <meta name="description" content="根据体重和运动量计算一天所需蛋白质的参考量,并换算成常见食品(鸡胸肉、鸡蛋、牛奶、纳豆各需多少)。适合健身、减肥和饮食管理。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/protein/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="蛋白质摄入量计算器(每日所需参考量) | Quick Calc">
+  <meta property="og:description" content="根据体重和运动量计算一天所需蛋白质的参考量,并换算成常见食品(鸡胸肉、鸡蛋、牛奶、纳豆各需多少)。适合健身、减肥和饮食管理。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/protein/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"蛋白质摄入量计算器(每日所需参考量)","item":"https://quick-calc.site/zh/tools/protein/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/protein/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/protein/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/protein/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/protein/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/protein/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>蛋白质摄入量计算器</h1>
+  <form class="tool-form" id="protein-form">
+    <span class="field-note">输入体重,结果立即显示在下方</span>
+    <label>体重(kg)
+      <input type="number" id="weight" inputmode="decimal" min="20" max="300" step="0.1" required placeholder="例: 60">
+    </label>
+    <label>运动量
+      <select id="level">
+        <option value="normal" selected>普通生活(以办公桌工作为主)</option>
+        <option value="active">有运动习惯(每周2〜3次)</option>
+        <option value="training">健身增肌·运动员</option>
+      </select>
+    </label>
+    <button type="submit">计算所需量</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 换算成食品·检查今天的摄入量</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">把所需量换算成常见食品</h3>
+      <p class="adv-note">把蛋白质的量(g)换算成「只靠这一种食品来满足」时的量(留空则使用上面算出的所需量)。</p>
+      <label>蛋白质的量(g)
+        <input type="number" id="adv-grams" inputmode="decimal" step="any" min="1" max="500" placeholder="留空则使用上面的计算结果">
+      </label>
+      <button type="button" id="adv-conv-run">换算成食品</button>
+
+      <h3 class="adv-h">今天摄入了多少?(按吃的量合计)</h3>
+      <p class="adv-note">输入今天吃的量,即可合计蛋白质并计算与所需量的差距(不用的栏留空即可)。</p>
+      <label>鸡胸肉(g)
+        <input type="number" id="adv-f-chicken" inputmode="decimal" step="any" min="0" max="2000" placeholder="例: 100">
+      </label>
+      <label>鸡蛋(个)
+        <input type="number" id="adv-f-egg" inputmode="decimal" step="any" min="0" max="30" placeholder="例: 2">
+      </label>
+      <label>纳豆(盒)
+        <input type="number" id="adv-f-natto" inputmode="decimal" step="any" min="0" max="20" placeholder="例: 1">
+      </label>
+      <label>牛奶(ml)
+        <input type="number" id="adv-f-milk" inputmode="decimal" step="any" min="0" max="3000" placeholder="例: 200">
+      </label>
+      <label>蛋白粉(勺)
+        <input type="number" id="adv-f-powder" inputmode="decimal" step="any" min="0" max="10" placeholder="例: 1">
+      </label>
+      <button type="button" id="adv-intake-run">合计今天的摄入量</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>只需输入体重,就能知道<strong>一天该摄入多少蛋白质</strong>。计算基于日本《饮食摄取基准》的思路和运动营养学的常用推荐值,并用鸡胸肉、鸡蛋等常见食品展示大概相当于多少。适合健身、减肥期间检查饮食。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>输入体重。</li>
+    <li>选择运动量(普通/有运动习惯/健身增肌)。</li>
+    <li>输入的同时,一天的参考量和食品换算立即显示在下方,无需点击按钮。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>普通生活: 体重 × 0.9g/日</strong>(基于《日本人饮食摄取基准》推算蛋白质推荐量时所用思路的概数。日本成人的推荐量为男性65g、女性50g/日)</li>
+    <li><strong>有运动习惯: 体重 × 1.2g / 健身增肌·运动员: 体重 × 1.6g</strong>(运动营养学中普遍推荐的1.2〜2.0g/kg范围内的代表值)</li>
+    <li>计算示例: 60kg·普通生活 → <strong>约54g/日</strong>。约相当于去皮鸡胸肉230g,或9个鸡蛋。</li>
+  </ul>
+
+  <h3>出处与前提</h3>
+  <ul class="sources">
+    <li>推荐量的依据: <a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/kenkou/eiyou/syokuji_kijyun.html" target="_blank" rel="noopener">日本厚生劳动省《日本人饮食摄取基准》</a>(日文) / 食品的蛋白质含量: <a href="https://fooddb.mext.go.jp/" target="_blank" rel="noopener">日本文部科学省 食品成分数据库</a>(日文)(去皮鸡胸肉每100g约23g、鸡蛋1个约6g、牛奶200ml约7g、纳豆1盒约8g)</li>
+  </ul>
+
+  <h2>前提与注意</h2>
+  <ul class="cautions">
+    <li>因肾脏疾病等被要求限制蛋白质的人,请优先遵循医生和注册营养师的指示。</li>
+    <li>与一次大量摄入相比,分三餐摄入的利用效率被认为更好。</li>
+    <li>长期大幅超过体重×2g的过量摄入,尚未确认有额外好处。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">需要喝蛋白粉(补剂)吗?</h3>
+  <p class="faq-a">如果三餐已能摄入参考量,就不是必需品。合理的用法是回顾一天的饮食,把不足的部分(例如20g)补上。蛋白粉1勺大约是15〜25g。</p>
+  <h3 class="faq-q">有哪些方便补充蛋白质的食品?</h3>
+  <p class="faq-a">大致参考: 鸡胸肉100g=约23g、鸡蛋1个=约6g、牛奶1杯=约7g、纳豆1盒=约8g、北豆腐半块=约10g、青花鱼罐头1罐=约26g。组合搭配来接近一天的参考量。</p>
+  <h3 class="faq-q">减肥期间也需要蛋白质吗?</h3>
+  <p class="faq-a">反而更重要。减少摄入热量时肌肉也容易流失,常见做法是保证体重×1.2g左右的蛋白质,同时调整热量。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/protein/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/protein/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/protein/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=protein">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/protein/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var LEVEL_ZH = {
+    "ふつうの生活": "普通生活",
+    "運動習慣あり(週2〜3回)": "有运动习惯(每周2〜3次)",
+    "筋トレ・スポーツ選手": "健身增肌·运动员"
+  };
+  var FOODS = [
+    ["鸡胸肉(去皮)", 23, "g", 100],
+    ["鸡蛋", 6.1, "个", 1],
+    ["牛奶(200ml)", 6.8, "杯", 1],
+    ["纳豆(1盒)", 8.3, "盒", 1]
+  ];
+  var weightEl = document.getElementById("weight");
+  function run() {
+    if (weightEl.value === "") { box.hidden = true; return; }
+    var r = ProteinCalc.needs(parseFloat(weightEl.value), document.getElementById("level").value);
+    if (!r.ok) { box.innerHTML = '<p class="result-error">体重请在20〜300kg范围内输入。</p>'; box.hidden = false; return; }
+    var rows = FOODS.map(function (f) {
+      var amount = f[0] === "鸡胸肉(去皮)" ? Math.round(r.grams / f[1] * f[3] / 10) * 10 + "g" : Math.round(r.grams / f[1] * 10) / 10 + f[2];
+      return "<tr><td>只靠" + f[0] + "的话</td><td>约 " + amount + "</td></tr>";
+    }).join("");
+    box.innerHTML =
+      '<div class="result-main">一天 约' + r.grams.toLocaleString() + " g</div>" +
+      "<p>" + (LEVEL_ZH[r.label] || r.label) + "(体重×" + r.rate + "g)的参考值。</p>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>食品换算</th><th>量</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div><p>实际请组合多种食品摄入。</p>";
+    box.hidden = false;
+  }
+  weightEl.addEventListener("input", run);
+  document.getElementById("level").addEventListener("change", run);
+  document.getElementById("protein-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var LEVEL_ZH = {
+    "ふつうの生活": "普通生活",
+    "運動習慣あり(週2〜3回)": "有运动习惯(每周2〜3次)",
+    "筋トレ・スポーツ選手": "健身增肌·运动员"
+  };
+  var advBox = document.getElementById("adv-result");
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function currentNeeds() {
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(w)) return null;
+    var r = ProteinCalc.needs(w, document.getElementById("level").value);
+    return r.ok ? r : null;
+  }
+  var lastAdv = null;
+  function runConv(fromButton) {
+    var gEl = document.getElementById("adv-grams");
+    var grams;
+    if (gEl.value === "") {
+      var n = currentNeeds();
+      if (!n) { if (fromButton) advErr("请输入克数,或在上面的表单中输入体重。"); return; }
+      grams = n.grams;
+    } else {
+      grams = parseFloat(gEl.value);
+    }
+    var r = ProteinCalc.foodEquivalents(grams);
+    if (!r.ok) { advErr("蛋白质的量请在1〜500g范围内输入。"); return; }
+    var fmt1 = function (v) { return v.toLocaleString(undefined, { maximumFractionDigits: 1 }); };
+    advBox.innerHTML =
+      '<div class="result-main">蛋白质 ' + fmt1(r.grams) + " g 相当于…</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>只靠这一种食品的话</th><th>量</th></tr></thead><tbody>' +
+      "<tr><td>鸡胸肉(100g≒22g)</td><td>约 " + r.chickenG.toLocaleString() + " g</td></tr>" +
+      "<tr><td>鸡蛋(1个≒6g)</td><td>约 " + fmt1(r.eggs) + " 个</td></tr>" +
+      "<tr><td>纳豆(1盒≒8g)</td><td>约 " + fmt1(r.natto) + " 盒</td></tr>" +
+      "<tr><td>牛奶(200ml≒7g)</td><td>约 " + fmt1(r.milkCups) + " 杯(200ml)</td></tr>" +
+      "<tr><td>蛋白粉(1勺≒20g)</td><td>约 " + fmt1(r.scoops) + " 勺</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">各项蛋白质含量均为概数。实际请组合多种食品摄入。</p>';
+    lastAdv = runConv;
+    advBox.hidden = false;
+  }
+  function runIntake(fromButton) {
+    function val(id) {
+      var v = document.getElementById(id).value;
+      return v === "" ? undefined : parseFloat(v);
+    }
+    var r = ProteinCalc.intakeFromFoods({
+      chickenG: val("adv-f-chicken"),
+      eggs: val("adv-f-egg"),
+      natto: val("adv-f-natto"),
+      milkMl: val("adv-f-milk"),
+      scoops: val("adv-f-powder")
+    });
+    if (!r.ok) {
+      if (fromButton || r.code !== "invalid_foods") {
+        advErr(r.code === "invalid_foods" ? "请至少输入一种食品的量。"
+          : "请输入各输入栏范围内的数值。");
+      }
+      return;
+    }
+    lastAdv = runIntake;
+    var html = '<div class="result-main">今天合计 约 ' +
+      r.totalG.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " g</div>";
+    var n = currentNeeds();
+    if (n) {
+      var diff = Math.round((n.grams - r.totalG) * 10) / 10;
+      if (diff > 0) {
+        html += "<p>距一天的所需量(约 " + n.grams.toLocaleString() + " g·" + (LEVEL_ZH[n.label] || n.label) +
+          ")还差 <strong>约 " + diff.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " g</strong>。</p>";
+      } else {
+        html += "<p><strong>已达到一天的所需量(约 " + n.grams.toLocaleString() + " g)。</strong></p>";
+      }
+    } else {
+      html += '<p class="adv-note">在上面的表单中输入体重,还会显示与一天所需量的差距。</p>';
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-conv-run").addEventListener("click", function () { runConv(true); });
+  document.getElementById("adv-intake-run").addEventListener("click", function () { runIntake(true); });
+  document.getElementById("adv-grams").addEventListener("input", function () { runConv(false); });
+  ["adv-f-chicken", "adv-f-egg", "adv-f-natto", "adv-f-milk", "adv-f-powder"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runIntake(false); });
+  });
+  document.getElementById("weight").addEventListener("input", function () { if (lastAdv) lastAdv(false); });
+  document.getElementById("level").addEventListener("change", function () { if (lastAdv) lastAdv(false); });
+})();
+</script>
+</body>
+</html>

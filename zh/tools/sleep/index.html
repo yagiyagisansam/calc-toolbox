@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>睡眠时长计算器(由就寝和起床时刻计算) | Quick Calc</title>
+  <meta name="description" content="只需输入就寝时刻和起床时刻,免费计算睡眠时长,跨越午夜也能正确计算。适合记录每日睡眠,或从起床时刻反推该几点睡。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/sleep/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="睡眠时长计算器(由就寝和起床时刻计算) | Quick Calc">
+  <meta property="og:description" content="只需输入就寝时刻和起床时刻,免费计算睡眠时长,跨越午夜也能正确计算。适合记录每日睡眠,或从起床时刻反推该几点睡。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/sleep/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"睡眠时长计算器(由就寝和起床时刻计算)","item":"https://quick-calc.site/zh/tools/sleep/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/sleep/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/sleep/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/sleep/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/sleep/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/sleep/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>睡眠时长计算器</h1>
+  <form class="tool-form" id="sleep-form">
+    <span class="field-note">选择时刻,睡眠时长立即显示在下方</span>
+    <label>就寝时刻
+      <input type="time" id="bed" value="23:00" required>
+    </label>
+    <label>起床时刻
+      <input type="time" id="wake" value="06:30" required>
+    </label>
+    <button type="submit">计算</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 一周睡眠记录·就寝时刻反算</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">这一周睡够了吗?(睡眠负债检查)</h3>
+      <p class="adv-note">每输入一天的睡眠时长(小时,可用小数),就只按已输入的天数计算平均值和相对每日7小时的差额(空着的日子忽略)。</p>
+      <div id="adv-week" style="display:flex;flex-wrap:wrap;gap:8px;">
+        <input type="number" id="adv-d1" inputmode="decimal" step="any" min="0" max="24" placeholder="第1天" aria-label="第1天的睡眠时长(小时)" style="width:6em;">
+        <input type="number" id="adv-d2" inputmode="decimal" step="any" min="0" max="24" placeholder="第2天" aria-label="第2天的睡眠时长(小时)" style="width:6em;">
+        <input type="number" id="adv-d3" inputmode="decimal" step="any" min="0" max="24" placeholder="第3天" aria-label="第3天的睡眠时长(小时)" style="width:6em;">
+        <input type="number" id="adv-d4" inputmode="decimal" step="any" min="0" max="24" placeholder="第4天" aria-label="第4天的睡眠时长(小时)" style="width:6em;">
+        <input type="number" id="adv-d5" inputmode="decimal" step="any" min="0" max="24" placeholder="第5天" aria-label="第5天的睡眠时长(小时)" style="width:6em;">
+        <input type="number" id="adv-d6" inputmode="decimal" step="any" min="0" max="24" placeholder="第6天" aria-label="第6天的睡眠时长(小时)" style="width:6em;">
+        <input type="number" id="adv-d7" inputmode="decimal" step="any" min="0" max="24" placeholder="第7天" aria-label="第7天的睡眠时长(小时)" style="width:6em;">
+      </div>
+      <button type="button" id="adv-week-run">查看一周汇总</button>
+
+      <h3 class="adv-h">从明天的起床时刻反算「该几点睡」</h3>
+      <p class="adv-note">输入目标睡眠时长,就会从上面表单的起床时刻反算「几点睡合适」。</p>
+      <label>目标睡眠时长(小时)
+        <input type="number" id="adv-target-hours" inputmode="decimal" step="any" min="1" max="16" value="7">
+      </label>
+      <button type="button" id="adv-bed-run">反算就寝时刻</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    本工具计算的是「上床到起床」的简单时间差,属于<strong>约值</strong>。不包含入睡所需时间和半夜醒来的时间,实际睡着的时间可能比这更短。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>只需输入睡觉和起床的时刻,就能立即知道<strong>睡了多久</strong>。跨越午夜0点也能正确计算。适合想调整睡眠节奏的人。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>输入就寝时刻(入睡的时刻)。</li>
+    <li>输入起床时刻的同时,睡眠时长立即显示在下方,无需点击按钮。</li>
+    <li>「想6点起床睡满7小时」→ 也可以用来从起床时刻反推、尝试不同的就寝时刻。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>睡眠时长 = 起床时刻 − 就寝时刻</strong>(24小时制。起床时刻更早时按跨天计算)</li>
+    <li>计算例: 23:00就寝 → 6:30起床 = 7小时30分</li>
+  </ul>
+
+  <h3>出处与前提</h3>
+  <ul class="sources">
+    <li>本工具只做时刻相减的算术计算。所需睡眠时长因人而异,本工具不判定「睡几小时才合适」。</li>
+  </ul>
+
+  <h2>前提与注意</h2>
+  <ul class="cautions">
+    <li>不包含午睡(小睡)。想把小睡也算进去时,请分别计算后相加。</li>
+    <li>无法测量睡眠质量(深度·中途醒来)。白天持续强烈困倦时请咨询医疗机构。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">睡几个小时最理想?</h3>
+  <p class="faq-a">所需睡眠时长因年龄和个人差异很大,没有统一的标准答案。白天没有强烈困倦、能正常度过,被认为是比较实用的判断标准。</p>
+  <h3 class="faq-q">听说按90分钟的倍数起床比较好?</h3>
+  <p class="faq-a">睡眠周期常被说成「约90分钟」,但实际周期因人(甚至同一晚内)有差异,所以本工具不做90分钟为单位的推荐。</p>
+  <h3 class="faq-q">回笼觉和贪睡闹钟的时间怎么算?</h3>
+  <p class="faq-a">把最终离开被窝的时刻作为起床时刻,算的是「躺着的时间」;把第一次醒来的时刻作为起床时刻,算的是「主睡眠时间」。请按目的选用。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/sleep/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/sleep/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/sleep/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=sleep">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/sleep/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_bed: "请输入就寝时刻。",
+    invalid_wake: "请输入起床时刻。",
+    same_time: "就寝时刻和起床时刻相同。"
+  };
+  var box = document.getElementById("result");
+  var bedEl = document.getElementById("bed");
+  var wakeEl = document.getElementById("wake");
+  function run() {
+    if (bedEl.value === "" || wakeEl.value === "") { box.hidden = true; return; }
+    var result = SleepCalc.calculate(bedEl.value, wakeEl.value);
+    if (result.ok) {
+      box.innerHTML = '<div class="result-main">' + result.hours + "小时" +
+        (result.minutes > 0 ? result.minutes + "分" : "") + "</div>" +
+        "<p>合计 " + result.totalMinutes.toLocaleString() + " 分钟</p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "请检查输入的数值。") + "</p>";
+    }
+    box.hidden = false;
+  }
+  bedEl.addEventListener("input", run);
+  wakeEl.addEventListener("input", run);
+  document.getElementById("sleep-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  var lastAdv = null;
+  function runWeek(fromButton) {
+    var list = [];
+    var entered = 0;
+    for (var i = 1; i <= 7; i++) {
+      var v = document.getElementById("adv-d" + i).value;
+      if (v === "") { list.push(null); continue; }
+      list.push(parseFloat(v));
+      entered++;
+    }
+    if (entered === 0) {
+      if (fromButton) advErr("请至少输入1天的睡眠时长。");
+      else if (lastAdv === runWeek) advBox.hidden = true;
+      return;
+    }
+    var r = SleepCalc.weekStatsPartial(list);
+    if (!r.ok) { advErr("睡眠时长请在0〜24小时范围内输入。"); return; }
+    lastAdv = runWeek;
+    var fmt1 = function (v) { return v.toLocaleString(undefined, { maximumFractionDigits: 1 }); };
+    var idealTotal = 7 * r.days;
+    var judge;
+    if (r.diffHours < 0) {
+      judge = "比理想值(每日7小时×" + r.days + "天=" + idealTotal + "小时)<strong>约少 " + fmt1(Math.abs(r.diffHours)) +
+        " 小时</strong>,可作为睡眠不足累积(睡眠负债)的参考。";
+    } else if (r.diffHours > 0) {
+      judge = "比理想值(" + idealTotal + "小时)约多睡了 " + fmt1(r.diffHours) + " 小时。";
+    } else {
+      judge = "<strong>正好符合理想节奏(每日7小时)。</strong>";
+    }
+    advBox.innerHTML =
+      '<div class="result-main">平均 ' + fmt1(r.avgHours) + " 小时/天</div>" +
+      "<p>按已输入的 " + r.days + " 天计算。补上其余天数会自动更新。</p>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>" + r.days + "天的合计</td><td>" + fmt1(r.totalHours) + " 小时</td></tr>" +
+      "<tr><td>与理想值(" + idealTotal + "小时)的差</td><td>" + (r.diffHours > 0 ? "+" : "") + fmt1(r.diffHours) + " 小时</td></tr>" +
+      "</tbody></table></div>" +
+      "<p>" + judge + "</p>" +
+      '<p class="adv-note">所需睡眠时长因人而异,7小时只是一般性参考值。</p>';
+    advBox.hidden = false;
+  }
+  function runBed(fromButton) {
+    var wake = document.getElementById("wake").value;
+    if (wake === "") { if (fromButton) advErr("请先在上面的表单中输入起床时刻。"); return; }
+    var tEl = document.getElementById("adv-target-hours");
+    if (tEl.value === "") { if (fromButton) advErr("请输入目标睡眠时长。"); return; }
+    var r = SleepCalc.bedTimeFor(wake, parseFloat(tEl.value));
+    if (!r.ok) {
+      advErr(r.code === "invalid_target" ? "目标睡眠时长请在1〜16小时范围内输入。"
+        : "请检查起床时刻。");
+      return;
+    }
+    lastAdv = runBed;
+    advBox.innerHTML =
+      '<div class="result-main">' + r.bedTime + " 前就寝</div>" +
+      "<p>要在 " + wake + " 起床并睡满 " + parseFloat(tEl.value).toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      " 小时,按计算需要在 <strong>" + r.bedTime + "</strong> 前入睡。由于不包含入睡所需时间,建议稍早一点上床。</p>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-week-run").addEventListener("click", function () { runWeek(true); });
+  document.getElementById("adv-bed-run").addEventListener("click", function () { runBed(true); });
+  for (var d = 1; d <= 7; d++) {
+    document.getElementById("adv-d" + d).addEventListener("input", function () { runWeek(false); });
+  }
+  document.getElementById("adv-target-hours").addEventListener("input", function () { runBed(false); });
+  document.getElementById("wake").addEventListener("input", function () { if (lastAdv === runBed) runBed(false); });
+})();
+</script>
+</body>
+</html>

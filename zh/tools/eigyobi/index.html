@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>日本工作日计算器(几个工作日后是哪天?排除周末和日本节假日) | Quick Calc</title>
+  <meta name="description" content="按日本的法定节假日(含振替休日)计算「3个工作日后是哪天」,也能统计期间内的工作日数。日本的节假日与中国不同,核对交货期、付款期限、办手续时间时很方便。免费即时,支持2026〜2027年。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/eigyobi/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="日本工作日计算器(几个工作日后是哪天?排除周末和日本节假日) | Quick Calc">
+  <meta property="og:description" content="按日本的法定节假日(含振替休日)计算「3个工作日后是哪天」,也能统计期间内的工作日数。日本的节假日与中国不同,核对交货期、付款期限、办手续时间时很方便。免费即时,支持2026〜2027年。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/eigyobi/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"日本工作日计算器","item":"https://quick-calc.site/zh/tools/eigyobi/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/eigyobi/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/eigyobi/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/eigyobi/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/eigyobi/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/eigyobi/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>日本工作日计算器(排除周末·日本节假日)</h1>
+  <form class="tool-form" id="eigyobi-form">
+    <span class="field-note">选好数值后,结果立即显示在下方</span>
+    <label>计算类型
+      <select id="mode">
+        <option value="add" selected>N个工作日后的日期</option>
+        <option value="count">期间内的工作日数</option>
+      </select>
+    </label>
+    <div class="field-row">
+      <label>起算日(年)
+        <select id="start-year"></select>
+      </label>
+      <label>月
+        <select id="start-month"></select>
+      </label>
+      <label>日
+        <select id="start-day"></select>
+      </label>
+    </div>
+    <label id="n-label">几个工作日后?
+      <input type="number" id="n" inputmode="numeric" min="1" max="200" step="1" value="3">
+    </label>
+    <div class="field-row" id="end-row" hidden>
+      <label>结束日(年)
+        <select id="end-year"></select>
+      </label>
+      <label>月
+        <select id="end-month"></select>
+      </label>
+      <label>日
+        <select id="end-day"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 反映公司休业日·周六上班</summary>
+    <div class="adv-inner">
+      <p class="adv-note">填入公司自己的休息日(如夏季休假),或切换成周六也上班,就会按公司日历重新做同样的计算。</p>
+      <label>公司休业日列表(用逗号或换行分隔)
+        <textarea id="adv-holidays" rows="3" placeholder="例: 2026-08-13, 2026-08-14, 2026-12-30"></textarea>
+      </label>
+      <label><input type="checkbox" id="adv-sat"> 周六也算工作日(周日·节假日照常休息)</label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    计算时排除周末和<strong>日本的法定节假日(含振替休日·国民休日)</strong>。不含年末年初、盂兰盆等公司自定休业日。支持范围为2026年1月〜2027年12月。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>输入起算日,立即算出「3个工作日后是哪天」——已自动排除周末和<strong>日本的法定节假日</strong>。日本的节假日和中国不一样(没有春节、国庆长假,却有「黄金周」等日本特有的连休),在日本核对交货期、付款期限,或推算银行、政府窗口哪天恢复办公时,用它就不会数错。也能统计期间内共有多少个工作日。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>选择「N个工作日后的日期」或「期间内的工作日数」。</li>
+    <li>输入起算日和工作日数(或结束日)。</li>
+    <li>输入的瞬间就会显示结果,无需点击按钮。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>工作日 = 周六、周日、日本节假日以外的日子</strong>。</li>
+    <li>「N个工作日后」从起算日的第二天开始数(周五的3个工作日后=下周三)。</li>
+    <li>节假日包含振替休日(节假日逢周日时,之后第一个平日补休)和国民休日(被两个节假日夹住的平日)。2026年,被9月21日敬老日和9月23日秋分日夹住的9月22日就是国民休日。</li>
+    <li>期间内的工作日数把开始日和结束日都算在内。</li>
+  </ul>
+
+  <h3>出处与前提</h3>
+  <ul class="sources">
+    <li>节假日依据日本《国民祝日相关法律》,并基于日本内阁府<a href="https://www8.cao.go.jp/chosei/shukujitsu/gaiyou.html" target="_blank" rel="noopener">「关于国民的祝日」</a>(日文)公布的2026年·2027年一览。</li>
+  </ul>
+
+  <h2>计算前提与注意</h2>
+  <ul class="cautions">
+    <li>银行转账、证券交割等在此之外还有年末年初(12/31〜1/3)等机构自定休业日。准确期限请向各机构确认。</li>
+    <li>有的公司对工作日的定义不同(周六营业、平日休息等)。</li>
+    <li>节假日可能因法律修订而变化(支持范围: 2026〜2027年)。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">「3个工作日以内」包含当天吗?</h3>
+  <p class="faq-a">按惯例多从起算日(提出请求当天)的下一个工作日开始数,但合同或条款可能另有定义。本工具按次日起算计算。重要期限最好向对方确认。</p>
+  <h3 class="faq-q">银行的「按下一个工作日处理」是什么意思?</h3>
+  <p class="faq-a">指在周末、节假日或15点以后操作转账时,实际处理会推到下一个工作日。周五15点以后的转账按周一处理(周一是节假日则推到周二)。</p>
+  <h3 class="faq-q">节假日数据是什么时候的?</h3>
+  <p class="faq-a">使用日本内阁府公布的2026年·2027年节假日(含振替休日)。超出范围的日期会报错。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/eigyobi/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/eigyobi/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/eigyobi/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=eigyobi">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/eigyobi/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var today = new Date();
+  var WD_ZH = { "月": "周一", "火": "周二", "水": "周三", "木": "周四", "金": "周五", "土": "周六", "日": "周日" };
+
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, "日", Math.min(keep, max));
+  }
+  function isoOf(prefix) {
+    adjustDays(prefix + "-year", prefix + "-month", prefix + "-day");
+    return val(prefix + "-year") + "-" +
+      String(val(prefix + "-month")).padStart(2, "0") + "-" +
+      String(val(prefix + "-day")).padStart(2, "0");
+  }
+  function zhDate(iso) {
+    var p = iso.split("-");
+    return parseInt(p[0], 10) + "年" + parseInt(p[1], 10) + "月" + parseInt(p[2], 10) + "日";
+  }
+  // 初始值控制在支持范围内(2026〜2027年)
+  var initY = Math.min(Math.max(today.getFullYear(), 2026), 2027);
+  var initM = today.getFullYear() === initY ? today.getMonth() + 1 : 1;
+  var initD = today.getFullYear() === initY ? today.getDate() : 1;
+  function initDate(prefix) {
+    fillSelect(document.getElementById(prefix + "-year"), 2026, 2027, "年", initY);
+    fillSelect(document.getElementById(prefix + "-month"), 1, 12, "月", initM);
+    fillSelect(document.getElementById(prefix + "-day"), 1, daysInMonth(initY, initM), "日", initD);
+  }
+  initDate("start");
+  initDate("end");
+
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var mode = document.getElementById("mode");
+  var nLabel = document.getElementById("n-label");
+  var endRow = document.getElementById("end-row");
+
+  var MSG = {
+    invalid_date: "请输入正确的日期。",
+    invalid_n: "工作日数请输入1〜200的整数。",
+    invalid_holidays: "休业日列表中有无法识别为日期的项目。请按「2026-08-13」的格式输入。",
+    out_of_range: "支持范围为2026年1月1日〜2027年12月31日。",
+    date_order: "结束日需在开始日当天或之后。"
+  };
+  function err(boxEl, code) {
+    boxEl.innerHTML = '<p class="result-error">' + (MSG[code] || "请检查输入内容。") + "</p>";
+    boxEl.hidden = false;
+  }
+
+  // ---- 主计算: 按周末+日本节假日日历即时计算 ----
+  function run() {
+    var start = isoOf("start");
+    if (mode.value === "add") {
+      var n = document.getElementById("n").value;
+      if (n === "") { box.hidden = true; runCustom(); return; }
+      var r = EigyobiCalc.addBusinessDays(start, parseInt(n, 10));
+      if (!r.ok) { err(box, r.code); runCustom(); return; }
+      box.innerHTML = '<div class="result-main">' + zhDate(r.date) + "(" + WD_ZH[r.weekday] + ")</div>" +
+        "<p>已排除周末和日本节假日。</p>";
+    } else {
+      var r2 = EigyobiCalc.countBusinessDays(start, isoOf("end"));
+      if (!r2.ok) { err(box, r2.code); runCustom(); return; }
+      box.innerHTML = '<div class="result-main">' + r2.businessDays + " 个工作日</div>" +
+        "<p>按日历计算为" + r2.totalDays + "天(含首尾两天)。</p>";
+    }
+    box.hidden = false;
+    runCustom();
+  }
+
+  // ---- 更多功能: 按公司日历即时计算 ----
+  function customNote(r, satOpen) {
+    return '<p class="adv-note">已反映公司休业日 ' + r.customCount.toLocaleString() + ' 天' +
+      (satOpen ? ",并将周六计为工作日" : "") + "。</p>";
+  }
+  function runCustom() {
+    var holidays = document.getElementById("adv-holidays").value;
+    var satOpen = document.getElementById("adv-sat").checked;
+    if (holidays.trim() === "" && !satOpen) { advBox.hidden = true; return; }
+    var start = isoOf("start");
+    if (mode.value === "add") {
+      var n = document.getElementById("n").value;
+      if (n === "") { advBox.hidden = true; return; }
+      var r = EigyobiCalc.addBusinessDaysCustom(start, parseInt(n, 10), holidays, satOpen);
+      if (!r.ok) { err(advBox, r.code); return; }
+      advBox.innerHTML =
+        '<div class="result-main">' + zhDate(r.date) + "(" + WD_ZH[r.weekday] + ")</div>" +
+        customNote(r, satOpen);
+    } else {
+      var r2 = EigyobiCalc.countBusinessDaysCustom(start, isoOf("end"), holidays, satOpen);
+      if (!r2.ok) { err(advBox, r2.code); return; }
+      advBox.innerHTML =
+        '<div class="result-main">工作日数 ' + r2.businessDays.toLocaleString() + ' 天</div>' +
+        "<p>整个期间: " + r2.totalDays.toLocaleString() + "天(含开始日和结束日)</p>" +
+        customNote(r2, satOpen);
+    }
+    advBox.hidden = false;
+  }
+
+  mode.addEventListener("change", function () {
+    var isAdd = mode.value === "add";
+    nLabel.hidden = !isAdd;
+    endRow.hidden = isAdd;
+    run();
+  });
+  ["start-year", "start-month", "start-day", "end-year", "end-month", "end-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", run);
+  });
+  document.getElementById("n").addEventListener("input", run);
+  document.getElementById("adv-holidays").addEventListener("input", runCustom);
+  document.getElementById("adv-sat").addEventListener("change", runCustom);
+  document.getElementById("eigyobi-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+
+  run();
+})();
+</script>
+</body>
+</html>

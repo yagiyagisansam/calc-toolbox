@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>쓰보(坪)·제곱미터(㎡)·조(畳) 변환기 | Quick Calc</title>
+  <meta name="description" content="일본 부동산 광고와 평면도에 나오는 면적 단위인 쓰보(坪)⇔제곱미터(㎡)⇔조(畳, 다다미)를 무료로 한 번에 상호 변환합니다. 1쓰보=약 3.31㎡, 다다미 1장=1.62㎡(일본 부동산 광고 표시 기준)를 근거로 하며 출처도 함께 표시합니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/tsubo/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="쓰보(坪)·제곱미터(㎡)·조(畳) 변환기 | Quick Calc">
+  <meta property="og:description" content="일본 부동산 광고와 평면도에 나오는 면적 단위인 쓰보(坪)⇔제곱미터(㎡)⇔조(畳, 다다미)를 무료로 한 번에 상호 변환합니다. 1쓰보=약 3.31㎡, 다다미 1장=1.62㎡(일본 부동산 광고 표시 기준)를 근거로 하며 출처도 함께 표시합니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/tsubo/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"쓰보(坪)·제곱미터(㎡)·조(畳) 변환기","item":"https://quick-calc.site/ko/tools/tsubo/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/tsubo/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/tsubo/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/tsubo/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/tsubo/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/tsubo/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>쓰보(坪)·제곱미터(㎡)·조(畳) 변환기</h1>
+  <form class="tool-form" id="tsubo-form">
+    <label>면적 값
+      <span class="field-note">숫자를 입력하면 바로 아래에 변환 결과가 표시됩니다(지원 범위: 0.01〜100,000)</span>
+      <input type="number" id="value" inputmode="decimal" step="0.01" min="0.01" max="100000" placeholder="100" required>
+    </label>
+    <label>입력한 값의 단위
+      <select id="unit">
+        <option value="sqm">제곱미터(㎡)</option>
+        <option value="tsubo">쓰보(坪)</option>
+        <option value="jo">조(畳, 다다미)</option>
+      </select>
+    </label>
+    <button type="submit">변환하기</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 건폐율·용적률과 쓰보 단가 계산</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">건폐율·용적률로 지을 수 있는 넓이 계산</h3>
+      <p class="adv-note">토지 광고에 적힌 <strong>건폐율(建ぺい率)</strong>(건물이 토지를 차지해도 되는 비율)과 <strong>용적률(容積率)</strong>(전체 층 바닥면적 합계의 상한 비율)로 지을 수 있는 건물의 상한을 계산합니다.</p>
+      <label>토지 면적
+        <input type="number" id="adv-land" inputmode="decimal" step="any" min="0.01" max="100000" placeholder="예: 100">
+      </label>
+      <label>토지 면적의 단위
+        <select id="adv-land-unit">
+          <option value="sqm" selected>제곱미터(㎡)</option>
+          <option value="tsubo">쓰보(坪)</option>
+        </select>
+      </label>
+      <label>건폐율(%)
+        <input type="number" id="adv-kenpei" inputmode="decimal" step="any" min="1" max="100" placeholder="예: 60">
+      </label>
+      <label>용적률(%)
+        <input type="number" id="adv-yoseki" inputmode="decimal" step="any" min="1" max="2000" placeholder="예: 200">
+      </label>
+      <button type="button" id="adv-limit-run">상한 계산하기</button>
+      <div class="tool-result" id="adv-limit-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">쓰보 단가 계산</h3>
+      <p class="adv-note">매물의 가격과 면적으로 쓰보 단가와 ㎡ 단가를 계산합니다.</p>
+      <label>가격(만 엔)
+        <span class="field-note">일본 부동산 광고는 「만 엔」 단위로 가격을 표시합니다. 1만 엔=10,000엔이므로 3000은 3,000만 엔입니다</span>
+        <input type="number" id="adv-price" inputmode="decimal" step="any" min="1" placeholder="예: 3000">
+      </label>
+      <label>면적
+        <input type="number" id="adv-area" inputmode="decimal" step="any" min="0.01" max="100000" placeholder="예: 100">
+      </label>
+      <label>면적의 단위
+        <select id="adv-area-unit">
+          <option value="sqm" selected>제곱미터(㎡)</option>
+          <option value="tsubo">쓰보(坪)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-price-run">쓰보 단가 계산하기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    이 도구의 변환 결과는 <strong>대략적인 값</strong>입니다. 조(畳)는 광고 표시 기준인 「1장=1.62㎡」로 환산하므로 실제 다다미의 치수(교마·주쿄마·에도마·단치마)와는 다를 수 있습니다.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>면적 숫자를 하나만 입력하면 <strong>쓰보·제곱미터(㎡)·조(다다미)로 각각 얼마인지</strong>를 바로 알 수 있습니다. 일본에서 방을 구할 때 광고와 평면도에는 이 세 단위가 섞여 나오는데(광고에는 「6畳」, 계약서에는 ㎡), 실제 넓이를 가늠할 때 유용합니다.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>변환하고 싶은 면적 값을 입력합니다(예: 100).</li>
+    <li>그 값의 단위(㎡·쓰보·조)를 선택합니다.</li>
+    <li>입력하는 순간 세 단위의 값이 모두 표시됩니다. 버튼은 누를 필요 없습니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>1쓰보 = 400/121㎡ ≒ 3.31㎡</strong>(1㎡ ≒ 0.3025쓰보)<br>
+      1샤쿠(尺)=10/33m라는 정의에서 1쓰보=(6샤쿠)²=400/121㎡가 됩니다. 또한 거래나 증명에 척관법(쓰보)을 사용하는 것은 일본 계량법에서 인정되지 않으므로, 쓰보 표기는 관용적인 참고값입니다.</li>
+    <li><strong>다다미 1장(1조) = 1.62㎡</strong><br>
+      일본 부동산 광고에서 「◯조(畳)」로 표시할 때의 기준입니다(벽심 면적 기준으로 다다미 1장당 1.62㎡ 이상).</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>자주 쓰는 환산 조견표(대략값)</caption>
+      <thead><tr><th>㎡</th><th>쓰보</th><th>조(다다미)</th></tr></thead>
+      <tbody>
+        <tr><td>9.72</td><td>2.94</td><td>6</td></tr>
+        <tr><td>16.2</td><td>4.9</td><td>10</td></tr>
+        <tr><td>33.06</td><td>10</td><td>20.41</td></tr>
+        <tr><td>66.12</td><td>20</td><td>40.81</td></tr>
+        <tr><td>100</td><td>30.25</td><td>61.73</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>출처(1차 정보)</h3>
+  <ul class="sources">
+    <li>계량법(1992년 법률 제51호)(거래·증명에서의 법정 계량 단위) — 일본 공식 법령 원문(일본어)<br>
+      <a href="https://laws.e-gov.go.jp/law/404AC0000000051" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/404AC0000000051</a>(2026년 7월 18일 열람)</li>
+    <li>부동산공정거래협의회연합회 「부동산 표시에 관한 공정경쟁규약·동 시행규칙」(다다미 1장=1.62㎡ 표시 기준) — 일본어<br>
+      <a href="https://www.rftc.jp/koseikyosokiyaku/" rel="noopener" target="_blank">https://www.rftc.jp/koseikyosokiyaku/</a>(2026년 7월 18일 열람)</li>
+  </ul>
+
+  <h2>계산의 전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>실제 다다미의 크기는 지역·종류에 따라 다릅니다(교마 약 1.82㎡, 주쿄마 약 1.66㎡, 에도마 약 1.55㎡, 단치마 약 1.45㎡ 정도). 이 도구는 광고 표시 기준인 1.62㎡로 통일했습니다.</li>
+    <li>부동산의 공식 면적은 등기부·도면(㎡ 표기)에서 확인해 주세요.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">1쓰보는 몇 조(다다미 몇 장)인가요?</h3>
+  <p class="faq-a">광고 표시 기준(다다미 1장=1.62㎡)으로 환산하면 1쓰보 ≒ 2.04조입니다. 관용적으로는 「1쓰보 ≒ 다다미 2장」으로 기억합니다.</p>
+  <h3 class="faq-q">같은 매물인데 자료마다 면적이 다른 이유는?</h3>
+  <p class="faq-a">광고에서는 벽 중심선으로 재는 「벽심 면적」, 등기에서는 벽 안쪽으로 재는 「내법 면적」을 쓰는 경우가 많아 같은 방이라도 수치가 달라집니다.</p>
+  <h3 class="faq-q">「6조(6畳)」 방이 생각보다 좁게 느껴졌는데요.</h3>
+  <p class="faq-a">실제 다다미 치수는 지역·건물에 따라 다르고(에도마·단치마는 교마보다 작습니다), 광고의 「6조」는 1.62㎡×6=9.72㎡ 이상이라는 기준만 충족하면 표시할 수 있기 때문입니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/tsubo/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/tsubo/" lang="en" hreflang="en">English</a><a href="/zh/tools/tsubo/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=tsubo">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/tsubo/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_value: "면적은 " + TsuboCalc.VALUE_MIN + "〜" + TsuboCalc.VALUE_MAX + " 범위로 입력해 주세요.",
+    invalid_unit: "단위를 선택해 주세요."
+  };
+  var box = document.getElementById("result");
+  function run() {
+    if (document.getElementById("value").value.trim() === "") { box.hidden = true; return; }
+    var value = parseFloat(document.getElementById("value").value);
+    var unit = document.getElementById("unit").value;
+    var result = TsuboCalc.convert(value, unit);
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">' + result.sqm.toLocaleString() + " ㎡</div>" +
+        "<p><strong>" + result.tsubo.toLocaleString() + " 쓰보</strong> / <strong>" + result.jo.toLocaleString() + " 조(다다미)</strong></p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "입력값을 확인해 주세요.") + "</p>";
+    }
+    box.hidden = false;
+  }
+  document.getElementById("value").addEventListener("input", run);
+  document.getElementById("unit").addEventListener("change", run);
+  document.getElementById("tsubo-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var limitBox = document.getElementById("adv-limit-result");
+  var fmt = function (x, d) { return x.toLocaleString(undefined, { maximumFractionDigits: d === undefined ? 2 : d }); };
+  function runLimit(force) {
+    if ((document.getElementById("adv-land").value.trim() === "" ||
+         document.getElementById("adv-kenpei").value.trim() === "" ||
+         document.getElementById("adv-yoseki").value.trim() === "") && !force) { limitBox.hidden = true; return; }
+    var land = parseFloat(document.getElementById("adv-land").value);
+    if (document.getElementById("adv-land-unit").value === "tsubo") {
+      land = land * TsuboCalc.SQM_PER_TSUBO;
+    }
+    var r = TsuboCalc.buildingLimits(
+      land,
+      parseFloat(document.getElementById("adv-kenpei").value),
+      parseFloat(document.getElementById("adv-yoseki").value)
+    );
+    if (!r.ok) {
+      var msg = r.code === "invalid_kenpei" ? "건폐율은 1〜100%로 입력해 주세요."
+        : r.code === "invalid_yoseki" ? "용적률은 1〜2000%로 입력해 주세요."
+        : "토지 면적을 숫자로 입력해 주세요.";
+      limitBox.innerHTML = '<p class="result-error">' + msg + '</p>';
+      limitBox.hidden = false;
+      return;
+    }
+    limitBox.innerHTML =
+      '<div class="result-main">연면적 상한 ' + fmt(r.floorSqm) + ' ㎡(약 ' + fmt(r.floorTsubo) + '쓰보)</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>건축면적의 상한(1층 부분)</td><td>' + fmt(r.buildingSqm) + ' ㎡(약 ' + fmt(r.buildingTsubo) + '쓰보)</td></tr>' +
+      '<tr><td>연면적의 상한(전체 층 합계)</td><td>' + fmt(r.floorSqm) + ' ㎡(약 ' + fmt(r.floorTsubo) + '쓰보)</td></tr>' +
+      '<tr><td>참고: 건폐율을 꽉 채워 지었을 때의 층수</td><td>약 ' + fmt(r.floorsHint, 1) + ' 층</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">높이 제한·사선 제한 등으로 더 제한될 수 있습니다. 정확한 내용은 지자체나 건축사에게 확인해 주세요.</p>';
+    limitBox.hidden = false;
+  }
+  ["adv-land", "adv-kenpei", "adv-yoseki"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runLimit(false); });
+  });
+  document.getElementById("adv-land-unit").addEventListener("change", function () { runLimit(false); });
+  document.getElementById("adv-limit-run").addEventListener("click", function () { runLimit(true); });
+  function runPrice(force) {
+    if ((document.getElementById("adv-price").value.trim() === "" ||
+         document.getElementById("adv-area").value.trim() === "") && !force) { advBox.hidden = true; return; }
+    var r = TsuboCalc.pricePerArea(
+      parseFloat(document.getElementById("adv-price").value),
+      parseFloat(document.getElementById("adv-area").value),
+      document.getElementById("adv-area-unit").value
+    );
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">가격과 면적을 0보다 큰 숫자로 입력해 주세요.</p>';
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">쓰보 단가 약 ' + fmt(r.perTsubo) + ' 만 엔</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>쓰보 단가</td><td>' + fmt(r.perTsubo) + ' 만 엔/쓰보(' + fmt(r.tsubo) + '쓰보)</td></tr>' +
+      '<tr><td>㎡ 단가</td><td>' + fmt(r.perSqm) + ' 만 엔/㎡(' + fmt(r.sqm) + '㎡)</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">1만 엔=10,000엔으로, 일본 부동산 광고에서 쓰는 단위입니다.</p>';
+    advBox.hidden = false;
+  }
+  ["adv-price", "adv-area"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runPrice(false); });
+  });
+  document.getElementById("adv-area-unit").addEventListener("change", function () { runPrice(false); });
+  document.getElementById("adv-price-run").addEventListener("click", function () { runPrice(true); });
+})();
+</script>
+</body>
+</html>

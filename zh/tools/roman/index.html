@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>罗马数字转换器(1〜3999⇔I V X表记) | Quick Calc</title>
+  <meta name="description" content="阿拉伯数字和罗马数字(I·V·X·L·C·D·M)免费即时互转。适用于钟表表盘、电影片名、年份刻印的读法,2026是MMXXVI。支持减法规则的精确转换。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/roman/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="罗马数字转换器(1〜3999⇔I V X表记) | Quick Calc">
+  <meta property="og:description" content="阿拉伯数字和罗马数字(I·V·X·L·C·D·M)免费即时互转。适用于钟表表盘、电影片名、年份刻印的读法,2026是MMXXVI。支持减法规则的精确转换。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/roman/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"罗马数字转换器","item":"https://quick-calc.site/zh/tools/roman/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/roman/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/roman/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/roman/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/roman/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/roman/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>罗马数字转换器</h1>
+  <form class="tool-form" id="roman-form">
+    <label>转换方向
+      <select id="mode">
+        <option value="toRoman" selected>数字 → 罗马数字</option>
+        <option value="fromRoman">罗马数字 → 数字</option>
+      </select>
+    </label>
+    <label id="input-label">数字(1〜3999)
+      <span class="field-note">输入后,转换结果立即显示在下方</span>
+      <input type="text" id="value" required placeholder="例: 2026" inputmode="numeric">
+    </label>
+    <button type="submit">转换</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 批量转换·日期的罗马数字写法</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">批量转换</h3>
+      <p class="adv-note">用逗号或换行分隔,一次最多转换20个(勾选「钟表表盘写法」时,4写作IIII)。</p>
+      <label>要转换的数字·罗马数字(逗号或换行分隔,最多20个)
+        <textarea id="adv-list" rows="4" placeholder="例: 1, 2, 3, 4 或 MMXXVI"></textarea>
+      </label>
+      <label style="display:block;"><input type="checkbox" id="adv-clock"> 钟表表盘写法(把4写成IIII)</label>
+      <button type="button" id="adv-list-run">批量转换</button>
+      <div class="tool-result" id="adv-list-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">把日期写成罗马数字</h3>
+      <p class="adv-note">把生日或纪念日写成「MMXXVI・VII・XXIV」这样的罗马数字形式(适合戒指刻字或设计草稿)。</p>
+      <div class="field-row">
+        <label>年(公历)
+          <input type="number" id="adv-year" inputmode="numeric" min="1" max="3999" step="1" placeholder="例: 2026">
+        </label>
+        <label>月
+          <input type="number" id="adv-month" inputmode="numeric" min="1" max="12" step="1" placeholder="例: 7">
+        </label>
+        <label>日
+          <input type="number" id="adv-day" inputmode="numeric" min="1" max="31" step="1" placeholder="例: 24">
+        </label>
+      </div>
+      <button type="button" id="adv-date-run">转换日期</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>只要输入数字,就能立即知道<strong>罗马数字(I·V·X·M等)的写法</strong>。反过来,也可以把在钟表表盘或电影片名里看到的罗马数字还原成普通数字。想查年份刻印或作品名的读法时很方便。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>选择转换方向。</li>
+    <li>输入数字(1〜3999)或罗马数字(例: MMXXVI)。</li>
+    <li>输入的瞬间就显示结果,无需点击按钮。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li>基本符号有 I=1, V=5, X=10, L=50, C=100, D=500, M=1000 共7个。</li>
+    <li>按从大到小排列相加,但<strong>小符号出现在大符号正前方时要相减</strong>(IV=4, IX=9, XL=40, XC=90, CD=400, CM=900)。</li>
+    <li>计算例: 1994 = 1000(M) + 900(CM) + 90(XC) + 4(IV) = <strong>MCMXCIV</strong></li>
+    <li>罗马数字→数字的转换会验证是否为标准写法(IIII会报错)。</li>
+  </ul>
+
+  <h3>出处与前提的说明</h3>
+  <ul class="sources">
+    <li>基于罗马数字的标准写法(减法规则)进行转换。</li>
+  </ul>
+
+  <h2>计算的前提与注意</h2>
+  <ul class="cautions">
+    <li>罗马数字没有0和负数,标准写法能表示的范围是1〜3999。</li>
+    <li>钟表表盘上传统上有时把4写作IIII,但本工具的主表单使用标准写法(IV)。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">钟表表盘为什么是「IIII」?</h3>
+  <p class="faq-a">说法不一,一般认为是出于表盘外观的平衡(与对面的VIII对称)和传统习惯。数学上的标准写法是IV。</p>
+  <h3 class="faq-q">2026年用罗马数字怎么写?</h3>
+  <p class="faq-a">MMXXVI(两个M=1000、两个X=10、VI=6)。常见于电影片尾的制作年份标注。</p>
+  <h3 class="faq-q">4000以上不能表示吗?</h3>
+  <p class="faq-a">标准写法最多到3999(MMMCMXCIX)。再往上有加上划线表示乘1000的方法(V̄=5000),但在一般用途中几乎不使用,所以本工具不支持。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/roman/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/roman/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/roman/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=roman">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/roman/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var label = document.getElementById("input-label");
+  var input = document.getElementById("value");
+  mode.addEventListener("change", function () {
+    var isTo = mode.value === "toRoman";
+    label.childNodes[0].textContent = isTo ? "数字(1〜3999)" : "罗马数字";
+    input.placeholder = isTo ? "例: 2026" : "例: MMXXVI";
+    input.inputMode = isTo ? "numeric" : "text";
+    run();
+  });
+  function run() {
+    if (input.value.trim() === "") { box.hidden = true; return; }
+    if (mode.value === "toRoman") {
+      var r = RomanCalc.toRoman(parseInt(input.value, 10));
+      if (!r.ok) { box.innerHTML = '<p class="result-error">请输入1〜3999的整数。</p>'; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">' + r.roman + "</div>";
+    } else {
+      var r2 = RomanCalc.fromRoman(input.value);
+      if (!r2.ok) { box.innerHTML = '<p class="result-error">请输入正确的罗马数字(例: MMXXVI。可用字母为 I V X L C D M)。</p>'; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">' + r2.value.toLocaleString() + "</div>";
+    }
+    box.hidden = false;
+  }
+  input.addEventListener("input", run);
+  document.getElementById("roman-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var listBox = document.getElementById("adv-list-result");
+  function runList() {
+    if (document.getElementById("adv-list").value.trim() === "") { listBox.hidden = true; return; }
+    var clock = document.getElementById("adv-clock").checked;
+    var r = RomanCalc.convertMany(document.getElementById("adv-list").value, clock);
+    if (!r.ok) {
+      listBox.innerHTML = '<p class="result-error">' +
+        (r.code === "too_many" ? "一次最多只能转换20个。" : "请输入要转换的数字或罗马数字。") +
+        '</p>';
+      listBox.hidden = false;
+      return;
+    }
+    var rows = r.items.map(function (it) {
+      var out = it.ok ? it.output : "无法转换(请输入1〜3999的数字或正确的罗马数字)";
+      return "<tr><td>" + it.input.replace(/[<>&]/g, "") + "</td><td>" + out + "</td></tr>";
+    }).join("");
+    listBox.innerHTML =
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>输入</th><th>转换结果</th></tr></thead><tbody>' +
+      rows + '</tbody></table></div>';
+    listBox.hidden = false;
+  }
+  document.getElementById("adv-list").addEventListener("input", runList);
+  document.getElementById("adv-clock").addEventListener("change", runList);
+  document.getElementById("adv-list-run").addEventListener("click", runList);
+  function runDate(force) {
+    var yRaw = document.getElementById("adv-year").value;
+    var mRaw = document.getElementById("adv-month").value;
+    var dRaw = document.getElementById("adv-day").value;
+    if ((yRaw.trim() === "" || mRaw.trim() === "" || dRaw.trim() === "") && !force) { advBox.hidden = true; return; }
+    var y = parseInt(yRaw, 10);
+    var m = parseInt(mRaw, 10);
+    var d = parseInt(dRaw, 10);
+    var r = RomanCalc.dateToRoman(y, m, d);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">请输入真实存在的日期,年份为公历1〜3999年。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">' + r.year + '・' + r.month + '・' + r.day + '</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>间隔号(・)分隔</td><td>' + r.year + '・' + r.month + '・' + r.day + '</td></tr>' +
+      '<tr><td>句点(.)分隔</td><td>' + r.year + '.' + r.month + '.' + r.day + '</td></tr>' +
+      '<tr><td>连字符(-)分隔</td><td>' + r.year + '-' + r.month + '-' + r.day + '</td></tr>' +
+      '</tbody></table></div>';
+    advBox.hidden = false;
+  }
+  ["adv-year", "adv-month", "adv-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runDate(false); });
+  });
+  document.getElementById("adv-date-run").addEventListener("click", function () { runDate(true); });
+})();
+</script>
+</body>
+</html>

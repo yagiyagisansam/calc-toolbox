@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>米的合·克换算计算器(1合是多少克?放多少水?) | Quick Calc</title>
+  <meta name="description" content="按大米1合=约150g、每合水约200ml的标准,由合数一并算出米的重量、加水量、煮好的饭量和几碗饭。也支持由克数反算合数。「合」是日本电饭锅量杯使用的单位。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/kome/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="米的合·克换算计算器(1合是多少克?放多少水?) | Quick Calc">
+  <meta property="og:description" content="按大米1合=约150g、每合水约200ml的标准,由合数一并算出米的重量、加水量、煮好的饭量和几碗饭。也支持由克数反算合数。「合」是日本电饭锅量杯使用的单位。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/kome/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"米的合·克换算计算器","item":"https://quick-calc.site/zh/tools/kome/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/kome/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/kome/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/kome/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/kome/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/kome/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>米的合·克换算计算器</h1>
+  <form class="tool-form" id="kome-form">
+    <label>计算类型
+      <select id="mode">
+        <option value="fromGo" selected>由合数计算(加水量·煮好的饭量)</option>
+        <option value="fromGram">由克数反算合数</option>
+      </select>
+    </label>
+    <label id="value-label-go">米的量(合)
+      <span class="field-note">选好后加水量和煮好的饭量立即显示在下方</span>
+      <select id="value-go"></select>
+    </label>
+    <label id="value-label-gram" style="display:none;">米的重量(g)
+      <input type="number" id="value" inputmode="decimal" min="0" step="any" placeholder="例: 300">
+    </label>
+    <button type="submit">计算</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 由想吃的量反算</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">由煮好的饭量反算</h3>
+      <p class="adv-note">「做咖喱要用600g米饭」等煮好的量已确定时,反算需要的合数和水量。</p>
+      <label>煮好的米饭量(g)
+        <input type="number" id="adv-cooked" inputmode="numeric" step="any" min="1" max="6600" placeholder="600">
+      </label>
+      <button type="button" id="adv-cooked-run">反算合数和水量</button>
+      <div class="tool-result" id="adv-result-cooked" hidden aria-live="polite"></div>
+      <h3 class="adv-h">按人数算「该煮几合?」</h3>
+      <p class="adv-note">按1碗 ≒ 米饭150g计,由人数和每人碗数算出需要的合数。</p>
+      <label>用餐人数(人)
+        <input type="number" id="adv-people" inputmode="numeric" step="1" min="1" max="20" placeholder="4">
+      </label>
+      <label>每人的碗数(碗)
+        <span class="field-note">普通盛=1碗、大盛=1.5碗为参考</span>
+        <input type="number" id="adv-bowls-each" inputmode="decimal" step="any" min="0.5" max="5" value="1">
+      </label>
+      <button type="button" id="adv-people-run">计算需要的合数</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>只需选择米的合数,就能知道<strong>米的重量、加水量和煮好的饭量</strong>。「合」是日本电饭锅量米杯使用的传统单位(1合=180ml≈150g)。也能从「想吃500g米饭」「要煮4人份」反算。煮饭拿不准放多少水时用它就行。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>选择要煮的合数(以0.5合为单位)。选好的瞬间就会显示米的重量、水量和煮好的饭量。</li>
+    <li>用秤量了袋里剩的米时,可用「由克数反算合数」倒推。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>1合 = 180ml</strong>(日本量米杯1杯。日本传统计量单位1升=约1.8L的1/10)≒ <strong>精白米 约150g</strong></li>
+    <li><strong>加水量参考 = 每合约200ml</strong>(米的容积的1.1〜1.2倍)。用电饭锅时以内胆刻度为准。</li>
+    <li><strong>煮好的饭约为米重量的2.2倍</strong>(1合→约330g米饭)。按1碗150g计约2.2碗。</li>
+  </ul>
+
+  <h3>出处(一次信息)</h3>
+  <ul class="sources">
+    <li>1合=180ml是源自日本计量法中传统计量单位(升)的容量。重量、加水量和煮好的饭量为日本通行的参考值(因大米品种、新米还是陈米、淘米方式而变化)。</li>
+  </ul>
+
+  <h2>前提与注意</h2>
+  <ul class="cautions">
+    <li>免淘米(无洗米)同样容积装的米更多,水建议稍多一点(每合+10〜20ml)作为参考。</li>
+    <li>新米水分多,水可稍微少放;陈米则稍微多放,更接近喜欢的口感。</li>
+    <li>用电饭锅煮时,对准内胆的水位线最可靠。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">1合够几个人吃?</h3>
+  <p class="faq-a">约合2.2碗,大致是2名成人一餐的量。要带便当或有饭量大的人时,不少家庭按每人1合来煮。</p>
+  <h3 class="faq-q">没有量杯时怎么量1合?</h3>
+  <p class="faq-a">用厨房秤量150g最准确。用纸杯(200ml)的话,装到接近9分满约为180ml。</p>
+  <h3 class="faq-q">5kg大米是多少合,能吃多少天?</h3>
+  <p class="faq-a">5,000g ÷ 150g = 约33合。每天煮2合的家庭约可吃16天。可用本工具的反算模式确认。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/kome/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/kome/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/kome/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=kome">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/kome/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var goSelect = document.getElementById("value-go");
+  var input = document.getElementById("value");
+  var labelGo = document.getElementById("value-label-go");
+  var labelGram = document.getElementById("value-label-gram");
+  (function fillGo() {
+    var html = "";
+    for (var v = 0.5; v <= 10; v += 0.5) {
+      html += '<option value="' + v + '"' + (v === 2 ? " selected" : "") + ">" +
+        v.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "合</option>";
+    }
+    goSelect.innerHTML = html;
+  })();
+  function run(showErrors) {
+    if (mode.value === "fromGo") {
+      var r = KomeCalc.fromGo(parseFloat(goSelect.value));
+      if (!r.ok) { box.innerHTML = '<p class="result-error">合数请输入大于0且不超过20的数值。</p>'; box.hidden = false; return; }
+      box.innerHTML =
+        '<div class="result-main">米 ' + r.riceG.toLocaleString() + "g·水 约" + r.waterMl.toLocaleString() + "ml</div>" +
+        '<div class="table-scroll"><table class="data-table"><tbody>' +
+        "<tr><td>米的重量</td><td>约 " + r.riceG.toLocaleString() + " g</td></tr>" +
+        "<tr><td>加水量参考</td><td>约 " + r.waterMl.toLocaleString() + " ml</td></tr>" +
+        "<tr><td>煮好的饭量</td><td>约 " + r.cookedG.toLocaleString() + " g</td></tr>" +
+        "<tr><td>饭碗(150g)</td><td>约 " + r.bowls.toLocaleString() + " 碗</td></tr>" +
+        "</tbody></table></div><p>用电饭锅时请以内胆刻度为准。</p>";
+    } else {
+      if (input.value === "") {
+        if (showErrors) {
+          box.innerHTML = '<p class="result-error">请输入米的重量(g)。</p>';
+          box.hidden = false;
+        } else {
+          box.hidden = true;
+        }
+        return;
+      }
+      var r2 = KomeCalc.fromGram(parseFloat(input.value));
+      if (!r2.ok) { box.innerHTML = '<p class="result-error">重量请输入大于0且不超过30,000g的数值。</p>'; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">约 ' + r2.go.toLocaleString() + " 合</div><p>按1合=约150g计算。</p>";
+    }
+    box.hidden = false;
+  }
+  mode.addEventListener("change", function () {
+    var isGo = mode.value === "fromGo";
+    labelGo.style.display = isGo ? "" : "none";
+    labelGram.style.display = isGo ? "none" : "";
+    run(false);
+  });
+  goSelect.addEventListener("change", function () { run(false); });
+  input.addEventListener("input", function () { run(false); });
+  document.getElementById("kome-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run(true);
+  });
+  run(false);
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var cookedBox = document.getElementById("adv-result-cooked");
+  function goSuggest(go) {
+    var s = Math.ceil(go * 2) / 2;
+    return s.toLocaleString(undefined, { maximumFractionDigits: 1 });
+  }
+  function renderResult(box, r, headNote) {
+    box.innerHTML =
+      '<div class="result-main">' + headNote + '米 约' + r.go.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' 合</div>' +
+      '<p>想煮个整数的话,推荐 <strong>' + goSuggest(r.go) + ' 合</strong>。</p>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>米的重量</td><td>约 ' + r.riceG.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' g</td></tr>' +
+      '<tr><td>水量</td><td>约 ' + r.waterMl.toLocaleString() + ' ml</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">水量为白米的参考值(每合约200ml)。电饭锅有刻度时请以刻度为准。</p>';
+    box.hidden = false;
+  }
+  function runCooked() {
+    var cooked = parseFloat(document.getElementById("adv-cooked").value);
+    var r = KomeCalc.fromCooked(cooked);
+    if (!r.ok) {
+      cookedBox.innerHTML = '<p class="result-error">煮好的饭量请在 1〜6,600g(最多20合)范围内输入。</p>';
+      cookedBox.hidden = false;
+      return;
+    }
+    renderResult(cookedBox, r, "");
+  }
+  function runPeople() {
+    var people = parseFloat(document.getElementById("adv-people").value);
+    var each = parseFloat(document.getElementById("adv-bowls-each").value);
+    if (isNaN(people) || people !== Math.floor(people) || people < 1 || people > 20 || isNaN(each)) {
+      advBox.innerHTML = '<p class="result-error">人数请输入 1〜20人 的整数,碗数请输入 0.5〜5碗。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var r = KomeCalc.fromBowls(people * each);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">合计碗数过多(最多40碗)。请检查碗数。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    renderResult(advBox, r, '米饭 约' + r.cookedG.toLocaleString() + ' g = ');
+  }
+  document.getElementById("adv-cooked-run").addEventListener("click", runCooked);
+  document.getElementById("adv-people-run").addEventListener("click", runPeople);
+  document.getElementById("adv-cooked").addEventListener("input", function () {
+    if (document.getElementById("adv-cooked").value !== "") { runCooked(); } else { cookedBox.hidden = true; }
+  });
+  function autoPeople() {
+    if (document.getElementById("adv-people").value !== "" &&
+        document.getElementById("adv-bowls-each").value !== "") {
+      runPeople();
+    } else {
+      advBox.hidden = true;
+    }
+  }
+  document.getElementById("adv-people").addEventListener("input", autoPeople);
+  document.getElementById("adv-bowls-each").addEventListener("input", autoPeople);
+})();
+</script>
+</body>
+</html>

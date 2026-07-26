@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Running Pace Calculator (Marathon &amp; Jogging) | Quick Calc</title>
+  <meta name="description" content="Get your pace per kilometre and your speed from a distance and a target time, free. It also predicts your finish time for a full or half marathon from a pace. Presets for 5 km, 10 km, half and full.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/pace/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Running Pace Calculator (Marathon &amp; Jogging) | Quick Calc">
+  <meta property="og:description" content="Get your pace per kilometre and your speed from a distance and a target time, free. It also predicts your finish time for a full or half marathon from a pace. Presets for 5 km, 10 km, half and full.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/pace/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Running Pace Calculator (Marathon &amp; Jogging)","item":"https://quick-calc.site/en/tools/pace/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/pace/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/pace/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/pace/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/pace/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/pace/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Running Pace Calculator</h1>
+  <form class="tool-form" id="pace-form">
+    <span class="field-note">Enter a distance and a target time and your pace appears right below</span>
+    <label>Distance
+      <select id="distance-preset">
+        <option value="42.195">Full marathon (42.195 km)</option>
+        <option value="21.0975">Half marathon (21.0975 km)</option>
+        <option value="10" selected>10 km</option>
+        <option value="5">5 km</option>
+        <option value="custom">Enter a distance</option>
+      </select>
+      <input type="number" id="distance" inputmode="decimal" step="any" min="0.1" max="1000" placeholder="10" hidden>
+    </label>
+    <div class="field-row">
+      <label>Target time (hours)
+        <input type="number" id="t-h" inputmode="numeric" step="1" min="0" max="99" placeholder="0">
+      </label>
+      <label>Minutes
+        <input type="number" id="t-m" inputmode="numeric" step="1" min="0" max="59" placeholder="50">
+      </label>
+      <label>Seconds
+        <input type="number" id="t-s" inputmode="numeric" step="1" min="0" max="59" placeholder="0">
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="time-form">
+    <label>Predict your finish time from a pace (min &amp; sec per km)
+      <span class="field-note">Uses the distance you selected above</span>
+    </label>
+    <div class="field-row">
+      <label>Pace (minutes per km)
+        <input type="number" id="p-m" inputmode="numeric" step="1" min="1" max="60" placeholder="5">
+      </label>
+      <label>Seconds
+        <input type="number" id="p-s" inputmode="numeric" step="1" min="0" max="59" placeholder="30">
+      </label>
+    </div>
+    <div class="tool-result" id="result-b" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: 5 km splits and a table of classic target times</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Get your 5 km splits from a target time</h3>
+      <p class="adv-note">Choose a race and a target time, and this builds the pace per km you need plus a table of split times every 5 km.</p>
+      <label>Race
+        <select id="adv-race">
+          <option value="42.195" selected>Full marathon (42.195 km)</option>
+          <option value="21.0975">Half marathon (21.0975 km)</option>
+          <option value="10">10 km</option>
+          <option value="5">5 km</option>
+        </select>
+      </label>
+      <label>Target time (hours, minutes, seconds)</label>
+      <div style="display:flex; gap:8px;">
+        <input type="number" id="adv-th" inputmode="numeric" step="1" min="0" max="99" value="4" aria-label="Hours">
+        <input type="number" id="adv-tm" inputmode="numeric" step="1" min="0" max="59" value="0" aria-label="Minutes">
+        <input type="number" id="adv-ts" inputmode="numeric" step="1" min="0" max="59" value="0" aria-label="Seconds">
+      </div>
+      <button type="button" id="adv-split-run">Build the split table</button>
+      <h3 class="adv-h">Pace needed for the classic targets</h3>
+      <p class="adv-note">Lists the pace per km needed for the classic targets of each race, such as a sub-4 marathon (the race is the one you selected above).</p>
+      <button type="button" id="adv-goal-run">Show the table</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    These are <strong>approximations</strong> assuming an even pace. In a real race your pace will vary with the hills, the drink stations and the crowds.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Enter the distance you are running and your target time, and you instantly see <strong>the minutes and seconds you need to run each kilometre in</strong>. It also works the other way round, predicting your finish time from your usual pace. Handy for setting a race goal or planning how to spread your effort on a jog.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Choose a distance (pick “Enter a distance” for anything not in the presets).</li>
+    <li>Enter a target time and your pace per km and your speed appear just below — no button needed.</li>
+    <li>You can also go the other way and enter your usual pace (for example 5 min 30 sec per km) to predict a finish time.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Pace (sec/km) = total time (sec) ÷ distance (km)</strong> (rounded to the nearest second)</li>
+    <li><strong>Speed (km/h) = distance ÷ time</strong></li>
+    <li>Examples: a 4-hour marathon means 5:41 per km (10.55 km/h). Running the full marathon at 5:00 per km gives a finish time of 3 hours 30 minutes 59 seconds.</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>Arithmetic based on the definitions of distance, time and speed. The full marathon is taken as 42.195 km and the half as 21.0975 km.</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>The distance shown by a GPS watch can differ from the measured course by a few percent. In a race, go by the distance markers on the course.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">What pace do I need for a sub-4 marathon (under 4 hours)?</h3>
+  <p class="faq-a">On a straight calculation, 5:41 per km. In practice many runners aim for around 5:30 per km to allow for time lost at drink stations and toilets. Use this tool to work out your own margin.</p>
+  <h3 class="faq-q">What is the difference between “pace” and “speed”?</h3>
+  <p class="faq-a">Pace is how many minutes one kilometre takes (smaller is faster); speed is how many kilometres you cover in one hour (larger is faster). This tool shows both.</p>
+  <h3 class="faq-q">Can I use this for treadmill speed settings?</h3>
+  <p class="faq-a">Yes. Enter your target pace and use the speed it shows as your setting (for example, 6:00 per km equals 10 km/h).</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/pace/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/pace/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/pace/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=pace">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/pace/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var boxB = document.getElementById("result-b");
+  var preset = document.getElementById("distance-preset");
+  var custom = document.getElementById("distance");
+  preset.addEventListener("change", function () {
+    custom.hidden = preset.value !== "custom";
+    runPace(false);
+    runTime(false);
+  });
+  custom.addEventListener("input", function () {
+    runPace(false);
+    runTime(false);
+  });
+  function currentDistance() {
+    return preset.value === "custom" ? parseFloat(custom.value) : parseFloat(preset.value);
+  }
+  function fmtTime(sec) {
+    var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    return (h > 0 ? h + "h " : "") + m + "m " + s + "s";
+  }
+  function fmtPace(sec) {
+    return Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0") + " per km";
+  }
+  var ERROR_MESSAGES = {
+    invalid_distance: "Enter a distance between 0.1 and 1000 km.",
+    invalid_time: "Enter a time between 1 minute and 100 hours.",
+    invalid_pace: "Enter a pace between 1:00 and 60:00 per km."
+  };
+  function showError(el, code) {
+    el.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "Check the entered values.") + "</p>";
+    el.hidden = false;
+  }
+  function runPace(fromSubmit) {
+    var hRaw = document.getElementById("t-h").value;
+    var mRaw = document.getElementById("t-m").value;
+    var sRaw = document.getElementById("t-s").value;
+    if (!fromSubmit && hRaw === "" && mRaw === "") { box.hidden = true; return; }
+    if (!fromSubmit && preset.value === "custom" && custom.value === "") { box.hidden = true; return; }
+    var t = (parseInt(hRaw || "0", 10)) * 3600 +
+            (parseInt(mRaw || "0", 10)) * 60 +
+            (parseInt(sRaw || "0", 10));
+    var r = PaceCalc.paceFor(currentDistance(), t);
+    if (!r.ok) { showError(box, r.code); return; }
+    box.innerHTML = '<div class="result-main">' + fmtPace(r.paceSecPerKm) + "</div>" +
+      "<p>Speed: <strong>" + r.speedKmh.toLocaleString() + " km/h</strong></p>";
+    box.hidden = false;
+  }
+  function runTime(fromSubmit) {
+    var mRaw = document.getElementById("p-m").value;
+    var sRaw = document.getElementById("p-s").value;
+    if (!fromSubmit && mRaw === "") { boxB.hidden = true; return; }
+    if (!fromSubmit && preset.value === "custom" && custom.value === "") { boxB.hidden = true; return; }
+    var p = (parseInt(mRaw || "0", 10)) * 60 +
+            (parseInt(sRaw || "0", 10));
+    var r = PaceCalc.timeFor(currentDistance(), p);
+    if (!r.ok) { showError(boxB, r.code); return; }
+    boxB.innerHTML = '<div class="result-main">' + fmtTime(r.totalSeconds) + "</div>" +
+      "<p>Running " + currentDistance() + " km at " + fmtPace(p) + "</p>";
+    boxB.hidden = false;
+  }
+  document.getElementById("pace-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runPace(true);
+  });
+  document.getElementById("time-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runTime(true);
+  });
+  ["t-h", "t-m", "t-s"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runPace(false); });
+  });
+  ["p-m", "p-s"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runTime(false); });
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advFmtTime(sec) {
+    var h = Math.floor(sec / 3600);
+    var m = Math.floor((sec % 3600) / 60);
+    var s = sec % 60;
+    function p(n) { return (n < 10 ? "0" : "") + n; }
+    return h > 0 ? h + ":" + p(m) + ":" + p(s) : m + ":" + p(s);
+  }
+  function advFmtPace(sec) {
+    return Math.floor(sec / 60) + ":" + ("0" + (sec % 60)).slice(-2) + " per km";
+  }
+  function advFail(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function runSplits(fromButton) {
+    if (!fromButton &&
+        document.getElementById("adv-th").value === "" &&
+        document.getElementById("adv-tm").value === "") { return; }
+    var d = parseFloat(document.getElementById("adv-race").value);
+    var h = parseInt(document.getElementById("adv-th").value, 10) || 0;
+    var m = parseInt(document.getElementById("adv-tm").value, 10) || 0;
+    var s = parseInt(document.getElementById("adv-ts").value, 10) || 0;
+    var total = h * 3600 + m * 60 + s;
+    var r = PaceCalc.raceSplits(d, total);
+    if (!r.ok) { advFail("Enter a target time between 1 minute and 100 hours."); return; }
+    var html = '<div class="result-main">Pace needed: ' + advFmtPace(r.paceSecPerKm) + '</div>' +
+      "<p>That is about " + r.speedKmh.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " km/h.</p>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Split point</th><th>Split time</th></tr></thead><tbody>';
+    for (var i = 0; i < r.rows.length; i++) {
+      var row = r.rows[i];
+      html += "<tr><td>" + (row.goal ? "Finish (" + row.km.toLocaleString() + " km)" : row.km + " km") +
+        "</td><td>" + advFmtTime(row.sec) + "</td></tr>";
+    }
+    html += "</tbody></table></div>" +
+      '<p class="adv-note">Calculated assuming an even pace.</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-split-run").addEventListener("click", function () { runSplits(true); });
+  ["adv-th", "adv-tm", "adv-ts"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runSplits(false); });
+  });
+  document.getElementById("adv-race").addEventListener("change", function () { runSplits(false); });
+  var ADV_GOALS = {
+    "42.195": [["Sub-3:00", 10800], ["Sub-3:30", 12600], ["Sub-4:00", 14400], ["Sub-4:30", 16200], ["Sub-5:00", 18000]],
+    "21.0975": [["1 h 30 min", 5400], ["1 h 45 min", 6300], ["2 h 00 min", 7200], ["2 h 30 min", 9000]],
+    "10": [["40 min", 2400], ["50 min", 3000], ["60 min", 3600]],
+    "5": [["20 min", 1200], ["25 min", 1500], ["30 min", 1800]]
+  };
+  document.getElementById("adv-goal-run").addEventListener("click", function () {
+    var key = document.getElementById("adv-race").value;
+    var d = parseFloat(key);
+    var goals = ADV_GOALS[key];
+    var html = '<div class="result-main">Classic targets and the pace they need</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Target</th><th>Pace needed per km</th></tr></thead><tbody>';
+    for (var i = 0; i < goals.length; i++) {
+      var r = PaceCalc.paceFor(d, goals[i][1]);
+      if (!r.ok) continue;
+      html += "<tr><td>" + goals[i][0] + "</td><td>" + advFmtPace(r.paceSecPerKm) + "</td></tr>";
+    }
+    html += "</tbody></table></div>";
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

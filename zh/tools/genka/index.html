@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>利润率·成本率 计算器(毛利与定价逆算) | Quick Calc</title>
+  <meta name="description" content="输入售价和成本,立即算出毛利·利润率·成本率。还支持「想要30%利润率该卖多少钱」的售价逆算,适合在日本开店定价、手工制品销售和二手转卖。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/genka/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="利润率·成本率 计算器(毛利与定价逆算) | Quick Calc">
+  <meta property="og:description" content="输入售价和成本,立即算出毛利·利润率·成本率。还支持「想要30%利润率该卖多少钱」的售价逆算,适合在日本开店定价、手工制品销售和二手转卖。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/genka/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"利润率·成本率 计算器","item":"https://quick-calc.site/zh/tools/genka/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/genka/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/genka/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/genka/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/genka/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/genka/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>利润率·成本率 计算器</h1>
+  <form class="tool-form" id="genka-form">
+    <label>计算类型
+      <select id="mode">
+        <option value="analyze" selected>从售价和成本计算利润率</option>
+        <option value="priceFor">从目标利润率逆算售价</option>
+      </select>
+    </label>
+    <label id="first-label">售价(日元)
+      <input type="number" id="first" inputmode="decimal" min="0" step="any" required placeholder="例: 1000">
+    </label>
+    <label id="second-label">成本(日元)
+      <input type="number" id="second" inputmode="decimal" min="0" step="any" required placeholder="例: 600">
+    </label>
+    <span class="field-note">输入两项后自动计算</span>
+    <button type="submit">计算</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 盈亏平衡点与到手利润</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">盈亏平衡点(卖多少个才不亏?)</h3>
+      <p class="adv-note">根据固定费用和每件的费用,计算不亏本所需的最低销量(填入目标利润,则是达成该目标所需的数量)。</p>
+      <label>固定费用(日元)
+        <span class="field-note">房租·人工费·摊位费等,即使卖不出去也要支出的费用合计</span>
+        <input type="number" id="adv-fixed" inputmode="numeric" step="any" min="0" placeholder="100000">
+      </label>
+      <label>每件变动成本(日元)
+        <span class="field-note">材料费·进货等,每卖出一件就发生的费用</span>
+        <input type="number" id="adv-var" inputmode="numeric" step="any" min="0" placeholder="300">
+      </label>
+      <label>销售单价(日元)
+        <input type="number" id="adv-price" inputmode="numeric" step="any" min="0.01" placeholder="800">
+      </label>
+      <label>目标利润(日元·留空视为0)
+        <input type="number" id="adv-target" inputmode="numeric" step="any" min="0" placeholder="50000">
+      </label>
+      <button type="button" id="adv-be-run">计算所需销量</button>
+      <div class="tool-result" id="adv-be-result" hidden aria-live="polite"></div>
+      <h3 class="adv-h">二手平台·网店的到手利润</h3>
+      <p class="adv-note">扣除Mercari(メルカリ)等平台的销售手续费和运费,计算「实际留在手里的利润」。</p>
+      <label>售价(日元)
+        <input type="number" id="adv-nprice" inputmode="numeric" step="any" min="0.01" placeholder="3000">
+      </label>
+      <label>销售手续费(%)
+        <input type="number" id="adv-nfee" inputmode="decimal" step="any" min="0" max="99" value="10">
+      </label>
+      <label>运费(日元·卖家承担部分)
+        <input type="number" id="adv-nship" inputmode="numeric" step="any" min="0" value="0">
+      </label>
+      <label>成本·进货价(日元)
+        <input type="number" id="adv-ncost" inputmode="numeric" step="any" min="0" placeholder="1000">
+      </label>
+      <button type="button" id="adv-np-run">计算到手利润</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>只要输入卖价和进货价,就能知道<strong>能赚多少钱、利润率是多少</strong>。也能反过来算「想要30%的利润率,该卖多少钱?」。适合店铺定价,以及手工制品和二手平台的价格设定。金额单位均为日元。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>选择「从售价和成本计算利润率」或「从目标利润率逆算售价」。</li>
+    <li>输入售价和成本(或成本和目标利润率)。</li>
+    <li>两项都填好的同时就会显示结果,无需点击按钮。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>毛利(利润)= 售价 − 成本</strong></li>
+    <li><strong>利润率(毛利率)= 毛利 ÷ 售价 × 100</strong>(以售价为基准) / <strong>成本率 = 成本 ÷ 售价 × 100</strong></li>
+    <li><strong>售价逆算 = 成本 ÷(1 − 目标利润率÷100)</strong>。请注意这与「在成本上加价30%」(成本×1.3)的结果不同。</li>
+    <li>计算例: 成本600日元、想要40%的利润率 → 600 ÷ 0.6 = <strong>1,000日元</strong>(按600×1.4=840日元,利润率只有28.6%)</li>
+  </ul>
+
+  <h3>出处·前提说明</h3>
+  <ul class="sources">
+    <li>基于「以售价为基准的利润率(毛利率)」定义的算术计算。</li>
+  </ul>
+
+  <h2>计算的前提与注意</h2>
+  <ul class="cautions">
+    <li>这里的「成本」指进货费和材料费,不含人工费·房租·手续费等经费,因此利润率并不等于最终留在手里的比例。</li>
+    <li>在二手平台和电商销售时,还需要扣除销售手续费(10%左右)和运费。</li>
+    <li>日本餐饮店的成本率通常以30%左右为参考值,但因业态不同差异很大。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">「利润率」和「在成本上加价○%」有什么区别?</h3>
+  <p class="faq-a">基准不同。成本600日元加价30%(加成)是780日元,但其利润率是180÷780=23%。要达到30%的利润率,需要按600÷0.7=857日元销售。混淆两者会导致实际利润比预想的薄。</p>
+  <h3 class="faq-q">利润率保持在多少比较合适?</h3>
+  <p class="faq-a">因行业而异。常见的参考值是零售20〜30%、餐饮60〜70%(成本率30〜40%)、手工制品为材料费的3倍(利润率67%)。请以能否覆盖经费和工时来判断。</p>
+  <h3 class="faq-q">计算时应该含消费税吗?</h3>
+  <p class="faq-a">基本原则是统一用不含税价格。用含税价格计算会使利润率偏离实际情况,请选定一种口径并保持一致。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/genka/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/genka/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/genka/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=genka">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/genka/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var firstLabel = document.getElementById("first-label");
+  var secondLabel = document.getElementById("second-label");
+  var first = document.getElementById("first");
+  var second = document.getElementById("second");
+  var MSG = {
+    invalid_price: "售价请输入大于0的数值。",
+    invalid_cost: "成本请输入0以上的数值。",
+    invalid_margin: "目标利润率请输入0〜99.9%。"
+  };
+  mode.addEventListener("change", function () {
+    var isA = mode.value === "analyze";
+    firstLabel.childNodes[0].textContent = isA ? "售价(日元)" : "成本(日元)";
+    secondLabel.childNodes[0].textContent = isA ? "成本(日元)" : "目标利润率(%)";
+    first.placeholder = isA ? "例: 1000" : "例: 600";
+    second.placeholder = isA ? "例: 600" : "例: 30";
+    runMain();
+  });
+  function runMain() {
+    if (first.value === "" || second.value === "") { box.hidden = true; return; }
+    var a = parseFloat(first.value);
+    var b = parseFloat(second.value);
+    if (mode.value === "analyze") {
+      var r = GenkaCalc.analyze(a, b);
+      if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "请确认输入值。") + "</p>"; box.hidden = false; return; }
+      box.innerHTML =
+        '<div class="result-main">利润率 ' + r.marginPct.toLocaleString() + " %</div>" +
+        '<div class="table-scroll"><table class="data-table"><tbody>' +
+        "<tr><td>毛利(利润)</td><td>" + r.profit.toLocaleString() + " 日元</td></tr>" +
+        "<tr><td>成本率</td><td>" + r.costPct.toLocaleString() + " %</td></tr>" +
+        "</tbody></table></div>" + (r.profit < 0 ? '<p class="result-error">亏损。</p>' : "");
+    } else {
+      var r2 = GenkaCalc.priceFor(a, b);
+      if (!r2.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r2.code] || "请确认输入值。") + "</p>"; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">售价 ' + r2.price.toLocaleString() + " 日元</div>" +
+        "<p>这是成本" + a.toLocaleString() + "日元时,确保利润率" + b.toLocaleString() + "%的售价。</p>";
+    }
+    box.hidden = false;
+  }
+  document.getElementById("genka-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
+  });
+  [first, second].forEach(function (el) {
+    el.addEventListener("input", runMain);
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var beBox = document.getElementById("adv-be-result");
+  var advBox = document.getElementById("adv-result");
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
+  }
+  function runBreakEven() {
+    var fixed = parseFloat(document.getElementById("adv-fixed").value);
+    var variable = parseFloat(document.getElementById("adv-var").value);
+    var price = parseFloat(document.getElementById("adv-price").value);
+    var targetRaw = document.getElementById("adv-target").value;
+    var target = targetRaw === "" ? 0 : parseFloat(targetRaw);
+    if (isNaN(fixed) || isNaN(variable) || isNaN(price) || isNaN(target)) {
+      showError(beBox, "请输入固定费用·每件变动成本·销售单价。");
+      return;
+    }
+    var r = GenkaCalc.breakEven(fixed, variable, price, target);
+    if (!r.ok) {
+      showError(beBox, r.code === "no_margin"
+        ? "销售单价低于或等于每件变动成本。按这个价格,无论卖多少个都无法盈利。"
+        : "请确认输入值(均需0日元以上,销售单价需大于0)。");
+      return;
+    }
+    beBox.innerHTML =
+      '<div class="result-main">' + r.qty.toLocaleString() + " 个以上" + (target > 0 ? "可达成目标" : "即可盈利") + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>此时的销售额</td><td>" + r.sales.toLocaleString() + " 日元</td></tr>" +
+      "<tr><td>每件的利润(边际贡献)</td><td>" + r.unitMargin.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " 日元(" + r.marginRatePct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%)</td></tr>" +
+      "</tbody></table></div>" +
+      (target > 0 ? '<p class="adv-note">这是包含目标利润 ' + target.toLocaleString() + " 日元在内的所需数量。</p>" : "");
+    beBox.hidden = false;
+  }
+  function runNetProfit() {
+    var price = parseFloat(document.getElementById("adv-nprice").value);
+    var fee = parseFloat(document.getElementById("adv-nfee").value);
+    var ship = parseFloat(document.getElementById("adv-nship").value);
+    var cost = parseFloat(document.getElementById("adv-ncost").value);
+    if (isNaN(price) || isNaN(fee) || isNaN(ship) || isNaN(cost)) {
+      showError(advBox, "请输入售价·手续费率·运费·成本。");
+      return;
+    }
+    var r = GenkaCalc.netProfit(price, fee, ship, cost);
+    if (!r.ok) { showError(advBox, "请确认输入值(手续费率为0〜99%)。"); return; }
+    advBox.innerHTML =
+      '<div class="result-main">到手 ' + r.profit.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " 日元</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>销售手续费(" + fee + "%)</td><td>" + r.fee.toLocaleString() + " 日元</td></tr>" +
+      "<tr><td>实际利润率</td><td>" + r.marginPct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " %</td></tr>" +
+      "</tbody></table></div>" +
+      (r.profit < 0 ? '<p class="result-error">亏损。建议提高售价,或选择运费更便宜的发货方式。</p>' : "");
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-be-run").addEventListener("click", runBreakEven);
+  document.getElementById("adv-np-run").addEventListener("click", runNetProfit);
+  ["adv-fixed", "adv-var", "adv-price", "adv-target"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-fixed").value !== "" &&
+          document.getElementById("adv-var").value !== "" &&
+          document.getElementById("adv-price").value !== "") runBreakEven();
+    });
+  });
+  ["adv-nprice", "adv-nfee", "adv-nship", "adv-ncost"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-nprice").value !== "" &&
+          document.getElementById("adv-nfee").value !== "" &&
+          document.getElementById("adv-nship").value !== "" &&
+          document.getElementById("adv-ncost").value !== "") runNetProfit();
+    });
+  });
+})();
+</script>
+</body>
+</html>

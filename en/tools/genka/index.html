@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Profit Margin &amp; Cost Ratio Calculator (Gross Profit and Pricing) | Quick Calc</title>
+  <meta name="description" content="Enter a selling price and a cost to get the gross profit, profit margin and cost ratio instantly. It also works backwards — find the price that hits a target margin — for shop pricing, handmade goods and online resale in Japan.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/genka/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Profit Margin &amp; Cost Ratio Calculator (Gross Profit and Pricing) | Quick Calc">
+  <meta property="og:description" content="Enter a selling price and a cost to get the gross profit, profit margin and cost ratio instantly. It also works backwards — find the price that hits a target margin — for shop pricing, handmade goods and online resale in Japan.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/genka/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Profit Margin &amp; Cost Ratio Calculator","item":"https://quick-calc.site/en/tools/genka/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/genka/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/genka/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/genka/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/genka/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/genka/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Profit Margin &amp; Cost Ratio Calculator</h1>
+  <form class="tool-form" id="genka-form">
+    <label>What to calculate
+      <select id="mode">
+        <option value="analyze" selected>Profit margin from price and cost</option>
+        <option value="priceFor">Selling price from a target margin</option>
+      </select>
+    </label>
+    <label id="first-label">Selling price (yen)
+      <input type="number" id="first" inputmode="decimal" min="0" step="any" required placeholder="e.g. 1000">
+    </label>
+    <label id="second-label">Cost (yen)
+      <input type="number" id="second" inputmode="decimal" min="0" step="any" required placeholder="e.g. 600">
+    </label>
+    <span class="field-note">Fill in both fields and the result appears automatically</span>
+    <button type="submit">Calculate</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: break-even point and net profit after fees</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Break-even point (how many do I have to sell?)</h3>
+      <p class="adv-note">From your fixed costs and the cost of each item, this works out the minimum number you must sell to avoid a loss — or, if you enter a target profit, the number needed to reach it.</p>
+      <label>Fixed costs (yen)
+        <span class="field-note">Rent, wages, stall fees and anything else you pay even when nothing sells</span>
+        <input type="number" id="adv-fixed" inputmode="numeric" step="any" min="0" placeholder="100000">
+      </label>
+      <label>Variable cost per item (yen)
+        <span class="field-note">Materials, purchase price and other costs incurred each time one item sells</span>
+        <input type="number" id="adv-var" inputmode="numeric" step="any" min="0" placeholder="300">
+      </label>
+      <label>Selling price per item (yen)
+        <input type="number" id="adv-price" inputmode="numeric" step="any" min="0.01" placeholder="800">
+      </label>
+      <label>Target profit (yen — blank counts as 0)
+        <input type="number" id="adv-target" inputmode="numeric" step="any" min="0" placeholder="50000">
+      </label>
+      <button type="button" id="adv-be-run">Calculate the quantity needed</button>
+      <div class="tool-result" id="adv-be-result" hidden aria-live="polite"></div>
+      <h3 class="adv-h">Net profit on flea-market and online sales</h3>
+      <p class="adv-note">Subtracts the selling fee and the shipping charged by marketplaces such as Mercari, to show the profit that actually stays with you.</p>
+      <label>Selling price (yen)
+        <input type="number" id="adv-nprice" inputmode="numeric" step="any" min="0.01" placeholder="3000">
+      </label>
+      <label>Selling fee (%)
+        <input type="number" id="adv-nfee" inputmode="decimal" step="any" min="0" max="99" value="10">
+      </label>
+      <label>Shipping paid by the seller (yen)
+        <input type="number" id="adv-nship" inputmode="numeric" step="any" min="0" value="0">
+      </label>
+      <label>Cost / purchase price (yen)
+        <input type="number" id="adv-ncost" inputmode="numeric" step="any" min="0" placeholder="1000">
+      </label>
+      <button type="button" id="adv-np-run">Calculate the net profit</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Enter what you sell for and what you paid, and see <strong>how much profit you make and what your profit margin is</strong>. It also answers the reverse question — “if I want a 30% margin, what should I charge?”. Useful for pricing in a shop, or for handmade and flea-market sales. All amounts are in Japanese yen.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Choose “Profit margin from price and cost” or “Selling price from a target margin”.</li>
+    <li>Enter the selling price and the cost (or the cost and your target margin).</li>
+    <li>As soon as both fields are filled in, the result appears — no button needed.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Gross profit = selling price − cost</strong></li>
+    <li><strong>Profit margin (gross margin) = gross profit ÷ selling price × 100</strong> (measured against the selling price) / <strong>Cost ratio = cost ÷ selling price × 100</strong></li>
+    <li><strong>Selling price from a target margin = cost ÷ (1 − target margin ÷ 100)</strong>. Note that this is not the same as “adding 30% to the cost” (cost × 1.3).</li>
+    <li>Example: a cost of 600 yen with a target margin of 40% → 600 ÷ 0.6 = <strong>1,000 yen</strong> (600 × 1.4 = 840 yen would give a margin of only 28.6%).</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>This is an arithmetic calculation based on the definition of profit margin measured against the selling price.</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>“Cost” here means the purchase price or materials. It does not include wages, rent or fees, so the profit margin is not the share that ends up in your pocket.</li>
+    <li>On flea-market apps and e-commerce sites you also have to subtract the selling fee (around 10%) and the shipping.</li>
+    <li>For restaurants in Japan a cost ratio of around 30% is often quoted as a rough guide, but it varies widely by type of business.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">What is the difference between a “profit margin” and “adding X% to the cost”?</h3>
+  <p class="faq-a">They use different bases. Adding 30% to a cost of 600 yen (a markup) gives 780 yen, but that is a margin of 180 ÷ 780 = 23%. To reach a 30% margin you have to sell at 600 ÷ 0.7 = 857 yen. Confusing the two leaves you with thinner profit than you expected.</p>
+  <h3 class="faq-q">What profit margin should I aim for?</h3>
+  <p class="faq-a">It depends on the business. Rules of thumb often quoted are 20–30% for retail, 60–70% for restaurants (a cost ratio of 30–40%), and three times the material cost for handmade goods (a margin of 67%). Judge by whether it covers your expenses and your working time.</p>
+  <h3 class="faq-q">Should I include consumption tax in the figures?</h3>
+  <p class="faq-a">As a rule, keep everything tax-exclusive. Calculating with tax-inclusive prices makes the margin drift away from reality, so decide on one basis and stick to it.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/genka/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/genka/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/genka/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=genka">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/genka/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var mode = document.getElementById("mode");
+  var firstLabel = document.getElementById("first-label");
+  var secondLabel = document.getElementById("second-label");
+  var first = document.getElementById("first");
+  var second = document.getElementById("second");
+  var MSG = {
+    invalid_price: "Enter a selling price greater than 0.",
+    invalid_cost: "Enter a cost of 0 or more.",
+    invalid_margin: "Enter a target margin between 0 and 99.9%."
+  };
+  mode.addEventListener("change", function () {
+    var isA = mode.value === "analyze";
+    firstLabel.childNodes[0].textContent = isA ? "Selling price (yen)" : "Cost (yen)";
+    secondLabel.childNodes[0].textContent = isA ? "Cost (yen)" : "Target profit margin (%)";
+    first.placeholder = isA ? "e.g. 1000" : "e.g. 600";
+    second.placeholder = isA ? "e.g. 600" : "e.g. 30";
+    runMain();
+  });
+  function runMain() {
+    if (first.value === "" || second.value === "") { box.hidden = true; return; }
+    var a = parseFloat(first.value);
+    var b = parseFloat(second.value);
+    if (mode.value === "analyze") {
+      var r = GenkaCalc.analyze(a, b);
+      if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "Check the entered values.") + "</p>"; box.hidden = false; return; }
+      box.innerHTML =
+        '<div class="result-main">Profit margin ' + r.marginPct.toLocaleString() + " %</div>" +
+        '<div class="table-scroll"><table class="data-table"><tbody>' +
+        "<tr><td>Gross profit</td><td>" + r.profit.toLocaleString() + " yen</td></tr>" +
+        "<tr><td>Cost ratio</td><td>" + r.costPct.toLocaleString() + " %</td></tr>" +
+        "</tbody></table></div>" + (r.profit < 0 ? '<p class="result-error">This is a loss.</p>' : "");
+    } else {
+      var r2 = GenkaCalc.priceFor(a, b);
+      if (!r2.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r2.code] || "Check the entered values.") + "</p>"; box.hidden = false; return; }
+      box.innerHTML = '<div class="result-main">Selling price ' + r2.price.toLocaleString() + " yen</div>" +
+        "<p>This is the price that secures a " + b.toLocaleString() + "% margin on a cost of " + a.toLocaleString() + " yen.</p>";
+    }
+    box.hidden = false;
+  }
+  document.getElementById("genka-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMain();
+  });
+  [first, second].forEach(function (el) {
+    el.addEventListener("input", runMain);
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var beBox = document.getElementById("adv-be-result");
+  var advBox = document.getElementById("adv-result");
+  function showError(boxEl, msg) {
+    boxEl.innerHTML = '<p class="result-error">' + msg + "</p>";
+    boxEl.hidden = false;
+  }
+  function runBreakEven() {
+    var fixed = parseFloat(document.getElementById("adv-fixed").value);
+    var variable = parseFloat(document.getElementById("adv-var").value);
+    var price = parseFloat(document.getElementById("adv-price").value);
+    var targetRaw = document.getElementById("adv-target").value;
+    var target = targetRaw === "" ? 0 : parseFloat(targetRaw);
+    if (isNaN(fixed) || isNaN(variable) || isNaN(price) || isNaN(target)) {
+      showError(beBox, "Enter the fixed costs, the variable cost per item and the selling price per item.");
+      return;
+    }
+    var r = GenkaCalc.breakEven(fixed, variable, price, target);
+    if (!r.ok) {
+      showError(beBox, r.code === "no_margin"
+        ? "The selling price is not above the variable cost per item. At this price you will never break even, however many you sell."
+        : "Check the entered values (all 0 yen or more, and the selling price greater than 0).");
+      return;
+    }
+    beBox.innerHTML =
+      '<div class="result-main">Sell ' + r.qty.toLocaleString() + " or more " + (target > 0 ? "to reach your target" : "to break even") + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>Sales at that point</td><td>" + r.sales.toLocaleString() + " yen</td></tr>" +
+      "<tr><td>Profit per item (contribution margin)</td><td>" + r.unitMargin.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " yen (" + r.marginRatePct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%)</td></tr>" +
+      "</tbody></table></div>" +
+      (target > 0 ? '<p class="adv-note">This quantity includes your target profit of ' + target.toLocaleString() + " yen.</p>" : "");
+    beBox.hidden = false;
+  }
+  function runNetProfit() {
+    var price = parseFloat(document.getElementById("adv-nprice").value);
+    var fee = parseFloat(document.getElementById("adv-nfee").value);
+    var ship = parseFloat(document.getElementById("adv-nship").value);
+    var cost = parseFloat(document.getElementById("adv-ncost").value);
+    if (isNaN(price) || isNaN(fee) || isNaN(ship) || isNaN(cost)) {
+      showError(advBox, "Enter the selling price, the fee rate, the shipping and the cost.");
+      return;
+    }
+    var r = GenkaCalc.netProfit(price, fee, ship, cost);
+    if (!r.ok) { showError(advBox, "Check the entered values (the fee rate must be 0–99%)."); return; }
+    advBox.innerHTML =
+      '<div class="result-main">Net profit ' + r.profit.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " yen</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>Selling fee (" + fee + "%)</td><td>" + r.fee.toLocaleString() + " yen</td></tr>" +
+      "<tr><td>Effective profit margin</td><td>" + r.marginPct.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " %</td></tr>" +
+      "</tbody></table></div>" +
+      (r.profit < 0 ? '<p class="result-error">This is a loss. Consider raising the price or choosing a cheaper shipping method.</p>' : "");
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-be-run").addEventListener("click", runBreakEven);
+  document.getElementById("adv-np-run").addEventListener("click", runNetProfit);
+  ["adv-fixed", "adv-var", "adv-price", "adv-target"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-fixed").value !== "" &&
+          document.getElementById("adv-var").value !== "" &&
+          document.getElementById("adv-price").value !== "") runBreakEven();
+    });
+  });
+  ["adv-nprice", "adv-nfee", "adv-nship", "adv-ncost"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (document.getElementById("adv-nprice").value !== "" &&
+          document.getElementById("adv-nfee").value !== "" &&
+          document.getElementById("adv-nship").value !== "" &&
+          document.getElementById("adv-ncost").value !== "") runNetProfit();
+    });
+  });
+})();
+</script>
+</body>
+</html>

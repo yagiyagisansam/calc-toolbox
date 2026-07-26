@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>입학·졸업 연도 계산기(일본 이력서용) | Quick Calc</title>
+  <meta name="description" content="생년월일을 넣으면 일본 학제(4월 입학·3월 졸업)에 따라 초등학교부터 대학교까지의 입학·졸업 연도를 계산해, 일본 이력서(履歴書)의 학력란에 그대로 적을 수 있습니다. 서기와 일본 연호를 함께 표시하고, 하야우마레(1월 1일〜4월 1일생)와 재수·유급·휴학 보정도 지원합니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/rireki/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="입학·졸업 연도 계산기(일본 이력서용) | Quick Calc">
+  <meta property="og:description" content="생년월일을 넣으면 일본 학제(4월 입학·3월 졸업)에 따라 초등학교부터 대학교까지의 입학·졸업 연도를 계산해, 일본 이력서(履歴書)의 학력란에 그대로 적을 수 있습니다. 서기와 일본 연호를 함께 표시하고, 하야우마레(1월 1일〜4월 1일생)와 재수·유급·휴학 보정도 지원합니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/rireki/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"입학·졸업 연도 계산기(일본 이력서용)","item":"https://quick-calc.site/ko/tools/rireki/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/rireki/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/rireki/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/rireki/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/rireki/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/rireki/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>입학·졸업 연도 계산기(일본 이력서용)</h1>
+  <form class="tool-form" id="rireki-form">
+    <span class="field-note">생년월일을 고르면 바로 아래에 학력 표가 표시됩니다</span>
+    <div class="field-row">
+      <label>생년월일(년)
+        <select id="birth-year"></select>
+      </label>
+      <label>월
+        <select id="birth-month"></select>
+      </label>
+      <label>일
+        <select id="birth-day"></select>
+      </label>
+    </div>
+    <label>재수·유급 등의 연수(선택)
+      <span class="field-note">고등학교 졸업 후 1년 재수했다면 「1」</span>
+      <input type="number" id="gap" inputmode="numeric" min="0" max="10" step="1" value="0">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 재수·유급·휴학 보정과 학력란 예문</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">재수·유급·휴학을 나눠서 보정하기</h3>
+      <p class="adv-note">재수·유급·휴학·대학원 진학을 각각 반영한 표를 만듭니다(생년월일은 위 폼의 값을 사용합니다).</p>
+      <label>재수 연수
+        <input type="number" id="adv-ronin" inputmode="numeric" min="0" max="10" step="1" value="0">
+      </label>
+      <label>대학에서의 유급 연수
+        <input type="number" id="adv-ryunen" inputmode="numeric" min="0" max="10" step="1" value="0">
+      </label>
+      <label>대학에서의 휴학 연수
+        <input type="number" id="adv-kyugaku" inputmode="numeric" min="0" max="10" step="1" value="0">
+      </label>
+      <label>대학원 진학
+        <select id="adv-grad">
+          <option value="none" selected>없음(대학까지)</option>
+          <option value="master">석사과정까지(2년)</option>
+          <option value="doctor">박사과정까지(석사 2년+박사 3년)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-detail-run">보정된 표 만들기</button>
+      <h3 class="adv-h">학력란 예문 만들기</h3>
+      <p class="adv-note">학교명을 넣으면 위 보정을 반영한 학력란 예문을 일본어 형식으로 만들어 줍니다(이력서에 그대로 옮겨 적을 수 있습니다).</p>
+      <label>중학교명
+        <input type="text" id="adv-jhs-name" placeholder="예: 品川区立◯◯中学校">
+      </label>
+      <label>고등학교명
+        <input type="text" id="adv-hs-name" placeholder="예: ◯◯高等学校">
+      </label>
+      <label>대학명·학부
+        <input type="text" id="adv-uni-name" placeholder="예: ◯◯大学◯◯学部">
+      </label>
+      <button type="button" id="adv-text-run">예문 만들기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>생년월일만 넣으면 일본 이력서(履歴書) 학력란에 적을 <strong>입학·졸업 연도</strong>를 서기와 일본 연호로 바로 확인할 수 있습니다. 이 도구는 <strong>일본의 학제</strong>를 따릅니다. 4월 입학·3월 졸업이고, 같은 학년은 「4월 2일생〜다음 해 4월 1일생」이므로 하야우마레(早生まれ·1월 1일〜4월 1일생)도 정확히 판정합니다. 일본에서 이력서나 엔트리 시트를 쓸 때 유용합니다.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>생년월일을 선택합니다.</li>
+    <li>재수·유급한 연수가 있으면 입력합니다(대학 입학·졸업 연도에 더해집니다).</li>
+    <li>선택하는 순간 학력 표가 서기와 일본 연호로 아래에 표시됩니다. 버튼은 누를 필요 없습니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li>일본의 학년 구분은 <strong>4월 2일생〜다음 해 4월 1일생</strong>입니다. 4월 1일생은 생일 전날(3월 31일)에 만 6세가 되기 때문에 한 학년 위가 됩니다.</li>
+    <li><strong>초등학교 입학 연도</strong>: 4/2〜12/31생 → 태어난 해 +7년의 4월 / 1/1〜4/1생(하야우마레) → 태어난 해 +6년의 4월</li>
+    <li>그 다음은 초등학교 6년·중학교 3년·고등학교 3년·대학 4년으로 계산합니다(입학은 4월, 졸업은 3월).</li>
+  </ul>
+
+  <h3>출처(1차 정보)</h3>
+  <ul class="sources">
+    <li>취학 시기의 기준은 <a href="https://elaws.e-gov.go.jp/document?lawid=322AC0000000026" target="_blank" rel="noopener">학교교육법(1947년 법률 제26호)</a> 제17조(만 6세에 도달한 날의 다음 날 이후 최초의 학년부터)와 연령계산에 관한 법률의 운용에 따릅니다. (일본어)</li>
+  </ul>
+
+  <h2>전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>대학은 4년제로 계산합니다. 단기대학·전문학교(2년), 6년제 학부(의·치·약학 등)는 졸업 연도를 바꿔서 읽어 주세요.</li>
+    <li>재수·유급·휴학이 있으면 합계를 「보정 연수」에 입력하세요(대학 입학·졸업 연도에 더해집니다).</li>
+    <li>9월 입학 등 특수한 경우는 지원하지 않습니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">4월 1일생은 왜 「하야우마레」인가요?</h3>
+  <p class="faq-a">일본 법률상 나이는 생일 전날이 끝나는 순간에 한 살 올라갑니다. 4월 1일생은 3월 31일에 만 6세가 되므로 「4월 1일까지 만 6세」 조건을 충족해 한 학년 위로 들어갑니다.</p>
+  <h3 class="faq-q">이력서는 서기와 일본 연호 중 무엇으로 쓰나요?</h3>
+  <p class="faq-a">둘 다 괜찮지만 서류 전체에서 하나로 통일하는 것이 기본 매너입니다. 이 도구는 둘 다 표시하므로 제출처의 양식에 맞춰 주세요.</p>
+  <h3 class="faq-q">중퇴한 경우는 어떻게 쓰나요?</h3>
+  <p class="faq-a">「◯年◯月 △△大学□□学部 中途退学」처럼 마지막으로 재학한 시기를 적는 것이 일반적입니다(中途退学 = 중퇴). 입학 연도는 이 도구의 결과를 그대로 쓸 수 있습니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/rireki/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/rireki/" lang="en" hreflang="en">English</a><a href="/zh/tools/rireki/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=rireki">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/rireki/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var ERA_KO = { "明治": "메이지", "大正": "다이쇼", "昭和": "쇼와", "平成": "헤이세이", "令和": "레이와" };
+  window.__rirekiWarekiKo = function (y) {
+    var s = RirekiCalc.wareki(y);
+    var m = /^(明治|大正|昭和|平成|令和)(元|[0-9]+)年$/.exec(s);
+    if (!m) return s;
+    return (ERA_KO[m[1]] || m[1]) + " " + (m[2] === "元" ? "원년" : m[2] + "년");
+  };
+
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, "일", Math.min(keep, max));
+  }
+  fillSelect(document.getElementById("birth-year"), 1900, 2100, "년", 2000);
+  fillSelect(document.getElementById("birth-month"), 1, 12, "월", 4);
+  fillSelect(document.getElementById("birth-day"), 1, daysInMonth(2000, 4), "일", 2);
+  function pad2(n) { return (n < 10 ? "0" : "") + n; }
+  window.__rirekiBirthISO = function () {
+    adjustDays("birth-year", "birth-month", "birth-day");
+    return val("birth-year") + "-" + pad2(val("birth-month")) + "-" + pad2(val("birth-day"));
+  };
+
+  function run() {
+    var r = RirekiCalc.schoolYears(window.__rirekiBirthISO());
+    if (!r.ok) { box.innerHTML = '<p class="result-error">생년월일을 올바르게 입력해 주세요.</p>'; box.hidden = false; return; }
+    var gap = parseInt(document.getElementById("gap").value || "0", 10);
+    if (!(gap >= 0 && gap <= 10)) gap = 0;
+    var w = RirekiCalc.wareki;
+    var wk = window.__rirekiWarekiKo;
+    function row(label, inY, outY) {
+      return "<tr><td>" + label + "</td><td>" + inY + "년 4월<br><span style=\"color:var(--color-muted);font-size:0.85em;\">" + wk(inY) + " (" + w(inY) + ")</span></td><td>" + outY + "년 3월<br><span style=\"color:var(--color-muted);font-size:0.85em;\">" + wk(outY) + " (" + w(outY) + ")</span></td></tr>";
+    }
+    box.innerHTML =
+      '<div class="result-main">' + (r.hayaumare ? "하야우마레(1/1〜4/1생·한 학년 위)" : "오소우마레(4/2〜12/31생)") + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>학교</th><th>입학</th><th>졸업</th></tr></thead><tbody>' +
+      row("초등학교", r.elemIn, r.elemOut) +
+      row("중학교", r.jhsIn, r.jhsOut) +
+      row("고등학교", r.hsIn, r.hsOut) +
+      row("대학(4년제)", r.uniIn + gap, r.uniOut + gap) +
+      "</tbody></table></div>" +
+      (gap > 0 ? "<p>대학에는 보정 " + gap + "년을 더했습니다.</p>" : "");
+    box.hidden = false;
+    if (window.__rirekiAdvRefresh) { window.__rirekiAdvRefresh(); }
+  }
+  document.getElementById("rireki-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run();
+  });
+  ["birth-year", "birth-month", "birth-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", run);
+  });
+  document.getElementById("gap").addEventListener("input", run);
+  run();
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var lastAdv = "";
+  function advCalc() {
+    var birth = window.__rirekiBirthISO();
+    var ronin = parseInt(document.getElementById("adv-ronin").value, 10) || 0;
+    var ryunen = parseInt(document.getElementById("adv-ryunen").value, 10) || 0;
+    var kyugaku = parseInt(document.getElementById("adv-kyugaku").value, 10) || 0;
+    var grad = document.getElementById("adv-grad").value;
+    return RirekiCalc.detailedYears(birth, ronin, ryunen, kyugaku, grad);
+  }
+  function advFail(code) {
+    var msg = code === "invalid_years" ? "재수·유급·휴학 연수는 0〜10의 정수로 입력해 주세요."
+      : "위 폼에서 생년월일을 입력해 주세요.";
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function advYm(y, m) {
+    return y + "년 " + m + "월 · " + window.__rirekiWarekiKo(y) + " " + m + "월 (" + RirekiCalc.wareki(y) + m + "月)";
+  }
+  function advYmJa(y, m) {
+    return y + "年" + m + "月(" + RirekiCalc.wareki(y) + m + "月)";
+  }
+  function runDetail() {
+    lastAdv = "detail";
+    var r = advCalc();
+    if (!r.ok) { advFail(r.code); return; }
+    var rows = [
+      ["초등학교 입학", r.elemIn], ["초등학교 졸업", r.elemOut, true],
+      ["중학교 졸업", r.jhsOut, true],
+      ["고등학교 입학", r.hsIn], ["고등학교 졸업", r.hsOut, true],
+      ["대학 입학", r.uniIn], ["대학 졸업", r.uniOut, true]
+    ];
+    if (r.msIn !== null) rows.push(["대학원(석사) 입학", r.msIn], ["대학원(석사) 수료", r.msOut, true]);
+    if (r.drIn !== null) rows.push(["대학원(박사) 입학", r.drIn], ["대학원(박사) 수료", r.drOut, true]);
+    var html = '<div class="result-main">보정된 학력 표</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>항목</th><th>연월</th></tr></thead><tbody>';
+    for (var i = 0; i < rows.length; i++) {
+      html += "<tr><td>" + rows[i][0] + "</td><td>" + advYm(rows[i][1], rows[i][2] ? 3 : 4) + "</td></tr>";
+    }
+    html += "</tbody></table></div>" +
+      '<p class="adv-note">졸업·수료는 3월, 입학은 4월로 표시하며, 대학원은 표준 수업연한(석사 2년·박사 3년)으로 계산합니다.</p>';
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+  function runText() {
+    lastAdv = "text";
+    var r = advCalc();
+    if (!r.ok) { advFail(r.code); return; }
+    function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+    var jhs = esc(document.getElementById("adv-jhs-name").value) || "◯◯中学校";
+    var hs = esc(document.getElementById("adv-hs-name").value) || "◯◯高等学校";
+    var uni = esc(document.getElementById("adv-uni-name").value) || "◯◯大学◯◯学部";
+    var lines = [
+      advYmJa(r.jhsOut, 3) + " " + jhs + " 卒業",
+      advYmJa(r.hsIn, 4) + " " + hs + " 入学",
+      advYmJa(r.hsOut, 3) + " " + hs + " 卒業",
+      advYmJa(r.uniIn, 4) + " " + uni + " 入学",
+      advYmJa(r.uniOut, 3) + " " + uni + " 卒業"
+    ];
+    if (r.msIn !== null) {
+      lines.push(advYmJa(r.msIn, 4) + " ◯◯大学大学院◯◯研究科(修士課程) 入学");
+      lines.push(advYmJa(r.msOut, 3) + " ◯◯大学大学院◯◯研究科(修士課程) 修了");
+    }
+    if (r.drIn !== null) {
+      lines.push(advYmJa(r.drIn, 4) + " ◯◯大学大学院◯◯研究科(博士課程) 入学");
+      lines.push(advYmJa(r.drOut, 3) + " ◯◯大学大学院◯◯研究科(博士課程) 修了");
+    }
+    advBox.innerHTML = '<div class="result-main">학력란 예문</div>' +
+      '<textarea rows="' + (lines.length + 1) + '" readonly style="width:100%;" aria-label="학력란 예문">' +
+      lines.join("\n").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</textarea>" +
+      '<p class="adv-note">이력서에 그대로 옮겨 적을 수 있도록 일본어로 작성했습니다(入学 = 입학, 卒業 = 졸업, 修了 = 수료). 괄호 안은 일본 연호이며, 서기와 연호 중 하나만 골라 서류 전체에서 통일해 주세요.</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-detail-run").addEventListener("click", runDetail);
+  document.getElementById("adv-text-run").addEventListener("click", runText);
+  function refreshLast() {
+    if (advBox.hidden) { return; }
+    if (lastAdv === "detail") { runDetail(); }
+    else if (lastAdv === "text") { runText(); }
+  }
+  function onDetailParam() {
+    if (!advBox.hidden && lastAdv === "text") { runText(); } else { runDetail(); }
+  }
+  ["adv-ronin", "adv-ryunen", "adv-kyugaku"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", onDetailParam);
+  });
+  document.getElementById("adv-grad").addEventListener("change", onDetailParam);
+  ["adv-jhs-name", "adv-hs-name", "adv-uni-name"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runText);
+  });
+  window.__rirekiAdvRefresh = refreshLast;
+})();
+</script>
+</body>
+</html>

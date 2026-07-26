@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>英寸⇔cm·磅⇔kg 换算计算器 | Quick Calc</title>
+  <meta name="description" content="免费在英寸和厘米、磅和千克之间相互换算。采用国际定义值,换算精确。适合确认电视·显示器尺寸,海淘选衣服鞋子,以及看懂哑铃的磅数。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/inch/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="英寸⇔cm·磅⇔kg 换算计算器 | Quick Calc">
+  <meta property="og:description" content="免费在英寸和厘米、磅和千克之间相互换算。采用国际定义值,换算精确。适合确认电视·显示器尺寸,海淘选衣服鞋子,以及看懂哑铃的磅数。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/inch/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"英寸⇔cm·磅⇔kg 换算计算器","item":"https://quick-calc.site/zh/tools/inch/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/inch/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/inch/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/inch/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/inch/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/inch/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>英寸⇔cm·磅⇔kg 换算计算器</h1>
+  <form class="tool-form" id="length-form">
+    <label>长度换算(英寸⇔cm)</label>
+    <span class="field-note">输入数值后,换算结果立即显示在下方</span>
+    <label>数值
+      <input type="number" id="l-value" inputmode="decimal" step="any" min="0.001" max="1000000" placeholder="65" required>
+    </label>
+    <label>输入数值的单位
+      <select id="l-unit">
+        <option value="in">英寸(in)</option>
+        <option value="cm">厘米(cm)</option>
+      </select>
+    </label>
+    <div class="tool-result" id="result-l" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="weight-form">
+    <label>重量换算(磅⇔kg)</label>
+    <label>数值
+      <input type="number" id="w-value" inputmode="decimal" step="any" min="0.001" max="1000000" placeholder="10">
+    </label>
+    <label>输入数值的单位
+      <select id="w-unit">
+        <option value="lb">磅(lb)</option>
+        <option value="kg">千克(kg)</option>
+      </select>
+    </label>
+    <div class="tool-result" id="result-w" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 电视·显示器的实际尺寸与观看距离·尺寸对比</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">电视·显示器的实际尺寸与观看距离</h3>
+      <p class="adv-note">从「○英寸」(即对角线长度)算出实际的宽·高(cm),以及舒适观看距离的参考值(全高清: 高度×3,4K: 高度×1.5)。</p>
+      <label>屏幕尺寸(英寸)
+        <input type="number" id="adv-inch" inputmode="decimal" step="any" min="0.001" max="1000" placeholder="例: 65">
+      </label>
+      <label>屏幕比例(宽:高)
+        <select id="adv-ratio">
+          <option value="16:9" selected>16:9(电视·常见显示器)</option>
+          <option value="16:10">16:10(部分电脑显示器)</option>
+          <option value="21:9">21:9(带鱼屏)</option>
+          <option value="4:3">4:3(老式电视·iPad)</option>
+        </select>
+      </label>
+      <button type="button" id="adv-screen-run">计算尺寸和距离</button>
+      <div class="tool-result" id="adv-screen-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">换机前后的尺寸对比</h3>
+      <p class="adv-note">用上面选择的屏幕比例,把「从24英寸换到27英寸能大多少?」变成具体数字。</p>
+      <label>现在的尺寸(英寸)
+        <input type="number" id="adv-inch-a" inputmode="decimal" step="any" min="0.001" max="1000" placeholder="例: 24">
+      </label>
+      <label>考虑中的尺寸(英寸)
+        <input type="number" id="adv-inch-b" inputmode="decimal" step="any" min="0.001" max="1000" placeholder="例: 27">
+      </label>
+      <button type="button" id="adv-compare-run">对比</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    电视·显示器的「◯英寸」指的是<strong>屏幕对角线的长度</strong>,不是宽度,请注意(例: 65英寸=对角线约165cm,宽度约144cm)。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>只要输入数字,就能立即把<strong>英寸换成cm(或把cm换成英寸)</strong>,也可以换算磅和kg。日本日常生活使用公制,但电视和显示器仍按英寸标示,因此在日本买家电、海淘衣服、或看到以磅标示的体重时都很方便。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>输入想换算的数值,并选择该数值的单位。</li>
+    <li>输入的同时,两种单位的数值立即显示在下方,无需点击按钮。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li><strong>1英寸 = 2.54cm</strong>(国际英寸的定义值,换算没有误差)</li>
+    <li><strong>1磅 = 0.45359237kg</strong>(国际磅的定义值)</li>
+    <li>两者均为1959年英码·磅国际协定的定义值。结果显示到小数点后2位。</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>常用换算速查表</caption>
+      <thead><tr><th>英寸</th><th>cm</th><th></th><th>磅</th><th>kg</th></tr></thead>
+      <tbody>
+        <tr><td>24</td><td>60.96</td><td></td><td>1</td><td>0.45</td></tr>
+        <tr><td>27</td><td>68.58</td><td></td><td>5</td><td>2.27</td></tr>
+        <tr><td>32</td><td>81.28</td><td></td><td>10</td><td>4.54</td></tr>
+        <tr><td>55</td><td>139.7</td><td></td><td>45</td><td>20.41</td></tr>
+        <tr><td>65</td><td>165.1</td><td></td><td>100</td><td>45.36</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出处(一次信息)</h3>
+  <ul class="sources">
+    <li>日本计量法(平成4年法律第51号)— 限制在交易·证明中使用非公制单位(日文)<br>
+      <a href="https://laws.e-gov.go.jp/law/404AC0000000051" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/404AC0000000051</a>(2026年7月18日查阅)</li>
+    <li>换算系数为国际协定(1959年)的定义值(1英寸=25.4mm、1磅=0.45359237kg)。</li>
+  </ul>
+
+  <h2>前提与注意</h2>
+  <ul class="cautions">
+    <li>鞋·衣服的尺码标注(US·UK尺码等)并不是英寸本身,而是各国的标准。请确认厂商的尺码表。</li>
+    <li>贵金属使用的「金衡盎司·金衡磅」与常衡磅是不同的单位,本工具不予处理。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">65英寸的电视宽度是多少cm?</h3>
+  <p class="faq-a">65英寸的对角线约165.1cm,若为16:9的屏幕,宽度约144cm、高度约81cm(不含边框)。确认摆放位置时请以厂商的外形尺寸为准。</p>
+  <h3 class="faq-q">可以换算英尺吗?</h3>
+  <p class="faq-a">1英尺=12英寸,把英尺乘以12后按英寸输入即可(例: 6英尺=72英寸=182.88cm)。</p>
+  <h3 class="faq-q">健身房哑铃的「45lb」是多少kg?</h3>
+  <p class="faq-a">约20.4kg。国外的杠铃片以45lb(≈20.4kg)为标准,与日本常见的20kg片略有差异。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/inch/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/inch/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/inch/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=inch">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/inch/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERROR_MESSAGES = {
+    invalid_value: "数值请在 0.001〜1,000,000 的范围内输入。",
+    invalid_unit: "请选择单位。"
+  };
+  function showError(box, code) {
+    box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "请检查输入的数值。") + "</p>";
+    box.hidden = false;
+  }
+  var lBox = document.getElementById("result-l");
+  var wBox = document.getElementById("result-w");
+  function runLength() {
+    if (document.getElementById("l-value").value.trim() === "") { lBox.hidden = true; return; }
+    var r = InchCalc.convertLength(parseFloat(document.getElementById("l-value").value), document.getElementById("l-unit").value);
+    if (!r.ok) { showError(lBox, r.code); return; }
+    lBox.innerHTML = '<div class="result-main">' + r.inch.toLocaleString() + " in = " + r.cm.toLocaleString() + " cm</div>";
+    lBox.hidden = false;
+  }
+  function runWeight() {
+    if (document.getElementById("w-value").value.trim() === "") { wBox.hidden = true; return; }
+    var r = InchCalc.convertWeight(parseFloat(document.getElementById("w-value").value), document.getElementById("w-unit").value);
+    if (!r.ok) { showError(wBox, r.code); return; }
+    wBox.innerHTML = '<div class="result-main">' + r.lb.toLocaleString() + " lb = " + r.kg.toLocaleString() + " kg</div>";
+    wBox.hidden = false;
+  }
+  document.getElementById("l-value").addEventListener("input", runLength);
+  document.getElementById("l-unit").addEventListener("change", runLength);
+  document.getElementById("length-form").addEventListener("submit", function (e) { e.preventDefault(); runLength(); });
+  document.getElementById("w-value").addEventListener("input", runWeight);
+  document.getElementById("w-unit").addEventListener("change", runWeight);
+  document.getElementById("weight-form").addEventListener("submit", function (e) { e.preventDefault(); runWeight(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function ratioParts() {
+    var v = document.getElementById("adv-ratio").value.split(":");
+    return [parseInt(v[0], 10), parseInt(v[1], 10)];
+  }
+  var screenBox = document.getElementById("adv-screen-result");
+  function runScreen(force) {
+    if (document.getElementById("adv-inch").value.trim() === "" && !force) { screenBox.hidden = true; return; }
+    var ratio = ratioParts();
+    var r = InchCalc.screenSize(parseFloat(document.getElementById("adv-inch").value), ratio[0], ratio[1]);
+    if (!r.ok) {
+      screenBox.innerHTML = '<p class="result-error">屏幕尺寸请输入大于0的数值(英寸)。</p>';
+      screenBox.hidden = false;
+      return;
+    }
+    screenBox.innerHTML =
+      '<div class="result-main">宽 ' + r.widthCm.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      ' cm × 高 ' + r.heightCm.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</div>' +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      '<tr><td>对角线</td><td>' + r.diagonalCm.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td></tr>' +
+      '<tr><td>观看距离参考(全高清)</td><td>约 ' + r.distFullHdCm.toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' cm(高度×3)</td></tr>' +
+      '<tr><td>观看距离参考(4K)</td><td>约 ' + r.dist4kCm.toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' cm(高度×1.5)</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="adv-note">这只是屏幕部分的尺寸。实际产品会因边框和底座而稍大一些。</p>';
+    screenBox.hidden = false;
+  }
+  document.getElementById("adv-inch").addEventListener("input", function () { runScreen(false); });
+  document.getElementById("adv-ratio").addEventListener("change", function () { runScreen(false); });
+  document.getElementById("adv-screen-run").addEventListener("click", function () { runScreen(true); });
+  function runCompare(force) {
+    if ((document.getElementById("adv-inch-a").value.trim() === "" ||
+         document.getElementById("adv-inch-b").value.trim() === "") && !force) { advBox.hidden = true; return; }
+    var ratio = ratioParts();
+    var r = InchCalc.compareScreens(
+      parseFloat(document.getElementById("adv-inch-a").value),
+      parseFloat(document.getElementById("adv-inch-b").value),
+      ratio[0], ratio[1]
+    );
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">两个尺寸都请输入大于0的数值(英寸)。</p>';
+      advBox.hidden = false;
+      return;
+    }
+    var up = r.areaRatePct >= 0 ? "变大" : "变小";
+    advBox.innerHTML =
+      '<div class="result-main">屏幕面积约 ' + up + ' ' + Math.abs(r.areaRatePct).toLocaleString(undefined, { maximumFractionDigits: 1 }) + '%</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th></th><th>宽</th><th>高</th></tr></thead><tbody>' +
+      '<tr><td>现在</td><td>' + r.widthA.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td><td>' + r.heightA.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td></tr>' +
+      '<tr><td>考虑中</td><td>' + r.widthB.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td><td>' + r.heightB.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td></tr>' +
+      '<tr><td>差值</td><td>' + r.widthDiff.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td><td>' + r.heightDiff.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' cm</td></tr>' +
+      '</tbody></table></div>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-inch-a").addEventListener("input", function () { runCompare(false); });
+  document.getElementById("adv-inch-b").addEventListener("input", function () { runCompare(false); });
+  document.getElementById("adv-ratio").addEventListener("change", function () { runCompare(false); });
+  document.getElementById("adv-compare-run").addEventListener("click", function () { runCompare(true); });
+})();
+</script>
+</body>
+</html>

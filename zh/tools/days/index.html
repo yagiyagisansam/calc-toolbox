@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>天数计算器(日期间隔·○天后的日期和星期) | Quick Calc</title>
+  <meta name="description" content="免费计算两个日期之间相差多少天,以及从基准日起○天后(○天前)的日期和星期。适合确认截止日、纪念日、付款和提交期限。支持闰年。">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/zh/tools/days/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="天数计算器(日期间隔·○天后的日期和星期) | Quick Calc">
+  <meta property="og:description" content="免费计算两个日期之间相差多少天,以及从基准日起○天后(○天前)的日期和星期。适合确认截止日、纪念日、付款和提交期限。支持闰年。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/zh/tools/days/">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/zh/"},{"@type":"ListItem","position":2,"name":"天数计算器(日期间隔·○天后)","item":"https://quick-calc.site/zh/tools/days/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/days/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/days/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/days/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/days/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/days/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>全部工具</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>天数计算器(日期间隔·○天后)</h1>
+  <form class="tool-form" id="between-form">
+    <span class="field-note">选择开始日和结束日后,天数会立即显示在下方</span>
+    <div class="field-row">
+      <label>开始日(年)
+        <select id="from-year"></select>
+      </label>
+      <label>月
+        <select id="from-month"></select>
+      </label>
+      <label>日
+        <select id="from-day"></select>
+      </label>
+    </div>
+    <div class="field-row">
+      <label>结束日(年)
+        <select id="to-year"></select>
+      </label>
+      <label>月
+        <select id="to-month"></select>
+      </label>
+      <label>日
+        <select id="to-day"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="add-form">
+    <span class="field-note">「100天后是几月几号?」用这里(往前用负数)</span>
+    <div class="field-row">
+      <label>基准日(年)
+        <select id="base-year"></select>
+      </label>
+      <label>月
+        <select id="base-month"></select>
+      </label>
+      <label>日
+        <select id="base-day"></select>
+      </label>
+    </div>
+    <label>多少天后?(往前用负数)
+      <span class="field-note">例: 100 / -30(支持范围: ±36,500天)</span>
+      <input type="number" id="offset" inputmode="numeric" step="1" min="-36500" max="36500" placeholder="100" required>
+    </label>
+    <div class="tool-result" id="result-b" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>更多功能: 周数·月数的换算和○个月后的日期</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">按周数·月数换算</h3>
+      <p class="adv-note">把上面「开始日」「结束日」的差,同时按「周数+零头天数」和「大约几个月」显示(包含首日的数法与住院天数等的算法相同)。</p>
+      <label><input type="checkbox" id="adv-include"> 包含首日计算(两端都算)</label>
+      <div class="tool-result" id="adv-bd-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">○个月后(○个月前)的日期</h3>
+      <p class="adv-note">从上面的「基准日」起,计算指定月数之后(负数为之前)的日期和星期。</p>
+      <label>几个月后?
+        <input type="number" id="adv-months" inputmode="numeric" min="-1200" max="1200" step="1" placeholder="例: 3">
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    天数有两种数法: 「不含首日(经过天数)」和「包含首日(含两端的天数)」。本工具<strong>两种都显示</strong>。合同、法律上的期间计算可能另有规定,请注意。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">这个工具能做什么</span><p>输入两个日期,立即知道<strong>相隔多少天</strong>。也能计算「100天后是几月几号?」这类未来日期。适合数活动倒计时、办理文件时的期间计算。</p></div>
+
+  <h2>使用方法</h2>
+  <ol class="steps">
+    <li>天数计算: 选择开始日和结束日,选好的瞬间就会显示间隔天数,无需按钮。</li>
+    <li>○天后的计算: 选择基准日并输入天数(过去用负数),对应的日期和星期会自动显示。</li>
+  </ol>
+
+  <h2>计算方法与依据</h2>
+  <ul class="method">
+    <li>基于格里高利历(现行公历),将日期转换为连续日数后计算差值与加减。支持闰年(每4年1次;能被100整除但不能被400整除的年份为平年)。</li>
+    <li><strong>经过天数</strong>不含首日(7月18日→7月19日为「1天」)。<strong>含两端的天数</strong>是在此基础上加1。</li>
+    <li>计算示例: 2026-07-18 → 2026-08-01 为 14天(含两端为15天)</li>
+  </ul>
+
+  <h3>出处与前提</h3>
+  <ul class="sources">
+    <li>基于格里高利历(闰年规则)的算术计算。</li>
+    <li>不考虑节假日和工作日(按日历日计算)。</li>
+  </ul>
+
+  <h2>计算的前提与注意</h2>
+  <ul class="cautions">
+    <li>如需按「工作日」计算(扣除周六日和节假日),请从本工具的结果中减去休息日天数。</li>
+    <li>法律上的期间计算(如日本民法的首日不算入原则)以具体规定为准。重要期限请查阅相关依据。</li>
+  </ul>
+
+  <h2 id="faq">常见问题</h2>
+  <h3 class="faq-q">「○天后」包含当天吗?</h3>
+  <p class="faq-a">不包含。「7月18日的1天后」是7月19日。如果想把当天算作第1天,请把输入的天数减1。</p>
+  <h3 class="faq-q">能计算几个月后·几年后吗?</h3>
+  <p class="faq-a">本工具专门计算天数。每个月的天数(28〜31天)各不相同,请先换算成天数再输入(参考: 1个月≒30天、1年=365或366天)。</p>
+  <h3 class="faq-q">可以用于过去的日期吗?</h3>
+  <p class="faq-a">支持1600年到2500年。天数输入负数即可计算「○天前」的日期。</p>
+
+  <h2>相关工具</h2>
+  <ul class="related">
+    <li><a href="../../">全部工具</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="语言"><a href="/tools/days/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/days/" lang="en" hreflang="en">English</a><span class="lang-current">简体中文</span><a href="/ko/tools/days/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>您输入的所有数据都只在您的设备上计算,不会发送到服务器。</p>
+  <nav>
+    <a href="../../">全部工具</a>
+    <a href="../../privacy.html">隐私政策</a>
+    <a href="../../disclaimer.html">免责声明</a>
+    <a href="../../../contact.html?tool=days">联系我们</a>
+  </nav>
+  <p>本站的计算结果均为约值。准确数值请以各页面注明的官方一次信息为准,或咨询相关政府窗口。</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/days/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var today = new Date();
+  var WD_ZH = { "月": "周一", "火": "周二", "水": "周三", "木": "周四", "金": "周五", "土": "周六", "日": "周日" };
+
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(document.getElementById(dId), 1, max, "日", Math.min(keep, max));
+  }
+  function isoOf(prefix) {
+    adjustDays(prefix + "-year", prefix + "-month", prefix + "-day");
+    return val(prefix + "-year") + "-" +
+      String(val(prefix + "-month")).padStart(2, "0") + "-" +
+      String(val(prefix + "-day")).padStart(2, "0");
+  }
+  function zhDate(iso) {
+    var p = iso.split("-");
+    return parseInt(p[0], 10) + "年" + parseInt(p[1], 10) + "月" + parseInt(p[2], 10) + "日";
+  }
+  function initDate(prefix) {
+    fillSelect(document.getElementById(prefix + "-year"), 1600, 2500, "年", today.getFullYear());
+    fillSelect(document.getElementById(prefix + "-month"), 1, 12, "月", today.getMonth() + 1);
+    fillSelect(document.getElementById(prefix + "-day"), 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), "日", today.getDate());
+  }
+  initDate("from");
+  initDate("to");
+  initDate("base");
+
+  var box = document.getElementById("result");
+  var boxB = document.getElementById("result-b");
+  var bdBox = document.getElementById("adv-bd-result");
+  var moBox = document.getElementById("adv-result");
+
+  var ERROR_MESSAGES = {
+    from_after_to: "开始日晚于结束日。",
+    invalid_offset: "天数请输入 ±36,500 以内的整数。",
+    out_of_range: "计算结果超出了支持范围(1600〜2500年)。"
+  };
+
+  // ---- 日期间隔(即时) ----
+  function runBetween() {
+    var result = DaysCalc.between(isoOf("from"), isoOf("to"));
+    if (!result.ok) {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "请检查输入值。") + "</p>";
+    } else {
+      box.innerHTML =
+        '<div class="result-main">' + result.days.toLocaleString() + " 天</div>" +
+        "<p>包含两端(首日和最后一天)时: <strong>" + result.inclusiveDays.toLocaleString() + " 天</strong></p>";
+    }
+    box.hidden = false;
+    runBreakdown();
+  }
+
+  // ---- ○天后的日期(即时) ----
+  function runAdd() {
+    var offset = document.getElementById("offset").value;
+    var base = isoOf("base");
+    if (offset === "") { boxB.hidden = true; runMonths(); return; }
+    var result = DaysCalc.addDays(base, parseFloat(offset));
+    if (!result.ok) {
+      boxB.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "请检查输入值。") + "</p>";
+    } else {
+      boxB.innerHTML = '<div class="result-main">' + zhDate(result.date) + "(" + WD_ZH[result.weekday] + ")</div>";
+    }
+    boxB.hidden = false;
+    runMonths();
+  }
+
+  // ---- 更多功能: 周数·月数的换算(即时) ----
+  function runBreakdown() {
+    var inc = document.getElementById("adv-include").checked;
+    var r = DaysCalc.breakdown(isoOf("from"), isoOf("to"), inc);
+    if (!r.ok) { bdBox.hidden = true; return; }
+    bdBox.innerHTML =
+      '<div class="result-main">' + r.days.toLocaleString() + " 天(" +
+      (inc ? "包含首日" : "不含首日") + ")</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>按周计算</td><td>" + r.weeks.toLocaleString() + "周" +
+      (r.weekDays > 0 ? "零" + r.weekDays + "天" : "") + "</td></tr>" +
+      "<tr><td>大约几个月</td><td>" + r.months.toLocaleString() + "个月" +
+      (r.monthDays > 0 ? "零" + r.monthDays + "天" : "") + "</td></tr>" +
+      "</tbody></table></div>" +
+      '<p class="adv-note">月数为按日历计算的差值(不含首日的数法)。</p>';
+    bdBox.hidden = false;
+  }
+
+  // ---- 更多功能: ○个月后的日期(即时) ----
+  function runMonths() {
+    var mo = document.getElementById("adv-months");
+    if (mo.value === "") { moBox.hidden = true; return; }
+    var base = isoOf("base");
+    var r = DaysCalc.addMonths(base, parseFloat(mo.value));
+    if (!r.ok) {
+      var msg = r.code === "invalid_months" ? "月数请输入-1,200〜1,200的整数。"
+        : r.code === "out_of_range" ? "计算结果超出了支持范围(1600〜2500年)。"
+        : "请正确输入基准日。";
+      moBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+      moBox.hidden = false;
+      return;
+    }
+    var n = parseFloat(mo.value);
+    moBox.innerHTML =
+      '<div class="result-main">' + zhDate(r.date) + "(" + WD_ZH[r.weekday] + ")</div>" +
+      "<p>" + zhDate(base) + " 的 " + Math.abs(n).toLocaleString() + " 个月" + (n < 0 ? "前" : "后") + "</p>" +
+      '<p class="adv-note">若目标月份没有相同的日期,则调整为月末(1月31日的1个月后是2月28日)。</p>';
+    moBox.hidden = false;
+  }
+
+  ["from-year", "from-month", "from-day", "to-year", "to-month", "to-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runBetween);
+  });
+  ["base-year", "base-month", "base-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runAdd);
+  });
+  document.getElementById("offset").addEventListener("input", runAdd);
+  document.getElementById("adv-include").addEventListener("change", runBreakdown);
+  document.getElementById("adv-months").addEventListener("input", runMonths);
+  document.getElementById("between-form").addEventListener("submit", function (e) { e.preventDefault(); runBetween(); });
+  document.getElementById("add-form").addEventListener("submit", function (e) { e.preventDefault(); runAdd(); });
+
+  runBetween();
+})();
+</script>
+</body>
+</html>

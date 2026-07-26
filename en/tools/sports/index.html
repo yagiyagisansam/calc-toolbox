@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Exercise Calorie Burn Calculator (Jogging, Swimming, Strength Training and More — 13 Activities) | Quick Calc</title>
+  <meta name="description" content="Calculate the calories burned by 13 activities — jogging, cycling, swimming, tennis, strength training, jump rope, yoga and more — with the METs method (official METs table). Just enter your weight and time. Includes fat equivalent.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/sports/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Exercise Calorie Burn Calculator (Jogging, Swimming, Strength Training and More — 13 Activities) | Quick Calc">
+  <meta property="og:description" content="Calculate the calories burned by 13 activities — jogging, cycling, swimming, tennis, strength training, jump rope, yoga and more — with the METs method (official METs table). Just enter your weight and time. Includes fat equivalent.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/sports/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Exercise Calorie Burn Calculator (Jogging, Swimming, Strength Training and More — 13 Activities)","item":"https://quick-calc.site/en/tools/sports/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/sports/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/sports/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/sports/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/sports/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/sports/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Exercise Calorie Burn Calculator</h1>
+  <form class="tool-form" id="sports-form">
+    <span class="field-note">Choose an activity and enter your weight and time — the result appears right below</span>
+    <label>Type of exercise
+      <select id="activity"></select>
+    </label>
+    <label>Weight (kg)
+      <input type="number" id="weight" inputmode="decimal" min="20" max="300" step="0.1" required placeholder="e.g. 60">
+    </label>
+    <label>Exercise time (minutes)
+      <input type="number" id="minutes" inputmode="numeric" min="1" max="600" step="1" required placeholder="e.g. 30">
+    </label>
+    <button type="submit">Calculate calories burned</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: total of several activities, time needed for a target amount</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Add up today's workouts</h3>
+      <p class="adv-note">On days with several activities, enter each one with its time to get the total (up to 5 entries; the weight above is used).</p>
+      <div id="adv-rows"></div>
+      <button type="button" id="adv-total-run">Calculate the total</button>
+
+      <h3 class="adv-h">Which activity, and how long, for a target amount?</h3>
+      <p class="adv-note">Lists the time needed to burn your target calories for each of the 13 activities, from shortest to longest.</p>
+      <label>Target calories to burn (kcal)
+        <input type="number" id="adv-target-kcal" inputmode="numeric" step="1" min="1" max="5000" placeholder="e.g. 300">
+      </label>
+      <button type="button" id="adv-compare-run">See the time needed by activity</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Just enter your weight and how long you exercised to see <strong>the calories you burned</strong>, using the METs formula from Japan's official exercise guidelines. It covers 13 activities including jogging, swimming and strength training. Use it to see how much today's workout was worth.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Choose the type of exercise (if yours is not listed, pick one of similar intensity).</li>
+    <li>Enter your weight and exercise time.</li>
+    <li>The calories burned and the body-fat equivalent appear right below as you type. Changing the activity recalculates instantly.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Energy burned (kcal) = 1.05 × METs × time (h) × weight (kg)</strong> (the formula used in the exercise guidelines of Japan's Ministry of Health, Labour and Welfare)</li>
+    <li>METs is exercise intensity with resting = 1. This tool uses values from the “METs table of physical activities”: jogging 7.0 / running 8 km/h 8.3 / cycling 6.8 / crawl (slow) 5.8 / tennis 7.3 / strength training (bodyweight) 3.5 / jump rope 8.8, and so on</li>
+    <li>Example: a 60 kg person jogging for 30 minutes → 1.05 × 7.0 × 0.5 × 60 = <strong>about 221 kcal</strong></li>
+    <li>The fat equivalent is based on 1 kg of body fat ≈ 7,200 kcal.</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>METs values: <a href="https://www.nibiohn.go.jp/eiken/programs/2011mets.pdf" target="_blank" rel="noopener">National Institute of Health and Nutrition (Japan), “METs table of physical activities” (2011 revised edition)</a> (in Japanese) / Formula: <a href="https://www.e-healthnet.mhlw.go.jp/information/exercise/s-02-004.html" target="_blank" rel="noopener">Ministry of Health, Labour and Welfare (Japan), e-Health Net “METs”</a> (in Japanese)</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>This formula includes the energy burned at rest (basal metabolism). For only the extra amount added by exercising, estimate with METs minus 1.</li>
+    <li>Even for the same activity, the actual METs varies with intensity (speed, load). The values shown are representative ones.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">How much exercise does one slice of cake take to burn off?</h3>
+  <p class="faq-a">A slice of shortcake is about 300–350 kcal. For a 60 kg person that is about 45 minutes of jogging, or about 1 hour 50 minutes of normal-pace walking. “Cancelling out what you ate with exercise” is quite hard, so combining it with adjusting your diet is more realistic.</p>
+  <h3 class="faq-q">Strength training burns fewer calories than I expected.</h3>
+  <p class="faq-a">The burn during strength training itself is modest, but more muscle raises your basal metabolism and makes you less likely to gain weight in the long run. The point is not to measure its value by calories alone.</p>
+  <h3 class="faq-q">How do I calculate walking?</h3>
+  <p class="faq-a">Ordinary walking at a normal pace (about 4 km/h) is about 3.0 METs, so you can estimate it with the same formula: 1.05 × 3.0 × time (h) × weight (kg). For example, 30 minutes at 60 kg is about 95 kcal.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/sports/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/sports/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/sports/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=sports">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/sports/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var LABEL_EN = {
+    "ジョギング(全般)": "Jogging (general)",
+    "ランニング(8km/h)": "Running (8 km/h)",
+    "サイクリング(16〜19km/h)": "Cycling (16–19 km/h)",
+    "水泳(クロール・ゆっくり)": "Swimming (crawl, slow)",
+    "水泳(平泳ぎ・レジャー)": "Swimming (breaststroke, leisurely)",
+    "テニス(全般)": "Tennis (general)",
+    "卓球": "Table tennis",
+    "ゴルフ(全般)": "Golf (general)",
+    "筋トレ(自重・軽〜中強度)": "Strength training (bodyweight, light to moderate)",
+    "ヨガ(ハタヨガ)": "Yoga (Hatha yoga)",
+    "なわとび(ゆっくり)": "Jump rope (slow)",
+    "ラジオ体操第一": "Radio calisthenics No. 1 (rajio taiso)",
+    "山登り(軽い荷物)": "Hiking (light pack)"
+  };
+  window.SportsLabel = function (label) { return LABEL_EN[label] || label; };
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var sel = document.getElementById("activity");
+  Object.keys(SportsCalc.ACTIVITIES).forEach(function (key) {
+    var a = SportsCalc.ACTIVITIES[key];
+    sel.add(new Option(SportsLabel(a.label) + " (" + a.mets + " METs)", key));
+  });
+  var MSG = {
+    invalid_weight: "Enter a weight between 20 and 300 kg.",
+    invalid_minutes: "Enter a time between 1 and 600 minutes.",
+    invalid_activity: "Choose a type of exercise."
+  };
+  var weightEl = document.getElementById("weight");
+  var minutesEl = document.getElementById("minutes");
+  function run() {
+    if (weightEl.value === "" || minutesEl.value === "") { box.hidden = true; return; }
+    var r = SportsCalc.calories(
+      parseFloat(weightEl.value),
+      parseFloat(minutesEl.value),
+      sel.value
+    );
+    if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "Check the entered values.") + "</p>"; box.hidden = false; return; }
+    box.innerHTML =
+      '<div class="result-main">About ' + r.kcal.toLocaleString() + " kcal</div>" +
+      "<p>" + SportsLabel(r.label) + " / equivalent to about <strong>" + r.fatG.toLocaleString() + " g</strong> of body fat (based on 1 kg ≈ 7,200 kcal)</p>";
+    box.hidden = false;
+  }
+  weightEl.addEventListener("input", run);
+  minutesEl.addEventListener("input", run);
+  sel.addEventListener("change", run);
+  document.getElementById("sports-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  var lastAdv = null;
+  var advRows = document.getElementById("adv-rows");
+  (function buildRows() {
+    for (var i = 0; i < 5; i++) {
+      var div = document.createElement("div");
+      div.className = "adv-sport-row";
+      div.style.cssText = "display:flex;gap:.5em;margin-bottom:8px;";
+      var sel = document.createElement("select");
+      sel.add(new Option("(none)", ""));
+      Object.keys(SportsCalc.ACTIVITIES).forEach(function (key) {
+        var a = SportsCalc.ACTIVITIES[key];
+        sel.add(new Option(SportsLabel(a.label) + " (" + a.mets + " METs)", key));
+      });
+      sel.setAttribute("aria-label", "Activity " + (i + 1));
+      var input = document.createElement("input");
+      input.type = "number";
+      input.min = "1"; input.max = "600"; input.step = "1";
+      input.setAttribute("inputmode", "numeric");
+      input.placeholder = "Time (min)";
+      input.setAttribute("aria-label", "Time in minutes for activity " + (i + 1));
+      input.style.width = "8em";
+      sel.addEventListener("change", function () { runTotal(false); });
+      input.addEventListener("input", function () { runTotal(false); });
+      div.appendChild(sel);
+      div.appendChild(input);
+      advRows.appendChild(div);
+    }
+  })();
+  function runTotal(fromButton) {
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(w)) { if (fromButton) advErr("First enter your weight in the form above."); return; }
+    var items = [];
+    var rowEls = advRows.querySelectorAll(".adv-sport-row");
+    for (var i = 0; i < rowEls.length; i++) {
+      var key = rowEls[i].querySelector("select").value;
+      var min = parseFloat(rowEls[i].querySelector("input").value);
+      if (key === "" || !isFinite(min)) continue;
+      items.push({ activity: key, minutes: min });
+    }
+    if (items.length === 0) { if (fromButton) advErr("Enter at least one activity with its time in minutes."); return; }
+    var r = SportsCalc.totalCalories(w, items);
+    if (!r.ok) {
+      advErr(r.code === "invalid_minutes" ? "Enter times between 1 and 600 minutes."
+        : "Check the entered values (weight 20–300 kg).");
+      return;
+    }
+    var rows = "";
+    for (var j = 0; j < r.items.length; j++) {
+      rows += "<tr><td>" + SportsLabel(r.items[j].label) + "</td><td>" + r.items[j].minutes.toLocaleString() +
+        " min</td><td>about " + r.items[j].kcal.toLocaleString() + " kcal</td></tr>";
+    }
+    lastAdv = runTotal;
+    advBox.innerHTML =
+      '<div class="result-main">Total: about ' + r.totalKcal.toLocaleString() + " kcal</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Activity</th><th>Time</th><th>Burned</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>" +
+      "<p>Equivalent to about <strong>" + r.fatG.toLocaleString() + " g</strong> of body fat (based on 1 kg ≈ 7,200 kcal).</p>";
+    advBox.hidden = false;
+  }
+  function runCompare(fromButton) {
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(w)) { if (fromButton) advErr("First enter your weight in the form above."); return; }
+    var kEl = document.getElementById("adv-target-kcal");
+    if (kEl.value === "") { if (fromButton) advErr("Enter the target calories to burn."); return; }
+    var r = SportsCalc.minutesForKcalAll(w, parseFloat(kEl.value));
+    if (!r.ok) {
+      advErr(r.code === "invalid_kcal" ? "Enter a target between 1 and 5,000 kcal."
+        : "Enter a weight between 20 and 300 kg.");
+      return;
+    }
+    var sorted = r.items.slice().sort(function (a, b) { return a.minutes - b.minutes; });
+    var rows = "";
+    for (var i = 0; i < sorted.length; i++) {
+      rows += "<tr><td>" + SportsLabel(sorted[i].label) + "</td><td>about " + sorted[i].minutes.toLocaleString() + " min</td></tr>";
+    }
+    lastAdv = runCompare;
+    advBox.innerHTML =
+      '<div class="result-main">Time needed to burn ' + parseFloat(kEl.value).toLocaleString() + " kcal</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>Activity</th><th>Time needed (rounded up)</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-total-run").addEventListener("click", function () { runTotal(true); });
+  document.getElementById("adv-compare-run").addEventListener("click", function () { runCompare(true); });
+  document.getElementById("adv-target-kcal").addEventListener("input", function () { runCompare(false); });
+  document.getElementById("weight").addEventListener("input", function () { if (lastAdv) lastAdv(false); });
+})();
+</script>
+</body>
+</html>

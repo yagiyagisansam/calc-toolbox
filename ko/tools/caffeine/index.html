@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>카페인 섭취량 계산기(커피 몇 잔까지?) | Quick Calc</title>
+  <meta name="description" content="커피·홍차·녹차·에너지 드링크 등의 카페인량을 합산해 하루 기준(건강한 성인 400mg·임신 중에는 더 적게)과 비교합니다. 과다 섭취 체크에 활용하세요.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/caffeine/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="카페인 섭취량 계산기(커피 몇 잔까지?) | Quick Calc">
+  <meta property="og:description" content="커피·홍차·녹차·에너지 드링크 등의 카페인량을 합산해 하루 기준(건강한 성인 400mg·임신 중에는 더 적게)과 비교합니다. 과다 섭취 체크에 활용하세요.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/caffeine/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"카페인 섭취량 계산기(커피 몇 잔까지?)","item":"https://quick-calc.site/ko/tools/caffeine/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/caffeine/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/caffeine/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/caffeine/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/caffeine/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/caffeine/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>카페인 섭취량 계산기</h1>
+  <form class="tool-form" id="caffeine-form">
+    <span class="field-note">음료와 양을 입력하면 바로 아래에 합계가 표시됩니다</span>
+    <div id="rows"></div>
+    <button type="button" id="add-row" style="font-size:0.95rem;padding:8px;border:1px dashed var(--color-border);border-radius:8px;background:transparent;color:var(--color-accent);cursor:pointer;">+ 음료 추가</button>
+    <button type="submit">카페인량 계산하기</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 취침 시 남는 카페인, 마지막 한 잔의 시각</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">잘 때 얼마나 남아 있을까?</h3>
+      <p class="adv-note">마시는 시각·잔 수·취침 예정 시각으로부터, 반감기 약 5시간의 기준치로 취침 시 남는 카페인량을 계산합니다(1잔 150ml≒90mg).</p>
+      <label>커피를 마시는 시각
+        <input type="time" id="adv-drink-time" value="15:00">
+      </label>
+      <label>잔 수
+        <input type="number" id="adv-cups" inputmode="numeric" step="1" min="1" max="10" value="1">
+      </label>
+      <label>취침 예정 시각
+        <input type="time" id="adv-bed-time" value="23:00">
+      </label>
+      <button type="button" id="adv-remain-run">남는 양 계산하기</button>
+
+      <h3 class="adv-h">몇 시까지 다 마셔야 할까?</h3>
+      <p class="adv-note">위의 잔 수와 취침 예정 시각으로부터, 취침 시 잔량이 100mg(잠에 영향을 주기 쉬운 기준선)을 밑돌게 되는 마지막 한 잔의 시각을 역산합니다.</p>
+      <button type="button" id="adv-last-run">마지막 한 잔의 시각 역산하기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>마신 것과 양만 입력하면 <strong>오늘 섭취한 카페인의 합계</strong>를 알 수 있습니다. 하루 기준(건강한 성인 400mg)과 비교해 과하지 않은지도 확인할 수 있습니다. 커피나 에너지 드링크를 자주 마시는 분의 과다 섭취 체크에 활용해 보세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>마신 것(커피·차·에너지 드링크 등)과 양(ml)을 입력합니다.</li>
+    <li>「+ 음료 추가」로 하루치를 한꺼번에 넣을 수 있습니다.</li>
+    <li>입력과 동시에 합계 mg과 기준 대비 비율이 바로 아래에 표시됩니다. 음료를 다시 선택해도 즉시 재계산됩니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>카페인량 = 농도(mg/100ml) × 양(ml) ÷ 100</strong>의 합계</li>
+    <li>농도는 일본 식품표준성분표(우려낸 액) 등의 값: 커피 60 / 인스턴트 57 / 홍차 30 / 센차·호지차·우롱차 20 / 교쿠로(옥로차) 160 / 콜라 약 10 mg/100ml</li>
+    <li>계산 예: 커피 2잔(400ml)+페트병 녹차(500ml)= 240+100 = <strong>340mg</strong>(성인 기준의 85%)</li>
+    <li>기준: 건강한 성인은 하루 400mg까지(유럽식품안전청 등의 평가). 임신·수유 중에는 더 적게(WHO는 300mg, 많은 기관은 200mg을 권장).</li>
+  </ul>
+
+  <h3>출처와 전제</h3>
+  <ul class="sources">
+    <li>음료의 카페인 농도와 섭취 기준: <a href="https://www.maff.go.jp/j/syouan/seisaku/risk_analysis/priority/hazard_chem/caffeine.html" target="_blank" rel="noopener">일본 농림수산성 「카페인의 과다 섭취에 대하여」</a>(일본 식품안전위원회·해외 기관의 평가 포함)(일본어)</li>
+  </ul>
+
+  <h2>계산의 전제와 주의</h2>
+  <ul class="cautions">
+    <li>에너지 드링크는 제품에 따라 카페인량이 크게 다릅니다(1개 30〜300mg). 정확한 양은 제품 표시를 확인해 주세요.</li>
+    <li>카페인 감수성에는 개인차가 커서, 소량으로도 잠들지 못하는 사람도 있습니다.</li>
+    <li>카페인 정제·졸음 방지 음료를 상시 복용하거나 몸 상태가 걱정될 때는 의사·약사와 상담해 주세요.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">커피는 하루 몇 잔까지 괜찮나요?</h3>
+  <p class="faq-a">드립 커피 1잔(150ml)은 약 90mg이므로, 건강한 성인의 기준 400mg은 <strong>4〜5잔 정도</strong>에 해당합니다. 다만 개인차가 있고, 저녁 이후에는 수면에 영향을 주기 쉬우므로 양과 타이밍 모두 신경 써 주세요.</p>
+  <h3 class="faq-q">잠들기 몇 시간 전까지 커피를 마셔도 되나요?</h3>
+  <p class="faq-a">카페인의 혈중 농도가 절반이 될 때까지 약 4시간(개인차 2〜8시간)이 걸립니다. 수면에 영향을 느끼는 분은 취침 5〜6시간 전까지로 하는 것이 무난합니다.</p>
+  <h3 class="faq-q">임신 중에는 어느 정도까지로 해야 하나요?</h3>
+  <p class="faq-a">WHO는 하루 300mg, 영국 등 많은 기관은 200mg까지를 권장합니다. 이 도구는 200mg 기준의 비율도 표시합니다. 주치의의 지시가 있으면 그쪽을 우선해 주세요.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/caffeine/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/caffeine/" lang="en" hreflang="en">English</a><a href="/zh/tools/caffeine/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=caffeine">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/caffeine/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var DRINK_LABEL_KO = {
+    coffee: "커피(드립)",
+    instant: "인스턴트 커피",
+    gyokuro: "교쿠로(옥로차)",
+    sencha: "녹차(센차)",
+    hojicha: "호지차",
+    oolong: "우롱차",
+    blacktea: "홍차",
+    cola: "콜라",
+    energy: "에너지 드링크(제품차 큼)",
+    decaf: "디카페인 커피"
+  };
+  var box = document.getElementById("result");
+  var rows = document.getElementById("rows");
+  function addRow(drink, ml) {
+    var div = document.createElement("div");
+    div.className = "caffeine-row";
+    div.style.cssText = "display:flex;gap:.5em;margin-bottom:8px;";
+    var sel = document.createElement("select");
+    Object.keys(CaffeineCalc.DRINKS).forEach(function (key) {
+      sel.add(new Option(DRINK_LABEL_KO[key] || CaffeineCalc.DRINKS[key].label, key));
+    });
+    sel.value = drink || "coffee";
+    var input = document.createElement("input");
+    input.type = "number";
+    input.min = "1"; input.max = "5000"; input.step = "any";
+    input.setAttribute("inputmode", "decimal");
+    input.placeholder = "양(ml)";
+    input.value = ml || "";
+    input.setAttribute("aria-label", "양(ml)");
+    input.style.width = "7em";
+    sel.addEventListener("change", function () { run(false); });
+    input.addEventListener("input", function () { run(false); });
+    div.appendChild(sel);
+    div.appendChild(input);
+    rows.appendChild(div);
+  }
+  addRow("coffee", 200);
+  document.getElementById("add-row").addEventListener("click", function () { addRow(); });
+  function run(fromSubmit) {
+    var items = [];
+    var rowEls = rows.querySelectorAll(".caffeine-row");
+    for (var i = 0; i < rowEls.length; i++) {
+      var ml = parseFloat(rowEls[i].querySelector("input").value);
+      if (!isFinite(ml) || ml <= 0) continue;
+      items.push({ drink: rowEls[i].querySelector("select").value, ml: ml });
+    }
+    var r = CaffeineCalc.total(items);
+    if (!r.ok) {
+      if (fromSubmit) {
+        box.innerHTML = '<p class="result-error">음료와 양(ml)을 1건 이상 입력해 주세요.</p>';
+        box.hidden = false;
+      } else {
+        box.hidden = true;
+      }
+      return;
+    }
+    var status = r.pctAdult >= 100 ? "성인의 하루 기준을 초과했습니다" : r.pctAdult >= 75 ? "기준에 가까워지고 있습니다" : "기준 범위 내입니다";
+    box.innerHTML =
+      '<div class="result-main">합계 약 ' + r.totalMg.toLocaleString() + " mg</div>" +
+      "<p>" + status + "</p>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>건강한 성인의 기준(400mg)</td><td><strong>" + r.pctAdult + "%</strong></td></tr>" +
+      "<tr><td>임신 중의 기준(200mg)</td><td>" + r.pctPregnant + "%</td></tr>" +
+      "</tbody></table></div>";
+    box.hidden = false;
+  }
+  document.getElementById("caffeine-form").addEventListener("submit", function (e) { e.preventDefault(); run(true); });
+  run(false);
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  var NOTE = '<p class="adv-note">반감기 약 5시간은 일반적인 평균치로, 실제로는 2.5〜10시간 정도로 개인차가 있습니다. 임신 중에는 분해가 느려지므로 더 적게 마시는 것이 기준입니다.</p>';
+  var lastAdv = null;
+  function runRemain(fromButton) {
+    var drink = document.getElementById("adv-drink-time").value;
+    var bed = document.getElementById("adv-bed-time").value;
+    var cupsRaw = document.getElementById("adv-cups").value;
+    if (drink === "" || bed === "" || cupsRaw === "") {
+      if (fromButton) advErr("시각과 잔 수를 입력해 주세요.");
+      return;
+    }
+    var r = CaffeineCalc.remainingAtBed(drink, bed, parseInt(cupsRaw, 10));
+    if (!r.ok) {
+      advErr(r.code === "invalid_cups" ? "잔 수는 1〜10잔의 정수로 입력해 주세요." : "시각을 입력해 주세요.");
+      return;
+    }
+    lastAdv = runRemain;
+    var judge = r.affectSleep
+      ? "<strong>100mg 이상 남아 있어, 잠들기·수면의 질에 영향을 주기 쉬운 기준선입니다.</strong>"
+      : "100mg 미만으로, 영향은 비교적 작은 편입니다.";
+    advBox.innerHTML =
+      '<div class="result-main">취침 시 남는 양 약 ' + r.remainingMg.toLocaleString() + " mg</div>" +
+      "<p>섭취한 " + r.intakeMg.toLocaleString() + " mg 중, 취침(" +
+      r.hoursUntilBed.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      " 시간 후) 시점에 몸에 남는 계산입니다. " + judge + "</p>" + NOTE;
+    advBox.hidden = false;
+  }
+  function runLast(fromButton) {
+    var bed = document.getElementById("adv-bed-time").value;
+    var cupsRaw = document.getElementById("adv-cups").value;
+    if (bed === "" || cupsRaw === "") {
+      if (fromButton) advErr("취침 예정 시각과 잔 수를 입력해 주세요.");
+      return;
+    }
+    var r = CaffeineCalc.lastCupTime(bed, parseInt(cupsRaw, 10));
+    if (!r.ok) {
+      advErr(r.code === "invalid_cups" ? "잔 수는 1〜10잔의 정수로 입력해 주세요." : "취침 예정 시각을 입력해 주세요.");
+      return;
+    }
+    lastAdv = runLast;
+    if (r.anytime) {
+      advBox.innerHTML =
+        '<div class="result-main">시간 제한은 특별히 없습니다</div>' +
+        "<p>" + r.intakeMg.toLocaleString() + " mg(커피 " +
+        (r.intakeMg / 90) + "잔분)이라면, 취침 시 잔량이 처음부터 100mg을 밑도는 계산입니다.</p>" + NOTE;
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">' + r.latestTime + " 까지가 기준</div>" +
+      "<p>" + r.intakeMg.toLocaleString() + " mg을 마신다면, 취침 약 <strong>" +
+      r.hoursBefore.toLocaleString(undefined, { maximumFractionDigits: 1 }) +
+      " 시간 전</strong>까지 다 마시면 취침 시 잔량이 100mg을 밑도는 계산입니다.</p>" + NOTE;
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-remain-run").addEventListener("click", function () { runRemain(true); });
+  document.getElementById("adv-last-run").addEventListener("click", function () { runLast(true); });
+  document.getElementById("adv-drink-time").addEventListener("input", function () { runRemain(false); });
+  ["adv-bed-time", "adv-cups"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { (lastAdv || runRemain)(false); });
+  });
+})();
+</script>
+</body>
+</html>

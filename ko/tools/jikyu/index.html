@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>시급⇔월급·연봉 환산기(세전) | Quick Calc</title>
+  <meta name="description" content="시급과 하루 근무시간·월 근무일수로 세전 월급과 연봉을 무료로 바로 계산합니다. 월급에서 시급을 거꾸로 구할 수도 있어, 일본의 아르바이트·파견 구인 조건 비교나 급여명세서 확인에 유용합니다.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/jikyu/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="시급⇔월급·연봉 환산기(세전) | Quick Calc">
+  <meta property="og:description" content="시급과 하루 근무시간·월 근무일수로 세전 월급과 연봉을 무료로 바로 계산합니다. 월급에서 시급을 거꾸로 구할 수도 있어, 일본의 아르바이트·파견 구인 조건 비교나 급여명세서 확인에 유용합니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/jikyu/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"시급⇔월급·연봉 환산기","item":"https://quick-calc.site/ko/tools/jikyu/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/jikyu/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/jikyu/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/jikyu/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/jikyu/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/jikyu/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>시급⇔월급·연봉 환산기</h1>
+  <form class="tool-form" id="to-monthly-form">
+    <label>시급(엔)
+      <span class="field-note">예: 1200(지원 범위: 100〜100,000엔)</span>
+      <input type="number" id="hourly" inputmode="numeric" step="1" min="100" max="100000" placeholder="1200" required>
+    </label>
+    <label>하루 근무시간(시간)
+      <span class="field-note">예: 8, 7.5(지원 범위: 0.5〜24)</span>
+      <input type="number" id="hours" inputmode="decimal" step="any" min="0.5" max="24" placeholder="8" required>
+    </label>
+    <label>월 근무일수(일)
+      <span class="field-note">예: 20(지원 범위: 1〜31·정수)</span>
+      <input type="number" id="days" inputmode="numeric" step="1" min="1" max="31" placeholder="20" required>
+    </label>
+    <button type="submit">월급·연봉 계산</button>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="to-hourly-form">
+    <label>월급(엔)에서 시급 역산
+      <span class="field-note">위에서 입력한 근무시간·근무일수를 사용합니다</span>
+      <input type="number" id="monthly" inputmode="numeric" step="1" min="10000" max="100000000" placeholder="200000">
+    </label>
+    <button type="submit">시급 역산</button>
+    <div class="tool-result" id="result-b" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 통근시간을 포함한 실질 시급·구인 비교</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">통근시간까지 넣은 「실질 시급」</h3>
+      <p class="adv-note">위 폼의 조건에 통근시간을 더해, 「집을 나서서 돌아올 때까지」의 시간으로 다시 나눈 시급을 냅니다.</p>
+      <label>편도 통근시간(분)
+        <input type="number" id="adv-commute" inputmode="numeric" step="1" min="0" max="300" placeholder="30">
+      </label>
+      <button type="button" id="adv-eff-run">실질 시급 계산</button>
+      <div class="tool-result" id="adv-result-eff" hidden aria-live="polite"></div>
+      <h3 class="adv-h">다른 구인과 비교하기</h3>
+      <p class="adv-note">같은 근무시간·근무일수에서 어느 쪽 구인이 실질 시급으로 더 유리한지 비교합니다.</p>
+      <label>구인 B의 시급(엔)
+        <input type="number" id="adv-hourly-b" inputmode="numeric" step="1" min="100" max="100000" placeholder="1300">
+      </label>
+      <label>구인 B의 편도 통근시간(분)
+        <input type="number" id="adv-commute-b" inputmode="numeric" step="1" min="0" max="300" placeholder="60">
+      </label>
+      <button type="button" id="adv-cmp-run">두 구인 비교하기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    계산 결과는 모두 <strong>세전(세금·사회보험료가 공제되기 전 금액)</strong>의 대략적인 값입니다. 실수령액은 부양 상황, 사회보험 가입 여부, 주민세 등에 따라 크게 달라집니다. 잔업수당·상여금·교통비도 포함되지 않습니다.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>시급과 근무 방식을 입력하면 <strong>월급과 연봉이 얼마가 되는지</strong>를 바로 알 수 있습니다(세금이 공제되기 전 금액으로, 일본 급여명세서에서는 「額面(가쿠멘)」이라고 합니다). 월급에서 시급을 거꾸로 구할 수도 있습니다. 일본에서 아르바이트·파견 구인 조건을 비교하거나 급여명세서(給与明細)의 금액을 확인할 때 활용하세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>시급·하루 근무시간·월 근무일수를 입력합니다. 세 가지를 모두 입력한 시점에 월급·연봉이 바로 아래에 자동으로 표시됩니다.</li>
+    <li>월급에서 시급을 알고 싶을 때는 근무시간·근무일수를 먼저 넣은 뒤 아래 칸에 월급을 입력합니다(이쪽도 자동 계산).</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>월급(세전) = 시급 × 하루 근무시간 × 월 근무일수</strong></li>
+    <li><strong>연봉(세전) = 월급 × 12</strong></li>
+    <li><strong>시급(역산) = 월급 ÷ (하루 근무시간 × 월 근무일수)</strong></li>
+    <li>계산 예: 시급 1,200엔 × 8시간 × 20일 = 월급 192,000엔(연봉 약 230만 엔)</li>
+  </ul>
+
+  <h3>출처·전제 명시</h3>
+  <ul class="sources">
+    <li>위 내용은 시급·시간·일수를 곱하고 나누는 산술 계산입니다(1엔 미만 반올림).</li>
+    <li>최저임금은 일본의 도도부현별로 매년 개정됩니다. 최신 최저임금은 일본 후생노동성의 「지역별 최저임금」 페이지에서 확인해 주세요.</li>
+  </ul>
+
+  <h2>전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>세전 금액에서 공제되는 항목(소득세·주민세·사회보험료 등)은 근무 조건과 부양 상황에 따라 다르므로, 실수령액은 이 계산보다 적어집니다.</li>
+    <li>주당 근무시간·근무일수에 따라 사회보험·고용보험 가입 조건이 달라집니다. 자세한 내용은 근무처나 연금사무소에 확인해 주세요.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">실수령액은 얼마가 되나요?</h3>
+  <p class="faq-a">이 도구는 세전 금액만 계산합니다. 실수령액은 일반적으로 세전의 75〜85% 정도라고 하지만 부양·보험 가입 여부·거주 지자체에 따라 크게 달라지므로, 정확한 금액은 급여명세서나 근무처에서 확인해 주세요.</p>
+  <h3 class="faq-q">주급·일급인 경우에는 어떻게 계산하나요?</h3>
+  <p class="faq-a">일급인 경우에는 「일급÷하루 근무시간」으로 시급으로 바꾼 뒤 입력해 주세요. 주 단위인 경우에는 월 근무일수를 「주당 일수×4.33」을 기준으로 환산할 수 있습니다(1개월≒4.33주).</p>
+  <h3 class="faq-q">잔업수당은 포함되나요?</h3>
+  <p class="faq-a">포함되지 않습니다. 법정 근로시간을 넘는 잔업에는 가산수당(25% 이상)이 필요합니다. 잔업이 많은 경우 실제 세전 금액은 이 계산보다 많아집니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/jikyu/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/jikyu/" lang="en" hreflang="en">English</a><a href="/zh/tools/jikyu/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=jikyu">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/jikyu/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var boxB = document.getElementById("result-b");
+  var ERROR_MESSAGES = {
+    invalid_hourly: "시급은 100〜100,000엔 범위로 입력해 주세요.",
+    invalid_monthly: "월급은 10,000〜100,000,000엔 범위로 입력해 주세요.",
+    invalid_hours: "근무시간은 0.5〜24시간 범위로 입력해 주세요.",
+    invalid_days: "근무일수는 1〜31일의 정수로 입력해 주세요."
+  };
+  function raw(id) { return document.getElementById(id).value; }
+  function workInputs() {
+    return {
+      hours: parseFloat(raw("hours")),
+      days: parseFloat(raw("days"))
+    };
+  }
+  function showError(target, code) {
+    target.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[code] || "입력값을 확인해 주세요.") + "</p>";
+    target.hidden = false;
+  }
+  function runMonthly() {
+    if (raw("hourly") === "" || raw("hours") === "" || raw("days") === "") {
+      box.hidden = true;
+      return;
+    }
+    var w = workInputs();
+    var result = JikyuCalc.toMonthly(parseFloat(raw("hourly")), w.hours, w.days);
+    if (!result.ok) { showError(box, result.code); return; }
+    box.innerHTML =
+      '<div class="result-main">월급(세전) 약 ' + result.monthlyYen.toLocaleString() + " 엔</div>" +
+      "<p>연봉(세전): <strong>약 " + result.yearlyYen.toLocaleString() + " 엔</strong></p>";
+    box.hidden = false;
+  }
+  function runHourly() {
+    if (raw("monthly") === "" || raw("hours") === "" || raw("days") === "") {
+      boxB.hidden = true;
+      return;
+    }
+    var w = workInputs();
+    var result = JikyuCalc.toHourly(parseFloat(raw("monthly")), w.hours, w.days);
+    if (!result.ok) { showError(boxB, result.code); return; }
+    boxB.innerHTML = '<div class="result-main">시급 환산 약 ' + result.hourlyYen.toLocaleString() + " 엔</div>";
+    boxB.hidden = false;
+  }
+  ["hourly", "hours", "days"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () { runMonthly(); runHourly(); });
+  });
+  document.getElementById("monthly").addEventListener("input", runHourly);
+  document.getElementById("to-monthly-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runMonthly();
+    if (raw("hourly") === "" || raw("hours") === "" || raw("days") === "") {
+      showError(box, raw("hourly") === "" ? "invalid_hourly" : raw("hours") === "" ? "invalid_hours" : "invalid_days");
+    }
+  });
+  document.getElementById("to-hourly-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    runHourly();
+    if (raw("monthly") === "" || raw("hours") === "" || raw("days") === "") {
+      showError(boxB, raw("monthly") === "" ? "invalid_monthly" : raw("hours") === "" ? "invalid_hours" : "invalid_days");
+    }
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  var effBox = document.getElementById("adv-result-eff");
+  function mainInputs() {
+    return {
+      hourly: parseFloat(document.getElementById("hourly").value),
+      hours: parseFloat(document.getElementById("hours").value),
+      days: parseFloat(document.getElementById("days").value)
+    };
+  }
+  var ADV_ERRORS = {
+    invalid_hourly: "시급(위 폼)은 100〜100,000엔 범위로 입력해 주세요.",
+    invalid_hours: "근무시간(위 폼)은 0.5〜24시간 범위로 입력해 주세요.",
+    invalid_days: "근무일수(위 폼)는 1〜31일의 정수로 입력해 주세요.",
+    invalid_commute: "통근시간은 0〜300분 범위로 입력해 주세요."
+  };
+  function advError(box, code) {
+    box.innerHTML = '<p class="result-error">' + (ADV_ERRORS[code] || "입력값을 확인해 주세요.") + "</p>";
+    box.hidden = false;
+  }
+  function filled(id) { return document.getElementById(id).value !== ""; }
+  function mainFilled() { return filled("hourly") && filled("hours") && filled("days"); }
+  function runEff() {
+    var m = mainInputs();
+    var commute = parseFloat(document.getElementById("adv-commute").value);
+    if (isNaN(commute)) commute = 0;
+    var r = JikyuCalc.effectiveHourly(m.hourly, m.hours, m.days, commute);
+    if (!r.ok) { advError(effBox, r.code); return; }
+    effBox.innerHTML =
+      '<div class="result-main">실질 시급 약 ' + r.effectiveHourlyYen.toLocaleString() + ' 엔</div>' +
+      '<p>세전 시급보다 <strong>' + r.dropYen.toLocaleString() + ' 엔</strong> 줄어듭니다<br>' +
+      '월 통근시간: ' + r.commuteHoursPerMonth.toLocaleString(undefined, { maximumFractionDigits: 1 }) + ' 시간(월급 ' + r.monthlyYen.toLocaleString() + ' 엔은 변하지 않습니다)</p>';
+    effBox.hidden = false;
+  }
+  function runCmp() {
+    var m = mainInputs();
+    var commuteA = parseFloat(document.getElementById("adv-commute").value);
+    if (isNaN(commuteA)) commuteA = 0;
+    var hourlyB = parseFloat(document.getElementById("adv-hourly-b").value);
+    var commuteB = parseFloat(document.getElementById("adv-commute-b").value);
+    if (isNaN(commuteB)) commuteB = 0;
+    var a = JikyuCalc.effectiveHourly(m.hourly, m.hours, m.days, commuteA);
+    if (!a.ok) { advError(advBox, a.code); return; }
+    var b = JikyuCalc.effectiveHourly(hourlyB, m.hours, m.days, commuteB);
+    if (!b.ok) {
+      if (b.code === "invalid_hourly") {
+        advBox.innerHTML = '<p class="result-error">구인 B의 시급은 100〜100,000엔 범위로 입력해 주세요.</p>';
+        advBox.hidden = false;
+      } else {
+        advError(advBox, b.code);
+      }
+      return;
+    }
+    var verdict;
+    if (a.effectiveHourlyYen > b.effectiveHourlyYen) {
+      verdict = "실질 시급으로는 <strong>지금의 조건(A)</strong>이 더 유리합니다.";
+    } else if (a.effectiveHourlyYen < b.effectiveHourlyYen) {
+      verdict = "실질 시급으로는 <strong>구인 B</strong>가 더 유리합니다.";
+    } else {
+      verdict = "실질 시급은 <strong>거의 같습니다</strong>.";
+    }
+    advBox.innerHTML =
+      '<div class="result-main">' + verdict + '</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead>' +
+      '<tr><th></th><th>A(위 폼)</th><th>구인 B</th></tr></thead><tbody>' +
+      '<tr><td>세전 시급</td><td>' + m.hourly.toLocaleString() + ' 엔</td><td>' + hourlyB.toLocaleString() + ' 엔</td></tr>' +
+      '<tr><td>편도 통근</td><td>' + commuteA.toLocaleString() + ' 분</td><td>' + commuteB.toLocaleString() + ' 분</td></tr>' +
+      '<tr><td>실질 시급</td><td><strong>' + a.effectiveHourlyYen.toLocaleString() + ' 엔</strong></td><td><strong>' + b.effectiveHourlyYen.toLocaleString() + ' 엔</strong></td></tr>' +
+      '<tr><td>월급(세전)</td><td>' + a.monthlyYen.toLocaleString() + ' 엔</td><td>' + b.monthlyYen.toLocaleString() + ' 엔</td></tr>' +
+      '</tbody></table></div>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-eff-run").addEventListener("click", runEff);
+  document.getElementById("adv-cmp-run").addEventListener("click", runCmp);
+  function autoEff() {
+    if (mainFilled() && filled("adv-commute")) { runEff(); } else { effBox.hidden = true; }
+  }
+  function autoCmp() {
+    if (mainFilled() && filled("adv-hourly-b")) { runCmp(); } else { advBox.hidden = true; }
+  }
+  document.getElementById("adv-commute").addEventListener("input", function () { autoEff(); if (!advBox.hidden) autoCmp(); });
+  document.getElementById("adv-hourly-b").addEventListener("input", autoCmp);
+  document.getElementById("adv-commute-b").addEventListener("input", function () { if (filled("adv-hourly-b")) autoCmp(); });
+  ["hourly", "hours", "days"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (!effBox.hidden || filled("adv-commute")) autoEff();
+      if (!advBox.hidden || filled("adv-hourly-b")) autoCmp();
+    });
+  });
+})();
+</script>
+</body>
+</html>

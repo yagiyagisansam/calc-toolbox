@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Mean &amp; Median Calculator (Just Paste Your Numbers) | Quick Calc</title>
+  <meta name="description" content="Paste a list of numbers to get the mean, median, max, min and sum in one go, for free. Handy for test scores, sales figures and records. Accepts commas, spaces and line breaks as separators.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/en/tools/heikin/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="Mean &amp; Median Calculator (Just Paste Your Numbers) | Quick Calc">
+  <meta property="og:description" content="Paste a list of numbers to get the mean, median, max, min and sum in one go, for free. Handy for test scores, sales figures and records. Accepts commas, spaces and line breaks as separators.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/en/tools/heikin/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/en/"},{"@type":"ListItem","position":2,"name":"Mean &amp; Median Calculator (Just Paste Your Numbers)","item":"https://quick-calc.site/en/tools/heikin/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/heikin/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/heikin/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/heikin/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/heikin/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/heikin/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>All tools</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>Mean &amp; Median Calculator</h1>
+  <form class="tool-form" id="heikin-form">
+    <label>Numbers (separated by commas, spaces or line breaks)
+      <span class="field-note">Paste them and the mean and median appear right below</span>
+      <textarea id="list" rows="4" required placeholder="e.g. 80, 92, 76, 88, 65"></textarea>
+    </label>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>More features: weighted mean, trimmed mean, target-average calculation</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">Weighted mean (weighted average)</h3>
+      <p class="adv-note">Enter one “value,weight” pair per line to calculate a weighted average — for example a grade where the midterm has weight 2 and the final has weight 3.</p>
+      <label>Values and weights (one “value,weight” per line, e.g. 90,2)
+        <textarea id="adv-pairs" rows="4" placeholder="e.g.&#10;90,2&#10;70,3"></textarea>
+      </label>
+      <button type="button" id="adv-weighted-run">Calculate the weighted mean</button>
+      <div class="tool-result" id="adv-weighted-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">Mean without the max and min (trimmed mean)</h3>
+      <p class="adv-note">To avoid being pulled by extreme values, this removes one highest and one lowest value from the numbers entered above and averages the rest.</p>
+      <button type="button" id="adv-trim-run">Calculate with the numbers above</button>
+      <div class="tool-result" id="adv-trim-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">What do I need next time to reach a target average?</h3>
+      <p class="adv-note">Treating the numbers above as your results so far, this works out the value you need in one more round to reach a target average.</p>
+      <label>Target average
+        <input type="number" id="adv-target" inputmode="decimal" step="any" placeholder="e.g. 80">
+      </label>
+      <button type="button" id="adv-need-run">Calculate the required value</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">What this tool tells you</span><p>Paste numbers such as test scores or sales figures and instantly see the <strong>mean and median</strong> — the sum, max and min are shown at the same time. Handy for grading and tidying up records.</p></div>
+
+  <h2>How to use</h2>
+  <ol class="steps">
+    <li>Enter the numbers separated by commas, spaces or line breaks (pasting a column from Excel works too).</li>
+    <li>The moment you paste (or type), the count, sum, mean, median, max and min appear. No button needed.</li>
+  </ol>
+
+  <h2>How it is calculated</h2>
+  <ul class="method">
+    <li><strong>Mean = sum ÷ count</strong></li>
+    <li><strong>Median</strong> = the middle value when sorted in ascending order (with an even count, the average of the two middle values)</li>
+    <li>Example: for 10, 10, 20 the mean is 13.3 but the median is 10. With big outliers in the data, the median is often closer to the “typical” feel.</li>
+  </ul>
+
+  <h3>Sources and assumptions</h3>
+  <ul class="sources">
+    <li>Calculations based on the standard statistical definitions (arithmetic mean and median).</li>
+  </ul>
+
+  <h2>Assumptions and notes</h2>
+  <ul class="cautions">
+    <li>If anything that is not a number is mixed in, you get an error (remove units such as “points” before pasting).</li>
+    <li>Up to 10,000 numbers can be calculated at once.</li>
+  </ul>
+
+  <h2 id="faq">Frequently asked questions</h2>
+  <h3 class="faq-q">Mean or median — which should I look at?</h3>
+  <p class="faq-a">If the data has no extreme values (outliers), the mean is enough. For data where a few very large values mix in, such as incomes or housing prices, the median matches the feel of the “middle” better. Looking at both is recommended.</p>
+  <h3 class="faq-q">Can I use a single column copied from Excel?</h3>
+  <p class="faq-a">Yes. It is recognized as line-break-separated, so select the column, copy it and paste it as is.</p>
+  <h3 class="faq-q">Can it also calculate hensachi (deviation scores)?</h3>
+  <p class="faq-a">For hensachi, use the hensachi (deviation score) calculator on this site — you can find it from “All tools”. Paste a list of scores there for a batch calculation.</p>
+
+  <h2>Related tools</h2>
+  <ul class="related">
+    <li><a href="../../">All tools</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="Language"><a href="/tools/heikin/" lang="ja" hreflang="ja">日本語</a><span class="lang-current">English</span><a href="/zh/tools/heikin/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/heikin/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>Everything you enter is calculated on your device and never sent to a server.</p>
+  <nav>
+    <a href="../../">All tools</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="../../disclaimer.html">Disclaimer</a>
+    <a href="../../../contact.html?tool=heikin">Contact</a>
+  </nav>
+  <p>All results on this site are approximations. For exact figures, check the primary sources listed on each page or contact the relevant public office.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/heikin/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  function run() {
+    var raw = document.getElementById("list").value.trim();
+    if (raw === "") { box.hidden = true; return; }
+    var parts = raw.split(/[\s,、]+/).filter(function (s) { return s !== ""; });
+    var list = parts.map(function (s) { return parseFloat(s); });
+    var bad = list.some(function (v) { return !isFinite(v); });
+    var r = bad ? { ok: false, code: "invalid_value" } : HeikinCalc.stats(list);
+    if (!r.ok) {
+      var msg = r.code === "invalid_value" ? "Some entries cannot be read as numbers. Enter only numbers, separated as described." : "Enter between 1 and 10,000 numbers.";
+      box.innerHTML = '<p class="result-error">' + msg + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">Mean ' + r.mean.toLocaleString() + "</div>" +
+      '<div class="table-scroll"><table class="data-table"><tbody>' +
+      "<tr><td>Median</td><td>" + r.median.toLocaleString() + "</td></tr>" +
+      "<tr><td>Count</td><td>" + r.n.toLocaleString() + "</td></tr>" +
+      "<tr><td>Sum</td><td>" + r.sum.toLocaleString() + "</td></tr>" +
+      "<tr><td>Min / Max</td><td>" + r.min.toLocaleString() + " / " + r.max.toLocaleString() + "</td></tr>" +
+      "</tbody></table></div>";
+    box.hidden = false;
+  }
+  document.getElementById("list").addEventListener("input", run);
+  document.getElementById("heikin-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var advBox = document.getElementById("adv-result");
+  function parseList() {
+    return document.getElementById("list").value.split(/[\s,、]+/)
+      .filter(function (p) { return p !== ""; })
+      .map(function (p) { return parseFloat(p); });
+  }
+  var wBox = document.getElementById("adv-weighted-result");
+  var tBox = document.getElementById("adv-trim-result");
+  function runWeighted() {
+    if (document.getElementById("adv-pairs").value.trim() === "") { wBox.hidden = true; return; }
+    var lines = document.getElementById("adv-pairs").value.split(/\n+/)
+      .map(function (l) { return l.trim(); })
+      .filter(function (l) { return l !== ""; });
+    var pairs = lines.map(function (l) {
+      var nums = l.split(/[\s,、:]+/).filter(function (p) { return p !== ""; })
+        .map(function (p) { return parseFloat(p); });
+      return nums.length === 2 ? nums : [NaN, NaN];
+    });
+    var r = HeikinCalc.weightedMean(pairs);
+    if (!r.ok) {
+      var msg = r.code === "invalid_weight" ? "Weights must be numbers of 0 or more, with a total greater than 0."
+        : "Enter two numbers per line as “value,weight” (e.g. 90,2).";
+      wBox.innerHTML = '<p class="result-error">' + msg + '</p>';
+      wBox.hidden = false;
+      return;
+    }
+    wBox.innerHTML =
+      '<div class="result-main">Weighted mean ' + r.mean.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '</div>' +
+      '<p>' + r.n.toLocaleString() + ' pairs / total weight ' + r.weightSum.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '</p>';
+    wBox.hidden = false;
+  }
+  document.getElementById("adv-pairs").addEventListener("input", runWeighted);
+  document.getElementById("adv-weighted-run").addEventListener("click", runWeighted);
+  function runTrim(force) {
+    if (document.getElementById("list").value.trim() === "" && !force) { tBox.hidden = true; return; }
+    var r = HeikinCalc.trimmedMean(parseList());
+    if (!r.ok) {
+      if (!force && tBox.hidden) return;
+      tBox.innerHTML = '<p class="result-error">Enter at least 3 numbers in the field above.</p>';
+      tBox.hidden = false;
+      return;
+    }
+    tBox.innerHTML =
+      '<div class="result-main">Trimmed mean ' + r.mean.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '</div>' +
+      '<p>This is the average of ' + r.used.toLocaleString() + ' values after removing the minimum ' +
+      r.removedMin.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' and the maximum ' +
+      r.removedMax.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '.</p>';
+    tBox.hidden = false;
+  }
+  document.getElementById("adv-trim-run").addEventListener("click", function () { runTrim(true); });
+  document.getElementById("list").addEventListener("input", function () { runTrim(false); });
+  function runNeed(force) {
+    var targetRaw = document.getElementById("adv-target").value;
+    if ((targetRaw.trim() === "" || document.getElementById("list").value.trim() === "") && !force) {
+      advBox.hidden = true;
+      return;
+    }
+    var target = parseFloat(targetRaw);
+    var r = HeikinCalc.needScore(parseList(), target);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">Enter numbers in the field above and set the target average as a number.</p>';
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">Needed next time: ' + r.needed.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '</div>' +
+      '<p>Your current average is ' + r.currentMean.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' (' + r.n.toLocaleString() +
+      ' values). If you get the value above in the next round, the average of ' + (r.n + 1).toLocaleString() + ' values becomes ' +
+      target.toLocaleString(undefined, { maximumFractionDigits: 2 }) + '.</p>';
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-target").addEventListener("input", function () { runNeed(false); });
+  document.getElementById("list").addEventListener("input", function () { runNeed(false); });
+  document.getElementById("adv-need-run").addEventListener("click", function () { runNeed(true); });
+})();
+</script>
+</body>
+</html>

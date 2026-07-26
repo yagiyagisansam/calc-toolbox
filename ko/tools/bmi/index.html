@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>BMI·표준체중 계산기(일본 기준 판정) | Quick Calc</title>
+  <meta name="description" content="키와 몸무게만 입력하면 BMI와 표준체중(BMI 22)을 무료로 계산. 일본 건강검진에서 쓰이는 일본비만학회 기준(저체중·보통·비만 1〜4도)으로 판정합니다. 계산식과 출처 명시.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/bmi/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="BMI·표준체중 계산기(일본 기준 판정) | Quick Calc">
+  <meta property="og:description" content="키와 몸무게만 입력하면 BMI와 표준체중(BMI 22)을 무료로 계산. 일본 건강검진에서 쓰이는 일본비만학회 기준(저체중·보통·비만 1〜4도)으로 판정합니다. 계산식과 출처 명시.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/bmi/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"BMI·표준체중 계산기(일본 기준 판정)","item":"https://quick-calc.site/ko/tools/bmi/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/bmi/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/bmi/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/bmi/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/bmi/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/bmi/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>BMI·표준체중 계산기</h1>
+  <form class="tool-form" id="bmi-form">
+    <span class="field-note">키와 몸무게를 입력하면 바로 아래에 결과가 표시됩니다</span>
+    <label>키(cm)
+      <span class="field-note">예: 170(지원 범위: 100〜250cm)</span>
+      <input type="number" id="height" inputmode="decimal" step="0.1" min="100" max="250" placeholder="170" required>
+    </label>
+    <label>몸무게(kg)
+      <span class="field-note">예: 60(지원 범위: 20〜300kg)</span>
+      <input type="number" id="weight" inputmode="decimal" step="0.1" min="20" max="300" placeholder="60" required>
+    </label>
+    <button type="submit">계산하기</button>
+  </form>
+
+  <div class="tool-result" id="result" hidden aria-live="polite"></div>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 목표 BMI에서 역산, 체중 조견표</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">목표 BMI에서 목표 체중 역산</h3>
+      <p class="adv-note">되고 싶은 BMI를 입력하면 목표 체중과 「앞으로 몇 kg인지」를 역산합니다(키·몸무게는 위 값을 사용).</p>
+      <label>목표 BMI
+        <input type="number" id="adv-target-bmi" inputmode="decimal" step="any" min="10" max="40" value="22">
+      </label>
+      <button type="button" id="adv-goal-run">목표 체중 역산하기</button>
+
+      <h3 class="adv-h">내 키의 체중 조견표</h3>
+      <p class="adv-note">위에서 입력한 키에서 BMI 18.5〜30에 해당하는 체중을 한눈에 보여줍니다.</p>
+      <button type="button" id="adv-table-run">조견표 보기</button>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    이 도구의 계산 결과는 <strong>대략적인 값</strong>입니다. 성인 대상이며 어린이·임신 중에는 적용할 수 없습니다. 건강 상태는 수치만으로 판단하지 말고 의사·보건사와 상담해 주세요.
+  </div>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>키와 몸무게만 입력하면 <strong>BMI와 표준체중</strong>을 바로 확인할 수 있습니다. 판정은 <strong>일본 건강검진에서 쓰이는 일본비만학회 기준</strong>(저체중〜비만)입니다. 일본에서 받은 건강검진 결과를 이해하거나 체중 목표를 세울 때 유용합니다.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>키를 cm 단위로 입력합니다(예: 170).</li>
+    <li>몸무게를 kg 단위로 입력합니다(예: 60).</li>
+    <li>입력과 동시에 BMI·판정·표준체중이 바로 아래에 표시됩니다. 버튼은 누를 필요 없습니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <p>이 도구는 다음 식으로 계산합니다(BMI는 소수 첫째 자리까지 표시하고, 판정은 표시값 기준).</p>
+  <ul class="method">
+    <li><strong>BMI</strong> = 몸무게(kg) ÷ 키(m) ÷ 키(m)</li>
+    <li><strong>표준체중</strong> = 22 × 키(m) × 키(m)<br>
+      BMI 22는 통계적으로 질병 위험이 가장 낮다고 알려진 값으로, 이를 기준으로 한 체중을 일본에서는 「표준체중(適正体重)」이라고 합니다.</li>
+  </ul>
+  <p>판정은 일본비만학회의 성인 기준을 따릅니다.</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>BMI 비만도 분류(일본비만학회)</caption>
+      <thead><tr><th>BMI</th><th>판정</th></tr></thead>
+      <tbody>
+        <tr><td>18.5 미만</td><td>저체중</td></tr>
+        <tr><td>18.5 이상 25 미만</td><td>보통 체중</td></tr>
+        <tr><td>25 이상 30 미만</td><td>비만(1도)</td></tr>
+        <tr><td>30 이상 35 미만</td><td>비만(2도)</td></tr>
+        <tr><td>35 이상 40 미만</td><td>비만(3도)</td></tr>
+        <tr><td>40 이상</td><td>비만(4도)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>출처(1차 정보)</h3>
+  <ul class="sources">
+    <li>일본 후생노동성 e-헬스넷 「BMI」 — 계산식과 BMI 22의 근거(일본어)<br>
+      <a href="https://kennet.mhlw.go.jp/information/information/dictionary/metabolic/ym-002.html" rel="noopener" target="_blank">https://kennet.mhlw.go.jp/information/information/dictionary/metabolic/ym-002.html</a>(2026년 7월 26일 열람)</li>
+    <li>일본비만학회 「비만증 진료 가이드라인 2016」 — 비만도 분류(일본어)<br>
+      <a href="http://www.jasso.or.jp/" rel="noopener" target="_blank">일본비만학회 공식 사이트</a>(2026년 7월 26일 열람)</li>
+  </ul>
+
+  <h2>전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>성인 대상입니다. 어린이는 성장곡선 등 나이에 맞는 다른 지표가 쓰이며, 임신 중에는 적용할 수 없습니다.</li>
+    <li>BMI는 키와 몸무게만으로 계산하므로 근육량이나 체지방률은 반영되지 않습니다. 근육량이 많으면 BMI가 높게 나올 수 있습니다.</li>
+    <li>판정 기준은 일본 기준입니다. 한국(대한비만학회)에서는 23 이상을 과체중(비만 전단계), 25 이상을 비만으로 보는 등 분류가 다르고, WHO 국제 기준에서는 비만의 경계가 BMI 30입니다. 일본 건강검진에서는 BMI 25부터 「비만(1도)」로 판정됩니다.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">BMI는 보통 체중인데 체형이 신경 쓰입니다.</h3>
+  <p class="faq-a">BMI는 키와 몸무게만 쓰는 지표라 근육과 지방을 구분하지 못합니다. 체성분(체지방률·근육량)은 체성분 측정기나 전문기관에서 측정해야 합니다.</p>
+  <h3 class="faq-q">아이의 비만 판정에 쓸 수 있나요?</h3>
+  <p class="faq-a">쓸 수 없습니다. 어린이는 성장곡선 등 나이에 맞는 지표가 쓰입니다. 학교나 소아과의 판정을 따라 주세요.</p>
+  <h3 class="faq-q">표준체중(BMI 22)을 꼭 목표로 해야 하나요?</h3>
+  <p class="faq-a">BMI 22는 「통계적으로 질병이 가장 적다」는 값일 뿐, 모두가 도달해야 하는 목표치는 아닙니다. 알맞은 체중은 나이·건강 상태에 따라 다르므로 의사와 상담해 주세요.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/bmi/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/bmi/" lang="en" hreflang="en">English</a><a href="/zh/tools/bmi/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=bmi">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/bmi/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var CATEGORY_KO = {
+    "低体重": "저체중",
+    "普通体重": "보통 체중",
+    "肥満(1度)": "비만(1도)",
+    "肥満(2度)": "비만(2도)",
+    "肥満(3度)": "비만(3도)",
+    "肥満(4度)": "비만(4도)"
+  };
+  var ERROR_MESSAGES = {
+    invalid_height: "키는 " + BmiCalc.HEIGHT_MIN_CM + "〜" + BmiCalc.HEIGHT_MAX_CM + " cm 범위로 입력해 주세요.",
+    invalid_weight: "몸무게는 " + BmiCalc.WEIGHT_MIN_KG + "〜" + BmiCalc.WEIGHT_MAX_KG + " kg 범위로 입력해 주세요."
+  };
+  var box = document.getElementById("result");
+  var heightEl = document.getElementById("height");
+  var weightEl = document.getElementById("weight");
+  function run() {
+    if (heightEl.value === "" || weightEl.value === "") { box.hidden = true; return; }
+    var result = BmiCalc.calculate(parseFloat(heightEl.value), parseFloat(weightEl.value));
+    if (result.ok) {
+      box.innerHTML =
+        '<div class="result-main">BMI ' + result.bmi.toFixed(1) + "(" + (CATEGORY_KO[result.category] || result.category) + ")</div>" +
+        "<p>당신의 표준체중(BMI 22 기준)은 약 <strong>" + result.idealWeightKg.toFixed(1) + " kg</strong>입니다.</p>";
+    } else {
+      box.innerHTML = '<p class="result-error">' + (ERROR_MESSAGES[result.code] || "입력값을 확인해 주세요.") + "</p>";
+    }
+    box.hidden = false;
+  }
+  heightEl.addEventListener("input", run);
+  weightEl.addEventListener("input", run);
+  document.getElementById("bmi-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var LABEL_KO = {
+    "低体重との境界": "저체중과의 경계",
+    "細めの普通体重": "마른 편의 보통 체중",
+    "適正体重(統計的に病気が最も少ない)": "표준체중(통계적으로 질병이 가장 적음)",
+    "肥満(1度)との境界": "비만(1도)과의 경계",
+    "肥満(2度)との境界": "비만(2도)과의 경계"
+  };
+  var advBox = document.getElementById("adv-result");
+  var lastAdv = null;
+  function advErr(msg) {
+    advBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function runGoal(fromButton) {
+    var h = parseFloat(document.getElementById("height").value);
+    var w = parseFloat(document.getElementById("weight").value);
+    if (!isFinite(h) || !isFinite(w)) {
+      if (fromButton) advErr("먼저 위 폼에 키와 몸무게를 입력해 주세요.");
+      return;
+    }
+    var tbRaw = document.getElementById("adv-target-bmi").value;
+    var r = BmiCalc.targetFromBmi(h, w, tbRaw === "" ? undefined : parseFloat(tbRaw));
+    if (!r.ok) {
+      advErr(r.code === "invalid_target_bmi"
+        ? "목표 BMI는 10〜40 범위로 입력해 주세요."
+        : "위 폼의 키·몸무게를 확인해 주세요(키 100〜250cm, 몸무게 20〜300kg).");
+      return;
+    }
+    var msg;
+    if (r.diffKg > 0) {
+      msg = "목표까지 <strong>" + r.diffKg.toFixed(1) + " kg 감량</strong>이 필요합니다.";
+    } else if (r.diffKg < 0) {
+      msg = "목표까지 <strong>" + Math.abs(r.diffKg).toFixed(1) + " kg 증량</strong>이 필요합니다.";
+    } else {
+      msg = "<strong>목표 체중을 거의 달성했습니다.</strong>";
+    }
+    lastAdv = runGoal;
+    advBox.innerHTML =
+      '<div class="result-main">목표 체중 약 ' + r.targetWeightKg.toFixed(1) + " kg</div>" +
+      "<p>BMI " + r.targetBmi + "일 때의 체중입니다. " + msg + "</p>";
+    advBox.hidden = false;
+  }
+  function runTable(fromButton) {
+    var h = parseFloat(document.getElementById("height").value);
+    if (!isFinite(h)) {
+      if (fromButton) advErr("먼저 위 폼에 키를 입력해 주세요.");
+      return;
+    }
+    var r = BmiCalc.bmiWeightTable(h);
+    if (!r.ok) { advErr("키는 100〜250cm 범위로 입력해 주세요."); return; }
+    var rows = "";
+    for (var i = 0; i < r.rows.length; i++) {
+      rows += "<tr><td>BMI " + r.rows[i].bmi + "</td><td>" + r.rows[i].weightKg.toFixed(1) +
+        " kg</td><td>" + (LABEL_KO[r.rows[i].label] || r.rows[i].label) + "</td></tr>";
+    }
+    lastAdv = runTable;
+    advBox.innerHTML =
+      '<div class="result-main">키 ' + h + " cm의 체중 조견표</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>BMI</th><th>체중</th><th>의미</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+    advBox.hidden = false;
+  }
+  document.getElementById("adv-goal-run").addEventListener("click", function () { runGoal(true); });
+  document.getElementById("adv-table-run").addEventListener("click", function () { runTable(true); });
+  document.getElementById("adv-target-bmi").addEventListener("input", function () { runGoal(false); });
+  ["height", "weight"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", function () {
+      if (lastAdv) lastAdv(false);
+    });
+  });
+})();
+</script>
+</body>
+</html>

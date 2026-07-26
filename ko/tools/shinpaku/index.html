@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>목표 심박수 계산기(카보넨 공식·유산소 운동 강도) | Quick Calc</title>
+  <meta name="description" content="나이와 안정 시 심박수로 지방 연소·지구력 향상에 알맞은 목표 심박수 구간을 카보넨(Karvonen) 공식으로 계산. 걷기·조깅·실내 자전거의 강도 설정에 활용하세요.">
+  <link rel="stylesheet" href="../../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/ko/tools/shinpaku/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="Quick Calc">
+  <meta property="og:title" content="목표 심박수 계산기(카보넨 공식·유산소 운동 강도) | Quick Calc">
+  <meta property="og:description" content="나이와 안정 시 심박수로 지방 연소·지구력 향상에 알맞은 목표 심박수 구간을 카보넨(Karvonen) 공식으로 계산. 걷기·조깅·실내 자전거의 강도 설정에 활용하세요.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/ko/tools/shinpaku/">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quick Calc","item":"https://quick-calc.site/ko/"},{"@type":"ListItem","position":2,"name":"목표 심박수 계산기(카보넨 공식)","item":"https://quick-calc.site/ko/tools/shinpaku/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/shinpaku/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/shinpaku/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/shinpaku/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/shinpaku/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/shinpaku/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>Quick Calc</a>
+  <a class="site-search-link" href="../../"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>전체 도구</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>목표 심박수 계산기(카보넨 공식)</h1>
+  <form class="tool-form" id="shinpaku-form">
+    <span class="field-note">나이를 입력하면 바로 아래에 목표 심박수가 표시됩니다</span>
+    <label>나이
+      <input type="number" id="age" inputmode="numeric" min="15" max="100" step="1" required placeholder="예: 40">
+    </label>
+    <label>안정 시 심박수(회/분)
+      <span class="field-note">아침에 일어나기 전에 잰 1분간의 맥박. 모르면 70 전후</span>
+      <input type="number" id="rest" inputmode="numeric" min="30" max="120" step="1" value="70" required>
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>상세 기능: 5존 일람표와 운동 중 맥박 체크</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">목적별 5존 일람표(최대 심박수 기준)</h3>
+      <p class="adv-note">최대 심박수(220−나이)에 대한 비율로, 스마트워치와 같은 방식의 5단계 존을 한눈에 보여줍니다.</p>
+      <label>나이
+        <input type="number" id="adv-age" inputmode="numeric" min="15" max="100" step="1" placeholder="예: 40">
+      </label>
+      <div class="tool-result" id="adv-zones-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">방금 잰 맥박으로 강도 체크</h3>
+      <p class="adv-note">운동을 잠시 멈추고 손목 맥박을 10초간 세어 입력하면 지금의 운동 강도를 판정합니다(나이는 위 칸의 값을 사용).</p>
+      <label>안정 시 심박수(회/분)
+        <input type="number" id="adv-rest" inputmode="numeric" min="30" max="120" step="1" value="70">
+      </label>
+      <label>10초간 센 맥박 수
+        <input type="number" id="adv-pulse" inputmode="numeric" min="5" max="40" step="1" placeholder="예: 21">
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="lead-card"><span class="lead-label">이 도구로 알 수 있는 것</span><p>나이와 안정 시 심박수만 입력하면 <strong>지방 연소에 딱 알맞은 심박수</strong>를 알 수 있는 도구입니다. 운동의 힘든 정도(강도)별 목표 심박수를 표로 보여줍니다. 걷기나 실내 자전거에서 「어느 정도로 해야 할지」 알고 싶을 때 활용해 보세요.</p></div>
+
+  <h2>사용 방법</h2>
+  <ol class="steps">
+    <li>나이를 입력합니다.</li>
+    <li>안정 시 심박수를 입력합니다(아침에 눈을 뜬 직후, 일어나기 전에 손목 맥박을 1분간 세는 것이 정확합니다).</li>
+    <li>입력과 동시에 강도 40〜70%의 목표 심박수 구간이 자동으로 표시됩니다.</li>
+  </ol>
+
+  <h2>계산 방법과 근거</h2>
+  <ul class="method">
+    <li><strong>최대 심박수 추정 = 220 − 나이</strong>(널리 쓰이는 추정식)</li>
+    <li><strong>목표 심박수 = (최대 심박수 − 안정 시 심박수) × 강도% + 안정 시 심박수</strong>(카보넨 공식)</li>
+    <li>계산 예: 40세·안정 시 70인 사람의 50% 강도 → (180−70)×0.5+70 = <strong>125회/분</strong></li>
+    <li>강도 기준: 40〜60%=건강 증진·지방 연소(편안함〜약간 힘듦) / 60〜70%=지구력 향상(약간 힘듦)</li>
+  </ul>
+
+  <h3>출처(1차 정보)</h3>
+  <ul class="sources">
+    <li>카보넨 공식과 운동 강도의 개념: <a href="https://www.e-healthnet.mhlw.go.jp/information/exercise" target="_blank" rel="noopener">일본 후생노동성 e-헬스넷(신체활동·운동)</a>(일본어)</li>
+  </ul>
+
+  <h2>전제와 주의사항</h2>
+  <ul class="cautions">
+    <li>「220−나이」는 추정식이며, 실제 최대 심박수에는 개인차(±10회 이상)가 있습니다.</li>
+    <li>심장질환·고혈압 등으로 치료 중인 분, 심박수에 영향을 주는 약(베타 차단제 등)을 복용 중인 분은 반드시 의사와 상담한 뒤 운동 강도를 정해 주세요.</li>
+    <li>운동 중 가슴 통증·심한 숨참·어지러움을 느끼면 즉시 중단해 주세요.</li>
+  </ul>
+
+  <h2 id="faq">자주 묻는 질문</h2>
+  <h3 class="faq-q">지방 연소에는 「가벼운 운동」이 좋다고 들었는데요?</h3>
+  <p class="faq-a">강도 40〜60%의 운동은 지방이 에너지로 쓰이는 비율이 높고 오래 지속하기 쉽다는 장점이 있습니다. 다만 총 소비 칼로리는 강도가 높을수록 늘어나므로, 「지속할 수 있는 강도로 오래」가 기본입니다.</p>
+  <h3 class="faq-q">안정 시 심박수를 모르겠어요.</h3>
+  <p class="faq-a">아침에 눈을 뜨고 일어나기 전에, 손목의 엄지 쪽에 반대쪽 손가락을 대고 1분간 세어 보세요. 스마트워치의 수면 심박수로 대신해도 됩니다. 성인 기준은 60〜80회/분입니다.</p>
+  <h3 class="faq-q">운동 중 심박수는 어떻게 재나요?</h3>
+  <p class="faq-a">스마트워치나 가슴 밴드형 심박계가 편리합니다. 기기가 없으면 운동을 잠시 멈추고 10초간 맥박을 세어 6배 하는 방법도 있습니다.</p>
+
+  <h2>관련 도구</h2>
+  <ul class="related">
+    <li><a href="../../">전체 도구</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="언어"><a href="/tools/shinpaku/" lang="ja" hreflang="ja">日本語</a><a href="/en/tools/shinpaku/" lang="en" hreflang="en">English</a><a href="/zh/tools/shinpaku/" lang="zh-CN" hreflang="zh">简体中文</a><span class="lang-current">한국어</span></nav>
+<!-- @langsw end -->
+  <p>입력한 값은 모두 사용 중인 기기 안에서만 계산되며 서버로 전송되지 않습니다.</p>
+  <nav>
+    <a href="../../">전체 도구</a>
+    <a href="../../privacy.html">개인정보 처리방침</a>
+    <a href="../../disclaimer.html">면책사항</a>
+    <a href="../../../contact.html?tool=shinpaku">문의하기</a>
+  </nav>
+  <p>이 사이트의 계산 결과는 모두 대략적인 값입니다. 정확한 수치는 각 페이지에 명시된 1차 정보(공식 자료)나 관계 기관에서 확인해 주세요.</p>
+  <p>© 2026 Quick Calc</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="../../../tools/shinpaku/calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("result");
+  var MSG = {
+    invalid_age: "나이는 15〜100세 범위로 입력해 주세요.",
+    invalid_rest: "안정 시 심박수는 30〜120 범위로 입력해 주세요."
+  };
+  function run() {
+    var age = document.getElementById("age").value;
+    var rest = document.getElementById("rest").value;
+    if (age === "" || rest === "") { box.hidden = true; return; }
+    var r = ShinpakuCalc.zones(parseFloat(age), parseFloat(rest));
+    if (!r.ok) { box.innerHTML = '<p class="result-error">' + (MSG[r.code] || "입력값을 확인해 주세요.") + "</p>"; box.hidden = false; return; }
+    box.innerHTML =
+      '<div class="result-main">지방 연소 존 ' + r.z40 + "〜" + r.z60 + " 회/분</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>강도</th><th>심박수</th><th>기준</th></tr></thead><tbody>' +
+      "<tr><td>40%</td><td>" + r.z40 + "</td><td>편안함(운동을 막 시작한 분)</td></tr>" +
+      "<tr><td>50%</td><td>" + r.z50 + "</td><td>건강 증진·지방 연소</td></tr>" +
+      "<tr><td>60%</td><td>" + r.z60 + "</td><td>지방 연소〜지구력 향상</td></tr>" +
+      "<tr><td>70%</td><td>" + r.z70 + "</td><td>지구력 향상(약간 힘듦)</td></tr>" +
+      "</tbody></table></div>" +
+      "<p>추정 최대 심박수: " + r.maxHr + "회/분(220−나이)</p>";
+    box.hidden = false;
+  }
+  document.getElementById("age").addEventListener("input", run);
+  document.getElementById("rest").addEventListener("input", run);
+  document.getElementById("shinpaku-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    run();
+  });
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var zonesBox = document.getElementById("adv-zones-result");
+  var pulseBox = document.getElementById("adv-result");
+  var advAge = document.getElementById("adv-age");
+  var mainAge = document.getElementById("age");
+  var advAgeTouched = false;
+  var ZONE_LABEL_KO = {
+    "回復(とても楽)": "회복(매우 편안함)",
+    "脂肪燃焼(楽)": "지방 연소(편안함)",
+    "持久力(ややきつい)": "지구력(약간 힘듦)",
+    "乳酸性作業閾値(きつい)": "젖산 역치(힘듦)",
+    "最大強度(非常にきつい)": "최대 강도(매우 힘듦)"
+  };
+  var PULSE_LABEL_KO = {
+    "楽(準備運動の範囲)": "편안함(준비운동 범위)",
+    "健康づくり・脂肪燃焼の強度": "건강 증진·지방 연소 강도",
+    "持久力向上の強度(ややきつい)": "지구력 향상 강도(약간 힘듦)",
+    "高強度(きつい)": "고강도(힘듦)",
+    "ほぼ全力(長くは続けられない強度)": "거의 전력(오래 지속할 수 없는 강도)"
+  };
+
+  // ---- 5존 일람(즉시) ----
+  function runZones() {
+    if (advAge.value === "") { zonesBox.hidden = true; return; }
+    var r = ShinpakuCalc.fiveZones(parseFloat(advAge.value));
+    if (!r.ok) {
+      zonesBox.innerHTML = '<p class="result-error">나이는 15〜100세 범위로 입력해 주세요.</p>';
+      zonesBox.hidden = false;
+      return;
+    }
+    var rows = "";
+    for (var i = 0; i < r.zones.length; i++) {
+      var z = r.zones[i];
+      rows += "<tr><td>존 " + z.no + "</td><td>" + (ZONE_LABEL_KO[z.label] || z.label) + "</td><td>" + z.pct + "</td><td>" +
+        z.lo + "〜" + z.hi + " 회/분</td></tr>";
+    }
+    zonesBox.innerHTML =
+      '<div class="result-main">추정 최대 심박수 ' + r.maxHr + ' 회/분</div>' +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>존</th><th>목적</th><th>최대 심박수 대비</th><th>심박수</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>" +
+      '<p class="adv-note">최대 심박수는 「220−나이」에 따른 추정값이므로 실제로는 개인차가 있습니다.</p>';
+    zonesBox.hidden = false;
+  }
+
+  // ---- 맥박 체크(즉시) ----
+  function runPulse() {
+    var pulse = document.getElementById("adv-pulse");
+    var rest = document.getElementById("adv-rest");
+    if (advAge.value === "" || pulse.value === "" || rest.value === "") { pulseBox.hidden = true; return; }
+    var r = ShinpakuCalc.pulseCheck(parseFloat(advAge.value), parseFloat(rest.value), parseFloat(pulse.value));
+    if (!r.ok) {
+      var msg = r.code === "invalid_age" ? "나이는 15〜100세 범위로 입력해 주세요."
+        : r.code === "invalid_rest" ? "안정 시 심박수는 30〜120 범위로 입력해 주세요."
+        : "10초간의 맥박 수는 5〜40 범위로 입력해 주세요.";
+      pulseBox.innerHTML = '<p class="result-error">' + msg + "</p>";
+      pulseBox.hidden = false;
+      return;
+    }
+    pulseBox.innerHTML =
+      '<div class="result-main">약 ' + r.bpm + ' 회/분 = 강도 ' + r.pct + '%</div>' +
+      "<p>판정: <strong>" + (PULSE_LABEL_KO[r.label] || r.label) + "</strong>(카보넨 공식에 따른 운동 강도)</p>";
+    pulseBox.hidden = false;
+  }
+
+  function runAdv() { runZones(); runPulse(); }
+  advAge.addEventListener("input", function () { advAgeTouched = true; runAdv(); });
+  document.getElementById("adv-rest").addEventListener("input", runPulse);
+  document.getElementById("adv-pulse").addEventListener("input", runPulse);
+  // 메인 나이를 입력하면 상세 기능의 나이에도 자동 반영(직접 입력한 뒤에는 덮어쓰지 않음)
+  mainAge.addEventListener("input", function () {
+    if (!advAgeTouched) {
+      advAge.value = mainAge.value;
+      runAdv();
+    }
+  });
+})();
+</script>
+</body>
+</html>

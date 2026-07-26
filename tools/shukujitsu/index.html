@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>日本の祝日カレンダー(2026年・2027年)次の祝日まで何日? | 計算ツールボックス</title>
+  <meta name="description" content="日本の祝日を一覧で確認できる無料ツール。次の祝日まであと何日かがすぐわかり、3連休以上の連休も一覧表示します。2026年・2027年の祝日に対応。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/tools/shukujitsu/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='#0b6e4f'/%3E%3Cg%20fill='none'%20stroke='#fff'%20stroke-width='1.7'%20stroke-linecap='round'%3E%3Crect%20x='6.6'%20y='4.6'%20width='10.8'%20height='14.8'%20rx='2.4'/%3E%3Cpath%20d='M9.6%208.2h4.8'/%3E%3Cpath%20d='M9.9%2012.4h.01M12%2012.4h.01M14.1%2012.4h.01M9.9%2015.9h.01M12%2015.9h.01M14.1%2015.9h.01'/%3E%3C/g%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta property="og:site_name" content="計算ツールボックス">
+  <meta property="og:title" content="日本の祝日カレンダー(2026年・2027年)次の祝日まで何日? | 計算ツールボックス">
+  <meta property="og:description" content="日本の祝日を一覧で確認できる無料ツール。次の祝日まであと何日かがすぐわかり、3連休以上の連休も一覧表示します。2026年・2027年の祝日に対応。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://quick-calc.site/tools/shukujitsu/">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"計算ツールボックス","item":"https://quick-calc.site/"},{"@type":"ListItem","position":2,"name":"日本の祝日カレンダー(2026年・2027年)","item":"https://quick-calc.site/tools/shukujitsu/"}]}</script>
+  <!-- @meta end -->
+  <!-- @hreflang start -->
+  <link rel="alternate" hreflang="ja" href="https://quick-calc.site/tools/shukujitsu/">
+  <link rel="alternate" hreflang="en" href="https://quick-calc.site/en/tools/shukujitsu/">
+  <link rel="alternate" hreflang="zh" href="https://quick-calc.site/zh/tools/shukujitsu/">
+  <link rel="alternate" hreflang="ko" href="https://quick-calc.site/ko/tools/shukujitsu/">
+  <link rel="alternate" hreflang="x-default" href="https://quick-calc.site/tools/shukujitsu/">
+  <!-- @hreflang end -->
+</head>
+<body>
+<!-- @partial:header start -->
+<header class="site-header">
+  <a class="site-brand" href="../../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../../#search"><svg class="site-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>ツールを探す</a>
+</header>
+<!-- @partial:header end -->
+<main>
+  <h1>日本の祝日カレンダー</h1>
+  <div class="tool-result" id="next-result" aria-live="polite"></div>
+  <form class="tool-form" id="shukujitsu-form">
+    <label>表示する年
+      <select id="year"></select>
+    </label>
+    <div class="tool-result" id="list-result" aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 3連休以上の連休一覧</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">その年の連休(土日+祝日が3日以上つながる期間)</h3>
+      <p class="adv-note">旅行や帰省の計画づくりに。土曜・日曜と祝日が続く期間だけを抜き出しています。</p>
+      <div class="tool-result" id="renkyu-result" aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    掲載しているのは<strong>国民の祝日と、その振替休日・国民の休日</strong>です。企業や学校の休み(年末年始・お盆など)は祝日ではないため含みません。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>日本の祝日が<strong>いつなのか・次の祝日まであと何日か</strong>がすぐわかるツールです。日本の祝日は毎年日付が変わるもの(成人の日・春分の日など)があり、振替休日も加わります。旅行や役所・銀行に行く日を決めるときにどうぞ。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>ページを開くと、上に「次の祝日」と残り日数が表示されます。</li>
+    <li>年を選ぶと、その年の祝日が一覧で表示されます。</li>
+    <li>3連休以上の連休を調べたいときは「＋詳細機能」を開いてください。</li>
+  </ol>
+
+  <h2>祝日の決まり方と根拠</h2>
+  <ul class="method">
+    <li><strong>日付が固定の祝日</strong>: 元日(1月1日)・建国記念の日(2月11日)・天皇誕生日(2月23日)・昭和の日(4月29日)・憲法記念日(5月3日)・みどりの日(5月4日)・こどもの日(5月5日)・山の日(8月11日)・文化の日(11月3日)・勤労感謝の日(11月23日)</li>
+    <li><strong>日付が動く祝日</strong>: 成人の日(1月第2月曜)・海の日(7月第3月曜)・敬老の日(9月第3月曜)・スポーツの日(10月第2月曜)。春分の日・秋分の日は天文計算により年ごとに決まります</li>
+    <li><strong>振替休日</strong>: 祝日が日曜と重なったとき、その後の最も近い平日が休日になります</li>
+    <li><strong>国民の休日</strong>: 祝日と祝日にはさまれた平日が休日になります(例: 2026年9月22日)</li>
+  </ul>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>内閣府「国民の祝日について」(祝日の一覧・振替休日・国民の休日)<br>
+      <a href="https://www8.cao.go.jp/chosei/shukujitsu/gaiyou.html" rel="noopener" target="_blank">https://www8.cao.go.jp/chosei/shukujitsu/gaiyou.html</a>(2026年7月26日参照)</li>
+    <li>国民の祝日に関する法律(昭和23年法律第178号)<br>
+      <a href="https://laws.e-gov.go.jp/law/323AC1000000178" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/323AC1000000178</a>(2026年7月26日参照)</li>
+  </ul>
+
+  <h2>前提と注意</h2>
+  <ul class="cautions">
+    <li>対応範囲は2026年・2027年です。翌年分の祝日は内閣府が例年2月頃に公表するため、公表後に追加します。</li>
+    <li>年末年始(12月29日〜1月3日)やお盆は祝日ではありません。ただし官公庁は行政機関の休日として年末年始が休みで、多くの企業もこれに準じます。</li>
+    <li>祝日は法改正や特例法で変更されることがあります(過去にはオリンピック開催に伴う移動がありました)。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">祝日に役所や銀行は開いていますか?</h3>
+  <p class="faq-a">閉まっています。市区町村の窓口・銀行の店舗はいずれも土日祝が休みです。ATMやコンビニ交付は利用できる場合があります。</p>
+  <h3 class="faq-q">なぜ毎年日付が変わる祝日があるのですか?</h3>
+  <p class="faq-a">成人の日・海の日・敬老の日・スポーツの日は「第○月曜日」と決められているため、連休になるよう毎年日付が動きます。春分の日・秋分の日は天文観測に基づいて決まります。</p>
+  <h3 class="faq-q">祝日が日曜と重なったらどうなりますか?</h3>
+  <p class="faq-a">その後の最も近い平日が「振替休日」として休みになります(通常は翌月曜日)。このツールの一覧にも振替休日を含めています。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../eigyobi/">営業日計算機</a></li>
+    <li><a href="../days/">日数計算機</a></li>
+    <li><a href="../../">ツール一覧へ</a></li>
+  </ul>
+</main>
+<!-- @partial:footer start -->
+<footer class="site-footer">
+<!-- @langsw start -->
+<nav class="lang-switch" aria-label="言語"><span class="lang-current">日本語</span><a href="/en/tools/shukujitsu/" lang="en" hreflang="en">English</a><a href="/zh/tools/shukujitsu/" lang="zh-CN" hreflang="zh">简体中文</a><a href="/ko/tools/shukujitsu/" lang="ko" hreflang="ko">한국어</a></nav>
+<!-- @langsw end -->
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../../">ツール一覧</a>
+    <a href="../../privacy.html">プライバシーポリシー</a>
+    <a href="../../disclaimer.html">免責事項</a>
+    <a href="../../contact.html?tool=shukujitsu">お問い合わせ</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<!-- @partial:footer end -->
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var yearEl = document.getElementById("year");
+  var nextBox = document.getElementById("next-result");
+  var listBox = document.getElementById("list-result");
+  var renkyuBox = document.getElementById("renkyu-result");
+
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function todayIso() {
+    var d = new Date();
+    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  }
+  function fmt(iso) {
+    return parseInt(iso.slice(5, 7), 10) + "月" + parseInt(iso.slice(8, 10), 10) + "日";
+  }
+  function fmtFull(iso) {
+    return iso.slice(0, 4) + "年" + fmt(iso);
+  }
+
+  // 次の祝日
+  var today = todayIso();
+  var n = ShukujitsuCalc.nextHoliday(today);
+  if (n.ok) {
+    nextBox.innerHTML =
+      '<div class="result-main">次の祝日: ' + n.name + "(" + fmtFull(n.date) + "・" + n.youbi + "曜)</div>" +
+      "<p>" + (n.daysUntil === 0 ? "<strong>今日です。</strong>" : "あと <strong>" + n.daysUntil + "日</strong>です。") + "</p>";
+  } else {
+    nextBox.innerHTML = "<p>次の祝日は、対応範囲(" +
+      ShukujitsuCalc.YEAR_MIN + "年〜" + ShukujitsuCalc.YEAR_MAX + "年)を超えるため表示できません。</p>";
+  }
+
+  // 年の選択肢
+  var thisYear = parseInt(today.slice(0, 4), 10);
+  var html = "";
+  for (var y = ShukujitsuCalc.YEAR_MIN; y <= ShukujitsuCalc.YEAR_MAX; y++) {
+    html += '<option value="' + y + '"' + (y === thisYear ? " selected" : "") + ">" + y + "年</option>";
+  }
+  yearEl.innerHTML = html;
+  if (thisYear < ShukujitsuCalc.YEAR_MIN || thisYear > ShukujitsuCalc.YEAR_MAX) {
+    yearEl.value = String(ShukujitsuCalc.YEAR_MIN);
+  }
+
+  function run() {
+    var y = parseInt(yearEl.value, 10);
+    var r = ShukujitsuCalc.listHolidays(y);
+    if (!r.ok) { listBox.innerHTML = ""; return; }
+    var rows = r.holidays.map(function (h) {
+      var isPast = h.date < today;
+      return "<tr" + (isPast ? ' style="opacity:.55"' : "") + "><td>" + fmt(h.date) +
+        "(" + h.youbi + ")</td><td>" + h.name + "</td></tr>";
+    }).join("");
+    listBox.innerHTML =
+      '<div class="result-main">' + y + "年の祝日 " + r.holidays.length + "日</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>日付</th><th>祝日</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>";
+
+    var lw = ShukujitsuCalc.longWeekends(y);
+    if (!lw.ok) { renkyuBox.innerHTML = ""; return; }
+    if (lw.runs.length === 0) {
+      renkyuBox.innerHTML = "<p>" + y + "年に3連休以上はありません。</p>";
+      return;
+    }
+    var lwRows = lw.runs.map(function (x) {
+      return "<tr><td>" + fmt(x.start) + "〜" + fmt(x.end) + "</td><td>" + x.days +
+        "連休</td><td>" + (x.names.join("・") || "-") + "</td></tr>";
+    }).join("");
+    renkyuBox.innerHTML =
+      '<div class="result-main">' + y + "年の連休 " + lw.runs.length + "回</div>" +
+      '<div class="table-scroll"><table class="data-table"><thead><tr><th>期間</th><th>日数</th><th>含まれる祝日</th></tr></thead><tbody>' +
+      lwRows + "</tbody></table></div>";
+  }
+
+  yearEl.addEventListener("change", run);
+  document.getElementById("shukujitsu-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
+})();
+</script>
+</body>
+</html>
