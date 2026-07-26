@@ -14,15 +14,19 @@ for (const m of iconsSrc.matchAll(/^ ([a-z]+): '(.*)',$/gm)) ICON_PATHS[m[1]] = 
 
 const GCLS = { "健康": "g0", "お金": "g1", "日付": "g2", "変換": "g3" };
 const CAT_ORDER = ["健康", "お金", "日付", "変換"];
+// 「みんなの投票」は計算ツールに含めず、一覧下部に別のツールとして載せる(Hiroさん指示・2026-07-26)
+const POLL = TOOLS.find((t) => t.slug === "poll");
+const CALC = TOOLS.filter((t) => t.slug !== "poll");
 // 人気ランキング(全ユーザーの利用データ基準)。週次運用でSearch Console/Analyticsの
 // 実データから並びを更新して再生成する。端末ごとの個人履歴は使わない(Hiroさん指示)
+// 注意: poll は計算ツールの枠に出さないため、RANKに入れないこと
 const RANK = ["moji", "password", "waribiki", "days", "bmi", "wareki", "eigyobi", "kinenbi", "jikan", "tax", "fudosan", "heikin"];
 
 function svg(slug) {
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICON_PATHS[slug] + "</svg>";
 }
 
-const sorted = CAT_ORDER.flatMap((c) => TOOLS.filter((t) => t.cat === c));
+const sorted = CAT_ORDER.flatMap((c) => CALC.filter((t) => t.cat === c));
 const tilesHtml = sorted.map((t) =>
   `      <a class="tile" href="./tools/${t.slug}/" data-slug="${t.slug}" data-cat="${t.cat}" data-kw="${(t.name + " " + t.desc + " " + t.kw).replace(/"/g, "")}" title="${t.name} — ${t.desc}">
         <span class="ic ${GCLS[t.cat]}">${svg(t.slug)}</span><span class="nm">${t.g}</span>
@@ -30,8 +34,9 @@ const tilesHtml = sorted.map((t) =>
 
 const seoList = CAT_ORDER.map((c) =>
   `      <h3>${c === "日付" ? "日付・時間" : c === "変換" ? "暮らし・変換" : c}</h3>\n      <ul>\n` +
-  TOOLS.filter((t) => t.cat === c).map((t) => `        <li><a href="./tools/${t.slug}/">${t.name}</a> — ${t.desc}</li>`).join("\n") +
-  "\n      </ul>").join("\n");
+  CALC.filter((t) => t.cat === c).map((t) => `        <li><a href="./tools/${t.slug}/">${t.name}</a> — ${t.desc}</li>`).join("\n") +
+  "\n      </ul>").join("\n") +
+  `\n      <h3>統計ツール</h3>\n      <ul>\n        <li><a href="./tools/${POLL.slug}/">${POLL.name}</a> — ${POLL.desc}</li>\n      </ul>`;
 
 const html = `<!DOCTYPE html>
 <html lang="ja">
@@ -103,6 +108,12 @@ const html = `<!DOCTYPE html>
       .g3 { background: #2e2740; color: #a98ce0; }
     }
     .no-hit { color: var(--tp-muted); font-size: 0.88rem; margin: 8px 2px; }
+    .poll-card { display: flex; align-items: center; gap: 14px; background: var(--tp-tile); border-radius: 20px; padding: 16px; text-decoration: none; color: var(--tp-ink); box-shadow: var(--tp-shadow); }
+    .poll-card .pic { width: 52px; height: 52px; flex: 0 0 auto; border-radius: 17px; background: #fde8ec; color: #d64560; display: flex; align-items: center; justify-content: center; }
+    .poll-card .pic svg { width: 26px; height: 26px; }
+    .poll-card .pt b { display: block; font-size: 0.98rem; font-weight: 800; }
+    .poll-card .pt small { display: block; font-size: 0.76rem; color: var(--tp-muted); margin-top: 2px; line-height: 1.5; }
+    @media (prefers-color-scheme: dark) { .poll-card .pic { background: #3a2229; color: #ff8798; } }
     .seo-list { margin-top: 34px; font-size: 0.85rem; }
     .seo-list summary { cursor: pointer; color: var(--tp-muted); font-weight: 600; }
     .seo-list h3 { font-size: 0.95rem; margin: 14px 0 4px; }
@@ -133,6 +144,14 @@ const html = `<!DOCTYPE html>
   <p class="no-hit" id="no-hit" hidden>該当するツールがありません。別のことばでお試しください(例: 家賃、割引、カロリー)</p>
   <div class="tp-grid" id="grid">
 ${tilesHtml}
+  </div>
+
+  <div id="poll-sec">
+    <div class="tp-sec"><b>統計ツール</b><span>計算ツールとは別のツールです</span></div>
+    <a class="poll-card" id="poll-card" href="./tools/${POLL.slug}/" data-kw="${(POLL.name + " " + POLL.desc + " " + POLL.kw).replace(/"/g, "")}">
+      <span class="pic">${svg("poll")}</span>
+      <span class="pt"><b>みんなの投票</b><small>アンケートを作ってシェア・リアルタイム集計(登録不要)</small></span>
+    </a>
   </div>
 
   <details class="seo-list">
@@ -177,6 +196,8 @@ ${seoList}
     });
   }
   var index = tiles.map(function (t) { return norm(t.dataset.kw + " " + t.textContent); });
+  var pollCard = document.getElementById("poll-card");
+  var pollIndex = norm(pollCard.dataset.kw + " " + pollCard.textContent);
 
   // 人気: 全ユーザーの利用データに基づくランキング(RANK。週次で更新される)
   function renderPopular() {
@@ -225,6 +246,9 @@ ${seoList}
       if (hit) shown++;
     });
     document.getElementById("pop-sec").style.display = (terms.length || current !== "all") ? "none" : "";
+    var pollHit = terms.length ? terms.every(function (w) { return pollIndex.indexOf(w) !== -1; }) : current === "all";
+    document.getElementById("poll-sec").style.display = pollHit ? "" : "none";
+    if (pollHit && terms.length) shown++;
     var label = terms.length ? "検索結果" : (current === "all" ? "すべて" : CATS.filter(function (c) { return c[0] === current; })[0][1]);
     document.getElementById("genre-title").innerHTML = "<b>" + label + "</b><span>" + shown + "個</span>";
     document.getElementById("no-hit").hidden = shown > 0;
