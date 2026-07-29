@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /*
  * 全ツールの tests.json を Node で一括実行する開発用ランナー(サイト本体には不要)。
- * 使い方: node scripts/run_tests.mjs [ツール名...]  ※省略時は全ツール
+ * 使い方: node scripts/run_tests.mjs [--lab] [ツール名...]  ※省略時は全ツール / --lab で lab/ を対象
  * 判定は各ツールの test.html と同じ「期待値の部分一致」。
  */
 import { readdirSync, readFileSync, existsSync } from "node:fs";
@@ -20,18 +20,21 @@ function matches(expect, actual) {
   return expect === actual;
 }
 
-const only = process.argv.slice(2);
-const dirs = readdirSync(path.join(root, "tools"), { withFileTypes: true })
+// --lab を付けると lab/(公開サイトに反映していない検討中ツール)を対象にする
+const args = process.argv.slice(2);
+const base = args.includes("--lab") ? "lab" : "tools";
+const only = args.filter((a) => a !== "--lab");
+const dirs = readdirSync(path.join(root, base), { withFileTypes: true })
   .filter((e) => e.isDirectory() && (only.length === 0 || only.includes(e.name)))
   .map((e) => e.name);
 
 let total = 0;
 let failed = 0;
 for (const dir of dirs) {
-  const specPath = path.join(root, "tools", dir, "tests.json");
+  const specPath = path.join(root, base, dir, "tests.json");
   if (!existsSync(specPath)) continue;
   const spec = JSON.parse(readFileSync(specPath, "utf8"));
-  const api = require(path.join(root, "tools", dir, spec.module));
+  const api = require(path.join(root, base, dir, spec.module));
   for (const c of spec.cases) {
     total++;
     let actual;

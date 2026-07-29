@@ -18,7 +18,7 @@ function listPages(base) {
       const p = join(dir, name);
       if (statSync(p).isDirectory()) {
         // 言語ディレクトリ自身の入れ子(ja基準走査時の en/zh/ko)は除外
-        if (rel === "" && ALT_LANGS.some((l) => l.dir === name)) continue;
+        if (rel === "" && (ALT_LANGS.some((l) => l.dir === name) || name === "lab")) continue;
         walk(p, rel ? rel + "/" + name : name);
       } else if (name.endsWith(".html") && name !== "test.html") {
         out.push(rel ? rel + "/" + name : name);

@@ -11,7 +11,8 @@ import { execFileSync } from "node:child_process";
 
 const ROOT = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const ORIGIN = "https://quick-calc.site";
-const SKIP_DIRS = new Set([".git", "scripts", "shared", "node_modules"]);
+// lab は公開サイトに反映していない検討中ツールのため、sitemapにもrobotsにも載せない
+const SKIP_DIRS = new Set([".git", "scripts", "shared", "node_modules", "lab"]);
 
 const files = [];
 (function walk(dir) {
