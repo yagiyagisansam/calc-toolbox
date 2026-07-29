@@ -1,0 +1,169 @@
+{
+  "tool": "sanzen",
+  "module": "calc.js",
+  "global": "SanzenCalc",
+  "cases": [
+    {
+      "name": "予定日2026-10-01(単胎)は産前8/21開始・産後11/26まで",
+      "func": "calculate",
+      "args": ["2026-10-01"],
+      "expect": {
+        "ok": true,
+        "prenatalStart": "2026-08-21",
+        "prenatalEnd": "2026-10-01",
+        "prenatalDays": 42,
+        "postnatalStart": "2026-10-02",
+        "postnatalMandatoryEnd": "2026-11-12",
+        "earliestWorkDate": "2026-11-13",
+        "postnatalEnd": "2026-11-26",
+        "returnDate": "2026-11-27",
+        "totalDays": 98,
+        "birthConfirmed": false
+      }
+    },
+    {
+      "name": "多胎妊娠は産前98日で2026-06-26開始",
+      "func": "calculate",
+      "args": ["2026-10-01", null, true],
+      "expect": { "ok": true, "prenatalStart": "2026-06-26", "prenatalDays": 98, "totalDays": 154 }
+    },
+    {
+      "name": "出産が4日遅れた場合は産前が46日になり産後もずれる",
+      "func": "calculate",
+      "args": ["2026-10-01", "2026-10-05"],
+      "expect": {
+        "ok": true,
+        "prenatalStart": "2026-08-21",
+        "prenatalEnd": "2026-10-05",
+        "prenatalDays": 46,
+        "postnatalStart": "2026-10-06",
+        "postnatalMandatoryEnd": "2026-11-16",
+        "postnatalEnd": "2026-11-30",
+        "returnDate": "2026-12-01",
+        "birthConfirmed": true,
+        "birthDiffDays": 4
+      }
+    },
+    {
+      "name": "出産が11日早まった場合は産前が31日で終わる",
+      "func": "calculate",
+      "args": ["2026-10-01", "2026-09-20"],
+      "expect": {
+        "ok": true,
+        "prenatalEnd": "2026-09-20",
+        "prenatalDays": 31,
+        "postnatalEnd": "2026-11-15",
+        "returnDate": "2026-11-16",
+        "birthDiffDays": -11
+      }
+    },
+    {
+      "name": "うるう年をまたぐ場合も正しく数える(予定日2024-03-01)",
+      "func": "calculate",
+      "args": ["2024-03-01"],
+      "expect": { "ok": true, "prenatalStart": "2024-01-20", "prenatalDays": 42 }
+    },
+    {
+      "name": "年をまたぐ場合も正しく数える(予定日2027-01-10)",
+      "func": "calculate",
+      "args": ["2027-01-10"],
+      "expect": { "ok": true, "prenatalStart": "2026-11-30", "prenatalDays": 42 }
+    },
+    {
+      "name": "産前休業の開始日だけを求める(単胎は42日)",
+      "func": "prenatalStartDate",
+      "args": ["2026-10-01"],
+      "expect": { "ok": true, "date": "2026-08-21", "days": 42 }
+    },
+    {
+      "name": "産前休業の開始日だけを求める(多胎は98日)",
+      "func": "prenatalStartDate",
+      "args": ["2026-10-01", true],
+      "expect": { "ok": true, "date": "2026-06-26", "days": 98 }
+    },
+    {
+      "name": "境界値: 出産日が予定日と同じなら産前42日ちょうど",
+      "func": "calculate",
+      "args": ["2026-10-01", "2026-10-01"],
+      "expect": { "ok": true, "prenatalDays": 42, "birthDiffDays": 0, "birthConfirmed": true }
+    },
+    {
+      "name": "境界値: 出産が100日遅れても計算できる",
+      "func": "calculate",
+      "args": ["2026-01-01", "2026-04-11"],
+      "expect": { "ok": true, "birthDiffDays": 100 }
+    },
+    {
+      "name": "境界値: 出産が101日遅れは入力誤りとみなす",
+      "func": "calculate",
+      "args": ["2026-01-01", "2026-04-12"],
+      "expect": { "ok": false, "code": "invalid_birth" }
+    },
+    {
+      "name": "産後休業は常に56日(8週間)",
+      "func": "calculate",
+      "args": ["2026-05-15"],
+      "expect": { "ok": true, "postnatalDays": 56, "postnatalStart": "2026-05-16", "postnatalEnd": "2026-07-10" }
+    },
+    {
+      "name": "月末の予定日でも正しく数える(2026-12-31)",
+      "func": "calculate",
+      "args": ["2026-12-31"],
+      "expect": { "ok": true, "prenatalStart": "2026-11-20", "postnatalEnd": "2027-02-25", "returnDate": "2027-02-26" }
+    },
+    {
+      "name": "異常入力: 存在しない日付(2月30日)はエラー",
+      "func": "calculate",
+      "args": ["2026-02-30"],
+      "expect": { "ok": false, "code": "invalid_due" }
+    },
+    {
+      "name": "異常入力: 13月はエラー",
+      "func": "calculate",
+      "args": ["2026-13-01"],
+      "expect": { "ok": false, "code": "invalid_due" }
+    },
+    {
+      "name": "異常入力: 書式が違う日付はエラー",
+      "func": "calculate",
+      "args": ["2026/10/01"],
+      "expect": { "ok": false, "code": "invalid_due" }
+    },
+    {
+      "name": "異常入力: 空文字はエラー",
+      "func": "calculate",
+      "args": [""],
+      "expect": { "ok": false, "code": "invalid_due" }
+    },
+    {
+      "name": "異常入力: 数値を渡すとエラー",
+      "func": "calculate",
+      "args": [20261001],
+      "expect": { "ok": false, "code": "invalid_due" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_due" }
+    },
+    {
+      "name": "異常入力: 出産日の書式が違うとエラー",
+      "func": "calculate",
+      "args": ["2026-10-01", "10月5日"],
+      "expect": { "ok": false, "code": "invalid_birth" }
+    },
+    {
+      "name": "異常入力: 多胎の指定が真偽値でないとエラー",
+      "func": "calculate",
+      "args": ["2026-10-01", null, "yes"],
+      "expect": { "ok": false, "code": "invalid_multiple" }
+    },
+    {
+      "name": "異常入力: 1899年は対応範囲外",
+      "func": "calculate",
+      "args": ["1899-10-01"],
+      "expect": { "ok": false, "code": "invalid_due" }
+    }
+  ]
+}
