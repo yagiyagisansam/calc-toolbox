@@ -1,0 +1,133 @@
+{
+  "tool": "taishokukin",
+  "module": "calc.js",
+  "global": "TaishokukinCalc",
+  "cases": [
+    {
+      "name": "代表例: 退職金2,000万円・勤続30年。控除1,500万円→退職所得250万円、所得税155,702円・住民税25万円",
+      "func": "calculate",
+      "args": [20000000, 30],
+      "expect": { "ok": true, "deductionYen": 15000000, "taxableIncomeYen": 2500000, "incomeTaxYen": 155702, "residentTaxYen": 250000, "totalTaxYen": 405702, "netYen": 19594298 }
+    },
+    {
+      "name": "境界: 勤続20年ちょうどは40万円×20年=800万円(20年超の式に切り替わらない)",
+      "func": "calculate",
+      "args": [10000000, 20],
+      "expect": { "ok": true, "deductionYen": 8000000, "taxableIncomeYen": 1000000, "incomeTaxYen": 51050, "residentTaxYen": 100000, "netYen": 9848950 }
+    },
+    {
+      "name": "境界: 退職金が控除額とちょうど同額なら税額は0円で全額手取り",
+      "func": "calculate",
+      "args": [8000000, 20],
+      "expect": { "ok": true, "taxableIncomeYen": 0, "incomeTaxYen": 0, "residentTaxYen": 0, "totalTaxYen": 0, "netYen": 8000000, "effectiveRatePercent": 0 }
+    },
+    {
+      "name": "境界: 勤続1年は40万円ではなく最低保証の80万円が控除額になる",
+      "func": "calculate",
+      "args": [5000000, 1],
+      "expect": { "ok": true, "deductionYen": 800000, "taxableIncomeYen": 2100000, "incomeTaxYen": 114862, "residentTaxYen": 210000, "netYen": 4675138 }
+    },
+    {
+      "name": "障害退職は控除額に100万円加算(2,000万円・30年で控除1,600万円)",
+      "func": "calculate",
+      "args": [20000000, 30, true],
+      "expect": { "ok": true, "deductionYen": 16000000, "taxableIncomeYen": 2000000, "incomeTaxYen": 104652, "residentTaxYen": 200000, "netYen": 19695348 }
+    },
+    {
+      "name": "特定役員退職手当等(役員5年以下)は1/2を乗じない(1,000万円・5年で課税800万円)",
+      "func": "calculate",
+      "args": [10000000, 5, false, "officer5"],
+      "expect": { "ok": true, "deductionYen": 2000000, "taxableIncomeYen": 8000000, "incomeTaxYen": 1229284, "residentTaxYen": 800000, "netYen": 7970716 }
+    },
+    {
+      "name": "短期退職手当等(非役員5年以下)は300万円超の部分に1/2を適用しない(課税650万円)",
+      "func": "calculate",
+      "args": [10000000, 5, false, "short5"],
+      "expect": { "ok": true, "taxableIncomeYen": 6500000, "incomeTaxYen": 890822, "residentTaxYen": 650000, "netYen": 8459178 }
+    },
+    {
+      "name": "短期退職手当等でも控除後300万円以下なら通常どおり1/2(課税100万円)",
+      "func": "calculate",
+      "args": [4000000, 5, false, "short5"],
+      "expect": { "ok": true, "taxableIncomeYen": 1000000, "incomeTaxYen": 51050, "residentTaxYen": 100000, "netYen": 3848950 }
+    },
+    {
+      "name": "高額例: 1億円・勤続40年。控除2,200万円→課税3,900万円で税率40%区分",
+      "func": "calculate",
+      "args": [100000000, 40],
+      "expect": { "ok": true, "deductionYen": 22000000, "taxableIncomeYen": 39000000, "incomeTaxYen": 13072884, "residentTaxYen": 3900000, "netYen": 83027116 }
+    },
+    {
+      "name": "退職所得控除: 勤続21年は800万円+70万円×1=870万円",
+      "func": "retirementDeduction",
+      "args": [21],
+      "expect": { "ok": true, "deductionYen": 8700000 }
+    },
+    {
+      "name": "退職所得控除: 勤続2年は40万円×2=80万円(最低保証と一致)",
+      "func": "retirementDeduction",
+      "args": [2],
+      "expect": { "ok": true, "deductionYen": 800000 }
+    },
+    {
+      "name": "非課税で受け取れる上限額は退職所得控除額と一致する(30年で1,500万円)",
+      "func": "taxFreeLimit",
+      "args": [30],
+      "expect": { "ok": true, "taxFreeLimitYen": 15000000 }
+    },
+    {
+      "name": "異常入力: 退職金0円はエラー",
+      "func": "calculate",
+      "args": [0, 10],
+      "expect": { "ok": false, "code": "invalid_amount" }
+    },
+    {
+      "name": "異常入力: 退職金が負の値はエラー",
+      "func": "calculate",
+      "args": [-1000000, 10],
+      "expect": { "ok": false, "code": "invalid_amount" }
+    },
+    {
+      "name": "異常入力: 退職金が上限(10億円)超はエラー",
+      "func": "calculate",
+      "args": [2000000000, 10],
+      "expect": { "ok": false, "code": "invalid_amount" }
+    },
+    {
+      "name": "異常入力: 数値でない退職金はエラー",
+      "func": "calculate",
+      "args": ["abc", 10],
+      "expect": { "ok": false, "code": "invalid_amount" }
+    },
+    {
+      "name": "異常入力: 勤続年数0年はエラー",
+      "func": "calculate",
+      "args": [10000000, 0],
+      "expect": { "ok": false, "code": "invalid_years" }
+    },
+    {
+      "name": "異常入力: 勤続年数が整数でない(1.5年)はエラー",
+      "func": "calculate",
+      "args": [10000000, 1.5],
+      "expect": { "ok": false, "code": "invalid_years" }
+    },
+    {
+      "name": "異常入力: 勤続年数が上限(70年)超はエラー",
+      "func": "calculate",
+      "args": [10000000, 71],
+      "expect": { "ok": false, "code": "invalid_years" }
+    },
+    {
+      "name": "異常入力: 区分の指定が不正な文字列はエラー",
+      "func": "calculate",
+      "args": [10000000, 10, false, "xxx"],
+      "expect": { "ok": false, "code": "invalid_kind" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_amount" }
+    }
+  ]
+}

@@ -1,0 +1,151 @@
+{
+  "tool": "zoyozei",
+  "module": "calc.js",
+  "global": "ZoyozeiCalc",
+  "cases": [
+    {
+      "name": "代表例: 500万円を特例税率で計算(課税価格390万・15%・控除10万=48万5千円)",
+      "func": "calculate",
+      "args": [5000000, "special"],
+      "expect": { "ok": true, "taxableYen": 3900000, "rate": 0.15, "deductionYen": 100000, "taxYen": 485000, "netYen": 4515000, "effectiveRate": 9.7 }
+    },
+    {
+      "name": "代表例: 500万円を一般税率で計算(課税価格390万・20%・控除25万=53万円)",
+      "func": "calculate",
+      "args": [5000000, "general"],
+      "expect": { "ok": true, "taxableYen": 3900000, "rate": 0.2, "deductionYen": 250000, "taxYen": 530000 }
+    },
+    {
+      "name": "境界値: 110万円ちょうどは基礎控除内で税額0円",
+      "func": "calculate",
+      "args": [1100000, "general"],
+      "expect": { "ok": true, "taxableYen": 0, "taxYen": 0, "netYen": 1100000 }
+    },
+    {
+      "name": "境界値: 110万円+1万円は課税価格1万円・10%で1,000円",
+      "func": "calculate",
+      "args": [1110000, "general"],
+      "expect": { "ok": true, "taxableYen": 10000, "rate": 0.1, "taxYen": 1000 }
+    },
+    {
+      "name": "境界値: 課税価格ちょうど200万円(贈与310万円)は一般税率10%で20万円",
+      "func": "calculate",
+      "args": [3100000, "general"],
+      "expect": { "ok": true, "taxableYen": 2000000, "rate": 0.1, "deductionYen": 0, "taxYen": 200000 }
+    },
+    {
+      "name": "境界値: 課税価格210万円(贈与320万円)は一般税率15%・控除10万で21万5千円",
+      "func": "calculate",
+      "args": [3200000, "general"],
+      "expect": { "ok": true, "taxableYen": 2100000, "rate": 0.15, "deductionYen": 100000, "taxYen": 215000 }
+    },
+    {
+      "name": "境界値: 特例税率で課税価格ちょうど4,500万円(贈与4,610万円)は50%・控除415万",
+      "func": "calculate",
+      "args": [46100000, "special"],
+      "expect": { "ok": true, "taxableYen": 45000000, "rate": 0.5, "deductionYen": 4150000, "taxYen": 18350000 }
+    },
+    {
+      "name": "境界値超え: 特例税率で課税価格4,510万円(贈与4,620万円)は55%・控除640万",
+      "func": "calculate",
+      "args": [46200000, "special"],
+      "expect": { "ok": true, "taxableYen": 45100000, "rate": 0.55, "deductionYen": 6400000, "taxYen": 18405000 }
+    },
+    {
+      "name": "境界値: 一般税率で課税価格ちょうど3,000万円(贈与3,110万円)は50%・控除250万",
+      "func": "calculate",
+      "args": [31100000, "general"],
+      "expect": { "ok": true, "taxableYen": 30000000, "rate": 0.5, "taxYen": 12500000 }
+    },
+    {
+      "name": "端数処理: 課税価格1,234円の税額123.4円は100円未満切捨てで100円",
+      "func": "calculate",
+      "args": [1101234, "general"],
+      "expect": { "ok": true, "taxableYen": 1234, "taxYen": 100 }
+    },
+    {
+      "name": "境界値: 贈与額0円は課税価格0円・税額0円",
+      "func": "calculate",
+      "args": [0, "general"],
+      "expect": { "ok": true, "taxableYen": 0, "taxYen": 0, "effectiveRate": 0 }
+    },
+    {
+      "name": "異常入力: 負の贈与額はエラー",
+      "func": "calculate",
+      "args": [-1, "general"],
+      "expect": { "ok": false, "code": "invalid_amount" }
+    },
+    {
+      "name": "異常入力: 数値でない贈与額はエラー",
+      "func": "calculate",
+      "args": ["abc", "general"],
+      "expect": { "ok": false, "code": "invalid_amount" }
+    },
+    {
+      "name": "異常入力: 上限超え(2兆円)はエラー",
+      "func": "calculate",
+      "args": [2000000000000, "special"],
+      "expect": { "ok": false, "code": "invalid_amount" }
+    },
+    {
+      "name": "異常入力: 税率区分の指定が不正ならエラー",
+      "func": "calculate",
+      "args": [5000000, "foo"],
+      "expect": { "ok": false, "code": "invalid_rate_type" }
+    },
+    {
+      "name": "税率区分: 直系尊属からで1月1日時点18歳は特例税率",
+      "func": "rateTypeOf",
+      "args": [true, 18],
+      "expect": { "ok": true, "rateType": "special", "isSpecial": true }
+    },
+    {
+      "name": "税率区分: 直系尊属からでも17歳なら一般税率",
+      "func": "rateTypeOf",
+      "args": [true, 17],
+      "expect": { "ok": true, "rateType": "general", "isSpecial": false }
+    },
+    {
+      "name": "税率区分: 直系尊属以外(配偶者の親など)からは年齢に関係なく一般税率",
+      "func": "rateTypeOf",
+      "args": [false, 40],
+      "expect": { "ok": true, "rateType": "general", "isSpecial": false }
+    },
+    {
+      "name": "異常入力: 年齢が数値でないときはエラー",
+      "func": "rateTypeOf",
+      "args": [true, "x"],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "両方計算: 500万円は一般53万円・特例48万5千円",
+      "func": "both",
+      "args": [5000000],
+      "expect": { "ok": true, "taxableYen": 3900000, "general": { "taxYen": 530000 }, "special": { "taxYen": 485000 } }
+    },
+    {
+      "name": "年数計算: 500万円を毎年110万円ずつ渡すと5年(最終年60万円)",
+      "func": "yearsToGive",
+      "args": [5000000],
+      "expect": { "ok": true, "years": 5, "perYearYen": 1100000, "lastYearYen": 600000 }
+    },
+    {
+      "name": "年数計算: 毎年の贈与額を指定できる(1000万円を200万円ずつで5年)",
+      "func": "yearsToGive",
+      "args": [10000000, 2000000],
+      "expect": { "ok": true, "years": 5, "lastYearYen": 2000000 }
+    },
+    {
+      "name": "異常入力: 年数計算で合計0円はエラー",
+      "func": "yearsToGive",
+      "args": [0],
+      "expect": { "ok": false, "code": "invalid_amount" }
+    },
+    {
+      "name": "異常入力: 年数計算で1年あたり0円はエラー(0除算にしない)",
+      "func": "yearsToGive",
+      "args": [5000000, 0],
+      "expect": { "ok": false, "code": "invalid_per_year" }
+    }
+  ]
+}

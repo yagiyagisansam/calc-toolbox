@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>印紙税額 計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="契約書や領収書の種類と記載金額から、必要な収入印紙の金額を判定します。軽減措置にも対応。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>印紙税額 計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>文書の種類
+      <select id="doc">
+        <option value="1">第1号文書(不動産の譲渡等に関する契約書)</option>
+        <option value="2">第2号文書(請負に関する契約書)</option>
+        <option value="7">第7号文書(継続的取引の基本となる契約書)</option>
+        <option value="17-1" selected>第17号の1文書(売上代金の領収書)</option>
+        <option value="17-2">第17号の2文書(売上代金以外の受取書)</option>
+      </select>
+    </label>
+    <label>記載金額(円)
+      <span class="field-note">消費税額を区分して記載している場合は、消費税額を除いた額を入れてください</span>
+      <input type="number" id="amount" inputmode="numeric" step="1" min="0" placeholder="1000000">
+    </label>
+    <label id="reduced-wrap" hidden><input type="checkbox" id="reduced"> 軽減措置を適用する(不動産の譲渡に関する契約書・建設工事の請負に関する契約書)</label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 選んだ文書の区分表・記載金額のない場合</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">選んだ文書の区分表</h3>
+      <p class="adv-note">記載金額の区分ごとの印紙税額です。境目の金額を確かめたいときにご覧ください。</p>
+      <div class="table-scroll" id="adv-table"></div>
+
+      <h3 class="adv-h">記載金額の記載がない場合</h3>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    この結果は<strong>文書の種類が正しく選べている場合</strong>の税額です。どの号に当たるかの判定(契約書が第2号か第7号かなど)は本ツールでは行いません。判断に迷うときは所轄の税務署にご確認ください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>契約書や領収書に<strong>いくらの収入印紙を貼ればよいか</strong>がわかります。「100万円ちょうどは200円、100万1円だと400円」のような金額区分の境目を間違えずに確認できます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>文書の種類を選び、契約書や領収書に書かれている記載金額を入れます。入力した瞬間に税額が出ます。</li>
+    <li>不動産の売買契約書・建設工事の請負契約書なら、軽減措置のチェックを入れてください(第1号・第2号を選んだときだけ表示されます)。</li>
+    <li>金額区分の境目を確かめたいときは「＋詳細機能」で区分表をご覧ください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>印紙税額</strong> = 文書の号 × 記載金額の区分で決まる<em>定額</em>(計算式ではなく一覧表で決まります)</li>
+    <li><strong>第1号文書</strong>(不動産の譲渡等) = 記載金額1万円未満は非課税。1万円以上10万円以下200円 〜 50億円超60万円</li>
+    <li><strong>第2号文書</strong>(請負) = 記載金額1万円未満は非課税。1万円以上100万円以下200円 〜 50億円超60万円</li>
+    <li><strong>第7号文書</strong>(継続的取引の基本となる契約書) = 記載金額にかかわらず定額4,000円</li>
+    <li><strong>第17号の1文書</strong>(売上代金の領収書) = 記載金額5万円未満は非課税。5万円以上100万円以下200円 〜 10億円超20万円</li>
+    <li><strong>第17号の2文書</strong>(売上代金以外の受取書) = 記載金額5万円未満は非課税。それ以上は定額200円</li>
+    <li><strong>軽減措置</strong> = 不動産の譲渡に関する契約書(10万円超)と建設工事の請負に関する契約書(100万円超)は、平成26年4月1日から令和9年3月31日までに作成されるものについて税率が軽減されます</li>
+  </ul>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>国税庁 タックスアンサー No.7140「印紙税額の一覧表(その1)第1号文書から第4号文書まで」<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/inshi/7140.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/inshi/7140.htm</a>(2026年7月29日参照)</li>
+    <li>国税庁 タックスアンサー No.7141「印紙税額の一覧表(その2)第5号文書から第20号文書まで」<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/inshi/7141.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/inshi/7141.htm</a>(2026年7月29日参照)</li>
+    <li>国税庁 タックスアンサー No.7108「不動産の譲渡に関する契約書等に係る印紙税の軽減措置」<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/inshi/7108.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/inshi/7108.htm</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li><strong>税額は2026年7月時点</strong>の内容です(国税庁タックスアンサーの「令和7年4月1日現在法令等」に基づきます)。軽減措置の適用期間は<strong>平成26年4月1日から令和9年3月31日まで</strong>に作成される文書です。期限は延長・終了することがあるため、必ず出典先で最新の内容をご確認ください。</li>
+    <li>対応しているのは第1号・第2号・第7号・第17号の1・第17号の2の5種類だけです。第3号〜第16号、第18号〜第20号は扱っていません。</li>
+    <li>軽減措置の対象は「不動産の譲渡に関する契約書(第1号の1文書)」と「建設工事の請負に関する契約書」に限られます。同じ第1号文書でも地上権の設定や債権譲渡の契約書は対象外です。</li>
+    <li>消費税額を区分して記載している場合、その消費税額は記載金額に含めません。区分記載していない場合は税込額が記載金額になります。</li>
+    <li>第17号文書は、営業に関しない受取書(個人間の取引など)であれば非課税です。</li>
+    <li>電子契約(紙の文書を作成しない場合)には印紙税がかかりません。</li>
+    <li>どの号の文書に当たるかの判定は本ツールでは行いません。実際の課否判定は所轄の税務署にご確認ください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">記載金額がちょうど区分の境目のときはどちらですか?</h3>
+  <p class="faq-a">一覧表は「10万円以下」「10万円を超え50万円以下」のように書かれており、境目の金額は<strong>下の区分</strong>に入ります。10万円ちょうどなら「10万円以下」の税額です。</p>
+  <h3 class="faq-q">領収書は必ず印紙が必要ですか?</h3>
+  <p class="faq-a">記載金額が5万円未満なら非課税です。また、営業に関しない受取書(個人が私物を売ったときなど)も非課税です。</p>
+  <h3 class="faq-q">電子契約でも印紙は必要ですか?</h3>
+  <p class="faq-a">紙の文書を作成しなければ印紙税はかかりません。PDFをメールで送るだけの契約は課税されないとされています。</p>
+  <h3 class="faq-q">印紙を貼り忘れるとどうなりますか?</h3>
+  <p class="faq-a">過怠税として、本来の印紙税額の3倍(自主的に申し出た場合は1.1倍)が課されます。詳しくは国税庁のページをご確認ください。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_doc_type: "文書の種類を選び直してください。",
+    invalid_amount: "記載金額は0円以上の数値で入れてください。"
+  };
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function el(id) { return document.getElementById(id); }
+  function yen(n) { return n.toLocaleString("ja-JP"); }
+
+  var docEl = el("doc"), amountEl = el("amount"), reducedEl = el("reduced");
+  var box = el("result"), advBox = el("adv-result"), advTable = el("adv-table");
+
+  function isReducible() { return docEl.value === "1" || docEl.value === "2"; }
+  function reducedOn() { return isReducible() && reducedEl.checked; }
+
+  function rangeLabel(min, max) {
+    if (max === null) return yen(min) + "円以上";
+    if (min === 0) return yen(max) + "円以下";
+    return yen(min) + "円 〜 " + yen(max) + "円";
+  }
+
+  function run() {
+    el("reduced-wrap").hidden = !isReducible();
+    renderTable();
+    var noAmt = InshizeiCalc.taxWithoutAmount(docEl.value);
+    if (noAmt.ok) {
+      advBox.innerHTML = "<p>記載金額の記載がない場合の印紙税額は <strong>" +
+        esc(yen(noAmt.tax)) + "円</strong> です。</p>";
+      advBox.hidden = false;
+    } else {
+      advBox.hidden = true;
+    }
+
+    if (amountEl.value === "") { box.hidden = true; return; }
+    var r = InshizeiCalc.calculate(docEl.value, parseFloat(amountEl.value), reducedOn());
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var html;
+    if (r.exempt) {
+      html = '<div class="result-main">非課税(印紙は不要)</div>' +
+        "<p>" + esc(yen(r.bracketMax + 1)) + "円未満のため印紙税はかかりません。</p>";
+    } else {
+      html = '<div class="result-main">' + esc(yen(r.tax)) + "円の収入印紙</div>";
+      if (docEl.value === "7" || docEl.value === "17-2") {
+        html += "<p>この文書は記載金額にかかわらず定額です。</p>";
+      } else {
+        html += "<p>この税額が適用される区分: " + esc(rangeLabel(r.bracketMin, r.bracketMax)) + "</p>";
+      }
+      if (r.reducedApplied && r.saving > 0) {
+        html += "<p>軽減措置により、本則の " + esc(yen(r.normalTax)) + "円から " +
+          esc(yen(r.saving)) + "円安くなっています。</p>";
+      } else if (r.reducedApplied) {
+        html += "<p>この金額の区分は軽減措置の対象外で、本則と同じ税額です。</p>";
+      }
+    }
+    box.innerHTML = html;
+    box.hidden = false;
+  }
+
+  function renderTable() {
+    var t = InshizeiCalc.table(docEl.value, reducedOn());
+    if (!t.ok) { advTable.innerHTML = ""; return; }
+    var rows = "";
+    if (t.exemptBelow > 0) {
+      rows += "<tr><td>" + esc(yen(t.exemptBelow)) + "円未満</td><td>非課税</td></tr>";
+    }
+    t.rows.forEach(function (r) {
+      rows += "<tr><td>" + esc(rangeLabel(r.min, r.max)) + "</td><td>" + esc(yen(r.tax)) + "円</td></tr>";
+    });
+    rows += "<tr><td>記載金額の記載がないもの</td><td>" + esc(yen(t.noAmount)) + "円</td></tr>";
+    advTable.innerHTML = '<table class="data-table"><caption>' +
+      esc(docEl.options[docEl.selectedIndex].text) + (reducedOn() ? "(軽減措置)" : "(本則)") +
+      "</caption><thead><tr><th>記載金額</th><th>印紙税額</th></tr></thead><tbody>" + rows + "</tbody></table>";
+  }
+
+  [docEl, amountEl, reducedEl].forEach(function (e) {
+    e.addEventListener("input", run);
+    e.addEventListener("change", run);
+  });
+  el("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
+})();
+</script>
+</body>
+</html>

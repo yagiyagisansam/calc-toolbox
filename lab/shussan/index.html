@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>出産手当金・出産育児一時金 計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="産前産後休業中に受け取れる出産手当金と出産育児一時金の合計見込み額を計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>出産手当金・出産育児一時金 計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>標準報酬月額の平均(円)
+      <span class="field-note">支給開始日以前の継続した12か月間の平均。分からないときは月給のおよその額で</span>
+      <input type="number" id="avg" inputmode="numeric" step="1000" min="10000" max="2000000" placeholder="300000">
+    </label>
+    <span class="field-note">出産予定日</span>
+    <div class="field-row">
+      <label>年<select id="due-year"></select></label>
+      <label>月<select id="due-month"></select></label>
+      <label>日<select id="due-day"></select></label>
+    </div>
+    <span class="field-note">実際の出産日(まだのときは予定日と同じにしてください)</span>
+    <div class="field-row">
+      <label>年<select id="b-year"></select></label>
+      <label>月<select id="b-month"></select></label>
+      <label>日<select id="b-day"></select></label>
+    </div>
+    <label>胎児数
+      <select id="babies">
+        <option value="1">1人(単胎)</option>
+        <option value="2">2人(双子)</option>
+        <option value="3">3人(三つ子)</option>
+      </select>
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 加入12か月未満・産科医療補償制度の対象外</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">条件を変えて計算する</h3>
+      <p class="adv-note">当てはまるものにチェックを入れると、上の結果がその条件で計算し直されます。</p>
+      <label><input type="checkbox" id="short-period"> 支給開始日以前の加入期間が12か月未満(上限32万円が適用される)</label>
+      <label><input type="checkbox" id="not-covered"> 産科医療補償制度に加入していない機関での出産、または在胎週数22週未満の出産(一時金が48.8万円になる)</label>
+
+      <h3 class="adv-h">内訳</h3>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    この金額は<strong>産前産後休業の全期間を休み、その間の給与の支払いが無い</strong>場合の満額です。給与の一部が支払われた場合は差額のみの支給になります。正確な額はご加入の健康保険にご確認ください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>妊娠が分かった時点で、<strong>産休中にいくら受け取れるか</strong>のおよその額がわかります。出産手当金(休んだ日数分)と出産育児一時金(1児50万円)を合わせた合計を出します。家計の見通しを立てるときにどうぞ。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>標準報酬月額の平均(およその月給)と、出産予定日を選びます。入力が揃った瞬間に結果が出ます。</li>
+    <li>まだ出産していない場合は、実際の出産日を予定日と同じにしておいてください。</li>
+    <li>双子以上の場合は胎児数を変えると、産前日数(98日)と一時金の人数分が自動で反映されます。</li>
+    <li>加入期間が12か月未満の方などは「＋詳細機能」で条件を追加してください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>出産手当金の1日あたりの額</strong> = 標準報酬月額の平均 ÷ 30(<em>10円未満四捨五入</em>)× 2/3(<em>1円未満四捨五入</em>)</li>
+    <li><strong>支給日数</strong> = 産前42日(多胎98日)＋ 予定日より遅れた日数 ＋ 産後56日</li>
+    <li><strong>出産手当金の合計</strong> = 1日あたりの額 × 支給日数</li>
+    <li><strong>出産育児一時金</strong> = 1児につき50万円 × 胎児数(産科医療補償制度の対象外は1児48.8万円)</li>
+    <li><strong>加入12か月未満のとき</strong>は、実際の平均額と32万円のいずれか低い額で計算する</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>標準報酬月額の平均ごとの目安(単胎・予定日どおり・98日分)</caption>
+      <thead><tr><th>平均</th><th>1日あたり</th><th>出産手当金(98日)</th><th>一時金を含む合計</th></tr></thead>
+      <tbody>
+        <tr><td>20万円</td><td>4,447円</td><td>435,806円</td><td>935,806円</td></tr>
+        <tr><td>26万円</td><td>5,780円</td><td>566,440円</td><td>1,066,440円</td></tr>
+        <tr><td>30万円</td><td>6,667円</td><td>653,366円</td><td>1,153,366円</td></tr>
+        <tr><td>38万円</td><td>8,447円</td><td>827,806円</td><td>1,327,806円</td></tr>
+        <tr><td>50万円</td><td>11,113円</td><td>1,089,074円</td><td>1,589,074円</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>全国健康保険協会(協会けんぽ)「出産手当金」<br>
+      <a href="https://www.kyoukaikenpo.or.jp/benefit/childbirth/001/index.html" rel="noopener" target="_blank">https://www.kyoukaikenpo.or.jp/benefit/childbirth/001/index.html</a>(2026年7月29日参照)</li>
+    <li>全国健康保険協会(協会けんぽ)「出産育児一時金」<br>
+      <a href="https://www.kyoukaikenpo.or.jp/benefit/childbirth/002/index.html" rel="noopener" target="_blank">https://www.kyoukaikenpo.or.jp/benefit/childbirth/002/index.html</a>(2026年7月29日参照)</li>
+    <li>厚生労働省「出産育児一時金等について」(令和5年4月から原則42万円→原則50万円)<br>
+      <a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/iryouhoken/shussan/index.html" rel="noopener" target="_blank">https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/iryouhoken/shussan/index.html</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li><strong>制度・金額は2026年7月時点</strong>の協会けんぽの内容です。出産育児一時金の50万円は2023年4月1日以降の出産に適用され、加入12か月未満のときの上限32万円は支給開始日が令和7年4月1日以降の場合の額です。制度は改定されることがあるため、最新の額は必ず出典先でご確認ください。</li>
+    <li>協会けんぽ(健康保険の被保険者本人)を前提としています。健康保険組合には独自の付加給付がある場合があり、国民健康保険では出産手当金は原則ありません。</li>
+    <li>標準報酬月額は月給そのものではなく、法令で定められた等級に区分された額です。上限・下限があるため、実際の等級は給与明細や会社の担当部署でご確認ください。</li>
+    <li>支給日数は制度上の上限日数です。実際に支給されるのは「会社を休み、給与の支払いが無かった日」だけです。</li>
+    <li>出産手当金と傷病手当金は重複して受給できません。また、休んだ期間に給与が支払われた場合は、その差額のみの支給になります。</li>
+    <li>出産手当金には所得税がかかりません。育児休業給付金(雇用保険)はこのツールの対象外です。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">予定日より早く産まれた場合、支給日数は減りますか?</h3>
+  <p class="faq-a">制度上の範囲は「出産の日以前42日から出産の翌日以後56日目まで」なので、合計98日のままです。ただし実際に支給されるのは休んだ日数分なので、産前に働いていた日があればその分は対象外になります。</p>
+  <h3 class="faq-q">予定日より遅れた分ももらえますか?</h3>
+  <p class="faq-a">もらえます。予定日以前42日に加えて、予定日から実際の出産日までの遅れた期間も支給対象になります。</p>
+  <h3 class="faq-q">標準報酬月額が分かりません。</h3>
+  <p class="faq-a">給与明細の健康保険料から逆算するか、会社の給与担当・協会けんぽ支部でご確認ください。目安を知りたいだけなら、およその月給(税引き前・通勤手当を含む)を入れてください。</p>
+  <h3 class="faq-q">双子のときはどうなりますか?</h3>
+  <p class="faq-a">産前が42日から98日に伸びて支給日数が154日になり、出産育児一時金も胎児数分(2人なら100万円)が支給されます。このツールでは胎児数を2以上にすると自動で反映されます。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_average: "標準報酬月額の平均は1万円〜200万円で入れてください。",
+    invalid_due_date: "出産予定日を正しく選んでください。",
+    invalid_birth_date: "実際の出産日が予定日から離れすぎています。日付を確認してください。",
+    invalid_babies: "胎児数を選び直してください。"
+  };
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function el(id) { return document.getElementById(id); }
+  function val(id) { return parseInt(el(id).value, 10); }
+  function yen(n) { return n.toLocaleString("ja-JP"); }
+
+  var today = new Date();
+  function fillSelect(id, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el(id).innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(dId, 1, max, "日", Math.min(keep, max));
+  }
+
+  var y0 = today.getFullYear();
+  ["due", "b"].forEach(function (pre) {
+    fillSelect(pre + "-year", y0 - 3, y0 + 3, "年", y0);
+    fillSelect(pre + "-month", 1, 12, "月", today.getMonth() + 1);
+    fillSelect(pre + "-day", 1, daysInMonth(y0, today.getMonth() + 1), "日", today.getDate());
+  });
+
+  var box = el("result");
+  var advBox = el("adv-result");
+
+  function run() {
+    adjustDays("due-year", "due-month", "due-day");
+    adjustDays("b-year", "b-month", "b-day");
+    if (el("avg").value === "") { box.hidden = true; advBox.hidden = true; return; }
+    var r = ShussanCalc.calculate(
+      parseFloat(el("avg").value),
+      val("due-year"), val("due-month"), val("due-day"),
+      val("b-year"), val("b-month"), val("b-day"),
+      val("babies"),
+      !el("not-covered").checked ? true : false,
+      !el("short-period").checked
+    );
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      advBox.hidden = true;
+      return;
+    }
+    box.innerHTML = '<div class="result-main">合計 約' + esc(yen(r.total)) + "円</div>" +
+      "<p>出産手当金: " + esc(yen(r.allowanceTotal)) + "円(1日" + esc(yen(r.daily)) + "円 × " +
+      esc(String(r.totalDays)) + "日)</p>" +
+      "<p>出産育児一時金: " + esc(yen(r.lumpSumTotal)) + "円(1児" + esc(yen(r.lumpSumPerBaby)) + "円)</p>";
+    box.hidden = false;
+
+    advBox.innerHTML =
+      "<p>計算に使った標準報酬月額の平均: " + esc(yen(r.base)) + "円" +
+      (r.capped ? "(加入12か月未満のため32万円が上限)" : "") + "</p>" +
+      "<p>平均額の30分の1(10円未満四捨五入): " + esc(yen(r.dailyBase)) + "円</p>" +
+      "<p>支給日数の内訳: 産前" + esc(String(r.prenatalDays)) + "日" +
+      (r.delayDays > 0 ? " ＋ 予定日より遅れた分" + esc(String(r.delayDays)) + "日" : "") +
+      " ＋ 産後" + esc(String(r.postnatalDays)) + "日 = " + esc(String(r.totalDays)) + "日</p>" +
+      (r.early ? "<p>予定日より早い出産のため、遅れた分の加算はありません。</p>" : "");
+    advBox.hidden = false;
+  }
+
+  ["avg", "due-year", "due-month", "due-day", "b-year", "b-month", "b-day",
+   "babies", "short-period", "not-covered"].forEach(function (id) {
+    el(id).addEventListener("input", run);
+    el(id).addEventListener("change", run);
+  });
+  el("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

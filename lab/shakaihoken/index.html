@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>社会保険料(健康保険・厚生年金)計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="月給から標準報酬月額を決め、健康保険・介護保険・厚生年金の本人負担額を令和8年度の料率で計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>社会保険料(健康保険・厚生年金)計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>月の報酬額(円)
+      <span class="field-note">通勤手当や残業代を含む、1か月の報酬の総額</span>
+      <input type="number" id="reward" inputmode="numeric" step="1000" min="0" max="20000000" placeholder="300000">
+    </label>
+    <div class="field-row">
+      <label>都道府県
+        <select id="pref"></select>
+      </label>
+      <label>年齢(歳)
+        <span class="field-note">40〜64歳は介護保険料が加算</span>
+        <input type="number" id="age" inputmode="numeric" step="1" min="0" max="120" placeholder="35">
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 内訳・全額(会社負担込み)・年間の目安</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">内訳と会社負担分</h3>
+      <p class="adv-note">保険料は会社と半分ずつ負担します(労使折半)。下の表は「全額」と「本人負担(給与から引かれる額)」です。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    料率は<strong>令和8年度</strong>のものです(健康保険料率・介護保険料率は令和8年3月分＝4月納付分から、子ども・子育て支援金率は令和8年4月分＝5月納付分から適用)。実際の控除額は勤務先が決定した標準報酬月額に基づくため、給与明細と1円単位で一致しないことがあります。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>月給と都道府県・年齢を入れるだけで、<strong>給与から引かれる社会保険料(健康保険・介護保険・子ども子育て支援金・厚生年金)の本人負担額</strong>がわかります。昇給や転職で手取りがどう変わるかの試算、給与明細の控除額の確認に使えます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>月の報酬額(額面の総支給額)を入れます。</li>
+    <li>勤務先が加入している協会けんぽの支部がある都道府県と、自分の年齢を選びます。</li>
+    <li>入力した瞬間に本人負担額が表示されます。会社負担を含む全額は「＋詳細機能」で確認できます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>標準報酬月額</strong> = 報酬月額を等級表に当てはめた額(健康保険は第1級58,000円〜第50級1,390,000円)</li>
+    <li><strong>健康保険料(本人)</strong> = 標準報酬月額 × 都道府県別の保険料率 ÷ 2</li>
+    <li><strong>介護保険料(本人)</strong> = 標準報酬月額 × 1.62% ÷ 2(40歳以上65歳未満のみ)</li>
+    <li><strong>子ども・子育て支援金(本人)</strong> = 標準報酬月額 × 0.23% ÷ 2</li>
+    <li><strong>厚生年金保険料(本人)</strong> = 厚生年金の標準報酬月額(第1級88,000円〜第32級650,000円) × 18.3% ÷ 2</li>
+    <li><strong>端数処理</strong> = 給与から控除する場合、本人負担額の端数が50銭以下は切り捨て、50銭を超えるときは切り上げて1円</li>
+  </ul>
+
+  <h3>都道府県別の健康保険料率(令和8年度)</h3>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>協会けんぽ 都道府県単位保険料率(令和8年3月分〜)。全国平均9.90%</caption>
+      <thead><tr><th>都道府県</th><th>料率</th><th>都道府県</th><th>料率</th></tr></thead>
+      <tbody id="rate-table"></tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>全国健康保険協会「令和8年度の協会けんぽの保険料率は3月分(4月納付分)から改定されます」(都道府県単位保険料率・介護保険料率1.62%・子ども子育て支援金率0.23%)<br>
+      <a href="https://www.kyoukaikenpo.or.jp/about/business/insurance_rate/rate_prefectures/r08/index.html" rel="noopener" target="_blank">https://www.kyoukaikenpo.or.jp/about/business/insurance_rate/rate_prefectures/r08/index.html</a>(2026年7月29日参照)</li>
+    <li>全国健康保険協会「令和8年度保険料額表」(標準報酬月額の等級表・端数処理の規定)<br>
+      <a href="https://www.kyoukaikenpo.or.jp/about/business/insurance_rate/premium_prefectures/r08/index.html" rel="noopener" target="_blank">https://www.kyoukaikenpo.or.jp/about/business/insurance_rate/premium_prefectures/r08/index.html</a>(2026年7月29日参照)</li>
+    <li>日本年金機構「厚生年金保険料額表」(厚生年金保険料率18.3%で固定)<br>
+      <a href="https://www.nenkin.go.jp/service/kounen/hokenryo/ryogaku/ryogakuhyo/index.html" rel="noopener" target="_blank">https://www.nenkin.go.jp/service/kounen/hokenryo/ryogaku/ryogakuhyo/index.html</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>料率は<strong>令和8年度(2026年度)</strong>時点です。毎年3月分(4月納付分)から改定されるため、翌年度は変わります。</li>
+    <li>協会けんぽ(全国健康保険協会)に加入する一般の被保険者を前提としています。健康保険組合・共済組合・厚生年金基金の加入者は料率が異なります。</li>
+    <li>実際の標準報酬月額は、毎年4〜6月の報酬をもとにした定時決定や、大きな昇給時の随時改定で決まります。このツールは「今の報酬額を等級表に当てはめたらどうなるか」の目安です。</li>
+    <li>賞与にかかる保険料(標準賞与額に同じ料率を掛ける)は含めていません。</li>
+    <li>子ども・子育て拠出金(拠出金率0.36%)は事業主のみの負担なので、本人負担には入れていません。</li>
+    <li>雇用保険料・所得税・住民税は含みません。手取り額はこれらを差し引いた後の金額になります。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">給与明細の控除額と数円ずれるのはなぜですか?</h3>
+  <p class="faq-a">実際の控除は、勤務先が届け出た標準報酬月額をもとに計算されるためです。定時決定は4〜6月の平均報酬で決まるので、今の月給と等級が一致しないことがあります。また端数処理について労使間の特約がある場合もあります。</p>
+  <h3 class="faq-q">介護保険料はいつから引かれますか?</h3>
+  <p class="faq-a">40歳に達したとき(誕生日の前日)が属する月から65歳に達した月の前月まで、介護保険第2号被保険者として健康保険料と合わせて徴収されます。このツールは年齢で40歳以上65歳未満かを判定しています。</p>
+  <h3 class="faq-q">月給が高くても保険料が増えなくなるのはなぜですか?</h3>
+  <p class="faq-a">標準報酬月額に上限があるためです。健康保険は1,390,000円(第50級)、厚生年金は650,000円(第32級)で頭打ちになります。</p>
+  <h3 class="faq-q">子ども・子育て支援金とは何ですか?</h3>
+  <p class="faq-a">令和8年4月分(5月納付分)から医療保険料と合わせて徴収が始まる、全国一律0.23%の負担です。健康保険料と同じく労使折半です。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_reward: "月の報酬額を0〜2,000万円の範囲で入力してください。",
+    invalid_prefecture: "都道府県を選んでください。",
+    invalid_age: "年齢を0〜120歳の範囲で入力してください。"
+  };
+  var PREFS = [
+    ["hokkaido", "北海道"], ["aomori", "青森県"], ["iwate", "岩手県"], ["miyagi", "宮城県"],
+    ["akita", "秋田県"], ["yamagata", "山形県"], ["fukushima", "福島県"], ["ibaraki", "茨城県"],
+    ["tochigi", "栃木県"], ["gunma", "群馬県"], ["saitama", "埼玉県"], ["chiba", "千葉県"],
+    ["tokyo", "東京都"], ["kanagawa", "神奈川県"], ["niigata", "新潟県"], ["toyama", "富山県"],
+    ["ishikawa", "石川県"], ["fukui", "福井県"], ["yamanashi", "山梨県"], ["nagano", "長野県"],
+    ["gifu", "岐阜県"], ["shizuoka", "静岡県"], ["aichi", "愛知県"], ["mie", "三重県"],
+    ["shiga", "滋賀県"], ["kyoto", "京都府"], ["osaka", "大阪府"], ["hyogo", "兵庫県"],
+    ["nara", "奈良県"], ["wakayama", "和歌山県"], ["tottori", "鳥取県"], ["shimane", "島根県"],
+    ["okayama", "岡山県"], ["hiroshima", "広島県"], ["yamaguchi", "山口県"], ["tokushima", "徳島県"],
+    ["kagawa", "香川県"], ["ehime", "愛媛県"], ["kochi", "高知県"], ["fukuoka", "福岡県"],
+    ["saga", "佐賀県"], ["nagasaki", "長崎県"], ["kumamoto", "熊本県"], ["oita", "大分県"],
+    ["miyazaki", "宮崎県"], ["kagoshima", "鹿児島県"], ["okinawa", "沖縄県"]
+  ];
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function yen(n) { return n.toLocaleString("ja-JP"); }
+
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var rewardEl = document.getElementById("reward");
+  var prefEl = document.getElementById("pref");
+  var ageEl = document.getElementById("age");
+
+  var html = "";
+  for (var i = 0; i < PREFS.length; i++) {
+    html += '<option value="' + PREFS[i][0] + '"' + (PREFS[i][0] === "tokyo" ? " selected" : "") + ">" + PREFS[i][1] + "</option>";
+  }
+  prefEl.innerHTML = html;
+
+  var rows = "";
+  for (var j = 0; j < PREFS.length; j += 2) {
+    rows += "<tr>";
+    for (var k = j; k < j + 2 && k < PREFS.length; k++) {
+      var r = ShakaihokenCalc.prefectureRate(PREFS[k][0]);
+      rows += "<td>" + PREFS[k][1] + "</td><td>" + r.rate.toFixed(2) + "%</td>";
+    }
+    if (j + 1 >= PREFS.length) rows += "<td></td><td></td>";
+    rows += "</tr>";
+  }
+  document.getElementById("rate-table").innerHTML = rows;
+
+  function run() {
+    if (rewardEl.value === "" || ageEl.value === "") { box.hidden = true; advBox.hidden = true; return; }
+    var r = ShakaihokenCalc.calculate(parseFloat(rewardEl.value), prefEl.value, parseFloat(ageEl.value));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      advBox.hidden = true;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">毎月 ' + esc(yen(r.employee.total)) + " 円</div>" +
+      "<p>標準報酬月額 " + esc(yen(r.standard)) + "円(健康保険 第" + esc(r.grade) + "級)" +
+      (r.pensionApplies ? " / 厚生年金 第" + esc(r.pensionGrade) + "級 " + esc(yen(r.pensionStandard)) + "円" : " / 厚生年金は対象外") + "</p>" +
+      "<p>健康保険 " + esc(yen(r.employee.health)) + "円" +
+      (r.careApplies ? " ＋ 介護保険 " + esc(yen(r.employee.care)) + "円" : "") +
+      " ＋ 子ども子育て支援金 " + esc(yen(r.employee.child)) + "円" +
+      (r.pensionApplies ? " ＋ 厚生年金 " + esc(yen(r.employee.pension)) + "円" : "") + "</p>" +
+      "<p>年間(賞与を除く) 約 " + esc(yen(r.employee.total * 12)) + " 円</p>";
+    box.hidden = false;
+
+    var lines = [
+      ["健康保険(" + r.rates.health.toFixed(2) + "%)", r.total.health, r.employee.health],
+      ["介護保険(" + (r.careApplies ? r.rates.care.toFixed(2) + "%" : "対象外") + ")", r.total.care, r.employee.care],
+      ["子ども子育て支援金(0.23%)", r.total.child, r.employee.child],
+      ["厚生年金(" + (r.pensionApplies ? "18.30%" : "対象外") + ")", r.total.pension, r.employee.pension]
+    ];
+    var t = '<div class="table-scroll"><table class="data-table"><thead><tr><th>種類</th><th>全額</th><th>本人負担</th></tr></thead><tbody>';
+    for (var m = 0; m < lines.length; m++) {
+      t += "<tr><td>" + esc(lines[m][0]) + "</td><td>" + esc(yen(lines[m][1])) + "円</td><td>" + esc(yen(lines[m][2])) + "円</td></tr>";
+    }
+    t += "<tr><td>合計</td><td>" + esc(yen(r.total.total)) + "円</td><td>" + esc(yen(r.employee.total)) + "円</td></tr>";
+    t += "</tbody></table></div>";
+    advBox.innerHTML = t;
+    advBox.hidden = false;
+  }
+
+  [rewardEl, ageEl].forEach(function (el) { el.addEventListener("input", run); });
+  prefEl.addEventListener("change", run);
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

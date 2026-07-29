@@ -1,0 +1,139 @@
+{
+  "tool": "kiso-nenkin",
+  "module": "calc.js",
+  "global": "KisoNenkinCalc",
+  "cases": [
+    {
+      "name": "上限480月すべて納付済なら満額847,300円・月額70,608円(令和8年度)",
+      "func": "calculate",
+      "args": [480, 0, 0, 0, 0],
+      "expect": { "ok": true, "eligible": true, "creditedMonths": 480, "annualYen": 847300, "monthlyYen": 70608, "ratePercent": 100 }
+    },
+    {
+      "name": "30年(360月)納付なら満額の4分の3で635,500円",
+      "func": "calculate",
+      "args": [360, 0, 0, 0, 0],
+      "expect": { "ok": true, "creditedMonths": 360, "annualYen": 635500, "ratePercent": 75 }
+    },
+    {
+      "name": "納付240月+全額免除240月は240+120=360月分と同じ635,500円",
+      "func": "calculate",
+      "args": [240, 240, 0, 0, 0],
+      "expect": { "ok": true, "totalMonths": 480, "creditedMonths": 360, "annualYen": 635500 }
+    },
+    {
+      "name": "境界値: 受給資格ちょうど120月は受給資格あり・211,800円",
+      "func": "calculate",
+      "args": [120, 0, 0, 0, 0],
+      "expect": { "ok": true, "eligible": true, "totalMonths": 120, "annualYen": 211800, "monthlyYen": 17650 }
+    },
+    {
+      "name": "境界値: 119月は受給資格なし(金額は参考値として計算)",
+      "func": "calculate",
+      "args": [119, 0, 0, 0, 0],
+      "expect": { "ok": true, "eligible": false, "totalMonths": 119 }
+    },
+    {
+      "name": "境界値: 0月は受給資格なし・年額0円",
+      "func": "calculate",
+      "args": [0, 0, 0, 0, 0],
+      "expect": { "ok": true, "eligible": false, "annualYen": 0, "monthlyYen": 0 }
+    },
+    {
+      "name": "一部免除あり: 納付300+全額60+4分の3免除40+半額40+4分の1免除40は420月分",
+      "func": "calculate",
+      "args": [300, 60, 40, 40, 40],
+      "expect": { "ok": true, "totalMonths": 480, "creditedMonths": 420, "annualYen": 741400, "ratePercent": 87.5 }
+    },
+    {
+      "name": "満額を指定: 昭和31年4月1日以前生まれの844,900円は月額70,408円",
+      "func": "calculate",
+      "args": [480, 0, 0, 0, 0, 844900],
+      "expect": { "ok": true, "annualYen": 844900, "monthlyYen": 70408 }
+    },
+    {
+      "name": "平成21年3月以前分の全額免除は3分の1(納付240+新120+旧120で340月分)",
+      "func": "calculateMixed",
+      "args": [240, [120, 0, 0, 0], [120, 0, 0, 0]],
+      "expect": { "ok": true, "totalMonths": 480, "creditedMonths": 340, "annualYen": 600200 }
+    },
+    {
+      "name": "免除の割合(平成21年4月以降): 全額1/2・4分の3免除5/8・半額3/4・4分の1免除7/8",
+      "func": "exemptionRates",
+      "args": ["new"],
+      "expect": { "ok": true, "full": 0.5, "threeQuarter": 0.625, "half": 0.75, "quarter": 0.875 }
+    },
+    {
+      "name": "免除の割合(平成21年3月分まで): 全額免除は3分の1、4分の3免除は2分の1",
+      "func": "exemptionRates",
+      "args": ["old"],
+      "expect": { "ok": true, "threeQuarter": 0.5, "quarter": 0.8333333333333334 }
+    },
+    {
+      "name": "免除の割合: 未知の区分はエラー",
+      "func": "exemptionRates",
+      "args": ["heisei"],
+      "expect": { "ok": false, "code": "invalid_era" }
+    },
+    {
+      "name": "付加年金: 120月納めると年額24,000円",
+      "func": "fukaNenkin",
+      "args": [120],
+      "expect": { "ok": true, "annualYen": 24000 }
+    },
+    {
+      "name": "付加年金: 月数が負の値はエラー",
+      "func": "fukaNenkin",
+      "args": [-1],
+      "expect": { "ok": false, "code": "invalid_months" }
+    },
+    {
+      "name": "異常入力: 納付済月数が負の値はエラー",
+      "func": "calculate",
+      "args": [-1, 0, 0, 0, 0],
+      "expect": { "ok": false, "code": "invalid_paid" }
+    },
+    {
+      "name": "異常入力: 納付済月数が481月(480月超)はエラー",
+      "func": "calculate",
+      "args": [481, 0, 0, 0, 0],
+      "expect": { "ok": false, "code": "invalid_paid" }
+    },
+    {
+      "name": "異常入力: 納付済月数が数値でないときはエラー",
+      "func": "calculate",
+      "args": ["abc", 0, 0, 0, 0],
+      "expect": { "ok": false, "code": "invalid_paid" }
+    },
+    {
+      "name": "異常入力: 月数の合計が480月を超えるとエラー",
+      "func": "calculate",
+      "args": [400, 200, 0, 0, 0],
+      "expect": { "ok": false, "code": "months_over_limit" }
+    },
+    {
+      "name": "異常入力: 全額免除月数が小数はエラー",
+      "func": "calculate",
+      "args": [100, 1.5, 0, 0, 0],
+      "expect": { "ok": false, "code": "invalid_full" }
+    },
+    {
+      "name": "異常入力: 半額免除月数が負の値はエラー",
+      "func": "calculate",
+      "args": [100, 0, 0, -3, 0],
+      "expect": { "ok": false, "code": "invalid_half" }
+    },
+    {
+      "name": "異常入力: 満額が0円はエラー",
+      "func": "calculate",
+      "args": [100, 0, 0, 0, 0, 0],
+      "expect": { "ok": false, "code": "invalid_full_amount" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_paid" }
+    }
+  ]
+}

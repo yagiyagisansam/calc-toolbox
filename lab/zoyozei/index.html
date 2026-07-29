@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>贈与税(暦年課税)計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="1年間にもらった財産の額から、暦年課税の贈与税額を一般税率・特例税率の両方で計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>贈与税(暦年課税)計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>1年間にもらった財産の合計額(円)
+      <span class="field-note">1月1日〜12月31日に、あなたが受け取った財産の合計。例: 5000000</span>
+      <input type="number" id="amount" inputmode="numeric" step="1" min="0" placeholder="5000000">
+    </label>
+    <div class="field-row">
+      <label>贈与してくれた人
+        <select id="lineal">
+          <option value="1">父母・祖父母など(直系尊属)</option>
+          <option value="0">それ以外(配偶者・兄弟姉妹・叔父叔母など)</option>
+        </select>
+      </label>
+      <label>その年の1月1日時点の年齢(歳)
+        <input type="number" id="age" inputmode="numeric" step="1" min="0" max="130" placeholder="25">
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 一般税率と特例税率の比較・毎年110万円ずつ渡す場合の年数</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">一般税率と特例税率の比較</h3>
+      <p class="adv-note">同じ贈与額でも、税率表が変わると税額がどれだけ違うかを並べて表示します。</p>
+      <div class="tool-result" id="adv-compare" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">毎年110万円ずつ渡すと何年かかるか</h3>
+      <p class="adv-note">基礎控除の範囲内で少しずつ渡す場合の年数の目安です(定期贈与とみなされないかは別途ご確認ください)。</p>
+      <div class="field-row">
+        <label>渡したい合計額(円)
+          <input type="number" id="total" inputmode="numeric" step="1" min="1" placeholder="10000000">
+        </label>
+        <label>1年あたりの贈与額(円)
+          <input type="number" id="peryear" inputmode="numeric" step="1" min="1" value="1100000">
+        </label>
+      </div>
+      <div class="tool-result" id="adv-years" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    ここで出る金額は<strong>暦年課税だけの概算</strong>です。相続時精算課税、住宅取得等資金・教育資金などの非課税特例、配偶者控除(おしどり贈与)は含みません。実際の申告額は税務署または税理士にご確認ください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>1年間にもらった財産の合計額を入れるだけで、<strong>贈与税がいくらかかるか</strong>が一般税率・特例税率の両方でわかります。基礎控除110万円を引いた後の課税価格・適用税率・控除額も表示します。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>1年間にもらった財産の合計額を円で入れます。入力した瞬間に結果が出ます。</li>
+    <li>贈与してくれた人が父母・祖父母など(直系尊属)かどうかを選びます。</li>
+    <li>その年の1月1日時点のあなたの年齢を入れます。直系尊属からで18歳以上なら特例税率が使えます。</li>
+    <li>両方の税率表を見比べたいときは「＋詳細機能」を開いてください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>課税価格</strong> = 1年間の贈与額の合計 − 基礎控除110万円(マイナスなら0円)</li>
+    <li><strong>贈与税額</strong> = 課税価格 × 税率 − 控除額(速算表)</li>
+    <li><strong>特例税率の条件</strong> = 直系尊属(父母・祖父母など)からの贈与、かつ贈与を受けた年の1月1日時点で受贈者が18歳以上</li>
+    <li><strong>端数</strong> = 税額の100円未満を切り捨て(国税通則法第119条第1項)</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>贈与税の速算表(令和7年4月1日現在法令等)</caption>
+      <thead><tr><th>基礎控除後の課税価格</th><th>一般税率</th><th>一般控除額</th><th>基礎控除後の課税価格</th><th>特例税率</th><th>特例控除額</th></tr></thead>
+      <tbody>
+        <tr><td>200万円以下</td><td>10%</td><td>—</td><td>200万円以下</td><td>10%</td><td>—</td></tr>
+        <tr><td>300万円以下</td><td>15%</td><td>10万円</td><td>400万円以下</td><td>15%</td><td>10万円</td></tr>
+        <tr><td>400万円以下</td><td>20%</td><td>25万円</td><td>600万円以下</td><td>20%</td><td>30万円</td></tr>
+        <tr><td>600万円以下</td><td>30%</td><td>65万円</td><td>1,000万円以下</td><td>30%</td><td>90万円</td></tr>
+        <tr><td>1,000万円以下</td><td>40%</td><td>125万円</td><td>1,500万円以下</td><td>40%</td><td>190万円</td></tr>
+        <tr><td>1,500万円以下</td><td>45%</td><td>175万円</td><td>3,000万円以下</td><td>45%</td><td>265万円</td></tr>
+        <tr><td>3,000万円以下</td><td>50%</td><td>250万円</td><td>4,500万円以下</td><td>50%</td><td>415万円</td></tr>
+        <tr><td>3,000万円超</td><td>55%</td><td>400万円</td><td>4,500万円超</td><td>55%</td><td>640万円</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>国税庁 タックスアンサー No.4408「贈与税の計算と税率(暦年課税)」(ページ表記の基準時点: 令和7年4月1日現在法令等)<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/zoyo/4408.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/zoyo/4408.htm</a>(2026年7月29日参照)</li>
+    <li>国税通則法(昭和37年法律第66号)第119条第1項(国税の確定金額の100円未満切捨て)<br>
+      <a href="https://laws.e-gov.go.jp/law/337AC0000000066" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/337AC0000000066</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>税率表は<strong>令和7年4月1日現在法令等</strong>にもとづく国税庁の速算表です。税制改正で変わることがあります。</li>
+    <li>基礎控除110万円は「もらった人1人あたり・1年あたり」です。複数の人からもらった場合は合計してから110万円を引きます。</li>
+    <li>一般贈与財産と特例贈与財産が同じ年に混ざる場合は按分計算が必要です。本ツールはどちらか一方の前提でのみ計算します。</li>
+    <li>相続時精算課税を選んでいる贈与、住宅取得等資金・教育資金・結婚子育て資金の非課税特例、配偶者控除(おしどり贈与)は計算に入っていません。</li>
+    <li>相続開始前の一定期間内の贈与は相続税の課税価格に加算される場合があります(生前贈与加算)。本ツールでは扱いません。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">年間110万円までなら申告も不要ですか?</h3>
+  <p class="faq-a">暦年課税で、1年間にもらった財産の合計が基礎控除110万円以下なら贈与税はかからず、贈与税の申告も不要です。ただし相続時精算課税を選択している場合など、別の届出が必要なケースがあります。</p>
+  <h3 class="faq-q">特例税率が使えるのはどんなときですか?</h3>
+  <p class="faq-a">父母・祖父母など直系尊属からの贈与で、贈与を受けた年の1月1日時点で受贈者が18歳以上のときです(令和4年3月31日以前の贈与は20歳以上)。配偶者の親や叔父叔母からの贈与は一般税率になります。</p>
+  <h3 class="faq-q">税額に端数が出たらどうなりますか?</h3>
+  <p class="faq-a">国税の確定金額は100円未満を切り捨てます(国税通則法第119条第1項)。本ツールも同じ処理をしています。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_amount: "贈与額は0円以上1兆円以下の数値で入力してください。",
+    invalid_age: "年齢は0〜130の数値で入力してください。",
+    invalid_rate_type: "税率区分を選び直してください。",
+    invalid_per_year: "1年あたりの贈与額は1円以上で入力してください。"
+  };
+  var box = document.getElementById("result");
+  var amountEl = document.getElementById("amount");
+  var linealEl = document.getElementById("lineal");
+  var ageEl = document.getElementById("age");
+  var cmpBox = document.getElementById("adv-compare");
+  var yearsBox = document.getElementById("adv-years");
+  var totalEl = document.getElementById("total");
+  var perYearEl = document.getElementById("peryear");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function yen(v) {
+    return Math.round(v).toLocaleString("ja-JP") + "円";
+  }
+  function err(target, code) {
+    target.innerHTML = '<p class="result-error">' + esc(ERRORS[code] || "入力値を確認してください。") + "</p>";
+    target.hidden = false;
+  }
+
+  function run() {
+    if (amountEl.value === "" || ageEl.value === "") { box.hidden = true; runCompare(); return; }
+    var amount = parseFloat(amountEl.value);
+    var age = parseFloat(ageEl.value);
+    var t = ZoyozeiCalc.rateTypeOf(linealEl.value === "1", age);
+    if (!t.ok) { err(box, t.code); runCompare(); return; }
+    var r = ZoyozeiCalc.calculate(amount, t.rateType);
+    if (!r.ok) { err(box, r.code); runCompare(); return; }
+    box.innerHTML =
+      '<div class="result-main">贈与税 ' + esc(yen(r.taxYen)) + "</div>" +
+      "<p>適用: " + (t.isSpecial ? "特例税率(特例贈与財産)" : "一般税率(一般贈与財産)") + "</p>" +
+      "<p>課税価格(基礎控除110万円を引いた後): " + esc(yen(r.taxableYen)) +
+      " / 税率 " + esc((r.rate * 100).toFixed(0)) + "% / 控除額 " + esc(yen(r.deductionYen)) + "</p>" +
+      "<p>手元に残る額: " + esc(yen(r.netYen)) + "(贈与額に対する負担率 " + esc(r.effectiveRate.toFixed(2)) + "%)</p>";
+    box.hidden = false;
+    runCompare();
+  }
+
+  function runCompare() {
+    if (amountEl.value === "") { cmpBox.hidden = true; return; }
+    var r = ZoyozeiCalc.both(parseFloat(amountEl.value));
+    if (!r.ok) { err(cmpBox, r.code); return; }
+    cmpBox.innerHTML =
+      '<div class="result-main">課税価格 ' + esc(yen(r.taxableYen)) + "</div>" +
+      "<p>一般税率で計算した場合: " + esc(yen(r.general.taxYen)) +
+      "(税率 " + esc((r.general.rate * 100).toFixed(0)) + "%)</p>" +
+      "<p>特例税率で計算した場合: " + esc(yen(r.special.taxYen)) +
+      "(税率 " + esc((r.special.rate * 100).toFixed(0)) + "%)</p>" +
+      "<p>差額: " + esc(yen(r.general.taxYen - r.special.taxYen)) + "</p>";
+    cmpBox.hidden = false;
+  }
+
+  function runYears() {
+    if (totalEl.value === "" || perYearEl.value === "") { yearsBox.hidden = true; return; }
+    var r = ZoyozeiCalc.yearsToGive(parseFloat(totalEl.value), parseFloat(perYearEl.value));
+    if (!r.ok) { err(yearsBox, r.code); return; }
+    yearsBox.innerHTML =
+      '<div class="result-main">' + esc(String(r.years)) + " 年</div>" +
+      "<p>1年あたり " + esc(yen(r.perYearYen)) + " ずつ渡した場合。最終年に渡す額は " + esc(yen(r.lastYearYen)) + " です。</p>";
+    yearsBox.hidden = false;
+  }
+
+  [amountEl, ageEl].forEach(function (el) { el.addEventListener("input", run); });
+  linealEl.addEventListener("change", run);
+  [totalEl, perYearEl].forEach(function (el) { el.addEventListener("input", runYears); });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

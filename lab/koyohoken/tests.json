@@ -1,0 +1,162 @@
+{
+  "tool": "koyohoken",
+  "module": "calc.js",
+  "global": "KoyohokenCalc",
+  "cases": [
+    {
+      "name": "令和8年度・一般の事業・賃金30万円(労働者5/1000=1500円、事業主8.5/1000=2550円)",
+      "func": "calculate",
+      "args": [300000, "general"],
+      "expect": {
+        "ok": true, "fiscalYear": 2026, "fiscalYearLabel": "令和8年度",
+        "employeeRate": 5, "employerRate": 8.5, "totalRate": 13.5,
+        "employee": 1500, "employer": 2550, "total": 4050
+      }
+    },
+    {
+      "name": "令和8年度・建設の事業・賃金25万円(労働者6/1000=1500円、事業主10.5/1000=2625円)",
+      "func": "calculate",
+      "args": [250000, "construction"],
+      "expect": {
+        "ok": true, "employeeRate": 6, "employerRate": 10.5, "totalRate": 16.5,
+        "employee": 1500, "employer": 2625, "total": 4125, "employerTwoBusiness": 1125
+      }
+    },
+    {
+      "name": "令和8年度・農林水産清酒製造の事業・賃金40万円(労働者6/1000=2400円、事業主9.5/1000=3800円)",
+      "func": "calculate",
+      "args": [400000, "agriculture"],
+      "expect": {
+        "ok": true, "employeeRate": 6, "employerRate": 9.5, "totalRate": 15.5,
+        "employee": 2400, "employer": 3800, "total": 6200
+      }
+    },
+    {
+      "name": "令和7年度・一般の事業・賃金30万円(労働者5.5/1000=1650円、事業主9/1000=2700円)",
+      "func": "calculate",
+      "args": [300000, "general", 2025],
+      "expect": {
+        "ok": true, "fiscalYear": 2025, "fiscalYearLabel": "令和7年度",
+        "employeeRate": 5.5, "employerRate": 9, "totalRate": 14.5,
+        "employee": 1650, "employer": 2700, "total": 4350
+      }
+    },
+    {
+      "name": "端数処理: 617.28円は50銭以下なので切り捨てて617円(賃金123,456円・一般)",
+      "func": "calculate",
+      "args": [123456, "general"],
+      "expect": { "ok": true, "employee": 617.28, "employeeDeduction": 617 }
+    },
+    {
+      "name": "境界値: 端数がちょうど50銭(502.5円)は切り捨てて502円",
+      "func": "calculate",
+      "args": [100500, "general"],
+      "expect": { "ok": true, "employee": 502.5, "employeeDeduction": 502 }
+    },
+    {
+      "name": "境界値: 端数が50銭1厘(503.51円)は切り上げて504円",
+      "func": "calculate",
+      "args": [100702, "general"],
+      "expect": { "ok": true, "employee": 503.51, "employeeDeduction": 504 }
+    },
+    {
+      "name": "境界値: 賃金0円なら保険料も0円",
+      "func": "calculate",
+      "args": [0, "general"],
+      "expect": { "ok": true, "employee": 0, "employer": 0, "total": 0, "employeeDeduction": 0 }
+    },
+    {
+      "name": "境界値: 上限の10億円も計算できる(一般の事業・労働者500万円)",
+      "func": "calculate",
+      "args": [1000000000, "general"],
+      "expect": { "ok": true, "employee": 5000000, "employer": 8500000, "total": 13500000 }
+    },
+    {
+      "name": "年額: 月給30万円＋賞与90万円=年収450万円(労働者22,500円・事業主38,250円)",
+      "func": "annual",
+      "args": [300000, 900000, "general"],
+      "expect": { "ok": true, "annualWage": 4500000, "employee": 22500, "employer": 38250, "total": 60750 }
+    },
+    {
+      "name": "年額: 賞与0円でも計算できる(月給20万円・年収240万円)",
+      "func": "annual",
+      "args": [200000, 0, "general"],
+      "expect": { "ok": true, "annualWage": 2400000, "employee": 12000, "employer": 20400 }
+    },
+    {
+      "name": "料率表: 令和8年度は一般13.5・農林水産15.5・建設16.5(いずれも1000分の)",
+      "func": "rateTable",
+      "args": [2026],
+      "expect": {
+        "ok": true, "fiscalYearLabel": "令和8年度",
+        "rows": {
+          "0": { "type": "general", "employee": 5, "employer": 8.5, "total": 13.5 },
+          "1": { "type": "agriculture", "employee": 6, "employer": 9.5, "total": 15.5 },
+          "2": { "type": "construction", "employee": 6, "employer": 10.5, "total": 16.5 },
+          "length": 3
+        }
+      }
+    },
+    {
+      "name": "料率表: 令和7年度は一般14.5・農林水産16.5・建設17.5",
+      "func": "rateTable",
+      "args": [2025],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "0": { "employee": 5.5, "employer": 9, "total": 14.5 },
+          "1": { "employee": 6.5, "employer": 10, "total": 16.5 },
+          "2": { "employee": 6.5, "employer": 11, "total": 17.5 }
+        }
+      }
+    },
+    {
+      "name": "異常入力: 賃金が負の値はエラー",
+      "func": "calculate",
+      "args": [-1, "general"],
+      "expect": { "ok": false, "code": "invalid_wage" }
+    },
+    {
+      "name": "異常入力: 賃金が上限超過(10億円超)はエラー",
+      "func": "calculate",
+      "args": [1000000001, "general"],
+      "expect": { "ok": false, "code": "invalid_wage" }
+    },
+    {
+      "name": "異常入力: 数値でない賃金はエラー",
+      "func": "calculate",
+      "args": ["abc", "general"],
+      "expect": { "ok": false, "code": "invalid_wage" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_wage" }
+    },
+    {
+      "name": "異常入力: 存在しない事業の種類はエラー",
+      "func": "calculate",
+      "args": [300000, "fishing"],
+      "expect": { "ok": false, "code": "invalid_business_type" }
+    },
+    {
+      "name": "異常入力: 対応していない年度(2024)はエラー",
+      "func": "calculate",
+      "args": [300000, "general", 2024],
+      "expect": { "ok": false, "code": "invalid_fiscal_year" }
+    },
+    {
+      "name": "異常入力: 年額計算で賞与が負の値はエラー",
+      "func": "annual",
+      "args": [300000, -100, "general"],
+      "expect": { "ok": false, "code": "invalid_bonus" }
+    },
+    {
+      "name": "異常入力: 料率表で対応していない年度はエラー",
+      "func": "rateTable",
+      "args": [2100],
+      "expect": { "ok": false, "code": "invalid_fiscal_year" }
+    }
+  ]
+}

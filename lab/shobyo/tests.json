@@ -1,0 +1,151 @@
+{
+  "tool": "shobyo",
+  "module": "calc.js",
+  "global": "ShobyoCalc",
+  "cases": [
+    {
+      "name": "代表例: 平均標準報酬月額28万円は日額6,220円(28万÷30=9,333.3→9,330→×2/3)",
+      "func": "dailyAmount",
+      "args": [280000],
+      "expect": { "ok": true, "per30Yen": 9330, "dailyYen": 6220 }
+    },
+    {
+      "name": "代表例: 平均30万円は30分の1が1万円・日額6,667円(50銭以上切上げ)",
+      "func": "dailyAmount",
+      "args": [300000],
+      "expect": { "ok": true, "per30Yen": 10000, "dailyYen": 6667 }
+    },
+    {
+      "name": "端数処理: 平均20万円は6,666.7→10円単位で6,670・日額4,447円",
+      "func": "dailyAmount",
+      "args": [200000],
+      "expect": { "ok": true, "per30Yen": 6670, "dailyYen": 4447 }
+    },
+    {
+      "name": "端数処理: 平均26万円は8,666.7→8,670・日額5,780円(割り切れる)",
+      "func": "dailyAmount",
+      "args": [260000],
+      "expect": { "ok": true, "per30Yen": 8670, "dailyYen": 5780 }
+    },
+    {
+      "name": "端数処理: 5円ちょうどの端数は10円に切上げ(平均28万50円→9,340円)",
+      "func": "dailyAmount",
+      "args": [280050],
+      "expect": { "ok": true, "per30Yen": 9340 }
+    },
+    {
+      "name": "代表例: 平均28万円で28日分は総額174,160円",
+      "func": "calculate",
+      "args": [280000, 28],
+      "expect": { "ok": true, "dailyYen": 6220, "days": 28, "totalYen": 174160 }
+    },
+    {
+      "name": "12か月未満: 平均40万円でも被保険者期間6か月なら32万円で計算(日額7,113円)",
+      "func": "calculate",
+      "args": [400000, 30, 6],
+      "expect": { "ok": true, "baseMonthlyYen": 320000, "usedAllInsuredAverage": true, "per30Yen": 10670, "dailyYen": 7113, "totalYen": 213390 }
+    },
+    {
+      "name": "12か月未満: 平均30万円なら全被保険者平均より低いので30万円のまま",
+      "func": "baseMonthly",
+      "args": [300000, 6, 320000],
+      "expect": { "ok": true, "baseMonthlyYen": 300000, "usedAllInsuredAverage": false }
+    },
+    {
+      "name": "境界値: 被保険者期間ちょうど12か月なら平均額をそのまま使う",
+      "func": "baseMonthly",
+      "args": [400000, 12],
+      "expect": { "ok": true, "baseMonthlyYen": 400000, "usedAllInsuredAverage": false }
+    },
+    {
+      "name": "境界値: 支給日数540日ちょうどは通算1年6月の目安内",
+      "func": "calculate",
+      "args": [300000, 540],
+      "expect": { "ok": true, "overLimit": false, "limitDays": 540, "totalYen": 3600180 }
+    },
+    {
+      "name": "境界値超え: 支給日数541日は通算1年6月の目安を超える",
+      "func": "calculate",
+      "args": [300000, 541],
+      "expect": { "ok": true, "overLimit": true }
+    },
+    {
+      "name": "待期: 7月29日に休み始めると8月1日が支給開始日(待期3日は7月31日まで)",
+      "func": "firstPayableDate",
+      "args": [2026, 7, 29],
+      "expect": { "ok": true, "waitEndIso": "2026-07-31", "firstPayableIso": "2026-08-01" }
+    },
+    {
+      "name": "待期: 月をまたぐ場合(2026年2月26日開始→3月1日から支給)",
+      "func": "firstPayableDate",
+      "args": [2026, 2, 26],
+      "expect": { "ok": true, "waitEndIso": "2026-02-28", "firstPayableIso": "2026-03-01" }
+    },
+    {
+      "name": "待期: うるう年の2月29日をまたぐ(2024年2月26日開始→2月29日から支給)",
+      "func": "firstPayableDate",
+      "args": [2024, 2, 26],
+      "expect": { "ok": true, "firstPayableIso": "2024-02-29", "firstPayableDay": 29 }
+    },
+    {
+      "name": "異常入力: 存在しない日付(2026年2月30日)はエラー",
+      "func": "firstPayableDate",
+      "args": [2026, 2, 30],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 平均標準報酬月額0円はエラー(0除算にしない)",
+      "func": "dailyAmount",
+      "args": [0],
+      "expect": { "ok": false, "code": "invalid_average" }
+    },
+    {
+      "name": "異常入力: 平均標準報酬月額が負の値はエラー",
+      "func": "dailyAmount",
+      "args": [-300000],
+      "expect": { "ok": false, "code": "invalid_average" }
+    },
+    {
+      "name": "異常入力: 数値でない平均額はエラー",
+      "func": "dailyAmount",
+      "args": ["abc"],
+      "expect": { "ok": false, "code": "invalid_average" }
+    },
+    {
+      "name": "異常入力: 平均額が上限超え(1,000万円)はエラー",
+      "func": "dailyAmount",
+      "args": [10000000],
+      "expect": { "ok": false, "code": "invalid_average" }
+    },
+    {
+      "name": "異常入力: 支給日数0日はエラー",
+      "func": "calculate",
+      "args": [300000, 0],
+      "expect": { "ok": false, "code": "invalid_days" }
+    },
+    {
+      "name": "異常入力: 支給日数が上限超え(1,001日)はエラー",
+      "func": "calculate",
+      "args": [300000, 1001],
+      "expect": { "ok": false, "code": "invalid_days" }
+    },
+    {
+      "name": "異常入力: 被保険者期間0か月はエラー",
+      "func": "baseMonthly",
+      "args": [300000, 0],
+      "expect": { "ok": false, "code": "invalid_months" }
+    },
+    {
+      "name": "異常入力: 全被保険者平均額が0円ならエラー",
+      "func": "baseMonthly",
+      "args": [300000, 6, 0],
+      "expect": { "ok": false, "code": "invalid_all_insured_average" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_average" }
+    }
+  ]
+}

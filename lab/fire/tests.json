@@ -1,0 +1,133 @@
+{
+  "tool": "fire",
+  "module": "calc.js",
+  "global": "FireCalc",
+  "cases": [
+    {
+      "name": "4%ルールの代表例: 年間支出300万円は25倍の7500万円",
+      "func": "required",
+      "args": [300, 4],
+      "expect": { "ok": true, "requiredMan": 7500, "multiple": 25, "monthlyExpenseMan": 25 }
+    },
+    {
+      "name": "3.5%ルール: 年間支出300万円は約28.6倍の8571.4万円",
+      "func": "required",
+      "args": [300, 3.5],
+      "expect": { "ok": true, "requiredMan": 8571.4, "multiple": 28.6 }
+    },
+    {
+      "name": "3%ルール: 年間支出300万円は約33.3倍の1億円",
+      "func": "required",
+      "args": [300, 3],
+      "expect": { "ok": true, "requiredMan": 10000, "multiple": 33.3 }
+    },
+    {
+      "name": "境界値: 取り崩し率の下限0.1%は1000倍",
+      "func": "required",
+      "args": [300, 0.1],
+      "expect": { "ok": true, "requiredMan": 300000, "multiple": 1000 }
+    },
+    {
+      "name": "境界値: 取り崩し率の上限20%は5倍",
+      "func": "required",
+      "args": [300, 20],
+      "expect": { "ok": true, "requiredMan": 1500, "multiple": 5 }
+    },
+    {
+      "name": "異常入力: 年間支出0はエラー",
+      "func": "required",
+      "args": [0, 4],
+      "expect": { "ok": false, "code": "invalid_expense" }
+    },
+    {
+      "name": "異常入力: 年間支出が数値でないときはエラー",
+      "func": "required",
+      "args": ["abc", 4],
+      "expect": { "ok": false, "code": "invalid_expense" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "required",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_expense" }
+    },
+    {
+      "name": "異常入力: 取り崩し率0はエラー(0除算にしない)",
+      "func": "required",
+      "args": [300, 0],
+      "expect": { "ok": false, "code": "invalid_rate" }
+    },
+    {
+      "name": "異常入力: 取り崩し率が上限超(20.1%)はエラー",
+      "func": "required",
+      "args": [300, 20.1],
+      "expect": { "ok": false, "code": "invalid_rate" }
+    },
+    {
+      "name": "達成年数: 目標7500万・現在1000万・年200万積立・利回り5%は17.1年",
+      "func": "simulate",
+      "args": [300, 4, 1000, 200, 5],
+      "expect": { "ok": true, "requiredMan": 7500, "years": 17.1, "shortfallMan": 6500, "alreadyReached": false }
+    },
+    {
+      "name": "達成年数: 目標6000万・資産ゼロから年100万積立・利回り5%は28.4年",
+      "func": "simulate",
+      "args": [240, 4, 0, 100, 5],
+      "expect": { "ok": true, "requiredMan": 6000, "years": 28.4 }
+    },
+    {
+      "name": "境界値: 利回り0%なら単純な割り算で20年",
+      "func": "simulate",
+      "args": [300, 4, 1500, 300, 0],
+      "expect": { "ok": true, "years": 20, "months": 240 }
+    },
+    {
+      "name": "境界値: すでに必要資産に届いているなら0年",
+      "func": "simulate",
+      "args": [300, 4, 8000, 0, 5],
+      "expect": { "ok": true, "years": 0, "shortfallMan": 0, "alreadyReached": true }
+    },
+    {
+      "name": "異常系: 利回り0%・積立0では永久に届かない",
+      "func": "simulate",
+      "args": [300, 4, 0, 0, 0],
+      "expect": { "ok": false, "code": "unreachable" }
+    },
+    {
+      "name": "異常入力: 現在資産が負の値はエラー",
+      "func": "simulate",
+      "args": [300, 4, -1, 100, 5],
+      "expect": { "ok": false, "code": "invalid_current" }
+    },
+    {
+      "name": "異常入力: 積立額が負の値はエラー",
+      "func": "simulate",
+      "args": [300, 4, 100, -1, 5],
+      "expect": { "ok": false, "code": "invalid_save" }
+    },
+    {
+      "name": "異常入力: 利回りが範囲外(31%)はエラー",
+      "func": "simulate",
+      "args": [300, 4, 100, 100, 31],
+      "expect": { "ok": false, "code": "invalid_return" }
+    },
+    {
+      "name": "支出削減の効果: 月1万円減らすと4%ルールで必要資産が300万円下がる",
+      "func": "impactOfMonthlyCut",
+      "args": [1, 4],
+      "expect": { "ok": true, "annualCutMan": 12, "reducedMan": 300 }
+    },
+    {
+      "name": "支出削減の効果: 月1万円減らすと3.5%ルールで342.9万円下がる",
+      "func": "impactOfMonthlyCut",
+      "args": [1, 3.5],
+      "expect": { "ok": true, "reducedMan": 342.9 }
+    },
+    {
+      "name": "異常入力: 削減額0はエラー",
+      "func": "impactOfMonthlyCut",
+      "args": [0, 4],
+      "expect": { "ok": false, "code": "invalid_cut" }
+    }
+  ]
+}

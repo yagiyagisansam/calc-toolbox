@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>ガチャ確率・期待課金額 計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="排出率と引く回数から当たる確率を計算し、天井までの期待回数と期待課金額を出す計算機。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>ガチャ確率・期待課金額 計算</h1>
+  <form class="tool-form" id="tool-form">
+    <div class="field-row">
+      <label>排出率(%)
+        <span class="field-note">例: 3(3%のとき)</span>
+        <input type="number" id="rate" inputmode="decimal" step="any" min="0" max="100" placeholder="3">
+      </label>
+      <label>引く回数
+        <span class="field-note">例: 100</span>
+        <input type="number" id="pulls" inputmode="numeric" step="1" min="1" max="100000" placeholder="100">
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 天井までの期待課金額・複数個ほしいとき・目標確率</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">天井までの期待回数と期待課金額</h3>
+      <p class="adv-note">「当たるか天井に達するまで引き続ける」と決めたときに、平均で何回・いくらかかるかを出します。</p>
+      <div class="field-row">
+        <label>天井回数
+          <input type="number" id="pity" inputmode="numeric" step="1" min="1" max="100000" placeholder="200">
+        </label>
+        <label>1回あたりの課金額(円)
+          <input type="number" id="cost" inputmode="numeric" step="1" min="0" max="10000000" placeholder="300">
+        </label>
+      </div>
+      <div class="tool-result" id="adv-cost" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">欲しい個数が2個以上のとき</h3>
+      <p class="adv-note">上で入れた排出率・引く回数のまま、指定した個数以上そろう確率を出します。</p>
+      <label>欲しい個数
+        <input type="number" id="want" inputmode="numeric" step="1" min="1" max="1000" placeholder="2">
+      </label>
+      <div class="tool-result" id="adv-count" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">目標の確率にするには何回引けばよいか</h3>
+      <p class="adv-note">「最低でも90%は当てたい」といった目標から、必要な回数を逆算します。</p>
+      <label>目標にする確率(%)
+        <input type="number" id="target" inputmode="decimal" step="any" min="0" max="100" placeholder="90">
+      </label>
+      <div class="tool-result" id="adv-target" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    この結果は<strong>毎回の排出率が一定で、前の結果に影響されない</strong>という前提での確率です。実際のゲームには公表されていない仕組み(引くほど確率が上がる等)がある場合があり、そのときは数値がずれます。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>「排出率1%を100連すればほぼ確実」という思い込みが正しいかどうかがわかります。実際は<strong>約63%</strong>で、4割近い人は1つも当たりません。引く前に上限額を決めるための材料としてお使いください。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>排出率(%)と引く回数を入れると、その瞬間に「1回以上当たる確率」が表示されます。ボタンは不要です。</li>
+    <li>いくらかかるかを知りたいときは「＋詳細機能」を開き、天井回数と1回あたりの課金額を入れてください。</li>
+    <li>同じ場所で「2個以上ほしいときの確率」「目標の確率に必要な回数」も計算できます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>n回で1回以上当たる確率</strong> = 1 −(1 − p)<sup>n</sup>(p は排出率、n は引く回数)</li>
+    <li><strong>k個以上そろう確率</strong> = 1 − Σ<sub>i=0..k−1</sub> <sub>n</sub>C<sub>i</sub> p<sup>i</sup>(1 − p)<sup>n−i</sup>(二項分布の上側累積)</li>
+    <li><strong>天井が無いときの期待回数</strong> = 1 ÷ p(幾何分布の平均)</li>
+    <li><strong>天井N回を考えた期待回数</strong> = Σ<sub>k=0..N−1</sub>(1 − p)<sup>k</sup> =(1 −(1 − p)<sup>N</sup>)÷ p</li>
+    <li><strong>期待課金額</strong> = 天井を考えた期待回数 × 1回あたりの課金額</li>
+    <li><strong>目標確率tに必要な回数</strong> = ln(1 − t)÷ ln(1 − p)を切り上げた整数</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>排出率ごとの「1回以上当たる確率」の目安</caption>
+      <thead><tr><th>排出率</th><th>10回</th><th>50回</th><th>100回</th><th>200回</th></tr></thead>
+      <tbody>
+        <tr><td>0.6%</td><td>5.8%</td><td>26.0%</td><td>45.2%</td><td>70.0%</td></tr>
+        <tr><td>1%</td><td>9.6%</td><td>39.5%</td><td>63.4%</td><td>86.6%</td></tr>
+        <tr><td>3%</td><td>26.3%</td><td>78.2%</td><td>95.2%</td><td>99.8%</td></tr>
+        <tr><td>5%</td><td>40.1%</td><td>92.3%</td><td>99.4%</td><td>100.0%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>ガチャ確率の数学(二項分布・天井)の解説。1 −(1 − p)<sup>n</sup> の式、排出率3%×33回=63.40%、2個以上=26.05%の数値を本ツールの計算と照合しています<br>
+      <a href="https://nandemo-tools.com/blog/gacha-probability-math-pity-binomial" rel="noopener" target="_blank">https://nandemo-tools.com/blog/gacha-probability-math-pity-binomial</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>各回の抽選が独立で、排出率が最初から最後まで一定であるという前提の計算です。ゲームによっては「一定回数ごとに確率が上がる(ソフト天井)」などの仕組みがあり、その場合の実際の確率とはずれます。</li>
+    <li>排出率はゲーム内の表記(ピックアップ対象だけの率か、同じレアリティ全体の率か)をよく確認してください。「★5全体で3%、そのうち目的のキャラは0.6%」のような表記が多くあります。</li>
+    <li>天井は「N回引けば必ず1個手に入る」確定天井のみを扱います。「天井で手に入るのは交換用アイテム」といった方式は対象外です。</li>
+    <li>期待課金額は<strong>平均</strong>です。実際に必要な額は運によって大きく上下し、平均より少なく済む人のほうが多くなります(中央値は平均より小さくなります)。</li>
+    <li>このツールは支出を判断するための参考値で、課金を勧めるものではありません。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">排出率1%を100連すれば必ず当たりますか?</h3>
+  <p class="faq-a">当たりません。1回以上当たる確率は約63.4%で、約36.6%の人は100連しても1つも当たりません。</p>
+  <h3 class="faq-q">なぜ「期待回数1÷p」と「天井を考えた期待回数」が違うのですか?</h3>
+  <p class="faq-a">1÷p は天井が無く無限に引ける場合の平均です。天井があると、それより多く引くことがなくなるため期待回数は小さくなります。</p>
+  <h3 class="faq-q">10連ガチャと単発10回で確率は変わりますか?</h3>
+  <p class="faq-a">1回ごとの排出率が同じなら変わりません。ただし「10連には★5が1つ確定」といった仕組みがある場合は、このツールの前提から外れます。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_rate: "排出率は0より大きく100以下の数値で入れてください。",
+    invalid_pulls: "引く回数は1〜100000の整数で入れてください。",
+    invalid_count: "欲しい個数は1以上、引く回数以下の整数で入れてください。",
+    invalid_pity: "天井回数は1〜100000の整数で入れてください。",
+    invalid_cost: "1回あたりの課金額は0円以上で入れてください。",
+    invalid_target: "目標の確率は0より大きく100未満で入れてください。",
+    out_of_range: "必要な回数が多すぎて計算できません。"
+  };
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function el(id) { return document.getElementById(id); }
+  function num(id) { var v = el(id).value; return v === "" ? NaN : parseFloat(v); }
+  function intOf(id) { var v = el(id).value; return v === "" ? NaN : parseInt(v, 10); }
+  function yen(n) { return n.toLocaleString("ja-JP"); }
+  function show(box, r, build) {
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML = build(r);
+    box.hidden = false;
+  }
+
+  var rateEl = el("rate"), pullsEl = el("pulls");
+  var boxMain = el("result");
+
+  function runMain() {
+    if (rateEl.value === "" || pullsEl.value === "") { boxMain.hidden = true; return; }
+    var r = GachaCalc.hitProbability(num("rate"), intOf("pulls"));
+    show(boxMain, r, function (v) {
+      return '<div class="result-main">1回以上当たる確率 ' + esc(v.percent.toFixed(2)) + "%</div>" +
+        "<p>1つも当たらない確率: " + esc(v.missPercent.toFixed(2)) + "% / 当たる個数の平均: " +
+        esc(v.expectedHits.toFixed(2)) + "個</p>";
+    });
+  }
+
+  function runCost() {
+    var box = el("adv-cost");
+    if (rateEl.value === "" || el("pity").value === "" || el("cost").value === "") { box.hidden = true; return; }
+    var r = GachaCalc.expected(num("rate"), intOf("pity"), num("cost"));
+    show(box, r, function (v) {
+      return '<div class="result-main">期待課金額 約' + esc(yen(v.expectedCost)) + "円</div>" +
+        "<p>平均で引く回数: 約" + esc(v.expectedPulls.toFixed(1)) + "回" +
+        "(天井が無い場合は約" + esc(v.expectedPullsNoPity.toFixed(1)) + "回)</p>" +
+        "<p>天井まで引くことになる確率: " + esc(v.pityReachPercent.toFixed(2)) + "% / " +
+        "天井まで引いた場合の上限額: " + esc(yen(v.maxCost)) + "円</p>";
+    });
+  }
+
+  function runCount() {
+    var box = el("adv-count");
+    if (rateEl.value === "" || pullsEl.value === "" || el("want").value === "") { box.hidden = true; return; }
+    var r = GachaCalc.atLeastCount(num("rate"), intOf("pulls"), intOf("want"));
+    show(box, r, function (v) {
+      return '<div class="result-main">' + esc(el("want").value) + "個以上そろう確率 " +
+        esc(v.percent.toFixed(2)) + "%</div>";
+    });
+  }
+
+  function runTarget() {
+    var box = el("adv-target");
+    if (rateEl.value === "" || el("target").value === "") { box.hidden = true; return; }
+    var r = GachaCalc.pullsForProbability(num("rate"), num("target"));
+    show(box, r, function (v) {
+      return '<div class="result-main">' + esc(String(v.pulls)) + "回</div>" +
+        "<p>この回数で当たる確率は " + esc(v.actualPercent.toFixed(2)) + "% になります。</p>";
+    });
+  }
+
+  function runAll() { runMain(); runCost(); runCount(); runTarget(); }
+  ["rate", "pulls", "pity", "cost", "want", "target"].forEach(function (id) {
+    el(id).addEventListener("input", runAll);
+  });
+  el("tool-form").addEventListener("submit", function (e) { e.preventDefault(); runAll(); });
+})();
+</script>
+</body>
+</html>

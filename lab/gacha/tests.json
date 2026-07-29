@@ -1,0 +1,182 @@
+{
+  "tool": "gacha",
+  "module": "calc.js",
+  "global": "GachaCalc",
+  "cases": [
+    {
+      "name": "代表例: 排出率1%を100回で1回以上当たる確率は63.4%(1-0.99^100)",
+      "func": "hitProbability",
+      "args": [1, 100],
+      "expect": { "ok": true, "percent": 63.4, "missPercent": 36.6, "expectedHits": 1 }
+    },
+    {
+      "name": "代表例: 排出率3%を33回でも63.4%(出典の例と一致)",
+      "func": "hitProbability",
+      "args": [3, 33],
+      "expect": { "ok": true, "percent": 63.4, "missPercent": 36.6 }
+    },
+    {
+      "name": "境界値: 排出率100%(上限)は1回で必ず当たる",
+      "func": "hitProbability",
+      "args": [100, 1],
+      "expect": { "ok": true, "percent": 100, "missPercent": 0 }
+    },
+    {
+      "name": "境界値: 引く回数1回(下限)なら確率は排出率そのもの",
+      "func": "hitProbability",
+      "args": [50, 1],
+      "expect": { "ok": true, "percent": 50, "missPercent": 50 }
+    },
+    {
+      "name": "異常系: 排出率0%はエラー",
+      "func": "hitProbability",
+      "args": [0, 100],
+      "expect": { "ok": false, "code": "invalid_rate" }
+    },
+    {
+      "name": "異常系: 排出率が100%超はエラー",
+      "func": "hitProbability",
+      "args": [101, 100],
+      "expect": { "ok": false, "code": "invalid_rate" }
+    },
+    {
+      "name": "異常系: 排出率が負の値はエラー",
+      "func": "hitProbability",
+      "args": [-1, 100],
+      "expect": { "ok": false, "code": "invalid_rate" }
+    },
+    {
+      "name": "異常系: 排出率が数値でないときはエラー",
+      "func": "hitProbability",
+      "args": ["abc", 100],
+      "expect": { "ok": false, "code": "invalid_rate" }
+    },
+    {
+      "name": "異常系: 引く回数0回はエラー",
+      "func": "hitProbability",
+      "args": [1, 0],
+      "expect": { "ok": false, "code": "invalid_pulls" }
+    },
+    {
+      "name": "異常系: 引く回数が小数はエラー",
+      "func": "hitProbability",
+      "args": [1, 10.5],
+      "expect": { "ok": false, "code": "invalid_pulls" }
+    },
+    {
+      "name": "異常系: 引く回数が上限(100000)超はエラー",
+      "func": "hitProbability",
+      "args": [1, 100001],
+      "expect": { "ok": false, "code": "invalid_pulls" }
+    },
+    {
+      "name": "個数指定: 3%を33回で1個以上は63.4%(1個以上は基本計算と一致)",
+      "func": "atLeastCount",
+      "args": [3, 33, 1],
+      "expect": { "ok": true, "percent": 63.4 }
+    },
+    {
+      "name": "個数指定: 3%を33回で2個以上は26.05%(出典の例と一致)",
+      "func": "atLeastCount",
+      "args": [3, 33, 2],
+      "expect": { "ok": true, "percent": 26.05 }
+    },
+    {
+      "name": "境界値: 排出率100%なら5回で5個以上は100%",
+      "func": "atLeastCount",
+      "args": [100, 5, 5],
+      "expect": { "ok": true, "percent": 100 }
+    },
+    {
+      "name": "異常系: 欲しい個数が引く回数より多いときはエラー",
+      "func": "atLeastCount",
+      "args": [3, 10, 11],
+      "expect": { "ok": false, "code": "invalid_count" }
+    },
+    {
+      "name": "異常系: 欲しい個数0はエラー",
+      "func": "atLeastCount",
+      "args": [3, 10, 0],
+      "expect": { "ok": false, "code": "invalid_count" }
+    },
+    {
+      "name": "期待値: 1%・天井100回・1回300円なら期待63.4回・19019円・天井到達36.6%",
+      "func": "expected",
+      "args": [1, 100, 300],
+      "expect": {
+        "ok": true,
+        "expectedPullsNoPity": 100,
+        "expectedPulls": 63.4,
+        "expectedCost": 19019,
+        "maxCost": 30000,
+        "pityReachPercent": 36.6
+      }
+    },
+    {
+      "name": "期待値: 3%・天井200回なら天井到達はほぼ無く期待回数は1/p(33.33)に近い",
+      "func": "expected",
+      "args": [3, 200, 300],
+      "expect": { "ok": true, "expectedPullsNoPity": 33.33, "expectedPulls": 33.26, "pityReachPercent": 0.23 }
+    },
+    {
+      "name": "境界値: 天井1回(下限)なら必ず1回で終わり課金額は1回分",
+      "func": "expected",
+      "args": [1, 1, 300],
+      "expect": { "ok": true, "expectedPulls": 1, "expectedCost": 300, "maxCost": 300 }
+    },
+    {
+      "name": "境界値: 1回あたり課金額0円でも計算でき期待課金額は0円",
+      "func": "expected",
+      "args": [1, 100, 0],
+      "expect": { "ok": true, "expectedCost": 0, "maxCost": 0 }
+    },
+    {
+      "name": "異常系: 1回あたり課金額が負の値はエラー",
+      "func": "expected",
+      "args": [1, 100, -1],
+      "expect": { "ok": false, "code": "invalid_cost" }
+    },
+    {
+      "name": "異常系: 天井回数0はエラー",
+      "func": "expected",
+      "args": [1, 0, 300],
+      "expect": { "ok": false, "code": "invalid_pity" }
+    },
+    {
+      "name": "必要回数: 1%で50%以上にするには69回(実際は50.02%)",
+      "func": "pullsForProbability",
+      "args": [1, 50],
+      "expect": { "ok": true, "pulls": 69, "actualPercent": 50.02 }
+    },
+    {
+      "name": "必要回数: 3%で90%以上にするには76回",
+      "func": "pullsForProbability",
+      "args": [3, 90],
+      "expect": { "ok": true, "pulls": 76, "actualPercent": 90.12 }
+    },
+    {
+      "name": "必要回数: 50%で99%以上にするには7回(0.5^7=0.78%が外れ)",
+      "func": "pullsForProbability",
+      "args": [50, 99],
+      "expect": { "ok": true, "pulls": 7, "actualPercent": 99.22 }
+    },
+    {
+      "name": "異常系: 目標確率100%は到達できないのでエラー",
+      "func": "pullsForProbability",
+      "args": [1, 100],
+      "expect": { "ok": false, "code": "invalid_target" }
+    },
+    {
+      "name": "異常系: 目標確率0%はエラー",
+      "func": "pullsForProbability",
+      "args": [1, 0],
+      "expect": { "ok": false, "code": "invalid_target" }
+    },
+    {
+      "name": "異常系: 引数なしはエラー",
+      "func": "hitProbability",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_rate" }
+    }
+  ]
+}

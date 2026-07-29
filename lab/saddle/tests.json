@@ -1,0 +1,157 @@
+{
+  "tool": "saddle",
+  "module": "calc.js",
+  "global": "SaddleCalc",
+  "cases": [
+    {
+      "name": "代表例: 股下80cm×0.885(ルモン方式)=708mm(クランク170mm)",
+      "func": "saddleHeight",
+      "args": [80],
+      "expect": { "ok": true, "heightMm": 708, "heightCm": 70.8, "baseHeightMm": 708, "crankAdjustMm": 0 }
+    },
+    {
+      "name": "係数を0.875に下げると股下80cmで700mm",
+      "func": "saddleHeight",
+      "args": [80, 0.875],
+      "expect": { "ok": true, "heightMm": 700, "heightCm": 70 }
+    },
+    {
+      "name": "クランク補正: 172.5mmは170mm基準より2.5mm低く706mm",
+      "func": "saddleHeight",
+      "args": [80, 0.885, 172.5],
+      "expect": { "ok": true, "heightMm": 706, "crankAdjustMm": -2.5 }
+    },
+    {
+      "name": "クランク補正: 165mmは170mm基準より5mm高い(股下75cmで669mm)",
+      "func": "saddleHeight",
+      "args": [75, 0.885, 165],
+      "expect": { "ok": true, "heightMm": 669, "baseHeightMm": 664, "crankAdjustMm": 5 }
+    },
+    {
+      "name": "下死点のペダル軸〜サドル上面 = サドル高+クランク長(708+170=878mm)",
+      "func": "saddleHeight",
+      "args": [80],
+      "expect": { "ok": true, "pedalToSaddleMm": 878 }
+    },
+    {
+      "name": "境界値: 股下50cm(下限)ちょうどは443mm",
+      "func": "saddleHeight",
+      "args": [50],
+      "expect": { "ok": true, "heightMm": 443 }
+    },
+    {
+      "name": "境界値: 股下110cm(上限)ちょうどは974mm",
+      "func": "saddleHeight",
+      "args": [110],
+      "expect": { "ok": true, "heightMm": 974 }
+    },
+    {
+      "name": "異常系: 股下が下限未満(49cm)はエラー",
+      "func": "saddleHeight",
+      "args": [49],
+      "expect": { "ok": false, "code": "invalid_inseam" }
+    },
+    {
+      "name": "異常系: 股下が上限超(111cm)はエラー",
+      "func": "saddleHeight",
+      "args": [111],
+      "expect": { "ok": false, "code": "invalid_inseam" }
+    },
+    {
+      "name": "異常系: 股下0はエラー",
+      "func": "saddleHeight",
+      "args": [0],
+      "expect": { "ok": false, "code": "invalid_inseam" }
+    },
+    {
+      "name": "異常系: 股下が負の値はエラー",
+      "func": "saddleHeight",
+      "args": [-80],
+      "expect": { "ok": false, "code": "invalid_inseam" }
+    },
+    {
+      "name": "異常系: 股下が数値でないときはエラー",
+      "func": "saddleHeight",
+      "args": ["abc"],
+      "expect": { "ok": false, "code": "invalid_inseam" }
+    },
+    {
+      "name": "異常系: 係数が範囲外(0.99)はエラー",
+      "func": "saddleHeight",
+      "args": [80, 0.99],
+      "expect": { "ok": false, "code": "invalid_ratio" }
+    },
+    {
+      "name": "異常系: 係数0はエラー",
+      "func": "saddleHeight",
+      "args": [80, 0],
+      "expect": { "ok": false, "code": "invalid_ratio" }
+    },
+    {
+      "name": "異常系: クランク長が範囲外(210mm)はエラー",
+      "func": "saddleHeight",
+      "args": [80, 0.885, 210],
+      "expect": { "ok": false, "code": "invalid_crank" }
+    },
+    {
+      "name": "境界値: クランク長140mm(下限)は有効で708+30=738mm",
+      "func": "saddleHeight",
+      "args": [80, 0.885, 140],
+      "expect": { "ok": true, "heightMm": 738, "crankAdjustMm": 30 }
+    },
+    {
+      "name": "範囲: 股下80cmは0.875〜0.885で700〜708mm",
+      "func": "heightRange",
+      "args": [80],
+      "expect": { "ok": true, "lowMm": 700, "highMm": 708, "lowRatio": 0.875, "highRatio": 0.885 }
+    },
+    {
+      "name": "範囲: クランク165mm・股下75cmは661〜669mm",
+      "func": "heightRange",
+      "args": [75, 165],
+      "expect": { "ok": true, "lowMm": 661, "highMm": 669 }
+    },
+    {
+      "name": "異常系: 範囲計算でも股下が範囲外ならエラー",
+      "func": "heightRange",
+      "args": [200],
+      "expect": { "ok": false, "code": "invalid_inseam" }
+    },
+    {
+      "name": "逆算: 股下80cmでサドル高708mmなら係数0.885・ルモン方式と同じ",
+      "func": "ratioFromHeight",
+      "args": [80, 708],
+      "expect": { "ok": true, "ratio": 0.885, "diffFromLemondMm": 0 }
+    },
+    {
+      "name": "逆算: 股下80cmでサドル高700mmなら係数0.875・ルモンより8mm低い",
+      "func": "ratioFromHeight",
+      "args": [80, 700],
+      "expect": { "ok": true, "ratio": 0.875, "diffFromLemondMm": -8 }
+    },
+    {
+      "name": "逆算: クランク172.5mmで705.5mmならクランク補正を戻して係数0.885",
+      "func": "ratioFromHeight",
+      "args": [80, 705.5, 172.5],
+      "expect": { "ok": true, "ratio": 0.885 }
+    },
+    {
+      "name": "異常系: 逆算でサドル高が範囲外(1200mm)はエラー",
+      "func": "ratioFromHeight",
+      "args": [80, 1200],
+      "expect": { "ok": false, "code": "invalid_height" }
+    },
+    {
+      "name": "異常系: 逆算でサドル高0はエラー",
+      "func": "ratioFromHeight",
+      "args": [80, 0],
+      "expect": { "ok": false, "code": "invalid_height" }
+    },
+    {
+      "name": "異常系: 引数なしはエラー",
+      "func": "saddleHeight",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_inseam" }
+    }
+  ]
+}

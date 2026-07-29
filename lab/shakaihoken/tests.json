@@ -1,0 +1,175 @@
+{
+  "tool": "shakaihoken",
+  "module": "calc.js",
+  "global": "ShakaihokenCalc",
+  "cases": [
+    {
+      "name": "東京都・月給30万円・35歳: 標準報酬月額30万(第22級)、健康保険14,775円・厚生年金27,450円",
+      "func": "calculate",
+      "args": [300000, "tokyo", 35],
+      "expect": {
+        "ok": true,
+        "grade": 22,
+        "standard": 300000,
+        "pensionGrade": 19,
+        "pensionStandard": 300000,
+        "careApplies": false,
+        "employee": { "health": 14775, "care": 0, "child": 345, "pension": 27450, "total": 42570 },
+        "total": { "health": 29550, "child": 690, "pension": 54900 }
+      }
+    },
+    {
+      "name": "東京都・月給30万円・45歳: 介護保険料2,430円が加わり本人負担合計45,000円",
+      "func": "calculate",
+      "args": [300000, "tokyo", 45],
+      "expect": {
+        "ok": true,
+        "careApplies": true,
+        "rates": { "health": 9.85, "care": 1.62, "child": 0.23, "pension": 18.3 },
+        "employee": { "health": 14775, "care": 2430, "child": 345, "pension": 27450, "total": 45000 }
+      }
+    },
+    {
+      "name": "大阪府・月給30万円・35歳: 料率10.13%で健康保険15,195円",
+      "func": "calculate",
+      "args": [300000, "osaka", 35],
+      "expect": {
+        "ok": true,
+        "rates": { "health": 10.13 },
+        "employee": { "health": 15195, "child": 345, "pension": 27450, "total": 42990 }
+      }
+    },
+    {
+      "name": "端数処理: 第1級58,000円は折半額2,856.5円→50銭以下で切り捨て2,856円、支援金66.7円→切り上げ67円",
+      "func": "calculate",
+      "args": [58000, "tokyo", 35],
+      "expect": {
+        "ok": true,
+        "grade": 1,
+        "standard": 58000,
+        "pensionGrade": 1,
+        "pensionStandard": 88000,
+        "employee": { "health": 2856, "child": 67, "pension": 8052, "total": 10975 }
+      }
+    },
+    {
+      "name": "境界値: 報酬月額63,000円ちょうどは第2級(標準報酬月額68,000円)",
+      "func": "standardMonthly",
+      "args": [63000],
+      "expect": { "ok": true, "grade": 2, "standard": 68000 }
+    },
+    {
+      "name": "境界値: 報酬月額62,999円は第1級(標準報酬月額58,000円)",
+      "func": "standardMonthly",
+      "args": [62999],
+      "expect": { "ok": true, "grade": 1, "standard": 58000 }
+    },
+    {
+      "name": "境界値: 報酬月額1,355,000円ちょうどは最上級の第50級(1,390,000円)",
+      "func": "standardMonthly",
+      "args": [1355000],
+      "expect": { "ok": true, "grade": 50, "standard": 1390000, "pensionGrade": 32, "pensionStandard": 650000 }
+    },
+    {
+      "name": "上限: 月給150万円でも厚生年金の標準報酬月額は650,000円で頭打ち(本人負担59,475円)",
+      "func": "calculate",
+      "args": [1500000, "tokyo", 35],
+      "expect": {
+        "ok": true,
+        "grade": 50,
+        "standard": 1390000,
+        "pensionStandard": 650000,
+        "employee": { "health": 68457, "child": 1598, "pension": 59475 }
+      }
+    },
+    {
+      "name": "境界値: 40歳ちょうどは介護保険第2号被保険者に該当する",
+      "func": "calculate",
+      "args": [300000, "tokyo", 40],
+      "expect": { "ok": true, "careApplies": true, "employee": { "care": 2430 } }
+    },
+    {
+      "name": "境界値: 39歳は介護保険料がかからない",
+      "func": "calculate",
+      "args": [300000, "tokyo", 39],
+      "expect": { "ok": true, "careApplies": false, "employee": { "care": 0 } }
+    },
+    {
+      "name": "境界値: 65歳ちょうどは介護保険第2号を外れ、給与からの介護保険料は0円",
+      "func": "calculate",
+      "args": [300000, "tokyo", 65],
+      "expect": { "ok": true, "careApplies": false, "employee": { "care": 0, "pension": 27450 } }
+    },
+    {
+      "name": "境界値: 70歳ちょうどは厚生年金の被保険者でなくなり保険料0円",
+      "func": "calculate",
+      "args": [300000, "tokyo", 70],
+      "expect": {
+        "ok": true,
+        "pensionApplies": false,
+        "pensionGrade": null,
+        "employee": { "pension": 0, "health": 14775, "total": 15120 }
+      }
+    },
+    {
+      "name": "料率参照: 沖縄県は令和8年度9.44%(全国で最も低い)",
+      "func": "prefectureRate",
+      "args": ["okinawa"],
+      "expect": { "ok": true, "rate": 9.44 }
+    },
+    {
+      "name": "料率参照: 佐賀県は令和8年度10.55%(全国で最も高い)",
+      "func": "prefectureRate",
+      "args": ["saga"],
+      "expect": { "ok": true, "rate": 10.55 }
+    },
+    {
+      "name": "年間目安: 東京都・月給30万円・45歳は月45,000円→年540,000円(賞与分を除く)",
+      "func": "yearlyEmployee",
+      "args": [300000, "tokyo", 45],
+      "expect": { "ok": true, "monthly": 45000, "yearly": 540000 }
+    },
+    {
+      "name": "異常入力: 報酬月額が負の値はエラー",
+      "func": "calculate",
+      "args": [-1, "tokyo", 35],
+      "expect": { "ok": false, "code": "invalid_reward" }
+    },
+    {
+      "name": "異常入力: 報酬月額が数値でないときはエラー",
+      "func": "calculate",
+      "args": ["abc", "tokyo", 35],
+      "expect": { "ok": false, "code": "invalid_reward" }
+    },
+    {
+      "name": "異常入力: 報酬月額が範囲超過(3,000万円)はエラー",
+      "func": "calculate",
+      "args": [30000000, "tokyo", 35],
+      "expect": { "ok": false, "code": "invalid_reward" }
+    },
+    {
+      "name": "異常入力: 存在しない都道府県キーはエラー",
+      "func": "calculate",
+      "args": [300000, "atlantis", 35],
+      "expect": { "ok": false, "code": "invalid_prefecture" }
+    },
+    {
+      "name": "異常入力: 年齢が負の値はエラー",
+      "func": "calculate",
+      "args": [300000, "tokyo", -1],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_reward" }
+    },
+    {
+      "name": "異常入力: 標準報酬月額の判定に文字列を渡すとエラー",
+      "func": "standardMonthly",
+      "args": ["300000"],
+      "expect": { "ok": false, "code": "invalid_reward" }
+    }
+  ]
+}

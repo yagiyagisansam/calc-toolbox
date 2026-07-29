@@ -1,0 +1,180 @@
+{
+  "tool": "inshizei",
+  "module": "calc.js",
+  "global": "InshizeiCalc",
+  "cases": [
+    {
+      "name": "第1号文書: 記載金額1万円未満は非課税",
+      "func": "calculate",
+      "args": ["1", 9999],
+      "expect": { "ok": true, "tax": 0, "exempt": true }
+    },
+    {
+      "name": "境界値: 第1号文書の1万円ちょうどは200円(非課税の境目)",
+      "func": "calculate",
+      "args": ["1", 10000],
+      "expect": { "ok": true, "tax": 200, "exempt": false, "bracketMin": 10000, "bracketMax": 100000 }
+    },
+    {
+      "name": "境界値: 第1号文書の10万円ちょうどは200円、10万1円は400円",
+      "func": "calculate",
+      "args": ["1", 100001],
+      "expect": { "ok": true, "tax": 400, "bracketMin": 100001, "bracketMax": 500000 }
+    },
+    {
+      "name": "第1号文書: 5,000万円ちょうどは2万円(1千万円超5千万円以下の区分)",
+      "func": "calculate",
+      "args": ["1", 50000000],
+      "expect": { "ok": true, "tax": 20000, "bracketMin": 10000001, "bracketMax": 50000000 }
+    },
+    {
+      "name": "境界値: 第1号文書の50億円超は最高額60万円",
+      "func": "calculate",
+      "args": ["1", 5000000001],
+      "expect": { "ok": true, "tax": 600000, "bracketMax": null }
+    },
+    {
+      "name": "軽減措置: 不動産譲渡5,000万円は本則2万円→軽減1万円",
+      "func": "calculate",
+      "args": ["1", 50000000, true],
+      "expect": { "ok": true, "tax": 10000, "normalTax": 20000, "saving": 10000, "reducedApplied": true }
+    },
+    {
+      "name": "軽減措置: 不動産譲渡1,000万円は本則1万円→軽減5千円",
+      "func": "calculate",
+      "args": ["1", 10000000, true],
+      "expect": { "ok": true, "tax": 5000, "normalTax": 10000, "saving": 5000 }
+    },
+    {
+      "name": "軽減措置の対象外: 不動産譲渡10万円以下は軽減しても200円のまま",
+      "func": "calculate",
+      "args": ["1", 100000, true],
+      "expect": { "ok": true, "tax": 200, "normalTax": 200, "saving": 0 }
+    },
+    {
+      "name": "境界値: 第2号文書(請負)の100万円ちょうどは200円",
+      "func": "calculate",
+      "args": ["2", 1000000],
+      "expect": { "ok": true, "tax": 200, "bracketMin": 10000, "bracketMax": 1000000 }
+    },
+    {
+      "name": "境界値: 第2号文書の100万1円は400円",
+      "func": "calculate",
+      "args": ["2", 1000001],
+      "expect": { "ok": true, "tax": 400 }
+    },
+    {
+      "name": "軽減措置: 建設工事請負200万円は本則400円→軽減200円",
+      "func": "calculate",
+      "args": ["2", 2000000, true],
+      "expect": { "ok": true, "tax": 200, "normalTax": 400, "saving": 200 }
+    },
+    {
+      "name": "軽減措置: 建設工事請負5,000万円は本則2万円→軽減1万円",
+      "func": "calculate",
+      "args": ["2", 50000000, true],
+      "expect": { "ok": true, "tax": 10000, "normalTax": 20000, "saving": 10000 }
+    },
+    {
+      "name": "第7号文書は記載金額にかかわらず定額4,000円",
+      "func": "calculate",
+      "args": ["7", 99999999],
+      "expect": { "ok": true, "tax": 4000, "exempt": false }
+    },
+    {
+      "name": "第7号文書は記載金額0でも4,000円",
+      "func": "calculate",
+      "args": ["7", 0],
+      "expect": { "ok": true, "tax": 4000 }
+    },
+    {
+      "name": "第17号の1(領収書): 5万円未満は非課税",
+      "func": "calculate",
+      "args": ["17-1", 49999],
+      "expect": { "ok": true, "tax": 0, "exempt": true }
+    },
+    {
+      "name": "境界値: 第17号の1の5万円ちょうどは200円",
+      "func": "calculate",
+      "args": ["17-1", 50000],
+      "expect": { "ok": true, "tax": 200, "bracketMin": 50000, "bracketMax": 1000000 }
+    },
+    {
+      "name": "境界値: 第17号の1の100万円は200円、100万1円は400円",
+      "func": "calculate",
+      "args": ["17-1", 1000001],
+      "expect": { "ok": true, "tax": 400 }
+    },
+    {
+      "name": "第17号の1: 3,000万円ちょうどは6,000円",
+      "func": "calculate",
+      "args": ["17-1", 30000000],
+      "expect": { "ok": true, "tax": 6000 }
+    },
+    {
+      "name": "境界値: 第17号の1の10億円超は最高額20万円",
+      "func": "calculate",
+      "args": ["17-1", 1000000001],
+      "expect": { "ok": true, "tax": 200000, "bracketMax": null }
+    },
+    {
+      "name": "第17号の2(売上代金以外の受取書)は5万円以上なら定額200円",
+      "func": "calculate",
+      "args": ["17-2", 100000000],
+      "expect": { "ok": true, "tax": 200 }
+    },
+    {
+      "name": "第17号の2も5万円未満は非課税",
+      "func": "calculate",
+      "args": ["17-2", 49999],
+      "expect": { "ok": true, "tax": 0, "exempt": true }
+    },
+    {
+      "name": "記載金額なし: 第1号文書は200円",
+      "func": "taxWithoutAmount",
+      "args": ["1"],
+      "expect": { "ok": true, "tax": 200 }
+    },
+    {
+      "name": "記載金額なし: 第7号文書は4,000円",
+      "func": "taxWithoutAmount",
+      "args": ["7"],
+      "expect": { "ok": true, "tax": 4000 }
+    },
+    {
+      "name": "異常系: 存在しない文書の種類はエラー",
+      "func": "calculate",
+      "args": ["9", 100000],
+      "expect": { "ok": false, "code": "invalid_doc_type" }
+    },
+    {
+      "name": "異常系: 記載金額が負の値はエラー",
+      "func": "calculate",
+      "args": ["1", -1],
+      "expect": { "ok": false, "code": "invalid_amount" }
+    },
+    {
+      "name": "異常系: 記載金額が数値でないときはエラー",
+      "func": "calculate",
+      "args": ["1", "abc"],
+      "expect": { "ok": false, "code": "invalid_amount" }
+    },
+    {
+      "name": "異常系: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_doc_type" }
+    },
+    {
+      "name": "区分表: 第1号文書の表は非課税1万円未満・記載なし200円で11区分",
+      "func": "table",
+      "args": ["1"],
+      "expect": {
+        "ok": true,
+        "exemptBelow": 10000,
+        "noAmount": 200,
+        "rows": { "0": { "min": 10000, "max": 100000, "tax": 200 }, "length": 11 }
+      }
+    }
+  ]
+}

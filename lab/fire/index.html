@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>FIRE必要資産(4%ルール)計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="年間支出と取り崩し率から、経済的自立(FIRE)に必要な資産額と達成年数を計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>FIRE必要資産(4%ルール)計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>年間支出(万円)
+      <span class="field-note">生活費の1年分。例: 300</span>
+      <input type="number" id="expense" inputmode="decimal" step="any" min="1" max="100000" placeholder="300">
+    </label>
+    <label>取り崩し率(%)
+      <span class="field-note">4%なら25倍、3.5%なら約28.6倍</span>
+      <input type="number" id="rate" inputmode="decimal" step="0.1" min="0.1" max="20" value="4">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 達成年数の試算・支出削減の効果</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">いつ達成できるか</h3>
+      <p class="adv-note">現在の資産と毎年の積立額、想定利回りを入れると、必要資産に届くまでの年数が出ます。</p>
+      <div class="field-row">
+        <label>現在の資産(万円)
+          <input type="number" id="current" inputmode="decimal" step="any" min="0" max="1000000" placeholder="1000">
+        </label>
+        <label>毎年の積立額(万円)
+          <input type="number" id="save" inputmode="decimal" step="any" min="0" max="100000" placeholder="200">
+        </label>
+        <label>想定利回り(年率%)
+          <input type="number" id="ret" inputmode="decimal" step="0.1" min="-20" max="30" value="5">
+        </label>
+      </div>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">支出を減らすと必要資産はいくら下がるか</h3>
+      <p class="adv-note">月あたりの生活費を下げると、必要資産は「削減額×12÷取り崩し率」だけ小さくなります。</p>
+      <label>月あたりの削減額(万円)
+        <input type="number" id="cut" inputmode="decimal" step="0.1" min="0.1" max="1000" value="1">
+      </label>
+      <div class="tool-result" id="cut-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    ここで出るのは<strong>税金・手数料・インフレ・為替を含まない概算</strong>です。実際には運用益に約20.315%の税金がかかるため、必要資産はこの計算より大きくなります。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>「いくら貯めれば仕事を辞められるか」を<strong>年間支出から逆算</strong>できます。あわせて、いまの資産と積立ペースで<strong>あと何年かかるか</strong>、生活費を月いくら下げると必要額がどれだけ減るかもわかります。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>1年間の生活費(万円)を入れます。入れた瞬間に必要資産が出ます。</li>
+    <li>取り崩し率を変えると必要資産が変わります。標準は4%(25倍)、慎重に見るなら3.5%(約28.6倍)です。</li>
+    <li>達成年数や支出削減の効果を見たいときは「＋詳細機能」を開いてください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>必要資産</strong> = 年間支出 ÷ 取り崩し率</li>
+    <li><strong>倍率</strong> = 1 ÷ 取り崩し率(4%→25倍、3.5%→約28.6倍、3%→約33.3倍)</li>
+    <li><strong>達成年数</strong> = log((必要資産×r + 積立額) ÷ (現在資産×r + 積立額)) ÷ log(1 + r)　※r は年利回り(小数)</li>
+    <li><strong>支出削減の効果</strong> = 月あたり削減額 × 12 ÷ 取り崩し率</li>
+  </ul>
+  <p>達成年数の式は、積立の将来価値 FV = 現在資産×(1+r)<sup>n</sup> + 積立額×((1+r)<sup>n</sup>−1)÷r を、FV が必要資産と等しくなる n について解いたものです。利回り0%のときは (必要資産−現在資産) ÷ 積立額 で計算します。</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>取り崩し率と必要資産の倍率</caption>
+      <thead><tr><th>取り崩し率</th><th>必要資産の倍率</th><th>年間支出300万円の場合</th></tr></thead>
+      <tbody>
+        <tr><td>4.0%</td><td>25.0倍</td><td>7,500万円</td></tr>
+        <tr><td>3.5%</td><td>約28.6倍</td><td>約8,571万円</td></tr>
+        <tr><td>3.0%</td><td>約33.3倍</td><td>1億円</td></tr>
+        <tr><td>2.5%</td><td>40.0倍</td><td>1億2,000万円</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>FIRE SIMULATOR「トリニティスタディに基づく4%ルールの理論と日本での実践」(4%ルールの定義、トリニティスタディの対象期間1926〜1995年・株式75%/債券25%・30年成功率98%、取り崩し率ごとの倍率)<br>
+      <a href="https://firesim.jp/fire/articles/basics/four-percent-rule" rel="noopener" target="_blank">https://firesim.jp/fire/articles/basics/four-percent-rule</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>金額の単位はすべて<strong>万円</strong>です。積立は年1回・期末払い、利回りは毎年一定の複利として計算しています。</li>
+    <li>税金・手数料・インフレ・為替の影響は含みません。日本では運用益に約20.315%の税金がかかるため、NISAなどの非課税枠を使わない場合は必要資産が増えます。</li>
+    <li>4%ルールの根拠となるトリニティスタディは<strong>1926〜1995年の米国市場</strong>のデータに基づくもので、日本円で生活する人にそのまま当てはまるとは限りません。</li>
+    <li>取り崩し率は「初年度の引出額 ÷ 資産」です。2年目以降は物価上昇に合わせて引出額を増やす前提のルールで、毎年同じ率で引き出す意味ではありません。</li>
+    <li>年金・退職金・医療費・介護費などは考慮していません。実際の生活設計は専門家にご相談ください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">なぜ「年間支出の25倍」なのですか?</h3>
+  <p class="faq-a">取り崩し率4%の逆数が25だからです(1÷0.04=25)。年間支出の25倍の資産があれば、その4%で1年分の生活費をまかなえる、という関係になります。</p>
+  <h3 class="faq-q">4%と3.5%のどちらを使えばよいですか?</h3>
+  <p class="faq-a">4%は米国市場の30年間の検証に基づく数字です。税金・為替・より長い取り崩し期間を考えて慎重に見たい場合は、3.5%(約28.6倍)で試算する考え方もあります。必要資産は約14%増えます。</p>
+  <h3 class="faq-q">生活費を下げると効果が大きいのはなぜですか?</h3>
+  <p class="faq-a">必要資産は年間支出に比例するためです。取り崩し率4%なら、月1万円(年12万円)減らすだけで必要資産は300万円下がります。同時に毎年の積立余力も増えるため、達成年数はさらに短くなります。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_expense: "年間支出は1〜100000万円の範囲で入力してください。",
+    invalid_rate: "取り崩し率は0.1〜20%の範囲で入力してください。",
+    invalid_current: "現在の資産は0〜1000000万円の範囲で入力してください。",
+    invalid_save: "毎年の積立額は0〜100000万円の範囲で入力してください。",
+    invalid_return: "想定利回りは-20〜30%の範囲で入力してください。",
+    invalid_cut: "月あたりの削減額は0.1〜1000万円の範囲で入力してください。",
+    unreachable: "この条件では必要資産に届きません(積立額か利回りを見直してください)。"
+  };
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function el(id) { return document.getElementById(id); }
+  function num(id) { return parseFloat(el(id).value); }
+  function filled(ids) {
+    return ids.every(function (id) { return el(id).value.trim() !== ""; });
+  }
+  function show(box, r, render) {
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return false;
+    }
+    box.innerHTML = render(r);
+    box.hidden = false;
+    return true;
+  }
+  function man(v) {
+    var s = v.toLocaleString("ja-JP", { maximumFractionDigits: 1 });
+    return v >= 10000 ? s + "万円(約" + (v / 10000).toFixed(2) + "億円)" : s + "万円";
+  }
+
+  var box = el("result");
+  var advBox = el("adv-result");
+  var cutBox = el("cut-result");
+
+  function runMain() {
+    if (!filled(["expense", "rate"])) { box.hidden = true; return; }
+    var r = FireCalc.required(num("expense"), num("rate"));
+    show(box, r, function (x) {
+      return '<div class="result-main">' + esc(man(x.requiredMan)) + "</div>" +
+        "<p>年間支出の <strong>" + esc(x.multiple) + "倍</strong>(月の支出 " + esc(x.monthlyExpenseMan) + "万円)</p>";
+    });
+    runAdv();
+  }
+
+  function runAdv() {
+    if (!filled(["expense", "rate", "current", "save", "ret"])) { advBox.hidden = true; return; }
+    var r = FireCalc.simulate(num("expense"), num("rate"), num("current"), num("save"), num("ret"));
+    show(advBox, r, function (x) {
+      if (x.alreadyReached) {
+        return '<div class="result-main">達成済み</div><p>必要資産 ' + esc(man(x.requiredMan)) + " にすでに届いています。</p>";
+      }
+      var yy = Math.floor(x.years);
+      var mm = Math.round((x.years - yy) * 12);
+      if (mm === 12) { yy += 1; mm = 0; }
+      return '<div class="result-main">約' + esc(x.years) + "年</div>" +
+        "<p>およそ " + esc(yy) + "年" + esc(mm) + "か月。不足額は " + esc(man(x.shortfallMan)) + " です。</p>";
+    });
+  }
+
+  function runCut() {
+    if (!filled(["rate", "cut"])) { cutBox.hidden = true; return; }
+    var r = FireCalc.impactOfMonthlyCut(num("cut"), num("rate"));
+    show(cutBox, r, function (x) {
+      return '<div class="result-main">必要資産 −' + esc(man(x.reducedMan)) + "</div>" +
+        "<p>年間 " + esc(x.annualCutMan) + "万円の削減にあたります。</p>";
+    });
+  }
+
+  ["expense", "rate"].forEach(function (id) {
+    el(id).addEventListener("input", function () { runMain(); runCut(); });
+  });
+  ["current", "save", "ret"].forEach(function (id) { el(id).addEventListener("input", runAdv); });
+  el("cut").addEventListener("input", runCut);
+  el("tool-form").addEventListener("submit", function (e) { e.preventDefault(); runMain(); });
+  runMain();
+  runCut();
+})();
+</script>
+</body>
+</html>

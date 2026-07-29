@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>住民税 概算計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="年収・社会保険料・扶養人数から、翌年度の個人住民税(所得割+均等割)を概算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>住民税 概算計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>年収(給与収入・円)
+      <span class="field-note">税金や社会保険料が引かれる前の金額。源泉徴収票の「支払金額」</span>
+      <input type="number" id="income" inputmode="numeric" step="10000" min="0" max="1000000000" placeholder="例: 5000000">
+    </label>
+    <label>1年間に支払った社会保険料(円)
+      <span class="field-note">厚生年金・健康保険・雇用保険の合計。源泉徴収票の「社会保険料等の金額」</span>
+      <input type="number" id="insurance" inputmode="numeric" step="1000" min="0" max="1000000000" placeholder="例: 700000">
+    </label>
+    <div class="field-row">
+      <label>配偶者控除の対象
+        <select id="spouse">
+          <option value="0" selected>いない</option>
+          <option value="1">いる(1人)</option>
+        </select>
+      </label>
+      <label>扶養親族(16歳以上)
+        <select id="deps"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 均等割の額を自分の自治体に合わせる・内訳を見る</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">均等割の年額を変える</h3>
+      <p class="adv-note">標準は4,000円(道府県1,000円+市町村3,000円)に森林環境税1,000円を加えた5,000円です。独自の上乗せがある自治体は実際の額を入れてください。</p>
+      <label>均等割の年額(円)
+        <input type="number" id="kintou" inputmode="numeric" step="100" min="0" max="100000" value="5000">
+      </label>
+      <h3 class="adv-h">計算の内訳</h3>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    住民税は<strong>前年(1〜12月)の所得</strong>に対して翌年度に課されます。ここで出るのは、入力した年収を稼いだ年の<strong>翌年6月〜翌々年5月に納める額</strong>の概算です。実際の税額は自治体からの通知書でご確認ください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>年収と社会保険料、扶養の人数を入れるだけで、<strong>来年いくら住民税が来るか</strong>の目安がわかります。転職・退職・独立の直後など、収入が大きく変わるときの資金繰りの確認にどうぞ。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>年収(源泉徴収票の「支払金額」)を入れます。</li>
+    <li>1年間に払った社会保険料の合計(源泉徴収票の「社会保険料等の金額」)を入れます。</li>
+    <li>配偶者控除の対象になる配偶者と、16歳以上の扶養親族の人数を選ぶと結果が出ます。ボタンは不要です。</li>
+    <li>お住まいの自治体の均等割が標準と違う場合は「＋詳細機能」で金額を変えてください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>給与所得</strong> = 年収 − 給与所得控除(下表・所得税法第28条第3項)</li>
+    <li><strong>課税所得金額</strong> = 給与所得 − (基礎控除43万円 + 社会保険料控除 + 配偶者控除33万円 + 扶養控除33万円×人数)。1,000円未満切捨て</li>
+    <li><strong>所得割(控除前)</strong> = 課税所得金額 × 10%(道府県民税4% + 市町村民税6%)</li>
+    <li><strong>調整控除</strong> = 合計課税所得が200万円以下なら「人的控除額の差の合計」と「課税所得」の少ないほうの5%。200万円超なら「人的控除額の差の合計 −(課税所得 − 200万円)」の5%(5万円を下回る場合は5万円で計算するため最低2,500円)</li>
+    <li><strong>所得割</strong> = 所得割(控除前) − 調整控除。100円未満切捨て</li>
+    <li><strong>年税額</strong> = 所得割 + 均等割(標準4,000円 + 森林環境税1,000円)</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>給与所得控除額(所得税法第28条第3項。令和7年分以後の所得税・令和8年度分以後の個人住民税)</caption>
+      <thead><tr><th>給与等の収入金額</th><th>給与所得控除額</th></tr></thead>
+      <tbody>
+        <tr><td>190万円以下</td><td>65万円</td></tr>
+        <tr><td>190万円超 360万円以下</td><td>65万円 +(収入 − 190万円)× 30%</td></tr>
+        <tr><td>360万円超 660万円以下</td><td>116万円 +(収入 − 360万円)× 20%</td></tr>
+        <tr><td>660万円超 850万円以下</td><td>176万円 +(収入 − 660万円)× 10%</td></tr>
+        <tr><td>850万円超</td><td>195万円</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>総務省「地方税制度|個人住民税」(所得割10%=道府県4%+市町村6%、均等割4,000円、森林環境税1,000円、基礎控除最高43万円・扶養控除33万円)<br>
+      <a href="https://www.soumu.go.jp/main_sosiki/jichi_zeisei/czaisei/czaisei_seido/150790_06.html" rel="noopener" target="_blank">https://www.soumu.go.jp/main_sosiki/jichi_zeisei/czaisei/czaisei_seido/150790_06.html</a>(2026年7月29日参照)</li>
+    <li>地方税法(昭和25年法律第226号)第35条・第310条・第314条の2・第314条の3・第37条・第314条の6(e-Gov法令検索)<br>
+      <a href="https://laws.e-gov.go.jp/law/325AC0000000226" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/325AC0000000226</a>(2026年7月29日参照)</li>
+    <li>所得税法(昭和40年法律第33号)第28条第3項(給与所得控除額。e-Gov法令検索・2026年4月1日施行版)<br>
+      <a href="https://laws.e-gov.go.jp/law/340AC0000000033" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/340AC0000000033</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>税率・控除額は<strong>2026(令和8)年7月29日時点の現行規定</strong>です。給与所得控除は最低保障額が65万円になった改正後の額(令和8年度分以後の個人住民税に対応)を使っています。</li>
+    <li>収入は<strong>給与1か所のみ</strong>とし、所得控除は基礎控除・社会保険料控除・配偶者控除・扶養控除だけを見ています。生命保険料控除・医療費控除・iDeCoの掛金などは含みません。</li>
+    <li>住宅ローン控除・ふるさと納税・配当割額控除などの<strong>税額控除は反映していません</strong>。これらがある場合、実際の税額はもっと低くなります。</li>
+    <li>所得税法第28条第4項の「別表第五」(収入660万円未満の速算表)ではなく第3項の算式で計算しているため、実際の額と数百円ずれることがあります。</li>
+    <li>所得が一定額以下の人は<strong>非課税</strong>になりますが(限度額は自治体の条例で異なる)、その判定は行っていません。</li>
+    <li>16歳未満の扶養親族には扶養控除がないため、人数に含めないでください。</li>
+    <li>政令指定都市では内訳(道府県2%+市8%)が変わりますが、合計10%・調整控除の合計5%は同じです。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">退職して収入がなくなったのに住民税が来るのはなぜですか?</h3>
+  <p class="faq-a">住民税は前年の所得に対して課される仕組みだからです。前年に働いていれば、今年の収入が0でも前年分の住民税を納めます。退職時は残額を一括徴収されることもあります。</p>
+  <h3 class="faq-q">均等割はなぜ5,000円なのですか?</h3>
+  <p class="faq-a">均等割の標準税率が道府県民税1,000円+市町村民税3,000円の合計4,000円で、2024(令和6)年度から森林環境税(国税)1,000円が住民税均等割と併せて徴収されるためです。自治体独自の上乗せがある場合は「＋詳細機能」で金額を変えてください。</p>
+  <h3 class="faq-q">調整控除とは何ですか?</h3>
+  <p class="faq-a">所得税と住民税では、基礎控除や扶養控除などの「人的控除」の額が違います(住民税のほうが小さい)。その差で住民税の負担が増えすぎないよう、所得割から差し引く控除が調整控除です。合計所得金額が2,500万円を超える人は対象外です。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_income: "年収を0円以上10億円以下で入力してください。",
+    invalid_insurance: "社会保険料を0円以上で入力してください。",
+    invalid_spouse: "配偶者の人数を選び直してください。",
+    invalid_dependents: "扶養親族の人数を選び直してください。",
+    invalid_kintouwari: "均等割の年額を0円以上100,000円以下で入力してください。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var incomeEl = document.getElementById("income");
+  var insEl = document.getElementById("insurance");
+  var spouseEl = document.getElementById("spouse");
+  var depsEl = document.getElementById("deps");
+  var kintouEl = document.getElementById("kintou");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function yen(n) { return Number(n).toLocaleString("ja-JP") + "円"; }
+
+  var opts = "";
+  for (var i = 0; i <= 10; i++) {
+    opts += '<option value="' + i + '"' + (i === 0 ? " selected" : "") + ">" + i + "人</option>";
+  }
+  depsEl.innerHTML = opts;
+
+  function run() {
+    if (incomeEl.value === "" || insEl.value === "") { box.hidden = true; advBox.hidden = true; return; }
+    var r = JuminzeiCalc.calculate(
+      parseFloat(incomeEl.value),
+      parseFloat(insEl.value),
+      parseInt(spouseEl.value, 10),
+      parseInt(depsEl.value, 10),
+      kintouEl.value === "" ? 5000 : parseFloat(kintouEl.value)
+    );
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      advBox.hidden = true;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">年額 ' + esc(yen(r.totalYen)) + "</div>" +
+      "<p>所得割 " + esc(yen(r.incomeLevyYen)) + " + 均等割 " + esc(yen(r.perCapitaLevyYen)) +
+      " / 月あたり約 " + esc(Math.round(r.monthlyYen).toLocaleString("ja-JP")) + "円</p>";
+    box.hidden = false;
+
+    advBox.innerHTML =
+      "<p>給与所得控除: " + esc(yen(r.salaryDeductionYen)) + "</p>" +
+      "<p>給与所得: " + esc(yen(r.salaryIncomeYen)) + "</p>" +
+      "<p>所得控除の合計: " + esc(yen(r.totalDeductionYen)) + "</p>" +
+      "<p>課税所得金額: " + esc(yen(r.taxableIncomeYen)) + "</p>" +
+      "<p>所得割(調整控除前): " + esc(yen(r.incomeTaxBeforeCreditYen)) + "</p>" +
+      "<p>調整控除: −" + esc(yen(r.adjustmentCreditYen)) + "</p>";
+    advBox.hidden = false;
+  }
+
+  [incomeEl, insEl, kintouEl].forEach(function (el) { el.addEventListener("input", run); });
+  [spouseEl, depsEl].forEach(function (el) { el.addEventListener("change", run); });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

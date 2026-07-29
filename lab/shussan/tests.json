@@ -1,0 +1,177 @@
+{
+  "tool": "shussan",
+  "module": "calc.js",
+  "global": "ShussanCalc",
+  "cases": [
+    {
+      "name": "協会けんぽの支給額例と一致: 平均17万円→30分の1は5,670円・1日3,780円",
+      "func": "dailyAmount",
+      "args": [170000],
+      "expect": { "ok": true, "base": 170000, "dailyBase": 5670, "daily": 3780, "capped": false }
+    },
+    {
+      "name": "端数処理: 平均30万円→30分の1はちょうど10,000円・1日6,667円(1円未満四捨五入)",
+      "func": "dailyAmount",
+      "args": [300000],
+      "expect": { "ok": true, "dailyBase": 10000, "daily": 6667 }
+    },
+    {
+      "name": "加入12か月未満: 平均40万円でも32万円が上限になり1日7,113円",
+      "func": "dailyAmount",
+      "args": [400000, false],
+      "expect": { "ok": true, "base": 320000, "capped": true, "dailyBase": 10670, "daily": 7113 }
+    },
+    {
+      "name": "加入12か月未満でも32万円以下なら上限は効かない(28万円のまま)",
+      "func": "dailyAmount",
+      "args": [280000, false],
+      "expect": { "ok": true, "base": 280000, "capped": false }
+    },
+    {
+      "name": "境界値: 標準報酬月額の平均が下限(1万円)でも計算できる",
+      "func": "dailyAmount",
+      "args": [10000],
+      "expect": { "ok": true, "dailyBase": 330, "daily": 220 }
+    },
+    {
+      "name": "異常系: 標準報酬月額の平均が0はエラー",
+      "func": "dailyAmount",
+      "args": [0],
+      "expect": { "ok": false, "code": "invalid_average" }
+    },
+    {
+      "name": "異常系: 標準報酬月額の平均が負の値はエラー",
+      "func": "dailyAmount",
+      "args": [-170000],
+      "expect": { "ok": false, "code": "invalid_average" }
+    },
+    {
+      "name": "異常系: 標準報酬月額の平均が数値でないときはエラー",
+      "func": "dailyAmount",
+      "args": ["abc"],
+      "expect": { "ok": false, "code": "invalid_average" }
+    },
+    {
+      "name": "異常系: 標準報酬月額の平均が上限(200万円)超はエラー",
+      "func": "dailyAmount",
+      "args": [2000001],
+      "expect": { "ok": false, "code": "invalid_average" }
+    },
+    {
+      "name": "支給日数: 予定日どおりの単胎は産前42日+産後56日=98日",
+      "func": "supportDays",
+      "args": [2026, 9, 1, 2026, 9, 1, false],
+      "expect": { "ok": true, "prenatalDays": 42, "delayDays": 0, "postnatalDays": 56, "totalDays": 98 }
+    },
+    {
+      "name": "支給日数: 予定日より10日遅れた単胎は98+10=108日",
+      "func": "supportDays",
+      "args": [2026, 9, 1, 2026, 9, 11, false],
+      "expect": { "ok": true, "delayDays": 10, "totalDays": 108 }
+    },
+    {
+      "name": "支給日数: 予定日より早い出産は遅れ日数0で98日のまま",
+      "func": "supportDays",
+      "args": [2026, 9, 1, 2026, 8, 20, false],
+      "expect": { "ok": true, "delayDays": 0, "totalDays": 98, "early": true }
+    },
+    {
+      "name": "支給日数: 多胎は産前98日+産後56日=154日",
+      "func": "supportDays",
+      "args": [2026, 9, 1, 2026, 9, 1, true],
+      "expect": { "ok": true, "prenatalDays": 98, "totalDays": 154 }
+    },
+    {
+      "name": "境界値: 予定日ちょうど+60日(上限)の遅れは有効で158日",
+      "func": "supportDays",
+      "args": [2026, 9, 1, 2026, 10, 31, false],
+      "expect": { "ok": true, "delayDays": 60, "totalDays": 158 }
+    },
+    {
+      "name": "異常系: 予定日より61日遅れは入力誤りとしてエラー",
+      "func": "supportDays",
+      "args": [2026, 9, 1, 2026, 11, 1, false],
+      "expect": { "ok": false, "code": "invalid_birth_date" }
+    },
+    {
+      "name": "異常系: 存在しない日付(2月30日)の予定日はエラー",
+      "func": "supportDays",
+      "args": [2026, 2, 30, 2026, 3, 1, false],
+      "expect": { "ok": false, "code": "invalid_due_date" }
+    },
+    {
+      "name": "一時金: 産科医療補償制度加入機関・22週以降の単胎は50万円",
+      "func": "lumpSum",
+      "args": [1, true],
+      "expect": { "ok": true, "perBaby": 500000, "total": 500000 }
+    },
+    {
+      "name": "一時金: 双子は胎児数分で100万円",
+      "func": "lumpSum",
+      "args": [2, true],
+      "expect": { "ok": true, "total": 1000000 }
+    },
+    {
+      "name": "一時金: 産科医療補償制度の対象外は1児48.8万円",
+      "func": "lumpSum",
+      "args": [1, false],
+      "expect": { "ok": true, "perBaby": 488000, "total": 488000 }
+    },
+    {
+      "name": "異常系: 胎児数0はエラー",
+      "func": "lumpSum",
+      "args": [0, true],
+      "expect": { "ok": false, "code": "invalid_babies" }
+    },
+    {
+      "name": "異常系: 胎児数が上限(5)超はエラー",
+      "func": "lumpSum",
+      "args": [6, true],
+      "expect": { "ok": false, "code": "invalid_babies" }
+    },
+    {
+      "name": "合計: 平均17万円・予定日どおり単胎は手当金370,440円+一時金50万円=870,440円",
+      "func": "calculate",
+      "args": [170000, 2026, 9, 1, 2026, 9, 1, 1, true],
+      "expect": {
+        "ok": true,
+        "daily": 3780,
+        "totalDays": 98,
+        "allowanceTotal": 370440,
+        "lumpSumTotal": 500000,
+        "total": 870440
+      }
+    },
+    {
+      "name": "合計: 平均30万円・10日遅れの単胎は6,667円×108日=720,036円+50万円",
+      "func": "calculate",
+      "args": [300000, 2026, 9, 1, 2026, 9, 11, 1, true],
+      "expect": { "ok": true, "daily": 6667, "totalDays": 108, "allowanceTotal": 720036, "total": 1220036 }
+    },
+    {
+      "name": "合計: 双子は自動で多胎扱い(154日)・一時金も2人分",
+      "func": "calculate",
+      "args": [300000, 2026, 9, 1, 2026, 9, 1, 2, true],
+      "expect": {
+        "ok": true,
+        "prenatalDays": 98,
+        "totalDays": 154,
+        "allowanceTotal": 1026718,
+        "lumpSumTotal": 1000000,
+        "total": 2026718
+      }
+    },
+    {
+      "name": "異常系: 合計計算でも標準報酬月額の平均が不正ならエラー",
+      "func": "calculate",
+      "args": [0, 2026, 9, 1, 2026, 9, 1, 1, true],
+      "expect": { "ok": false, "code": "invalid_average" }
+    },
+    {
+      "name": "異常系: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_average" }
+    }
+  ]
+}

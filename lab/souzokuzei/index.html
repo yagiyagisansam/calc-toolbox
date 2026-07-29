@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>相続税 概算計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="遺産総額と法定相続人の構成から、相続税の総額と一人あたりの負担額を概算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>相続税 概算計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>遺産総額(万円)
+      <span class="field-note">借金や葬式費用を差し引いた正味の金額。例: 8000</span>
+      <input type="number" id="estate" inputmode="numeric" step="1" min="0" placeholder="8000">
+    </label>
+    <div class="field-row">
+      <label>配偶者
+        <select id="spouse">
+          <option value="1">いる</option>
+          <option value="0">いない</option>
+        </select>
+      </label>
+      <label>子の人数
+        <select id="children"></select>
+      </label>
+    </div>
+    <div class="field-row">
+      <label>親(直系尊属)の人数
+        <span class="field-note">子がいる場合は相続人になりません</span>
+        <select id="parents"></select>
+      </label>
+      <label>兄弟姉妹の人数
+        <span class="field-note">子・親がいない場合のみ</span>
+        <select id="siblings"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 非課税になる遺産総額の上限(基礎控除)</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">この家族構成なら遺産がいくらまで非課税か</h3>
+      <p class="adv-note">上で選んだ家族構成の基礎控除額です。遺産総額がこの額以下なら相続税はかからず、申告も原則不要です。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    この結果は<strong>「遺産を法定相続分どおりに分けた場合」の概算</strong>です。小規模宅地等の特例、生命保険金の非課税枠、生前贈与加算、未成年者控除などは含んでいません。実際の申告額は税理士または税務署にご確認ください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>遺産総額と家族構成を入れるだけで、<strong>そもそも相続税がかかるのか</strong>、かかるなら<strong>家族全体でいくらか</strong>がわかります。配偶者の税額軽減を使った後の実際の納税額も表示します。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>遺産総額(万円)を入れます。預貯金・不動産・株式などの合計から、借金と葬式費用を引いた額です。</li>
+    <li>配偶者の有無と、子・親・兄弟姉妹の人数を選びます。入れた瞬間に結果が出ます。</li>
+    <li>相続人は「子 → 親 → 兄弟姉妹」の順で決まります。子がいれば親と兄弟姉妹は相続人になりません。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>基礎控除額</strong> = 3,000万円 + 600万円 × 法定相続人の数</li>
+    <li><strong>課税遺産総額</strong> = 遺産総額 − 基礎控除額(マイナスなら0)</li>
+    <li><strong>各人の取得金額</strong> = 課税遺産総額 × 法定相続分(1,000円未満切り捨て)</li>
+    <li><strong>各人の税額</strong> = 取得金額 × 税率 − 控除額(下の速算表)</li>
+    <li><strong>相続税の総額</strong> = 各人の税額の合計</li>
+    <li><strong>配偶者の税額軽減</strong> = 法定相続分どおりに取得した配偶者の税額は全額が軽減される</li>
+  </ul>
+
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>法定相続分(国税庁 No.4132)</caption>
+      <thead><tr><th>相続人の構成</th><th>配偶者</th><th>他の相続人(全員で)</th></tr></thead>
+      <tbody>
+        <tr><td>配偶者と子</td><td>2分の1</td><td>2分の1</td></tr>
+        <tr><td>配偶者と直系尊属(親)</td><td>3分の2</td><td>3分の1</td></tr>
+        <tr><td>配偶者と兄弟姉妹</td><td>4分の3</td><td>4分の1</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>相続税の速算表(国税庁 No.4155・平成27年1月1日以後の相続)</caption>
+      <thead><tr><th>法定相続分に応ずる取得金額</th><th>税率</th><th>控除額</th></tr></thead>
+      <tbody>
+        <tr><td>1,000万円以下</td><td>10%</td><td>―</td></tr>
+        <tr><td>1,000万円超 3,000万円以下</td><td>15%</td><td>50万円</td></tr>
+        <tr><td>3,000万円超 5,000万円以下</td><td>20%</td><td>200万円</td></tr>
+        <tr><td>5,000万円超 1億円以下</td><td>30%</td><td>700万円</td></tr>
+        <tr><td>1億円超 2億円以下</td><td>40%</td><td>1,700万円</td></tr>
+        <tr><td>2億円超 3億円以下</td><td>45%</td><td>2,700万円</td></tr>
+        <tr><td>3億円超 6億円以下</td><td>50%</td><td>4,200万円</td></tr>
+        <tr><td>6億円超</td><td>55%</td><td>7,200万円</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>国税庁 タックスアンサー No.4152「相続税の計算」(令和7年4月1日現在法令等)<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/sozoku/4152.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/sozoku/4152.htm</a>(2026年7月29日参照)</li>
+    <li>国税庁 タックスアンサー No.4155「相続税の税率」(速算表・令和7年4月1日現在法令等)<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/sozoku/4155.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/sozoku/4155.htm</a>(2026年7月29日参照)</li>
+    <li>国税庁 タックスアンサー No.4132「相続人の範囲と法定相続分」(令和7年4月1日現在法令等)<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/sozoku/4132.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/sozoku/4132.htm</a>(2026年7月29日参照)</li>
+    <li>国税庁 タックスアンサー No.4158「配偶者の税額の軽減」(令和7年4月1日現在法令等)<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/sozoku/4158.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/sozoku/4158.htm</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>税率と基礎控除は<strong>平成27年1月1日以後に開始した相続</strong>のものです(上記出典は令和7年4月1日現在の法令等)。</li>
+    <li>遺産を法定相続分どおりに分けた前提の概算です。実際の分割割合が違えば各人の負担額は変わります(相続税の総額は変わりません)。</li>
+    <li>小規模宅地等の特例、生命保険金・死亡退職金の非課税枠(500万円×法定相続人の数)、生前贈与加算、相続時精算課税、未成年者控除・障害者控除は含みません。</li>
+    <li>兄弟姉妹や孫が相続する場合の<strong>相続税額の2割加算</strong>は反映していません。</li>
+    <li>相続放棄した人がいる場合でも、基礎控除の計算では放棄がなかったものとして人数を数えます。本ツールは入力した人数をそのまま法定相続人として扱います。</li>
+    <li>養子は基礎控除の計算で人数に上限があります(実子がいる場合1人、いない場合2人)。該当する場合は上限までの人数を入力してください。</li>
+    <li>配偶者の税額軽減を使って納税額が0になる場合でも、相続税の申告そのものは必要です。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">遺産がいくらまでなら相続税はかかりませんか?</h3>
+  <p class="faq-a">基礎控除額(3,000万円 + 600万円 × 法定相続人の数)までです。例えば配偶者と子2人なら4,800万円までかかりません。「＋詳細機能」でこの額を確認できます。</p>
+  <h3 class="faq-q">配偶者がいると相続税はかからないと聞きました。</h3>
+  <p class="faq-a">配偶者は「1億6,000万円」または「法定相続分相当額」の多い方まで税額が軽減されます(国税庁 No.4158)。本ツールは法定相続分どおりに取得した前提のため、配偶者の税額は0として計算しています。</p>
+  <h3 class="faq-q">相続を放棄した人がいる場合はどう入力しますか?</h3>
+  <p class="faq-a">基礎控除と相続税の総額の計算では放棄がなかったものとして扱うため、放棄した人も含めた人数を入力してください。</p>
+  <h3 class="faq-q">子がいない場合、親と兄弟姉妹はどちらが相続人ですか?</h3>
+  <p class="faq-a">親(直系尊属)が優先です。親が誰もいない場合に初めて兄弟姉妹が相続人になります。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_estate: "遺産総額を0以上の数値で入力してください。",
+    invalid_children: "子の人数を選び直してください。",
+    invalid_parents: "親の人数を選び直してください。",
+    invalid_siblings: "兄弟姉妹の人数を選び直してください。",
+    invalid_spouse: "配偶者の有無を選び直してください。",
+    no_heir: "法定相続人が一人もいません。配偶者・子・親・兄弟姉妹のいずれかを選んでください。"
+  };
+  var GROUP_LABEL = {
+    children: "子",
+    parents: "親",
+    siblings: "兄弟姉妹",
+    spouse_only: "配偶者"
+  };
+
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var estateEl = document.getElementById("estate");
+  var spouseEl = document.getElementById("spouse");
+  var childrenEl = document.getElementById("children");
+  var parentsEl = document.getElementById("parents");
+  var siblingsEl = document.getElementById("siblings");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function fillCount(el, max, selected) {
+    var html = "";
+    for (var v = 0; v <= max; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + "人</option>";
+    }
+    el.innerHTML = html;
+  }
+  function yen(n) { return n.toLocaleString("ja-JP"); }
+  function man(n) {
+    var m = n / 10000;
+    return (Math.round(m * 10) / 10).toLocaleString("ja-JP");
+  }
+
+  fillCount(childrenEl, 10, 2);
+  fillCount(parentsEl, 4, 0);
+  fillCount(siblingsEl, 10, 0);
+
+  function inputs() {
+    return [
+      spouseEl.value === "1",
+      parseInt(childrenEl.value, 10),
+      parseInt(parentsEl.value, 10),
+      parseInt(siblingsEl.value, 10)
+    ];
+  }
+
+  function runAdv() {
+    var a = inputs();
+    var r = SouzokuzeiCalc.basicDeduction(a[0], a[1], a[2], a[3]);
+    if (!r.ok) { advBox.hidden = true; return; }
+    advBox.innerHTML =
+      '<div class="result-main">' + esc(man(r.basicDeductionYen)) + "万円まで非課税</div>" +
+      "<p>法定相続人 " + esc(String(r.heirCount)) + "人 → 3,000万円 + 600万円 × " +
+      esc(String(r.heirCount)) + "人 = " + esc(yen(r.basicDeductionYen)) + "円</p>";
+    advBox.hidden = false;
+  }
+
+  function run() {
+    runAdv();
+    if (estateEl.value === "") { box.hidden = true; return; }
+    var a = inputs();
+    var r = SouzokuzeiCalc.calculate(parseFloat(estateEl.value), a[0], a[1], a[2], a[3]);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var html;
+    if (!r.taxable) {
+      html = '<div class="result-main">相続税は0円</div>' +
+        "<p>遺産総額が基礎控除額(" + esc(man(r.basicDeductionYen)) + "万円)以下のため、相続税はかかりません。</p>";
+    } else {
+      var label = GROUP_LABEL[r.groupType] || "他の相続人";
+      html = '<div class="result-main">相続税の総額 ' + esc(man(r.totalTaxYen)) + "万円</div>" +
+        "<p>法定相続人 " + esc(String(r.heirCount)) + "人 / 基礎控除 " + esc(man(r.basicDeductionYen)) +
+        "万円 / 課税遺産総額 " + esc(man(r.taxableEstateYen)) + "万円</p>" +
+        "<ul>";
+      if (r.spouseTaxYen > 0) {
+        html += "<li>配偶者の税額: " + esc(yen(r.spouseTaxYen)) + "円 → 税額軽減で0円</li>";
+      }
+      if (r.groupCount > 0) {
+        html += "<li>" + esc(label) + "1人あたり: " + esc(yen(r.eachGroupTaxYen)) + "円(" +
+          esc(String(r.groupCount)) + "人で" + esc(yen(r.eachGroupTaxYen * r.groupCount)) + "円)</li>";
+      }
+      html += "<li><strong>実際に納める合計: " + esc(yen(r.netTotalTaxYen)) + "円</strong></li></ul>";
+    }
+    box.innerHTML = html;
+    box.hidden = false;
+  }
+
+  [estateEl, spouseEl, childrenEl, parentsEl, siblingsEl].forEach(function (el) {
+    el.addEventListener("input", run);
+    el.addEventListener("change", run);
+  });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  runAdv();
+})();
+</script>
+</body>
+</html>

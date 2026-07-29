@@ -1,0 +1,139 @@
+{
+  "tool": "ikuji-kyufu",
+  "module": "calc.js",
+  "global": "IkujiCalc",
+  "cases": [
+    {
+      "name": "賃金日額: 6か月180万円は180で割って10,000円",
+      "func": "dailyWage",
+      "args": [1800000],
+      "expect": { "ok": true, "dailyWage": 10000, "dailyWageUsed": 10000, "capped": false }
+    },
+    {
+      "name": "代表例: 月給30万円(6か月180万円)・育休12か月は総額210万6,000円",
+      "func": "calculate",
+      "args": [1800000, 12, true],
+      "expect": {
+        "ok": true, "dailyWage": 10000, "monthly67": 201000, "monthly50": 150000,
+        "months67": 6, "months50": 6, "total": 2106000
+      }
+    },
+    {
+      "name": "上限適用: 高収入でも67%は月323,811円・50%は月241,650円で頭打ち",
+      "func": "calculate",
+      "args": [6000000, 12, true],
+      "expect": {
+        "ok": true, "dailyWage": 33333, "dailyWageUsed": 16110, "capped": true,
+        "monthly67": 323811, "monthly50": 241650, "total": 3392766
+      }
+    },
+    {
+      "name": "上限を外すと頭打ちにならない(比較用)",
+      "func": "calculate",
+      "args": [6000000, 12, false],
+      "expect": { "ok": true, "dailyWageUsed": 33333, "capped": false, "monthly67": 669993, "monthly50": 499995 }
+    },
+    {
+      "name": "境界値: 育休6か月ちょうどは全期間が67%",
+      "func": "calculate",
+      "args": [1800000, 6, true],
+      "expect": { "ok": true, "months67": 6, "months50": 0, "total": 1206000 }
+    },
+    {
+      "name": "境界値: 育休7か月目から50%期間が1か月分つく",
+      "func": "calculate",
+      "args": [1800000, 7, true],
+      "expect": { "ok": true, "months67": 6, "months50": 1, "total": 1356000 }
+    },
+    {
+      "name": "境界値: 育休の下限1か月",
+      "func": "calculate",
+      "args": [1800000, 1, true],
+      "expect": { "ok": true, "months67": 1, "months50": 0, "total": 201000 }
+    },
+    {
+      "name": "境界値: 育休の上限24か月",
+      "func": "calculate",
+      "args": [1800000, 24, true],
+      "expect": { "ok": true, "months67": 6, "months50": 18, "total": 3906000 }
+    },
+    {
+      "name": "異常入力: 賃金総額0はエラー",
+      "func": "calculate",
+      "args": [0, 12, true],
+      "expect": { "ok": false, "code": "invalid_wage" }
+    },
+    {
+      "name": "異常入力: 賃金総額が負の値はエラー",
+      "func": "calculate",
+      "args": [-1800000, 12, true],
+      "expect": { "ok": false, "code": "invalid_wage" }
+    },
+    {
+      "name": "異常入力: 賃金総額が数値でないときはエラー",
+      "func": "calculate",
+      "args": ["abc", 12, true],
+      "expect": { "ok": false, "code": "invalid_wage" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_wage" }
+    },
+    {
+      "name": "異常入力: 月数0はエラー",
+      "func": "calculate",
+      "args": [1800000, 0, true],
+      "expect": { "ok": false, "code": "invalid_months" }
+    },
+    {
+      "name": "異常入力: 月数が上限超(25か月)はエラー",
+      "func": "calculate",
+      "args": [1800000, 25, true],
+      "expect": { "ok": false, "code": "invalid_months" }
+    },
+    {
+      "name": "異常入力: 月数が整数でないときはエラー",
+      "func": "calculate",
+      "args": [1800000, 1.5, true],
+      "expect": { "ok": false, "code": "invalid_months" }
+    },
+    {
+      "name": "出生後休業支援給付金: 賃金日額10,000円×28日×13%は36,400円",
+      "func": "sangoShien",
+      "args": [1800000, 28, true],
+      "expect": { "ok": true, "dailyWageUsed": 10000, "days": 28, "amount": 36400 }
+    },
+    {
+      "name": "出生後休業支援給付金の上限58,640円(公表額と一致)",
+      "func": "sangoShien",
+      "args": [6000000, 28, true],
+      "expect": { "ok": true, "dailyWageUsed": 16110, "amount": 58640 }
+    },
+    {
+      "name": "異常入力: 出生後休業の日数が上限超(29日)はエラー",
+      "func": "sangoShien",
+      "args": [1800000, 29, true],
+      "expect": { "ok": false, "code": "invalid_days" }
+    },
+    {
+      "name": "出生時育児休業給付金の上限302,223円(公表額と一致)",
+      "func": "shusshoji",
+      "args": [6000000, 28, true],
+      "expect": { "ok": true, "dailyWageUsed": 16110, "amount": 302223 }
+    },
+    {
+      "name": "出生時育児休業給付金: 賃金日額10,000円×14日×67%は93,800円",
+      "func": "shusshoji",
+      "args": [1800000, 14, true],
+      "expect": { "ok": true, "days": 14, "amount": 93800 }
+    },
+    {
+      "name": "異常入力: 出生時育児休業の日数0はエラー",
+      "func": "shusshoji",
+      "args": [1800000, 0, true],
+      "expect": { "ok": false, "code": "invalid_days" }
+    }
+  ]
+}

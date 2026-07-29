@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>高額療養費 自己負担限度額の計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="1か月の医療費と所得区分から、高額療養費制度の自己負担限度額と払い戻し額を計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>高額療養費 自己負担限度額の計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>1か月の総医療費(円)
+      <span class="field-note">保険が使われる前の10割の金額。窓口で3割払ったなら「窓口の金額 ÷ 0.3」。例: 1000000</span>
+      <input type="number" id="total" inputmode="numeric" step="1" min="0" placeholder="1000000">
+    </label>
+    <div class="field-row">
+      <label>年齢
+        <select id="age-group">
+          <option value="u70">70歳未満</option>
+          <option value="o70">70歳以上</option>
+        </select>
+      </label>
+      <label>窓口負担割合
+        <select id="rate">
+          <option value="30">3割</option>
+          <option value="20">2割</option>
+          <option value="10">1割</option>
+        </select>
+      </label>
+    </div>
+    <label>所得区分
+      <span class="field-note">健康保険証や限度額適用認定証、マイナポータルで確認できます</span>
+      <select id="category"></select>
+    </label>
+    <div class="field-row">
+      <label>診療を受けた月
+        <select id="period">
+          <option value="current">令和8年7月診療分まで</option>
+          <option value="r8">令和8年8月診療分から</option>
+        </select>
+      </label>
+      <label>多数回該当
+        <span class="field-note">過去12か月で4回目以降</span>
+        <select id="multiple">
+          <option value="0">いいえ</option>
+          <option value="1">はい</option>
+        </select>
+      </label>
+    </div>
+    <label id="outpatient-wrap" hidden>入院・外来の別
+      <select id="outpatient">
+        <option value="0">入院あり(世帯ごとの限度額)</option>
+        <option value="1">外来のみ(個人ごとの限度額)</option>
+      </select>
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 払い戻しが始まる医療費の目安</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">総医療費がいくらを超えると払い戻しがあるか</h3>
+      <p class="adv-note">上で選んだ所得区分・負担割合で、窓口負担がちょうど限度額に達する総医療費です。この額を超えると高額療養費の対象になります。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    自己負担限度額は<strong>令和8年8月診療分から引き上げ</strong>られます。診療を受けた月に合わせて「診療を受けた月」を切り替えてください。入院時の食費・差額ベッド代・先進医療の費用は対象外です。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>入院や手術で医療費が高額になったとき、<strong>最終的に自分がいくら払うことになるのか</strong>と、<strong>いくら戻ってくるのか</strong>がわかります。限度額適用認定証やマイナ保険証を使えば、最初から限度額までの支払いで済みます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>1か月の総医療費(10割の金額)を入れます。窓口で3割を払った場合は「窓口で払った額 ÷ 0.3」がおおよその総医療費です。</li>
+    <li>年齢・負担割合・所得区分を選ぶと、その場で限度額と払い戻し額が出ます。</li>
+    <li>過去12か月に3回以上限度額に達している場合は「多数回該当」を「はい」にしてください。限度額がさらに下がります。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>窓口負担</strong> = 総医療費 × 負担割合</li>
+    <li><strong>自己負担限度額</strong> = 所得区分ごとの定額、または「基準額 + (総医療費 − 控除額) × 1%」</li>
+    <li><strong>払い戻し額</strong> = 窓口負担 − 自己負担限度額(マイナスなら0)</li>
+  </ul>
+
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>70歳未満のひと月の上限額(令和8年7月診療分まで)</caption>
+      <thead><tr><th>区分</th><th>年収の目安</th><th>ひと月の上限額</th><th>多数回該当</th></tr></thead>
+      <tbody>
+        <tr><td>ア</td><td>約1,160万円〜</td><td>252,600円 + (医療費 − 842,000円) × 1%</td><td>140,100円</td></tr>
+        <tr><td>イ</td><td>約770万〜約1,160万円</td><td>167,400円 + (医療費 − 558,000円) × 1%</td><td>93,000円</td></tr>
+        <tr><td>ウ</td><td>約370万〜約770万円</td><td>80,100円 + (医療費 − 267,000円) × 1%</td><td>44,400円</td></tr>
+        <tr><td>エ</td><td>〜約370万円</td><td>57,600円</td><td>44,400円</td></tr>
+        <tr><td>オ</td><td>住民税非課税</td><td>35,400円</td><td>24,600円</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>70歳未満のひと月の上限額(令和8年8月〜令和9年7月診療分)</caption>
+      <thead><tr><th>区分</th><th>ひと月の上限額</th><th>多数回該当</th><th>年間上限</th></tr></thead>
+      <tbody>
+        <tr><td>ア</td><td>270,300円 + (医療費 − 901,000円) × 1%</td><td>140,100円</td><td>1,680,000円</td></tr>
+        <tr><td>イ</td><td>179,100円 + (医療費 − 597,000円) × 1%</td><td>93,000円</td><td>1,110,000円</td></tr>
+        <tr><td>ウ</td><td>85,800円 + (医療費 − 286,000円) × 1%</td><td>44,400円</td><td>530,000円</td></tr>
+        <tr><td>エ</td><td>61,500円</td><td>44,400円</td><td>530,000円</td></tr>
+        <tr><td>オ</td><td>36,900円</td><td>24,600円</td><td>290,000円</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>厚生労働省保険局「高額療養費制度を利用される皆さまへ(平成30年8月診療分から)」<br>
+      <a href="https://www.mhlw.go.jp/content/000333280.pdf" rel="noopener" target="_blank">https://www.mhlw.go.jp/content/000333280.pdf</a>(2026年7月29日参照)</li>
+    <li>厚生労働省「高額療養費制度の見直しについて(令和8年8月診療分から)」<br>
+      <a href="https://www.mhlw.go.jp/content/001726232.pdf" rel="noopener" target="_blank">https://www.mhlw.go.jp/content/001726232.pdf</a>(2026年7月29日参照)</li>
+    <li>厚生労働省「高額療養費制度を利用される皆さまへ」<br>
+      <a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/iryouhoken/juuyou/kougakuiryou/index.html" rel="noopener" target="_blank">https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/iryouhoken/juuyou/kougakuiryou/index.html</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>限度額は<strong>令和8年7月診療分まで</strong>が平成30年8月改定の額、<strong>令和8年8月診療分から</strong>が令和8年8月改定の額です。<strong>令和9年8月診療分からは所得区分が5区分から13区分に細分化</strong>されますが、本ツールは未対応です。</li>
+    <li>ひと月・1つの医療機関での自己負担を前提とした概算です。世帯合算(同じ医療保険の家族分の合算)は反映していません。</li>
+    <li>入院時の食費・居住費、差額ベッド代、先進医療にかかる費用は高額療養費の対象外です。総医療費に含めないでください。</li>
+    <li>健康保険組合の付加給付や自治体の医療費助成があると、実際の自己負担はさらに低くなることがあります。</li>
+    <li>人工透析・血友病・HIVなど長期高額疾病には特例(原則月1万円)があり、本ツールでは扱っていません。</li>
+    <li>窓口負担額は「総医療費 × 負担割合」で計算しています。実際は医療機関ごとに端数処理が入るため、数十円ずれることがあります。</li>
+    <li>70歳未満で複数の医療機関の自己負担を合算するには、それぞれ21,000円以上である必要があります。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">総医療費がわからない場合はどうすればいいですか?</h3>
+  <p class="faq-a">窓口で払った額を負担割合で割ると概算できます。3割負担で30万円払ったなら、総医療費は約100万円です。領収書の「保険適用分」の点数を10倍しても求められます(1点=10円)。</p>
+  <h3 class="faq-q">自分の所得区分がわかりません。</h3>
+  <p class="faq-a">マイナポータル(健康保険証 → 限度額適用認定証関連の情報)、または勤務先が提出している標準報酬月額で確認できます。加入している健康保険にお問い合わせいただくのが確実です。</p>
+  <h3 class="faq-q">後から払い戻すのではなく、最初から限度額だけ払う方法はありますか?</h3>
+  <p class="faq-a">あります。マイナ保険証を使うか、事前に「限度額適用認定証」の交付を受けて医療機関の窓口で提示すれば、窓口での支払いが限度額までになります。</p>
+  <h3 class="faq-q">「多数回該当」とは何ですか?</h3>
+  <p class="faq-a">直近12か月で3回以上、自己負担限度額に達した場合、4回目からは限度額がさらに下がる仕組みです。住民税非課税(70歳以上のI区分など)には適用されません。</p>
+  <h3 class="faq-q">令和8年8月から何が変わりますか?</h3>
+  <p class="faq-a">全ての所得区分でひと月の上限額が引き上げられます。一方で多数回該当の額は据え置かれ、新たに「年間上限」(8月から翌年7月までの合計)が設けられます。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_total: "1か月の総医療費を0以上の数値で入力してください。",
+    invalid_category: "所得区分を選び直してください。",
+    invalid_period: "診療を受けた月を選び直してください。",
+    invalid_rate: "窓口負担割合を選び直してください。",
+    invalid_multiple: "多数回該当の選択を確認してください。",
+    invalid_outpatient: "入院・外来の別を選び直してください。"
+  };
+  var CATEGORIES = {
+    u70: [
+      ["u70_a", "ア 年収約1,160万円〜"],
+      ["u70_i", "イ 年収約770万〜約1,160万円"],
+      ["u70_u", "ウ 年収約370万〜約770万円"],
+      ["u70_e", "エ 〜年収約370万円"],
+      ["u70_o", "オ 住民税非課税"]
+    ],
+    o70: [
+      ["o70_g3", "現役並みIII 年収約1,160万円〜"],
+      ["o70_g2", "現役並みII 年収約770万〜約1,160万円"],
+      ["o70_g1", "現役並みI 年収約370万〜約770万円"],
+      ["o70_ippan", "一般 〜年収約370万円"],
+      ["o70_low2", "住民税非課税II"],
+      ["o70_low1", "住民税非課税I(年金収入80万円以下など)"]
+    ]
+  };
+
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var totalEl = document.getElementById("total");
+  var ageEl = document.getElementById("age-group");
+  var rateEl = document.getElementById("rate");
+  var catEl = document.getElementById("category");
+  var periodEl = document.getElementById("period");
+  var multiEl = document.getElementById("multiple");
+  var outEl = document.getElementById("outpatient");
+  var outWrap = document.getElementById("outpatient-wrap");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function yen(n) { return n.toLocaleString("ja-JP") + "円"; }
+
+  function fillCategories() {
+    var list = CATEGORIES[ageEl.value];
+    var html = "";
+    for (var i = 0; i < list.length; i++) {
+      html += '<option value="' + list[i][0] + '">' + list[i][1] + "</option>";
+    }
+    catEl.innerHTML = html;
+    if (ageEl.value === "u70") {
+      catEl.selectedIndex = 2;
+      outWrap.hidden = true;
+      outEl.value = "0";
+    } else {
+      catEl.selectedIndex = 3;
+      outWrap.hidden = false;
+    }
+  }
+
+  function args() {
+    return [
+      parseFloat(totalEl.value),
+      parseInt(rateEl.value, 10),
+      catEl.value,
+      multiEl.value === "1",
+      periodEl.value,
+      outEl.value === "1"
+    ];
+  }
+
+  function runAdv() {
+    var r = KogakuCalc.threshold(parseInt(rateEl.value, 10), catEl.value, multiEl.value === "1", periodEl.value);
+    if (!r.ok) { advBox.hidden = true; return; }
+    advBox.innerHTML = '<div class="result-main">総医療費 ' + esc(yen(r.thresholdYen)) + " を超えたら対象</div>" +
+      "<p>この所得区分・負担割合では、総医療費がこの額を超えると払い戻しが発生します(外来のみの限度額は考慮していません)。</p>";
+    advBox.hidden = false;
+  }
+
+  function run() {
+    runAdv();
+    if (totalEl.value === "") { box.hidden = true; return; }
+    var a = args();
+    var r = KogakuCalc.calculate(a[0], a[1], a[2], a[3], a[4], a[5]);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var html = '<div class="result-main">最終的な自己負担 ' + esc(yen(r.finalYen)) + "</div><ul>";
+    html += "<li>高額療養費を使わない場合の窓口負担: " + esc(yen(r.windowYen)) + "</li>";
+    if (r.applied) {
+      html += "<li>自己負担限度額: " + esc(yen(r.limitYen)) +
+        (r.multipleApplied ? "(多数回該当)" : "") + "</li>";
+      html += "<li><strong>払い戻される額: " + esc(yen(r.refundYen)) + "</strong></li>";
+    } else {
+      html += "<li>窓口負担が自己負担限度額に達していないため、払い戻しはありません。</li>";
+    }
+    if (r.yearLimitYen !== null) {
+      html += "<li>この区分の年間上限額(8月〜翌年7月): " + esc(yen(r.yearLimitYen)) + "</li>";
+    }
+    html += "</ul>";
+    box.innerHTML = html;
+    box.hidden = false;
+  }
+
+  ageEl.addEventListener("change", function () { fillCategories(); run(); });
+  [totalEl, rateEl, catEl, periodEl, multiEl, outEl].forEach(function (el) {
+    el.addEventListener("input", run);
+    el.addEventListener("change", run);
+  });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  fillCategories();
+  runAdv();
+})();
+</script>
+</body>
+</html>

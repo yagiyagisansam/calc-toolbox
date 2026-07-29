@@ -1,0 +1,225 @@
+{
+  "tool": "souzokuzei",
+  "module": "calc.js",
+  "global": "SouzokuzeiCalc",
+  "cases": [
+    {
+      "name": "代表例: 遺産1億円・配偶者と子2人(基礎控除4800万・総額630万・配偶者軽減後290万)",
+      "func": "calculate",
+      "args": [10000, true, 2, 0, 0],
+      "expect": {
+        "ok": true,
+        "heirCount": 3,
+        "basicDeductionYen": 48000000,
+        "taxableEstateYen": 52000000,
+        "totalTaxYen": 6300000,
+        "spouseReliefYen": 3400000,
+        "eachGroupTaxYen": 1450000,
+        "netTotalTaxYen": 2900000
+      }
+    },
+    {
+      "name": "配偶者なし: 遺産1億円・子2人のみ(基礎控除4200万・総額770万)",
+      "func": "calculate",
+      "args": [10000, false, 2, 0, 0],
+      "expect": {
+        "ok": true,
+        "heirCount": 2,
+        "basicDeductionYen": 42000000,
+        "taxableEstateYen": 58000000,
+        "totalTaxYen": 7700000,
+        "eachGroupTaxYen": 3850000,
+        "netTotalTaxYen": 7700000
+      }
+    },
+    {
+      "name": "第2順位: 遺産2億円・配偶者と親2人(配偶者2/3・親1/3)",
+      "func": "calculate",
+      "args": [20000, true, 0, 2, 0],
+      "expect": {
+        "ok": true,
+        "groupType": "parents",
+        "basicDeductionYen": 48000000,
+        "taxableEstateYen": 152000000,
+        "spouseTaxYen": 23533200,
+        "eachGroupTaxYen": 3299950,
+        "totalTaxYen": 30133100
+      }
+    },
+    {
+      "name": "第3順位: 遺産1億円・配偶者と兄弟姉妹2人(配偶者3/4・兄弟1/4)",
+      "func": "calculate",
+      "args": [10000, true, 0, 0, 2],
+      "expect": {
+        "ok": true,
+        "groupType": "siblings",
+        "spouseTaxYen": 5800000,
+        "eachGroupTaxYen": 650000,
+        "totalTaxYen": 7100000,
+        "netTotalTaxYen": 1300000
+      }
+    },
+    {
+      "name": "上位順位が優先: 子がいれば親・兄弟姉妹は相続人にならない",
+      "func": "heirs",
+      "args": [true, 2, 2, 3],
+      "expect": {
+        "ok": true,
+        "heirCount": 3,
+        "groupType": "children",
+        "groupCount": 2,
+        "spouseShare": 0.5
+      }
+    },
+    {
+      "name": "境界値: 遺産が基礎控除ちょうど4800万円なら課税遺産総額は0で相続税0",
+      "func": "calculate",
+      "args": [4800, true, 2, 0, 0],
+      "expect": {
+        "ok": true,
+        "taxableEstateYen": 0,
+        "totalTaxYen": 0,
+        "netTotalTaxYen": 0,
+        "taxable": false
+      }
+    },
+    {
+      "name": "境界値: 基礎控除を1万円超えると課税(4801万・課税1万円。按分後に1000円未満を切り捨てるため配偶者5000円→500円、子2000円→200円ずつで計900円)",
+      "func": "calculate",
+      "args": [4801, true, 2, 0, 0],
+      "expect": {
+        "ok": true,
+        "taxableEstateYen": 10000,
+        "spouseTaxYen": 500,
+        "eachGroupTaxYen": 200,
+        "totalTaxYen": 900,
+        "taxable": true
+      }
+    },
+    {
+      "name": "境界値: 遺産0円でも相続人がいればエラーにせず税額0を返す",
+      "func": "calculate",
+      "args": [0, true, 1, 0, 0],
+      "expect": {
+        "ok": true,
+        "taxableEstateYen": 0,
+        "totalTaxYen": 0
+      }
+    },
+    {
+      "name": "高額: 遺産10億円・配偶者と子1人(各4億7900万で税率50%・控除4200万)",
+      "func": "calculate",
+      "args": [100000, true, 1, 0, 0],
+      "expect": {
+        "ok": true,
+        "taxableEstateYen": 958000000,
+        "eachGroupTaxYen": 197500000,
+        "totalTaxYen": 395000000,
+        "netTotalTaxYen": 197500000
+      }
+    },
+    {
+      "name": "速算表: 1000万円ちょうどは税率10%・控除なしで100万円",
+      "func": "applyRate",
+      "args": [10000000],
+      "expect": 1000000
+    },
+    {
+      "name": "速算表: 1000万円超は税率15%・控除50万円(1001万円なら100.15万円)",
+      "func": "applyRate",
+      "args": [10010000],
+      "expect": 1001500
+    },
+    {
+      "name": "速算表: 6億円超は税率55%・控除7200万円(7億円なら3億1300万円)",
+      "func": "applyRate",
+      "args": [700000000],
+      "expect": 313000000
+    },
+    {
+      "name": "基礎控除: 法定相続人3人なら4800万円",
+      "func": "basicDeduction",
+      "args": [true, 2, 0, 0],
+      "expect": {
+        "ok": true,
+        "heirCount": 3,
+        "basicDeductionMan": 4800
+      }
+    },
+    {
+      "name": "異常入力: 相続人が一人もいない場合はエラー",
+      "func": "calculate",
+      "args": [10000, false, 0, 0, 0],
+      "expect": {
+        "ok": false,
+        "code": "no_heir"
+      }
+    },
+    {
+      "name": "異常入力: 遺産総額が負の値はエラー",
+      "func": "calculate",
+      "args": [-100, true, 1, 0, 0],
+      "expect": {
+        "ok": false,
+        "code": "invalid_estate"
+      }
+    },
+    {
+      "name": "異常入力: 遺産総額が数値でない場合はエラー",
+      "func": "calculate",
+      "args": ["1億円", true, 1, 0, 0],
+      "expect": {
+        "ok": false,
+        "code": "invalid_estate"
+      }
+    },
+    {
+      "name": "異常入力: 子の人数が小数はエラー",
+      "func": "calculate",
+      "args": [10000, true, 1.5, 0, 0],
+      "expect": {
+        "ok": false,
+        "code": "invalid_children"
+      }
+    },
+    {
+      "name": "異常入力: 子の人数が負の値はエラー",
+      "func": "calculate",
+      "args": [10000, true, -1, 0, 0],
+      "expect": {
+        "ok": false,
+        "code": "invalid_children"
+      }
+    },
+    {
+      "name": "異常入力: 配偶者の有無が真偽値でない場合はエラー",
+      "func": "calculate",
+      "args": [10000, "あり", 1, 0, 0],
+      "expect": {
+        "ok": false,
+        "code": "invalid_spouse"
+      }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": {
+        "ok": false,
+        "code": "invalid_estate"
+      }
+    },
+    {
+      "name": "配偶者のみが相続人: 法定相続分は1で税額は全額軽減され0になる",
+      "func": "calculate",
+      "args": [10000, true, 0, 0, 0],
+      "expect": {
+        "ok": true,
+        "heirCount": 1,
+        "groupType": "spouse_only",
+        "basicDeductionYen": 36000000,
+        "netTotalTaxYen": 0
+      }
+    }
+  ]
+}

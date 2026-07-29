@@ -1,0 +1,151 @@
+{
+  "tool": "juminzei",
+  "module": "calc.js",
+  "global": "JuminzeiCalc",
+  "cases": [
+    {
+      "name": "年収500万・社保70万・単身: 課税所得243万、所得割240,500円、合計245,500円",
+      "func": "calculate",
+      "args": [5000000, 700000, 0, 0, 5000],
+      "expect": { "ok": true, "salaryDeductionYen": 1440000, "taxableIncomeYen": 2430000, "adjustmentCreditYen": 2500, "incomeLevyYen": 240500, "totalYen": 245500 }
+    },
+    {
+      "name": "年収300万・社保43万・単身: 給与所得控除98万、合計118,500円",
+      "func": "calculate",
+      "args": [3000000, 430000, 0, 0, 5000],
+      "expect": { "ok": true, "salaryDeductionYen": 980000, "taxableIncomeYen": 1160000, "incomeLevyYen": 113500, "totalYen": 118500 }
+    },
+    {
+      "name": "年収600万・社保85万・配偶者1人+扶養2人: 調整控除5,500円、合計208,500円",
+      "func": "calculate",
+      "args": [6000000, 850000, 1, 2, 5000],
+      "expect": { "ok": true, "totalDeductionYen": 2270000, "taxableIncomeYen": 2090000, "adjustmentCreditYen": 5500, "incomeLevyYen": 203500, "totalYen": 208500 }
+    },
+    {
+      "name": "年収900万(給与所得控除は上限195万): 合計534,500円",
+      "func": "calculate",
+      "args": [9000000, 1300000, 0, 0, 5000],
+      "expect": { "ok": true, "salaryDeductionYen": 1950000, "taxableIncomeYen": 5320000, "incomeLevyYen": 529500, "totalYen": 534500 }
+    },
+    {
+      "name": "課税所得が0になる年収100万: 所得割0で均等割5,000円のみ",
+      "func": "calculate",
+      "args": [1000000, 0, 0, 0, 5000],
+      "expect": { "ok": true, "taxableIncomeYen": 0, "adjustmentCreditYen": 0, "incomeLevyYen": 0, "totalYen": 5000 }
+    },
+    {
+      "name": "境界値: 年収0円でもエラーにせず均等割のみ",
+      "func": "calculate",
+      "args": [0, 0, 0, 0, 5000],
+      "expect": { "ok": true, "incomeLevyYen": 0, "totalYen": 5000 }
+    },
+    {
+      "name": "均等割を0円にした場合は所得割だけになる",
+      "func": "calculate",
+      "args": [3000000, 430000, 0, 0, 0],
+      "expect": { "ok": true, "perCapitaLevyYen": 0, "totalYen": 113500 }
+    },
+    {
+      "name": "給与所得控除: 収入190万円ちょうどは最低保障の65万円",
+      "func": "kyuyoDeduction",
+      "args": [1900000],
+      "expect": { "ok": true, "value": 650000 }
+    },
+    {
+      "name": "給与所得控除: 収入360万円ちょうどは116万円",
+      "func": "kyuyoDeduction",
+      "args": [3600000],
+      "expect": { "ok": true, "value": 1160000 }
+    },
+    {
+      "name": "給与所得控除: 収入660万円ちょうどは176万円",
+      "func": "kyuyoDeduction",
+      "args": [6600000],
+      "expect": { "ok": true, "value": 1760000 }
+    },
+    {
+      "name": "給与所得控除: 収入850万円超は上限195万円",
+      "func": "kyuyoDeduction",
+      "args": [12000000],
+      "expect": { "ok": true, "value": 1950000 }
+    },
+    {
+      "name": "給与所得控除: 負の収入はエラー",
+      "func": "kyuyoDeduction",
+      "args": [-1],
+      "expect": { "ok": false, "code": "invalid_income" }
+    },
+    {
+      "name": "調整控除: 合計課税所得200万円以下は人的控除差5万円の5%で2,500円",
+      "func": "adjustmentCredit",
+      "args": [1160000, 50000],
+      "expect": { "ok": true, "value": 2500 }
+    },
+    {
+      "name": "調整控除: 課税所得が控除差より小さいと課税所得側で頭打ち(3万円×5%=1,500円)",
+      "func": "adjustmentCredit",
+      "args": [30000, 50000],
+      "expect": { "ok": true, "value": 1500 }
+    },
+    {
+      "name": "調整控除: 合計課税所得200万円超でも下限5万円分の2,500円は残る",
+      "func": "adjustmentCredit",
+      "args": [2430000, 50000],
+      "expect": { "ok": true, "value": 2500 }
+    },
+    {
+      "name": "調整控除: 課税所得209万・人的控除差20万円は11万円の5%で5,500円",
+      "func": "adjustmentCredit",
+      "args": [2090000, 200000],
+      "expect": { "ok": true, "value": 5500 }
+    },
+    {
+      "name": "調整控除: 課税所得0円なら0円",
+      "func": "adjustmentCredit",
+      "args": [0, 50000],
+      "expect": { "ok": true, "value": 0 }
+    },
+    {
+      "name": "異常入力: 年収が数値でないときはエラー",
+      "func": "calculate",
+      "args": ["abc", 0],
+      "expect": { "ok": false, "code": "invalid_income" }
+    },
+    {
+      "name": "異常入力: 年収が負の値はエラー",
+      "func": "calculate",
+      "args": [-1, 0],
+      "expect": { "ok": false, "code": "invalid_income" }
+    },
+    {
+      "name": "異常入力: 社会保険料が負の値はエラー",
+      "func": "calculate",
+      "args": [5000000, -1],
+      "expect": { "ok": false, "code": "invalid_insurance" }
+    },
+    {
+      "name": "異常入力: 配偶者の人数が2人はエラー",
+      "func": "calculate",
+      "args": [5000000, 0, 2, 0],
+      "expect": { "ok": false, "code": "invalid_spouse" }
+    },
+    {
+      "name": "異常入力: 扶養人数が上限20人を超えるとエラー",
+      "func": "calculate",
+      "args": [5000000, 0, 0, 21],
+      "expect": { "ok": false, "code": "invalid_dependents" }
+    },
+    {
+      "name": "異常入力: 均等割が負の値はエラー",
+      "func": "calculate",
+      "args": [5000000, 0, 0, 0, -5],
+      "expect": { "ok": false, "code": "invalid_kintouwari" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_income" }
+    }
+  ]
+}

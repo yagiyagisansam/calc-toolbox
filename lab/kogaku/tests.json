@@ -1,0 +1,246 @@
+{
+  "tool": "kogaku",
+  "module": "calc.js",
+  "global": "KogakuCalc",
+  "cases": [
+    {
+      "name": "厚労省の例そのまま: 総医療費100万円・3割・70歳以上の現役並みI(限度額87,430円・払戻212,570円)",
+      "func": "calculate",
+      "args": [1000000, 30, "o70_g1", false, "current", false],
+      "expect": {
+        "ok": true,
+        "windowYen": 300000,
+        "limitYen": 87430,
+        "refundYen": 212570,
+        "finalYen": 87430,
+        "applied": true
+      }
+    },
+    {
+      "name": "70歳未満・区分ウ: 総医療費100万円・3割(80,100円+(100万-267,000)×1%=87,430円)",
+      "func": "calculate",
+      "args": [1000000, 30, "u70_u", false, "current", false],
+      "expect": {
+        "ok": true,
+        "limitYen": 87430,
+        "refundYen": 212570,
+        "kind": "formula"
+      }
+    },
+    {
+      "name": "多数回該当: 区分ウは4回目以降44,400円になる",
+      "func": "calculate",
+      "args": [1000000, 30, "u70_u", true, "current", false],
+      "expect": {
+        "ok": true,
+        "limitYen": 44400,
+        "refundYen": 255600,
+        "kind": "multiple",
+        "multipleApplied": true
+      }
+    },
+    {
+      "name": "定額区分: 区分エは総医療費にかかわらず57,600円(総医療費30万・3割)",
+      "func": "calculate",
+      "args": [300000, 30, "u70_e", false, "current", false],
+      "expect": {
+        "ok": true,
+        "windowYen": 90000,
+        "limitYen": 57600,
+        "refundYen": 32400,
+        "kind": "base"
+      }
+    },
+    {
+      "name": "住民税非課税(区分オ): 限度額35,400円",
+      "func": "calculate",
+      "args": [300000, 30, "u70_o", false, "current", false],
+      "expect": {
+        "ok": true,
+        "limitYen": 35400,
+        "refundYen": 54600
+      }
+    },
+    {
+      "name": "70歳以上一般の外来(個人ごと): 限度額18,000円(令和8年7月診療分まで)",
+      "func": "calculate",
+      "args": [200000, 20, "o70_ippan", false, "current", true],
+      "expect": {
+        "ok": true,
+        "windowYen": 40000,
+        "limitYen": 18000,
+        "refundYen": 22000,
+        "kind": "outpatient"
+      }
+    },
+    {
+      "name": "令和8年8月から: 区分ア 総医療費100万円は270,300円+(100万-901,000)×1%=271,290円",
+      "func": "calculate",
+      "args": [1000000, 30, "u70_a", false, "r8", false],
+      "expect": {
+        "ok": true,
+        "limitYen": 271290,
+        "refundYen": 28710,
+        "yearLimitYen": 1680000
+      }
+    },
+    {
+      "name": "令和8年8月から: 区分ウ 総医療費100万円は85,800円+(100万-286,000)×1%=92,940円",
+      "func": "calculate",
+      "args": [1000000, 30, "u70_u", false, "r8", false],
+      "expect": {
+        "ok": true,
+        "limitYen": 92940,
+        "refundYen": 207060,
+        "yearLimitYen": 530000
+      }
+    },
+    {
+      "name": "令和8年8月から: 区分エは61,500円に引き上げ(現行57,600円から+3,900円)",
+      "func": "limit",
+      "args": [300000, "u70_e", false, "r8", false],
+      "expect": {
+        "ok": true,
+        "limitYen": 61500,
+        "yearLimitYen": 530000
+      }
+    },
+    {
+      "name": "令和8年8月から: 多数回該当の額は据え置き(区分ウは44,400円のまま)",
+      "func": "limit",
+      "args": [1000000, "u70_u", true, "r8", false],
+      "expect": {
+        "ok": true,
+        "limitYen": 44400,
+        "multipleApplied": true
+      }
+    },
+    {
+      "name": "境界値: 区分ウの3割負担は総医療費267,000円ちょうどで窓口80,100円=限度額(払戻0)",
+      "func": "calculate",
+      "args": [267000, 30, "u70_u", false, "current", false],
+      "expect": {
+        "ok": true,
+        "windowYen": 80100,
+        "limitYen": 80100,
+        "refundYen": 0,
+        "applied": false
+      }
+    },
+    {
+      "name": "境界値: 区分ウの3割負担で総医療費267,100円なら払戻が発生する",
+      "func": "calculate",
+      "args": [267100, 30, "u70_u", false, "current", false],
+      "expect": {
+        "ok": true,
+        "windowYen": 80130,
+        "limitYen": 80101,
+        "refundYen": 29,
+        "applied": true
+      }
+    },
+    {
+      "name": "対象になる総医療費の下限: 区分ウ・3割は267,000円",
+      "func": "threshold",
+      "args": [30, "u70_u", false, "current"],
+      "expect": {
+        "ok": true,
+        "thresholdYen": 267000
+      }
+    },
+    {
+      "name": "対象になる総医療費の下限: 区分エ・3割は192,000円(57,600円÷0.3)",
+      "func": "threshold",
+      "args": [30, "u70_e", false, "current"],
+      "expect": {
+        "ok": true,
+        "thresholdYen": 192000
+      }
+    },
+    {
+      "name": "少額: 総医療費5万円・3割なら窓口15,000円で払い戻しなし",
+      "func": "calculate",
+      "args": [50000, 30, "u70_u", false, "current", false],
+      "expect": {
+        "ok": true,
+        "windowYen": 15000,
+        "refundYen": 0,
+        "applied": false
+      }
+    },
+    {
+      "name": "境界値: 総医療費0円は窓口0円・払戻0円",
+      "func": "calculate",
+      "args": [0, 30, "u70_e", false, "current", false],
+      "expect": {
+        "ok": true,
+        "windowYen": 0,
+        "refundYen": 0
+      }
+    },
+    {
+      "name": "異常入力: 総医療費が負の値はエラー",
+      "func": "calculate",
+      "args": [-1000, 30, "u70_u", false, "current", false],
+      "expect": {
+        "ok": false,
+        "code": "invalid_total"
+      }
+    },
+    {
+      "name": "異常入力: 総医療費が数値でない場合はエラー",
+      "func": "calculate",
+      "args": ["100万円", 30, "u70_u", false, "current", false],
+      "expect": {
+        "ok": false,
+        "code": "invalid_total"
+      }
+    },
+    {
+      "name": "異常入力: 存在しない所得区分はエラー",
+      "func": "calculate",
+      "args": [1000000, 30, "u70_x", false, "current", false],
+      "expect": {
+        "ok": false,
+        "code": "invalid_category"
+      }
+    },
+    {
+      "name": "異常入力: 存在しない適用時期はエラー",
+      "func": "calculate",
+      "args": [1000000, 30, "u70_u", false, "r9", false],
+      "expect": {
+        "ok": false,
+        "code": "invalid_period"
+      }
+    },
+    {
+      "name": "異常入力: 負担割合が10・20・30以外はエラー",
+      "func": "calculate",
+      "args": [1000000, 25, "u70_u", false, "current", false],
+      "expect": {
+        "ok": false,
+        "code": "invalid_rate"
+      }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": {
+        "ok": false,
+        "code": "invalid_total"
+      }
+    },
+    {
+      "name": "住民税非課税I(70歳以上)は多数回該当の適用がないので通常の限度額15,000円のまま",
+      "func": "limit",
+      "args": [500000, "o70_low1", true, "current", false],
+      "expect": {
+        "ok": true,
+        "limitYen": 15000,
+        "multipleApplied": false
+      }
+    }
+  ]
+}

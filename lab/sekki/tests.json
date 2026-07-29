@@ -1,0 +1,200 @@
+{
+  "tool": "sekki",
+  "module": "calc.js",
+  "global": "SekkiCalc",
+  "cases": [
+    {
+      "name": "2026年の立春は2月4日5時2分(暦要項と一致)",
+      "func": "sekkiByName",
+      "args": [2026, "立春"],
+      "expect": { "ok": true, "iso": "2026-02-04", "month": 2, "day": 4, "hour": 5, "minute": 2 }
+    },
+    {
+      "name": "2026年の春分は3月20日23時46分(暦要項と一致)",
+      "func": "sekkiByName",
+      "args": [2026, "春分"],
+      "expect": { "ok": true, "iso": "2026-03-20", "hour": 23, "minute": 46 }
+    },
+    {
+      "name": "2026年の冬至は12月22日5時50分(暦要項と一致)",
+      "func": "sekkiByName",
+      "args": [2026, "冬至"],
+      "expect": { "ok": true, "iso": "2026-12-22", "hour": 5, "minute": 50 }
+    },
+    {
+      "name": "境界: 2021年の立春は2月3日23時59分(日付が変わる直前)",
+      "func": "sekkiByName",
+      "args": [2021, "立春"],
+      "expect": { "ok": true, "iso": "2021-02-03", "hour": 23, "minute": 59 }
+    },
+    {
+      "name": "2025年の立春は2月3日23時10分(立春が3日になる年)",
+      "func": "sekkiByName",
+      "args": [2025, "立春"],
+      "expect": { "ok": true, "iso": "2025-02-03", "hour": 23, "minute": 10 }
+    },
+    {
+      "name": "うるう年2024年の春分は3月20日(暦要項と同じ日)",
+      "func": "sekkiByName",
+      "args": [2024, "春分"],
+      "expect": { "ok": true, "iso": "2024-03-20" }
+    },
+    {
+      "name": "2027年の秋分は9月23日(暦要項と同じ日)",
+      "func": "sekkiByName",
+      "args": [2027, "秋分"],
+      "expect": { "ok": true, "iso": "2027-09-23" }
+    },
+    {
+      "name": "二十四節気は1年で必ず24件そろう(2026年)",
+      "func": "sekkiOfYear",
+      "args": [2026],
+      "expect": { "ok": true, "year": 2026, "terms": { "length": 24 } }
+    },
+    {
+      "name": "2026年の並びは小寒→大寒→立春の順(1件目・2件目)",
+      "func": "sekkiOfYear",
+      "args": [2026],
+      "expect": {
+        "ok": true,
+        "terms": {
+          "0": { "name": "小寒", "iso": "2026-01-05" },
+          "1": { "name": "大寒", "iso": "2026-01-20" },
+          "23": { "name": "冬至", "iso": "2026-12-22" }
+        }
+      }
+    },
+    {
+      "name": "雑節: 2026年の節分は立春(2月4日)の前日で2月3日",
+      "func": "zassetsuByName",
+      "args": [2026, "節分"],
+      "expect": { "ok": true, "iso": "2026-02-03" }
+    },
+    {
+      "name": "雑節: 立春が2月3日の2025年は節分が2月2日になる",
+      "func": "zassetsuByName",
+      "args": [2025, "節分"],
+      "expect": { "ok": true, "iso": "2025-02-02" }
+    },
+    {
+      "name": "雑節: 2026年の八十八夜は立春から88日目で5月2日",
+      "func": "zassetsuByName",
+      "args": [2026, "八十八夜"],
+      "expect": { "ok": true, "iso": "2026-05-02" }
+    },
+    {
+      "name": "雑節: うるう年2024年の二百十日は8月31日",
+      "func": "zassetsuByName",
+      "args": [2024, "二百十日"],
+      "expect": { "ok": true, "iso": "2024-08-31" }
+    },
+    {
+      "name": "雑節: 2026年の春彼岸入りは春分(3月20日)の3日前で3月17日",
+      "func": "zassetsuByName",
+      "args": [2026, "春彼岸入り"],
+      "expect": { "ok": true, "iso": "2026-03-17" }
+    },
+    {
+      "name": "雑節: 2026年の秋彼岸入りは秋分(9月23日)の3日前で9月20日",
+      "func": "zassetsuByName",
+      "args": [2026, "秋彼岸入り"],
+      "expect": { "ok": true, "iso": "2026-09-20" }
+    },
+    {
+      "name": "雑節: 2026年の夏土用入り(黄経117度)は7月20日0時48分",
+      "func": "zassetsuByName",
+      "args": [2026, "夏土用入り"],
+      "expect": { "ok": true, "iso": "2026-07-20", "hour": 0, "minute": 48 }
+    },
+    {
+      "name": "雑節: 2026年の冬土用入り(黄経297度)は1月17日12時3分",
+      "func": "zassetsuByName",
+      "args": [2026, "冬土用入り"],
+      "expect": { "ok": true, "iso": "2026-01-17", "hour": 12, "minute": 3 }
+    },
+    {
+      "name": "雑節: 2026年の入梅(黄経80度)は6月11日6時14分",
+      "func": "zassetsuByName",
+      "args": [2026, "入梅"],
+      "expect": { "ok": true, "iso": "2026-06-11", "hour": 6, "minute": 14 }
+    },
+    {
+      "name": "雑節: 2026年の半夏生(黄経100度)は7月2日5時4分",
+      "func": "zassetsuByName",
+      "args": [2026, "半夏生"],
+      "expect": { "ok": true, "iso": "2026-07-02", "hour": 5, "minute": 4 }
+    },
+    {
+      "name": "黄経を直接指定: 2026年の黄経0度(春分)は3月20日",
+      "func": "solarTermAt",
+      "args": [2026, 0],
+      "expect": { "ok": true, "iso": "2026-03-20" }
+    },
+    {
+      "name": "境界値: 下限の1900年も24件計算できる",
+      "func": "sekkiOfYear",
+      "args": [1900],
+      "expect": { "ok": true, "terms": { "length": 24 } }
+    },
+    {
+      "name": "境界値: 上限の2100年も24件計算できる",
+      "func": "sekkiOfYear",
+      "args": [2100],
+      "expect": { "ok": true, "terms": { "length": 24 } }
+    },
+    {
+      "name": "異常入力: 下限未満の1899年はエラー",
+      "func": "sekkiOfYear",
+      "args": [1899],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "異常入力: 上限超過の2101年はエラー",
+      "func": "sekkiOfYear",
+      "args": [2101],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "異常入力: 0年はエラー",
+      "func": "sekkiOfYear",
+      "args": [0],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "異常入力: 負の年はエラー",
+      "func": "sekkiOfYear",
+      "args": [-2026],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "異常入力: 数値でない年はエラー",
+      "func": "sekkiOfYear",
+      "args": ["abc"],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "sekkiOfYear",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "異常入力: 存在しない節気名はエラー",
+      "func": "sekkiByName",
+      "args": [2026, "存在しない節気"],
+      "expect": { "ok": false, "code": "invalid_name" }
+    },
+    {
+      "name": "異常入力: 黄経360度は範囲外でエラー",
+      "func": "solarTermAt",
+      "args": [2026, 360],
+      "expect": { "ok": false, "code": "invalid_longitude" }
+    },
+    {
+      "name": "異常入力: 黄経が負の値はエラー",
+      "func": "solarTermAt",
+      "args": [2026, -15],
+      "expect": { "ok": false, "code": "invalid_longitude" }
+    }
+  ]
+}

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>育児休業給付金 計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="育休中に雇用保険から支給される育児休業給付金の月額と総額を、67%期間と50%期間に分けて計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>育児休業給付金 計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>休業開始前6か月の賃金総額(円)
+      <span class="field-note">賞与は含めません。月給30万円なら 1800000</span>
+      <input type="number" id="wage" inputmode="numeric" step="1000" min="1" max="100000000" placeholder="1800000">
+    </label>
+    <label>育休の期間(月数)
+      <span class="field-note">1か月＝支給単位期間30日として計算します</span>
+      <input type="number" id="months" inputmode="numeric" step="1" min="1" max="24" value="12">
+    </label>
+    <label>
+      <input type="checkbox" id="cap" checked> 支給上限額を適用する(通常はオン)
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 出生後休業支援給付金・出生時育児休業給付金</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">出生後休業支援給付金(13%の上乗せ)</h3>
+      <p class="adv-note">令和7年4月に創設された給付です。両親ともに14日以上の育休を取得した場合などに、最大28日分が13%上乗せされます。</p>
+      <label>出生後休業の日数(1〜28日)
+        <input type="number" id="sango-days" inputmode="numeric" step="1" min="1" max="28" value="28">
+      </label>
+      <div class="tool-result" id="sango-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">出生時育児休業給付金(産後パパ育休)</h3>
+      <p class="adv-note">子の出生後8週間以内に取得する休業に対する給付です。支給率67%、通算28日が上限です。</p>
+      <label>出生時育児休業の日数(1〜28日)
+        <input type="number" id="ss-days" inputmode="numeric" step="1" min="1" max="28" value="28">
+      </label>
+      <div class="tool-result" id="ss-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    金額は<strong>令和7年8月1日〜令和8年7月31日</strong>に適用される支給上限額に基づく概算です。上限額は毎年8月1日に改定されます。実際の支給額は必ずハローワークでご確認ください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>育休中に雇用保険から受け取れる<strong>1か月あたりの金額と期間全体の総額</strong>がわかります。最初の6か月(180日)は賃金の67%、それ以降は50%と支給率が下がるため、<strong>いつ手取りが減るか</strong>も同時に確認できます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>育休に入る前6か月間の賃金総額(賞与を除く)を円で入れます。月給30万円なら 1800000 です。</li>
+    <li>取得予定の育休の月数を入れると、67%期間と50%期間に分けた金額がすぐ出ます。</li>
+    <li>産後パパ育休や13%の上乗せ給付を見たいときは「＋詳細機能」を開いてください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>休業開始時賃金日額</strong> = 休業開始前6か月間の賃金総額 ÷ 180(1円未満切り捨て)</li>
+    <li><strong>支給額(1支給単位期間)</strong> = 賃金日額 × 支給日数(30日) × 支給率</li>
+    <li><strong>支給率</strong> = 休業開始から通算180日目まで67%、181日目以降は50%</li>
+    <li><strong>出生後休業支援給付金</strong> = 賃金日額 × 出生後休業日数(上限28日) × 13%</li>
+    <li><strong>出生時育児休業給付金</strong> = 賃金日額 × 休業日数(上限28日) × 67%</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>支給上限額(令和7年8月1日〜令和8年7月31日)</caption>
+      <thead><tr><th>給付の種類</th><th>支給率</th><th>支給上限額</th></tr></thead>
+      <tbody>
+        <tr><td>育児休業給付金(30日分)</td><td>67%</td><td>323,811円</td></tr>
+        <tr><td>育児休業給付金(30日分)</td><td>50%</td><td>241,650円</td></tr>
+        <tr><td>出生時育児休業給付金(28日分)</td><td>67%</td><td>302,223円</td></tr>
+        <tr><td>出生後休業支援給付金(28日分)</td><td>13%</td><td>58,640円</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>上記4つの上限額は、いずれも休業開始時賃金日額の上限 16,110円 から計算した額と一致します(16,110円 × 30日 × 67% = 323,811円 など)。本ツールもこの賃金日額の上限を使って計算しています。</p>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>厚生労働省・都道府県労働局・ハローワーク「令和7年8月1日から支給限度額が変更になります」(支給上限額の一次資料)<br>
+      <a href="https://www.mhlw.go.jp/content/001520023.pdf" rel="noopener" target="_blank">https://www.mhlw.go.jp/content/001520023.pdf</a>(2026年7月29日参照)</li>
+    <li>ハローワークインターネットサービス「育児休業等給付」<br>
+      <a href="https://www.hellowork.mhlw.go.jp/insurance/insurance_childcareleave.html" rel="noopener" target="_blank">https://www.hellowork.mhlw.go.jp/insurance/insurance_childcareleave.html</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>支給上限額は<strong>令和7年8月1日〜令和8年7月31日</strong>に適用される額です。毎月勤労統計の平均定期給与額の増減をもとに<strong>毎年8月1日に改定</strong>されるため、それ以降は金額が変わります。</li>
+    <li>1支給単位期間を30日として計算しています。実際は育休の開始日を起点とした期間で区切られるため、月によって支給日数が異なることがあります。</li>
+    <li>賃金日額には下限額も定められています。本ツールは上限のみを扱うため、収入が非常に低い場合は実際の支給額がこの計算より多くなることがあります。</li>
+    <li>育休中に会社から賃金が支払われる場合は、その額に応じて給付が減額または不支給になります。本ツールでは考慮していません。</li>
+    <li>受給には「休業開始前2年間に賃金支払基礎日数11日以上の月が12か月以上ある」などの要件があります。要件を満たすかはハローワークにご確認ください。</li>
+    <li>育児休業給付は非課税で、育休中は申し出により社会保険料も免除されます。そのため手取りベースでは支給率以上の割合が残ります。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">67%から50%に下がるのはいつですか?</h3>
+  <p class="faq-a">休業開始から通算して180日目までが67%、181日目以降が50%です。1支給単位期間を30日とすると、7か月目から50%になります。</p>
+  <h3 class="faq-q">「手取り10割」と聞きましたが本当ですか?</h3>
+  <p class="faq-a">令和7年4月に創設された出生後休業支援給付金(13%)を合わせると、最大28日間は賃金の80%相当になります。給付が非課税であることと社会保険料が免除されることを加味すると、この期間は手取りベースで概ね10割相当になるとされています。対象は、両親ともに一定期間の育休を取得した場合などに限られます。</p>
+  <h3 class="faq-q">賞与(ボーナス)は賃金総額に含めますか?</h3>
+  <p class="faq-a">含めません。休業開始時賃金日額の計算対象は、3か月を超える期間ごとに支払われる賃金(賞与など)を除いた賃金です。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_wage: "6か月の賃金総額は1円〜1億円の範囲で入力してください。",
+    invalid_months: "育休の月数は1〜24の整数で入力してください。",
+    invalid_days: "日数は1〜28の整数で入力してください。"
+  };
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function el(id) { return document.getElementById(id); }
+  function int(id) { return parseInt(el(id).value, 10); }
+  function filled(ids) {
+    return ids.every(function (id) { return el(id).value.trim() !== ""; });
+  }
+  function yen(v) { return v.toLocaleString("ja-JP") + "円"; }
+  function show(box, r, render) {
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML = render(r);
+    box.hidden = false;
+  }
+
+  var box = el("result");
+  var sangoBox = el("sango-result");
+  var ssBox = el("ss-result");
+
+  function runMain() {
+    if (!filled(["wage", "months"])) { box.hidden = true; return; }
+    var r = IkujiCalc.calculate(int("wage"), int("months"), el("cap").checked);
+    show(box, r, function (x) {
+      var html = '<div class="result-main">総額 ' + esc(yen(x.total)) + "</div>";
+      html += "<p>賃金日額 " + esc(yen(x.dailyWageUsed)) +
+        (x.capped ? "(上限16,110円を適用。計算上は " + esc(yen(x.dailyWage)) + ")" : "") + "</p>";
+      html += '<div class="table-scroll"><table class="data-table">' +
+        "<thead><tr><th>期間</th><th>月額</th><th>月数</th><th>小計</th></tr></thead><tbody>" +
+        "<tr><td>67%(180日目まで)</td><td>" + esc(yen(x.monthly67)) + "</td><td>" + esc(x.months67) +
+        "か月</td><td>" + esc(yen(x.total67)) + "</td></tr>";
+      if (x.months50 > 0) {
+        html += "<tr><td>50%(181日目以降)</td><td>" + esc(yen(x.monthly50)) + "</td><td>" + esc(x.months50) +
+          "か月</td><td>" + esc(yen(x.total50)) + "</td></tr>";
+      }
+      html += "</tbody></table></div>";
+      return html;
+    });
+  }
+
+  function runSango() {
+    if (!filled(["wage", "sango-days"])) { sangoBox.hidden = true; return; }
+    var r = IkujiCalc.sangoShien(int("wage"), int("sango-days"), el("cap").checked);
+    show(sangoBox, r, function (x) {
+      return '<div class="result-main">' + esc(yen(x.amount)) + "</div>" +
+        "<p>賃金日額 " + esc(yen(x.dailyWageUsed)) + " × " + esc(x.days) + "日 × 13%(上限58,640円)</p>";
+    });
+  }
+
+  function runSs() {
+    if (!filled(["wage", "ss-days"])) { ssBox.hidden = true; return; }
+    var r = IkujiCalc.shusshoji(int("wage"), int("ss-days"), el("cap").checked);
+    show(ssBox, r, function (x) {
+      return '<div class="result-main">' + esc(yen(x.amount)) + "</div>" +
+        "<p>賃金日額 " + esc(yen(x.dailyWageUsed)) + " × " + esc(x.days) + "日 × 67%(上限302,223円)</p>";
+    });
+  }
+
+  function runAll() { runMain(); runSango(); runSs(); }
+  ["wage", "months", "sango-days", "ss-days"].forEach(function (id) {
+    el(id).addEventListener("input", runAll);
+  });
+  el("cap").addEventListener("change", runAll);
+  el("tool-form").addEventListener("submit", function (e) { e.preventDefault(); runAll(); });
+  runAll();
+})();
+</script>
+</body>
+</html>
