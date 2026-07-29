@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>六曜(大安・仏滅)カレンダー(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="指定した日の六曜を判定し、直近の大安・友引の日を一覧表示します。旧暦の月日から計算しています。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>六曜(大安・仏滅)カレンダー</h1>
+  <form class="tool-form" id="tool-form">
+    <label>日付
+      <span class="field-note">1900年〜2099年に対応</span>
+      <input type="date" id="date" min="1900-01-01" max="2099-12-31">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 直近の大安・友引を探す</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">指定日以降で近い日を一覧にする</h3>
+      <p class="adv-note">結婚式・地鎮祭・納車などの日取りを決めるときにどうぞ。</p>
+      <div class="field-row">
+        <label>探す六曜
+          <select id="target">
+            <option value="大安" selected>大安</option>
+            <option value="友引">友引</option>
+            <option value="先勝">先勝</option>
+            <option value="先負">先負</option>
+            <option value="赤口">赤口</option>
+            <option value="仏滅">仏滅</option>
+          </select>
+        </label>
+        <label>件数
+          <select id="count">
+            <option value="5">5件</option>
+            <option value="10" selected>10件</option>
+            <option value="20">20件</option>
+          </select>
+        </label>
+      </div>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    六曜は<strong>旧暦の月日から機械的に決まる</strong>もので、国が定めた暦ではありません。旧暦そのものも公的な暦ではないため、市販のカレンダーとまれに1日ずれることがあります。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>その日の<strong>六曜(大安・友引・先負・仏滅・赤口・先勝)</strong>と、もとになる<strong>旧暦の月日</strong>がわかります。直近の大安・友引を探すこともできます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>日付を選ぶと、その瞬間に六曜と旧暦の月日が表示されます。</li>
+    <li>「＋詳細機能」で六曜を選ぶと、その日以降で近い日を一覧にします。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>六曜</strong> = (旧暦の月 ＋ 旧暦の日) を6で割った余り<br>
+      余り0=大安 / 1=赤口 / 2=先勝 / 3=友引 / 4=先負 / 5=仏滅</li>
+    <li>この規則により、旧暦1月1日と7月1日は必ず先勝になります(1+1=2、7+1=8。どちらも余り2)。</li>
+    <li><strong>旧暦</strong> = 朔(新月)の瞬間が属する日を各月の1日とし、中気(太陽黄経が30度の倍数になる瞬間)を含まない月を閏月とする太陰太陽暦。冬至を含む月を11月とします。</li>
+    <li>朔の時刻は Meeus「Astronomical Algorithms」第49章、太陽黄経は同第25章の計算式で求め、ΔT(地球時と世界時の差)を補正して日本標準時に直しています。</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>六曜と余りの対応</caption>
+      <thead><tr><th>余り</th><th>六曜</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td>大安</td></tr>
+        <tr><td>1</td><td>赤口</td></tr>
+        <tr><td>2</td><td>先勝</td></tr>
+        <tr><td>3</td><td>友引</td></tr>
+        <tr><td>4</td><td>先負</td></tr>
+        <tr><td>5</td><td>仏滅</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典</h3>
+  <ul class="sources">
+    <li>国立国会図書館「日本の暦」六曜 —「1月、7月(旧暦)の1日(朔日)に先勝を当て、以後順に配当していきます」<br>
+      <a href="https://www.ndl.go.jp/koyomi/chapter3/s3.html" rel="noopener" target="_blank">https://www.ndl.go.jp/koyomi/chapter3/s3.html</a>(2026年7月29日参照)</li>
+    <li>国立天文台「『旧暦』ってなに?」(旧暦=太陰太陽暦の仕組みと閏月の入れ方)<br>
+      <a href="https://www.nao.ac.jp/faq/a0304.html" rel="noopener" target="_blank">https://www.nao.ac.jp/faq/a0304.html</a>(2026年7月29日参照)</li>
+    <li>国立天文台 暦計算室「暦Wiki」(暦の用語と計算の考え方)<br>
+      <a href="https://eco.mtk.nao.ac.jp/koyomi/wiki/" rel="noopener" target="_blank">https://eco.mtk.nao.ac.jp/koyomi/wiki/</a>(2026年7月29日参照)</li>
+    <li>Jean Meeus「Astronomical Algorithms」第2版 第25章(太陽の位置)・第49章(朔弦望の時刻)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li><strong>基準の時点:</strong> 六曜の配当規則は2026年7月29日時点の上記ページの記載内容にもとづいています。</li>
+    <li>現在の日本の旧暦は<strong>国が定めた暦ではありません</strong>。本ツールは天保暦の規則を天文計算で再現したもので、市販の暦とまれに1日ずれることがあります。</li>
+    <li>朔・中気の時刻は日本標準時(UT+9時間)で判定しています。中国の農暦(UT+8時間)とは、朔が深夜に起こる年に1日ずれることがあります。</li>
+    <li>対応範囲は西暦1900年〜2099年です。</li>
+    <li>六曜には科学的な根拠はありません。日取りの参考としてお使いください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">なぜ六曜の並びが月の途中で飛ぶことがありますか?</h3>
+  <p class="faq-a">六曜は旧暦の月日から決まるためです。旧暦の月が変わると(月の1日に戻ると)、六曜の並びもその月の決まった位置にリセットされます。</p>
+  <h3 class="faq-q">閏月の六曜はどうなりますか?</h3>
+  <p class="faq-a">閏月は本来の月と同じ番号を使うため、六曜も同じ計算になります(例: 閏2月7日は 2+7=9、余り3で友引)。</p>
+  <h3 class="faq-q">大安と友引はどちらが良い日ですか?</h3>
+  <p class="faq-a">一般には大安が最も良いとされ、友引は祝い事には良いが葬儀は避けるとされます。ただし六曜は明治以降に広まった民間の習俗で、公的な意味づけはありません。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_date: "日付を正しく入力してください。",
+    out_of_range: "対応範囲は1900年〜2099年です。",
+    invalid_days: "日数の指定が正しくありません。",
+    invalid_rokuyo: "六曜の指定が正しくありません。",
+    invalid_count: "件数の指定が正しくありません。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var dateEl = document.getElementById("date");
+  var targetEl = document.getElementById("target");
+  var countEl = document.getElementById("count");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  var WEEK = ["日", "月", "火", "水", "木", "金", "土"];
+  function weekday(y, m, d) {
+    return WEEK[new Date(Date.UTC(y, m - 1, d)).getUTCDay()];
+  }
+
+  function run() {
+    if (dateEl.value === "") { box.hidden = true; advBox.hidden = true; return; }
+    var p = dateEl.value.split("-");
+    var y = parseInt(p[0], 10);
+    var m = parseInt(p[1], 10);
+    var d = parseInt(p[2], 10);
+    var r = RokuyoCalc.rokuyo(y, m, d);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false; advBox.hidden = true; return;
+    }
+    box.innerHTML = '<div class="result-main">' + esc(r.name) + "</div>" +
+      "<p>" + esc(y + "年" + m + "月" + d + "日(" + weekday(y, m, d) + ")") + "</p>" +
+      "<p>旧暦: " + (r.leap ? "閏" : "") + esc(r.kyurekiMonth + "月" + r.kyurekiDay + "日") +
+      "((" + esc(String(r.kyurekiMonth)) + "＋" + esc(String(r.kyurekiDay)) + ")÷6の余り " + esc(String(r.index)) + ")</p>";
+    box.hidden = false;
+
+    var f = RokuyoCalc.findNext(y, m, d, targetEl.value, parseInt(countEl.value, 10), 400);
+    if (!f.ok) {
+      advBox.innerHTML = '<p class="result-error">' + esc(ERRORS[f.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false; return;
+    }
+    var rows = "";
+    f.rows.forEach(function (row) {
+      rows += "<tr><td>" + row.year + "/" + row.month + "/" + row.day +
+        "(" + weekday(row.year, row.month, row.day) + ")</td><td>" +
+        (row.leap ? "閏" : "") + row.kyurekiMonth + "月" + row.kyurekiDay + "日</td></tr>";
+    });
+    advBox.innerHTML = '<div class="table-scroll"><table class="data-table">' +
+      "<caption>" + esc(targetEl.value) + "の日</caption>" +
+      "<thead><tr><th>日付</th><th>旧暦</th></tr></thead><tbody>" + rows + "</tbody></table></div>";
+    advBox.hidden = false;
+  }
+  [dateEl, targetEl, countEl].forEach(function (el) {
+    el.addEventListener("input", run);
+    el.addEventListener("change", run);
+  });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

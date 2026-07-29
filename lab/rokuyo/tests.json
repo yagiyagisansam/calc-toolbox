@@ -1,0 +1,175 @@
+{
+  "tool": "rokuyo",
+  "module": "calc.js",
+  "global": "RokuyoCalc",
+  "cases": [
+    {
+      "name": "2024年1月1日(元日)は赤口(旧暦11月20日・11+20=31、6で割った余り1)",
+      "func": "rokuyo",
+      "args": [2024, 1, 1],
+      "expect": { "ok": true, "name": "赤口", "index": 1, "kyurekiMonth": 11, "kyurekiDay": 20, "leap": false }
+    },
+    {
+      "name": "2026年2月17日は旧正月(旧暦1月1日)で先勝",
+      "func": "rokuyo",
+      "args": [2026, 2, 17],
+      "expect": { "ok": true, "name": "先勝", "index": 2, "kyurekiMonth": 1, "kyurekiDay": 1 }
+    },
+    {
+      "name": "2025年1月29日も旧暦1月1日で先勝(1+1=2)",
+      "func": "rokuyo",
+      "args": [2025, 1, 29],
+      "expect": { "ok": true, "name": "先勝", "kyurekiMonth": 1, "kyurekiDay": 1 }
+    },
+    {
+      "name": "2024年2月10日も旧暦1月1日で先勝",
+      "func": "kyureki",
+      "args": [2024, 2, 10],
+      "expect": { "ok": true, "month": 1, "day": 1, "leap": false }
+    },
+    {
+      "name": "2026年9月25日は中秋の名月(旧暦8月15日)で仏滅(8+15=23、余り5)",
+      "func": "rokuyo",
+      "args": [2026, 9, 25],
+      "expect": { "ok": true, "name": "仏滅", "index": 5, "kyurekiMonth": 8, "kyurekiDay": 15 }
+    },
+    {
+      "name": "2026年1月1日は旧暦11月13日で大安(11+13=24、余り0)",
+      "func": "rokuyo",
+      "args": [2026, 1, 1],
+      "expect": { "ok": true, "name": "大安", "index": 0, "kyurekiMonth": 11, "kyurekiDay": 13 }
+    },
+    {
+      "name": "閏月の判定: 2023年3月28日は閏2月7日で友引",
+      "func": "rokuyo",
+      "args": [2023, 3, 28],
+      "expect": { "ok": true, "name": "友引", "kyurekiMonth": 2, "kyurekiDay": 7, "leap": true }
+    },
+    {
+      "name": "閏月の判定: 2025年7月28日は閏6月4日で先負",
+      "func": "rokuyo",
+      "args": [2025, 7, 28],
+      "expect": { "ok": true, "name": "先負", "kyurekiMonth": 6, "kyurekiDay": 4, "leap": true }
+    },
+    {
+      "name": "境界値: 対応範囲の下限1900年1月1日も計算できる",
+      "func": "rokuyo",
+      "args": [1900, 1, 1],
+      "expect": { "ok": true, "name": "赤口", "kyurekiMonth": 12, "kyurekiDay": 1 }
+    },
+    {
+      "name": "境界値: 対応範囲の上限2099年12月31日も計算できる",
+      "func": "rokuyo",
+      "args": [2099, 12, 31],
+      "expect": { "ok": true, "name": "赤口", "kyurekiMonth": 11, "kyurekiDay": 20 }
+    },
+    {
+      "name": "一覧: 2026年1月1日から7日ぶんは大安→赤口→先勝→友引→先負→仏滅→大安",
+      "func": "range",
+      "args": [2026, 1, 1, 7],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "length": 7,
+          "0": { "day": 1, "name": "大安" },
+          "1": { "day": 2, "name": "赤口" },
+          "2": { "day": 3, "name": "先勝" },
+          "3": { "day": 4, "name": "友引" },
+          "4": { "day": 5, "name": "先負" },
+          "5": { "day": 6, "name": "仏滅" },
+          "6": { "day": 7, "name": "大安" }
+        }
+      }
+    },
+    {
+      "name": "検索: 2026年1月1日以降の大安3件は1/1・1/7・1/13",
+      "func": "findNext",
+      "args": [2026, 1, 1, "大安", 3],
+      "expect": {
+        "ok": true,
+        "rows": { "length": 3, "0": { "month": 1, "day": 1 }, "1": { "month": 1, "day": 7 }, "2": { "month": 1, "day": 13 } }
+      }
+    },
+    {
+      "name": "検索: 2026年1月1日以降の友引3件は1/4・1/10・1/16",
+      "func": "findNext",
+      "args": [2026, 1, 1, "友引", 3],
+      "expect": {
+        "ok": true,
+        "rows": { "length": 3, "0": { "day": 4 }, "1": { "day": 10 }, "2": { "day": 16 } }
+      }
+    },
+    {
+      "name": "うるう年の2月29日も計算できる(2024年)",
+      "func": "rokuyo",
+      "args": [2024, 2, 29],
+      "expect": { "ok": true, "kyurekiMonth": 1, "kyurekiDay": 20 }
+    },
+    {
+      "name": "ユリウス通日の往復変換(2026年7月29日)",
+      "func": "fromJDN",
+      "args": [2461251],
+      "expect": { "year": 2026, "month": 7, "day": 29 }
+    },
+    {
+      "name": "六曜の名前は6種類(余り0が大安)",
+      "func": "names",
+      "args": [],
+      "expect": { "0": "大安", "1": "赤口", "2": "先勝", "3": "友引", "4": "先負", "5": "仏滅", "length": 6 }
+    },
+    {
+      "name": "異常入力: 存在しない日付(2月30日)はエラー",
+      "func": "rokuyo",
+      "args": [2026, 2, 30],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 13月はエラー",
+      "func": "rokuyo",
+      "args": [2026, 13, 1],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "境界値: 1899年は対応範囲外",
+      "func": "rokuyo",
+      "args": [1899, 1, 1],
+      "expect": { "ok": false, "code": "out_of_range" }
+    },
+    {
+      "name": "境界値: 2100年は対応範囲外",
+      "func": "rokuyo",
+      "args": [2100, 1, 1],
+      "expect": { "ok": false, "code": "out_of_range" }
+    },
+    {
+      "name": "異常入力: 数値でない年はエラー",
+      "func": "rokuyo",
+      "args": ["abc", 1, 1],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "rokuyo",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 一覧の日数0はエラー",
+      "func": "range",
+      "args": [2026, 1, 1, 0],
+      "expect": { "ok": false, "code": "invalid_days" }
+    },
+    {
+      "name": "異常入力: 一覧の日数401はエラー",
+      "func": "range",
+      "args": [2026, 1, 1, 401],
+      "expect": { "ok": false, "code": "invalid_days" }
+    },
+    {
+      "name": "異常入力: 存在しない六曜名はエラー",
+      "func": "findNext",
+      "args": [2026, 1, 1, "吉日"],
+      "expect": { "ok": false, "code": "invalid_rokuyo" }
+    }
+  ]
+}

@@ -42,7 +42,7 @@ async function check(name, fn) {
 const PROBES = ["", "0", "1", "-1", "999999999", "abc", "<img src=x onerror=alert(1)>"];
 
 const slugs = readdirSync(LAB, { withFileTypes: true })
-  .filter((e) => e.isDirectory())
+  .filter((e) => e.isDirectory() && !e.name.startsWith("_")) // _template などの作業用は対象外
   .map((e) => e.name)
   .sort();
 
@@ -106,7 +106,15 @@ for (const slug of slugs) {
       for (const el of els) {
         if (el.tagName === "SELECT") { if (el.options.length > 1) { el.selectedIndex = 1; n++; } }
         else if (el.type === "checkbox" || el.type === "radio") { el.checked = true; n++; }
-        else {
+        else if (el.type === "date" || el.type === "month" || el.type === "time") {
+          // 日付系は「10」では無効値になるので、min/maxの範囲に収まる実在の値を入れる
+          const def = { date: "2026-07-15", month: "2026-07", time: "12:00" }[el.type];
+          let v = def;
+          if (el.min && v < el.min) v = el.min;
+          if (el.max && v > el.max) v = el.max;
+          el.value = v;
+          n++;
+        } else {
           const min = parseFloat(el.min), max = parseFloat(el.max);
           let v = 10;
           if (isFinite(min) && v < min) v = min;

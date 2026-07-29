@@ -1,5 +1,49 @@
 {
+ "bakers": {
+  "ok": true,
+  "note": ""
+ },
+ "bitrate": {
+  "ok": true,
+  "note": ""
+ },
+ "bpmdelay": {
+  "ok": true,
+  "note": ""
+ },
+ "brinkman": {
+  "ok": true,
+  "note": ""
+ },
+ "bsa": {
+  "ok": true,
+  "note": ""
+ },
+ "caketin": {
+  "ok": true,
+  "note": ""
+ },
+ "cooler": {
+  "ok": true,
+  "note": ""
+ },
+ "coursek": {
+  "ok": true,
+  "note": ""
+ },
  "dof": {
+  "ok": true,
+  "note": ""
+ },
+ "dpi": {
+  "ok": true,
+  "note": ""
+ },
+ "egfr": {
+  "ok": true,
+  "note": ""
+ },
+ "eto": {
   "ok": true,
   "note": ""
  },
@@ -7,7 +51,35 @@
   "ok": true,
   "note": ""
  },
+ "fire": {
+  "ok": true,
+  "note": ""
+ },
  "furusato": {
+  "ok": true,
+  "note": ""
+ },
+ "fuyo-kojo": {
+  "ok": true,
+  "note": ""
+ },
+ "gacha": {
+  "ok": true,
+  "note": ""
+ },
+ "gearratio": {
+  "ok": true,
+  "note": ""
+ },
+ "gensen": {
+  "ok": true,
+  "note": ""
+ },
+ "getsurei": {
+  "ok": true,
+  "note": ""
+ },
+ "hainenrei": {
   "ok": true,
   "note": ""
  },
@@ -15,7 +87,19 @@
   "ok": true,
   "note": ""
  },
+ "hinode": {
+  "ok": true,
+  "note": ""
+ },
  "hiryo": {
+  "ok": true,
+  "note": ""
+ },
+ "hyoko": {
+  "ok": true,
+  "note": ""
+ },
+ "hyperfocal": {
   "ok": true,
   "note": ""
  },
@@ -23,11 +107,279 @@
   "ok": true,
   "note": ""
  },
+ "ikuji-kyufu": {
+  "ok": true,
+  "note": ""
+ },
+ "inshizei": {
+  "ok": true,
+  "note": ""
+ },
+ "iryohi": {
+  "ok": true,
+  "note": ""
+ },
+ "jidoshazei": {
+  "ok": true,
+  "note": ""
+ },
+ "jisa": {
+  "ok": true,
+  "note": ""
+ },
+ "juminzei": {
+  "ok": true,
+  "note": ""
+ },
+ "junaru": {
+  "ok": true,
+  "note": ""
+ },
  "juryozei": {
   "ok": true,
   "note": ""
  },
+ "jutaku-kojo": {
+  "ok": true,
+  "note": ""
+ },
+ "kabegami": {
+  "ok": true,
+  "note": ""
+ },
+ "kabuma": {
+  "ok": true,
+  "note": ""
+ },
+ "kami": {
+  "ok": true,
+  "note": ""
+ },
+ "kaup": {
+  "ok": true,
+  "note": ""
+ },
+ "kazoedoshi": {
+  "ok": true,
+  "note": ""
+ },
+ "ketsuatsu": {
+  "ok": true,
+  "note": ""
+ },
+ "kettou-heikin": {
+  "ok": true,
+  "note": ""
+ },
+ "kishaku": {
+  "ok": true,
+  "note": ""
+ },
+ "kiso-nenkin": {
+  "ok": true,
+  "note": ""
+ },
+ "kogaku": {
+  "ok": true,
+  "note": ""
+ },
+ "koteishisan": {
+  "ok": true,
+  "note": ""
+ },
+ "koyohoken": {
+  "ok": true,
+  "note": ""
+ },
+ "kurisage": {
+  "ok": true,
+  "note": ""
+ },
+ "kutsu": {
+  "ok": true,
+  "note": ""
+ },
+ "kyusu": {
+  "ok": true,
+  "note": ""
+ },
+ "kyuyo-kojo": {
+  "ok": true,
+  "note": ""
+ },
+ "lbm": {
+  "ok": true,
+  "note": ""
+ },
+ "ldl": {
+  "ok": true,
+  "note": ""
+ },
+ "led": {
+  "ok": true,
+  "note": ""
+ },
+ "lumen": {
+  "ok": true,
+  "note": ""
+ },
+ "menkyo-koshin": {
+  "ok": true,
+  "note": ""
+ },
+ "metabo": {
+  "ok": true,
+  "note": ""
+ },
+ "mets": {
+  "ok": true,
+  "note": ""
+ },
+ "mobabatt": {
+  "ok": true,
+  "note": ""
+ },
+ "nendo": {
+  "ok": true,
+  "note": ""
+ },
+ "nomimizu": {
+  "ok": true,
+  "note": ""
+ },
+ "omori": {
+  "ok": true,
+  "note": ""
+ },
+ "onerm": {
+  "ok": true,
+  "note": ""
+ },
+ "onkai": {
+  "ok": true,
+  "note": ""
+ },
+ "paint": {
+  "ok": true,
+  "note": ""
+ },
+ "peline": {
+  "ok": true,
+  "note": ""
+ },
+ "petfood": {
+  "ok": true,
+  "note": ""
+ },
+ "portable": {
+  "ok": true,
+  "note": ""
+ },
+ "renryo": {
+  "ok": true,
+  "note": ""
+ },
+ "rohrer": {
+  "ok": true,
+  "note": ""
+ },
+ "rokuyo": {
+  "ok": true,
+  "note": ""
+ },
+ "saddle": {
+  "ok": true,
+  "note": ""
+ },
+ "saidai-sanso": {
+  "ok": true,
+  "note": ""
+ },
+ "saitei-chingin": {
+  "ok": true,
+  "note": ""
+ },
+ "sanzen": {
+  "ok": true,
+  "note": ""
+ },
+ "sekki": {
+  "ok": true,
+  "note": ""
+ },
+ "shakaihoken": {
+  "ok": true,
+  "note": ""
+ },
+ "shitsugyo": {
+  "ok": true,
+  "note": ""
+ },
+ "shobyo": {
+  "ok": true,
+  "note": ""
+ },
+ "shokyaku": {
+  "ok": true,
+  "note": ""
+ },
+ "shotokuzei": {
+  "ok": true,
+  "note": ""
+ },
+ "shuban": {
+  "ok": true,
+  "note": ""
+ },
+ "shussan": {
+  "ok": true,
+  "note": ""
+ },
+ "shutokuzei": {
+  "ok": true,
+  "note": ""
+ },
+ "souzokuzei": {
+  "ok": true,
+  "note": ""
+ },
+ "suibun": {
+  "ok": true,
+  "note": ""
+ },
+ "tairyoku": {
+  "ok": true,
+  "note": ""
+ },
+ "taishibo": {
+  "ok": true,
+  "note": ""
+ },
  "taishokukin": {
+  "ok": true,
+  "note": ""
+ },
+ "teinen": {
+  "ok": true,
+  "note": ""
+ },
+ "tiresize": {
+  "ok": true,
+  "note": ""
+ },
+ "todokede": {
+  "ok": true,
+  "note": ""
+ },
+ "torokuzei": {
+  "ok": true,
+  "note": ""
+ },
+ "uruudoshi": {
+  "ok": true,
+  "note": ""
+ },
+ "wbgt": {
   "ok": true,
   "note": ""
  },
@@ -36,6 +388,14 @@
   "note": ""
  },
  "yakudoshi": {
+  "ok": true,
+  "note": ""
+ },
+ "youbi": {
+  "ok": true,
+  "note": ""
+ },
+ "zoyozei": {
   "ok": true,
   "note": ""
  }
