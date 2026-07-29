@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>ローレル指数(学童)計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="小中学生の身長と体重からローレル指数を計算し、やせすぎ〜太りすぎの5区分で判定します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>.sources a { overflow-wrap: anywhere; word-break: break-word; }</style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>ローレル指数(学童)計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>身長(cm)
+      <span class="field-note">小数点以下も入れられます</span>
+      <input type="number" id="height" inputmode="decimal" step="0.1" min="80" max="200" placeholder="例: 140">
+    </label>
+    <label>体重(kg)
+      <input type="number" id="weight" inputmode="decimal" step="0.1" min="3" max="200" placeholder="例: 35">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 標準の体重範囲と区分ごとの境目</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">その身長で「標準」になる体重</h3>
+      <p class="adv-note">ローレル指数115以上145未満に入る体重の範囲です。上で入れた身長で計算します。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">区分の境目にあたる体重</h3>
+      <p class="adv-note">指数100・115・145・160のちょうどの体重を並べたものです。</p>
+      <div class="tool-result" id="table-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    ローレル指数は<strong>学年全体の傾向や年次推移など、集団の傾向を表すための指数</strong>です。身長が高いほど指数が小さく出る性質があるため、個人の肥満・やせの医学的な判断には使えません。日本小児内分泌学会は、個人の評価には性別・年齢別・身長別標準体重を使った「肥満度」のほうが優れているとしています。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>小中学生の身長と体重から<strong>ローレル指数と5区分の判定</strong>がわかります。保健だよりや自由研究でよく出てくる指数です。標準に入る体重の範囲も表示します。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>身長(cm)と体重(kg)を入れると、その場で指数と判定が表示されます。ボタンは不要です。</li>
+    <li>標準に入る体重の範囲を見たいときは「＋詳細機能」を開いてください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>ローレル指数</strong> = 体重(kg) ÷ 身長(cm)<sup>3</sup> × 10,000,000</li>
+    <li><strong>標準になる体重</strong> = ローレル指数 × 身長(cm)<sup>3</sup> ÷ 10,000,000(指数115〜145の範囲)</li>
+  </ul>
+  <p>身長をメートルで書くと「体重(kg) ÷ 身長(m)<sup>3</sup> × 10」と同じ式になります。</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>ローレル指数の分類</caption>
+      <thead><tr><th>ローレル指数</th><th>区分</th></tr></thead>
+      <tbody>
+        <tr><td>99以下</td><td>やせすぎ</td></tr>
+        <tr><td>100〜114</td><td>やややせている</td></tr>
+        <tr><td>115〜144</td><td>標準</td></tr>
+        <tr><td>145〜159</td><td>やや太っている</td></tr>
+        <tr><td>160以上</td><td>太りすぎ</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>滋賀県「学校保健統計調査 7 ローレル指数」(計算式と分類の出典)<br>
+      <a href="https://www.pref.shiga.lg.jp/file/attachment/34297.pdf" rel="noopener" target="_blank">https://www.pref.shiga.lg.jp/file/attachment/34297.pdf</a>(2026年7月29日参照)</li>
+    <li>文部科学省「学校保健統計調査」(児童生徒の身長・体重の全国平均)<br>
+      <a href="https://www.mext.go.jp/b_menu/toukei/chousa05/hoken/1268826.htm" rel="noopener" target="_blank">https://www.mext.go.jp/b_menu/toukei/chousa05/hoken/1268826.htm</a>(2026年7月29日参照)</li>
+    <li>日本小児内分泌学会「日本人小児の体格の評価」(個人の評価には肥満度が適するとする根拠)<br>
+      <a href="https://jspe.umin.jp/medical/taikaku.html" rel="noopener" target="_blank">https://jspe.umin.jp/medical/taikaku.html</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>ローレル指数は<strong>身長が高いほど小さく出ます</strong>。同じ体型でも学年が上がると数値が下がるため、学年をまたいだ比較には向きません。</li>
+    <li>幼児にはローレル指数ではなくカウプ指数(乳幼児向けの指数)が使われるのが一般的です。</li>
+    <li>筋肉量の多い子は指数が高く出ます。数値だけで肥満と判断しないでください。</li>
+    <li>健康上の心配があるときは、学校の養護教諭や小児科医にご相談ください。</li>
+    <li>身長は80〜200cm、体重は3〜200kgの範囲で計算します。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">ローレル指数とBMIはどう違いますか?</h3>
+  <p class="faq-a">BMIは身長の2乗で割るのに対し、ローレル指数は3乗で割ります。成長期の子どもは体型が身長の3乗に近く変化するため、学童ではローレル指数が使われてきました。ただし身長による偏りは残るため、個人の評価には肥満度のほうが適しています。</p>
+  <h3 class="faq-q">160以上だとすぐ病院に行くべきですか?</h3>
+  <p class="faq-a">この指数だけで判断はできません。学校健診では性別・年齢別・身長別標準体重をもとにした「肥満度」で評価するのが一般的です。気になる場合は学校の健診結果とあわせて相談してください。</p>
+  <h3 class="faq-q">身長をメートルで入れてもいいですか?</h3>
+  <p class="faq-a">このツールはセンチメートルで入力してください(1.4ではなく140)。80cm未満は範囲外としてエラーになります。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_height: "身長は80cm以上200cm以下で入力してください。",
+    invalid_weight: "体重は3kg以上200kg以下で入力してください。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var tableBox = document.getElementById("table-result");
+  var hEl = document.getElementById("height");
+  var wEl = document.getElementById("weight");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function err(target, code) {
+    target.innerHTML = '<p class="result-error">' + esc(ERRORS[code] || "入力値を確認してください。") + "</p>";
+    target.hidden = false;
+  }
+
+  function run() {
+    if (hEl.value.trim() === "" || wEl.value.trim() === "") { box.hidden = true; return; }
+    var r = RohrerCalc.calculate(parseFloat(hEl.value), parseFloat(wEl.value));
+    if (!r.ok) { err(box, r.code); return; }
+    box.innerHTML =
+      '<div class="result-main">ローレル指数 ' + esc(r.index) + "</div>" +
+      "<p>判定: " + esc(r.category) + "</p>";
+    box.hidden = false;
+  }
+
+  function runAdv() {
+    if (hEl.value.trim() === "") { advBox.hidden = true; tableBox.hidden = true; return; }
+    var h = parseFloat(hEl.value);
+    var r = RohrerCalc.standardWeightRange(h);
+    if (!r.ok) { err(advBox, r.code); tableBox.hidden = true; return; }
+    advBox.innerHTML =
+      '<div class="result-main">' + esc(r.minKg) + " 〜 " + esc(r.maxKg) + " kg</div>" +
+      "<p>身長 " + esc(h) + "cm でローレル指数115以上145未満になる体重です(上端の " +
+      esc(r.maxKg) + "kg はちょうど145になる値)。</p>";
+    advBox.hidden = false;
+
+    var t = RohrerCalc.boundaryTable(h);
+    if (!t.ok) { tableBox.hidden = true; return; }
+    var rows = "";
+    t.rows.forEach(function (row) {
+      rows += "<tr><td>" + esc(row.index) + "</td><td>" + esc(row.weightKg) +
+        " kg</td><td>" + esc(row.category) + "</td></tr>";
+    });
+    tableBox.innerHTML =
+      '<div class="table-scroll"><table class="data-table">' +
+      "<thead><tr><th>指数</th><th>そのときの体重</th><th>ここから上の区分</th></tr></thead><tbody>" +
+      rows + "</tbody></table></div>";
+    tableBox.hidden = false;
+  }
+
+  function runAll() { run(); runAdv(); }
+  [hEl, wEl].forEach(function (el) { el.addEventListener("input", runAll); });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); runAll(); });
+})();
+</script>
+</body>
+</html>

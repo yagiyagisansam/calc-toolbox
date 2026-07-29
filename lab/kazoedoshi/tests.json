@@ -1,0 +1,185 @@
+{
+  "tool": "kazoedoshi",
+  "module": "calc.js",
+  "global": "KazoedoshiCalc",
+  "cases": [
+    {
+      "name": "誕生日を迎えた後: 1990年5月10日生まれの2026年7月29日は満36歳・数え37歳",
+      "func": "calculate",
+      "args": [1990, 5, 10, 2026, 7, 29],
+      "expect": { "ok": true, "mannenrei": 36, "kazoedoshi": 37, "hadBirthday": true }
+    },
+    {
+      "name": "誕生日前: 1990年12月10日生まれの2026年7月29日は満35歳・数え37歳",
+      "func": "calculate",
+      "args": [1990, 12, 10, 2026, 7, 29],
+      "expect": { "ok": true, "mannenrei": 35, "kazoedoshi": 37, "hadBirthday": false }
+    },
+    {
+      "name": "境界値: 誕生日当日は満年齢が1つ上がる",
+      "func": "calculate",
+      "args": [1990, 7, 29, 2026, 7, 29],
+      "expect": { "ok": true, "mannenrei": 36, "kazoedoshi": 37, "hadBirthday": true }
+    },
+    {
+      "name": "境界値: 誕生日の前日はまだ上がらない",
+      "func": "calculate",
+      "args": [1990, 7, 29, 2026, 7, 28],
+      "expect": { "ok": true, "mannenrei": 35, "kazoedoshi": 37, "hadBirthday": false }
+    },
+    {
+      "name": "境界値: 生まれた当日は満0歳・数え1歳",
+      "func": "calculate",
+      "args": [2026, 7, 29, 2026, 7, 29],
+      "expect": { "ok": true, "mannenrei": 0, "kazoedoshi": 1 }
+    },
+    {
+      "name": "還暦: 1966年1月1日生まれの2026年7月29日は満60歳・数え61歳",
+      "func": "calculate",
+      "args": [1966, 1, 1, 2026, 7, 29],
+      "expect": { "ok": true, "mannenrei": 60, "kazoedoshi": 61 }
+    },
+    {
+      "name": "うるう日生まれ: 2000年2月29日生まれは平年の2月28日時点でまだ満25歳",
+      "func": "calculate",
+      "args": [2000, 2, 29, 2026, 2, 28],
+      "expect": { "ok": true, "mannenrei": 25, "kazoedoshi": 27, "hadBirthday": false }
+    },
+    {
+      "name": "うるう日生まれ: 平年の3月1日から満26歳になる",
+      "func": "calculate",
+      "args": [2000, 2, 29, 2026, 3, 1],
+      "expect": { "ok": true, "mannenrei": 26, "kazoedoshi": 27, "hadBirthday": true }
+    },
+    {
+      "name": "うるう年の2月29日当日は満年齢が上がる",
+      "func": "calculate",
+      "args": [2000, 2, 29, 2024, 2, 29],
+      "expect": { "ok": true, "mannenrei": 24, "kazoedoshi": 25 }
+    },
+    {
+      "name": "異常入力: 存在しない日付(2月30日)はエラー",
+      "func": "calculate",
+      "args": [2000, 2, 30, 2026, 1, 1],
+      "expect": { "ok": false, "code": "invalid_birth_date" }
+    },
+    {
+      "name": "異常入力: 基準日が生年月日より前はエラー",
+      "func": "calculate",
+      "args": [1990, 5, 10, 1990, 5, 9],
+      "expect": { "ok": false, "code": "ref_before_birth" }
+    },
+    {
+      "name": "異常入力: 対応範囲外の生年(1867年)はエラー",
+      "func": "calculate",
+      "args": [1867, 1, 1, 2026, 1, 1],
+      "expect": { "ok": false, "code": "invalid_birth_date" }
+    },
+    {
+      "name": "異常入力: 基準日の月が0はエラー",
+      "func": "calculate",
+      "args": [1990, 5, 10, 2026, 0, 1],
+      "expect": { "ok": false, "code": "invalid_ref_date" }
+    },
+    {
+      "name": "異常入力: 日付が数値でないときはエラー",
+      "func": "calculate",
+      "args": ["abc", 5, 10, 2026, 7, 29],
+      "expect": { "ok": false, "code": "invalid_birth_date" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_birth_date" }
+    },
+    {
+      "name": "賀寿: 数え61歳は還暦",
+      "func": "gaju",
+      "args": [61],
+      "expect": { "ok": true, "name": "還暦(かんれき)" }
+    },
+    {
+      "name": "賀寿: 数え88歳は米寿",
+      "func": "gaju",
+      "args": [88],
+      "expect": { "ok": true, "name": "米寿(べいじゅ)" }
+    },
+    {
+      "name": "賀寿: 数え62歳は該当なし(nullを返す)",
+      "func": "gaju",
+      "args": [62],
+      "expect": { "ok": true, "name": null }
+    },
+    {
+      "name": "異常入力: 年齢0の賀寿判定はエラー",
+      "func": "gaju",
+      "args": [0],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "厄年: 男性の数え42歳は本厄かつ大厄",
+      "func": "yakudoshi",
+      "args": [42, "male"],
+      "expect": { "ok": true, "kind": "本厄", "honyaku": 42, "taiyaku": true }
+    },
+    {
+      "name": "厄年: 男性の数え41歳は前厄",
+      "func": "yakudoshi",
+      "args": [41, "male"],
+      "expect": { "ok": true, "kind": "前厄", "honyaku": 42 }
+    },
+    {
+      "name": "厄年: 男性の数え43歳は後厄",
+      "func": "yakudoshi",
+      "args": [43, "male"],
+      "expect": { "ok": true, "kind": "後厄", "honyaku": 42 }
+    },
+    {
+      "name": "厄年: 女性の数え33歳は本厄かつ大厄",
+      "func": "yakudoshi",
+      "args": [33, "female"],
+      "expect": { "ok": true, "kind": "本厄", "honyaku": 33, "taiyaku": true }
+    },
+    {
+      "name": "厄年でない年は null を返す",
+      "func": "yakudoshi",
+      "args": [50, "male"],
+      "expect": { "ok": true, "kind": null, "taiyaku": false }
+    },
+    {
+      "name": "異常入力: 性別の指定が不正はエラー",
+      "func": "yakudoshi",
+      "args": [33, "x"],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    },
+    {
+      "name": "節目の年: 2020年生まれの女性は2026年に数え7歳の七五三",
+      "func": "milestones",
+      "args": [2020, "female", 2026, 3],
+      "expect": {
+        "ok": true,
+        "items": { "0": { "year": 2026, "kazoedoshi": 7, "type": "七五三" }, "length": 3 }
+      }
+    },
+    {
+      "name": "節目の年: 1966年生まれの男性は2026年が還暦かつ61歳の本厄",
+      "func": "milestones",
+      "args": [1966, "male", 2026, 2],
+      "expect": {
+        "ok": true,
+        "items": {
+          "0": { "year": 2026, "kazoedoshi": 61, "type": "厄年" },
+          "1": { "year": 2026, "kazoedoshi": 61, "type": "賀寿", "name": "還暦(かんれき)" },
+          "length": 2
+        }
+      }
+    },
+    {
+      "name": "異常入力: 件数の上限が0はエラー",
+      "func": "milestones",
+      "args": [1990, "male", 2026, 0],
+      "expect": { "ok": false, "code": "invalid_limit" }
+    }
+  ]
+}

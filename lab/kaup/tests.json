@@ -1,0 +1,169 @@
+{
+  "tool": "kaup",
+  "module": "calc.js",
+  "global": "KaupCalc",
+  "cases": [
+    {
+      "name": "代表例: 身長75cm・体重9.0kgのカウプ指数は16.0(9÷0.75²)",
+      "func": "index",
+      "args": [9.0, 75],
+      "expect": { "ok": true, "index": 16 }
+    },
+    {
+      "name": "代表例: 身長70cm・体重7.5kgは15.3(7.5÷0.49=15.306)",
+      "func": "index",
+      "args": [7.5, 70],
+      "expect": { "ok": true, "index": 15.3 }
+    },
+    {
+      "name": "代表例: 身長65cm・体重6.0kgは14.2(6÷0.4225=14.201)で一応の基準を下回る",
+      "func": "calculate",
+      "args": [6.0, 65, 4],
+      "expect": { "ok": true, "index": 14.2, "band": "low", "inKaupAge": true }
+    },
+    {
+      "name": "境界値: カウプ指数ちょうど15.0(身長100cm・体重15kg)は標準の範囲",
+      "func": "calculate",
+      "args": [15, 100, 30],
+      "expect": { "ok": true, "index": 15, "band": "standard" }
+    },
+    {
+      "name": "境界値: カウプ指数14.9は標準の範囲を下回る",
+      "func": "calculate",
+      "args": [14.9, 100, 30],
+      "expect": { "ok": true, "index": 14.9, "band": "low" }
+    },
+    {
+      "name": "境界値: カウプ指数ちょうど19.0は標準の範囲",
+      "func": "calculate",
+      "args": [19, 100, 30],
+      "expect": { "ok": true, "index": 19, "band": "standard" }
+    },
+    {
+      "name": "境界値: カウプ指数19.1は標準の範囲を上回る",
+      "func": "calculate",
+      "args": [19.1, 100, 30],
+      "expect": { "ok": true, "index": 19.1, "band": "high" }
+    },
+    {
+      "name": "月齢2か月はカウプ指数が使われる月齢(生後3か月以上)に入らない",
+      "func": "calculate",
+      "args": [9, 75, 2],
+      "expect": { "ok": true, "index": 16, "inKaupAge": false, "standingHeight": false }
+    },
+    {
+      "name": "月齢24か月ちょうどから身長は立位で測る",
+      "func": "calculate",
+      "args": [9, 75, 24],
+      "expect": { "ok": true, "inKaupAge": true, "standingHeight": true }
+    },
+    {
+      "name": "標準体重: 男児・身長100cmは15.47kg(0.00206×100²−0.1166×100+6.5273)",
+      "func": "standardWeight",
+      "args": [100, "male"],
+      "expect": { "ok": true, "standardWeightKg": 15.47 }
+    },
+    {
+      "name": "標準体重: 女児・身長100cmは15.36kg(0.00249×100²−0.1858×100+9.0360)",
+      "func": "standardWeight",
+      "args": [100, "female"],
+      "expect": { "ok": true, "standardWeightKg": 15.36 }
+    },
+    {
+      "name": "境界値: 身長70cmちょうどは標準体重の式が使える(男児8.46kg)",
+      "func": "standardWeight",
+      "args": [70, "male"],
+      "expect": { "ok": true, "standardWeightKg": 8.46 }
+    },
+    {
+      "name": "境界値: 身長120cmは式の適用範囲外(120cm未満まで)",
+      "func": "standardWeight",
+      "args": [120, "male"],
+      "expect": { "ok": false, "code": "out_of_range" }
+    },
+    {
+      "name": "境界値: 身長69.9cmは式の適用範囲外",
+      "func": "standardWeight",
+      "args": [69.9, "male"],
+      "expect": { "ok": false, "code": "out_of_range" }
+    },
+    {
+      "name": "肥満度: 男児・身長100cm・体重17kgは+9.9%で「ふつう」",
+      "func": "obesityDegree",
+      "args": [17, 100, "male"],
+      "expect": { "ok": true, "standardWeightKg": 15.47, "degree": 9.9, "category": "normal" }
+    },
+    {
+      "name": "境界値: 肥満度ちょうど+15.0%は「ふつう」",
+      "func": "obesityDegree",
+      "args": [17.7905, 100, "male"],
+      "expect": { "ok": true, "degree": 15, "category": "normal" }
+    },
+    {
+      "name": "境界値: 肥満度+15.1%は「ふつう」を超える",
+      "func": "obesityDegree",
+      "args": [17.8, 100, "male"],
+      "expect": { "ok": true, "degree": 15.1, "category": "over" }
+    },
+    {
+      "name": "境界値: 肥満度ちょうど−15.0%は「ふつう」",
+      "func": "obesityDegree",
+      "args": [13.1495, 100, "male"],
+      "expect": { "ok": true, "degree": -15, "category": "normal" }
+    },
+    {
+      "name": "境界値: 肥満度−15.1%は「ふつう」を下回る",
+      "func": "obesityDegree",
+      "args": [13.14, 100, "male"],
+      "expect": { "ok": true, "degree": -15.1, "category": "under" }
+    },
+    {
+      "name": "異常入力: 体重0kgはエラー",
+      "func": "index",
+      "args": [0, 75],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 体重が負の値はエラー",
+      "func": "index",
+      "args": [-3, 75],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 身長0cmはエラー(0除算にならない)",
+      "func": "index",
+      "args": [9, 0],
+      "expect": { "ok": false, "code": "invalid_height" }
+    },
+    {
+      "name": "異常入力: 身長が範囲超過(141cm)はエラー",
+      "func": "index",
+      "args": [9, 141],
+      "expect": { "ok": false, "code": "invalid_height" }
+    },
+    {
+      "name": "異常入力: 月齢72か月(6歳)は範囲外でエラー",
+      "func": "calculate",
+      "args": [9, 75, 72],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "異常入力: 性別の指定が不正なときはエラー",
+      "func": "obesityDegree",
+      "args": [17, 100, "unknown"],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    },
+    {
+      "name": "異常入力: 身長が数値でないときはエラー",
+      "func": "index",
+      "args": [9, "75"],
+      "expect": { "ok": false, "code": "invalid_height" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    }
+  ]
+}

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>メッツ(METs)消費カロリー計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="メッツ値・運動時間・体重から消費エネルギー(kcal)と1週間の身体活動量(メッツ・時)を計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>メッツ(METs)消費カロリー計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>メッツ値(運動の強度)
+      <span class="field-note">安静座位=1、立位≒2、歩行≒3、ジョギング≒6(厚生労働省 e-ヘルスネット)</span>
+      <input type="number" id="mets" inputmode="decimal" step="0.1" min="0.5" max="30" placeholder="3">
+    </label>
+    <div class="field-row">
+      <label>運動時間(分)
+        <input type="number" id="minutes" inputmode="numeric" step="1" min="1" max="1440" placeholder="60">
+      </label>
+      <label>体重(kg)
+        <input type="number" id="weight" inputmode="decimal" step="0.1" min="1" max="300" placeholder="60">
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 1週間の身体活動量(週23メッツ・時の目安)</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">週の実施回数から1週間の活動量を出す</h3>
+      <p class="adv-note">厚生労働省は、成人に「3メッツ以上の身体活動を週23メッツ・時以上」を推奨しています。</p>
+      <label>週の実施回数
+        <input type="number" id="times" inputmode="numeric" step="1" min="1" max="50" value="3">
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    表示する kcal は<strong>安静時の消費分を含む総エネルギー消費量</strong>です。「運動によって余分に消費した分」を知りたいときは、あわせて表示する<strong>正味の消費</strong>を見てください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>運動の強度(メッツ)・時間・体重を入れると、<strong>その運動で何kcal消費したか</strong>がわかります。週の回数を入れれば、厚生労働省が推奨する<strong>週23メッツ・時</strong>に届いているかも確認できます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>メッツ値・運動時間・体重を入れると、その瞬間に身体活動量(メッツ・時)と消費エネルギーが出ます。</li>
+    <li>メッツ値がわからないときは、歩行=3、ジョギング=6 を目安に入れてください。</li>
+    <li>1週間の合計は「＋詳細機能」で週の回数を入れると出ます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>身体活動量(メッツ・時)</strong> = メッツ × 時間(h)</li>
+    <li><strong>エネルギー消費量(kcal)</strong> = 1.05 × メッツ・時 × 体重(kg)<br>厚生労働省「エクササイズガイド2006」の簡易換算式そのままです。安静時の消費分も含む総エネルギー消費量です。</li>
+    <li><strong>正味の消費(kcal)</strong> = 1.05 × (メッツ − 1) × 時間(h) × 体重(kg)<br>安静座位の1メッツ分を差し引いた、本サイトによる派生計算です。</li>
+    <li><strong>週の身体活動量</strong> = メッツ × 時間(h) × 週の回数。3メッツ以上のものだけが推奨値(週23メッツ・時)の対象です。</li>
+  </ul>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>厚生労働省「健康づくりのための運動指針2006(エクササイズガイド2006)」参考資料 —「エネルギー消費量(kcal)＝1.05×エクササイズ(メッツ・時)×体重(kg)」<br>
+      <a href="https://www.mhlw.go.jp/shingi/2006/07/dl/s0725-9f-4.pdf" rel="noopener" target="_blank">https://www.mhlw.go.jp/shingi/2006/07/dl/s0725-9f-4.pdf</a>(2026年7月29日参照)</li>
+    <li>厚生労働省「健康づくりのための身体活動・運動ガイド2023」(令和6年1月) —「強度が3メッツ以上の身体活動を週23メッツ・時以上行うことを推奨する」<br>
+      <a href="https://www.mhlw.go.jp/content/001194020.pdf" rel="noopener" target="_blank">https://www.mhlw.go.jp/content/001194020.pdf</a>(2026年7月29日参照)</li>
+    <li>厚生労働省 e-ヘルスネット「メッツ / METs」(メッツの定義と代表的な強度)<br>
+      <a href="https://kennet.mhlw.go.jp/information/information/dictionary/exercise/ys-004.html" rel="noopener" target="_blank">https://kennet.mhlw.go.jp/information/information/dictionary/exercise/ys-004.html</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li><strong>基準の時点:</strong> 週23メッツ・時の推奨値は「健康づくりのための身体活動・運動ガイド2023」(令和6年1月公表)によるものです。</li>
+    <li>簡易換算式による概算です。実際の消費エネルギーは年齢・性別・体組成・環境で変わります。</li>
+    <li>個々の運動のメッツ値は入力してもらう方式です。運動の種類ごとのメッツ値は、国立健康・栄養研究所の「身体活動のメッツ(METs)表」などをご確認ください。</li>
+    <li>週23メッツ・時は成人向けの推奨値です。こども・高齢者、持病のある方は主治医にご相談ください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">なぜ1.05を掛けるのですか?</h3>
+  <p class="faq-a">厚生労働省のエクササイズガイド2006が示す簡易換算式が「1.05 × メッツ・時 × 体重」だからです。1メッツ・時あたり体重1kgで約1.05kcal消費するという換算です。</p>
+  <h3 class="faq-q">「メッツ・時」とは何ですか?</h3>
+  <p class="faq-a">メッツ(強度)に時間を掛けた活動量の単位です。3メッツの歩行を1時間で3メッツ・時、30分なら1.5メッツ・時になります。</p>
+  <h3 class="faq-q">週23メッツ・時はどのくらいの運動量ですか?</h3>
+  <p class="faq-a">厚生労働省は「歩行またはそれと同等以上の身体活動を1日60分以上(1日約8,000歩以上)」がほぼこれに相当するとしています。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_mets: "メッツ値は0.5〜30で入力してください。",
+    invalid_minutes: "運動時間は1〜1440分で入力してください。",
+    invalid_weight: "体重は0より大きく300kg以下で入力してください。",
+    invalid_times: "週の実施回数は1〜50で入力してください。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var metsEl = document.getElementById("mets");
+  var minutesEl = document.getElementById("minutes");
+  var weightEl = document.getElementById("weight");
+  var timesEl = document.getElementById("times");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function run() {
+    if (metsEl.value === "" || minutesEl.value === "" || weightEl.value === "") {
+      box.hidden = true; advBox.hidden = true; return;
+    }
+    var mets = parseFloat(metsEl.value);
+    var minutes = parseFloat(minutesEl.value);
+    var weight = parseFloat(weightEl.value);
+    var r = MetsCalc.calculate(mets, minutes, weight);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false; advBox.hidden = true; return;
+    }
+    box.innerHTML = '<div class="result-main">' + esc(String(r.kcal)) + " kcal</div>" +
+      "<p>身体活動量: " + esc(String(r.exerciseMetsHour)) + " メッツ・時</p>" +
+      "<p>正味の消費(安静時分を除く): " + esc(String(r.netKcal)) + " kcal</p>";
+    box.hidden = false;
+
+    if (timesEl.value === "") { advBox.hidden = true; return; }
+    var s = MetsCalc.summary(mets, minutes, weight, parseFloat(timesEl.value));
+    if (!s.ok) {
+      advBox.innerHTML = '<p class="result-error">' + esc(ERRORS[s.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false; return;
+    }
+    var msg;
+    if (!s.week.countsForGuideline) {
+      msg = "強度が3メッツ未満のため、週23メッツ・時の推奨値の対象外です。";
+    } else if (s.week.meetsGuideline) {
+      msg = "週23メッツ・時の推奨値を満たしています。";
+    } else {
+      msg = "推奨値まであと " + s.week.shortfallMetsHour + " メッツ・時です。";
+    }
+    advBox.innerHTML = '<div class="result-main">' + esc(String(s.week.weeklyMetsHour)) + " メッツ・時/週</div>" +
+      "<p>週の消費エネルギー: " + esc(String(s.weeklyKcal)) + " kcal</p>" +
+      "<p>" + esc(msg) + "</p>";
+    advBox.hidden = false;
+  }
+  [metsEl, minutesEl, weightEl, timesEl].forEach(function (el) { el.addEventListener("input", run); });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

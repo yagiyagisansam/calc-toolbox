@@ -1,0 +1,157 @@
+{
+  "tool": "todokede",
+  "module": "calc.js",
+  "global": "TodokedeCalc",
+  "cases": [
+    {
+      "name": "出生届: 2026年7月1日生まれは初日を算入して14日以内、期限は7月14日",
+      "func": "deadline",
+      "args": ["birth", "2026-07-01", false],
+      "expect": { "ok": true, "startDate": "2026-07-01", "countedFrom": "2026-07-01", "deadline": "2026-07-14", "unit": "day", "count": 14, "includesFirstDay": true }
+    },
+    {
+      "name": "出生届(国外): 2026年7月1日生まれは3か月以内、応当日10月1日の前日で9月30日",
+      "func": "deadline",
+      "args": ["birth", "2026-07-01", true],
+      "expect": { "ok": true, "deadline": "2026-09-30", "unit": "month", "count": 3 }
+    },
+    {
+      "name": "死亡届: 2026年7月1日に死亡を知った場合は7日以内、期限は7月7日",
+      "func": "deadline",
+      "args": ["death", "2026-07-01", false],
+      "expect": { "ok": true, "deadline": "2026-07-07", "unit": "day", "count": 7, "includesFirstDay": true }
+    },
+    {
+      "name": "死亡届(国外): 2026年7月1日に知った場合は3か月以内で9月30日",
+      "func": "deadline",
+      "args": ["death", "2026-07-01", true],
+      "expect": { "ok": true, "deadline": "2026-09-30", "count": 3 }
+    },
+    {
+      "name": "転入届: 住民基本台帳法は初日不算入なので7月1日転入の期限は7月15日",
+      "func": "deadline",
+      "args": ["moveIn", "2026-07-01", false],
+      "expect": { "ok": true, "countedFrom": "2026-07-02", "deadline": "2026-07-15", "includesFirstDay": false }
+    },
+    {
+      "name": "転居届: 同じ市区町村内の引っ越しも14日以内(初日不算入)",
+      "func": "deadline",
+      "args": ["moveWithin", "2026-07-01", false],
+      "expect": { "ok": true, "deadline": "2026-07-15", "count": 14 }
+    },
+    {
+      "name": "世帯変更届: 変更があった日から14日以内(初日不算入)",
+      "func": "deadline",
+      "args": ["householdChange", "2026-07-01", false],
+      "expect": { "ok": true, "deadline": "2026-07-15" }
+    },
+    {
+      "name": "転出届は「あらかじめ」の届出で日数の定めがないため期限は出さない",
+      "func": "deadline",
+      "args": ["moveOut", "2026-07-01", false],
+      "expect": { "ok": true, "deadline": null, "unit": "none", "weekday": null }
+    },
+    {
+      "name": "婚姻届には届出期限の定めがない",
+      "func": "deadline",
+      "args": ["marriage", "2026-07-01", false],
+      "expect": { "ok": true, "deadline": null, "unit": "none" }
+    },
+    {
+      "name": "離婚届にも届出期限の定めがない",
+      "func": "deadline",
+      "args": ["divorce", "2026-07-01", false],
+      "expect": { "ok": true, "deadline": null, "unit": "none" }
+    },
+    {
+      "name": "相続放棄: 2026年7月1日に知った場合は初日不算入で起算7月2日、期限は10月1日",
+      "func": "deadline",
+      "args": ["inheritance", "2026-07-01", false],
+      "expect": { "ok": true, "countedFrom": "2026-07-02", "deadline": "2026-10-01", "unit": "month", "count": 3, "includesFirstDay": false }
+    },
+    {
+      "name": "民法143条2項ただし書: 相続放棄で起算日が12月1日なら3か月後は2027年2月28日",
+      "func": "deadline",
+      "args": ["inheritance", "2026-11-30", false],
+      "expect": { "ok": true, "countedFrom": "2026-12-01", "deadline": "2027-02-28" }
+    },
+    {
+      "name": "民法143条2項ただし書: 起算日11月30日の3か月後は応当日がなく2月末日の2027年2月28日",
+      "func": "deadline",
+      "args": ["birth", "2026-11-30", true],
+      "expect": { "ok": true, "countedFrom": "2026-11-30", "deadline": "2027-02-28" }
+    },
+    {
+      "name": "うるう年をまたぐ: 2024年2月29日生まれの出生届の期限は3月13日",
+      "func": "deadline",
+      "args": ["birth", "2024-02-29", false],
+      "expect": { "ok": true, "deadline": "2024-03-13" }
+    },
+    {
+      "name": "外国の方式による証書の提出は3か月以内(戸籍法41条)",
+      "func": "deadline",
+      "args": ["foreignCertificate", "2026-07-01", false],
+      "expect": { "ok": true, "deadline": "2026-09-30", "unit": "month", "count": 3 }
+    },
+    {
+      "name": "残り日数: 7月25日生まれの出生届は7月29日時点で残り9日",
+      "func": "remaining",
+      "args": ["birth", "2026-07-25", false, "2026-07-29"],
+      "expect": { "ok": true, "deadline": "2026-08-07", "remainingDays": 9, "expired": false }
+    },
+    {
+      "name": "境界値: 期限日当日は残り0日で、まだ過ぎていない",
+      "func": "remaining",
+      "args": ["birth", "2026-07-16", false, "2026-07-29"],
+      "expect": { "ok": true, "deadline": "2026-07-29", "remainingDays": 0, "expired": false }
+    },
+    {
+      "name": "境界値: 期限の翌日は残り−1日で期限切れ",
+      "func": "remaining",
+      "args": ["birth", "2026-07-15", false, "2026-07-29"],
+      "expect": { "ok": true, "deadline": "2026-07-28", "remainingDays": -1, "expired": true }
+    },
+    {
+      "name": "期限のない届出は残り日数も出さない",
+      "func": "remaining",
+      "args": ["marriage", "2026-07-01", false, "2026-07-29"],
+      "expect": { "ok": true, "deadline": null, "remainingDays": null, "expired": false }
+    },
+    {
+      "name": "異常入力: 未対応の届出の種類はエラー",
+      "func": "deadline",
+      "args": ["passport", "2026-07-01", false],
+      "expect": { "ok": false, "code": "invalid_kind" }
+    },
+    {
+      "name": "異常入力: 存在しない日付(2026年2月30日)はエラー",
+      "func": "deadline",
+      "args": ["birth", "2026-02-30", false],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 13月はエラー",
+      "func": "deadline",
+      "args": ["birth", "2026-13-01", false],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 日付の書式が違うときはエラー",
+      "func": "deadline",
+      "args": ["birth", "2026/7/1", false],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 日付が数値のときはエラー",
+      "func": "deadline",
+      "args": ["birth", 20260701, false],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "deadline",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_kind" }
+    }
+  ]
+}

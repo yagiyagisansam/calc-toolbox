@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>犬猫の1日必要カロリー・給餌量計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="体重とライフステージから1日の必要エネルギー(DER)とフードのグラム数を計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>
+    /* 出典の長いURLが画面からはみ出さないようにする */
+    .sources a { overflow-wrap: anywhere; word-break: break-word; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>犬猫の1日必要カロリー・給餌量計算</h1>
+  <form class="tool-form" id="tool-form">
+    <div class="field-row">
+      <label>犬 / 猫
+        <select id="species">
+          <option value="dog" selected>犬</option>
+          <option value="cat">猫</option>
+        </select>
+      </label>
+      <label>体重(kg)
+        <input type="number" id="weight" inputmode="decimal" step="0.1" min="0" max="200" placeholder="例: 5">
+      </label>
+    </div>
+    <label>ライフステージ・状態
+      <span class="field-note">避妊去勢の有無で必要量が変わります</span>
+      <select id="stage"></select>
+    </label>
+    <label>フードのカロリー(kcal / 100g)
+      <span class="field-note">袋の「代謝エネルギー ○○kcal/100g」の数字。kcal/kg 表示なら10で割ってください</span>
+      <input type="number" id="kcal" inputmode="decimal" step="1" min="0" max="1000" placeholder="例: 350">
+    </label>
+    <label>1日の給餌回数
+      <select id="meals"></select>
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 活動係数を自分で指定する・計算の内訳</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">活動係数を直接入れる</h3>
+      <p class="adv-note">産後授乳期のように幅がある区分では、体調や体重の変化を見ながら数値を調整してください。空欄にすると上で選んだ区分の値を使います。</p>
+      <label>活動係数
+        <input type="number" id="factor" inputmode="decimal" step="0.1" min="0" max="10" placeholder="例: 1.6">
+      </label>
+      <h3 class="adv-h">計算の内訳</h3>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    ここで出る量は<strong>健康な犬猫の目安</strong>です。療養食や治療中の給与量は必ずかかりつけの獣医師の指示に従ってください。増減させるときは一度にではなく、様子を見ながら少しずつ変えてください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>体重とライフステージを選ぶだけで、<strong>その子に合った1日のカロリーとフードのグラム数</strong>がわかります。袋の給餌量表は避妊去勢や年齢を反映していないため、この計算のほうがその子の実態に近くなります。フードを変えたときや肥満対策の出発点にどうぞ。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>犬か猫かを選び、体重(kg)を入れます。</li>
+    <li>ライフステージ・状態を選びます(避妊去勢の有無で係数が変わります)。</li>
+    <li>フードの袋に書かれた100gあたりのカロリーを入れると、その瞬間に1日の量が出ます。ボタンは不要です。</li>
+    <li>1日の給餌回数を選ぶと1回あたりの量も表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>RER(安静時エネルギー要求量)</strong> =(体重kg)の0.75乗 × 70</li>
+    <li><strong>DER(1日の必要エネルギー)</strong> = RER × 活動係数</li>
+    <li><strong>1日あたりのフード量(g)</strong> = DER ÷ 100gあたりのカロリー × 100</li>
+    <li><strong>1回あたりのフード量(g)</strong> = 1日あたりのフード量 ÷ 1日の給餌回数</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>活動係数(犬)</caption>
+      <thead><tr><th>状態</th><th>活動係数</th></tr></thead>
+      <tbody>
+        <tr><td>避妊・去勢していない成犬</td><td>1.8</td></tr>
+        <tr><td>避妊・去勢している成犬</td><td>1.6</td></tr>
+        <tr><td>肥満傾向犬</td><td>1.4</td></tr>
+        <tr><td>減量が必要な犬</td><td>1</td></tr>
+        <tr><td>重篤管理が必要な犬</td><td>1</td></tr>
+        <tr><td>体重増加が見込まれる犬</td><td>1.2〜1.4</td></tr>
+        <tr><td>高齢犬</td><td>1.4</td></tr>
+        <tr><td>子犬(離乳期〜3ヶ月)</td><td>3</td></tr>
+        <tr><td>子犬(4ヶ月〜9ヶ月)</td><td>2.5</td></tr>
+        <tr><td>子犬(10ヶ月〜1歳まで)</td><td>2</td></tr>
+        <tr><td>妊娠期(1〜4週まで)</td><td>2</td></tr>
+        <tr><td>妊娠期(5〜6週まで)</td><td>2.5</td></tr>
+        <tr><td>妊娠期(7〜8週まで)</td><td>3</td></tr>
+        <tr><td>産後授乳期</td><td>4.0〜8.0</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>活動係数(猫)</caption>
+      <thead><tr><th>状態</th><th>活動係数</th></tr></thead>
+      <tbody>
+        <tr><td>避妊・去勢していない成猫</td><td>1.4</td></tr>
+        <tr><td>避妊・去勢している成猫</td><td>1.2</td></tr>
+        <tr><td>肥満傾向の猫</td><td>1</td></tr>
+        <tr><td>減量が必要な猫</td><td>0.8</td></tr>
+        <tr><td>重篤管理が必要な猫</td><td>1</td></tr>
+        <tr><td>体重増加が見込まれる猫</td><td>1.2〜1.4</td></tr>
+        <tr><td>高齢猫</td><td>1.1</td></tr>
+        <tr><td>子猫(離乳期〜3ヶ月)</td><td>3</td></tr>
+        <tr><td>子猫(4ヶ月〜6ヶ月)</td><td>2.5</td></tr>
+        <tr><td>子猫(7ヶ月〜1歳まで)</td><td>2</td></tr>
+        <tr><td>妊娠期</td><td>2</td></tr>
+        <tr><td>産後授乳期(自由に食べれる状態でよい)</td><td>2.0〜6.0</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>栃木県動物愛護指導センター「愛犬と愛猫へのフード量はどう計算するの？」(2024年4月17日公開・2024年4月24日更新)<br>
+      <a href="https://www.douai.pref.tochigi.lg.jp/20240477_1/" rel="noopener" target="_blank">https://www.douai.pref.tochigi.lg.jp/20240477_1/</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>計算式・活動係数は上記ページ(2024年4月公開)の内容にもとづき、<strong>2026年7月29日時点</strong>で確認したものです。</li>
+    <li>健康な犬猫の維持量の目安です。<strong>療養中・治療中の給与量は獣医師の指示に従ってください。</strong></li>
+    <li>フードのカロリーは「代謝エネルギー kcal/100g」を使います。袋に kcal/kg で書かれている場合は10で割ってください。</li>
+    <li>おやつ・トッピングを与えている場合は、その分のカロリーを差し引く必要があります。</li>
+    <li>本ツールのRERは小数第2位で四捨五入します(体重3kgなら159.57kcal)。出典ページの電卓手順では159.56と表示されますが、以降の計算結果は同じです。</li>
+    <li>成犬・成猫で体重も体型も安定しているなら、今の量を続けて様子を見るのが基本です。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">袋に書かれた給餌量と違うのですが、どちらが正しいですか?</h3>
+  <p class="faq-a">袋の表は体重だけで決めた平均的な量で、避妊去勢の有無や年齢を反映していません。この計算のほうがその子の状態に近い目安になります。ただしどちらも目安なので、体重と体型(肋骨の触りやすさ)を見ながら調整してください。</p>
+  <h3 class="faq-q">なぜ体重をそのまま掛けずに0.75乗するのですか?</h3>
+  <p class="faq-a">動物の基礎代謝は体重に正比例せず、体重の0.75乗におおよそ比例することが知られているためです。小型の子ほど体重あたりの必要カロリーが大きくなります。</p>
+  <h3 class="faq-q">減量させたいときはどうすればよいですか?</h3>
+  <p class="faq-a">「減量が必要な犬(係数1)」「減量が必要な猫(係数0.8)」を選んでください。急激に減らすと体調を崩すため、少しずつ量を減らし、定期的に体重を測って進み具合を確認してください。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_weight: "体重を0より大きく200kg以下で入力してください。",
+    invalid_factor: "活動係数を0より大きく10以下で入力してください。",
+    invalid_kcal: "フードのカロリーを0より大きく1000kcal/100g以下で入力してください。",
+    invalid_meals: "1日の給餌回数を選び直してください。",
+    invalid_species: "犬か猫を選び直してください。",
+    invalid_factor_key: "ライフステージを選び直してください。"
+  };
+  var STAGES = {
+    dog: [
+      ["adult_intact", "避妊・去勢していない成犬"],
+      ["adult_neutered", "避妊・去勢している成犬"],
+      ["obese", "肥満傾向犬"],
+      ["weight_loss", "減量が必要な犬"],
+      ["critical_care", "重篤管理が必要な犬"],
+      ["weight_gain", "体重増加が見込まれる犬"],
+      ["senior", "高齢犬"],
+      ["young_0_3m", "子犬(離乳期〜3ヶ月)"],
+      ["young_4_9m", "子犬(4ヶ月〜9ヶ月)"],
+      ["young_10_12m", "子犬(10ヶ月〜1歳まで)"],
+      ["pregnancy_1_4w", "妊娠期(1〜4週まで)"],
+      ["pregnancy_5_6w", "妊娠期(5〜6週まで)"],
+      ["pregnancy_7_8w", "妊娠期(7〜8週まで)"],
+      ["lactation", "産後授乳期"]
+    ],
+    cat: [
+      ["adult_intact", "避妊・去勢していない成猫"],
+      ["adult_neutered", "避妊・去勢している成猫"],
+      ["obese", "肥満傾向の猫"],
+      ["weight_loss", "減量が必要な猫"],
+      ["critical_care", "重篤管理が必要な猫"],
+      ["weight_gain", "体重増加が見込まれる猫"],
+      ["senior", "高齢猫"],
+      ["young_0_3m", "子猫(離乳期〜3ヶ月)"],
+      ["young_4_6m", "子猫(4ヶ月〜6ヶ月)"],
+      ["young_7_12m", "子猫(7ヶ月〜1歳まで)"],
+      ["pregnancy", "妊娠期"],
+      ["lactation", "産後授乳期"]
+    ]
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var speciesEl = document.getElementById("species");
+  var weightEl = document.getElementById("weight");
+  var stageEl = document.getElementById("stage");
+  var kcalEl = document.getElementById("kcal");
+  var mealsEl = document.getElementById("meals");
+  var factorEl = document.getElementById("factor");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function fillStages() {
+    var list = STAGES[speciesEl.value] || STAGES.dog;
+    var keep = stageEl.value;
+    var html = "";
+    for (var i = 0; i < list.length; i++) {
+      var f = PetFoodCalc.factorFor(speciesEl.value, list[i][0]);
+      var label = list[i][1];
+      if (f.ok) {
+        label += f.min === f.max ? "(係数" + f.min + ")" : "(係数" + f.min + "〜" + f.max + "・中央値" + f.mid + ")";
+      }
+      html += '<option value="' + list[i][0] + '">' + label + "</option>";
+    }
+    stageEl.innerHTML = html;
+    for (var j = 0; j < stageEl.options.length; j++) {
+      if (stageEl.options[j].value === keep) { stageEl.selectedIndex = j; return; }
+    }
+    stageEl.selectedIndex = 1;
+  }
+
+  var mealHtml = "";
+  for (var m = 1; m <= 5; m++) {
+    mealHtml += '<option value="' + m + '"' + (m === 2 ? " selected" : "") + ">" + m + "回</option>";
+  }
+  mealsEl.innerHTML = mealHtml;
+
+  function run() {
+    if (weightEl.value === "" || kcalEl.value === "") { box.hidden = true; advBox.hidden = true; return; }
+    var f = PetFoodCalc.factorFor(speciesEl.value, stageEl.value);
+    if (!f.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[f.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      advBox.hidden = true;
+      return;
+    }
+    var factor = factorEl.value === "" ? f.mid : parseFloat(factorEl.value);
+    var r = PetFoodCalc.calculate(
+      parseFloat(weightEl.value), factor, parseFloat(kcalEl.value), parseInt(mealsEl.value, 10));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      advBox.hidden = true;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">1日 ' + esc(r.gramsPerDay) + " g</div>" +
+      "<p>1回あたり 約" + esc(r.gramsPerMeal) + "g / 1日の必要エネルギー(DER) " + esc(r.derKcal) + "kcal</p>";
+    box.hidden = false;
+
+    advBox.innerHTML =
+      "<p>RER(安静時): " + esc(r.rerKcal) + "kcal</p>" +
+      "<p>使った活動係数: " + esc(factor) + "</p>" +
+      "<p>DER: " + esc(r.derKcal) + "kcal</p>" +
+      (f.min === f.max ? "" : "<p>この区分の係数の幅: " + esc(f.min) + "〜" + esc(f.max) + "</p>");
+    advBox.hidden = false;
+  }
+
+  fillStages();
+  speciesEl.addEventListener("change", function () { fillStages(); run(); });
+  [weightEl, kcalEl, factorEl].forEach(function (el) { el.addEventListener("input", run); });
+  [stageEl, mealsEl].forEach(function (el) { el.addEventListener("change", run); });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>クーラーボックス 保冷剤・氷の必要量(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="クーラーボックス容量と泊数から、必要な保冷剤・氷の量と食材が入る余裕を計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>/* 長いURLがはみ出さないようにする(shared/style.cssは変更しない) */
+  .sources a { word-break: break-all; overflow-wrap: anywhere; }</style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>クーラーボックス 保冷剤・氷の必要量</h1>
+  <form class="tool-form" id="tool-form">
+    <label>クーラーボックスの容量(L)
+      <span class="field-note">本体に書かれている容量。例: 20</span>
+      <input type="number" id="cap" inputmode="decimal" step="0.5" min="0.5" max="1000" placeholder="20">
+    </label>
+    <div class="field-row">
+      <label>泊数(泊)
+        <span class="field-note">日帰りは0</span>
+        <input type="number" id="nights" inputmode="numeric" step="1" min="0" max="29" placeholder="1">
+      </label>
+      <label>入れたい食材・飲み物(L)
+        <input type="number" id="food" inputmode="decimal" step="0.5" min="0" max="1000" placeholder="10">
+      </label>
+    </div>
+    <label>外気温(℃)
+      <span class="field-note">注意点の表示に使います。必要量そのものは変わりません</span>
+      <input type="number" id="temp" inputmode="decimal" step="1" min="-30" max="60" placeholder="32">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 「容量の1/4」の目安でも計算する</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">「容量の1/4」の目安</h3>
+      <p class="adv-note">出典にはもうひとつ「保冷剤の量はクーラーボックスの1/4程度」という目安があります。こちらは泊数によらない量です。2つを見くらべてください。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    ここで出る量は<strong>ざっくりした目安</strong>です。断熱性能(真空断熱パネル・発泡ウレタンなど)、事前の予冷、開け閉めの回数で必要量は大きく変わります。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>クーラーボックスの容量と泊数を入れるだけで、<strong>保冷剤・氷をどれくらい用意すればよいか</strong>と、<strong>食材がちゃんと入るか</strong>がわかります。氷を買いすぎて食材が入らない失敗を防げます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>クーラーボックスの容量(L)を入れます。</li>
+    <li>泊数と、入れたい食材・飲み物のかさ(L)を入れると、その瞬間に必要量と空きが出ます。</li>
+    <li>もうひとつの目安「容量の1/4」と見くらべたいときは「＋詳細機能」を開いてください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>保冷剤の目安(重さ)</strong> = 容量(L) × 100g(出典の「クーラーボックスのリットル数×100g」)</li>
+    <li><strong>日数分</strong> = 上の量 × 日数(泊数+1)。<strong>これは出典の数値ではなく</strong>、1日ごとに同量を補充すると考えた本ツールの単純合計です</li>
+    <li><strong>もうひとつの目安</strong> = 容量の1/4程度(出典の「保冷剤の量はクーラーボックスの1/4程度」)</li>
+    <li><strong>体積への換算</strong> = 保冷剤の密度を水と同じ(1g = 1cm³)として、1,000g = 1L</li>
+    <li><strong>空き容量</strong> = 容量 − 保冷剤の体積 − 食材の体積</li>
+  </ul>
+
+  <h3>出典</h3>
+  <ul class="sources">
+    <li>アウトドアギア解説「クーラーボックスに入れる保冷剤の量の目安」(RANK KING、2025年4月1日更新)<br>
+      <a href="https://outdoor.rank-king.jp/article/727" rel="noopener" target="_blank">https://outdoor.rank-king.jp/article/727</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>出典の目安は<strong>2026年7月29日時点</strong>で確認した「容量×100g」(釣りの場合)と「容量の1/4程度」の2つです。公的機関の基準ではありません。</li>
+    <li>出典に<strong>泊数や外気温による倍率の記載はありません</strong>。本ツールの日数分の計算は単純合計であり、外気温は必要量を変えません。</li>
+    <li>保冷剤の体積は密度を水と同じとして換算しています。実際の保冷剤はケースの分だけかさばります。</li>
+    <li>板氷・ブロック氷は溶けにくく、砕氷(クラッシュアイス)は早く溶けます。同じ重さでも持ちは変わります。</li>
+    <li>使う前日に凍らせたペットボトルなどでクーラーボックス自体を予冷しておくと、保冷剤の消費を抑えられます。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">保冷剤は上と下のどちらに入れますか?</h3>
+  <p class="faq-a">冷気は下に降りるため、保冷剤は上に置くのが基本です。氷や凍らせたペットボトルを下に敷き、食材の上にも保冷剤を置くと全体が冷えます。</p>
+  <h3 class="faq-q">大きい保冷剤と小さい保冷剤、どちらがよいですか?</h3>
+  <p class="faq-a">同じ重さなら大きいものの方が表面積が小さく、持ちが長くなります。すき間を埋める用途では小さいものも便利です。</p>
+  <h3 class="faq-q">泊数を増やすと保冷剤だけで満杯になってしまいます</h3>
+  <p class="faq-a">長い日程では、途中で氷を買い足す前提にするか、クーラーボックスを2つに分けるのが現実的です。本ツールの日数分の計算は「毎日同量を補充する」考え方なので、そのまま全部を最初に詰める必要はありません。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_capacity: "容量は0.5〜1000Lの数値で入力してください。",
+    invalid_nights: "泊数は0〜29の数値で入力してください。",
+    invalid_days: "日数を確認してください。",
+    invalid_food: "食材の量は0〜1000Lの数値で入力してください。",
+    invalid_coolant: "保冷剤の量を確認してください。",
+    invalid_basis: "目安の取り方を確認してください。",
+    invalid_temp: "外気温は-30〜60℃の数値で入力してください。"
+  };
+  var TEMP_NOTE = {
+    mild: "外気温25℃未満。ふつうの使い方なら目安の量で足ります。",
+    warm: "外気温25〜30℃。直射日光を避け、開け閉めを減らすと持ちが変わります。",
+    hot: "外気温30〜35℃。前日の予冷と、日陰・車内を避けた保管をおすすめします。",
+    very_hot: "外気温35℃以上。生ものは別の小さいクーラーにまとめ、氷の買い足しも考えてください。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var capEl = document.getElementById("cap");
+  var nightsEl = document.getElementById("nights");
+  var foodEl = document.getElementById("food");
+  var tempEl = document.getElementById("temp");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function err(target, code) {
+    target.innerHTML = '<p class="result-error">' + esc(ERRORS[code] || "入力値を確認してください。") + "</p>";
+    target.hidden = false;
+  }
+
+  function run() {
+    if (capEl.value === "" || nightsEl.value === "" || foodEl.value === "") { box.hidden = true; runAdv(); return; }
+    var r = CoolerCalc.plan(parseFloat(capEl.value), parseFloat(nightsEl.value), parseFloat(foodEl.value));
+    if (!r.ok) { err(box, r.code); runAdv(); return; }
+    var note = "";
+    if (tempEl.value !== "") {
+      var band = CoolerCalc.temperatureBand(parseFloat(tempEl.value));
+      note = band.ok ? "<p>" + esc(TEMP_NOTE[band.key]) + "</p>" : "";
+    }
+    box.innerHTML =
+      '<div class="result-main">保冷剤 約' + esc(r.coolantGram.toLocaleString("ja-JP")) + " g(約" +
+      esc(r.coolantVolumeL.toFixed(1)) + " L)</div>" +
+      "<p>" + esc(String(r.days)) + "日分(容量×100g/日の単純合計)</p>" +
+      "<p>保冷剤+食材で " + esc(r.usedL.toFixed(1)) + " L(使用率 " + esc(r.usageRate.toFixed(1)) + "%)、" +
+      (r.fits ? "残り " + esc(r.remainL.toFixed(1)) + " L の余裕があります。"
+              : "容量を " + esc(Math.abs(r.remainL).toFixed(1)) + " L 超えています。") + "</p>" +
+      note;
+    box.hidden = false;
+    runAdv();
+  }
+
+  function runAdv() {
+    if (capEl.value === "" || foodEl.value === "") { advBox.hidden = true; return; }
+    var q = CoolerCalc.coolantByQuarter(parseFloat(capEl.value));
+    if (!q.ok) { err(advBox, q.code); return; }
+    var s = CoolerCalc.space(parseFloat(capEl.value), q.volumeL, parseFloat(foodEl.value));
+    if (!s.ok) { err(advBox, s.code); return; }
+    advBox.innerHTML =
+      '<div class="result-main">保冷剤 約' + esc(q.volumeL.toFixed(1)) + " L(約" +
+      esc(q.gram.toLocaleString("ja-JP")) + " g)</div>" +
+      "<p>容量の1/4を保冷剤にあてた場合。食材と合わせて " + esc(s.usedL.toFixed(1)) + " L、" +
+      (s.fits ? "残り " + esc(s.remainL.toFixed(1)) + " L です。"
+              : "容量を " + esc(Math.abs(s.remainL).toFixed(1)) + " L 超えます。") + "</p>";
+    advBox.hidden = false;
+  }
+
+  [capEl, nightsEl, foodEl, tempEl].forEach(function (el) { el.addEventListener("input", run); });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

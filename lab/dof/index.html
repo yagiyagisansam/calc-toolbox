@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>被写界深度の計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="焦点距離・F値・撮影距離・センサーサイズから、ピントが合って見える手前〜奥の範囲と過焦点距離を計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>被写界深度の計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>センサーサイズ
+      <select id="sensor">
+        <option value="medium44x33">中判(44×33mm) 許容錯乱円0.042mm</option>
+        <option value="fullframe" selected>35mmフルサイズ 許容錯乱円0.033mm</option>
+        <option value="apsc15">APS-C(23.5×15.6mm) 0.022mm</option>
+        <option value="apsc16">APS-C(22.3×14.9mm) 0.021mm</option>
+        <option value="m43">マイクロフォーサーズ 0.017mm</option>
+        <option value="type1">1型 0.012mm</option>
+      </select>
+    </label>
+    <label>焦点距離(mm)
+      <span class="field-note">レンズの実焦点距離。例: 50</span>
+      <input type="number" id="focal" inputmode="decimal" step="any" min="1" max="2000" placeholder="50">
+    </label>
+    <label>F値(絞り)
+      <span class="field-note">例: 2.8</span>
+      <input type="number" id="fnumber" inputmode="decimal" step="any" min="0.5" max="100" placeholder="2.8">
+    </label>
+    <label>被写体までの距離(m)
+      <span class="field-note">例: 3</span>
+      <input type="number" id="distance" inputmode="decimal" step="any" min="0.01" max="10000" placeholder="3">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 許容錯乱円径を自分で決める</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">許容錯乱円径(mm)</h3>
+      <p class="adv-note">空欄ならセンサーサイズのプリセットを使います。厳しく見たいとき(等倍で確認するときなど)は小さい値を入れてください。</p>
+      <label>許容錯乱円径(mm)
+        <input type="number" id="coc" inputmode="decimal" step="0.001" min="0.001" max="0.2" placeholder="0.033">
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    ピントが合う・合わないは実際には<strong>段階的に変化</strong>します。ここで出る範囲は「許容錯乱円径」という目安をもとにした計算値で、収差や回折は考慮していません。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>撮影前に<strong>どこからどこまでピントが合って見えるか</strong>がわかります。物撮りやポートレートで絞りを決めるとき、集合写真で全員にピントを合わせたいときの根拠になります。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>センサーサイズを選びます(許容錯乱円径が自動で決まります)。</li>
+    <li>焦点距離・F値・被写体までの距離を入れると、その瞬間に範囲が表示されます。</li>
+    <li>「＋詳細機能」で許容錯乱円径を自分の基準に変えられます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <p>記号は f=焦点距離、F=F値、δ=許容錯乱円径、s=レンズから被写体までの距離(すべてmm)です。</p>
+  <ul class="method">
+    <li><strong>前方被写界深度</strong> = δ × F × s × (s − f) ÷ (f² + δ × F × s)</li>
+    <li><strong>後方被写界深度</strong> = δ × F × s × (s − f) ÷ (f² − δ × F × s) ※ f² ≦ δ×F×s のときは無限遠まで</li>
+    <li><strong>過焦点距離</strong> = f² ÷ (δ × F) + f</li>
+    <li><strong>許容錯乱円径のプリセット</strong> = センサー対角長 ÷ 1300</li>
+  </ul>
+  <p>写真の解説でよく見る「s²」を使った式は、s が f に対して十分大きいときの近似です。本ツールは近似せず (s − f) を使った式で計算しています。</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>センサーサイズと許容錯乱円径(対角長÷1300)</caption>
+      <thead><tr><th>センサー</th><th>対角長</th><th>許容錯乱円径</th></tr></thead>
+      <tbody>
+        <tr><td>中判(44×33mm)</td><td>54.9mm</td><td>0.042mm</td></tr>
+        <tr><td>35mmフルサイズ(36×24mm)</td><td>43.27mm</td><td>0.033mm</td></tr>
+        <tr><td>APS-C(23.5×15.6mm)</td><td>28.21mm</td><td>0.022mm</td></tr>
+        <tr><td>APS-C(22.3×14.9mm)</td><td>26.82mm</td><td>0.021mm</td></tr>
+        <tr><td>マイクロフォーサーズ(17.3×13mm)</td><td>21.64mm</td><td>0.017mm</td></tr>
+        <tr><td>1型(13.2×8.8mm)</td><td>15.86mm</td><td>0.012mm</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>東芝テリー株式会社「知っていると便利な光学知識 - 被写界深度と過焦点距離・過焦点系列」<br>
+      <a href="https://www.toshiba-teli.co.jp/technology/technical/t0019_DoF_HyperfocalDistance.htm" rel="noopener" target="_blank">https://www.toshiba-teli.co.jp/technology/technical/t0019_DoF_HyperfocalDistance.htm</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>距離はレンズ(前側主点)から被写体までの距離です。カメラの距離目盛は撮像面基準のため、接写では数cmのずれが出ます。</li>
+    <li>許容錯乱円径のプリセットは、出典が例として挙げている「画面対角線の1/1300」に基づく値です。大きく引き伸ばす場合や等倍で確認する場合は、もっと小さい値で見積もるべきです。</li>
+    <li>収差・回折は考慮していません。F16より絞ると回折で解像が落ち、計算どおりのシャープさは得られません。</li>
+    <li>マクロ撮影(等倍に近い領域)では実効F値が大きくなるため、計算値よりわずかに深度が深くなります。</li>
+    <li>後方被写界深度が「無限遠」と出るのは、過焦点距離に近い距離にピントを合わせたときです。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">過焦点距離とは何ですか?</h3>
+  <p class="faq-a">その距離にピントを合わせると、およそ半分の距離から無限遠までがピントの合う範囲に入る、という距離です。風景写真で「手前の花も遠くの山も入れたい」ときの目安になります。</p>
+  <h3 class="faq-q">センサーが小さいほど深度が深いのはなぜですか?</h3>
+  <p class="faq-a">同じ画角を得るのに焦点距離が短いレンズを使うためです。式のf²が効くので、焦点距離が半分になると深度は大きく深くなります(許容錯乱円径が小さくなる分は逆に働きますが、焦点距離の効果が上回ります)。</p>
+  <h3 class="faq-q">前より後ろのほうが深いのはなぜですか?</h3>
+  <p class="faq-a">式の分母が、前方は「f² + δFs」、後方は「f² − δFs」となるためです。距離が遠くなるほど後方の深度が急に伸び、ついには無限遠に達します。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_focal: "焦点距離を1〜2000mmの範囲で入力してください。",
+    invalid_fnumber: "F値を0.5〜100の範囲で入力してください。",
+    invalid_distance: "被写体までの距離を、焦点距離より大きい値(0.01〜10000m)で入力してください。",
+    invalid_coc: "許容錯乱円径を0.001〜0.2mmの範囲で入力してください。",
+    invalid_sensor: "センサーサイズを選び直してください。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var sensorEl = document.getElementById("sensor");
+  var focalEl = document.getElementById("focal");
+  var fnumberEl = document.getElementById("fnumber");
+  var distanceEl = document.getElementById("distance");
+  var cocEl = document.getElementById("coc");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function m(v) { return v.toFixed(3) + "m"; }
+
+  function currentCoc() {
+    if (cocEl.value !== "") return parseFloat(cocEl.value);
+    var p = DofCalc.cocForSensor(sensorEl.value);
+    return p.ok ? p.cocMm : NaN;
+  }
+
+  function run() {
+    if (focalEl.value === "" || fnumberEl.value === "" || distanceEl.value === "") {
+      box.hidden = true; advBox.hidden = true; return;
+    }
+    var coc = currentCoc();
+    var r = DofCalc.calculate(
+      parseFloat(focalEl.value), parseFloat(fnumberEl.value),
+      parseFloat(distanceEl.value), coc
+    );
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      advBox.hidden = true;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">' + esc(m(r.nearM)) + " 〜 " + (r.isFarInfinite ? "無限遠" : esc(m(r.farM))) + "</div>" +
+      "<p>前方の深度: " + esc(m(r.frontM)) + " / 後方の深度: " + (r.isFarInfinite ? "無限遠まで" : esc(m(r.rearM))) + "</p>" +
+      (r.isFarInfinite ? "" : "<p>被写界深度の合計: " + esc(m(r.totalM)) + "</p>") +
+      "<p>過焦点距離: " + esc(m(r.hyperfocalM)) + "</p>";
+    box.hidden = false;
+    advBox.innerHTML = '<div class="result-main">許容錯乱円径 ' + esc(coc) + "mm</div>" +
+      "<p>この値で上の結果を計算しています。</p>";
+    advBox.hidden = false;
+  }
+
+  [focalEl, fnumberEl, distanceEl, cocEl].forEach(function (el) { el.addEventListener("input", run); });
+  sensorEl.addEventListener("change", run);
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

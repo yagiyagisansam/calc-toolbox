@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>育児休業 取得可能期間の計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="子の生年月日から、育児休業の一歳到達日・1歳6か月・2歳までの延長期限と、出生時育児休業(産後パパ育休)の期間を計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>育児休業 取得可能期間の計算</h1>
+  <form class="tool-form" id="tool-form">
+    <span class="field-note">子の生年月日(出産予定日でも試算できます)</span>
+    <div class="field-row">
+      <label>年
+        <select id="birth-year"></select>
+      </label>
+      <label>月
+        <select id="birth-month"></select>
+      </label>
+      <label>日
+        <select id="birth-day"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 出生時育児休業(産後パパ育休)の期間</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">出産予定日を入れて期間を出す</h3>
+      <p class="adv-note">予定日と実際の出生日がずれた場合、期間の取り方が変わります。予定日どおりなら上の日付と同じにしてください。</p>
+      <div class="field-row">
+        <label>予定日(年)
+          <select id="due-year"></select>
+        </label>
+        <label>月
+          <select id="due-month"></select>
+        </label>
+        <label>日
+          <select id="due-day"></select>
+        </label>
+      </div>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    表示するのは<strong>法律上の期間の上限</strong>です。実際に取得できるかは、勤務先の労使協定・申出期限・雇用期間などの要件によります。育児休業給付金の支給要件は別に確認が必要です。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>子の生年月日から、<strong>育児休業をいつまで取れるか</strong>(原則の一歳到達日、1歳6か月・2歳までの延長期限、パパ・ママ育休プラスの上限)と、<strong>出生時育児休業(産後パパ育休)の期間</strong>がわかります。復職日や保活のスケジュールの逆算に使えます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>子の生年月日を選ぶと、その瞬間に節目の日付が表示されます。</li>
+    <li>出生時育児休業の期間を知りたいときは「＋詳細機能」で出産予定日も選んでください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>一歳到達日</strong> = 子が一歳に達する日。年齢は出生の日から起算するため、<strong>誕生日の前日</strong>になります</li>
+    <li><strong>1歳6か月・2歳に達する日</strong> = 起算日(出生日)に応当する日の前日。応当する日がない月は、その月の末日</li>
+    <li><strong>パパ・ママ育休プラス</strong> = 配偶者が一歳到達日以前に育児休業をしている場合、一歳二か月に達する日まで</li>
+    <li><strong>出生時育児休業の期間</strong> = 出生日と出産予定日の早いほうから、遅いほうの56日後(八週間を経過する日の翌日)まで。この期間内に通算28日まで、2回まで分割可</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>育児・介護休業法の主な規定</caption>
+      <thead><tr><th>制度</th><th>期間</th><th>分割</th><th>根拠条文</th></tr></thead>
+      <tbody>
+        <tr><td>育児休業(原則)</td><td>一歳に満たない子について、一歳到達日まで</td><td>2回まで</td><td>第5条第1項・第2項</td></tr>
+        <tr><td>パパ・ママ育休プラス</td><td>一歳二か月に満たない子まで</td><td>—</td><td>第9条の6第1項</td></tr>
+        <tr><td>延長(1回目)</td><td>一歳から一歳六か月に達するまで</td><td>—</td><td>第5条第3項</td></tr>
+        <tr><td>延長(2回目)</td><td>一歳六か月から二歳に達するまで</td><td>—</td><td>第5条第4項</td></tr>
+        <tr><td>出生時育児休業</td><td>出生の日から起算して八週間を経過する日の翌日までの期間内に四週間以内</td><td>2回まで(通算28日)</td><td>第9条の2</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>育児休業、介護休業等育児又は家族介護を行う労働者の福祉に関する法律(平成3年法律第76号)<br>
+      <a href="https://laws.e-gov.go.jp/law/403AC0000000076" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/403AC0000000076</a>(2026年7月29日参照)</li>
+    <li>年齢計算ニ関スル法律(明治35年法律第50号)<br>
+      <a href="https://laws.e-gov.go.jp/law/135AC0000000050" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/135AC0000000050</a>(2026年7月29日参照)</li>
+    <li>厚生労働省「育児・介護休業法について」<br>
+      <a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000130583.html" rel="noopener" target="_blank">https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000130583.html</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>条文は<strong>2026年7月29日時点</strong>の育児・介護休業法によります。法改正で変わることがあります。</li>
+    <li>1歳6か月・2歳までの延長は、保育所に入所できない等の要件を満たす場合に限られます。誰でも自動的に延長できるわけではありません。</li>
+    <li>パパ・ママ育休プラスは、配偶者が一歳到達日以前に育児休業をしている場合の特例です。1人あたりの休業できる日数の上限が延びるわけではありません。</li>
+    <li>有期雇用の方には別の要件(子が一歳六か月に達する日までに労働契約が満了することが明らかでないこと等)があります。</li>
+    <li>申出には期限があります(勤務先の規定をご確認ください)。このツールでは申出期限は計算していません。</li>
+    <li>育児休業給付金の支給要件・支給期間は雇用保険法で別に定められています。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">なぜ「一歳に達する日」が誕生日の前日なのですか?</h3>
+  <p class="faq-a">年齢計算ニ関スル法律により、年齢は出生の日から起算します。民法第143条第2項で「期間は、応当する日の前日に満了する」と定められているため、1年の期間は誕生日の前日に満了し、その日が「一歳に達する日」になります。</p>
+  <h3 class="faq-q">2月29日生まれの子はどうなりますか?</h3>
+  <p class="faq-a">翌年の2月に29日がないため、民法第143条第2項ただし書により、その月の末日(2月28日)に一歳に達します。</p>
+  <h3 class="faq-q">出生時育児休業と通常の育児休業は両方取れますか?</h3>
+  <p class="faq-a">取れます。出生時育児休業は通常の育児休業とは別枠で、2回まで通算28日まで取得できます。通常の育児休業もこれとは別に2回まで分割できます。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_birth_date: "子の生年月日を正しく選んでください。",
+    invalid_due_date: "出産予定日を正しく選んでください。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var today = new Date();
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function fillSelect(id, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    document.getElementById(id).innerHTML = html;
+  }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function daysInMonth(y, m) { return new Date(Date.UTC(y, m, 0)).getUTCDate(); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(dId, 1, max, "日", Math.min(keep, max));
+  }
+  function jp(iso) {
+    var p = iso.split("-");
+    return p[0] + "年" + parseInt(p[1], 10) + "月" + parseInt(p[2], 10) + "日";
+  }
+
+  var y0 = today.getFullYear();
+  fillSelect("birth-year", y0 - 5, y0 + 3, "年", y0);
+  fillSelect("birth-month", 1, 12, "月", today.getMonth() + 1);
+  fillSelect("birth-day", 1, daysInMonth(y0, today.getMonth() + 1), "日", today.getDate());
+  fillSelect("due-year", y0 - 5, y0 + 3, "年", y0);
+  fillSelect("due-month", 1, 12, "月", today.getMonth() + 1);
+  fillSelect("due-day", 1, daysInMonth(y0, today.getMonth() + 1), "日", today.getDate());
+
+  function run() {
+    adjustDays("birth-year", "birth-month", "birth-day");
+    var r = IkujiKikanCalc.calculate(val("birth-year"), val("birth-month"), val("birth-day"));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      runAdv();
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">原則 ' + esc(jp(r.age1Date)) + " まで</div>" +
+      "<p>一歳到達日(誕生日の前日)。分割は" + esc(r.maxTimes) + "回まで</p>" +
+      "<p>パパ・ママ育休プラス(1歳2か月まで): " + esc(jp(r.age1m2Date)) + "</p>" +
+      "<p>延長1回目(1歳6か月まで): " + esc(jp(r.age1m6Date)) + "</p>" +
+      "<p>延長2回目(2歳まで): " + esc(jp(r.age2Date)) + "</p>";
+    box.hidden = false;
+    runAdv();
+  }
+
+  function runAdv() {
+    adjustDays("due-year", "due-month", "due-day");
+    var r = IkujiKikanCalc.postnatalWindow(
+      val("birth-year"), val("birth-month"), val("birth-day"),
+      val("due-year"), val("due-month"), val("due-day")
+    );
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">' + esc(jp(r.startDate)) + " 〜 " + esc(jp(r.endDate)) + "</div>" +
+      "<p>この" + esc(r.windowDays) + "日間のうち、通算" + esc(r.maxDays) + "日まで・" + esc(r.maxTimes) + "回まで取得できます。</p>";
+    advBox.hidden = false;
+  }
+
+  ["birth-year", "birth-month", "birth-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", run);
+  });
+  ["due-year", "due-month", "due-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runAdv);
+  });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
+})();
+</script>
+</body>
+</html>

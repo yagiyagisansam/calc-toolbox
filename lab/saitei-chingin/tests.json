@@ -1,0 +1,148 @@
+{
+  "tool": "saitei-chingin",
+  "module": "calc.js",
+  "global": "SaiteiChinginCalc",
+  "cases": [
+    {
+      "name": "月給20万円÷160時間=1250円は東京(1226円)を満たす",
+      "func": "checkMonthly",
+      "args": [200000, 0, 160, "tokyo"],
+      "expect": {
+        "ok": true, "hourly": 1250, "minimumWage": 1226,
+        "prefectureName": "東京", "meets": true, "diff": 24
+      }
+    },
+    {
+      "name": "除外賃金の効果: 月給17万円から通勤手当1万円を除くと1000円で東京は未達",
+      "func": "checkMonthly",
+      "args": [170000, 10000, 160, "tokyo"],
+      "expect": { "ok": true, "base": 160000, "hourly": 1000, "meets": false, "diff": -226 }
+    },
+    {
+      "name": "月給18万円÷160時間=1125円は沖縄(1023円)を満たす",
+      "func": "checkMonthly",
+      "args": [180000, 0, 160, "okinawa"],
+      "expect": { "ok": true, "hourly": 1125, "minimumWage": 1023, "meets": true, "diff": 102 }
+    },
+    {
+      "name": "日給9000円÷8時間=1125円は大阪(1177円)に届かない",
+      "func": "checkDaily",
+      "args": [9000, 0, 8, "osaka"],
+      "expect": { "ok": true, "hourly": 1125, "minimumWage": 1177, "meets": false, "diff": -52 }
+    },
+    {
+      "name": "境界値: 時給が最低賃金ちょうど(東京1226円)は満たす",
+      "func": "checkHourly",
+      "args": [1226, "tokyo"],
+      "expect": { "ok": true, "hourly": 1226, "meets": true, "diff": 0 }
+    },
+    {
+      "name": "境界値: 時給が最低賃金より1円低い(東京1225円)は未達",
+      "func": "checkHourly",
+      "args": [1225, "tokyo"],
+      "expect": { "ok": true, "meets": false, "diff": -1 }
+    },
+    {
+      "name": "境界値: 全国で最も低い高知1023円ちょうども満たす",
+      "func": "checkHourly",
+      "args": [1023, "kochi"],
+      "expect": { "ok": true, "minimumWage": 1023, "meets": true, "diff": 0 }
+    },
+    {
+      "name": "境界値: 時給0円は未達(最低賃金との差はマイナス)",
+      "func": "checkHourly",
+      "args": [0, "tokyo"],
+      "expect": { "ok": true, "hourly": 0, "meets": false, "diff": -1226 }
+    },
+    {
+      "name": "1か月平均所定労働時間: 1日8時間×年250日÷12=166.67時間",
+      "func": "averageMonthlyHours",
+      "args": [8, 250],
+      "expect": { "ok": true, "monthlyHours": 166.67 }
+    },
+    {
+      "name": "1か月平均所定労働時間: 1日7.5時間×年240日÷12=150時間",
+      "func": "averageMonthlyHours",
+      "args": [7.5, 240],
+      "expect": { "ok": true, "monthlyHours": 150 }
+    },
+    {
+      "name": "必要な月給: 東京1226円×160時間=196,160円",
+      "func": "requiredMonthlyWage",
+      "args": [160, "tokyo"],
+      "expect": { "ok": true, "requiredMonthly": 196160, "minimumWage": 1226 }
+    },
+    {
+      "name": "必要な月給: 端数は切り上げる(埼玉1141円×166.67時間=190,170.47円→190,171円)",
+      "func": "requiredMonthlyWage",
+      "args": [166.67, "saitama"],
+      "expect": { "ok": true, "requiredMonthly": 190171, "minimumWage": 1141 }
+    },
+    {
+      "name": "都道府県一覧は47件そろっており、先頭は北海道1075円",
+      "func": "prefectures",
+      "args": [],
+      "expect": { "0": { "code": "hokkaido", "name": "北海道", "wage": 1075 }, "length": 47 }
+    },
+    {
+      "name": "異常入力: 月給が負の値はエラー",
+      "func": "checkMonthly",
+      "args": [-1, 0, 160, "tokyo"],
+      "expect": { "ok": false, "code": "invalid_wage" }
+    },
+    {
+      "name": "異常入力: 所定労働時間0はエラー(0で割らない)",
+      "func": "checkMonthly",
+      "args": [200000, 0, 0, "tokyo"],
+      "expect": { "ok": false, "code": "invalid_hours" }
+    },
+    {
+      "name": "異常入力: 所定労働時間が負の値はエラー",
+      "func": "checkMonthly",
+      "args": [200000, 0, -160, "tokyo"],
+      "expect": { "ok": false, "code": "invalid_hours" }
+    },
+    {
+      "name": "異常入力: 除外賃金が月給を超える場合はエラー",
+      "func": "checkMonthly",
+      "args": [100000, 200000, 160, "tokyo"],
+      "expect": { "ok": false, "code": "excluded_over_wage" }
+    },
+    {
+      "name": "異常入力: 除外賃金が負の値はエラー",
+      "func": "checkMonthly",
+      "args": [200000, -1, 160, "tokyo"],
+      "expect": { "ok": false, "code": "invalid_excluded" }
+    },
+    {
+      "name": "異常入力: 存在しない都道府県コードはエラー",
+      "func": "checkMonthly",
+      "args": [200000, 0, 160, "hawaii"],
+      "expect": { "ok": false, "code": "invalid_prefecture" }
+    },
+    {
+      "name": "異常入力: 数値でない月給はエラー",
+      "func": "checkMonthly",
+      "args": ["abc", 0, 160, "tokyo"],
+      "expect": { "ok": false, "code": "invalid_wage" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "checkMonthly",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_wage" }
+    },
+    {
+      "name": "異常入力: 1日の所定労働時間が24時間超はエラー",
+      "func": "checkDaily",
+      "args": [9000, 0, 25, "osaka"],
+      "expect": { "ok": false, "code": "invalid_hours" }
+    },
+    {
+      "name": "異常入力: 年間所定労働日数が366日超はエラー",
+      "func": "averageMonthlyHours",
+      "args": [8, 400],
+      "expect": { "ok": false, "code": "invalid_work_days" }
+    }
+  ]
+}

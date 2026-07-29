@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>不動産取得税 計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="土地・建物を取得したときに一度だけかかる不動産取得税を、住宅の軽減措置込みで計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>
+    /* 出典の長いURLが画面からはみ出さないようにする */
+    .sources a { overflow-wrap: anywhere; word-break: break-word; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>不動産取得税 計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>建物の固定資産税評価額(円)
+      <span class="field-note">購入価格ではなく評価額です</span>
+      <input type="number" id="house" inputmode="numeric" step="100000" min="0" placeholder="例: 15000000">
+    </label>
+    <label>土地の固定資産税評価額(円)
+      <input type="number" id="land" inputmode="numeric" step="100000" min="0" placeholder="例: 30000000">
+    </label>
+    <div class="field-row">
+      <label>土地の地積(㎡)
+        <input type="number" id="area" inputmode="decimal" step="0.01" min="0" placeholder="例: 150">
+      </label>
+      <label>住宅の床面積(㎡)
+        <input type="number" id="floor" inputmode="decimal" step="0.01" min="0" placeholder="例: 100">
+      </label>
+    </div>
+    <label>物件の種類
+      <select id="kind">
+        <option value="new" selected>新築住宅(建売・新築マンションを含む)</option>
+        <option value="used">中古住宅(自分が住むもの)</option>
+        <option value="non">住宅以外(店舗・事務所など)</option>
+      </select>
+    </label>
+    <div class="field-row" id="built-row" hidden>
+      <label>新築された年(西暦)
+        <input type="number" id="built-year" inputmode="numeric" step="1" min="1900" max="2100" placeholder="例: 2005">
+      </label>
+      <label>月
+        <select id="built-month"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 軽減の内訳・免税点・中古住宅の控除額表</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">軽減の内訳</h3>
+      <p class="adv-note">上で入れた条件について、軽減がなかった場合の税額と、いくら減るかを表示します。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">中古住宅の控除額(新築された日による)</h3>
+      <div class="table-scroll">
+        <table class="data-table">
+          <caption>中古住宅を取得したときの家屋の控除額</caption>
+          <thead><tr><th>新築された日</th><th>控除額</th></tr></thead>
+          <tbody>
+            <tr><td>昭和56年7月1日〜昭和60年6月30日</td><td>420万円</td></tr>
+            <tr><td>昭和60年7月1日〜平成元年3月31日</td><td>450万円</td></tr>
+            <tr><td>平成元年4月1日〜平成9年3月31日</td><td>1,000万円</td></tr>
+            <tr><td>平成9年4月1日以後</td><td>1,200万円</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="adv-h">免税点(令和8年4月1日以降の取得)</h3>
+      <p class="adv-note">課税標準となるべき額がこの金額未満なら、不動産取得税はかかりません。</p>
+      <div class="table-scroll">
+        <table class="data-table">
+          <caption>免税点</caption>
+          <thead><tr><th>区分</th><th>令和8年3月31日以前</th><th>令和8年4月1日以降</th></tr></thead>
+          <tbody>
+            <tr><td>土地</td><td>10万円</td><td>16万円</td></tr>
+            <tr><td>家屋(新築・増築・改築)</td><td>23万円</td><td>66万円</td></tr>
+            <tr><td>家屋(売買などその他)</td><td>12万円</td><td>34万円</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    軽減を受けるには<strong>床面積などの要件を満たし、申告する</strong>必要があります。ここでの計算は要件を満たす前提の目安です。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>固定資産税評価額と面積を入れると、<strong>不動産取得税がいくらになるか</strong>が軽減措置込みでわかります。住宅を買ったあと数か月してから届く納税通知に驚かないよう、事前に見積もっておくためのツールです。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>建物と土地の固定資産税評価額(円)、土地の地積と住宅の床面積(㎡)を入れます。</li>
+    <li>物件の種類を選びます。中古住宅を選んだときは新築された年月も入れてください。</li>
+    <li>入力が揃うと、その瞬間に税額が下に表示されます。ボタンは不要です。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>税率</strong> = 土地・住宅は3%、住宅以外の家屋は4%(令和9年3月31日までの特例)</li>
+    <li><strong>新築住宅の家屋</strong> = (評価額 − 1,200万円) × 3%</li>
+    <li><strong>中古住宅の家屋</strong> = (評価額 − 新築年次に応じた控除額) × 3%</li>
+    <li><strong>土地の当初税額</strong> = 評価額 × 1/2 × 3%(令和9年3月31日までの宅地等の特例)</li>
+    <li><strong>土地の減額額</strong> = 「45,000円」と「(評価額 × 1/2 ÷ 地積) × 住宅の床面積の2倍(200㎡が上限) × 持分 × 3%」の大きい方</li>
+    <li><strong>土地の納付税額</strong> = 当初税額 − 減額額(マイナスになる場合は0円)</li>
+  </ul>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>東京都主税局「不動産取得税」(税率・免税点・課税標準の特例・軽減の計算式)<br>
+      <a href="https://www.tax.metro.tokyo.lg.jp/shisan/fudosan.html" rel="noopener" target="_blank">https://www.tax.metro.tokyo.lg.jp/shisan/fudosan.html</a>(2026年7月29日参照)</li>
+    <li>総務省「地方税制度 不動産取得税」<br>
+      <a href="https://www.soumu.go.jp/main_sosiki/jichi_zeisei/czaisei/czaisei_seido/150790_17.html" rel="noopener" target="_blank">https://www.soumu.go.jp/main_sosiki/jichi_zeisei/czaisei/czaisei_seido/150790_17.html</a>(2026年7月29日参照)</li>
+    <li>国土交通省「住宅:不動産取得税に係る特例措置」(税率3%・控除1,200万円・適用期限)<br>
+      <a href="https://www.mlit.go.jp/jutakukentiku/house/jutakukentiku_house_tk2_000020.html" rel="noopener" target="_blank">https://www.mlit.go.jp/jutakukentiku/house/jutakukentiku_house_tk2_000020.html</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>不動産取得税は都道府県税です。金額・要件は<strong>令和8年(2026年)7月時点の東京都の記載</strong>に基づいています。他の道府県でも標準的な内容は同じですが、必ずお住まいの都道府県にご確認ください。</li>
+    <li>税率3%と宅地等の課税標準1/2の特例は<strong>令和9年3月31日まで</strong>の取得に適用されます。</li>
+    <li>「不動産の価格」は固定資産評価基準により評価・決定された価格(評価額)です。購入価格や建築工事費ではありません。</li>
+    <li>新築住宅の1,200万円控除には床面積50㎡以上240㎡以下などの要件があります。</li>
+    <li>併用住宅・共有・長期優良住宅・買取再販などの個別の取扱いは反映していません。</li>
+    <li>相続による取得など、課税されない場合があります。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">固定資産税評価額はどこで調べられますか?</h3>
+  <p class="faq-a">市区町村から届く固定資産税の納税通知書に同封される課税明細書、または市区町村の窓口で取得できる固定資産評価証明書で確認できます。新築の建物は取得時にはまだ評価額が決まっていないことがあります。</p>
+  <h3 class="faq-q">計算結果が0円になりましたが本当ですか?</h3>
+  <p class="faq-a">住宅と敷地の軽減が大きいため、一般的な広さの新築住宅では0円になることがよくあります。ただし軽減を受けるには申告が必要な自治体が多いので、取得したら必ず都道府県税事務所に確認してください。</p>
+  <h3 class="faq-q">納税通知はいつ届きますか?</h3>
+  <p class="faq-a">取得から数か月後です。東京都の場合は都税事務所から納税通知書が送られ、原則として発送月の月末が納期限になります。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_value: "評価額は0円以上の数値で入力してください。",
+    invalid_deduction: "控除額を計算できませんでした。",
+    invalid_land_area: "土地の地積は0より大きい数値で入力してください。",
+    invalid_floor_area: "住宅の床面積は0より大きい数値で入力してください。",
+    invalid_share: "持分の値が正しくありません。",
+    invalid_built_date: "新築された年月を正しく入力してください。",
+    built_before_1981_07: "昭和56年6月30日以前に新築された住宅の控除額は個別に定まります。都道府県税事務所にご確認ください。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var houseEl = document.getElementById("house");
+  var landEl = document.getElementById("land");
+  var areaEl = document.getElementById("area");
+  var floorEl = document.getElementById("floor");
+  var kindEl = document.getElementById("kind");
+  var builtRow = document.getElementById("built-row");
+  var builtYearEl = document.getElementById("built-year");
+  var builtMonthEl = document.getElementById("built-month");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function yen(n) {
+    return n.toLocaleString("ja-JP") + "円";
+  }
+
+  var monthHtml = "";
+  for (var mo = 1; mo <= 12; mo++) monthHtml += '<option value="' + mo + '">' + mo + "月</option>";
+  builtMonthEl.innerHTML = monthHtml;
+
+  function run() {
+    var kind = kindEl.value;
+    builtRow.hidden = kind !== "used";
+    if (houseEl.value === "" || landEl.value === "" || areaEl.value === "" || floorEl.value === "") {
+      box.hidden = true; advBox.hidden = true; return;
+    }
+    var houseValue = parseFloat(houseEl.value);
+    var landValue = parseFloat(landEl.value);
+    var area = parseFloat(areaEl.value);
+    var floor = parseFloat(floorEl.value);
+
+    var houseResult;
+    var deduction = 0;
+    if (kind === "non") {
+      houseResult = ShutokuzeiCalc.nonHouseTax(houseValue);
+    } else if (kind === "used") {
+      if (builtYearEl.value === "") { box.hidden = true; advBox.hidden = true; return; }
+      var d = ShutokuzeiCalc.usedHouseDeduction(parseInt(builtYearEl.value, 10), parseInt(builtMonthEl.value, 10));
+      if (!d.ok) {
+        box.innerHTML = '<p class="result-error">' + esc(ERRORS[d.code] || "入力値を確認してください。") + "</p>";
+        box.hidden = false; advBox.hidden = true; return;
+      }
+      deduction = d.deduction;
+      houseResult = ShutokuzeiCalc.houseTax(houseValue, deduction);
+    } else {
+      deduction = ShutokuzeiCalc.NEW_HOUSE_DEDUCTION;
+      houseResult = ShutokuzeiCalc.houseTax(houseValue, deduction);
+    }
+    if (!houseResult.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[houseResult.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false; advBox.hidden = true; return;
+    }
+
+    var landResult = kind === "non"
+      ? ShutokuzeiCalc.plainLandTax(landValue, true)
+      : ShutokuzeiCalc.landTax(landValue, area, floor, 1);
+    if (!landResult.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[landResult.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false; advBox.hidden = true; return;
+    }
+
+    var total = houseResult.tax + landResult.tax;
+    box.innerHTML =
+      '<div class="result-main">' + esc(yen(total)) + "</div>" +
+      "<p>建物 " + esc(yen(houseResult.tax)) + " + 土地 " + esc(yen(landResult.tax)) + "</p>" +
+      (kind === "non"
+        ? "<p>住宅以外の家屋は税率4%、土地は宅地等として評価額の1/2に3%で計算しています。</p>"
+        : "<p>建物は控除額 " + esc(yen(deduction)) + " を差し引いた " + esc(yen(houseResult.taxableBase)) + " に3%を掛けています。</p>");
+    box.hidden = false;
+
+    if (kind === "non") {
+      advBox.innerHTML = "<p>住宅以外の家屋には軽減措置がないため、内訳の表示はありません。</p>";
+      advBox.hidden = false;
+      return;
+    }
+    var houseBefore = Math.floor(houseValue * 0.03);
+    var before = houseBefore + landResult.baseTax;
+    advBox.innerHTML =
+      '<div class="result-main">軽減で ' + esc(yen(before - total)) + " 減っています</div>" +
+      "<p>軽減なしの税額: 建物 " + esc(yen(houseBefore)) + " + 土地 " + esc(yen(landResult.baseTax)) +
+      " = " + esc(yen(before)) + "</p>" +
+      "<p>土地の減額額は「45,000円」と「" + esc(yen(landResult.reductionB)) +
+      "(1㎡あたり " + esc(yen(landResult.unitPrice)) + " × " + esc(landResult.cappedArea) +
+      "㎡ × 3%)」の大きい方で " + esc(yen(landResult.reduction)) + " です。</p>";
+    advBox.hidden = false;
+  }
+
+  [houseEl, landEl, areaEl, floorEl, builtYearEl].forEach(function (el) { el.addEventListener("input", run); });
+  [kindEl, builtMonthEl].forEach(function (el) { el.addEventListener("change", run); });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
+})();
+</script>
+</body>
+</html>

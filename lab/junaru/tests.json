@@ -1,0 +1,151 @@
+{
+  "tool": "junaru",
+  "module": "calc.js",
+  "global": "JunaruCalc",
+  "cases": [
+    {
+      "name": "ガイドラインの例: ビール500ml・5%は純アルコール20g",
+      "func": "grams",
+      "args": [500, 5, 1],
+      "expect": { "ok": true, "grams": 20, "gramsPerCup": 20, "totalMl": 500 }
+    },
+    {
+      "name": "杯数を省略すると1杯として計算する",
+      "func": "grams",
+      "args": [500, 5],
+      "expect": { "ok": true, "grams": 20 }
+    },
+    {
+      "name": "缶ビール350ml・5%を2本は28g",
+      "func": "grams",
+      "args": [350, 5, 2],
+      "expect": { "ok": true, "grams": 28, "gramsPerCup": 14, "totalMl": 700 }
+    },
+    {
+      "name": "日本酒1合180ml・15%は21.6g",
+      "func": "grams",
+      "args": [180, 15, 1],
+      "expect": { "ok": true, "grams": 21.6 }
+    },
+    {
+      "name": "ウイスキーダブル60ml・43%は20.6g",
+      "func": "grams",
+      "args": [60, 43, 1],
+      "expect": { "ok": true, "grams": 20.6 }
+    },
+    {
+      "name": "焼酎110ml・25%は22g",
+      "func": "grams",
+      "args": [110, 25, 1],
+      "expect": { "ok": true, "grams": 22 }
+    },
+    {
+      "name": "ワイン180ml・12%は17.3g",
+      "func": "grams",
+      "args": [180, 12, 1],
+      "expect": { "ok": true, "grams": 17.3 }
+    },
+    {
+      "name": "境界値: 男性40gちょうどは生活習慣病のリスクを高める量",
+      "func": "assess",
+      "args": [40, "male"],
+      "expect": { "ok": true, "threshold": 40, "overThreshold": true, "ratio": 100 }
+    },
+    {
+      "name": "境界値: 男性39.9gはまだ基準未満",
+      "func": "assess",
+      "args": [39.9, "male"],
+      "expect": { "ok": true, "overThreshold": false, "ratio": 99.8 }
+    },
+    {
+      "name": "境界値: 女性20gちょうどは生活習慣病のリスクを高める量",
+      "func": "assess",
+      "args": [20, "female"],
+      "expect": { "ok": true, "threshold": 20, "overThreshold": true, "ratio": 100 }
+    },
+    {
+      "name": "境界値: 女性19.9gはまだ基準未満",
+      "func": "assess",
+      "args": [19.9, "female"],
+      "expect": { "ok": true, "overThreshold": false }
+    },
+    {
+      "name": "男性20gは基準の半分(節度ある適度な飲酒の範囲内)",
+      "func": "assess",
+      "args": [20, "male"],
+      "expect": { "ok": true, "overThreshold": false, "overModerate": false, "ratio": 50 }
+    },
+    {
+      "name": "境界値: 純アルコール量0gも計算できる",
+      "func": "assess",
+      "args": [0, "male"],
+      "expect": { "ok": true, "grams": 0, "overThreshold": false, "ratio": 0 }
+    },
+    {
+      "name": "まとめて計算: ビール500mlを2杯・男性は40gで基準到達",
+      "func": "calculate",
+      "args": [500, 5, 2, "male"],
+      "expect": { "ok": true, "grams": 40, "overThreshold": true, "beer500Equiv": 2 }
+    },
+    {
+      "name": "まとめて計算: ビール500mlを1杯・女性は20gで基準到達",
+      "func": "calculate",
+      "args": [500, 5, 1, "female"],
+      "expect": { "ok": true, "grams": 20, "overThreshold": true, "beer500Equiv": 1 }
+    },
+    {
+      "name": "異常入力: 飲酒量0はエラー",
+      "func": "grams",
+      "args": [0, 5, 1],
+      "expect": { "ok": false, "code": "invalid_ml" }
+    },
+    {
+      "name": "異常入力: 飲酒量が負の値はエラー",
+      "func": "grams",
+      "args": [-500, 5, 1],
+      "expect": { "ok": false, "code": "invalid_ml" }
+    },
+    {
+      "name": "異常入力: 飲酒量が数値でないときはエラー",
+      "func": "grams",
+      "args": ["abc", 5, 1],
+      "expect": { "ok": false, "code": "invalid_ml" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "grams",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_ml" }
+    },
+    {
+      "name": "異常入力: 度数0はエラー",
+      "func": "grams",
+      "args": [500, 0, 1],
+      "expect": { "ok": false, "code": "invalid_abv" }
+    },
+    {
+      "name": "異常入力: 度数が100%超はエラー",
+      "func": "grams",
+      "args": [500, 101, 1],
+      "expect": { "ok": false, "code": "invalid_abv" }
+    },
+    {
+      "name": "異常入力: 杯数0はエラー",
+      "func": "grams",
+      "args": [500, 5, 0],
+      "expect": { "ok": false, "code": "invalid_cups" }
+    },
+    {
+      "name": "異常入力: 性別の指定が不正はエラー",
+      "func": "assess",
+      "args": [20, "x"],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    },
+    {
+      "name": "異常入力: 純アルコール量が負の値はエラー",
+      "func": "assess",
+      "args": [-1, "male"],
+      "expect": { "ok": false, "code": "invalid_grams" }
+    }
+  ]
+}

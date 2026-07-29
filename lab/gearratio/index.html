@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>自転車ギア比・速度・ケイデンス計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="前後の歯数とタイヤ周長から、ギア比・速度・展開長・ギアインチを計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>
+    /* 出典の長いURLが画面からはみ出さないようにする */
+    .sources a { overflow-wrap: anywhere; word-break: break-word; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>自転車ギア比・速度・ケイデンス計算</h1>
+  <form class="tool-form" id="tool-form">
+    <div class="field-row">
+      <label>フロント歯数(T)
+        <span class="field-note">チェーンリング</span>
+        <input type="number" id="front" inputmode="numeric" step="1" min="1" max="200" placeholder="例: 50">
+      </label>
+      <label>リア歯数(T)
+        <span class="field-note">スプロケット</span>
+        <input type="number" id="rear" inputmode="numeric" step="1" min="1" max="200" placeholder="例: 25">
+      </label>
+    </div>
+    <label>タイヤ周長(mm)
+      <span class="field-note">700×25Cで約2,111mm。サイクルコンピュータに設定している値でも可</span>
+      <input type="number" id="circ" inputmode="numeric" step="1" min="1" max="5000" value="2111">
+    </label>
+    <label>ケイデンス(rpm)
+      <span class="field-note">1分あたりのペダル回転数。ロードバイクでは80〜90が目安</span>
+      <input type="number" id="cadence" inputmode="numeric" step="1" min="0" max="300" value="90">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: タイヤ周長の推定・目標速度からケイデンスを逆算</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">ETRTO表記からタイヤ周長を推定する</h3>
+      <p class="adv-note">タイヤの側面にある「25-622」のような表記の、右がリム径・左がタイヤ幅です。真円とみなした幾何計算なので実測値とは数mmずれます。</p>
+      <div class="field-row">
+        <label>リム径(mm)
+          <input type="number" id="rim" inputmode="numeric" step="1" min="1" max="1000" value="622">
+        </label>
+        <label>タイヤ幅(mm)
+          <input type="number" id="width" inputmode="numeric" step="1" min="1" max="200" value="25">
+        </label>
+      </div>
+
+      <h3 class="adv-h">目標速度からケイデンスを逆算する</h3>
+      <label>目標速度(km/h)
+        <input type="number" id="speed" inputmode="decimal" step="0.5" min="0" max="300" value="30">
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    ここで出る速度は<strong>理論値</strong>です。実際には空気抵抗・路面抵抗・勾配・ドライブトレインのロスがあるため、同じケイデンスでも表示より遅くなります(下りでは速くなります)。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>前後の歯数を入れるだけで、<strong>そのギアで何km/h出るか、ペダル1回転で何m進むか</strong>がわかります。スプロケット交換やヒルクライム用のギア選びで、「この組み合わせで足りるか」を事前に検討できます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>フロント(チェーンリング)とリア(スプロケット)の歯数を入れます。</li>
+    <li>タイヤ周長とケイデンスを入れると、その瞬間に速度が表示されます。ボタンは不要です。</li>
+    <li>周長がわからないときは「＋詳細機能」でタイヤ側面のETRTO表記から推定できます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>ギア比</strong> = フロント歯数 ÷ リア歯数</li>
+    <li><strong>速度(km/h)</strong> = ギア比 × ケイデンス(rpm)× タイヤ周長(m)× 60 ÷ 1000</li>
+    <li><strong>展開長(m)</strong> = ギア比 × タイヤ周長(m)。ペダル1回転で進む距離</li>
+    <li><strong>ギアインチ</strong> = ギア比 × タイヤ外径(インチ)。外径は 周長 ÷ 円周率 で求める</li>
+    <li><strong>タイヤ周長の推定</strong> = 円周率 ×(リム径mm + タイヤ幅mm × 2)</li>
+  </ul>
+  <p>出典の計算例(タイヤ周長2,100mm)と一致することを確認しています。ギア比2.0 × ケイデンス80rpm × 2.1m × 60分 = 時速20.16km、ギア比3.0 × ケイデンス90rpm × 2.1m × 60分 = 時速34.02km。</p>
+
+  <h3>出典</h3>
+  <ul class="sources">
+    <li>若狭路サイクリング「ギア比とケイデンスと速度の関係」(ギア比の定義と 速度 = ギア比 × ケイデンス × タイヤ周長 × 60 の式、計算例)<br>
+      <a href="https://wakasaji-rhc.com/572/" rel="noopener" target="_blank">https://wakasaji-rhc.com/572/</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>速度は理論値です。空気抵抗・転がり抵抗・勾配・チェーンのロスは考慮していません。</li>
+    <li>タイヤ周長は空気圧・体重・タイヤの摩耗で変わります。正確に知りたい場合は、バルブに印を付けて実際に乗った状態で1回転させた距離を測ってください。</li>
+    <li>「＋詳細機能」の周長推定は、タイヤを真円とみなした幾何計算です。実測値とは数mm〜数十mm異なります。</li>
+    <li>ギアインチは、入力した周長から求めた外径をもとに計算しています(周長 ÷ 円周率)。</li>
+    <li>内装変速ハブやベルトドライブなど、ハブ内部に減速比がある場合は別途その比を掛ける必要があります。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">ギア比が小さいほうが坂に強いのですか?</h3>
+  <p class="faq-a">はい。ギア比が小さいほどペダルは軽くなり、同じケイデンスでの速度は下がります。ヒルクライムではフロントを小さく、リアを大きくしてギア比1.0前後まで下げられる構成が楽になります。</p>
+  <h3 class="faq-q">展開長とギアインチはどう使い分けますか?</h3>
+  <p class="faq-a">展開長は「ペダル1回転で何m進むか」で直感的に比較しやすい指標です。ギアインチは古くから使われる指標で、海外のギア表と比べるときに便利です。どちらも大きいほど重いギアです。</p>
+  <h3 class="faq-q">タイヤ周長はどの値を入れればよいですか?</h3>
+  <p class="faq-a">サイクルコンピュータに設定している値があればそれを使うのが確実です。なければ「＋詳細機能」でタイヤ側面のETRTO表記(例: 25-622)から推定してください。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_front: "フロントの歯数を1〜200の整数で入力してください。",
+    invalid_rear: "リアの歯数を1〜200の整数で入力してください。",
+    invalid_circumference: "タイヤ周長を1〜5000mmで入力してください。",
+    invalid_cadence: "ケイデンスを0〜300rpmで入力してください。",
+    invalid_speed: "目標速度を0〜300km/hで入力してください。",
+    invalid_rim: "リム径を1〜1000mmで入力してください。",
+    invalid_width: "タイヤ幅を1〜200mmで入力してください。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var frontEl = document.getElementById("front");
+  var rearEl = document.getElementById("rear");
+  var circEl = document.getElementById("circ");
+  var cadEl = document.getElementById("cadence");
+  var rimEl = document.getElementById("rim");
+  var widthEl = document.getElementById("width");
+  var speedEl = document.getElementById("speed");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function run() {
+    if (frontEl.value === "" || rearEl.value === "" || circEl.value === "" || cadEl.value === "") {
+      box.hidden = true; advBox.hidden = true; return;
+    }
+    var front = parseFloat(frontEl.value);
+    var rear = parseFloat(rearEl.value);
+    var circ = parseFloat(circEl.value);
+    var r = GearRatioCalc.calculate(front, rear, circ, parseFloat(cadEl.value));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      advBox.hidden = true;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">' + esc(r.speedKmh) + " km/h</div>" +
+      "<p>ギア比 " + esc(r.ratio) + " / 展開長 " + esc(r.developmentM) + "m / ギアインチ " + esc(r.gearInch) + "</p>";
+    box.hidden = false;
+
+    var html = "";
+    var e = GearRatioCalc.circumferenceFromEtrto(
+      rimEl.value === "" ? 0 : parseFloat(rimEl.value),
+      widthEl.value === "" ? 0 : parseFloat(widthEl.value));
+    if (e.ok) {
+      html += "<p>推定周長: " + esc(e.circumferenceMm.toLocaleString("ja-JP")) + "mm(外径 " +
+        esc(e.outerDiameterMm) + "mm)</p>";
+    } else {
+      html += "<p>" + esc(ERRORS[e.code] || "入力値を確認してください。") + "</p>";
+    }
+    var cf = GearRatioCalc.cadenceForSpeed(front, rear, circ,
+      speedEl.value === "" ? 0 : parseFloat(speedEl.value));
+    if (cf.ok) {
+      html += "<p>この組み合わせで " + esc(speedEl.value === "" ? 0 : speedEl.value) +
+        "km/h を出すには ケイデンス " + esc(cf.cadenceRpm) + "rpm</p>";
+    } else {
+      html += "<p>" + esc(ERRORS[cf.code] || "入力値を確認してください。") + "</p>";
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+
+  [frontEl, rearEl, circEl, cadEl, rimEl, widthEl, speedEl].forEach(function (el) {
+    el.addEventListener("input", run);
+  });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

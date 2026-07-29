@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>LEDの電流制限抵抗 計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="電源電圧・LEDの順電圧・電流から必要な抵抗値(Ω)と消費電力(W)、E24系列の値を計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>
+    /* 長い出典URLが横スクロールを起こさないようにする(このページ内だけの調整) */
+    .sources a { overflow-wrap: anywhere; word-break: break-word; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>LEDの電流制限抵抗 計算</h1>
+  <form class="tool-form" id="tool-form">
+    <div class="field-row">
+      <label>電源電圧(V)
+        <span class="field-note">Arduinoは5V、Raspberry Piは3.3V</span>
+        <input type="number" id="supply" inputmode="decimal" step="0.1" min="0.1" max="1000" placeholder="5">
+      </label>
+      <label>LEDの順電圧Vf(V)
+        <span class="field-note">赤2.0前後、青・白3.2前後</span>
+        <input type="number" id="vf" inputmode="decimal" step="0.1" min="0.1" max="100" placeholder="2">
+      </label>
+    </div>
+    <div class="field-row">
+      <label>流したい電流If(mA)
+        <span class="field-note">一般的な砲弾型は20mAまで</span>
+        <input type="number" id="current" inputmode="decimal" step="1" min="0.01" max="10000" placeholder="20">
+      </label>
+      <label>直列するLEDの個数
+        <input type="number" id="count" inputmode="numeric" step="1" min="1" max="100" value="1">
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 手持ちの抵抗を使ったときの電流・直列できる最大個数</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">手持ちの抵抗を使うとどうなるか</h3>
+      <p class="adv-note">計算値の抵抗が手元にないとき、持っている抵抗を入れると実際に流れる電流が出ます。</p>
+      <label>使う抵抗値(Ω)
+        <input type="number" id="ohm" inputmode="decimal" step="1" min="0.1" max="10000000" placeholder="220">
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">直列できる最大個数</h3>
+      <div class="tool-result" id="adv-max" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    LEDの順電圧Vfは<strong>電流・個体差・温度で変わります</strong>。必ず使うLEDのデータシートの値を入れてください。順電圧が分からないまま抵抗を小さくすると、LEDや電源側が壊れることがあります。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>ArduinoやRaspberry PiでLEDを光らせるときに必要な<strong>抵抗値(Ω)と抵抗の消費電力(W)</strong>がわかります。実際に売っているE24・E12系列の抵抗値と、そのときに流れる電流も出るので、そのまま買い物に使えます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>電源電圧・LEDの順電圧Vf・流したい電流を入れると、その瞬間に抵抗値が出ます。ボタンは不要です。</li>
+    <li>LEDを直列につなぐ場合は個数を変えてください。合計の順電圧が電源電圧を超えると点灯できません。</li>
+    <li>手持ちの抵抗で足りるか確かめたいときは「＋詳細機能」に抵抗値を入れてください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>抵抗にかかる電圧</strong> = 電源電圧 −(順電圧Vf × 直列するLEDの個数)</li>
+    <li><strong>抵抗値 R(Ω)</strong> = 抵抗にかかる電圧 ÷ 電流(A)……オームの法則</li>
+    <li><strong>抵抗の消費電力 P(W)</strong> = 抵抗にかかる電圧 × 電流(A)</li>
+    <li><strong>選ぶ抵抗の定格電力</strong> = 消費電力の2倍以上(余裕を持たせるため)</li>
+    <li><strong>E24・E12系列</strong> = IEC 60063(JIS C 5063)で決められた標準抵抗値。実際に売られている値</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>よくある組み合わせ(LED1個)</caption>
+      <thead><tr><th>電源</th><th>Vf</th><th>電流</th><th>計算値</th><th>E24</th></tr></thead>
+      <tbody>
+        <tr><td>5V</td><td>2.0V(赤)</td><td>20mA</td><td>150Ω</td><td>150Ω</td></tr>
+        <tr><td>5V</td><td>3.2V(青・白)</td><td>20mA</td><td>90Ω</td><td>91Ω</td></tr>
+        <tr><td>5V</td><td>2.0V(赤)</td><td>5mA</td><td>600Ω</td><td>620Ω</td></tr>
+        <tr><td>3.3V</td><td>2.0V(赤)</td><td>10mA</td><td>130Ω</td><td>130Ω</td></tr>
+        <tr><td>12V</td><td>2.0V(赤)</td><td>20mA</td><td>500Ω</td><td>510Ω</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>大塚商会「LEDの抵抗値計算・電流制限抵抗の求め方」(抵抗値=電圧÷電流、電力(W)=電圧(V)×電流(A))<br>
+      <a href="https://www.otsuka-shokai.co.jp/products/led/howto/resistance.html" rel="noopener" target="_blank">https://www.otsuka-shokai.co.jp/products/led/howto/resistance.html</a>(2026年7月29日参照)</li>
+    <li>E12・E24系列(標準抵抗値)は IEC 60063「Preferred number series for resistors and capacitors」
+      (日本では JIS C 5063)で定められた値を使用しています。</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>LEDを直列につなぎ、そこに1本の抵抗を直列に入れる基本の回路を前提としています。並列につなぐ場合は<strong>LEDごとに抵抗を入れて</strong>ください(1本の抵抗で複数のLEDを並列にすると電流が偏ります)。</li>
+    <li>順電圧Vfは電流・個体差・温度で変わります。データシートの「順電圧」欄の、使いたい電流での値をお使いください。</li>
+    <li>抵抗の定格電力を「消費電力の2倍以上」としているのは一般的な目安で、出典に書かれた数値ではありません。出典は「余裕を持たせた抵抗器を使う」とだけ述べています。</li>
+    <li>マイコンのGPIOピンには1ピンあたり・全ピア合計の出力電流の上限があります(Arduino Unoは1ピン20mA推奨など)。ピンの定格も必ず確認してください。</li>
+    <li>E24・E12の「近い値」より「必要値以上でもっとも小さい値」を選ぶほうが安全です。抵抗を大きくすれば電流は減るためLEDが壊れません(少し暗くなります)。</li>
+    <li>高輝度LEDやパワーLEDでは、抵抗ではなく定電流回路(ドライバIC)を使うのが一般的です。抵抗方式は電源電圧の変動で電流が大きく変わります。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">抵抗を入れないとどうなりますか?</h3>
+  <p class="faq-a">LEDは電圧が少し上がるだけで電流が急増する性質があります。抵抗が無いと過大な電流が流れ、LEDやマイコンのピンが焼損します。必ず入れてください。</p>
+  <h3 class="faq-q">計算値の抵抗が売っていません。</h3>
+  <p class="faq-a">E24・E12系列の「必要値以上でもっとも小さい値」を選んでください。抵抗を大きくすると電流が減るのでLEDは壊れません。少し暗くなるだけです。</p>
+  <h3 class="faq-q">LEDの順電圧Vfが分かりません。</h3>
+  <p class="faq-a">色でおおよその見当がつきます。赤・黄は約2.0V、緑は約2.1〜3.2V、青・白は約3.0〜3.4Vです。ただし正確な値はデータシートでご確認ください。</p>
+  <h3 class="faq-q">抵抗はLEDの前と後ろのどちらに入れますか?</h3>
+  <p class="faq-a">直列回路なのでどちらでも同じ電流になります。回路図の書きやすさや基板の配置で決めてかまいません。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_supply: "電源電圧は0.1〜1000Vで入れてください。",
+    invalid_vf: "LEDの順電圧Vfは0.1〜100Vで入れてください。",
+    invalid_current: "電流は0.01〜10000mAで入れてください。",
+    invalid_count: "直列するLEDの個数は1〜100の整数で入れてください。",
+    invalid_ohm: "抵抗値は0より大きい数値で入れてください。",
+    voltage_too_low: "LEDの合計順電圧が電源電圧以上です。個数を減らすか、電源電圧を上げてください。"
+  };
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function el(id) { return document.getElementById(id); }
+  function num(id) { return el(id).value === "" ? NaN : parseFloat(el(id).value); }
+
+  var box = el("result"), advBox = el("adv-result"), maxBox = el("adv-max");
+
+  function err(target, code) {
+    target.innerHTML = '<p class="result-error">' + esc(ERRORS[code] || "入力値を確認してください。") + "</p>";
+    target.hidden = false;
+  }
+
+  function run() {
+    var filled = el("supply").value !== "" && el("vf").value !== "";
+    runMax(filled);
+    runOhm(filled);
+    if (!filled || el("current").value === "" || el("count").value === "") { box.hidden = true; return; }
+    var r = LedCalc.calculate(num("supply"), num("vf"), num("current"), parseInt(el("count").value, 10));
+    if (!r.ok) { err(box, r.code); return; }
+    box.innerHTML = '<div class="result-main">' + esc(String(r.ohm)) + " Ω</div>" +
+      "<p>抵抗にかかる電圧: " + esc(String(r.resistorV)) + " V / 抵抗の消費電力: " +
+      esc(String(r.milliWatt)) + " mW(" + esc(String(r.watt)) + " W)</p>" +
+      "<p>選ぶ抵抗の定格電力: <strong>" + esc(String(r.recommendedWatt)) + "W以上</strong>" +
+      "(実消費の2倍以上)</p>" +
+      "<p>E24系列: 近い値 " + esc(String(r.e24)) + "Ω / 安全側(必要値以上) <strong>" +
+      esc(String(r.e24Up)) + "Ω</strong> → 実際に流れる電流 約" +
+      esc(String(r.actualCurrentMa)) + "mA</p>" +
+      "<p>E12系列: 近い値 " + esc(String(r.e12)) + "Ω / 安全側 " + esc(String(r.e12Up)) + "Ω</p>";
+    box.hidden = false;
+  }
+
+  function runOhm(filled) {
+    if (!filled || el("ohm").value === "" || el("count").value === "") { advBox.hidden = true; return; }
+    var r = LedCalc.currentFromOhm(num("supply"), num("vf"), num("ohm"), parseInt(el("count").value, 10));
+    if (!r.ok) { err(advBox, r.code); return; }
+    advBox.innerHTML = '<div class="result-main">約 ' + esc(String(r.currentMa)) + " mA</div>" +
+      "<p>抵抗の消費電力: " + esc(String(r.milliWatt)) + " mW / 定格 " +
+      esc(String(r.recommendedWatt)) + "W以上の抵抗を選んでください。</p>";
+    advBox.hidden = false;
+  }
+
+  function runMax(filled) {
+    if (!filled) { maxBox.hidden = true; return; }
+    var r = LedCalc.maxSeriesCount(num("supply"), num("vf"));
+    if (!r.ok) { err(maxBox, r.code); return; }
+    maxBox.innerHTML = r.maxCount === 0
+      ? "<p>この電源電圧ではLEDを1個も点灯できません。</p>"
+      : "<p>この電源電圧では直列で最大 <strong>" + esc(String(r.maxCount)) +
+        "個</strong> まで点灯できます(抵抗にかける電圧の余裕を残すため、実際はこれより少なくするのが安全です)。</p>";
+    maxBox.hidden = false;
+  }
+
+  ["supply", "vf", "current", "count", "ohm"].forEach(function (id) {
+    el(id).addEventListener("input", run);
+    el(id).addEventListener("change", run);
+  });
+  el("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

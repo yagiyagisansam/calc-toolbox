@@ -1,0 +1,175 @@
+{
+  "tool": "uruudoshi",
+  "module": "calc.js",
+  "global": "UruudoshiCalc",
+  "cases": [
+    {
+      "name": "2024年は4で割り切れるのでうるう年(366日)",
+      "func": "isLeap",
+      "args": [2024],
+      "expect": { "ok": true, "leap": true, "reason": "div4", "days": 366 }
+    },
+    {
+      "name": "2026年は4で割り切れないので平年(365日)",
+      "func": "isLeap",
+      "args": [2026],
+      "expect": { "ok": true, "leap": false, "reason": "common", "days": 365 }
+    },
+    {
+      "name": "2000年は400で割り切れるのでうるう年",
+      "func": "isLeap",
+      "args": [2000],
+      "expect": { "ok": true, "leap": true, "reason": "div400" }
+    },
+    {
+      "name": "1900年は100で割り切れて400で割り切れないので平年",
+      "func": "isLeap",
+      "args": [1900],
+      "expect": { "ok": true, "leap": false, "reason": "div100" }
+    },
+    {
+      "name": "2100年も100で割り切れて400で割り切れないので平年",
+      "func": "isLeap",
+      "args": [2100],
+      "expect": { "ok": true, "leap": false, "reason": "div100" }
+    },
+    {
+      "name": "2400年は400で割り切れるのでうるう年",
+      "func": "isLeap",
+      "args": [2400],
+      "expect": { "ok": true, "leap": true, "reason": "div400" }
+    },
+    {
+      "name": "境界値: 下限の1583年は平年(4で割り切れない)",
+      "func": "isLeap",
+      "args": [1583],
+      "expect": { "ok": true, "leap": false }
+    },
+    {
+      "name": "境界値: 上限の9999年も判定できる",
+      "func": "isLeap",
+      "args": [9999],
+      "expect": { "ok": true, "leap": false }
+    },
+    {
+      "name": "前後のうるう年: 2026年の前は2024年、次は2028年",
+      "func": "neighbours",
+      "args": [2026],
+      "expect": { "ok": true, "leap": false, "previous": 2024, "next": 2028 }
+    },
+    {
+      "name": "前後のうるう年: 2100年は平年で、前が2096年・次が2104年と8年空く",
+      "func": "neighbours",
+      "args": [2100],
+      "expect": { "ok": true, "leap": false, "previous": 2096, "next": 2104 }
+    },
+    {
+      "name": "前後のうるう年: 2096年はうるう年で、次のうるう年は2104年",
+      "func": "neighbours",
+      "args": [2096],
+      "expect": { "ok": true, "leap": true, "previous": 2092, "next": 2104 }
+    },
+    {
+      "name": "列挙: 2020〜2030年のうるう年は2020・2024・2028の3回、合計4,018日",
+      "func": "listLeapYears",
+      "args": [2020, 2030],
+      "expect": { "ok": true, "count": 3, "days": 4018, "years": { "0": 2020, "1": 2024, "2": 2028, "length": 3 } }
+    },
+    {
+      "name": "列挙: 1896〜1904年は1900年が平年なのでうるう年は2回だけ",
+      "func": "listLeapYears",
+      "args": [1896, 1904],
+      "expect": { "ok": true, "count": 2, "days": 3287, "years": { "0": 1896, "1": 1904 } }
+    },
+    {
+      "name": "列挙: 400年間(1601〜2000年)のうるう年は97回",
+      "func": "listLeapYears",
+      "args": [1601, 2000],
+      "expect": { "ok": true, "count": 97, "days": 146097 }
+    },
+    {
+      "name": "2月29日生まれ: 2000年2月29日生まれは2026年2月28日時点でまだ25歳(28日の終了時に加齢)",
+      "func": "ageOn",
+      "args": [2000, 2, 29, 2026, 2, 28],
+      "expect": { "ok": true, "age": 25, "isFeb29Birth": true, "birthdayThisYear": "2026-02-28" }
+    },
+    {
+      "name": "2月29日生まれ: 2026年3月1日時点では26歳",
+      "func": "ageOn",
+      "args": [2000, 2, 29, 2026, 3, 1],
+      "expect": { "ok": true, "age": 26 }
+    },
+    {
+      "name": "2月29日生まれ: うるう年の2024年2月29日時点では24歳で、加齢日も2月29日",
+      "func": "ageOn",
+      "args": [2000, 2, 29, 2024, 2, 29],
+      "expect": { "ok": true, "age": 24, "birthdayThisYear": "2024-02-29" }
+    },
+    {
+      "name": "通常の誕生日: 誕生日当日は満年齢が1つ増えている",
+      "func": "ageOn",
+      "args": [2000, 7, 29, 2026, 7, 29],
+      "expect": { "ok": true, "age": 26, "isFeb29Birth": false, "birthdayThisYear": "2026-07-29" }
+    },
+    {
+      "name": "通常の誕生日: 誕生日の前日はまだ1つ前の年齢",
+      "func": "ageOn",
+      "args": [2000, 7, 29, 2026, 7, 28],
+      "expect": { "ok": true, "age": 25 }
+    },
+    {
+      "name": "異常入力: 1582年(範囲外)はエラー",
+      "func": "isLeap",
+      "args": [1582],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "異常入力: 10000年(範囲外)はエラー",
+      "func": "isLeap",
+      "args": [10000],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "異常入力: 整数でない年はエラー",
+      "func": "isLeap",
+      "args": [2024.5],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "異常入力: 年が数値でないときはエラー",
+      "func": "isLeap",
+      "args": ["2024"],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "isLeap",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "異常入力: 開始年が終了年より後のときはエラー",
+      "func": "listLeapYears",
+      "args": [2030, 2020],
+      "expect": { "ok": false, "code": "invalid_range" }
+    },
+    {
+      "name": "異常入力: 範囲が広すぎる(2001年分)ときはエラー",
+      "func": "listLeapYears",
+      "args": [2000, 4000],
+      "expect": { "ok": false, "code": "too_wide" }
+    },
+    {
+      "name": "異常入力: 存在しない誕生日(平年の2月29日)はエラー",
+      "func": "ageOn",
+      "args": [2001, 2, 29, 2026, 1, 1],
+      "expect": { "ok": false, "code": "invalid_birth_date" }
+    },
+    {
+      "name": "異常入力: 基準日が誕生日より前のときはエラー",
+      "func": "ageOn",
+      "args": [2026, 3, 1, 2026, 2, 28],
+      "expect": { "ok": false, "code": "reference_before_birth" }
+    }
+  ]
+}

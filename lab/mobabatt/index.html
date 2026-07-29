@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>モバイルバッテリー mAh⇔Wh・充電回数(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="モバイルバッテリーのmAhをWhに換算して飛行機への持ち込み可否を判定し、スマホを何回充電できるかを計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>
+    /* 長い出典URLが横スクロールを起こさないようにする(このページ内だけの調整) */
+    .sources a { overflow-wrap: anywhere; word-break: break-word; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>モバイルバッテリー mAh⇔Wh・充電回数</h1>
+  <form class="tool-form" id="tool-form">
+    <div class="field-row">
+      <label>バッテリー容量(mAh)
+        <span class="field-note">本体や箱に書かれている数値</span>
+        <input type="number" id="mah" inputmode="numeric" step="100" min="1" max="1000000" placeholder="20000">
+      </label>
+      <label>セル電圧(V)
+        <span class="field-note">通常は3.7V</span>
+        <input type="number" id="volt" inputmode="decimal" step="0.05" min="1" max="60" value="3.7">
+      </label>
+    </div>
+    <label>スマホのバッテリー容量(mAh)
+      <span class="field-note">充電回数を知りたいときだけ。iPhoneは3000〜4700程度</span>
+      <input type="number" id="device" inputmode="numeric" step="100" min="1" max="1000000" placeholder="4000">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 変換効率を変える・Whから容量を逆算する</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">変換効率を変えて充電回数を見直す</h3>
+      <p class="adv-note">既定は70%です。ケーブルや端末によって実際の効率は変わります。</p>
+      <label>変換効率
+        <select id="eff">
+          <option value="0.6">60%(条件が悪いとき)</option>
+          <option value="0.7" selected>70%(目安)</option>
+          <option value="0.8">80%(条件が良いとき)</option>
+        </select>
+      </label>
+
+      <h3 class="adv-h">Whから容量(mAh)を逆算する</h3>
+      <p class="adv-note">「100Wh・160Whは何mAhか」を調べたいときにお使いください。</p>
+      <label>ワット時定格量(Wh)
+        <input type="number" id="wh" inputmode="decimal" step="1" min="0" max="100000" placeholder="100">
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    持ち込みの判定は<strong>2026年7月時点の日本航空(JAL)の取り扱い</strong>に基づきます。航空会社・路線によって規定は異なり、変更もあります。搭乗前に必ずご利用の航空会社の最新の案内をご確認ください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>「20000mAhのモバイルバッテリーは飛行機に持ち込めるのか」がすぐわかります。表記されている<strong>mAhをWh(ワット時定格量)に換算</strong>し、160Whの上限と比べて判定します。スマホを何回充電できるかの目安も出ます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>バッテリー容量(mAh)を入れると、その瞬間にWhと持ち込み可否が出ます。ボタンは不要です。</li>
+    <li>セル電圧は通常3.7Vですが、本体に別の値が書かれていればそれに合わせてください。</li>
+    <li>充電回数を知りたいときは、スマホのバッテリー容量も入れてください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>ワット時定格量(Wh)</strong> = 定格容量(Ah)× 定格電圧(V)= mAh ÷ 1000 × 電圧</li>
+    <li><strong>機内持ち込み</strong> = 160Whを超えるものは不可。160Wh以下は1名当たり2個まで</li>
+    <li><strong>預け入れ荷物</strong> = 容量にかかわらずモバイルバッテリーを入れることはできない</li>
+    <li><strong>充電回数の目安</strong> = バッテリー容量(mAh)× 変換効率 ÷ 端末のバッテリー容量(mAh)</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>よくある容量の換算(セル電圧3.7Vの場合)</caption>
+      <thead><tr><th>容量</th><th>Wh</th><th>機内持ち込み</th></tr></thead>
+      <tbody>
+        <tr><td>5,000mAh</td><td>18.5Wh</td><td>可(1名2個まで)</td></tr>
+        <tr><td>10,000mAh</td><td>37Wh</td><td>可(1名2個まで)</td></tr>
+        <tr><td>20,000mAh</td><td>74Wh</td><td>可(1名2個まで)</td></tr>
+        <tr><td>27,027mAh</td><td>100Wh</td><td>可(1名2個まで)</td></tr>
+        <tr><td>30,000mAh</td><td>111Wh</td><td>可(1名2個まで)</td></tr>
+        <tr><td>43,243mAh</td><td>160Wh</td><td>可(上限ちょうど)</td></tr>
+        <tr><td>45,000mAh</td><td>166.5Wh</td><td>不可</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>日本航空「国内線 制限のあるお手荷物」(Wh = 定格容量(Ah)× 定格電圧(V)、160Wh超は持ち込み不可、預け入れ不可)<br>
+      <a href="https://www.jal.co.jp/jp/ja/dom/baggage/limit/" rel="noopener" target="_blank">https://www.jal.co.jp/jp/ja/dom/baggage/limit/</a>(2026年7月29日参照)</li>
+    <li>日本航空「モバイルバッテリーの機内持ち込み個数および充電に関するルール変更についてのお願い(2026年4月24日以降)」(1名当たり2個まで、機内での充電・給電の禁止)<br>
+      <a href="https://www.jal.co.jp/jp/ja/info/2026/other/260330/" rel="noopener" target="_blank">https://www.jal.co.jp/jp/ja/info/2026/other/260330/</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li><strong>判定の基準は2026年7月時点</strong>の日本航空の取り扱いです。2026年4月24日から「1名当たり2個まで」に変わりました。さらに<strong>2027年1月以降は上限が100Whに制限される可能性</strong>があるとの注記が出ています。搭乗前に必ず最新の案内をご確認ください。</li>
+    <li>航空会社・路線(国内線／国際線)によって規定は異なります。他社便をご利用の場合はその会社の案内をご確認ください。</li>
+    <li>モバイルバッテリーは<strong>預け入れ荷物に入れられません</strong>。必ず機内持ち込みにしてください。また、機内での充電・他機器への給電は禁止されており、座席上の収納棚に入れないよう求められています。</li>
+    <li>Whの計算にはセル電圧が必要です。多くの製品は3.7Vですが、本体に「定格電圧」や「Wh」の表記があればそちらが正確です。<strong>Whが本体に書かれている場合は、その値が優先されます。</strong></li>
+    <li>充電回数の変換効率(既定70%)は出典に書かれた数値ではなく、一般的な目安として置いたものです。セルの3.7VからUSB出力の5Vへ昇圧する損失、ケーブルの損失、端末側の充電損失を合わせた概算です。実際の回数は使用条件で上下します。</li>
+    <li>表記の容量どおりに充電できないのは故障ではありません。電圧変換の損失があるため、20000mAhのバッテリーで4000mAhのスマホを5回満充電することはできません。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">20000mAhは飛行機に持ち込めますか?</h3>
+  <p class="faq-a">持ち込めます。3.7Vなら74Whで、上限の160Whを大きく下回ります。ただし1名当たり2個までという個数制限があります。</p>
+  <h3 class="faq-q">何mAhから持ち込めなくなりますか?</h3>
+  <p class="faq-a">3.7Vの場合、160Whにあたるのは約43,243mAhです。これを超えると持ち込めません。市販のモバイルバッテリーで超えるものはほとんどありません。</p>
+  <h3 class="faq-q">スーツケースに入れて預けてもよいですか?</h3>
+  <p class="faq-a">できません。容量にかかわらず、モバイルバッテリーは預け入れ荷物に入れられません。必ず手荷物として機内に持ち込んでください。</p>
+  <h3 class="faq-q">20000mAhでスマホを5回充電できないのはなぜですか?</h3>
+  <p class="faq-a">バッテリーのセル電圧(3.7V)からUSBの出力電圧(5V)へ変換する際に損失が出るためです。実際に使えるのは表記容量の6〜7割程度になります。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_mah: "バッテリー容量は1〜1000000mAhで入れてください。",
+    invalid_voltage: "セル電圧は1〜60Vで入れてください。",
+    invalid_device_mah: "スマホのバッテリー容量は1mAh以上で入れてください。",
+    invalid_efficiency: "変換効率を選び直してください。",
+    invalid_wh: "Whは0より大きい数値で入れてください。"
+  };
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function el(id) { return document.getElementById(id); }
+  function numOrUndef(id) { return el(id).value === "" ? undefined : parseFloat(el(id).value); }
+
+  var box = el("result"), advBox = el("adv-result");
+
+  function run() {
+    runWh();
+    if (el("mah").value === "" || el("volt").value === "") { box.hidden = true; return; }
+    var r = MobabattCalc.calculate(
+      parseFloat(el("mah").value),
+      parseFloat(el("volt").value),
+      numOrUndef("device"),
+      parseFloat(el("eff").value)
+    );
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var status = r.carryOn
+      ? "機内持ち込み可(1名2個まで)"
+      : "機内持ち込み不可(160Whを超えています)";
+    box.innerHTML = '<div class="result-main">' + esc(String(r.wh)) + " Wh</div>" +
+      "<p><strong>" + esc(status) + "</strong>" +
+      (r.carryOn && r.category === "100to160" ? "(100Whを超える区分です)" : "") + "</p>" +
+      "<p>預け入れ荷物には容量にかかわらず入れられません。</p>" +
+      (r.count !== null
+        ? "<p>スマホを約 " + esc(r.count.toFixed(1)) + " 回充電できる目安です(実際に使える容量 約" +
+          esc(String(r.usableMah)) + "mAh)。</p>"
+        : "");
+    box.hidden = false;
+  }
+
+  function runWh() {
+    if (el("wh").value === "" || el("volt").value === "") { advBox.hidden = true; return; }
+    var r = MobabattCalc.mahFromWh(parseFloat(el("wh").value), parseFloat(el("volt").value));
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    var s = MobabattCalc.flightStatus(parseFloat(el("wh").value));
+    advBox.innerHTML = '<div class="result-main">約 ' + esc(String(r.mah)) + " mAh</div>" +
+      (s.ok ? "<p>" + esc(s.carryOn ? "機内持ち込み可(1名2個まで)" : "機内持ち込み不可") + "</p>" : "");
+    advBox.hidden = false;
+  }
+
+  ["mah", "volt", "device", "eff", "wh"].forEach(function (id) {
+    el(id).addEventListener("input", run);
+    el(id).addEventListener("change", run);
+  });
+  el("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

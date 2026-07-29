@@ -1,0 +1,151 @@
+{
+  "tool": "bitrate",
+  "module": "calc.js",
+  "global": "BitrateCalc",
+  "cases": [
+    {
+      "name": "20Mbpsで60分撮ると9,000,000,000バイト=9GB(2進では8.38GiB)",
+      "func": "fileSize",
+      "args": [20, 60],
+      "expect": { "ok": true, "bytes": 9000000000, "gb": 9, "gib": 8.38, "seconds": 3600 }
+    },
+    {
+      "name": "4K相当の100Mbpsで10分撮ると7.5GB",
+      "func": "fileSize",
+      "args": [100, 10],
+      "expect": { "ok": true, "bytes": 7500000000, "gb": 7.5 }
+    },
+    {
+      "name": "8Mbpsで1分は60,000,000バイト=60MB",
+      "func": "fileSize",
+      "args": [8, 1],
+      "expect": { "ok": true, "bytes": 60000000, "mb": 60, "gb": 0.06 }
+    },
+    {
+      "name": "境界値: 収録時間0分なら容量も0バイト",
+      "func": "fileSize",
+      "args": [20, 0],
+      "expect": { "ok": true, "bytes": 0, "gb": 0, "seconds": 0 }
+    },
+    {
+      "name": "録画可能時間: 64GBのカードに28Mbpsで撮ると5時間4分45秒",
+      "func": "recordingTime",
+      "args": [64, 28],
+      "expect": { "ok": true, "seconds": 18285, "hours": 5, "minutes": 4, "remainSeconds": 45 }
+    },
+    {
+      "name": "録画可能時間: 128GBに400Mbpsだと42分40秒",
+      "func": "recordingTime",
+      "args": [128, 400],
+      "expect": { "ok": true, "seconds": 2560, "hours": 0, "minutes": 42, "remainSeconds": 40 }
+    },
+    {
+      "name": "録画可能時間: 32GBに20Mbpsだと3時間33分20秒",
+      "func": "recordingTime",
+      "args": [32, 20],
+      "expect": { "ok": true, "seconds": 12800, "hours": 3, "minutes": 33, "remainSeconds": 20 }
+    },
+    {
+      "name": "単位の違い: 1GiB(2^30バイト)に8Mbpsだと1073秒",
+      "func": "recordingTime",
+      "args": [1, 8, "GiB"],
+      "expect": { "ok": true, "bytes": 1073741824, "seconds": 1073 }
+    },
+    {
+      "name": "単位の違い: 1GB(10^9バイト)に8Mbpsだと1000秒",
+      "func": "recordingTime",
+      "args": [1, 8, "GB"],
+      "expect": { "ok": true, "bytes": 1000000000, "seconds": 1000 }
+    },
+    {
+      "name": "使える容量95%で補正: 64GB・28Mbpsは4時間49分31秒",
+      "func": "recordingTime",
+      "args": [64, 28, "GB", 0.95],
+      "expect": { "ok": true, "seconds": 17371, "hours": 4, "minutes": 49, "remainSeconds": 31 }
+    },
+    {
+      "name": "境界値: 使える容量の割合が1(100%)は有効",
+      "func": "recordingTime",
+      "args": [1, 8, "GB", 1],
+      "expect": { "ok": true, "seconds": 1000 }
+    },
+    {
+      "name": "必要なビットレート: 64GBに120分収めるなら最大71.11Mbps",
+      "func": "maxBitrate",
+      "args": [64, 120],
+      "expect": { "ok": true, "bitrateMbps": 71.11 }
+    },
+    {
+      "name": "必要なビットレート: 1GBに10分収めるなら最大13.33Mbps",
+      "func": "maxBitrate",
+      "args": [1, 10],
+      "expect": { "ok": true, "bitrateMbps": 13.33 }
+    },
+    {
+      "name": "異常入力: ビットレート0はエラー(0で割らない)",
+      "func": "recordingTime",
+      "args": [64, 0],
+      "expect": { "ok": false, "code": "invalid_bitrate" }
+    },
+    {
+      "name": "異常入力: ビットレートが負の値はエラー",
+      "func": "fileSize",
+      "args": [-20, 60],
+      "expect": { "ok": false, "code": "invalid_bitrate" }
+    },
+    {
+      "name": "異常入力: ビットレートが範囲超過(200000Mbps)はエラー",
+      "func": "fileSize",
+      "args": [200000, 60],
+      "expect": { "ok": false, "code": "invalid_bitrate" }
+    },
+    {
+      "name": "異常入力: 収録時間が負の値はエラー",
+      "func": "fileSize",
+      "args": [20, -1],
+      "expect": { "ok": false, "code": "invalid_minutes" }
+    },
+    {
+      "name": "異常入力: 容量0はエラー",
+      "func": "recordingTime",
+      "args": [0, 28],
+      "expect": { "ok": false, "code": "invalid_capacity" }
+    },
+    {
+      "name": "異常入力: 知らない容量の単位はエラー",
+      "func": "recordingTime",
+      "args": [64, 28, "TB"],
+      "expect": { "ok": false, "code": "invalid_unit" }
+    },
+    {
+      "name": "異常入力: 使える容量の割合が1超はエラー",
+      "func": "recordingTime",
+      "args": [64, 28, "GB", 1.5],
+      "expect": { "ok": false, "code": "invalid_ratio" }
+    },
+    {
+      "name": "異常入力: 使える容量の割合が0はエラー",
+      "func": "recordingTime",
+      "args": [64, 28, "GB", 0],
+      "expect": { "ok": false, "code": "invalid_ratio" }
+    },
+    {
+      "name": "異常入力: 数値でないビットレートはエラー",
+      "func": "fileSize",
+      "args": ["abc", 60],
+      "expect": { "ok": false, "code": "invalid_bitrate" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "fileSize",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_bitrate" }
+    },
+    {
+      "name": "異常入力: 必要ビットレートの計算で収録時間0はエラー",
+      "func": "maxBitrate",
+      "args": [64, 0],
+      "expect": { "ok": false, "code": "invalid_minutes" }
+    }
+  ]
+}

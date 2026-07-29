@@ -1,0 +1,139 @@
+{
+  "tool": "kyuyo-kojo",
+  "module": "calc.js",
+  "global": "KyuyoKojoCalc",
+  "cases": [
+    {
+      "name": "令和7年分以降: 年収500万円は控除144万円・給与所得356万円",
+      "func": "calculate",
+      "args": [5000000],
+      "expect": { "ok": true, "deductionYen": 1440000, "salaryIncomeYen": 3560000, "deductionRatePct": 28.8, "tableLabel": "令和7年分以降" }
+    },
+    {
+      "name": "令和7年分以降: 境界ちょうど190万円は定額65万円控除",
+      "func": "calculate",
+      "args": [1900000, "r7"],
+      "expect": { "ok": true, "deductionYen": 650000, "salaryIncomeYen": 1250000 }
+    },
+    {
+      "name": "令和7年分以降: 境界の1円上190万1円も控除65万円(表が連続)",
+      "func": "calculate",
+      "args": [1900001, "r7"],
+      "expect": { "ok": true, "deductionYen": 650000, "salaryIncomeYen": 1250001 }
+    },
+    {
+      "name": "令和7年分以降: 境界360万円は30%+8万=116万円控除",
+      "func": "calculate",
+      "args": [3600000, "r7"],
+      "expect": { "ok": true, "deductionYen": 1160000, "salaryIncomeYen": 2440000 }
+    },
+    {
+      "name": "令和7年分以降: 境界660万円は20%+44万=176万円控除",
+      "func": "calculate",
+      "args": [6600000, "r7"],
+      "expect": { "ok": true, "deductionYen": 1760000, "salaryIncomeYen": 4840000 }
+    },
+    {
+      "name": "令和7年分以降: 上限の850万円ちょうどで控除195万円",
+      "func": "calculate",
+      "args": [8500000, "r7"],
+      "expect": { "ok": true, "deductionYen": 1950000, "salaryIncomeYen": 6550000 }
+    },
+    {
+      "name": "令和7年分以降: 850万円超は控除195万円で頭打ち(年収2000万円)",
+      "func": "calculate",
+      "args": [20000000, "r7"],
+      "expect": { "ok": true, "deductionYen": 1950000, "salaryIncomeYen": 18050000 }
+    },
+    {
+      "name": "令和7年分以降: 年収60万円は控除が収入を超えないため所得0円",
+      "func": "calculate",
+      "args": [600000, "r7"],
+      "expect": { "ok": true, "deductionYen": 600000, "salaryIncomeYen": 0 }
+    },
+    {
+      "name": "令和7年分以降: 年収103万円の給与所得は38万円",
+      "func": "calculate",
+      "args": [1030000, "r7"],
+      "expect": { "ok": true, "deductionYen": 650000, "salaryIncomeYen": 380000 }
+    },
+    {
+      "name": "境界値: 年収0円は控除0円・所得0円",
+      "func": "calculate",
+      "args": [0, "r7"],
+      "expect": { "ok": true, "deductionYen": 0, "salaryIncomeYen": 0, "deductionRatePct": 0 }
+    },
+    {
+      "name": "令和2〜6年分: 年収500万円は控除144万円(令和7年分以降と同額)",
+      "func": "calculate",
+      "args": [5000000, "r2"],
+      "expect": { "ok": true, "deductionYen": 1440000, "salaryIncomeYen": 3560000, "tableLabel": "令和2年分から令和6年分" }
+    },
+    {
+      "name": "令和2〜6年分: 境界162万5000円は定額55万円控除",
+      "func": "calculate",
+      "args": [1625000, "r2"],
+      "expect": { "ok": true, "deductionYen": 550000, "salaryIncomeYen": 1075000 }
+    },
+    {
+      "name": "令和2〜6年分: 境界180万円は40%-10万=62万円控除",
+      "func": "calculate",
+      "args": [1800000, "r2"],
+      "expect": { "ok": true, "deductionYen": 620000, "salaryIncomeYen": 1180000 }
+    },
+    {
+      "name": "令和2〜6年分: 年収103万円の給与所得は48万円",
+      "func": "calculate",
+      "args": [1030000, "r2"],
+      "expect": { "ok": true, "deductionYen": 550000, "salaryIncomeYen": 480000 }
+    },
+    {
+      "name": "控除額のみ取得: 年収700万円は10%+110万=180万円",
+      "func": "deduction",
+      "args": [7000000, "r7"],
+      "expect": { "ok": true, "deductionYen": 1800000 }
+    },
+    {
+      "name": "比較: 年収103万円は令和7年分以降で控除が10万円増える",
+      "func": "compare",
+      "args": [1030000],
+      "expect": { "ok": true, "diffDeductionYen": 100000, "diffSalaryIncomeYen": -100000 }
+    },
+    {
+      "name": "比較: 年収500万円は改正前後で差がない",
+      "func": "compare",
+      "args": [5000000],
+      "expect": { "ok": true, "diffDeductionYen": 0, "diffSalaryIncomeYen": 0 }
+    },
+    {
+      "name": "異常入力: 負の年収はエラー",
+      "func": "calculate",
+      "args": [-1],
+      "expect": { "ok": false, "code": "invalid_income" }
+    },
+    {
+      "name": "異常入力: 数値でない年収はエラー",
+      "func": "calculate",
+      "args": ["abc"],
+      "expect": { "ok": false, "code": "invalid_income" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_income" }
+    },
+    {
+      "name": "異常入力: 10億円を超える年収はエラー",
+      "func": "calculate",
+      "args": [2000000000],
+      "expect": { "ok": false, "code": "invalid_income" }
+    },
+    {
+      "name": "異常入力: 存在しない年分の指定はエラー",
+      "func": "calculate",
+      "args": [5000000, "r9"],
+      "expect": { "ok": false, "code": "invalid_year" }
+    }
+  ]
+}

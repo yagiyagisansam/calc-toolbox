@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>医療費控除 還付額計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="1年間の医療費と保険金の補填額から医療費控除額と、還付される所得税・減る住民税の目安を計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>医療費控除 還付額計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>1年間の医療費の合計(円)
+      <span class="field-note">1月1日〜12月31日に実際に支払った額。生計を一にする家族の分も合算できます</span>
+      <input type="number" id="medical" inputmode="numeric" step="1000" min="0" max="100000000" placeholder="500000">
+    </label>
+    <label>保険金などで補填された額(円)
+      <span class="field-note">高額療養費・出産育児一時金・入院給付金など。なければ0</span>
+      <input type="number" id="comp" inputmode="numeric" step="1000" min="0" max="100000000" placeholder="0">
+    </label>
+    <label>総所得金額等(円)
+      <span class="field-note">給与だけの人は「給与所得控除後の金額」(源泉徴収票の2つ目の金額)</span>
+      <input type="number" id="income" inputmode="numeric" step="10000" min="0" max="1000000000" placeholder="5000000">
+    </label>
+    <label>適用される所得税率
+      <select id="rate">
+        <option value="5">5%(課税所得 195万円未満)</option>
+        <option value="10">10%(課税所得 195万〜330万円未満)</option>
+        <option value="20" selected>20%(課税所得 330万〜695万円未満)</option>
+        <option value="23">23%(課税所得 695万〜900万円未満)</option>
+        <option value="33">33%(課税所得 900万〜1,800万円未満)</option>
+        <option value="40">40%(課税所得 1,800万〜4,000万円未満)</option>
+        <option value="45">45%(課税所得 4,000万円以上)</option>
+      </select>
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 課税所得から税率を調べる</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">課税される所得金額から税率を判定</h3>
+      <p class="adv-note">源泉徴収票の「所得控除の額の合計額」を給与所得控除後の金額から引いた額が、おおよその課税所得です。</p>
+      <label>課税される所得金額(円)
+        <input type="number" id="taxable" inputmode="numeric" step="10000" min="0" max="1000000000" placeholder="3000000">
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    ここで出る額は<strong>目安</strong>です。実際の還付額は、その年に納めた所得税額を超えることはありません。住民税は還付ではなく<strong>翌年度の住民税が減る</strong>形になります。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>1年分の医療費の領収書を集めて確定申告する価値があるかを、<strong>医療費控除額</strong>と<strong>戻る税金のおよその額</strong>で判断できます。総所得金額等が200万円未満の人は足切りが10万円より小さくなるため、思ったより控除を受けられる場合があります。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>1年間(1月1日〜12月31日)に実際に支払った医療費の合計を入れます。</li>
+    <li>保険金や高額療養費などで戻ってきた額を入れます(なければ0)。</li>
+    <li>総所得金額等を入れ、自分の所得税率を選ぶと、控除額と戻る税金の目安が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>足切り額</strong> = 10万円(総所得金額等が200万円未満の人は、総所得金額等の5%)</li>
+    <li><strong>医療費控除額</strong> = (支払った医療費 − 保険金などで補填される金額) − 足切り額(上限200万円)</li>
+    <li><strong>戻る所得税</strong> = 医療費控除額 × 所得税率</li>
+    <li><strong>減る復興特別所得税</strong> = 戻る所得税 × 2.1%</li>
+    <li><strong>減る住民税(翌年度)</strong> = 医療費控除額 × 10%(所得割の標準税率)</li>
+  </ul>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>国税庁 タックスアンサー No.1120「医療費を支払ったとき(医療費控除)」(令和7年4月1日現在の法令等)<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1120.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1120.htm</a>(2026年7月29日参照)</li>
+    <li>国税庁 タックスアンサー No.2260「所得税の税率」(速算表・復興特別所得税2.1%)<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2260.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2260.htm</a>(2026年7月29日参照)</li>
+    <li>総務省「個人住民税」(所得割の標準税率10%)<br>
+      <a href="https://www.soumu.go.jp/main_sosiki/jichi_zeisei/czaisei/czaisei_seido/150790_06.html" rel="noopener" target="_blank">https://www.soumu.go.jp/main_sosiki/jichi_zeisei/czaisei/czaisei_seido/150790_06.html</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>制度の内容は<strong>令和7年4月1日現在の法令等</strong>に基づきます(国税庁タックスアンサーの適用時点)。</li>
+    <li>還付額は概算です。実際に戻る所得税は、その年に源泉徴収された所得税額が上限になります。</li>
+    <li>医療費控除によって課税所得が下の税率区分に移る場合、この計算より還付は少なくなります。</li>
+    <li>保険金などで補填される金額は、その給付の目的となった医療費を限度として差し引きます。引ききれない分をほかの医療費から差し引くことはできません。</li>
+    <li>実際に支払った年の医療費が対象です。年末時点で未払いの分は、支払った年の控除になります。</li>
+    <li>セルフメディケーション税制とは選択適用で、併用はできません。</li>
+    <li>健康診断・人間ドックの費用や、美容目的の施術など、医療費控除の対象にならない支出があります。対象範囲は出典のページで確認してください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">医療費が10万円を超えないと使えませんか?</h3>
+  <p class="faq-a">総所得金額等が200万円未満の人は、足切りが「総所得金額等の5%」になります。たとえば総所得が150万円なら足切りは75,000円なので、10万円未満の医療費でも控除を受けられます。</p>
+  <h3 class="faq-q">家族の医療費も合算できますか?</h3>
+  <p class="faq-a">生計を一にする配偶者やその他の親族のために支払った医療費は合算できます。誰の申告にまとめるかは選べるため、通常は所得税率が高い人にまとめるほうが戻る額が大きくなります。</p>
+  <h3 class="faq-q">住民税も還付されますか?</h3>
+  <p class="faq-a">還付ではなく、申告した翌年度の住民税が減る形になります。会社員の場合は6月以降の給与天引き額が下がります。</p>
+  <h3 class="faq-q">控除額に上限はありますか?</h3>
+  <p class="faq-a">200万円が上限です。医療費が非常に高額でも、控除額はここで頭打ちになります。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_medical: "医療費の合計を0〜1億円の範囲で入力してください。",
+    invalid_compensated: "補填された額を0〜1億円の範囲で入力してください。",
+    invalid_income: "総所得金額等を0円以上で入力してください。",
+    invalid_rate: "所得税率を選び直してください。",
+    invalid_taxable: "課税される所得金額を0円以上で入力してください。"
+  };
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function yen(n) { return n.toLocaleString("ja-JP"); }
+
+  var box = document.getElementById("result");
+  var medEl = document.getElementById("medical");
+  var compEl = document.getElementById("comp");
+  var incEl = document.getElementById("income");
+  var rateEl = document.getElementById("rate");
+
+  function run() {
+    if (medEl.value === "" || incEl.value === "") { box.hidden = true; return; }
+    var comp = compEl.value === "" ? 0 : parseFloat(compEl.value);
+    var r = IryohiCalc.refund(parseFloat(medEl.value), comp, parseFloat(incEl.value), parseFloat(rateEl.value));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var body = '<div class="result-main">戻る税金 約 ' + esc(yen(r.total)) + " 円</div>" +
+      "<p>医療費控除額 " + esc(yen(r.deduction)) + " 円(足切り " + esc(yen(r.threshold)) + " 円)" +
+      (r.capped ? " ※上限200万円に達しています" : "") + "</p>" +
+      "<p>所得税の還付 " + esc(yen(r.incomeTax)) + " 円 ＋ 復興特別所得税 " + esc(yen(r.reconstructionTax)) +
+      " 円 ＋ 翌年度の住民税が " + esc(yen(r.residentTax)) + " 円減る</p>";
+    if (r.deduction === 0) {
+      body += "<p>今回の条件では医療費控除は受けられません(医療費が足切り額以下です)。</p>";
+    }
+    box.innerHTML = body;
+    box.hidden = false;
+  }
+
+  [medEl, compEl, incEl].forEach(function (el) { el.addEventListener("input", run); });
+  rateEl.addEventListener("change", run);
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+
+  var advBox = document.getElementById("adv-result");
+  var taxableEl = document.getElementById("taxable");
+  function runAdv() {
+    if (taxableEl.value === "") { advBox.hidden = true; return; }
+    var r = IryohiCalc.taxRateFromTaxable(parseFloat(taxableEl.value));
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML = '<div class="result-main">所得税率 ' + esc(r.rate) + " %</div>" +
+      "<p>速算表の控除額 " + esc(yen(r.quickDeduction)) + " 円。上の「適用される所得税率」でこの税率を選んでください。</p>";
+    advBox.hidden = false;
+  }
+  taxableEl.addEventListener("input", runAdv);
+})();
+</script>
+</body>
+</html>

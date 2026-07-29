@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>ふるさと納税 控除上限額の計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="年収や住民税所得割額から、自己負担2,000円で済むふるさと納税の控除上限額を総務省の式で計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>ふるさと納税 控除上限額の計算</h1>
+  <form class="tool-form" id="tool-form">
+    <span class="field-note">年収から概算する(給与収入だけの方向け)</span>
+    <label>年収(万円)
+      <span class="field-note">額面。源泉徴収票の「支払金額」。例: 500</span>
+      <input type="number" id="income" inputmode="decimal" step="any" min="0" max="50000" placeholder="500">
+    </label>
+    <label>社会保険料の年額(万円)
+      <span class="field-note">源泉徴収票の「社会保険料等の金額」。目安は年収の約15%</span>
+      <input type="number" id="social" inputmode="decimal" step="any" min="0" max="50000" placeholder="75">
+    </label>
+    <label>
+      <input type="checkbox" id="spouse"> 配偶者控除を受ける(配偶者の所得が48万円以下など)
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 住民税所得割額から正確に出す・寄附額の内訳</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">住民税の所得割額から計算する</h3>
+      <p class="adv-note">住民税決定通知書(給与明細と一緒に配られる紙)の「所得割額」の市町村民税+道府県民税の合計を入れると、総務省の式そのままの結果になります。</p>
+      <div class="field-row">
+        <label>住民税の所得割額(円)
+          <input type="number" id="shotokuwari" inputmode="numeric" step="1" min="0" max="500000000" placeholder="238000">
+        </label>
+        <label>所得税の税率
+          <select id="rate">
+            <option value="0">0%(課税所得0円)</option>
+            <option value="5">5%(課税所得195万円未満)</option>
+            <option value="10" selected>10%(195万〜330万円未満)</option>
+            <option value="20">20%(330万〜695万円未満)</option>
+            <option value="23">23%(695万〜900万円未満)</option>
+            <option value="33">33%(900万〜1,800万円未満)</option>
+            <option value="40">40%(1,800万〜4,000万円未満)</option>
+            <option value="45">45%(4,000万円以上)</option>
+          </select>
+        </label>
+      </div>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">その他の所得控除</h3>
+      <p class="adv-note">扶養控除・生命保険料控除・医療費控除・iDeCoなどの合計を入れると、上の年収からの概算に反映されます。</p>
+      <label>その他の所得控除の合計(万円)
+        <input type="number" id="other" inputmode="decimal" step="any" min="0" max="50000" placeholder="0">
+      </label>
+    </div>
+  </details>
+
+  <div class="note-box">
+    年収からの計算は<strong>概算</strong>です。正確な上限は、住民税決定通知書の「所得割額」を「＋詳細機能」に入れて計算してください。実際に寄附する際は、上限より少し低めの金額にしておくと安全です。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>ふるさと納税で<strong>自己負担が2,000円で済む寄附額の上限</strong>がわかります。上限を超えた分は自己負担が増えるため、年末に寄附額を決める前の確認に使えます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>年収と社会保険料の年額を万円単位で入れると、その瞬間に上限の目安が出ます。</li>
+    <li>配偶者控除を受ける場合はチェックを入れます。</li>
+    <li>より正確に知りたいときは「＋詳細機能」を開き、住民税決定通知書の所得割額を入れてください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <p>総務省が示す控除の3つの式のうち、住民税の特例分(3)が「住民税所得割額の20%」の頭打ちに達する点が控除上限額です。</p>
+  <ul class="method">
+    <li><strong>(1) 所得税の控除</strong> = (ふるさと納税額 − 2,000円)× 所得税の税率</li>
+    <li><strong>(2) 住民税の控除(基本分)</strong> = (ふるさと納税額 − 2,000円)× 10%</li>
+    <li><strong>(3) 住民税の控除(特例分)</strong> = (ふるさと納税額 − 2,000円)×(100% − 10% − 所得税率 × 復興税率1.021)</li>
+    <li><strong>(3)' 特例分の上限</strong> = 住民税所得割額 × 20%</li>
+    <li><strong>控除上限額</strong> = 住民税所得割額 × 20% ÷ (100% − 10% − 所得税率 × 1.021) + 2,000円</li>
+  </ul>
+  <p>年収からの概算では、給与所得控除(令和7年分以降)・社会保険料控除・基礎控除(所得税は令和7・8年分の額、住民税は43万円)・配偶者控除(所得税38万円・住民税33万円)を差し引いて課税所得を求め、住民税の所得割を10%として計算しています。</p>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>総務省「ふるさと納税のしくみ:税金の控除について」<br>
+      <a href="https://www.soumu.go.jp/main_sosiki/jichi_zeisei/czaisei/czaisei_seido/furusato/mechanism/deduction.html" rel="noopener" target="_blank">https://www.soumu.go.jp/main_sosiki/jichi_zeisei/czaisei/czaisei_seido/furusato/mechanism/deduction.html</a>(2026年7月29日参照)</li>
+    <li>国税庁「No.1410 給与所得控除」(令和7年分以降)<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1410.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1410.htm</a>(2026年7月29日参照)</li>
+    <li>国税庁「No.1199 基礎控除」(令和7年分・令和8年分の額)<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1199.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1199.htm</a>(2026年7月29日参照)</li>
+    <li>国税庁「No.2260 所得税の税率」<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2260.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2260.htm</a>(2026年7月29日参照)</li>
+    <li>地方税法 第314条の2(住民税の基礎控除43万円・控除対象配偶者33万円)<br>
+      <a href="https://laws.e-gov.go.jp/law/325AC0000000226" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/325AC0000000226</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>控除の式と控除率は<strong>2026年7月29日時点</strong>の制度によります。所得税の給与所得控除・基礎控除は令和7年分以降の額を使っています。</li>
+    <li>年収からの概算は<strong>給与収入だけ</strong>の方を想定しています。事業所得・不動産所得・株の譲渡益などがある場合は上限が変わります。</li>
+    <li>概算では<strong>調整控除</strong>(通常2,500円程度、住民税の所得割を下げる)を考慮していないため、上限がやや大きめに出ます。</li>
+    <li>住宅ローン控除・医療費控除・iDeCoなどがあると上限は下がります。「＋詳細機能」の「その他の所得控除」に金額を入れてください。</li>
+    <li>ふるさと納税は<strong>その年の1月1日〜12月31日</strong>の寄附が対象で、上限はその年の所得で決まります。年の途中では見込みでの計算になります。</li>
+    <li>(1)の所得税分は、復興特別所得税(2.1%)分も軽減されるため、本ツールでは「所得税率×1.021」で計算しています。総務省の式では(3)にこの1.021が組み込まれており、(1)(2)(3)の合計は(寄附額−2,000円)と一致します。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">「住民税の所得割額」はどこを見ればわかりますか?</h3>
+  <p class="faq-a">毎年5〜6月に配られる住民税決定通知書(特別徴収税額の決定・変更通知書)の「税額」欄にある、市町村民税と道府県民税それぞれの「所得割額」を合計した金額です。均等割(合計5,000円程度)は含めません。</p>
+  <h3 class="faq-q">上限を超えて寄附するとどうなりますか?</h3>
+  <p class="faq-a">住民税の特例分が「所得割額の20%」で頭打ちになるため、超えた分はほぼ全額が自己負担になります。返礼品の価値は寄附額の3割以下と定められているので、大きく超えると損になります。</p>
+  <h3 class="faq-q">ワンストップ特例と確定申告で上限は変わりますか?</h3>
+  <p class="faq-a">上限額は変わりません。ワンストップ特例では所得税の控除分も住民税から控除される形になりますが、控除の合計額は同じです。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_income: "年収を0以上の金額で入力してください。",
+    invalid_social_insurance: "社会保険料の年額を0以上の金額で入力してください。",
+    invalid_other: "その他の所得控除を0以上の金額で入力してください。",
+    invalid_resident_tax: "住民税の所得割額を0以上の金額で入力してください。",
+    invalid_tax_rate: "所得税の税率を選び直してください。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var incomeEl = document.getElementById("income");
+  var socialEl = document.getElementById("social");
+  var spouseEl = document.getElementById("spouse");
+  var otherEl = document.getElementById("other");
+  var shotokuwariEl = document.getElementById("shotokuwari");
+  var rateEl = document.getElementById("rate");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function yen(v) { return Math.round(v).toLocaleString("ja-JP") + "円"; }
+
+  function run() {
+    if (incomeEl.value === "" || socialEl.value === "") { box.hidden = true; return; }
+    var other = otherEl.value === "" ? 0 : parseFloat(otherEl.value) * 10000;
+    var r = FurusatoCalc.estimate(
+      parseFloat(incomeEl.value) * 10000,
+      parseFloat(socialEl.value) * 10000,
+      spouseEl.checked,
+      other
+    );
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">上限の目安 ' + esc(yen(r.safeLimitYen)) + "</div>" +
+      "<p>計算上の上限: " + esc(yen(r.limitYen)) + "(1,000円未満を切り捨てた安全側の目安を上に表示しています)</p>" +
+      "<p>給与所得: " + esc(yen(r.salaryIncomeYen)) + " / 所得税の課税所得: " + esc(yen(r.taxableIncomeYen)) +
+        "(税率 " + esc(r.ratePercent) + "%)</p>" +
+      "<p>住民税の所得割額(概算): " + esc(yen(r.shotokuwariYen)) + "</p>";
+    box.hidden = false;
+  }
+
+  function runAdv() {
+    if (shotokuwariEl.value === "") { advBox.hidden = true; return; }
+    var r = FurusatoCalc.limitFromResidentTax(
+      parseFloat(shotokuwariEl.value),
+      parseInt(rateEl.value, 10)
+    );
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">上限の目安 ' + esc(yen(r.safeLimitYen)) + "</div>" +
+      "<p>計算上の上限: " + esc(yen(r.limitYen)) + "</p>" +
+      "<p>式の分母(100%−10%−所得税率×1.021): " + esc(r.denominator) + "</p>";
+    advBox.hidden = false;
+  }
+
+  [incomeEl, socialEl, otherEl].forEach(function (el) { el.addEventListener("input", run); });
+  spouseEl.addEventListener("change", run);
+  shotokuwariEl.addEventListener("input", runAdv);
+  rateEl.addEventListener("change", runAdv);
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

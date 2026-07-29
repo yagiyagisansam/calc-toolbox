@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>住宅ローン控除 計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="年末ローン残高と住宅の区分から、住宅借入金等特別控除の控除額と、所得税・住民税それぞれから引ける額を計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>.sources a { overflow-wrap: anywhere; word-break: break-word; }</style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>住宅ローン控除 計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>年末のローン残高(円)
+      <span class="field-note">年末残高等証明書に書かれている12月31日時点の残高</span>
+      <input type="number" id="balance" inputmode="numeric" step="1" min="0" placeholder="例: 30000000">
+    </label>
+    <div class="field-row">
+      <label>住宅の区分
+        <select id="house">
+          <option value="nintei" selected>認定長期優良住宅・認定低炭素住宅</option>
+          <option value="zeh">ZEH水準省エネ住宅</option>
+          <option value="shoene">省エネ基準適合住宅</option>
+          <option value="sonota">その他の住宅</option>
+        </select>
+      </label>
+      <label>居住開始年
+        <select id="period">
+          <option value="2024" selected>令和6年・7年</option>
+          <option value="2022">令和4年・5年</option>
+        </select>
+      </label>
+    </div>
+    <label>その年の所得税額(円)
+      <span class="field-note">源泉徴収票の「源泉徴収税額」など。住宅ローン控除を引く前の額</span>
+      <input type="number" id="tax" inputmode="numeric" step="1" min="0" placeholder="例: 200000">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 特例対象個人・住民税の上限・13年分の一覧</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">条件を細かく指定する</h3>
+      <p class="adv-note">子育て世帯・若者夫婦世帯(特例対象個人)は借入限度額が上乗せされます。課税総所得金額等を入れると、住民税から引ける上限がより正確になります。</p>
+      <label><input type="checkbox" id="special"> 特例対象個人(19歳未満の扶養親族がいる、または夫婦のどちらかが40歳未満)</label>
+      <label>課税総所得金額等(円)
+        <span class="field-note">空欄なら住民税の上限を97,500円として計算します</span>
+        <input type="number" id="taxable" inputmode="numeric" step="1" min="0" placeholder="例: 3000000">
+      </label>
+      <label>借入限度額を自分で指定する(円)
+        <span class="field-note">中古住宅や、上の表にない年に入居した場合はここに限度額を入れてください</span>
+        <input type="number" id="custom" inputmode="numeric" step="1" min="0" placeholder="空欄なら区分の表を使う">
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">控除期間13年分の目安</h3>
+      <p class="adv-note">元金が毎年一定額ずつ減るという単純な仮定での概算です。実際の残高は返済予定表でご確認ください。</p>
+      <label>1年で減る元金(円)
+        <input type="number" id="repay" inputmode="numeric" step="1" min="0" placeholder="例: 1000000">
+      </label>
+      <div class="tool-result" id="sched-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    借入限度額の表は<strong>国税庁タックスアンサー No.1211-1(令和7年4月1日現在の法令等)</strong>に基づく、令和4年〜令和7年に入居した<strong>新築・買取再販</strong>の住宅のものです。中古住宅や令和8年以降に入居した場合は、「＋詳細機能」で借入限度額を自分で指定してください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>その年の住宅ローン控除がいくらになるか、そのうち<strong>所得税から引ける分と住民税から引ける分</strong>がいくらかがわかります。所得税が少なくて控除を使いきれない場合、いくら余るのかも表示します。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>年末のローン残高・住宅の区分・居住開始年・所得税額を入れると、その場で控除額が表示されます。</li>
+    <li>子育て世帯の上乗せや住民税の上限を正確に見たいときは「＋詳細機能」を開いてください。</li>
+    <li>13年間でいくら戻るかを見たいときは、「1年で減る元金」を入れると一覧が出ます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>控除額</strong> = min(年末残高, 借入限度額) × 0.7%(100円未満は切り捨て)</li>
+    <li><strong>所得税から引ける額</strong> = min(控除額, その年の所得税額)</li>
+    <li><strong>住民税から引ける額</strong> = min(引ききれなかった額, min(課税総所得金額等 × 5%, 97,500円))</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>借入限度額(新築・買取再販、控除期間13年)</caption>
+      <thead><tr><th>住宅の区分</th><th>令和4年・5年入居</th><th>令和6年・7年入居</th><th>同(特例対象個人)</th></tr></thead>
+      <tbody>
+        <tr><td>認定長期優良住宅・認定低炭素住宅</td><td>5,000万円</td><td>4,500万円</td><td>5,000万円</td></tr>
+        <tr><td>ZEH水準省エネ住宅</td><td>4,500万円</td><td>3,500万円</td><td>4,500万円</td></tr>
+        <tr><td>省エネ基準適合住宅</td><td>4,000万円</td><td>3,000万円</td><td>4,000万円</td></tr>
+        <tr><td>その他の住宅</td><td>3,000万円</td><td>原則対象外</td><td>原則対象外</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>国税庁 タックスアンサー No.1211-1「住宅の新築等をし、令和4年以降に居住の用に供した場合(住宅借入金等特別控除)」(令和7年4月1日現在法令等)<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1211-1.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1211-1.htm</a>(2026年7月29日参照)</li>
+    <li>総務省「新築・購入等で住宅ローンを組む方・組んでいる方へ 個人住民税の住宅ローン控除がうけられる場合があります」<br>
+      <a href="https://www.soumu.go.jp/main_sosiki/jichi_zeisei/czaisei/czaisei_seido/090929.html" rel="noopener" target="_blank">https://www.soumu.go.jp/main_sosiki/jichi_zeisei/czaisei/czaisei_seido/090929.html</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>このツールは<strong>金額だけ</strong>を計算します。合計所得金額2,000万円以下(特例居住用家屋等は1,000万円以下)、床面積、入居時期といった<strong>適用要件は判定していません</strong>。</li>
+    <li>「その他の住宅」で令和6年・7年入居の場合、令和5年12月31日以前に建築確認を受けた等の要件を満たすと、借入限度額2,000万円・控除期間10年の経過措置があります。「＋詳細機能」で限度額を手入力してください。</li>
+    <li>住民税からの控除は<strong>翌年度</strong>の個人住民税に反映されます。市区町村への申告は不要です。</li>
+    <li>連帯債務やペアローンの場合は、各自の持分に応じた年末残高を入力してください。</li>
+    <li>初年度は確定申告が必要です。2年目以降は年末調整で手続きできます。</li>
+    <li>令和8年以降に入居した場合の借入限度額は、国税庁の解説が更新されていないため表に入れていません。手入力でご利用ください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">所得税が少ないと控除は使いきれませんか?</h3>
+  <p class="faq-a">所得税から引ききれなかった額は、翌年度の住民税から引かれます。ただし住民税からの控除には「課税総所得金額等の5%(最高97,500円)」という上限があるため、それも超えると使いきれずに消えます。ツールは使いきれない額も表示します。</p>
+  <h3 class="faq-q">特例対象個人とは誰のことですか?</h3>
+  <p class="faq-a">居住した年の12月31日時点で、40歳未満で配偶者がいる人、40歳以上で40歳未満の配偶者がいる人、または19歳未満の扶養親族がいる人です。該当すると令和6年・7年入居の借入限度額が上乗せされます。</p>
+  <h3 class="faq-q">控除額に100円未満の端数が出たらどうなりますか?</h3>
+  <p class="faq-a">100円未満は切り捨てます。例えば残高12,345,678円なら 12,345,678×0.7%=86,419.746円 となり、控除額は86,400円です。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_balance: "年末残高は0円以上10億円以下の数値で入力してください。",
+    invalid_income_tax: "所得税額は0円以上の数値で入力してください。",
+    invalid_taxable_income: "課税総所得金額等は0円以上の数値で入力してください。",
+    invalid_custom_limit: "借入限度額は1円以上の数値で入力してください。",
+    invalid_house_type: "住宅の区分を選び直してください。",
+    invalid_period: "居住開始年を選び直してください。",
+    invalid_repayment: "1年で減る元金は0円以上の数値で入力してください。",
+    not_eligible: "選んだ条件(令和6年・7年入居の「その他の住宅」)は原則として控除の対象外です。経過措置に当てはまる場合は「＋詳細機能」で借入限度額を手入力してください。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var schedBox = document.getElementById("sched-result");
+  var balanceEl = document.getElementById("balance");
+  var houseEl = document.getElementById("house");
+  var periodEl = document.getElementById("period");
+  var taxEl = document.getElementById("tax");
+  var specialEl = document.getElementById("special");
+  var taxableEl = document.getElementById("taxable");
+  var customEl = document.getElementById("custom");
+  var repayEl = document.getElementById("repay");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function yen(n) { return Number(n).toLocaleString("ja-JP"); }
+  function num(el) {
+    return el.value.trim() === "" ? null : parseFloat(el.value);
+  }
+  function err(target, code) {
+    target.innerHTML = '<p class="result-error">' + esc(ERRORS[code] || "入力値を確認してください。") + "</p>";
+    target.hidden = false;
+  }
+
+  function compute() {
+    return JutakuKojoCalc.calculate(
+      parseFloat(balanceEl.value), houseEl.value, periodEl.value,
+      parseFloat(taxEl.value), num(taxableEl), specialEl.checked, num(customEl)
+    );
+  }
+
+  function render(target, r) {
+    var html = '<div class="result-main">今年の控除額 ' + esc(yen(r.deduction)) + " 円</div>" +
+      "<p>所得税から " + esc(yen(r.fromIncomeTax)) + " 円 / 住民税から " +
+      esc(yen(r.fromResidentTax)) + " 円(上限 " + esc(yen(r.residentTaxCap)) + " 円)</p>";
+    if (r.unusable > 0) {
+      html += "<p>控除しきれない額: " + esc(yen(r.unusable)) + " 円</p>";
+    }
+    html += "<p>借入限度額 " + esc(yen(r.limit)) + " 円 / 控除の対象になった残高 " +
+      esc(yen(r.appliedBalance)) + " 円 / 控除期間 " + esc(r.years) + " 年</p>";
+    target.innerHTML = html;
+    target.hidden = false;
+  }
+
+  function run() {
+    if (balanceEl.value.trim() === "" || taxEl.value.trim() === "") {
+      box.hidden = true; advBox.hidden = true; return;
+    }
+    var r = compute();
+    if (!r.ok) { err(box, r.code); advBox.hidden = true; return; }
+    render(box, r);
+    render(advBox, r);
+  }
+
+  function runSchedule() {
+    if (balanceEl.value.trim() === "" || repayEl.value.trim() === "") { schedBox.hidden = true; return; }
+    var r = JutakuKojoCalc.schedule(
+      parseFloat(balanceEl.value), parseFloat(repayEl.value),
+      houseEl.value, periodEl.value, specialEl.checked, num(customEl)
+    );
+    if (!r.ok) { err(schedBox, r.code); return; }
+    var rows = "";
+    r.rows.forEach(function (row) {
+      rows += "<tr><td>" + esc(row.year) + "年目</td><td>" + esc(yen(row.balance)) +
+        " 円</td><td>" + esc(yen(row.deduction)) + " 円</td></tr>";
+    });
+    schedBox.innerHTML =
+      '<div class="result-main">' + esc(r.years) + "年間の合計 " + esc(yen(r.total)) + " 円</div>" +
+      '<p>所得税額を考えない場合の上限です。</p>' +
+      '<div class="table-scroll"><table class="data-table">' +
+      "<thead><tr><th>年</th><th>年末残高</th><th>控除額</th></tr></thead><tbody>" +
+      rows + "</tbody></table></div>";
+    schedBox.hidden = false;
+  }
+
+  function runAll() { run(); runSchedule(); }
+
+  [balanceEl, taxEl, taxableEl, customEl, repayEl].forEach(function (el) {
+    el.addEventListener("input", runAll);
+  });
+  [houseEl, periodEl, specialEl].forEach(function (el) { el.addEventListener("change", runAll); });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); runAll(); });
+})();
+</script>
+</body>
+</html>

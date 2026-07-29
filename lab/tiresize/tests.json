@@ -1,0 +1,163 @@
+{
+  "tool": "tiresize",
+  "module": "calc.js",
+  "global": "TiresizeCalc",
+  "cases": [
+    {
+      "name": "外径: 195/65R15は634.5mm(381+253.5)",
+      "func": "outerDiameter",
+      "args": [195, 65, 15],
+      "expect": { "ok": true, "outerMm": 634.5, "sectionHeightMm": 126.8 }
+    },
+    {
+      "name": "外径: 205/55R16は631.9mm(406.4+225.5)",
+      "func": "outerDiameter",
+      "args": [205, 55, 16],
+      "expect": { "ok": true, "outerMm": 631.9, "sectionHeightMm": 112.8 }
+    },
+    {
+      "name": "外径: 165/70R14は586.6mm(355.6+231)",
+      "func": "outerDiameter",
+      "args": [165, 70, 14],
+      "expect": { "ok": true, "outerMm": 586.6, "sectionHeightMm": 115.5 }
+    },
+    {
+      "name": "外径: 225/60R17は701.8mm(431.8+270)",
+      "func": "outerDiameter",
+      "args": [225, 60, 17],
+      "expect": { "ok": true, "outerMm": 701.8, "sectionHeightMm": 135 }
+    },
+    {
+      "name": "境界値: 扁平率100%でも計算できる(195/100R15)",
+      "func": "outerDiameter",
+      "args": [195, 100, 15],
+      "expect": { "ok": true, "outerMm": 771 }
+    },
+    {
+      "name": "195/65R15→205/55R16は外径-2.6mm(-0.41%)・40km/h表示で実速39.84km/h",
+      "func": "compare",
+      "args": [195, 65, 15, 205, 55, 16],
+      "expect": { "ok": true, "oldOuterMm": 634.5, "newOuterMm": 631.9, "diffMm": -2.6, "diffPct": -0.41, "actualSpeedAt40": 39.84 }
+    },
+    {
+      "name": "同じサイズなら外径差0・実速度も40km/hのまま",
+      "func": "compare",
+      "args": [195, 65, 15, 195, 65, 15],
+      "expect": { "ok": true, "diffMm": 0, "diffPct": 0, "actualSpeedAt40": 40, "speedoErrorPct": 0 }
+    },
+    {
+      "name": "195/65R15→225/60R17は外径+67.3mm(+10.61%)で実速44.24km/h",
+      "func": "compare",
+      "args": [195, 65, 15, 225, 60, 17],
+      "expect": { "ok": true, "diffMm": 67.3, "diffPct": 10.61, "actualSpeedAt40": 44.24, "speedoErrorPct": -9.59 }
+    },
+    {
+      "name": "判定: 634.5→631.9mm(平成19年以降製作)は基準内",
+      "func": "speedoJudge",
+      "args": [634.5, 631.9, "h19", 40],
+      "expect": { "ok": true, "v2": 39.84, "minV2": 30.91, "maxV2": 40, "pass": true }
+    },
+    {
+      "name": "判定: 634.5→701.8mm(平成19年以降製作)は上限超過で基準外",
+      "func": "speedoJudge",
+      "args": [634.5, 701.8, "h19", 40],
+      "expect": { "ok": true, "v2": 44.24, "maxV2": 40, "pass": false }
+    },
+    {
+      "name": "判定: 同じ外径差でも平成18年以前製作なら上限44.44km/hで基準内",
+      "func": "speedoJudge",
+      "args": [634.5, 701.8, "h18", 40],
+      "expect": { "ok": true, "v2": 44.24, "maxV2": 44.44, "pass": true, "eraLabel": "平成18年12月31日までに製作" }
+    },
+    {
+      "name": "判定: 外径が小さすぎる(634.5→480mm)と下限割れで基準外",
+      "func": "speedoJudge",
+      "args": [634.5, 480, "h19", 40],
+      "expect": { "ok": true, "v2": 30.26, "minV2": 30.91, "pass": false }
+    },
+    {
+      "name": "判定: 634.5→500mmは下限ぎりぎりで基準内",
+      "func": "speedoJudge",
+      "args": [634.5, 500, "h19", 40],
+      "expect": { "ok": true, "v2": 31.52, "pass": true }
+    },
+    {
+      "name": "境界値: 同じ外径ちょうど(V2=V1)は平成19年以降でも基準内",
+      "func": "speedoJudge",
+      "args": [634.5, 634.5, "h19", 40],
+      "expect": { "ok": true, "v2": 40, "maxV2": 40, "pass": true }
+    },
+    {
+      "name": "指示速度を省略すると40km/hで判定する",
+      "func": "speedoJudge",
+      "args": [634.5, 634.5, "h19"],
+      "expect": { "ok": true, "v1": 40, "pass": true }
+    },
+    {
+      "name": "まとめ: 195/65R15→205/55R16(平成19年以降製作)は基準内",
+      "func": "calculate",
+      "args": [{ "oldWidthMm": 195, "oldAspectPct": 65, "oldRimInch": 15, "newWidthMm": 205, "newAspectPct": 55, "newRimInch": 16, "era": "h19" }],
+      "expect": { "ok": true, "size": { "diffPct": -0.41 }, "judge": { "pass": true } }
+    },
+    {
+      "name": "異常入力: 断面幅0はエラー",
+      "func": "outerDiameter",
+      "args": [0, 65, 15],
+      "expect": { "ok": false, "code": "invalid_width" }
+    },
+    {
+      "name": "異常入力: 扁平率0はエラー",
+      "func": "outerDiameter",
+      "args": [195, 0, 15],
+      "expect": { "ok": false, "code": "invalid_aspect" }
+    },
+    {
+      "name": "異常入力: 扁平率101%は範囲外",
+      "func": "outerDiameter",
+      "args": [195, 101, 15],
+      "expect": { "ok": false, "code": "invalid_aspect" }
+    },
+    {
+      "name": "異常入力: リム径が負の値はエラー",
+      "func": "outerDiameter",
+      "args": [195, 65, -15],
+      "expect": { "ok": false, "code": "invalid_rim" }
+    },
+    {
+      "name": "異常入力: 数値でない断面幅はエラー",
+      "func": "outerDiameter",
+      "args": ["abc", 65, 15],
+      "expect": { "ok": false, "code": "invalid_width" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "outerDiameter",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_width" }
+    },
+    {
+      "name": "異常入力: 変更後のサイズが不正なら比較もエラー",
+      "func": "compare",
+      "args": [195, 65, 15, 205, 55, 0],
+      "expect": { "ok": false, "code": "invalid_rim" }
+    },
+    {
+      "name": "異常入力: 製作時期の指定が不正はエラー",
+      "func": "speedoJudge",
+      "args": [634.5, 631.9, "h30", 40],
+      "expect": { "ok": false, "code": "invalid_era" }
+    },
+    {
+      "name": "異常入力: 外径0はエラー",
+      "func": "speedoJudge",
+      "args": [0, 631.9, "h19", 40],
+      "expect": { "ok": false, "code": "invalid_diameter" }
+    },
+    {
+      "name": "異常入力: 指示速度5km/hは範囲外",
+      "func": "speedoJudge",
+      "args": [634.5, 631.9, "h19", 5],
+      "expect": { "ok": false, "code": "invalid_speed" }
+    }
+  ]
+}

@@ -1,0 +1,222 @@
+{
+  "tool": "portable",
+  "module": "calc.js",
+  "global": "PortableCalc",
+  "cases": [
+    {
+      "name": "出典の例: 容量3000Wh・消費電力950Wなら3000×0.8÷950=約2.53時間(2時間32分)",
+      "func": "runtime",
+      "args": [3000, 950],
+      "expect": {
+        "ok": true,
+        "hours": 2.53,
+        "hoursPart": 2,
+        "minutesPart": 32,
+        "usableWh": 2400
+      }
+    },
+    {
+      "name": "電気毛布(50W)を1000Whの電源で使うと16時間",
+      "func": "runtime",
+      "args": [1000, 50],
+      "expect": {
+        "ok": true,
+        "hours": 16,
+        "hoursPart": 16,
+        "minutesPart": 0,
+        "usableWh": 800
+      }
+    },
+    {
+      "name": "500Whの電源で100Wの機器なら4時間",
+      "func": "runtime",
+      "args": [500, 100],
+      "expect": {
+        "ok": true,
+        "hours": 4,
+        "usableWh": 400
+      }
+    },
+    {
+      "name": "効率を1.0(ロスなし)にすると1000Wh÷100Wでちょうど10時間",
+      "func": "runtime",
+      "args": [1000, 100, 1],
+      "expect": {
+        "ok": true,
+        "hours": 10,
+        "usableWh": 1000
+      }
+    },
+    {
+      "name": "効率0.85を指定すると1000Wh×0.85÷100W=8.5時間",
+      "func": "runtime",
+      "args": [1000, 100, 0.85],
+      "expect": {
+        "ok": true,
+        "hours": 8.5,
+        "hoursPart": 8,
+        "minutesPart": 30,
+        "usableWh": 850
+      }
+    },
+    {
+      "name": "必要容量: 50Wの機器を8時間使うには400Wh消費で500Whの容量が必要",
+      "func": "requiredCapacity",
+      "args": [50, 8],
+      "expect": {
+        "ok": true,
+        "consumedWh": 400,
+        "requiredWh": 500
+      }
+    },
+    {
+      "name": "必要容量: 950Wの機器を3時間使うには3562.5Whの容量が必要",
+      "func": "requiredCapacity",
+      "args": [950, 3],
+      "expect": {
+        "ok": true,
+        "consumedWh": 2850,
+        "requiredWh": 3562.5
+      }
+    },
+    {
+      "name": "必要容量: 効率1.0なら消費電力量と必要容量が一致する",
+      "func": "requiredCapacity",
+      "args": [100, 5, 1],
+      "expect": {
+        "ok": true,
+        "consumedWh": 500,
+        "requiredWh": 500
+      }
+    },
+    {
+      "name": "出典の例: 31,000mAh・3.2Vは99.2Wh",
+      "func": "mahToWh",
+      "args": [31000, 3.2],
+      "expect": {
+        "ok": true,
+        "wh": 99.2
+      }
+    },
+    {
+      "name": "mAh換算: 20,000mAh・3.7Vは74Wh",
+      "func": "mahToWh",
+      "args": [20000, 3.7],
+      "expect": {
+        "ok": true,
+        "wh": 74
+      }
+    },
+    {
+      "name": "境界値: 効率の下限0.1でも計算できる",
+      "func": "runtime",
+      "args": [1000, 100, 0.1],
+      "expect": {
+        "ok": true,
+        "hours": 1,
+        "usableWh": 100
+      }
+    },
+    {
+      "name": "境界値: 消費電力が容量より大きくても1時間未満として計算できる",
+      "func": "runtime",
+      "args": [100, 1000],
+      "expect": {
+        "ok": true,
+        "hours": 0.08,
+        "hoursPart": 0,
+        "minutesPart": 5
+      }
+    },
+    {
+      "name": "異常入力: 消費電力0はエラー(0除算を起こさない)",
+      "func": "runtime",
+      "args": [1000, 0],
+      "expect": {
+        "ok": false,
+        "code": "invalid_power"
+      }
+    },
+    {
+      "name": "異常入力: 容量0はエラー",
+      "func": "runtime",
+      "args": [0, 100],
+      "expect": {
+        "ok": false,
+        "code": "invalid_capacity"
+      }
+    },
+    {
+      "name": "異常入力: 容量が負の値はエラー",
+      "func": "runtime",
+      "args": [-1000, 100],
+      "expect": {
+        "ok": false,
+        "code": "invalid_capacity"
+      }
+    },
+    {
+      "name": "異常入力: 容量が上限超過はエラー",
+      "func": "runtime",
+      "args": [2000000, 100],
+      "expect": {
+        "ok": false,
+        "code": "invalid_capacity"
+      }
+    },
+    {
+      "name": "異常入力: 効率が0はエラー(0除算を起こさない)",
+      "func": "requiredCapacity",
+      "args": [100, 5, 0],
+      "expect": {
+        "ok": false,
+        "code": "invalid_efficiency"
+      }
+    },
+    {
+      "name": "異常入力: 効率が1.0を超える値はエラー",
+      "func": "runtime",
+      "args": [1000, 100, 1.2],
+      "expect": {
+        "ok": false,
+        "code": "invalid_efficiency"
+      }
+    },
+    {
+      "name": "異常入力: 容量が数値でない場合はエラー",
+      "func": "runtime",
+      "args": ["1000Wh", 100],
+      "expect": {
+        "ok": false,
+        "code": "invalid_capacity"
+      }
+    },
+    {
+      "name": "異常入力: 使用時間が0はエラー",
+      "func": "requiredCapacity",
+      "args": [100, 0],
+      "expect": {
+        "ok": false,
+        "code": "invalid_hours"
+      }
+    },
+    {
+      "name": "異常入力: 電圧0はエラー",
+      "func": "mahToWh",
+      "args": [20000, 0],
+      "expect": {
+        "ok": false,
+        "code": "invalid_voltage"
+      }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "runtime",
+      "args": [],
+      "expect": {
+        "ok": false,
+        "code": "invalid_capacity"
+      }
+    }
+  ]
+}

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>運転免許 更新期間・区分 判定(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="免許証の有効期限と違反歴・年齢から、更新手続きができる期間と講習区分を判定します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>
+    /* 長い出典URLが横スクロールを起こさないようにする(このページ内だけの調整) */
+    .sources a { overflow-wrap: anywhere; word-break: break-word; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>運転免許 更新期間・区分 判定</h1>
+  <form class="tool-form" id="tool-form">
+    <span class="field-note">免許証の「有効期間の末日」に書かれている年月日を選びます</span>
+    <div class="field-row">
+      <label>有効期限(年)
+        <select id="exp-y"></select>
+      </label>
+      <label>月
+        <select id="exp-m"></select>
+      </label>
+      <label>日
+        <select id="exp-d"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="class-form">
+    <span class="field-note">講習区分と次回の有効期間を調べる</span>
+    <div class="field-row">
+      <label>免許を受けてからの年数
+        <select id="years"></select>
+      </label>
+      <label>更新日の年齢(歳)
+        <input type="number" id="age" inputmode="numeric" step="1" min="16" max="120" value="40">
+      </label>
+    </div>
+    <div class="field-row">
+      <label>過去5年の軽微な違反の回数
+        <span class="field-note">駐車違反・一時不停止など</span>
+        <select id="violations"></select>
+      </label>
+      <label>人身事故・重大な違反
+        <select id="serious">
+          <option value="0">なし</option>
+          <option value="1">あり</option>
+        </select>
+      </label>
+    </div>
+    <div class="tool-result" id="result-b" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 70歳以上に必要な講習・検査</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">更新期間が満了する日の年齢で決まります</h3>
+      <p class="adv-note">上で入力した年齢をもとに、更新前に受けておく必要があるものを表示します。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    有効期間の末日が<strong>日曜日など</strong>に当たるときは翌日が末日になります(道路交通法第95条の6第3項)。本ツールは祝日等の判定をしていないため、期限が迫っている場合は免許証の記載と警察の案内をご確認ください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>更新はがきを失くしても、免許証の有効期限だけで<strong>いつから手続きできるか</strong>がわかります。違反歴と年数から<strong>優良・一般・違反・初回のどの区分か</strong>、講習が何分か、次回の有効期間が何年かも判定します。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>免許証に書かれた有効期限の年月日を選ぶと、更新できる期間が表示されます。</li>
+    <li>2段目で免許取得からの年数・年齢・過去5年の違反歴を選ぶと、講習区分と次回の有効期間が出ます。</li>
+    <li>70歳以上の方は「＋詳細機能」で、更新前に受けておく必要のある講習・検査を確認できます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>更新期間</strong> = 有効期間満了日の直前の誕生日の1か月前 〜 有効期間満了日(道路交通法 第101条第1項)</li>
+    <li><strong>有効期間満了日</strong> = 誕生日から起算して1か月を経過する日。つまり更新期間は<strong>誕生日の1か月前から1か月後まで</strong></li>
+    <li><strong>優良運転者</strong> = 継続して免許を受けている期間が5年以上かつ、5年間に違反行為等がない</li>
+    <li><strong>一般運転者</strong> = 優良運転者・違反運転者等のいずれにも当たらない(継続5年以上で軽微違反1回のみなど)</li>
+    <li><strong>違反運転者等</strong> = 継続5年以上で違反行為等がある、または継続期間が5年未満</li>
+  </ul>
+
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>講習区分・講習時間・有効期間</caption>
+      <thead><tr><th>区分</th><th>条件</th><th>講習時間</th><th>有効期間</th></tr></thead>
+      <tbody>
+        <tr><td>優良運転者</td><td>継続5年以上・違反なし</td><td>30分</td><td>5年(70歳は4年・71歳以上は3年)</td></tr>
+        <tr><td>一般運転者</td><td>継続5年以上・軽微違反1回のみ</td><td>1時間</td><td>5年(70歳は4年・71歳以上は3年)</td></tr>
+        <tr><td>違反運転者</td><td>上記以外(違反2回以上など)</td><td>2時間</td><td>3年</td></tr>
+        <tr><td>初回更新者</td><td>継続5年未満・軽微違反1回以下</td><td>2時間</td><td>3年</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>道路交通法 第101条第1項(更新期間)・第95条の6第1項(有効期間と運転者区分)・第101条の4(70歳以上の特例)<br>
+      <a href="https://laws.e-gov.go.jp/law/335AC0000000105" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/335AC0000000105</a>(2026年7月29日参照)</li>
+    <li>道路交通法施行令 第33条の7(優良運転者及び違反運転者等に係る基準)<br>
+      <a href="https://laws.e-gov.go.jp/law/335CO0000000270" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/335CO0000000270</a>(2026年7月29日参照)</li>
+    <li>道路交通法施行規則 第38条第11項(更新時講習の区分と講習時間)<br>
+      <a href="https://laws.e-gov.go.jp/law/335M50000002060" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/335M50000002060</a>(2026年7月29日参照)</li>
+    <li>警察庁「運転免許の更新」<br>
+      <a href="https://www.npa.go.jp/policies/application/license_renewal/index.html" rel="noopener" target="_blank">https://www.npa.go.jp/policies/application/license_renewal/index.html</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>条文は<strong>2026年7月29日時点</strong>のe-Gov法令検索の内容によります。有効期間の規定は現在<strong>道路交通法第95条の6</strong>にあります。</li>
+    <li>有効期間の末日が日曜日その他政令で定める日に当たるときは翌日が末日になります(法第95条の6第3項)。本ツールは祝日等を判定していません。</li>
+    <li>「継続して免許を受けている期間」は、免許停止・取消しがあるとリセット・短縮されることがあります。</li>
+    <li>違反歴の判定期間は、正確には「更新前の免許証の有効期間が満了する日の直前の誕生日の40日前」から遡る5年間です(施行令第33条の7)。本ツールは回数だけで簡易に判定します。</li>
+    <li>軽微違反行為が1回でも、それによって人身事故を起こした場合は違反運転者等になります。物損のみで報告義務違反もない場合は除かれます。</li>
+    <li>「初回更新者」は法律上は違反運転者等に含まれますが、講習の区分としては別に扱われます。有効期間はどちらも3年です。</li>
+    <li>誕生日が2月29日の場合、うるう年以外の年は2月28日とみなされます(法第101条第2項)。本ツールはこの読み替えをしていません。</li>
+    <li>海外滞在などやむを得ない理由がある場合の特例、免許の種類による違い、優良運転者の経由地更新(他県での更新)は扱っていません。</li>
+    <li>更新手続きの受付日時・場所・持ち物は都道府県警によって異なります。必ずお住まいの都道府県警のページをご確認ください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">更新はがきをなくしました。いつから手続きできますか?</h3>
+  <p class="faq-a">免許証の有効期限の2か月前(誕生日の1か月前)からです。有効期限の年月日を入力すれば正確な開始日がわかります。</p>
+  <h3 class="faq-q">誕生日を過ぎてしまいましたが、まだ更新できますか?</h3>
+  <p class="faq-a">有効期限(誕生日の1か月後)までなら更新できます。それを過ぎると免許は失効し、再取得の手続きが必要になります。</p>
+  <h3 class="faq-q">駐車違反が1回だけありました。優良運転者ではなくなりますか?</h3>
+  <p class="faq-a">軽微な違反1回だけ(人身事故なし)なら「一般運転者」になります。講習は1時間、有効期間は5年のままです。</p>
+  <h3 class="faq-q">70歳になると何が変わりますか?</h3>
+  <p class="faq-a">更新期間が満了する日の年齢が70歳以上になると、更新前6か月以内に高齢者講習を受ける必要があります。75歳以上ではさらに認知機能検査等も必要です。</p>
+  <h3 class="faq-q">有効期間が5年ではなく3年なのはなぜですか?</h3>
+  <p class="faq-a">違反運転者等(違反歴がある、または免許取得から5年未満)に当たるためです。71歳以上の場合も3年になります。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_expiry: "有効期限の年月日を選び直してください。",
+    invalid_today: "今日の日付を取得できませんでした。",
+    invalid_years: "免許を受けてからの年数を選び直してください。",
+    invalid_violations: "違反の回数を選び直してください。",
+    invalid_serious: "人身事故・重大な違反の有無を選び直してください。",
+    invalid_age: "年齢を16〜120の範囲で入力してください。",
+    invalid_valid_years: "有効期間の年数を確認してください。"
+  };
+  var CATEGORY_LABEL = {
+    excellent: "優良運転者",
+    general: "一般運転者",
+    violator: "違反運転者",
+    first: "初回更新者"
+  };
+  var LEGAL_LABEL = {
+    excellent: "優良運転者",
+    general: "一般運転者",
+    violator: "違反運転者等"
+  };
+
+  var box = document.getElementById("result");
+  var boxB = document.getElementById("result-b");
+  var advBox = document.getElementById("adv-result");
+  var yEl = document.getElementById("exp-y");
+  var mEl = document.getElementById("exp-m");
+  var dEl = document.getElementById("exp-d");
+  var yearsEl = document.getElementById("years");
+  var ageEl = document.getElementById("age");
+  var vioEl = document.getElementById("violations");
+  var seriousEl = document.getElementById("serious");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function fillSelect(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function fmt(d) { return d.y + "年" + d.m + "月" + d.d + "日"; }
+  function val(el) { return parseInt(el.value, 10); }
+
+  var today = new Date();
+  fillSelect(yEl, today.getFullYear() - 3, today.getFullYear() + 8, "年", today.getFullYear() + 1);
+  fillSelect(mEl, 1, 12, "月", today.getMonth() + 1);
+  fillSelect(dEl, 1, 31, "日", today.getDate());
+  fillSelect(yearsEl, 0, 60, "年", 10);
+  fillSelect(vioEl, 0, 10, "回", 0);
+
+  function adjustDays() {
+    var keep = val(dEl);
+    var max = new Date(val(yEl), val(mEl), 0).getDate();
+    fillSelect(dEl, 1, max, "日", Math.min(keep, max));
+  }
+
+  function runAdv() {
+    if (ageEl.value === "") { advBox.hidden = true; return; }
+    var r = MenkyoKoshinCalc.elderlyRequirement(parseInt(ageEl.value, 10));
+    if (!r.ok) { advBox.hidden = true; return; }
+    var items = "";
+    if (r.elderlyLecture) {
+      items += "<li>高齢者講習(更新期間満了日前6か月以内に受講)</li>";
+    }
+    if (r.cognitiveTest) {
+      items += "<li>認知機能検査等(更新期間満了日前6か月以内)</li>" +
+        "<li>一定の違反歴がある場合は運転技能検査等も必要です</li>";
+    }
+    if (items === "") {
+      advBox.innerHTML = '<div class="result-main">高齢者向けの講習・検査は不要</div>' +
+        "<p>70歳未満のため、通常の更新時講習のみです。</p>";
+    } else {
+      advBox.innerHTML = '<div class="result-main">更新前に受けておくもの</div><ul>' + items + "</ul>";
+    }
+    advBox.hidden = false;
+  }
+
+  function run() {
+    var r = MenkyoKoshinCalc.statusOn(val(yEl), val(mEl), val(dEl),
+      today.getFullYear(), today.getMonth() + 1, today.getDate());
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var head, note;
+    if (r.status === "before") {
+      head = "手続きできるのは " + fmt(r.start) + " から";
+      note = "あと" + r.daysToStart + "日で更新期間に入ります。";
+    } else if (r.status === "open") {
+      head = "いま更新できます";
+      note = "期限まであと" + r.daysToEnd + "日です。";
+    } else {
+      head = "有効期限を過ぎています";
+      note = "期限から" + (-r.daysToEnd) + "日経過しています。免許が失効している可能性があるため、早めに運転免許センターへご相談ください。";
+    }
+    box.innerHTML = '<div class="result-main">' + esc(head) + "</div><ul>" +
+      "<li>更新期間: " + esc(fmt(r.start)) + " 〜 " + esc(fmt(r.end)) + "</li>" +
+      "<li>" + esc(note) + "</li></ul>";
+    box.hidden = false;
+  }
+
+  function runB() {
+    runAdv();
+    if (ageEl.value === "") { boxB.hidden = true; return; }
+    var r = MenkyoKoshinCalc.classify(val(yearsEl), val(vioEl), seriousEl.value === "1", parseInt(ageEl.value, 10));
+    if (!r.ok) {
+      boxB.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      boxB.hidden = false;
+      return;
+    }
+    var minutes = r.lectureMinutes < 60 ? r.lectureMinutes + "分" : (r.lectureMinutes / 60) + "時間";
+    var html = '<div class="result-main">' + esc(CATEGORY_LABEL[r.lectureCategory]) + "(講習 " + esc(minutes) + ")</div><ul>" +
+      "<li>法律上の区分: " + esc(LEGAL_LABEL[r.legalCategory]) + "</li>" +
+      "<li>更新後の有効期間: " + esc(String(r.validYears)) + "年</li>";
+    var n = MenkyoKoshinCalc.nextExpiry(val(yEl), val(mEl), val(dEl), r.validYears);
+    if (n.ok) {
+      html += "<li>次回の有効期限の目安: " + esc(fmt(n.next)) + "</li>";
+    }
+    html += "</ul>";
+    boxB.innerHTML = html;
+    boxB.hidden = false;
+  }
+
+  [yEl, mEl].forEach(function (el) {
+    el.addEventListener("change", function () { adjustDays(); run(); runB(); });
+  });
+  dEl.addEventListener("change", function () { run(); runB(); });
+  [yearsEl, ageEl, vioEl, seriousEl].forEach(function (el) {
+    el.addEventListener("input", runB);
+    el.addEventListener("change", runB);
+  });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  document.getElementById("class-form").addEventListener("submit", function (e) { e.preventDefault(); runB(); });
+  adjustDays();
+  run();
+  runB();
+})();
+</script>
+</body>
+</html>

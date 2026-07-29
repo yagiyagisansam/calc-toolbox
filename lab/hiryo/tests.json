@@ -1,0 +1,139 @@
+{
+  "tool": "hiryo",
+  "module": "calc.js",
+  "global": "HiryoCalc",
+  "cases": [
+    {
+      "name": "窒素20gを14-14-14で施すには肥料142.9g(20÷0.14)",
+      "func": "fertilizerAmount",
+      "args": [20, 14],
+      "expect": { "ok": true, "fertilizerGram": 142.9 }
+    },
+    {
+      "name": "同じ窒素20gでも8-8-8なら250gと1.75倍必要になる",
+      "func": "fertilizerAmount",
+      "args": [20, 8],
+      "expect": { "ok": true, "fertilizerGram": 250 }
+    },
+    {
+      "name": "境界: 保証成分量100%なら成分量と肥料の重さが一致する",
+      "func": "fertilizerAmount",
+      "args": [20, 100],
+      "expect": { "ok": true, "fertilizerGram": 20 }
+    },
+    {
+      "name": "10m²に窒素2g/m²を14-14-14で: 肥料142.9g・りん酸20g・加里20g",
+      "func": "calculate",
+      "args": [10, 2, 14, 14, 14],
+      "expect": { "ok": true, "totalNitrogenGram": 20, "fertilizerGram": 142.9, "phosphateGram": 20, "potashGram": 20, "fertilizerPerM2Gram": 14.3 }
+    },
+    {
+      "name": "同じ条件を8-8-8にすると肥料250g・1m²あたり25g",
+      "func": "calculate",
+      "args": [10, 2, 8, 8, 8],
+      "expect": { "ok": true, "fertilizerGram": 250, "fertilizerPerM2Gram": 25, "phosphateGram": 20, "potashGram": 20 }
+    },
+    {
+      "name": "成分が偏った肥料(10-18-15)では窒素基準で撒くとりん酸36g・加里30gが入る",
+      "func": "calculate",
+      "args": [10, 2, 10, 18, 15],
+      "expect": { "ok": true, "fertilizerGram": 200, "phosphateGram": 36, "potashGram": 30 }
+    },
+    {
+      "name": "1,000m²(10a相当)に窒素10g/m²を14-14-14で施すと71.43kg",
+      "func": "calculate",
+      "args": [1000, 10, 14, 14, 14],
+      "expect": { "ok": true, "totalNitrogenGram": 10000, "fertilizerKg": 71.43 }
+    },
+    {
+      "name": "りん酸・加里の指定を省略すると0として扱う",
+      "func": "calculate",
+      "args": [10, 2, 14],
+      "expect": { "ok": true, "fertilizerGram": 142.9, "phosphateGram": 0, "potashGram": 0 }
+    },
+    {
+      "name": "単位換算: 施肥基準10kg/10aはそのまま10g/m²",
+      "func": "fromKgPer10a",
+      "args": [10],
+      "expect": { "ok": true, "gramPerM2": 10 }
+    },
+    {
+      "name": "境界: 施肥基準0kg/10aは0g/m²",
+      "func": "fromKgPer10a",
+      "args": [0],
+      "expect": { "ok": true, "gramPerM2": 0 }
+    },
+    {
+      "name": "異常入力: 面積0m²はエラー",
+      "func": "calculate",
+      "args": [0, 2, 14],
+      "expect": { "ok": false, "code": "invalid_area" }
+    },
+    {
+      "name": "異常入力: 面積が負の値はエラー",
+      "func": "calculate",
+      "args": [-10, 2, 14],
+      "expect": { "ok": false, "code": "invalid_area" }
+    },
+    {
+      "name": "異常入力: 数値でない面積はエラー",
+      "func": "calculate",
+      "args": ["abc", 2, 14],
+      "expect": { "ok": false, "code": "invalid_area" }
+    },
+    {
+      "name": "異常入力: 施したい窒素量0g/m²はエラー",
+      "func": "calculate",
+      "args": [10, 0, 14],
+      "expect": { "ok": false, "code": "invalid_target" }
+    },
+    {
+      "name": "異常入力: 窒素の保証成分量0%はエラー(0除算にならない)",
+      "func": "calculate",
+      "args": [10, 2, 0],
+      "expect": { "ok": false, "code": "invalid_guarantee" }
+    },
+    {
+      "name": "異常入力: 窒素の保証成分量が100%超はエラー",
+      "func": "calculate",
+      "args": [10, 2, 101],
+      "expect": { "ok": false, "code": "invalid_guarantee" }
+    },
+    {
+      "name": "異常入力: りん酸が負の値はエラー",
+      "func": "calculate",
+      "args": [10, 2, 14, -1],
+      "expect": { "ok": false, "code": "invalid_phosphate" }
+    },
+    {
+      "name": "異常入力: 加里が100%超はエラー",
+      "func": "calculate",
+      "args": [10, 2, 14, 14, 101],
+      "expect": { "ok": false, "code": "invalid_potash" }
+    },
+    {
+      "name": "異常入力: 施したい成分量0gはエラー",
+      "func": "fertilizerAmount",
+      "args": [0, 14],
+      "expect": { "ok": false, "code": "invalid_target" }
+    },
+    {
+      "name": "異常入力: 保証成分量0%はエラー",
+      "func": "fertilizerAmount",
+      "args": [20, 0],
+      "expect": { "ok": false, "code": "invalid_guarantee" }
+    },
+    {
+      "name": "異常入力: 施肥基準が負の値はエラー",
+      "func": "fromKgPer10a",
+      "args": [-1],
+      "expect": { "ok": false, "code": "invalid_standard" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_area" }
+    }
+  ]
+}

@@ -1,0 +1,223 @@
+{
+  "tool": "kettou-heikin",
+  "module": "calc.js",
+  "global": "KettouHeikinCalc",
+  "cases": [
+    {
+      "name": "ADA換算表と一致: HbA1c 7.0%は eAG 154.2mg/dL(28.7×7−46.7)",
+      "func": "toEag",
+      "args": [7],
+      "expect": {
+        "ok": true,
+        "eagMgDl": 154.2,
+        "eagMmolL": 8.54
+      }
+    },
+    {
+      "name": "ADA換算表と一致: HbA1c 6.0%は eAG 125.5mg/dL(表示上は126)",
+      "func": "toEag",
+      "args": [6],
+      "expect": {
+        "ok": true,
+        "eagMgDl": 125.5
+      }
+    },
+    {
+      "name": "ADA換算表と一致: HbA1c 8.0%は eAG 182.9mg/dL(表示上は183)",
+      "func": "toEag",
+      "args": [8],
+      "expect": {
+        "ok": true,
+        "eagMgDl": 182.9
+      }
+    },
+    {
+      "name": "ADA換算表と一致: HbA1c 12.0%は eAG 297.7mg/dL(表示上は298)",
+      "func": "toEag",
+      "args": [12],
+      "expect": {
+        "ok": true,
+        "eagMgDl": 297.7
+      }
+    },
+    {
+      "name": "糖尿病型の目安: HbA1c 6.5%は eAG 139.8mg/dL",
+      "func": "toEag",
+      "args": [6.5],
+      "expect": {
+        "ok": true,
+        "eagMgDl": 139.8,
+        "eagMmolL": 7.75
+      }
+    },
+    {
+      "name": "境界値: 下限のHbA1c 4.0%は eAG 68.1mg/dL",
+      "func": "toEag",
+      "args": [4],
+      "expect": {
+        "ok": true,
+        "eagMgDl": 68.1
+      }
+    },
+    {
+      "name": "境界値: 上限のHbA1c 20.0%は eAG 527.3mg/dL",
+      "func": "toEag",
+      "args": [20],
+      "expect": {
+        "ok": true,
+        "eagMgDl": 527.3
+      }
+    },
+    {
+      "name": "逆算: eAG 154.2mg/dL は HbA1c 7.0%に戻る",
+      "func": "fromEag",
+      "args": [154.2],
+      "expect": {
+        "ok": true,
+        "a1c": 7
+      }
+    },
+    {
+      "name": "逆算: eAG 126mg/dL は HbA1c 6.0%",
+      "func": "fromEag",
+      "args": [126],
+      "expect": {
+        "ok": true,
+        "a1c": 6
+      }
+    },
+    {
+      "name": "逆算: eAG 200mg/dL は HbA1c 8.6%",
+      "func": "fromEag",
+      "args": [200],
+      "expect": {
+        "ok": true,
+        "a1c": 8.6
+      }
+    },
+    {
+      "name": "換算表: 6%から10%まで1%刻みで5行",
+      "func": "table",
+      "args": [6, 10, 1],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "0": {
+            "a1c": 6,
+            "eagMgDl": 125.5
+          },
+          "4": {
+            "a1c": 10,
+            "eagMgDl": 240.3
+          },
+          "length": 5
+        }
+      }
+    },
+    {
+      "name": "換算表: 5%から6%まで0.5%刻みで3行",
+      "func": "table",
+      "args": [5, 6, 0.5],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "1": {
+            "a1c": 5.5,
+            "eagMgDl": 111.2
+          },
+          "length": 3
+        }
+      }
+    },
+    {
+      "name": "異常入力: HbA1cが下限未満(3.9%)はエラー",
+      "func": "toEag",
+      "args": [3.9],
+      "expect": {
+        "ok": false,
+        "code": "invalid_a1c"
+      }
+    },
+    {
+      "name": "異常入力: HbA1cが上限超過(20.1%)はエラー",
+      "func": "toEag",
+      "args": [20.1],
+      "expect": {
+        "ok": false,
+        "code": "invalid_a1c"
+      }
+    },
+    {
+      "name": "異常入力: HbA1cが0はエラー",
+      "func": "toEag",
+      "args": [0],
+      "expect": {
+        "ok": false,
+        "code": "invalid_a1c"
+      }
+    },
+    {
+      "name": "異常入力: HbA1cが負の値はエラー",
+      "func": "toEag",
+      "args": [-7],
+      "expect": {
+        "ok": false,
+        "code": "invalid_a1c"
+      }
+    },
+    {
+      "name": "異常入力: HbA1cが数値でない場合はエラー",
+      "func": "toEag",
+      "args": ["7%"],
+      "expect": {
+        "ok": false,
+        "code": "invalid_a1c"
+      }
+    },
+    {
+      "name": "異常入力: eAGが範囲外(60mg/dL)はエラー",
+      "func": "fromEag",
+      "args": [60],
+      "expect": {
+        "ok": false,
+        "code": "invalid_eag"
+      }
+    },
+    {
+      "name": "異常入力: eAGが0はエラー",
+      "func": "fromEag",
+      "args": [0],
+      "expect": {
+        "ok": false,
+        "code": "invalid_eag"
+      }
+    },
+    {
+      "name": "異常入力: 換算表の刻み幅が0はエラー",
+      "func": "table",
+      "args": [6, 10, 0],
+      "expect": {
+        "ok": false,
+        "code": "invalid_step"
+      }
+    },
+    {
+      "name": "異常入力: 換算表の開始が終了より大きい場合はエラー",
+      "func": "table",
+      "args": [10, 6, 1],
+      "expect": {
+        "ok": false,
+        "code": "invalid_range"
+      }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "toEag",
+      "args": [],
+      "expect": {
+        "ok": false,
+        "code": "invalid_a1c"
+      }
+    }
+  ]
+}

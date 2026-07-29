@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>BPM→ディレイタイム計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="曲のBPMから、各音符に同期するディレイタイム(ms)とLFOレート(Hz)を一覧で表示します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>BPM→ディレイタイム計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>BPM(テンポ)
+      <span class="field-note">20〜999。例: 120</span>
+      <input type="number" id="bpm" inputmode="decimal" step="0.01" min="20" max="999" value="120">
+    </label>
+    <div class="field-row">
+      <label>音符
+        <select id="denom">
+          <option value="1">全音符</option>
+          <option value="2">2分音符</option>
+          <option value="4" selected>4分音符</option>
+          <option value="8">8分音符</option>
+          <option value="16">16分音符</option>
+          <option value="32">32分音符</option>
+        </select>
+      </label>
+      <label>種類
+        <select id="mod">
+          <option value="normal">通常</option>
+          <option value="dotted">付点</option>
+          <option value="triplet">3連</option>
+        </select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 音符ごとの一覧表</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">全音符から32分音符まで一覧</h3>
+      <p class="adv-note">通常・付点・3連のミリ秒と、通常音符に対応するLFOレート(Hz)です。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    4分音符を1拍とする拍子(4/4など)を前提にしています。実機のディレイでは指定できる最小単位や上限が機種ごとに異なります。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>曲のBPMに<strong>ぴったり同期するディレイタイム(ms)</strong>がわかります。プラグインにテンポ同期機能がない場合や、リバーブのプリディレイ・LFOのレートを手で合わせたいときに使えます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>曲のBPMを入れます。入れた瞬間に結果が出ます。</li>
+    <li>合わせたい音符(4分・8分・16分など)と、付点・3連の別を選びます。</li>
+    <li>他の音符も一度に見たいときは「＋詳細機能」の一覧表を開いてください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>4分音符(1拍)</strong> = 60000ms ÷ BPM</li>
+    <li><strong>音符の長さ</strong> = 4分音符の長さ × (4 ÷ 音符の分母)</li>
+    <li><strong>付点</strong> = 1.5倍　/　<strong>3連</strong> = 3分の2倍</li>
+    <li><strong>LFOレート(Hz)</strong> = 1000 ÷ 音符の長さ(ms)</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>BPM120のときの各音符(出典の例と一致)</caption>
+      <thead><tr><th>音符</th><th>通常</th><th>付点</th><th>3連</th></tr></thead>
+      <tbody>
+        <tr><td>4分音符</td><td>500ms</td><td>750ms</td><td>333.33ms</td></tr>
+        <tr><td>8分音符</td><td>250ms</td><td>375ms</td><td>166.67ms</td></tr>
+        <tr><td>16分音符</td><td>125ms</td><td>187.5ms</td><td>83.33ms</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>「音楽テンポBPM - 音符msec計算方法(ディレイ編)」(基本式 60000ms ÷ BPM = 1拍、および付点0.75倍・0.375倍などの倍率と BPM120 の計算例の出典)<br>
+      <a href="https://nac-s.blogspot.com/2021/09/music-bpm-msec.html" rel="noopener" target="_blank">https://nac-s.blogspot.com/2021/09/music-bpm-msec.html</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>4分音符を1拍とする拍子を前提としています。6/8拍子など8分音符を基準に数える曲では、読み替えが必要です。</li>
+    <li>3連符は「1拍を3等分する」定義から、通常の音符の3分の2の長さとしています。</li>
+    <li>ミリ秒は小数第2位、Hzは小数第3位で四捨五入しています。機材によっては整数値しか入力できません。</li>
+    <li>テンポが曲中で変わる場合は、その区間ごとに計算し直してください。</li>
+    <li>ディレイの「フィードバック」「ミックス量」はテンポとは無関係です。本ツールでは扱いません。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">付点8分ディレイがよく使われるのはなぜですか?</h3>
+  <p class="faq-a">原音と重ならない位置に返ってくるため、8分の裏拍と噛み合ってリズムに厚みが出るからです。BPM120なら375msになります。</p>
+  <h3 class="faq-q">LFOレート(Hz)はどう使いますか?</h3>
+  <p class="faq-a">トレモロやフィルターのLFOを曲に同期させたいとき、その周期をHzで指定する機材があります。1000 ÷ ミリ秒 で求めた値を入れると、その音符の周期で揺れます。</p>
+  <h3 class="faq-q">リバーブのプリディレイにも使えますか?</h3>
+  <p class="faq-a">使えます。16分や32分など短い音符の値を入れると、残響の立ち上がりが曲のグリッドに乗ります。ただし長すぎると原音とリバーブが分離して聞こえます。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_bpm: "BPMは20〜999の範囲で入力してください。",
+    invalid_denominator: "音符を選び直してください。",
+    invalid_modifier: "音符の種類を選び直してください。"
+  };
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function el(id) { return document.getElementById(id); }
+
+  var box = el("result");
+  var advBox = el("adv-result");
+
+  function run() {
+    var bpmEl = el("bpm");
+    if (bpmEl.value.trim() === "") { box.hidden = true; advBox.hidden = true; return; }
+    var bpm = parseFloat(bpmEl.value);
+    var r = BpmDelayCalc.noteMs(bpm, parseInt(el("denom").value, 10), el("mod").value);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      advBox.hidden = true;
+      return;
+    }
+    box.innerHTML = '<div class="result-main">' + esc(r.ms) + " ms</div>" +
+      "<p>" + esc(r.name) + " / LFOレート " + esc(r.hz) + " Hz</p>";
+    box.hidden = false;
+
+    var t = BpmDelayCalc.table(bpm);
+    if (!t.ok) { advBox.hidden = true; return; }
+    var html = '<div class="table-scroll"><table class="data-table">' +
+      "<thead><tr><th>音符</th><th>通常</th><th>付点</th><th>3連</th><th>LFO(通常)</th></tr></thead><tbody>";
+    t.rows.forEach(function (row) {
+      html += "<tr><td>" + esc(row.name) + "</td><td>" + esc(row.normalMs) + " ms</td><td>" +
+        esc(row.dottedMs) + " ms</td><td>" + esc(row.tripletMs) + " ms</td><td>" +
+        esc(row.normalHz) + " Hz</td></tr>";
+    });
+    html += "</tbody></table></div>";
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+
+  el("bpm").addEventListener("input", run);
+  el("denom").addEventListener("change", run);
+  el("mod").addEventListener("change", run);
+  el("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
+})();
+</script>
+</body>
+</html>

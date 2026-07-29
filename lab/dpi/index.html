@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>画像の印刷可能サイズ計算(dpi)(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="画像のピクセル数から、350dpiなどで印刷できる実寸(mm)を計算します。必要ピクセル数の逆算もできます。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>
+    /* 長い出典URLが横スクロールを起こさないようにする(このページ内だけの調整) */
+    .sources a { overflow-wrap: anywhere; word-break: break-word; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>画像の印刷可能サイズ計算(dpi)</h1>
+  <form class="tool-form" id="tool-form">
+    <div class="field-row">
+      <label>画像の横(px)
+        <span class="field-note">例: 4000</span>
+        <input type="number" id="px-w" inputmode="numeric" step="1" min="1" placeholder="4000">
+      </label>
+      <label>画像の縦(px)
+        <span class="field-note">例: 3000</span>
+        <input type="number" id="px-h" inputmode="numeric" step="1" min="1" placeholder="3000">
+      </label>
+    </div>
+    <label>目標解像度(dpi)
+      <select id="dpi">
+        <option value="350" selected>350dpi(フルカラー印刷の標準)</option>
+        <option value="600">600dpi(グレースケール)</option>
+        <option value="1200">1200dpi(モノクロ2階調・線画)</option>
+        <option value="200">200dpi(大型ポスター)</option>
+        <option value="72">72dpi(画面表示の目安)</option>
+      </select>
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 用紙サイズに耐えるかの判定と必要ピクセル数</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">この画像は用紙いっぱいに印刷できるか</h3>
+      <p class="adv-note">上で入力した画像とdpiで、選んだ用紙いっぱいに印刷できるかを判定します。画像の向きは自動で合わせます。</p>
+      <label>用紙サイズ
+        <select id="paper">
+          <option value="a3">A3(297×420mm)</option>
+          <option value="a4" selected>A4(210×297mm)</option>
+          <option value="a5">A5(148×210mm)</option>
+          <option value="b4">B4(257×364mm)</option>
+          <option value="b5">B5(182×257mm)</option>
+          <option value="postcard">はがき(100×148mm)</option>
+          <option value="business_card">名刺(91×55mm)</option>
+          <option value="l">L判(89×127mm)</option>
+        </select>
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    低い解像度の画像を後から拡大しても、<strong>実際の精細さは上がりません</strong>。足りない場合は元の高解像度データから作り直してください。塗り足し(裁ち落とし)は含んでいないため、入稿時は各印刷所の指定を確認してください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>手元の写真が<strong>A4ポスターに耐えるか</strong>、<strong>同人誌の表紙に使えるか</strong>がわかります。逆に「この大きさで印刷したい」から必要なピクセル数を逆算することもできます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>画像の横と縦のピクセル数を入れます(スマホの写真アプリやパソコンのプロパティで確認できます)。</li>
+    <li>目標解像度を選ぶと、その解像度で印刷できる実寸が表示されます。</li>
+    <li>用紙に収まるか知りたいときは「＋詳細機能」で用紙サイズを選んでください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>印刷サイズ(mm)</strong> = ピクセル数 ÷ dpi × 25.4</li>
+    <li><strong>必要ピクセル数</strong> = 印刷サイズ(mm) ÷ 25.4 × dpi(切り上げ)</li>
+    <li><strong>実効解像度(dpi)</strong> = ピクセル数 ÷ (印刷サイズ(mm) ÷ 25.4)</li>
+    <li>1インチ = 25.4mm</li>
+  </ul>
+
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>用途ごとの推奨解像度(印刷通販グラフィック)</caption>
+      <thead><tr><th>用途</th><th>推奨解像度</th></tr></thead>
+      <tbody>
+        <tr><td>フルカラー印刷</td><td>350dpi</td></tr>
+        <tr><td>グレースケール</td><td>600dpi</td></tr>
+        <tr><td>モノクロ2階調(線画)</td><td>1,200dpi</td></tr>
+        <tr><td>ポスターなど大型印刷物</td><td>200dpi程度</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>印刷通販グラフィック「印刷に最適な解像度(画像解像度)とは?」<br>
+      <a href="https://www.graphic.jp/feature/print_resolution" rel="noopener" target="_blank">https://www.graphic.jp/feature/print_resolution</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>dpi(1インチあたりのドット数)とppi(1インチあたりの画素数)を同じものとして扱っています。</li>
+    <li><strong>塗り足し(裁ち落とし)</strong>は含みません。フチなし印刷では上下左右に3mm程度の余分が必要です。</li>
+    <li>必要ピクセル数は<strong>切り上げ</strong>ています。1px足りないだけでも解像度不足と判定されることがあるためです。</li>
+    <li>画像を後から拡大しても精細さは上がりません。表示上のdpiだけを変えても意味がありません。</li>
+    <li>推奨解像度は印刷所によって異なります。実際の入稿前には利用する印刷所の入稿ガイドを確認してください。</li>
+    <li>用紙サイズはJIS規格の仕上がり寸法です。名刺(91×55mm)は日本の一般的なサイズです。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">スマホの写真はA4ポスターに使えますか?</h3>
+  <p class="faq-a">A4を350dpiで印刷するには2,894×4,093px(約1,180万画素)必要です。4000×3000px(1200万画素)の写真でも、縦横比が違うため350dpiにはわずかに足りません。ポスター向けの200dpiなら十分です。</p>
+  <h3 class="faq-q">72dpiの画像を350dpiに設定し直せば印刷できますか?</h3>
+  <p class="faq-a">できません。dpiの設定を変えてもピクセル数は増えないため、印刷サイズが小さくなるだけです。元の高解像度データが必要です。</p>
+  <h3 class="faq-q">なぜ350dpiが標準なのですか?</h3>
+  <p class="faq-a">一般的な商業印刷の網点(175線)に対して、その2倍の解像度があると滑らかに再現できるためです。</p>
+  <h3 class="faq-q">「実効dpi」とは何ですか?</h3>
+  <p class="faq-a">その画像を用紙いっぱいに印刷したときに実際に得られる解像度です。目標解像度を下回っていれば、印刷すると粗く見える可能性があります。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_px_width: "画像の横ピクセル数を1以上の数値で入力してください。",
+    invalid_px_height: "画像の縦ピクセル数を1以上の数値で入力してください。",
+    invalid_dpi: "解像度を選び直してください。",
+    invalid_paper: "用紙サイズを選び直してください。",
+    invalid_width: "印刷したい幅を確認してください。",
+    invalid_height: "印刷したい高さを確認してください。"
+  };
+
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var wEl = document.getElementById("px-w");
+  var hEl = document.getElementById("px-h");
+  var dpiEl = document.getElementById("dpi");
+  var paperEl = document.getElementById("paper");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function runAdv() {
+    if (wEl.value === "" || hEl.value === "") { advBox.hidden = true; return; }
+    var r = DpiCalc.checkPaper(parseFloat(wEl.value), parseFloat(hEl.value), paperEl.value, parseFloat(dpiEl.value));
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML = '<div class="result-main">' + (r.fits ? "この用紙に耐えます" : "解像度が足りません") + "</div><ul>" +
+      "<li>用紙: " + esc(r.paperWidthMm + "×" + r.paperHeightMm) + "mm</li>" +
+      "<li>必要なピクセル数: " + esc(r.neededPxWidth.toLocaleString("ja-JP")) + "×" +
+      esc(r.neededPxHeight.toLocaleString("ja-JP")) + "px</li>" +
+      "<li>用紙いっぱいに印刷したときの実効解像度: " + esc(r.effectiveDpi.toFixed(1)) + "dpi</li></ul>";
+    advBox.hidden = false;
+  }
+
+  function run() {
+    runAdv();
+    if (wEl.value === "" || hEl.value === "") { box.hidden = true; return; }
+    var dpi = parseFloat(dpiEl.value);
+    var r = DpiCalc.printSize(parseFloat(wEl.value), parseFloat(hEl.value), dpi);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML = '<div class="result-main">' + esc(r.widthMm.toFixed(1)) + " × " +
+      esc(r.heightMm.toFixed(1)) + " mm</div>" +
+      "<p>" + esc(dpiEl.value) + "dpi で印刷できる実寸です(" +
+      esc(r.widthCm.toFixed(2)) + " × " + esc(r.heightCm.toFixed(2)) + " cm)。</p>";
+    box.hidden = false;
+  }
+
+  [wEl, hEl, dpiEl].forEach(function (el) {
+    el.addEventListener("input", run);
+    el.addEventListener("change", run);
+  });
+  paperEl.addEventListener("change", runAdv);
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+{
+  "tool": "shotokuzei",
+  "module": "calc.js",
+  "global": "ShotokuzeiCalc",
+  "cases": [
+    {
+      "name": "代表例: 課税所得300万円は税率10%・控除97,500円で所得税202,500円",
+      "func": "calculate",
+      "args": [3000000],
+      "expect": { "ok": true, "rate": 0.1, "deduction": 97500, "incomeTax": 202500, "reconstructionTax": 4252, "totalTax": 206752, "totalTaxRounded": 206700 }
+    },
+    {
+      "name": "代表例: 課税所得500万円は税率20%で所得税572,500円・合計584,500円",
+      "func": "calculate",
+      "args": [5000000],
+      "expect": { "ok": true, "rate": 0.2, "incomeTax": 572500, "reconstructionTax": 12022, "totalTaxRounded": 584500, "effectiveRate": 11.69 }
+    },
+    {
+      "name": "課税所得は1,000円未満切り捨て(3,000,999円は3,000,000円として計算)",
+      "func": "calculate",
+      "args": [3000999],
+      "expect": { "ok": true, "taxableIncome": 3000000, "incomeTax": 202500 }
+    },
+    {
+      "name": "境界値: 1,949,000円までは税率5%(所得税97,450円)",
+      "func": "calculate",
+      "args": [1949000],
+      "expect": { "ok": true, "rate": 0.05, "deduction": 0, "incomeTax": 97450 }
+    },
+    {
+      "name": "境界値: 1,950,000円ちょうどから税率10%(所得税97,500円)",
+      "func": "calculate",
+      "args": [1950000],
+      "expect": { "ok": true, "rate": 0.1, "deduction": 97500, "incomeTax": 97500 }
+    },
+    {
+      "name": "境界値: 6,950,000円ちょうどから税率23%(所得税962,500円)",
+      "func": "calculate",
+      "args": [6950000],
+      "expect": { "ok": true, "rate": 0.23, "deduction": 636000, "incomeTax": 962500 }
+    },
+    {
+      "name": "境界値: 9,000,000円ちょうどから税率33%(所得税1,434,000円)",
+      "func": "calculate",
+      "args": [9000000],
+      "expect": { "ok": true, "rate": 0.33, "deduction": 1536000, "incomeTax": 1434000 }
+    },
+    {
+      "name": "上限の段階: 40,000,000円ちょうどから税率45%(所得税13,204,000円)",
+      "func": "calculate",
+      "args": [40000000],
+      "expect": { "ok": true, "rate": 0.45, "deduction": 4796000, "incomeTax": 13204000, "reconstructionTax": 277284, "totalTaxRounded": 13481200 }
+    },
+    {
+      "name": "下限: 課税所得0円は税額0円",
+      "func": "calculate",
+      "args": [0],
+      "expect": { "ok": true, "taxableIncome": 0, "incomeTax": 0, "totalTax": 0, "totalTaxRounded": 0 }
+    },
+    {
+      "name": "1,000円未満は切り捨てで課税所得0円になり税額0円",
+      "func": "calculate",
+      "args": [999],
+      "expect": { "ok": true, "taxableIncome": 0, "incomeTax": 0, "totalTaxRounded": 0 }
+    },
+    {
+      "name": "異常入力: 負の課税所得はエラー",
+      "func": "calculate",
+      "args": [-1],
+      "expect": { "ok": false, "code": "invalid_income" }
+    },
+    {
+      "name": "異常入力: 数値でない値はエラー",
+      "func": "calculate",
+      "args": ["abc"],
+      "expect": { "ok": false, "code": "invalid_income" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_income" }
+    },
+    {
+      "name": "異常入力: 桁が大きすぎる値(2兆円)はエラー",
+      "func": "calculate",
+      "args": [2000000000000],
+      "expect": { "ok": false, "code": "invalid_income" }
+    },
+    {
+      "name": "段階の判定: 課税所得500万円は20%・控除427,500円、上限は6,949,000円",
+      "func": "bracket",
+      "args": [5000000],
+      "expect": { "ok": true, "rate": 0.2, "deduction": 427500, "lower": 3300000, "upper": 6949000 }
+    },
+    {
+      "name": "段階の判定: 最上位の段階には上限がない",
+      "func": "bracket",
+      "args": [50000000],
+      "expect": { "ok": true, "rate": 0.45, "upper": null }
+    },
+    {
+      "name": "限界税率: 課税所得300万円なら10%(復興込み10.21%)・次の段階まで30万円",
+      "func": "marginal",
+      "args": [3000000],
+      "expect": { "ok": true, "marginalRate": 10, "marginalRateWithReconstruction": 10.21, "nextBracketAt": 3300000, "toNextBracket": 300000 }
+    },
+    {
+      "name": "限界税率: 最上位の段階では次の段階が存在しない",
+      "func": "marginal",
+      "args": [45000000],
+      "expect": { "ok": true, "marginalRate": 45, "nextBracketAt": null, "toNextBracket": null }
+    },
+    {
+      "name": "限界税率: 数値でない値はエラー",
+      "func": "marginal",
+      "args": [null],
+      "expect": { "ok": false, "code": "invalid_income" }
+    },
+    {
+      "name": "速算表は7段階で、先頭が5%・末尾が45%",
+      "func": "table",
+      "args": [],
+      "expect": { "ok": true, "rows": { "0": { "rate": 0.05, "deduction": 0 }, "6": { "rate": 0.45, "deduction": 4796000 }, "length": 7 } }
+    }
+  ]
+}

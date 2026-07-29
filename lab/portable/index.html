@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>ポータブル電源 稼働時間計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="ポータブル電源の容量と家電の消費電力から、実際に使える時間と必要な容量を計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>
+    /* 長い出典URLが横スクロールを起こさないようにする(このページ内だけの調整) */
+    .sources a { overflow-wrap: anywhere; word-break: break-word; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>ポータブル電源 稼働時間計算</h1>
+  <form class="tool-form" id="tool-form">
+    <div class="field-row">
+      <label>電源の容量(Wh)
+        <span class="field-note">本体や取扱説明書に書かれています。例: 1000</span>
+        <input type="number" id="capacity" inputmode="decimal" step="any" min="0" placeholder="1000">
+      </label>
+      <label>機器の消費電力(W)
+        <span class="field-note">複数使うなら合計。例: 50</span>
+        <input type="number" id="power" inputmode="decimal" step="any" min="0" placeholder="50">
+      </label>
+    </div>
+    <label>変換効率
+      <span class="field-note">DC-AC変換のロスを見込んだ補正。迷ったら80%のまま</span>
+      <select id="eff">
+        <option value="0.8" selected>80%(一般的な目安)</option>
+        <option value="0.85">85%</option>
+        <option value="0.9">90%</option>
+        <option value="1">100%(ロスなしとして計算)</option>
+      </select>
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 必要な容量の逆算とmAh→Wh換算</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">この時間使うには何Wh必要か</h3>
+      <p class="adv-note">上で入力した消費電力を、指定した時間だけ使うのに必要な容量を計算します。</p>
+      <label>使用したい時間(時間)
+        <input type="number" id="hours" inputmode="decimal" step="any" min="0" placeholder="8">
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">容量がmAh表記のとき</h3>
+      <p class="adv-note">Ah × 電圧(V) = Wh で換算できます。</p>
+      <div class="field-row">
+        <label>容量(mAh)
+          <input type="number" id="mah" inputmode="numeric" step="1" min="0" placeholder="31000">
+        </label>
+        <label>電圧(V)
+          <input type="number" id="volt" inputmode="decimal" step="0.1" min="0" placeholder="3.2">
+        </label>
+      </div>
+      <div class="tool-result" id="adv-result-b" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    ここで出る時間は<strong>理論上の参考値</strong>です。バッテリーの劣化、気温(低温では容量が下がる)、起動時の突入電力によって実際の稼働時間は短くなります。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>冬キャンプの電気毛布や車中泊の扇風機が<strong>朝まで持つか</strong>、防災用に<strong>どれだけの容量を買えばいいか</strong>がわかります。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>ポータブル電源の容量(Wh)と、使いたい家電の消費電力(W)を入れます。</li>
+    <li>複数の家電を同時に使う場合は、消費電力を合計して入れてください。</li>
+    <li>必要な容量を逆算したいときは「＋詳細機能」に使用したい時間を入れます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>稼働時間(h)</strong> = 容量(Wh) × 変換効率 ÷ 消費電力(W)</li>
+    <li><strong>必要な容量(Wh)</strong> = 消費電力(W) × 使用時間(h) ÷ 変換効率</li>
+    <li><strong>mAh → Wh</strong> = 容量(mAh) ÷ 1000 × 電圧(V)</li>
+  </ul>
+  <p>変換効率の既定値0.8(80%)は、出典のメーカー解説が示す計算式にならったものです。</p>
+
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>主な家電の消費電力の目安(入力の参考)</caption>
+      <thead><tr><th>家電</th><th>消費電力の目安</th></tr></thead>
+      <tbody>
+        <tr><td>スマートフォンの充電</td><td>約10〜30W</td></tr>
+        <tr><td>電気毛布</td><td>約30〜80W</td></tr>
+        <tr><td>ノートパソコン</td><td>約50〜100W</td></tr>
+        <tr><td>扇風機</td><td>約20〜50W</td></tr>
+        <tr><td>車載冷蔵庫</td><td>約40〜60W</td></tr>
+        <tr><td>電気ケトル</td><td>約800〜1300W</td></tr>
+        <tr><td>電子レンジ</td><td>約1000〜1400W</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>正確な値は各家電の本体表示にある「定格消費電力」を確認してください。</p>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>Jackery Japan(メーカー)「ポータブル電源で電化製品を使える時間は?計算方法を分かりやすく解説」<br>
+      <a href="https://www.jackery.jp/blogs/power-station/using-time-of-power-station" rel="noopener" target="_blank">https://www.jackery.jp/blogs/power-station/using-time-of-power-station</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>変換効率0.8は<strong>一般的な目安</strong>です。機種によって異なるため、正確な値は各製品の仕様をご確認ください。</li>
+    <li>バッテリーは使用を重ねると容量が下がります。年数の経った電源では計算より短くなります。</li>
+    <li>気温が低いと容量が下がります。冬のキャンプ・車中泊では余裕を持った容量を選んでください。</li>
+    <li>モーターやコンプレッサーを使う家電(冷蔵庫・電動工具など)は、起動時に定格の数倍の電力を必要とします。</li>
+    <li>冷蔵庫のように運転と停止を繰り返す家電は、定格消費電力で計算すると実際より短く出ます。</li>
+    <li>ポータブル電源の<strong>定格出力(W)</strong>を超える家電は動かせません。本ツールでは出力の判定をしていません。</li>
+    <li>時間は小数第2位で四捨五入しています。出典の例(3000Wh÷950W)は2.52時間と表記されていますが、これは切り捨て表示のためで、四捨五入すると2.53時間です。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">なぜ容量をそのまま使えないのですか?</h3>
+  <p class="faq-a">ポータブル電源は内部の直流(DC)を家庭用の交流(AC)に変換して出力するため、その過程で電力のロスが生じます。目安として容量の80%程度が実際に使える電力量とされています。</p>
+  <h3 class="faq-q">電気毛布を一晩(8時間)使うにはどのくらいの容量が必要ですか?</h3>
+  <p class="faq-a">消費電力50Wの電気毛布なら、50W × 8時間 ÷ 0.8 = 500Wh が目安です。余裕を見て700Wh以上の機種を選ぶと安心です。</p>
+  <h3 class="faq-q">mAh表記の製品は容量が大きく見えますが?</h3>
+  <p class="faq-a">mAhだけでは電力量はわかりません。電圧をかけてWhに直す必要があります。例えば31,000mAh・3.2Vなら99.2Whです。</p>
+  <h3 class="faq-q">電子レンジや電気ケトルは使えますか?</h3>
+  <p class="faq-a">消費電力が1000Wを超えるため、定格出力がそれ以上の機種が必要です。使えても稼働時間は短く、1000Whの電源で1000Wの機器なら約48分です。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_capacity: "電源の容量を0より大きい数値で入力してください。",
+    invalid_power: "機器の消費電力を0より大きい数値で入力してください。",
+    invalid_efficiency: "変換効率を選び直してください。",
+    invalid_hours: "使用したい時間を0より大きい数値で入力してください。",
+    invalid_mah: "容量(mAh)を0より大きい数値で入力してください。",
+    invalid_voltage: "電圧を0より大きい数値で入力してください。"
+  };
+
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var advBoxB = document.getElementById("adv-result-b");
+  var capEl = document.getElementById("capacity");
+  var powEl = document.getElementById("power");
+  var effEl = document.getElementById("eff");
+  var hoursEl = document.getElementById("hours");
+  var mahEl = document.getElementById("mah");
+  var voltEl = document.getElementById("volt");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function runAdv() {
+    if (powEl.value === "" || hoursEl.value === "") { advBox.hidden = true; return; }
+    var r = PortableCalc.requiredCapacity(parseFloat(powEl.value), parseFloat(hoursEl.value), parseFloat(effEl.value));
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML = '<div class="result-main">必要な容量 約 ' + esc(r.requiredWh.toLocaleString("ja-JP")) + " Wh</div>" +
+      "<p>実際に消費する電力量は " + esc(r.consumedWh.toLocaleString("ja-JP")) + " Wh です。</p>";
+    advBox.hidden = false;
+  }
+
+  function runMah() {
+    if (mahEl.value === "" || voltEl.value === "") { advBoxB.hidden = true; return; }
+    var r = PortableCalc.mahToWh(parseFloat(mahEl.value), parseFloat(voltEl.value));
+    if (!r.ok) {
+      advBoxB.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      advBoxB.hidden = false;
+      return;
+    }
+    advBoxB.innerHTML = '<div class="result-main">' + esc(r.wh.toLocaleString("ja-JP")) + " Wh</div>";
+    advBoxB.hidden = false;
+  }
+
+  function run() {
+    runAdv();
+    if (capEl.value === "" || powEl.value === "") { box.hidden = true; return; }
+    var r = PortableCalc.runtime(parseFloat(capEl.value), parseFloat(powEl.value), parseFloat(effEl.value));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML = '<div class="result-main">約 ' + esc(r.hoursPart + "時間" + r.minutesPart + "分") + "</div>" +
+      "<p>およそ " + esc(r.hours.toFixed(2)) + " 時間です(実際に使える電力量 " +
+      esc(r.usableWh.toLocaleString("ja-JP")) + " Wh)。</p>";
+    box.hidden = false;
+  }
+
+  [capEl, powEl, effEl].forEach(function (el) {
+    el.addEventListener("input", run);
+    el.addEventListener("change", run);
+  });
+  hoursEl.addEventListener("input", runAdv);
+  [mahEl, voltEl].forEach(function (el) { el.addEventListener("input", runMah); });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

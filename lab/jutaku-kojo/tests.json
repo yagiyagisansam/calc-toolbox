@@ -1,0 +1,183 @@
+{
+  "tool": "jutaku-kojo",
+  "module": "calc.js",
+  "global": "JutakuKojoCalc",
+  "cases": [
+    {
+      "name": "認定住宅・令和6年入居・残高3000万円なら控除額21万円(3000万×0.7%)",
+      "func": "calculate",
+      "args": [30000000, "nintei", "2024", 200000],
+      "expect": {
+        "ok": true, "limit": 45000000, "years": 13,
+        "appliedBalance": 30000000, "deduction": 210000,
+        "fromIncomeTax": 200000, "fromResidentTax": 10000, "unusable": 0
+      }
+    },
+    {
+      "name": "借入限度額で頭打ち: 残高5000万でも認定住宅・令和6年は4500万まで(控除31.5万円)",
+      "func": "calculate",
+      "args": [50000000, "nintei", "2024", 400000],
+      "expect": { "ok": true, "limit": 45000000, "appliedBalance": 45000000, "deduction": 315000 }
+    },
+    {
+      "name": "特例対象個人(子育て世帯等)なら認定住宅・令和6年の限度額が5000万に上がる(控除35万円)",
+      "func": "calculate",
+      "args": [50000000, "nintei", "2024", 400000, null, true],
+      "expect": { "ok": true, "limit": 50000000, "deduction": 350000 }
+    },
+    {
+      "name": "令和4年入居の認定住宅は限度額5000万円(控除35万円)",
+      "func": "calculate",
+      "args": [60000000, "nintei", "2022", 400000],
+      "expect": { "ok": true, "limit": 50000000, "deduction": 350000, "periodLabel": "令和4年・5年入居" }
+    },
+    {
+      "name": "住民税の上限: 課税総所得150万円なら5%の75,000円までしか住民税から引けない",
+      "func": "calculate",
+      "args": [30000000, "zeh", "2024", 100000, 1500000],
+      "expect": {
+        "ok": true, "deduction": 210000, "fromIncomeTax": 100000,
+        "residentTaxCap": 75000, "fromResidentTax": 75000, "unusable": 35000
+      }
+    },
+    {
+      "name": "住民税の上限: 課税総所得500万円だと5%は25万円だが97,500円が限度",
+      "func": "calculate",
+      "args": [30000000, "zeh", "2024", 100000, 5000000],
+      "expect": { "ok": true, "residentTaxCap": 97500, "fromResidentTax": 97500, "unusable": 12500 }
+    },
+    {
+      "name": "端数処理: 残高12,345,678円は86,419.746円→100円未満切り捨てで86,400円",
+      "func": "calculate",
+      "args": [12345678, "nintei", "2024", 500000],
+      "expect": { "ok": true, "deduction": 86400 }
+    },
+    {
+      "name": "境界値: 残高0円なら控除額も0円",
+      "func": "calculate",
+      "args": [0, "nintei", "2024", 200000],
+      "expect": { "ok": true, "deduction": 0, "fromIncomeTax": 0, "fromResidentTax": 0 }
+    },
+    {
+      "name": "境界値: 所得税0円なら全額が住民税(上限97,500円)からの控除に回る",
+      "func": "calculate",
+      "args": [30000000, "nintei", "2024", 0],
+      "expect": { "ok": true, "fromIncomeTax": 0, "fromResidentTax": 97500, "unusable": 112500 }
+    },
+    {
+      "name": "境界値: 借入限度額ちょうどの残高でも頭打ちにならない(省エネ基準3000万)",
+      "func": "calculate",
+      "args": [30000000, "shoene", "2024", 300000],
+      "expect": { "ok": true, "limit": 30000000, "appliedBalance": 30000000, "deduction": 210000 }
+    },
+    {
+      "name": "令和6年入居の「その他の住宅」は原則対象外",
+      "func": "calculate",
+      "args": [30000000, "sonota", "2024", 200000],
+      "expect": { "ok": false, "code": "not_eligible" }
+    },
+    {
+      "name": "令和4年入居の「その他の住宅」は限度額3000万円で対象になる",
+      "func": "calculate",
+      "args": [30000000, "sonota", "2022", 200000],
+      "expect": { "ok": true, "limit": 30000000, "deduction": 210000 }
+    },
+    {
+      "name": "借入限度額を自分で指定(2000万円)すると表より優先される",
+      "func": "calculate",
+      "args": [30000000, "sonota", "2024", 200000, null, false, 20000000],
+      "expect": { "ok": true, "limit": 20000000, "deduction": 140000, "periodLabel": "手入力" }
+    },
+    {
+      "name": "借入限度額の表: ZEH水準・令和6年入居は3500万円(特例対象個人は4500万円)",
+      "func": "borrowingLimit",
+      "args": ["zeh", "2024", false],
+      "expect": { "ok": true, "limit": 35000000, "years": 13, "eligible": true }
+    },
+    {
+      "name": "借入限度額の表: ZEH水準・令和6年入居で特例対象個人なら4500万円",
+      "func": "borrowingLimit",
+      "args": ["zeh", "2024", true],
+      "expect": { "ok": true, "limit": 45000000 }
+    },
+    {
+      "name": "借入限度額の表: 省エネ基準適合・令和4年入居は4000万円",
+      "func": "borrowingLimit",
+      "args": ["shoene", "2022", false],
+      "expect": { "ok": true, "limit": 40000000, "periodLabel": "令和4年・5年入居" }
+    },
+    {
+      "name": "13年分の一覧: 残高3000万・年100万返済・省エネ基準は13年で合計218.4万円",
+      "func": "schedule",
+      "args": [30000000, 1000000, "shoene", "2024"],
+      "expect": {
+        "ok": true, "years": 13, "total": 2184000,
+        "rows": {
+          "0": { "year": 1, "balance": 30000000, "deduction": 210000 },
+          "12": { "year": 13, "balance": 18000000, "deduction": 126000 },
+          "length": 13
+        }
+      }
+    },
+    {
+      "name": "13年分の一覧: 返済が進んで残高0になっても控除額はマイナスにならない",
+      "func": "schedule",
+      "args": [3000000, 1000000, "shoene", "2024"],
+      "expect": { "ok": true, "rows": { "3": { "year": 4, "balance": 0, "deduction": 0 } } }
+    },
+    {
+      "name": "異常入力: 年末残高が負の値はエラー",
+      "func": "calculate",
+      "args": [-1, "nintei", "2024", 200000],
+      "expect": { "ok": false, "code": "invalid_balance" }
+    },
+    {
+      "name": "異常入力: 年末残高が上限超過(10億円超)はエラー",
+      "func": "calculate",
+      "args": [1000000001, "nintei", "2024", 200000],
+      "expect": { "ok": false, "code": "invalid_balance" }
+    },
+    {
+      "name": "異常入力: 所得税額が負の値はエラー",
+      "func": "calculate",
+      "args": [30000000, "nintei", "2024", -1],
+      "expect": { "ok": false, "code": "invalid_income_tax" }
+    },
+    {
+      "name": "異常入力: 課税総所得金額等が負の値はエラー",
+      "func": "calculate",
+      "args": [30000000, "nintei", "2024", 200000, -1],
+      "expect": { "ok": false, "code": "invalid_taxable_income" }
+    },
+    {
+      "name": "異常入力: 知らない住宅の区分はエラー",
+      "func": "calculate",
+      "args": [30000000, "chuko", "2024", 200000],
+      "expect": { "ok": false, "code": "invalid_house_type" }
+    },
+    {
+      "name": "異常入力: 対応していない居住年の区分はエラー",
+      "func": "calculate",
+      "args": [30000000, "nintei", "2030", 200000],
+      "expect": { "ok": false, "code": "invalid_period" }
+    },
+    {
+      "name": "異常入力: 数値でない残高はエラー",
+      "func": "calculate",
+      "args": ["abc", "nintei", "2024", 200000],
+      "expect": { "ok": false, "code": "invalid_balance" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_balance" }
+    },
+    {
+      "name": "異常入力: 手入力の借入限度額が0はエラー",
+      "func": "calculate",
+      "args": [30000000, "nintei", "2024", 200000, null, false, 0],
+      "expect": { "ok": false, "code": "invalid_custom_limit" }
+    }
+  ]
+}

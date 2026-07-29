@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>子どもの肥満度 判定(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="身長・体重・性別・年齢から、学校保健統計方式の身長別標準体重と肥満度(過体重度)を計算して判定します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>子どもの肥満度 判定</h1>
+  <form class="tool-form" id="tool-form">
+    <div class="field-row">
+      <label>性別
+        <select id="sex">
+          <option value="male">男子</option>
+          <option value="female">女子</option>
+        </select>
+      </label>
+      <label>年齢
+        <select id="age"></select>
+      </label>
+    </div>
+    <label>身長(cm)
+      <span class="field-note">小数第1位まで。例: 154.0</span>
+      <input type="number" id="height" inputmode="decimal" step="0.1" min="80" max="220" placeholder="154">
+    </label>
+    <label>体重(kg)
+      <span class="field-note">小数第1位まで。例: 45.0</span>
+      <input type="number" id="weight" inputmode="decimal" step="0.1" min="5" max="200" placeholder="45">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 肥満傾向・痩身傾向になる体重の境目</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">同じ身長での境界体重</h3>
+      <p class="adv-note">入力した性別・年齢・身長で、肥満傾向(+20%)と痩身傾向(−20%)になる体重を示します。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    子どもは成長の途中のため、大人の<strong>BMIでは判定できません</strong>。このツールは文部科学省の学校保健統計調査と同じ「身長別標準体重」による肥満度(過体重度)で判定します。医学的な診断ではありません。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>5歳〜17歳の子どもについて、<strong>身長別標準体重</strong>と<strong>肥満度(過体重度)</strong>がわかります。学校の健康診断で「肥満傾向」と言われたときの再確認や、成長の記録づけに使えます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>性別と年齢(その年度の4月1日時点の満年齢)を選びます。</li>
+    <li>身長と体重を入れると、その瞬間に標準体重と肥満度が表示されます。</li>
+    <li>「＋詳細機能」を開くと、肥満傾向・痩身傾向になる体重の境目がわかります。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>身長別標準体重(kg)</strong> = a × 実測身長(cm) − b (係数a・bは性別・年齢別)</li>
+    <li><strong>肥満度(過体重度)</strong> = 〔実測体重(kg) − 身長別標準体重(kg)〕 ÷ 身長別標準体重(kg) × 100(%)</li>
+    <li><strong>判定</strong> = 肥満度が+20%以上で肥満傾向児、−20%以下で痩身傾向児</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>身長別標準体重の係数(文部科学省の算出方法より)</caption>
+      <thead><tr><th>年齢</th><th>男子 a</th><th>男子 b</th><th>女子 a</th><th>女子 b</th></tr></thead>
+      <tbody>
+        <tr><td>5歳</td><td>0.386</td><td>23.699</td><td>0.377</td><td>22.750</td></tr>
+        <tr><td>6歳</td><td>0.461</td><td>32.382</td><td>0.458</td><td>32.079</td></tr>
+        <tr><td>7歳</td><td>0.513</td><td>38.878</td><td>0.508</td><td>38.367</td></tr>
+        <tr><td>8歳</td><td>0.592</td><td>48.804</td><td>0.561</td><td>45.006</td></tr>
+        <tr><td>9歳</td><td>0.687</td><td>61.390</td><td>0.652</td><td>56.992</td></tr>
+        <tr><td>10歳</td><td>0.752</td><td>70.461</td><td>0.730</td><td>68.091</td></tr>
+        <tr><td>11歳</td><td>0.782</td><td>75.106</td><td>0.803</td><td>78.846</td></tr>
+        <tr><td>12歳</td><td>0.783</td><td>75.642</td><td>0.796</td><td>76.934</td></tr>
+        <tr><td>13歳</td><td>0.815</td><td>81.348</td><td>0.655</td><td>54.234</td></tr>
+        <tr><td>14歳</td><td>0.832</td><td>83.695</td><td>0.594</td><td>43.264</td></tr>
+        <tr><td>15歳</td><td>0.766</td><td>70.989</td><td>0.560</td><td>37.002</td></tr>
+        <tr><td>16歳</td><td>0.656</td><td>51.822</td><td>0.578</td><td>39.057</td></tr>
+        <tr><td>17歳</td><td>0.672</td><td>53.642</td><td>0.598</td><td>42.339</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>文部科学省「学校保健統計調査」(参考)肥満・痩身傾向児の算出方法について<br>
+      <a href="https://www.mext.go.jp/content/20260213-mxt_chousa01-000046876_3.pdf" rel="noopener" target="_blank">https://www.mext.go.jp/content/20260213-mxt_chousa01-000046876_3.pdf</a>(2026年7月29日参照)</li>
+    <li>文部科学省「学校保健統計調査」(調査の一覧ページ)<br>
+      <a href="https://www.mext.go.jp/b_menu/toukei/chousa05/hoken/1268826.htm" rel="noopener" target="_blank">https://www.mext.go.jp/b_menu/toukei/chousa05/hoken/1268826.htm</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>係数と判定基準は<strong>2026年7月29日時点</strong>で文部科学省が公表しているものです(係数の出典は日本学校保健会「児童生徒の健康診断マニュアル 平成27年度改訂版」)。</li>
+    <li>対象は<strong>5歳〜17歳</strong>です。4歳以下や18歳以上には、この式は使えません(大人はBMIで判定します)。</li>
+    <li>年齢は文部科学省の調査に合わせ、その年度の4月1日時点の満年齢を想定しています。</li>
+    <li>肥満度は小数第1位まで四捨五入し、その値で判定しています(+20.0%以上/−20.0%以下が境界)。</li>
+    <li>この判定は統計上の分類であり、医学的な診断ではありません。気になる場合は学校医や小児科にご相談ください。</li>
+    <li>筋肉量が多い場合や成長のタイミングによっては、体格が良いだけでも肥満傾向と出ることがあります。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">子どもにBMIを使ってはいけないのですか?</h3>
+  <p class="faq-a">子どもは年齢によって体格の標準が大きく変わるため、大人と同じBMIの基準(25以上で肥満など)は当てはまりません。日本の学校の健康診断では、この身長別標準体重を使った肥満度で判定しています。</p>
+  <h3 class="faq-q">「肥満傾向児」と言われました。すぐ受診が必要ですか?</h3>
+  <p class="faq-a">肥満度+20%は統計上の分類の境目です。ただし+30%や+50%を超える場合や、急に体重が増えた場合は、学校医や小児科への相談をおすすめします。</p>
+  <h3 class="faq-q">身長を測るタイミングで結果が変わりますか?</h3>
+  <p class="faq-a">身長は朝と夜で1cm程度変わることがあり、この式では身長1cmの差が標準体重0.4〜0.8kgの差になります。同じ条件で測って比べるのがおすすめです。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_sex: "性別を選び直してください。",
+    invalid_age: "年齢を5〜17歳の範囲で選んでください。",
+    invalid_height: "身長を80〜220cmの範囲で入力してください。",
+    invalid_weight: "体重を5〜200kgの範囲で入力してください。",
+    invalid_result: "この年齢と身長の組み合わせでは標準体重を計算できません。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var sexEl = document.getElementById("sex");
+  var ageEl = document.getElementById("age");
+  var heightEl = document.getElementById("height");
+  var weightEl = document.getElementById("weight");
+
+  var html = "";
+  for (var v = 5; v <= 17; v++) {
+    html += '<option value="' + v + '"' + (v === 12 ? " selected" : "") + ">" + v + "歳</option>";
+  }
+  ageEl.innerHTML = html;
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function run() {
+    if (heightEl.value === "" || weightEl.value === "") { box.hidden = true; runAdv(); return; }
+    var r = HimandoCalc.calculate(
+      sexEl.value, parseInt(ageEl.value, 10),
+      parseFloat(heightEl.value), parseFloat(weightEl.value)
+    );
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      runAdv();
+      return;
+    }
+    var sign = r.degreePercent > 0 ? "+" : "";
+    box.innerHTML =
+      '<div class="result-main">肥満度 ' + esc(sign + r.degreePercent.toFixed(1)) + "% (" + esc(r.category) + ")</div>" +
+      "<p>身長別標準体重: " + esc(r.standardWeightKg.toFixed(1)) + "kg</p>" +
+      "<p>標準体重との差: " + esc((r.diffKg > 0 ? "+" : "") + r.diffKg.toFixed(1)) + "kg</p>";
+    box.hidden = false;
+    runAdv();
+  }
+
+  function runAdv() {
+    if (heightEl.value === "") { advBox.hidden = true; return; }
+    var r = HimandoCalc.thresholds(sexEl.value, parseInt(ageEl.value, 10), parseFloat(heightEl.value));
+    if (!r.ok) { advBox.hidden = true; return; }
+    advBox.innerHTML =
+      '<div class="result-main">標準体重 ' + esc(r.standardWeightKg.toFixed(1)) + "kg</div>" +
+      "<p>肥満傾向(+20%)になるのは " + esc(r.obeseFromKg.toFixed(2)) + "kg 以上</p>" +
+      "<p>痩身傾向(−20%)になるのは " + esc(r.thinUpToKg.toFixed(2)) + "kg 以下</p>";
+    advBox.hidden = false;
+  }
+
+  [heightEl, weightEl].forEach(function (el) { el.addEventListener("input", run); });
+  [sexEl, ageEl].forEach(function (el) { el.addEventListener("change", run); });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

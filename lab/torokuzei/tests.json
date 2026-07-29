@@ -1,0 +1,139 @@
+{
+  "tool": "torokuzei",
+  "module": "calc.js",
+  "global": "TorokuzeiCalc",
+  "cases": [
+    {
+      "name": "建物の所有権保存: 評価額1000万円×0.4%は4万円",
+      "func": "calculate",
+      "args": [10000000, "hozon", false],
+      "expect": { "ok": true, "base": 10000000, "ratePct": 0.4, "tax": 40000, "exempt": false }
+    },
+    {
+      "name": "住宅用家屋の軽減: 保存登記は0.15%で1万5000円",
+      "func": "calculate",
+      "args": [10000000, "hozon", true],
+      "expect": { "ok": true, "ratePct": 0.15, "tax": 15000, "genmenApplied": true }
+    },
+    {
+      "name": "土地の売買移転(本則2.0%): 評価額1500万円で30万円",
+      "func": "calculate",
+      "args": [15000000, "baibai_tochi", false],
+      "expect": { "ok": true, "ratePct": 2, "tax": 300000 }
+    },
+    {
+      "name": "土地の売買移転(軽減1.5%・令和11年3月31日まで): 1500万円で22万5000円",
+      "func": "calculate",
+      "args": [15000000, "baibai_tochi", true],
+      "expect": { "ok": true, "ratePct": 1.5, "tax": 225000, "genmenApplied": true }
+    },
+    {
+      "name": "端数処理: 評価額12,345,678円は課税標準12,345,000円・税額は百円未満切り捨て(0.3%で37,000円)",
+      "func": "calculate",
+      "args": [12345678, "baibai_tateya", true],
+      "expect": { "ok": true, "base": 12345000, "ratePct": 0.3, "tax": 37000 }
+    },
+    {
+      "name": "端数処理: 同じ評価額で相続0.4%なら49,380円→49,300円",
+      "func": "calculate",
+      "args": [12345678, "sozoku_tateya", false],
+      "expect": { "ok": true, "base": 12345000, "tax": 49300 }
+    },
+    {
+      "name": "最低税額: 計算額が千円未満でも1,000円になる(登録免許税法19条)",
+      "func": "calculate",
+      "args": [200000, "sozoku_tateya", false],
+      "expect": { "ok": true, "base": 200000, "tax": 1000 }
+    },
+    {
+      "name": "境界値: 課税標準が千円未満でも千円として扱う(登録免許税法15条)",
+      "func": "calculate",
+      "args": [500, "hozon", false],
+      "expect": { "ok": true, "base": 1000, "tax": 1000 }
+    },
+    {
+      "name": "相続した土地の免税: 課税標準90万円は0円",
+      "func": "calculate",
+      "args": [900000, "sozoku_tochi", false],
+      "expect": { "ok": true, "tax": 0, "exempt": true }
+    },
+    {
+      "name": "境界値: 相続した土地は課税標準100万円ちょうどまで免税",
+      "func": "calculate",
+      "args": [1000000, "sozoku_tochi", false],
+      "expect": { "ok": true, "base": 1000000, "tax": 0, "exempt": true }
+    },
+    {
+      "name": "境界値: 相続した土地が100万円超なら課税(150万円×0.4%=6,000円)",
+      "func": "calculate",
+      "args": [1500000, "sozoku_tochi", false],
+      "expect": { "ok": true, "tax": 6000, "exempt": false }
+    },
+    {
+      "name": "贈与による移転は2.0%(2000万円で40万円)",
+      "func": "calculate",
+      "args": [20000000, "zoyo", false],
+      "expect": { "ok": true, "ratePct": 2, "tax": 400000 }
+    },
+    {
+      "name": "異常入力: 評価額0はエラー",
+      "func": "calculate",
+      "args": [0, "hozon", false],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 評価額が負の値はエラー",
+      "func": "calculate",
+      "args": [-10000000, "hozon", false],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 評価額が数値でないときはエラー",
+      "func": "calculate",
+      "args": ["abc", "hozon", false],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 存在しない登記の種類はエラー",
+      "func": "calculate",
+      "args": [10000000, "nazo", false],
+      "expect": { "ok": false, "code": "invalid_kind" }
+    },
+    {
+      "name": "異常入力: 相続登記に軽減税率は存在しないのでエラー",
+      "func": "calculate",
+      "args": [10000000, "sozoku_tateya", true],
+      "expect": { "ok": false, "code": "genmen_not_available" }
+    },
+    {
+      "name": "抵当権設定(本則0.4%): 借入3000万円で12万円",
+      "func": "teitoken",
+      "args": [30000000, false],
+      "expect": { "ok": true, "base": 30000000, "ratePct": 0.4, "tax": 120000 }
+    },
+    {
+      "name": "抵当権設定(住宅取得資金の軽減0.1%): 借入3000万円で3万円",
+      "func": "teitoken",
+      "args": [30000000, true],
+      "expect": { "ok": true, "ratePct": 0.1, "tax": 30000, "genmenApplied": true }
+    },
+    {
+      "name": "異常入力: 借入額0はエラー",
+      "func": "teitoken",
+      "args": [0, true],
+      "expect": { "ok": false, "code": "invalid_loan" }
+    },
+    {
+      "name": "新築購入の合計: 土地1500万・建物1000万・ローン3000万で軽減適用は27万円",
+      "func": "purchaseTotal",
+      "args": [15000000, 10000000, "hozon", true, 30000000],
+      "expect": { "ok": true, "total": 270000, "land": { "tax": 225000 }, "building": { "tax": 15000 }, "teitoken": { "tax": 30000 } }
+    }
+  ]
+}

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>体脂肪率計算(米海軍式)(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="身長・首まわり・腹まわりの3サイズ(女性は腰まわりも)から体脂肪率を推定します。メジャー1本で測れます。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>体脂肪率計算(米海軍式)</h1>
+  <form class="tool-form" id="tool-form">
+    <label>性別
+      <select id="sex">
+        <option value="male" selected>男性</option>
+        <option value="female">女性</option>
+      </select>
+    </label>
+    <div class="field-row">
+      <label>身長(cm)
+        <input type="number" id="height" inputmode="decimal" step="0.1" min="100" max="250" placeholder="175">
+      </label>
+      <label>首囲(cm)
+        <span class="field-note">のどぼとけの下</span>
+        <input type="number" id="neck" inputmode="decimal" step="0.1" min="20" max="80" placeholder="38">
+      </label>
+    </div>
+    <div class="field-row">
+      <label>腹囲(cm)
+        <span class="field-note" id="waist-note">へそ回り</span>
+        <input type="number" id="waist" inputmode="decimal" step="0.1" min="40" max="200" placeholder="85">
+      </label>
+      <label id="hip-label" hidden>腰囲(cm)
+        <span class="field-note">ヒップの最も太い位置</span>
+        <input type="number" id="hip" inputmode="decimal" step="0.1" min="40" max="200" placeholder="92">
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 体脂肪量と除脂肪体重</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">体重を入れて体脂肪量を出す</h3>
+      <p class="adv-note">体脂肪率に体重を掛けた体脂肪量と、そこから引いた除脂肪体重(筋肉・骨・内臓など)です。</p>
+      <label>体重(kg)
+        <input type="number" id="weight" inputmode="decimal" step="0.1" min="20" max="300" placeholder="70">
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    メジャーだけで出す<strong>統計式による推定値</strong>です。体組成計やDXA(専門機関の測定)の値とは数%ずれます。日々の変化を追う目安としてお使いください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>体組成計がなくても、<strong>メジャー1本で体脂肪率のおおよその値</strong>がわかります。日本の特定健診でも腹囲を測るので、入力する数字は手元にあることが多いはずです。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>性別を選び、身長・首囲・腹囲を入れると、その瞬間に体脂肪率が出ます。女性は腰囲(ヒップ)も入れます。</li>
+    <li>首囲はのどぼとけの下、腹囲は男性がへそ回り、女性は最も細い位置を測ります。</li>
+    <li>体脂肪量・除脂肪体重を知りたいときは「＋詳細機能」で体重を入れてください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>男性</strong> = 495 ÷ (1.0324 − 0.19077×log10(腹囲 − 首囲) + 0.15456×log10(身長)) − 450</li>
+    <li><strong>女性</strong> = 495 ÷ (1.29579 − 0.35004×log10(腹囲 + 腰囲 − 首囲) + 0.22100×log10(身長)) − 450</li>
+    <li>いずれも長さの単位は cm です。</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>体脂肪率の区分(American Council on Exercise)</caption>
+      <thead><tr><th>区分</th><th>男性</th><th>女性</th></tr></thead>
+      <tbody>
+        <tr><td>必須脂肪</td><td>2〜5%</td><td>10〜13%</td></tr>
+        <tr><td>アスリート</td><td>6〜13%</td><td>14〜20%</td></tr>
+        <tr><td>フィットネス</td><td>14〜17%</td><td>21〜24%</td></tr>
+        <tr><td>平均</td><td>18〜24%</td><td>25〜31%</td></tr>
+        <tr><td>肥満</td><td>25%以上</td><td>32%以上</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典</h3>
+  <ul class="sources">
+    <li>Calculator.net「Body Fat Calculator」(U.S. Navy法の計算式とACEの体脂肪率区分)<br>
+      <a href="https://www.calculator.net/body-fat-calculator.html" rel="noopener" target="_blank">https://www.calculator.net/body-fat-calculator.html</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li><strong>基準の時点:</strong> 2026年7月29日時点の上記ページの記載内容にもとづいています。米海軍式の計算式もACEの区分も、日本の公的機関が定めた基準ではありません。</li>
+    <li>統計式による推定です。筋肉量が多い人・体格が平均から外れる人ほど誤差が大きくなります。</li>
+    <li>男性は「腹囲 − 首囲」、女性は「腹囲 + 腰囲 − 首囲」が0以下だと対数が計算できないため、結果は出ません。</li>
+    <li>健康状態の判断には使えません。気になる数値が出た場合は医療機関にご相談ください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">体組成計の数値と違うのはなぜですか?</h3>
+  <p class="faq-a">体組成計は体に微弱な電流を流して推定する別の方式です。米海軍式は体のサイズだけから統計的に推定するため、数%ずれるのが普通です。どちらか一方に絞って変化を追うのがおすすめです。</p>
+  <h3 class="faq-q">どこを測ればよいですか?</h3>
+  <p class="faq-a">首囲はのどぼとけの下でメジャーを水平に。腹囲は男性がへそ回り、女性は胴の最も細い位置。腰囲(女性のみ)はヒップの最も太い位置です。息を止めず、自然に立って測ります。</p>
+  <h3 class="faq-q">BMIとどう違いますか?</h3>
+  <p class="faq-a">BMIは身長と体重だけの指標なので、筋肉と脂肪の区別がつきません。体脂肪率は「体重のうち脂肪が何%か」を推定するため、体型の中身を見るのに向いています。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_sex: "性別を選んでください。",
+    invalid_height: "身長は100〜250cmで入力してください。",
+    invalid_neck: "首囲は20〜80cmで入力してください。",
+    invalid_waist: "腹囲は40〜200cmで入力してください。",
+    invalid_hip: "腰囲は40〜200cmで入力してください。",
+    invalid_measure: "この寸法の組み合わせでは計算できません(腹囲が首囲を上回る必要があります)。",
+    invalid_weight: "体重は20〜300kgで入力してください。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var sexEl = document.getElementById("sex");
+  var heightEl = document.getElementById("height");
+  var neckEl = document.getElementById("neck");
+  var waistEl = document.getElementById("waist");
+  var hipEl = document.getElementById("hip");
+  var hipLabel = document.getElementById("hip-label");
+  var waistNote = document.getElementById("waist-note");
+  var weightEl = document.getElementById("weight");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function syncSex() {
+    var female = sexEl.value === "female";
+    hipLabel.hidden = !female;
+    waistNote.textContent = female ? "胴の最も細い位置" : "へそ回り";
+  }
+
+  function run() {
+    syncSex();
+    var female = sexEl.value === "female";
+    if (heightEl.value === "" || neckEl.value === "" || waistEl.value === "" ||
+        (female && hipEl.value === "")) {
+      box.hidden = true; advBox.hidden = true; return;
+    }
+    var h = parseFloat(heightEl.value);
+    var n = parseFloat(neckEl.value);
+    var w = parseFloat(waistEl.value);
+    var hip = female ? parseFloat(hipEl.value) : null;
+    var r = TaishiboCalc.calculate(sexEl.value, h, n, w, hip);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false; advBox.hidden = true; return;
+    }
+    box.innerHTML = '<div class="result-main">' + esc(String(r.bodyFatPct)) + " %</div>" +
+      "<p>区分: " + esc(r.category) + "(American Council on Exercise)</p>";
+    box.hidden = false;
+
+    if (weightEl.value === "") { advBox.hidden = true; return; }
+    var d = TaishiboCalc.withWeight(sexEl.value, h, n, w, hip, parseFloat(weightEl.value));
+    if (!d.ok) {
+      advBox.innerHTML = '<p class="result-error">' + esc(ERRORS[d.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false; return;
+    }
+    advBox.innerHTML = '<div class="result-main">体脂肪量 ' + esc(String(d.fatMassKg)) + " kg</div>" +
+      "<p>除脂肪体重: " + esc(String(d.leanMassKg)) + " kg</p>";
+    advBox.hidden = false;
+  }
+  [sexEl, heightEl, neckEl, waistEl, hipEl, weightEl].forEach(function (el) {
+    el.addEventListener("input", run);
+    el.addEventListener("change", run);
+  });
+  syncSex();
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>eGFR(腎機能)計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="血清クレアチニン値・年齢・性別から推算糸球体濾過量(eGFR)を求め、CKDのGFR区分を判定します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>
+    /* 長い出典URLが横スクロールを起こさないようにする(このページ内だけの調整) */
+    .sources a { overflow-wrap: anywhere; word-break: break-word; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>eGFR(腎機能)計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>血清クレアチニン値(mg/dL)
+      <span class="field-note">健康診断の結果の「クレアチニン」「Cr」「CRE」。例: 1.05</span>
+      <input type="number" id="cr" inputmode="decimal" step="0.01" min="0.1" max="30" placeholder="1.05">
+    </label>
+    <div class="field-row">
+      <label>年齢(歳)
+        <input type="number" id="age" inputmode="numeric" step="1" min="18" max="120" placeholder="50">
+      </label>
+      <label>性別
+        <select id="sex">
+          <option value="male">男性</option>
+          <option value="female">女性</option>
+        </select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 区分の境界にあたるクレアチニン値</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">今の年齢・性別では、どのクレアチニン値で区分が変わるか</h3>
+      <p class="adv-note">GFR区分の境界(90 / 60 / 45 / 30 / 15)にあたる血清クレアチニン値です。次回の検査結果を見るときの目安になります。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    eGFRは<strong>推算値</strong>です。筋肉量の影響を強く受けるため、痩せている人・筋肉質な人では実際の腎機能とずれます。1回の結果だけで判断せず、必ず医師にご相談ください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>健康診断でクレアチニン値だけ返ってきたとき、<strong>腎臓がどのくらい働いているか(eGFR)</strong>と、<strong>慢性腎臓病(CKD)のどの段階にあたるか</strong>がわかります。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>健康診断の結果から血清クレアチニン値(mg/dL)を入れます。</li>
+    <li>年齢と性別を選ぶと、その場でeGFRとGFR区分が表示されます。</li>
+    <li>18歳未満の方には使えません(小児には別の推算式があります)。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>eGFR(男性)</strong> = 194 × Cr<sup>−1.094</sup> × 年齢<sup>−0.287</sup></li>
+    <li><strong>eGFR(女性)</strong> = 男性の値 × 0.739</li>
+    <li>単位は mL/分/1.73m²(体表面積1.73m²あたりに補正した値)</li>
+  </ul>
+
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>CKDのGFR区分(厚生労働科学研究 腎疾患政策研究事業)</caption>
+      <thead><tr><th>区分</th><th>eGFR(mL/分/1.73m²)</th><th>腎機能の程度</th></tr></thead>
+      <tbody>
+        <tr><td>G1</td><td>90以上</td><td>正常または高値</td></tr>
+        <tr><td>G2</td><td>60〜89</td><td>正常または軽度低下</td></tr>
+        <tr><td>G3a</td><td>45〜59</td><td>軽度〜中等度低下</td></tr>
+        <tr><td>G3b</td><td>30〜44</td><td>中等度〜高度低下</td></tr>
+        <tr><td>G4</td><td>15〜29</td><td>高度低下</td></tr>
+        <tr><td>G5</td><td>15未満</td><td>末期腎不全</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>日本腎臓学会「CKD診療ガイド2012」eGFR男女・年齢別早見表(推算式の記載あり)<br>
+      <a href="https://cdn.jsn.or.jp/guideline/pdf/CKDguide2012_3.pdf" rel="noopener" target="_blank">https://cdn.jsn.or.jp/guideline/pdf/CKDguide2012_3.pdf</a>(2026年7月29日参照)</li>
+    <li>日本腎臓学会 診療ガイドライン一覧<br>
+      <a href="https://jsn.or.jp/medic/guideline/" rel="noopener" target="_blank">https://jsn.or.jp/medic/guideline/</a>(2026年7月29日参照)</li>
+    <li>厚生労働科学研究 腎疾患政策研究事業「腎機能(eGFR)測定ツール」(GFR区分)<br>
+      <a href="https://ckd-research.jp/admin/calculate_egfr/" rel="noopener" target="_blank">https://ckd-research.jp/admin/calculate_egfr/</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>日本人向けの3変数式です。<strong>18歳以上の成人</strong>が対象で、小児には使えません。</li>
+    <li>血清クレアチニン値は<strong>酵素法</strong>で測定した値を前提としています。</li>
+    <li>筋肉量の影響を受けます。痩せている人・高齢者では腎機能を過大評価し、筋肉質な人では過小評価する傾向があります。</li>
+    <li>体表面積1.73m²あたりに補正した値です。薬の投与量を決めるときは個々の体表面積で補正した値が必要です。</li>
+    <li>CKDの重症度は eGFR だけでなく、<strong>原因(C)・GFR区分(G)・蛋白尿/アルブミン尿区分(A)</strong> を組み合わせて評価します。本ツールはGFR区分だけを示しています。</li>
+    <li>GFR区分は小数第2位まで考慮して判定しています。表示するeGFRは小数第1位に丸めるため、境界付近では表示値と区分が食い違って見えることがあります。</li>
+    <li>診断・治療の判断には使えません。結果が気になる場合は医療機関を受診してください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">eGFRはいくつ以上あれば安心ですか?</h3>
+  <p class="faq-a">一般に60以上が保たれていれば、GFRだけを見る限り大きな低下はないとされます(G1・G2)。ただし蛋白尿がある場合は60以上でもCKDに当たることがあります。</p>
+  <h3 class="faq-q">クレアチニン値が正常範囲でもeGFRが低いのはなぜですか?</h3>
+  <p class="faq-a">eGFRは年齢と性別も加味するためです。加齢とともに同じクレアチニン値でもeGFRは低く出ます。</p>
+  <h3 class="faq-q">シスタチンCによるeGFRとは違うのですか?</h3>
+  <p class="faq-a">別の推算式です。筋肉量の影響を受けにくいため、クレアチニンによる推算が当てにならない場合に使われます。本ツールはクレアチニンによる推算のみです。</p>
+  <h3 class="faq-q">18歳未満は計算できませんか?</h3>
+  <p class="faq-a">この式は成人向けのため、18歳未満では計算できません。小児には別の推算式があります。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_cr: "血清クレアチニン値を0.1〜30の範囲で入力してください。",
+    invalid_age: "年齢を18〜120の範囲で入力してください。",
+    invalid_sex: "性別を選び直してください。",
+    invalid_egfr: "eGFRの値を確認してください。"
+  };
+  var STAGE_NOTE = {
+    G1: "正常または高値",
+    G2: "正常または軽度低下",
+    G3a: "軽度〜中等度低下",
+    G3b: "中等度〜高度低下",
+    G4: "高度低下",
+    G5: "末期腎不全"
+  };
+  var BOUNDS = [90, 60, 45, 30, 15];
+
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var crEl = document.getElementById("cr");
+  var ageEl = document.getElementById("age");
+  var sexEl = document.getElementById("sex");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function runAdv() {
+    if (ageEl.value === "") { advBox.hidden = true; return; }
+    var age = parseInt(ageEl.value, 10);
+    var rows = "";
+    for (var i = 0; i < BOUNDS.length; i++) {
+      var r = EgfrCalc.creatinineFor(BOUNDS[i], age, sexEl.value);
+      if (!r.ok) { advBox.hidden = true; return; }
+      rows += "<tr><td>" + esc(String(BOUNDS[i])) + "</td><td>" + esc(r.crMgDl.toFixed(2)) + " mg/dL</td></tr>";
+    }
+    advBox.innerHTML = '<div class="table-scroll"><table class="data-table">' +
+      "<thead><tr><th>eGFRの境界</th><th>血清クレアチニン値</th></tr></thead><tbody>" +
+      rows + "</tbody></table></div>";
+    advBox.hidden = false;
+  }
+
+  function run() {
+    runAdv();
+    if (crEl.value === "" || ageEl.value === "") { box.hidden = true; return; }
+    var r = EgfrCalc.calculate(parseFloat(crEl.value), parseInt(ageEl.value, 10), sexEl.value);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML = '<div class="result-main">eGFR ' + esc(r.egfr.toFixed(1)) + " mL/分/1.73m&sup2;</div>" +
+      "<p>GFR区分: <strong>" + esc(r.stage) + "</strong>(" + esc(STAGE_NOTE[r.stage]) + ")</p>";
+    box.hidden = false;
+  }
+
+  [crEl, ageEl, sexEl].forEach(function (el) {
+    el.addEventListener("input", run);
+    el.addEventListener("change", run);
+  });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

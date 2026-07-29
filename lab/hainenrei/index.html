@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>肺年齢 計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="呼吸機能検査のFEV1(1秒量)・身長・性別から肺年齢を計算し、実年齢と比べます。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>
+    /* 出典の長いURLが画面からはみ出さないようにする */
+    .sources a { overflow-wrap: anywhere; word-break: break-word; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>肺年齢 計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>FEV1(1秒量)(L)
+      <span class="field-note">健診の呼吸機能検査の結果票に書かれている値です</span>
+      <input type="number" id="fev1" inputmode="decimal" step="0.01" min="0" max="10" placeholder="例: 3.20">
+    </label>
+    <label>身長(cm)
+      <input type="number" id="height" inputmode="decimal" step="0.1" min="100" max="250" placeholder="例: 170">
+    </label>
+    <div class="field-row">
+      <label>性別
+        <select id="sex">
+          <option value="male" selected>男性</option>
+          <option value="female">女性</option>
+        </select>
+      </label>
+      <label>実年齢(歳)
+        <input type="number" id="age" inputmode="numeric" step="1" min="0" max="120" placeholder="例: 45">
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 肺年齢を実年齢に合わせるために必要なFEV1</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">目標の肺年齢から必要なFEV1を逆算する</h3>
+      <p class="adv-note">同じ身長・性別で、指定した肺年齢になるFEV1を求めます。</p>
+      <label>目標の肺年齢(歳)
+        <input type="number" id="target" inputmode="numeric" step="1" min="18" max="95" value="45">
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    肺年齢は<strong>健常な人でもおよそ半数が実年齢より高く出る</strong>性質があります(日本呼吸器学会のステートメント)。肺年齢だけで病気を判定するものではありません。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>健診の呼吸機能検査で測ったFEV1(1秒量)から、<strong>あなたの肺が何歳ぐらいの働きか</strong>を計算します。喫煙している方がCOPD(慢性閉塞性肺疾患)のリスクを考えるきっかけにするための指標です。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>結果票のFEV1(1秒量)をリットル(L)で入れます。mL表示の場合は1000で割ってください(3200mL → 3.20L)。</li>
+    <li>身長・性別・実年齢を入れると、その瞬間に肺年齢が表示されます。</li>
+    <li>目標の肺年齢に必要なFEV1を知りたいときは「＋詳細機能」を開いてください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>男性の肺年齢</strong> = (0.036 × 身長(cm) − 1.178 − FEV1(L)) ÷ 0.028</li>
+    <li><strong>女性の肺年齢</strong> = (0.022 × 身長(cm) − 0.005 − FEV1(L)) ÷ 0.022</li>
+    <li><strong>予測1秒量</strong>(男性) = 0.036 × 身長(cm) − 0.028 × 年齢 − 1.178</li>
+    <li><strong>予測1秒量</strong>(女性) = 0.022 × 身長(cm) − 0.022 × 年齢 − 0.005</li>
+    <li><strong>%1秒量</strong> = FEV1 ÷ 予測1秒量 × 100</li>
+  </ul>
+  <p>これらは日本呼吸器学会肺生理専門委員会が2001年に公表した「日本人のスパイログラムと動脈血液ガス分圧基準値」の1秒量の回帰式を、年齢について解いたものです。</p>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>日本呼吸器学会「肺年齢に関するステートメント」<br>
+      <a href="https://www.jrs.or.jp/activities/guidelines/statement/20191217170833.html" rel="noopener" target="_blank">https://www.jrs.or.jp/activities/guidelines/statement/20191217170833.html</a>(2026年7月29日参照)</li>
+    <li>日本呼吸器学会「肺年齢コンセプト(使用手引)」<br>
+      <a href="https://www.jrs.or.jp/activities/guidelines/file/hainenrei_shiyousyo_11b.pdf" rel="noopener" target="_blank">https://www.jrs.or.jp/activities/guidelines/file/hainenrei_shiyousyo_11b.pdf</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>肺年齢の対象は18〜95歳です。この範囲を外れた結果は参考値として表示します。</li>
+    <li>健常な人でもFEV1にはばらつきがあり、回帰式の性質上およそ半数が実年齢より高い肺年齢になります。実年齢より高いことだけを理由に異常と判断しないでください。</li>
+    <li>1秒率(FEV1/FVC)が70%未満かどうかがCOPDの判定では重要です。肺年齢だけでは判定できません。</li>
+    <li>この計算は診断ではありません。結果が気になる場合は呼吸器内科を受診してください。</li>
+    <li>FEV1は測定の仕方(息の吐き方)で変わります。健診で正しく測定された値を使ってください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">FEV1(1秒量)はどこに書いてありますか?</h3>
+  <p class="faq-a">健診の呼吸機能検査(スパイロメトリー)の結果票に「FEV1」「1秒量」「FEV1.0」などの名前で載っています。単位はLかmLです。</p>
+  <h3 class="faq-q">肺年齢が実年齢より10歳以上高いと危険ですか?</h3>
+  <p class="faq-a">日本呼吸器学会は、健常者でも肺年齢が実年齢より高く出やすいことを指摘しています。差だけで判断せず、%1秒量や1秒率と合わせて、医師の判断を仰いでください。</p>
+  <h3 class="faq-q">禁煙すると肺年齢は若返りますか?</h3>
+  <p class="faq-a">失われた肺機能そのものは戻りませんが、禁煙すると1秒量が減っていくスピードが非喫煙者と同じ程度まで緩やかになるとされています。肺年齢は禁煙のきっかけづくりのために作られた指標です。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_fev1: "FEV1(1秒量)は0より大きい数値をリットル単位で入力してください。",
+    invalid_height: "身長は100cm以上250cm以下で入力してください。",
+    invalid_sex: "性別を選び直してください。",
+    invalid_age: "実年齢は0歳以上120歳以下で入力してください。",
+    invalid_target_age: "目標の肺年齢は18歳以上95歳以下で入力してください。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var fev1El = document.getElementById("fev1");
+  var heightEl = document.getElementById("height");
+  var sexEl = document.getElementById("sex");
+  var ageEl = document.getElementById("age");
+  var targetEl = document.getElementById("target");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function run() {
+    if (fev1El.value === "" || heightEl.value === "" || ageEl.value === "") {
+      box.hidden = true; runAdv(); return;
+    }
+    var r = HainenreiCalc.calculate(
+      parseFloat(fev1El.value),
+      parseFloat(heightEl.value),
+      sexEl.value,
+      parseFloat(ageEl.value)
+    );
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false; runAdv(); return;
+    }
+    var diffText = r.diff > 0
+      ? "実年齢より " + r.diff + "歳 高い"
+      : (r.diff < 0 ? "実年齢より " + (-r.diff) + "歳 低い" : "実年齢と同じ");
+    box.innerHTML =
+      '<div class="result-main">肺年齢 ' + esc(r.lungAge) + " 歳</div>" +
+      "<p>" + esc(diffText) + "(実年齢 " + esc(ageEl.value) + "歳)</p>" +
+      "<p>実年齢での予測1秒量 " + esc(r.predictedFev1) + "L / %1秒量 " + esc(r.percentPredicted) + "%</p>" +
+      (r.outOfRange ? "<p>肺年齢が対象年齢(18〜95歳)の外に出ています。参考値として見てください。</p>" : "");
+    box.hidden = false;
+    runAdv();
+  }
+
+  function runAdv() {
+    if (heightEl.value === "" || targetEl.value === "") { advBox.hidden = true; return; }
+    var r = HainenreiCalc.fev1ForLungAge(parseFloat(heightEl.value), sexEl.value, parseFloat(targetEl.value));
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">FEV1 ' + esc(r.requiredFev1) + " L</div>" +
+      "<p>身長 " + esc(heightEl.value) + "cm で肺年齢 " + esc(targetEl.value) +
+      "歳になるのは、1秒量がこの値のときです。</p>";
+    advBox.hidden = false;
+  }
+
+  [fev1El, heightEl, ageEl, targetEl].forEach(function (el) { el.addEventListener("input", run); });
+  sexEl.addEventListener("change", run);
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

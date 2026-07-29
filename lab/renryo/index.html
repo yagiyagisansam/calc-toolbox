@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>紙の連量⇔坪量 換算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="四六判・菊判などの連量(kg)と坪量(g/m²)を相互換算し、印刷物1部の重さも計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>/* 長いURLがはみ出さないようにする(shared/style.cssは変更しない) */
+  .sources a { word-break: break-all; overflow-wrap: anywhere; }</style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>紙の連量⇔坪量 換算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>原紙の判型
+      <select id="size">
+        <option value="shiroku">四六判(788×1091mm)</option>
+        <option value="kiku">菊判(636×939mm)</option>
+        <option value="a">A列本判(625×880mm)</option>
+        <option value="b">B列本判(765×1085mm)</option>
+        <option value="hatron">ハトロン判(900×1200mm)</option>
+      </select>
+    </label>
+    <label>連量(kg)
+      <span class="field-note">「四六判90kg」の90の部分。1連=1,000枚あたりの重さです</span>
+      <input type="number" id="renryo" inputmode="decimal" step="0.1" min="0.1" max="10000" placeholder="90">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="rev-form">
+    <span class="field-note">坪量から連量を調べる</span>
+    <label>坪量(g/m²)
+      <input type="number" id="gsm" inputmode="decimal" step="0.1" min="0.1" max="3000" placeholder="104.7">
+    </label>
+    <div class="tool-result" id="result-b" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 別の判型に換算する・冊子1部の重さを出す</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">別の判型の連量に換算</h3>
+      <p class="adv-note">「四六判90kgは菊判だと何kg?」のように、同じ厚さ(坪量)にあたる連量を求めます。</p>
+      <label>換算先の判型
+        <select id="tosize">
+          <option value="kiku">菊判</option>
+          <option value="shiroku">四六判</option>
+          <option value="a">A列本判</option>
+          <option value="b">B列本判</option>
+          <option value="hatron">ハトロン判</option>
+        </select>
+      </label>
+      <div class="tool-result" id="adv-convert" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">冊子1部の重さ</h3>
+      <p class="adv-note">仕上がりサイズとページ数から、本文＋表紙の重さを求めます。インキ・製本の重さは含みません。</p>
+      <div class="field-row">
+        <label>仕上がり幅(mm)
+          <input type="number" id="w" inputmode="numeric" step="1" min="1" max="3000" value="148">
+        </label>
+        <label>仕上がり高さ(mm)
+          <input type="number" id="h" inputmode="numeric" step="1" min="1" max="3000" value="210">
+        </label>
+      </div>
+      <div class="field-row">
+        <label>本文ページ数
+          <input type="number" id="pages" inputmode="numeric" step="1" min="1" max="10000" value="40">
+        </label>
+        <label>表紙の坪量(g/m²)
+          <input type="number" id="covergsm" inputmode="decimal" step="1" min="0" max="3000" value="180">
+        </label>
+      </div>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    連量は<strong>原紙(裁断前の大きな紙)1連=1,000枚あたりの重さ</strong>です。同じ「90kg」でも判型が違えば厚さは違います。厚さをくらべるときは坪量(g/m²)で見てください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>「四六判70kgと90kgはどちらが厚いか」「菊判だと何kg相当か」が、<strong>坪量(g/m²)に直すことで一目でわかります</strong>。同人誌やチラシ1部の重さも計算できるので、郵送料の区分を調べるときの目安になります。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>原紙の判型を選び、連量(kg)を入れると坪量(g/m²)が出ます。</li>
+    <li>逆に坪量から連量を知りたいときは、2段目の「坪量」に入れてください。</li>
+    <li>別の判型への換算や冊子1部の重さは「＋詳細機能」を開いてください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>連量(kg)</strong> = 坪量(g/m²) × 原紙の横(m) × 原紙の縦(m) × 1連の枚数 ÷ 1000</li>
+    <li><strong>坪量(g/m²)</strong> = 連量(kg) × 1000 ÷ (原紙の横(m) × 原紙の縦(m) × 1連の枚数)</li>
+    <li><strong>1連の枚数</strong> = 洋紙1,000枚 / 板紙100枚</li>
+    <li><strong>1枚の重さ(g)</strong> = 坪量(g/m²) × 仕上がり面積(m²)</li>
+    <li><strong>冊子1部(g)</strong> = 1枚の重さ × 枚数(ページ数÷2、端数切り上げ) + 表紙の重さ</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>原紙寸法(JIS P 0202:1998)と面積</caption>
+      <thead><tr><th>判型</th><th>寸法(mm)</th><th>面積(m²)</th><th>連量100kgのときの坪量</th></tr></thead>
+      <tbody>
+        <tr><td>四六判</td><td>788×1091</td><td>0.859708</td><td>116.3 g/m²</td></tr>
+        <tr><td>菊判</td><td>636×939</td><td>0.597204</td><td>167.4 g/m²</td></tr>
+        <tr><td>A列本判</td><td>625×880</td><td>0.550000</td><td>181.8 g/m²</td></tr>
+        <tr><td>B列本判</td><td>765×1085</td><td>0.830025</td><td>120.5 g/m²</td></tr>
+        <tr><td>ハトロン判</td><td>900×1200</td><td>1.080000</td><td>92.6 g/m²</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>日本紙パルプ商事「紙の単位(坪量、連、連量)」(換算式・1連の枚数の定義)<br>
+      <a href="https://www.kamipa.co.jp/media/1521/" rel="noopener" target="_blank">https://www.kamipa.co.jp/media/1521/</a>(2026年7月29日参照)</li>
+    <li>JIS P 0202:1998「紙の原紙寸法」(日本規格協会)<br>
+      <a href="https://webdesk.jsa.or.jp/books/W11M0090/index/?bunsyo_id=JIS+P+0202:1998" rel="noopener" target="_blank">https://webdesk.jsa.or.jp/books/W11M0090/index/?bunsyo_id=JIS+P+0202:1998</a>(2026年7月29日参照)</li>
+    <li>JIS規格ポケットブック「用紙のサイズ・寸法一覧(紙の原紙寸法: JIS P 0202)」(寸法の確認に使用)<br>
+      <a href="https://jis.jts-tokyo.com/kami-size-genshi/" rel="noopener" target="_blank">https://jis.jts-tokyo.com/kami-size-genshi/</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>原紙寸法は<strong>JIS P 0202:1998</strong>の値です(2026年7月29日時点)。実際の紙は許容差(＋6mm・−0mm)があります。</li>
+    <li>連量は取引上の呼び名で、四六判・菊判など判型ごとに基準が違います。厚さの比較は坪量(g/m²)で行ってください。</li>
+    <li>坪量が同じでも、紙の種類(上質紙・コート紙・嵩高紙など)によって実際の厚み(mm)は変わります。</li>
+    <li>冊子の重さはインキ・PP加工・製本(ホチキス・のり)の重さを含みません。実際はこれより少し重くなります。</li>
+    <li>郵送料の区分は封筒・梱包材の重さも合計して判定されます。実際の料金は日本郵便などの窓口でご確認ください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">四六判70kgと90kgではどちらが厚いですか?</h3>
+  <p class="faq-a">90kgの方が厚い紙です。坪量に直すと70kgは約81.4g/m²、90kgは約104.7g/m²になります。</p>
+  <h3 class="faq-q">四六判90kgは菊判では何kgですか?</h3>
+  <p class="faq-a">約62.5kgです。判型の面積が違うため、同じ厚さでも連量の数字は変わります。「＋詳細機能」で換算できます。</p>
+  <h3 class="faq-q">板紙のときはどう計算しますか?</h3>
+  <p class="faq-a">板紙の1連は100枚です。本ツールは洋紙(1,000枚)を前提にしていますが、板紙の値がほしいときは求めた坪量を10倍してお使いください。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_size: "判型を選び直してください。",
+    invalid_renryo: "連量は0.1〜10000kgの数値で入力してください。",
+    invalid_basis_weight: "坪量は0.1〜3000g/m²の数値で入力してください。",
+    invalid_sheets: "1連の枚数を確認してください。",
+    invalid_width: "仕上がり幅は1〜3000mmの数値で入力してください。",
+    invalid_height: "仕上がり高さは1〜3000mmの数値で入力してください。",
+    invalid_pages: "ページ数は1〜10000の数値で入力してください。",
+    invalid_cover_weight: "表紙の坪量は0〜3000g/m²の数値で入力してください。",
+    invalid_cover_pages: "表紙のページ数を確認してください。"
+  };
+  var SIZE_LABELS = {
+    shiroku: "四六判", kiku: "菊判", a: "A列本判", b: "B列本判", hatron: "ハトロン判"
+  };
+  var box = document.getElementById("result");
+  var boxB = document.getElementById("result-b");
+  var cvBox = document.getElementById("adv-convert");
+  var advBox = document.getElementById("adv-result");
+  var sizeEl = document.getElementById("size");
+  var toSizeEl = document.getElementById("tosize");
+  var renryoEl = document.getElementById("renryo");
+  var gsmEl = document.getElementById("gsm");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function err(target, code) {
+    target.innerHTML = '<p class="result-error">' + esc(ERRORS[code] || "入力値を確認してください。") + "</p>";
+    target.hidden = false;
+  }
+  function num(id) { return parseFloat(document.getElementById(id).value); }
+  function val(id) { return document.getElementById(id).value; }
+
+  function run() {
+    if (renryoEl.value === "") { box.hidden = true; runConvert(); return; }
+    var r = RenryoCalc.toBasisWeight(sizeEl.value, parseFloat(renryoEl.value));
+    if (!r.ok) { err(box, r.code); runConvert(); return; }
+    box.innerHTML =
+      '<div class="result-main">坪量 ' + esc(r.basisWeightGsm.toFixed(1)) + " g/m²</div>" +
+      "<p>" + esc(SIZE_LABELS[sizeEl.value]) + " " + esc(renryoEl.value) + "kg(1連 " +
+      esc(String(r.sheetsPerRen)) + "枚 / 原紙1枚 " + esc(r.areaM2.toFixed(6)) + " m²)</p>";
+    box.hidden = false;
+    runConvert();
+  }
+
+  function runB() {
+    if (gsmEl.value === "") { boxB.hidden = true; return; }
+    var r = RenryoCalc.toRenryo(sizeEl.value, parseFloat(gsmEl.value));
+    if (!r.ok) { err(boxB, r.code); return; }
+    boxB.innerHTML =
+      '<div class="result-main">' + esc(SIZE_LABELS[sizeEl.value]) + " 連量 " +
+      esc(r.renryoKg.toFixed(1)) + " kg</div>";
+    boxB.hidden = false;
+  }
+
+  function runConvert() {
+    if (renryoEl.value === "") { cvBox.hidden = true; return; }
+    var r = RenryoCalc.convert(sizeEl.value, parseFloat(renryoEl.value), toSizeEl.value);
+    if (!r.ok) { err(cvBox, r.code); return; }
+    cvBox.innerHTML =
+      '<div class="result-main">' + esc(SIZE_LABELS[toSizeEl.value]) + " " +
+      esc(r.renryoKg.toFixed(1)) + " kg 相当</div>" +
+      "<p>どちらも坪量 " + esc(r.basisWeightGsm.toFixed(1)) + " g/m² の紙です。</p>";
+    cvBox.hidden = false;
+  }
+
+  function runBooklet() {
+    if (renryoEl.value === "" || val("w") === "" || val("h") === "" || val("pages") === "") {
+      advBox.hidden = true; return;
+    }
+    var base = RenryoCalc.toBasisWeight(sizeEl.value, parseFloat(renryoEl.value));
+    if (!base.ok) { err(advBox, base.code); return; }
+    var cover = val("covergsm") === "" ? 0 : num("covergsm");
+    var r = RenryoCalc.bookletWeight(base.basisWeightGsm, num("w"), num("h"), num("pages"), cover);
+    if (!r.ok) { err(advBox, r.code); return; }
+    advBox.innerHTML =
+      '<div class="result-main">1部 約' + esc(r.totalGram.toFixed(1)) + " g</div>" +
+      "<p>本文: " + esc(String(r.bodySheets)) + "枚 " + esc(r.bodyGram.toFixed(1)) + "g / 表紙: " +
+      esc(String(r.coverSheets)) + "枚 " + esc(r.coverGram.toFixed(1)) + "g</p>" +
+      "<p>本文の坪量は " + esc(base.basisWeightGsm.toFixed(1)) + " g/m² として計算しています。</p>";
+    advBox.hidden = false;
+  }
+
+  function runAll() { run(); runB(); runBooklet(); }
+
+  renryoEl.addEventListener("input", function () { run(); runBooklet(); });
+  gsmEl.addEventListener("input", runB);
+  sizeEl.addEventListener("change", runAll);
+  toSizeEl.addEventListener("change", runConvert);
+  ["w", "h", "pages", "covergsm"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", runBooklet);
+  });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  document.getElementById("rev-form").addEventListener("submit", function (e) { e.preventDefault(); runB(); });
+})();
+</script>
+</body>
+</html>

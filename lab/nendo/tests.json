@@ -1,0 +1,139 @@
+{
+  "tool": "nendo",
+  "module": "calc.js",
+  "global": "NendoCalc",
+  "cases": [
+    {
+      "name": "境界値: 2026年3月31日は2025年度の第4四半期(年度末当日)",
+      "func": "fiscalYear",
+      "args": [2026, 3, 31, 4],
+      "expect": { "ok": true, "fiscalYear": 2025, "label": "2025年度", "quarter": 4, "endYmd": "2026-03-31", "daysToEnd": 0, "progressPercent": 100 }
+    },
+    {
+      "name": "境界値: 2026年4月1日は2026年度の第1四半期(年度初日)",
+      "func": "fiscalYear",
+      "args": [2026, 4, 1, 4],
+      "expect": { "ok": true, "fiscalYear": 2026, "quarter": 1, "startYmd": "2026-04-01", "endYmd": "2027-03-31", "daysToEnd": 364, "elapsedDays": 1 }
+    },
+    {
+      "name": "1月は前の年度の第4四半期になる(2026年1月15日は2025年度)",
+      "func": "fiscalYear",
+      "args": [2026, 1, 15, 4],
+      "expect": { "ok": true, "fiscalYear": 2025, "quarter": 4, "quarterStartYmd": "2026-01-01", "daysToEnd": 75 }
+    },
+    {
+      "name": "7月は第2四半期(2026年7月29日は2026年度・第2四半期)",
+      "func": "fiscalYear",
+      "args": [2026, 7, 29, 4],
+      "expect": { "ok": true, "fiscalYear": 2026, "quarter": 2, "quarterStartYmd": "2026-07-01", "quarterEndYmd": "2026-09-30" }
+    },
+    {
+      "name": "開始月を1月(暦年)にすると2026年7月29日は2026年度・第3四半期",
+      "func": "fiscalYear",
+      "args": [2026, 7, 29, 1],
+      "expect": { "ok": true, "fiscalYear": 2026, "quarter": 3, "startYmd": "2026-01-01", "endYmd": "2026-12-31" }
+    },
+    {
+      "name": "開始月を10月にすると2026年10月1日は2026年度・第1四半期",
+      "func": "fiscalYear",
+      "args": [2026, 10, 1, 10],
+      "expect": { "ok": true, "fiscalYear": 2026, "quarter": 1, "startYmd": "2026-10-01", "endYmd": "2027-09-30" }
+    },
+    {
+      "name": "開始月を省略すると4月として扱う",
+      "func": "fiscalYear",
+      "args": [2026, 5, 1],
+      "expect": { "ok": true, "fiscalYear": 2026, "quarter": 1, "startYmd": "2026-04-01" }
+    },
+    {
+      "name": "残りの平日: 2026年度の初日からは土日を除いて260日ある",
+      "func": "fiscalYear",
+      "args": [2026, 4, 1, 4],
+      "expect": { "ok": true, "weekdaysToEnd": 260 }
+    },
+    {
+      "name": "四半期の期間: 2026年度の第1四半期は4月1日〜6月30日の91日",
+      "func": "quarterRange",
+      "args": [2026, 1, 4],
+      "expect": { "ok": true, "startYmd": "2026-04-01", "endYmd": "2026-06-30", "days": 91 }
+    },
+    {
+      "name": "四半期の期間: 2026年度の第4四半期は翌年1月1日〜3月31日の90日",
+      "func": "quarterRange",
+      "args": [2026, 4, 4],
+      "expect": { "ok": true, "startYmd": "2027-01-01", "endYmd": "2027-03-31", "days": 90 }
+    },
+    {
+      "name": "年度の期間: 2026年度は365日、うるう年を含む2027年度は366日",
+      "func": "fiscalYearRange",
+      "args": [2026, 4],
+      "expect": { "ok": true, "startYmd": "2026-04-01", "endYmd": "2027-03-31", "days": 365 }
+    },
+    {
+      "name": "年度の期間: 2027年度は2028年2月29日を含むため366日",
+      "func": "fiscalYearRange",
+      "args": [2027, 4],
+      "expect": { "ok": true, "endYmd": "2028-03-31", "days": 366 }
+    },
+    {
+      "name": "年度の期間: 開始月1月なら暦年と同じ1月1日〜12月31日",
+      "func": "fiscalYearRange",
+      "args": [2026, 1],
+      "expect": { "ok": true, "startYmd": "2026-01-01", "endYmd": "2026-12-31", "days": 365 }
+    },
+    {
+      "name": "うるう年の2月29日も正しく扱える(2028年2月29日は2027年度)",
+      "func": "fiscalYear",
+      "args": [2028, 2, 29, 4],
+      "expect": { "ok": true, "fiscalYear": 2027, "quarter": 4, "daysToEnd": 31 }
+    },
+    {
+      "name": "異常入力: 存在しない月(13月)はエラー",
+      "func": "fiscalYear",
+      "args": [2026, 13, 1, 4],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 存在しない日(2026年2月30日)はエラー",
+      "func": "fiscalYear",
+      "args": [2026, 2, 30, 4],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 開始月0はエラー",
+      "func": "fiscalYear",
+      "args": [2026, 7, 29, 0],
+      "expect": { "ok": false, "code": "invalid_start_month" }
+    },
+    {
+      "name": "異常入力: 年が数値でないときはエラー",
+      "func": "fiscalYear",
+      "args": ["abc", 7, 29, 4],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 日が整数でない(29.5)はエラー",
+      "func": "fiscalYear",
+      "args": [2026, 7, 29.5, 4],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "fiscalYear",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 四半期の番号が5はエラー",
+      "func": "quarterRange",
+      "args": [2026, 5, 4],
+      "expect": { "ok": false, "code": "invalid_quarter" }
+    },
+    {
+      "name": "異常入力: 年が範囲外(1500年)はエラー",
+      "func": "fiscalYearRange",
+      "args": [1500, 4],
+      "expect": { "ok": false, "code": "invalid_fiscal_year" }
+    }
+  ]
+}

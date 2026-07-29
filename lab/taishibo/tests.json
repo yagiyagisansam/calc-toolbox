@@ -1,0 +1,139 @@
+{
+  "tool": "taishibo",
+  "module": "calc.js",
+  "global": "TaishiboCalc",
+  "cases": [
+    {
+      "name": "男性 身長175/首38/腹85 は16.9%(フィットネス)",
+      "func": "calculate",
+      "args": ["male", 175, 38, 85],
+      "expect": { "ok": true, "bodyFatPct": 16.9, "category": "フィットネス" }
+    },
+    {
+      "name": "男性 身長170/首36/腹95 は26.3%(肥満)",
+      "func": "calculate",
+      "args": ["male", 170, 36, 95],
+      "expect": { "ok": true, "bodyFatPct": 26.3, "category": "肥満" }
+    },
+    {
+      "name": "男性 身長180/首40/腹78 は8.5%(アスリート)",
+      "func": "calculate",
+      "args": ["male", 180, 40, 78],
+      "expect": { "ok": true, "bodyFatPct": 8.5, "category": "アスリート" }
+    },
+    {
+      "name": "男性 身長175/首38/腹70 は3.3%(必須脂肪の域)",
+      "func": "calculate",
+      "args": ["male", 175, 38, 70],
+      "expect": { "ok": true, "bodyFatPct": 3.3, "category": "必須脂肪" }
+    },
+    {
+      "name": "女性 身長160/首31/腹70/腰92 は25.2%(平均)",
+      "func": "calculate",
+      "args": ["female", 160, 31, 70, 92],
+      "expect": { "ok": true, "bodyFatPct": 25.2, "category": "平均" }
+    },
+    {
+      "name": "女性 身長165/首32/腹65/腰90 は19.5%(アスリート)",
+      "func": "calculate",
+      "args": ["female", 165, 32, 65, 90],
+      "expect": { "ok": true, "bodyFatPct": 19.5, "category": "アスリート" }
+    },
+    {
+      "name": "女性 身長158/首30/腹85/腰100 は37.7%(肥満)",
+      "func": "calculate",
+      "args": ["female", 158, 30, 85, 100],
+      "expect": { "ok": true, "bodyFatPct": 37.7, "category": "肥満" }
+    },
+    {
+      "name": "女性 身長170/首33/腹60/腰85 は12.0%(必須脂肪の域)",
+      "func": "calculate",
+      "args": ["female", 170, 33, 60, 85],
+      "expect": { "ok": true, "bodyFatPct": 12, "category": "必須脂肪" }
+    },
+    {
+      "name": "体重も入れると体脂肪量11.8kg・除脂肪58.2kg(男性70kg・16.9%)",
+      "func": "withWeight",
+      "args": ["male", 175, 38, 85, null, 70],
+      "expect": { "ok": true, "bodyFatPct": 16.9, "fatMassKg": 11.8, "leanMassKg": 58.2 }
+    },
+    {
+      "name": "境界値: 身長の下限100cmでも計算できる",
+      "func": "calculate",
+      "args": ["male", 100, 30, 70],
+      "expect": { "ok": true }
+    },
+    {
+      "name": "境界値: 身長99cmは範囲外",
+      "func": "calculate",
+      "args": ["male", 99, 38, 85],
+      "expect": { "ok": false, "code": "invalid_height" }
+    },
+    {
+      "name": "境界値: 身長251cmは範囲外",
+      "func": "calculate",
+      "args": ["male", 251, 38, 85],
+      "expect": { "ok": false, "code": "invalid_height" }
+    },
+    {
+      "name": "異常入力: 腹囲が首囲以下(対数が計算できない)はエラー",
+      "func": "calculate",
+      "args": ["male", 175, 80, 80],
+      "expect": { "ok": false, "code": "invalid_measure" }
+    },
+    {
+      "name": "異常入力: 性別の指定がないとエラー",
+      "func": "calculate",
+      "args": ["", 175, 38, 85],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    },
+    {
+      "name": "異常入力: 女性で腰囲を入れないとエラー",
+      "func": "calculate",
+      "args": ["female", 160, 31, 70],
+      "expect": { "ok": false, "code": "invalid_hip" }
+    },
+    {
+      "name": "異常入力: 首囲0はエラー",
+      "func": "calculate",
+      "args": ["male", 175, 0, 85],
+      "expect": { "ok": false, "code": "invalid_neck" }
+    },
+    {
+      "name": "異常入力: 腹囲が負の値はエラー",
+      "func": "calculate",
+      "args": ["male", 175, 38, -85],
+      "expect": { "ok": false, "code": "invalid_waist" }
+    },
+    {
+      "name": "異常入力: 数値でない身長はエラー",
+      "func": "calculate",
+      "args": ["male", "abc", 38, 85],
+      "expect": { "ok": false, "code": "invalid_height" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    },
+    {
+      "name": "異常入力: 体重0kgはエラー",
+      "func": "withWeight",
+      "args": ["male", 175, 38, 85, null, 0],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "区分の判定: 男性25.0%ちょうどは肥満",
+      "func": "category",
+      "args": ["male", 25],
+      "expect": "肥満"
+    },
+    {
+      "name": "区分の判定: 女性31.9%は平均、32.0%から肥満",
+      "func": "category",
+      "args": ["female", 31.9],
+      "expect": "平均"
+    }
+  ]
+}

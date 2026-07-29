@@ -1,0 +1,139 @@
+{
+  "tool": "whr",
+  "module": "calc.js",
+  "global": "WhrCalc",
+  "cases": [
+    {
+      "name": "代表例: 男性 ウエスト85cm・ヒップ95cm はWHR0.89で基準内",
+      "func": "calculate",
+      "args": ["male", 85, 95],
+      "expect": { "ok": true, "whr": 0.89, "cutoff": 0.9, "category": "基準内", "isAbdominalObesity": false }
+    },
+    {
+      "name": "代表例: 女性 ウエスト70cm・ヒップ95cm はWHR0.74で基準内",
+      "func": "calculate",
+      "args": ["female", 70, 95],
+      "expect": { "ok": true, "whr": 0.74, "cutoff": 0.85, "category": "基準内" }
+    },
+    {
+      "name": "境界: 男性 WHR0.90ちょうどは腹部肥満(WHOは0.90以上)",
+      "func": "calculate",
+      "args": ["male", 90, 100],
+      "expect": { "ok": true, "whr": 0.9, "category": "腹部肥満", "isAbdominalObesity": true }
+    },
+    {
+      "name": "境界の直前: 男性 WHR0.89は基準内",
+      "func": "calculate",
+      "args": ["male", 89, 100],
+      "expect": { "ok": true, "whr": 0.89, "category": "基準内" }
+    },
+    {
+      "name": "境界: 女性 WHR0.85ちょうどは腹部肥満(WHOは0.85以上)",
+      "func": "calculate",
+      "args": ["female", 85, 100],
+      "expect": { "ok": true, "whr": 0.85, "category": "腹部肥満", "isAbdominalObesity": true }
+    },
+    {
+      "name": "境界の直前: 女性 WHR0.84は基準内",
+      "func": "calculate",
+      "args": ["female", 84, 100],
+      "expect": { "ok": true, "whr": 0.84, "category": "基準内" }
+    },
+    {
+      "name": "ウエストがヒップより大きい場合もWHRは1を超えて計算できる",
+      "func": "calculate",
+      "args": ["male", 120, 100],
+      "expect": { "ok": true, "whr": 1.2, "category": "腹部肥満" }
+    },
+    {
+      "name": "腹囲リスク: 男性94cmちょうどはまだ基準内(WHOは94cm超で増加)",
+      "func": "waistRisk",
+      "args": ["male", 94],
+      "expect": { "ok": true, "level": 0, "category": "基準内", "increasedFromCm": 94, "substantialFromCm": 102 }
+    },
+    {
+      "name": "腹囲リスク: 男性95cmはリスク増加",
+      "func": "waistRisk",
+      "args": ["male", 95],
+      "expect": { "ok": true, "level": 1, "category": "リスク増加" }
+    },
+    {
+      "name": "腹囲リスク: 男性102cmちょうどはまだリスク増加どまり",
+      "func": "waistRisk",
+      "args": ["male", 102],
+      "expect": { "ok": true, "level": 1 }
+    },
+    {
+      "name": "腹囲リスク: 男性103cmでリスクが著しく増加",
+      "func": "waistRisk",
+      "args": ["male", 103],
+      "expect": { "ok": true, "level": 2, "category": "リスクが著しく増加" }
+    },
+    {
+      "name": "腹囲リスク: 女性80cmちょうどは基準内、81cmでリスク増加",
+      "func": "waistRisk",
+      "args": ["female", 81],
+      "expect": { "ok": true, "level": 1, "increasedFromCm": 80, "substantialFromCm": 88 }
+    },
+    {
+      "name": "腹囲リスク: 女性89cmでリスクが著しく増加",
+      "func": "waistRisk",
+      "args": ["female", 89],
+      "expect": { "ok": true, "level": 2 }
+    },
+    {
+      "name": "境界ヒップ: 男性ウエスト90cmならヒップ100.0cm以下で腹部肥満",
+      "func": "hipLimit",
+      "args": ["male", 90],
+      "expect": { "ok": true, "cutoff": 0.9, "hipLimitCm": 100 }
+    },
+    {
+      "name": "境界ヒップ: 女性ウエスト85cmならヒップ100.0cm以下で腹部肥満",
+      "func": "hipLimit",
+      "args": ["female", 85],
+      "expect": { "ok": true, "cutoff": 0.85, "hipLimitCm": 100 }
+    },
+    {
+      "name": "異常入力: 性別の指定が不正はエラー",
+      "func": "calculate",
+      "args": ["x", 85, 95],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    },
+    {
+      "name": "異常入力: ウエスト0cmはエラー",
+      "func": "calculate",
+      "args": ["male", 0, 95],
+      "expect": { "ok": false, "code": "invalid_waist" }
+    },
+    {
+      "name": "異常入力: ヒップ0cmはエラー(0除算にならない)",
+      "func": "calculate",
+      "args": ["male", 85, 0],
+      "expect": { "ok": false, "code": "invalid_hip" }
+    },
+    {
+      "name": "異常入力: ヒップが負の値はエラー",
+      "func": "calculate",
+      "args": ["male", 85, -95],
+      "expect": { "ok": false, "code": "invalid_hip" }
+    },
+    {
+      "name": "異常入力: 数値でないウエストはエラー",
+      "func": "calculate",
+      "args": ["male", "abc", 95],
+      "expect": { "ok": false, "code": "invalid_waist" }
+    },
+    {
+      "name": "異常入力: ウエストが上限(250cm)超はエラー",
+      "func": "calculate",
+      "args": ["male", 300, 95],
+      "expect": { "ok": false, "code": "invalid_waist" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    }
+  ]
+}

@@ -1,0 +1,185 @@
+{
+  "tool": "youbi",
+  "module": "calc.js",
+  "global": "YoubiCalc",
+  "cases": [
+    {
+      "name": "代表例: 2000年1月1日は土曜日",
+      "func": "dayOfWeek",
+      "args": [2000, 1, 1],
+      "expect": { "ok": true, "index": 6, "key": "saturday", "zellerH": 0 }
+    },
+    {
+      "name": "代表例: 2026年7月29日は水曜日",
+      "func": "dayOfWeek",
+      "args": [2026, 7, 29],
+      "expect": { "ok": true, "index": 3, "key": "wednesday" }
+    },
+    {
+      "name": "改元日: 1989年1月8日(平成元年の初日)は日曜日",
+      "func": "dayOfWeek",
+      "args": [1989, 1, 8],
+      "expect": { "ok": true, "index": 0, "key": "sunday" }
+    },
+    {
+      "name": "改元日: 2019年5月1日(令和元年の初日)は水曜日",
+      "func": "dayOfWeek",
+      "args": [2019, 5, 1],
+      "expect": { "ok": true, "index": 3, "key": "wednesday" }
+    },
+    {
+      "name": "1月・2月は前年の13月・14月として扱う(2021年1月1日は金曜日)",
+      "func": "dayOfWeek",
+      "args": [2021, 1, 1],
+      "expect": { "ok": true, "index": 5, "key": "friday" }
+    },
+    {
+      "name": "うるう日: 1980年2月29日は金曜日",
+      "func": "dayOfWeek",
+      "args": [1980, 2, 29],
+      "expect": { "ok": true, "index": 5, "key": "friday" }
+    },
+    {
+      "name": "境界値: 対象の下限1583年1月1日は土曜日",
+      "func": "dayOfWeek",
+      "args": [1583, 1, 1],
+      "expect": { "ok": true, "index": 6, "key": "saturday" }
+    },
+    {
+      "name": "境界値: 対象の上限9999年12月31日は金曜日",
+      "func": "dayOfWeek",
+      "args": [9999, 12, 31],
+      "expect": { "ok": true, "index": 5, "key": "friday" }
+    },
+    {
+      "name": "置閏法: 2000年は400で割り切れるのでうるう年",
+      "func": "isLeapYear",
+      "args": [2000],
+      "expect": { "ok": true, "leap": true }
+    },
+    {
+      "name": "置閏法: 1900年は100で割り切れて400では割り切れないので平年",
+      "func": "isLeapYear",
+      "args": [1900],
+      "expect": { "ok": true, "leap": false }
+    },
+    {
+      "name": "置閏法: 1900年2月は28日まで",
+      "func": "daysInMonth",
+      "args": [1900, 2],
+      "expect": { "ok": true, "days": 28 }
+    },
+    {
+      "name": "置閏法: 2024年2月は29日まで",
+      "func": "daysInMonth",
+      "args": [2024, 2],
+      "expect": { "ok": true, "days": 29 }
+    },
+    {
+      "name": "異常入力: 存在しない日付(1900年2月29日)はエラー",
+      "func": "dayOfWeek",
+      "args": [1900, 2, 29],
+      "expect": { "ok": false, "code": "invalid_day" }
+    },
+    {
+      "name": "異常入力: 4月31日はエラー",
+      "func": "dayOfWeek",
+      "args": [2026, 4, 31],
+      "expect": { "ok": false, "code": "invalid_day" }
+    },
+    {
+      "name": "異常入力: 対象範囲外の年(1582年)はエラー",
+      "func": "dayOfWeek",
+      "args": [1582, 10, 15],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "異常入力: 月が13はエラー",
+      "func": "dayOfWeek",
+      "args": [2026, 13, 1],
+      "expect": { "ok": false, "code": "invalid_month" }
+    },
+    {
+      "name": "異常入力: 日が0はエラー",
+      "func": "dayOfWeek",
+      "args": [2026, 7, 0],
+      "expect": { "ok": false, "code": "invalid_day" }
+    },
+    {
+      "name": "異常入力: 小数の年はエラー",
+      "func": "dayOfWeek",
+      "args": [2026.5, 7, 29],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "異常入力: 数値でない年はエラー",
+      "func": "dayOfWeek",
+      "args": ["abc", 7, 29],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "dayOfWeek",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "同じ月日の一覧: 7月29日の2024〜2027年は月・火・水・木",
+      "func": "sameDayEachYear",
+      "args": [7, 29, 2024, 2027],
+      "expect": {
+        "ok": true,
+        "skipped": 0,
+        "rows": {
+          "0": { "year": 2024, "key": "monday" },
+          "1": { "year": 2025, "key": "tuesday" },
+          "2": { "year": 2026, "key": "wednesday" },
+          "3": { "year": 2027, "key": "thursday" },
+          "length": 4
+        }
+      }
+    },
+    {
+      "name": "同じ月日の一覧: 2月29日は存在しない年を飛ばす(2020〜2028で3件・6年スキップ)",
+      "func": "sameDayEachYear",
+      "args": [2, 29, 2020, 2028],
+      "expect": { "ok": true, "skipped": 6, "rows": { "0": { "year": 2020, "key": "saturday" }, "length": 3 } }
+    },
+    {
+      "name": "異常入力: 一覧の年の範囲が逆転しているとエラー",
+      "func": "sameDayEachYear",
+      "args": [7, 29, 2030, 2020],
+      "expect": { "ok": false, "code": "invalid_range" }
+    },
+    {
+      "name": "異常入力: 一覧の年の範囲が広すぎる(300年)とエラー",
+      "func": "sameDayEachYear",
+      "args": [7, 29, 1700, 2000],
+      "expect": { "ok": false, "code": "invalid_range" }
+    },
+    {
+      "name": "第何曜日: 2026年7月20日は第3月曜日(海の日)",
+      "func": "nthWeekdayOfMonth",
+      "args": [2026, 7, 20],
+      "expect": { "ok": true, "nth": 3, "key": "monday", "isLast": false }
+    },
+    {
+      "name": "第何曜日: 2026年7月27日は第4月曜でその月最後の月曜",
+      "func": "nthWeekdayOfMonth",
+      "args": [2026, 7, 27],
+      "expect": { "ok": true, "nth": 4, "key": "monday", "isLast": true }
+    },
+    {
+      "name": "境界値: 月の1日は必ず第1週(2026年7月1日)",
+      "func": "nthWeekdayOfMonth",
+      "args": [2026, 7, 1],
+      "expect": { "ok": true, "nth": 1, "key": "wednesday" }
+    },
+    {
+      "name": "異常入力: 第何曜日の計算でも存在しない日付はエラー",
+      "func": "nthWeekdayOfMonth",
+      "args": [2026, 2, 30],
+      "expect": { "ok": false, "code": "invalid_day" }
+    }
+  ]
+}

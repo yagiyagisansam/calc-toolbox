@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>株間から必要な苗・種の数を計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="畝の長さ・株間・条数から、必要な苗の本数と植えられる株数を計算します。予備率も加味できます。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>株間から必要な苗・種の数を計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>作る野菜
+      <span class="field-note">選ぶと株間・条数の目安が入ります(あとから変えられます)</span>
+      <select id="veg"></select>
+    </label>
+    <div class="field-row">
+      <label>畝の長さ(m)
+        <input type="number" id="length" inputmode="decimal" step="0.1" min="0.1" max="1000" placeholder="5">
+      </label>
+      <label>株間(cm)
+        <input type="number" id="spacing" inputmode="decimal" step="1" min="1" max="500" placeholder="50">
+      </label>
+    </div>
+    <div class="field-row">
+      <label>条数(列)
+        <input type="number" id="rows" inputmode="numeric" step="1" min="1" max="50" placeholder="2">
+      </label>
+      <label>予備率(%)
+        <span class="field-note">枯れ・不発芽の余裕</span>
+        <input type="number" id="spare" inputmode="numeric" step="5" min="0" max="200" placeholder="10">
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 畝幅と条間から条数を出す・1株あたりの面積</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">畝幅から条数を求める</h3>
+      <p class="adv-note">畝の端に空けるスペースを引いた幅を、条間で割って条数を出します。</p>
+      <div class="field-row">
+        <label>畝幅(cm)
+          <input type="number" id="width" inputmode="decimal" step="5" min="1" max="2000" placeholder="120">
+        </label>
+        <label>条間(cm)
+          <input type="number" id="rowspace" inputmode="decimal" step="5" min="1" max="500" placeholder="60">
+        </label>
+        <label>端の空き(片側cm)
+          <input type="number" id="edge" inputmode="decimal" step="5" min="0" max="500" placeholder="30">
+        </label>
+      </div>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    株間・条間の目安は品種・地域・仕立て方で変わります。ここに入っている値は Honda「人気野菜の育て方」の記載をもとにした<strong>一般的な目安</strong>です。種袋・苗のラベルに書かれた指定があればそちらを優先してください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>畝の長さと株間を入れるだけで、<strong>植えられる株数</strong>と<strong>買うべき苗・種の数</strong>がわかります。ホームセンターへ行く前に本数を決めておけば、買いすぎも足りずも防げます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>作る野菜を選ぶと、株間と条数の目安が自動で入ります。</li>
+    <li>実際の畝の長さを入れます。</li>
+    <li>予備率(枯れる分の余裕)を入れると、その瞬間に必要な本数が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>1条あたりの株数</strong> = 畝の長さ(cm) ÷ 株間(cm) + 1(畝の両端にも植える数え方)</li>
+    <li><strong>合計株数</strong> = 1条あたりの株数 × 条数</li>
+    <li><strong>必要な本数</strong> = 合計株数 × (1 + 予備率 ÷ 100)(小数は切り上げ)</li>
+    <li><strong>条数(畝幅から)</strong> = (畝幅 − 端の空き × 2) ÷ 条間 + 1(小数は切り捨て)</li>
+  </ul>
+
+  <h3>野菜ごとの畝幅・株間の目安</h3>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>Honda「人気野菜の育て方」各野菜のページに記載された畝幅・株間</caption>
+      <thead><tr><th>野菜</th><th>畝幅</th><th>株間</th></tr></thead>
+      <tbody id="veg-table"></tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>Honda 耕うん機「つくりたい野菜の特徴を知ろう(菜園プランの立て方)」<br>
+      <a href="https://www.honda.co.jp/tiller/yasai/howto/planning/" rel="noopener" target="_blank">https://www.honda.co.jp/tiller/yasai/howto/planning/</a>(2026年7月29日参照)</li>
+    <li>Honda 耕うん機「人気野菜の育て方」(各野菜のページに畝幅・株間の記載)<br>
+      <a href="https://www.honda.co.jp/tiller/yasai/popular/" rel="noopener" target="_blank">https://www.honda.co.jp/tiller/yasai/popular/</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>1条あたりの株数は<strong>畝の両端にも植える</strong>数え方(畝長÷株間+1)です。端に植えない場合は1株少なくなります(結果欄に両方表示しています)。</li>
+    <li>株間・条間の目安は品種・地域・仕立て方で変わります。表の値は目安として扱ってください。</li>
+    <li>種まきの場合、1か所に複数粒まいて間引く育て方が多いため、必要な種の数は株数より多くなります。</li>
+    <li>カボチャ・スイカのようにツルが広がる野菜は、畝の長さよりも1株あたりに必要な面積(2m四方など)で考えてください。</li>
+    <li>作業や管理の基準は関東地方以西の平野部です。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">「株間」と「条間」はどう違いますか?</h3>
+  <p class="faq-a">株間は同じ列の中で株と株の間隔、条間は列と列の間隔です。1つの畝に2列植えることを二条植えといいます。</p>
+  <h3 class="faq-q">なぜ株数に「+1」するのですか?</h3>
+  <p class="faq-a">畝の両端にも株を植えるためです。5mの畝に50cm間隔で植えると、間隔は10個ですが株は11本になります(電柱と電線の関係と同じです)。</p>
+  <h3 class="faq-q">予備率はどのくらいにすればよいですか?</h3>
+  <p class="faq-a">苗を買う場合は10%程度、種から育てる場合は発芽しないものが出るためもう少し多めが安心です。天候が不安定な時期はさらに余裕を見てください。</p>
+  <h3 class="faq-q">株間を狭くすればたくさん収穫できますか?</h3>
+  <p class="faq-a">込み合うと日当たりや風通しが悪くなり、生育不良や病害虫の原因になります。1株に必要な広さは決まっているので、目安の株間は守ったほうが結果的に収量が上がります。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_length: "畝の長さを0.1〜1000mの範囲で入力してください。",
+    invalid_spacing: "株間(条間)を1〜500cmの範囲で入力してください。",
+    invalid_rows: "条数を1〜50の整数で入力してください。",
+    invalid_spare: "予備率を0〜200%の範囲で入力してください。",
+    invalid_width: "畝幅を1〜2000cmの範囲で入力してください。",
+    invalid_edge: "端の空きを0cm以上で入力してください。",
+    out_of_range: "端の空きが畝幅の半分を超えています。",
+    invalid_count: "株数を1以上の整数で入力してください。"
+  };
+  /* [キー, 表示名, 畝幅(表示用), 株間(表示用), 既定の株間cm, 既定の条数] */
+  var VEGETABLES = [
+    ["", "選ばない(自分で入力)", "", "", null, null],
+    ["tomato", "トマト", "120cm(二条植え)", "45〜50cm", 50, 2],
+    ["eggplant", "ナス", "60cm", "60cm", 60, 1],
+    ["cucumber", "キュウリ", "120cm(二条植え)", "45cm", 45, 2],
+    ["bellpepper", "ピーマン", "120cm(二条植え)", "50〜60cm", 50, 2],
+    ["cabbage", "キャベツ", "60cm", "40〜45cm", 45, 1],
+    ["broccoli", "ブロッコリー", "60〜70cm", "40〜45cm", 45, 1],
+    ["chinesecabbage", "ハクサイ", "60〜70cm", "40〜45cm", 45, 1],
+    ["japaneseradish", "ダイコン", "60cm", "30cm", 30, 1],
+    ["carrot", "ニンジン", "60cm", "10〜12cm", 12, 2],
+    ["onion", "タマネギ", "60cm", "10〜12cm", 12, 2],
+    ["potato", "ジャガイモ", "60〜70cm", "30cm", 30, 1],
+    ["spinach", "ホウレンソウ", "60cm(二条まき)", "3〜4cm", 4, 2],
+    ["komatsuna", "コマツナ", "60cm", "3〜4cm", 4, 2],
+    ["greenonion", "ネギ", "90〜100cm", "5cm", 5, 1],
+    ["edamame", "エダマメ", "60cm", "30cm", 30, 1],
+    ["corn", "トウモロコシ", "80〜90cm(二条まき)", "30cm", 30, 2],
+    ["turnip", "カブ", "60cm", "10〜12cm", 12, 2],
+    ["sweetpotato", "サツマイモ", "60〜70cm", "30〜40cm", 35, 1],
+    ["pumpkin", "カボチャ", "200cm", "200cm", 200, 1],
+    ["watermelon", "スイカ", "200cm", "200cm", 200, 1]
+  ];
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var vegEl = document.getElementById("veg");
+  var lengthEl = document.getElementById("length");
+  var spacingEl = document.getElementById("spacing");
+  var rowsEl = document.getElementById("rows");
+  var spareEl = document.getElementById("spare");
+  var widthEl = document.getElementById("width");
+  var rowspaceEl = document.getElementById("rowspace");
+  var edgeEl = document.getElementById("edge");
+
+  var opts = "", trows = "";
+  for (var i = 0; i < VEGETABLES.length; i++) {
+    var v = VEGETABLES[i];
+    opts += '<option value="' + v[0] + '">' + v[1] + "</option>";
+    if (v[0] !== "") {
+      trows += "<tr><td>" + v[1] + "</td><td>" + v[2] + "</td><td>" + v[3] + "</td></tr>";
+    }
+  }
+  vegEl.innerHTML = opts;
+  document.getElementById("veg-table").innerHTML = trows;
+
+  vegEl.addEventListener("change", function () {
+    for (var i = 0; i < VEGETABLES.length; i++) {
+      if (VEGETABLES[i][0] === vegEl.value && VEGETABLES[i][4] !== null) {
+        spacingEl.value = VEGETABLES[i][4];
+        rowsEl.value = VEGETABLES[i][5];
+      }
+    }
+    run();
+  });
+
+  function run() {
+    if (lengthEl.value === "" || spacingEl.value === "" || rowsEl.value === "") { box.hidden = true; return; }
+    var spare = spareEl.value === "" ? 0 : parseFloat(spareEl.value);
+    var r = KabumaCalc.calculate(
+      parseFloat(lengthEl.value),
+      parseFloat(spacingEl.value),
+      parseInt(rowsEl.value, 10),
+      spare
+    );
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML = '<div class="result-main">' + esc(r.needed) + " 本 用意する</div>" +
+      "<p>植えられるのは合計 " + esc(r.total) + " 株(1条あたり " + esc(r.perRow) + " 株 × " + esc(rowsEl.value) + " 条)</p>" +
+      "<p>予備 " + esc(r.spareCount) + " 本を含みます。畝の端に植えない場合は1条あたり " + esc(r.perRowNoEdge) + " 株になります。</p>";
+    box.hidden = false;
+  }
+
+  function runAdv() {
+    if (widthEl.value === "" || rowspaceEl.value === "") { advBox.hidden = true; return; }
+    var edge = edgeEl.value === "" ? 0 : parseFloat(edgeEl.value);
+    var r = KabumaCalc.rowsFromBedWidth(parseFloat(widthEl.value), parseFloat(rowspaceEl.value), edge);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    var body = '<div class="result-main">' + esc(r.rows) + " 条</div>" +
+      "<p>使える幅 " + esc(r.usableCm) + " cm。上の「条数」欄にこの値を入れて計算できます。</p>";
+    if (lengthEl.value !== "" && spacingEl.value !== "") {
+      var c = KabumaCalc.calculate(parseFloat(lengthEl.value), parseFloat(spacingEl.value), r.rows, 0);
+      if (c.ok) {
+        var a = KabumaCalc.areaPerPlant(parseFloat(lengthEl.value), parseFloat(widthEl.value), c.total);
+        if (a.ok) {
+          body += "<p>この条数で植えると畝の面積 " + esc(a.areaM2) + " m² に " + esc(c.total) +
+            " 株、1株あたり " + esc(a.perPlantCm2) + " cm² です。</p>";
+        }
+      }
+    }
+    advBox.innerHTML = body;
+    advBox.hidden = false;
+  }
+
+  [lengthEl, spacingEl, rowsEl, spareEl].forEach(function (el) {
+    el.addEventListener("input", function () { run(); runAdv(); });
+  });
+  [widthEl, rowspaceEl, edgeEl].forEach(function (el) { el.addEventListener("input", runAdv); });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

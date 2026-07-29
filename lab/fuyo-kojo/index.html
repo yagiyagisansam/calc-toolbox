@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>扶養控除・配偶者控除 判定(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="年収から扶養控除・配偶者控除・配偶者特別控除に当てはまるかと控除額を判定します(令和7年分以後)。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>
+    /* 長い出典URLが横スクロールを起こさないようにする(このページ内だけの調整) */
+    .sources a { overflow-wrap: anywhere; word-break: break-word; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>扶養控除・配偶者控除 判定</h1>
+  <form class="tool-form" id="tool-form">
+    <label>だれについて調べますか
+      <select id="mode">
+        <option value="dependent">子・親などの扶養親族</option>
+        <option value="spouse">配偶者</option>
+      </select>
+    </label>
+    <label>その人の年収(給与収入・円)
+      <span class="field-note">源泉徴収票の「支払金額」。給与以外の収入がある場合は使えません。例: 1200000</span>
+      <input type="number" id="salary" inputmode="numeric" step="1" min="0" placeholder="1200000">
+    </label>
+    <div class="field-row">
+      <label>その人の年齢(12月31日現在)
+        <input type="number" id="age" inputmode="numeric" step="1" min="0" max="130" placeholder="20">
+      </label>
+      <label id="cohabit-wrap">同居老親等
+        <span class="field-note">70歳以上で自分か配偶者の親・祖父母と同居</span>
+        <select id="cohabit">
+          <option value="0">いいえ</option>
+          <option value="1">はい</option>
+        </select>
+      </label>
+    </div>
+    <label id="taxpayer-wrap" hidden>あなた(納税者本人)の年収(給与収入・円)
+      <span class="field-note">配偶者控除は本人の合計所得1,000万円までが対象です</span>
+      <input type="number" id="taxpayer" inputmode="numeric" step="1" min="0" placeholder="6000000">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 給与収入から合計所得金額を出す</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">給与所得控除を引いた「合計所得金額」</h3>
+      <p class="adv-note">扶養や配偶者の判定に使われるのは年収そのものではなく、給与所得控除を引いた後の合計所得金額です。</p>
+      <label>給与収入(円)
+        <input type="number" id="adv-salary" inputmode="numeric" step="1" min="0" placeholder="1500000">
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    金額は<strong>令和7年度税制改正後(令和7年分以後の所得税)</strong>のものです。扶養親族・配偶者の所得要件が48万円から<strong>58万円(給与収入123万円)</strong>に引き上げられ、19〜22歳向けに<strong>特定親族特別控除</strong>が新設されました。住民税の控除額や社会保険の扶養(130万円の壁)は別の制度です。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>「いくらまで働いても扶養から外れないか」「今の年収だと控除はいくらになるか」がわかります。所得税の<strong>123万円の壁</strong>と、19〜22歳が使える<strong>特定親族特別控除</strong>にも対応しています。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>扶養親族(子・親など)か配偶者かを選びます。</li>
+    <li>その人の年収と年齢を入れると、その場で控除の該当と控除額が出ます。</li>
+    <li>配偶者を選んだ場合は、あなた自身の年収も入れてください。本人の所得によって控除額が変わります。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>合計所得金額</strong> = 給与収入 − 給与所得控除額</li>
+    <li><strong>給与所得控除額</strong>(令和7年分以後) = 収入190万円まで65万円 / 190万円超360万円以下は収入×30%+8万円 / 360万円超660万円以下は収入×20%+44万円 / 660万円超850万円以下は収入×10%+110万円 / 850万円超は195万円</li>
+    <li><strong>扶養控除の所得要件</strong> = 合計所得金額58万円以下(給与収入123万円以下)</li>
+  </ul>
+
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>扶養控除の額(国税庁 No.1180)</caption>
+      <thead><tr><th>区分</th><th>年齢(12月31日現在)</th><th>控除額</th></tr></thead>
+      <tbody>
+        <tr><td>控除対象外</td><td>16歳未満</td><td>0円</td></tr>
+        <tr><td>一般の控除対象扶養親族</td><td>16歳以上19歳未満・23歳以上70歳未満</td><td>38万円</td></tr>
+        <tr><td>特定扶養親族</td><td>19歳以上23歳未満</td><td>63万円</td></tr>
+        <tr><td>老人扶養親族(同居老親等以外)</td><td>70歳以上</td><td>48万円</td></tr>
+        <tr><td>同居老親等</td><td>70歳以上・同居</td><td>58万円</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>特定親族特別控除(国税庁 No.1177・19歳以上23歳未満)</caption>
+      <thead><tr><th>合計所得金額</th><th>控除額</th></tr></thead>
+      <tbody>
+        <tr><td>58万円超 85万円以下</td><td>63万円</td></tr>
+        <tr><td>85万円超 90万円以下</td><td>61万円</td></tr>
+        <tr><td>90万円超 95万円以下</td><td>51万円</td></tr>
+        <tr><td>95万円超 100万円以下</td><td>41万円</td></tr>
+        <tr><td>100万円超 105万円以下</td><td>31万円</td></tr>
+        <tr><td>105万円超 110万円以下</td><td>21万円</td></tr>
+        <tr><td>110万円超 115万円以下</td><td>11万円</td></tr>
+        <tr><td>115万円超 120万円以下</td><td>6万円</td></tr>
+        <tr><td>120万円超 123万円以下</td><td>3万円</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>配偶者控除・配偶者特別控除(国税庁 No.1191 / No.1195)</caption>
+      <thead><tr><th>配偶者の合計所得金額</th><th>本人900万円以下</th><th>900万円超950万円以下</th><th>950万円超1,000万円以下</th></tr></thead>
+      <tbody>
+        <tr><td>58万円以下(配偶者控除)</td><td>38万円</td><td>26万円</td><td>13万円</td></tr>
+        <tr><td>58万円以下・70歳以上(老人控除対象配偶者)</td><td>48万円</td><td>32万円</td><td>16万円</td></tr>
+        <tr><td>58万円超 95万円以下</td><td>38万円</td><td>26万円</td><td>13万円</td></tr>
+        <tr><td>95万円超 100万円以下</td><td>36万円</td><td>24万円</td><td>12万円</td></tr>
+        <tr><td>100万円超 105万円以下</td><td>31万円</td><td>21万円</td><td>11万円</td></tr>
+        <tr><td>105万円超 110万円以下</td><td>26万円</td><td>18万円</td><td>9万円</td></tr>
+        <tr><td>110万円超 115万円以下</td><td>21万円</td><td>14万円</td><td>7万円</td></tr>
+        <tr><td>115万円超 120万円以下</td><td>16万円</td><td>11万円</td><td>6万円</td></tr>
+        <tr><td>120万円超 125万円以下</td><td>11万円</td><td>8万円</td><td>4万円</td></tr>
+        <tr><td>125万円超 130万円以下</td><td>6万円</td><td>4万円</td><td>2万円</td></tr>
+        <tr><td>130万円超 133万円以下</td><td>3万円</td><td>2万円</td><td>1万円</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>国税庁 タックスアンサー No.1410「給与所得控除」(令和7年4月1日現在法令等)<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1410.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1410.htm</a>(2026年7月29日参照)</li>
+    <li>国税庁 タックスアンサー No.1180「扶養控除」(令和7年4月1日現在法令等)<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1180.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1180.htm</a>(2026年7月29日参照)</li>
+    <li>国税庁 タックスアンサー No.1177「特定親族特別控除」(令和7年4月1日現在法令等)<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1177.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1177.htm</a>(2026年7月29日参照)</li>
+    <li>国税庁 タックスアンサー No.1191「配偶者控除」(令和7年4月1日現在法令等)<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1191.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1191.htm</a>(2026年7月29日参照)</li>
+    <li>国税庁 タックスアンサー No.1195「配偶者特別控除」(令和7年4月1日現在法令等)<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1195.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1195.htm</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>金額は<strong>令和7年分以後の所得税</strong>のものです(令和7年12月1日施行の改正後)。令和6年分以前は所得要件48万円・給与収入103万円でした。</li>
+    <li>収入は<strong>給与のみ</strong>として計算しています。事業所得・年金・株式・不動産などの所得がある場合は判定できません。</li>
+    <li>所得税の所得控除だけを扱います。<strong>住民税</strong>の扶養控除(一般33万円など)は金額が異なります。</li>
+    <li><strong>社会保険の扶養</strong>(いわゆる106万円・130万円の壁)は税金とは別の制度で、本ツールでは判定できません。</li>
+    <li>年齢はその年の12月31日現在で判定します。年の途中で誕生日を迎える場合は年末時点の年齢を入れてください。</li>
+    <li>納税者と生計を一にしていること、青色・白色事業専従者でないことなどの要件は満たしている前提です。</li>
+    <li>非居住者である親族には追加の要件(留学・障害・年38万円以上の送金など)があり、本ツールでは扱っていません。</li>
+    <li>障害者控除・ひとり親控除は含みません。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">扶養に入れる年収の上限はいくらですか?</h3>
+  <p class="faq-a">所得税では給与収入123万円(合計所得58万円)までです。令和7年分から103万円→123万円に引き上げられました。</p>
+  <h3 class="faq-q">大学生の子が123万円を超えて働いてしまいました。</h3>
+  <p class="faq-a">19歳以上23歳未満なら「特定親族特別控除」の対象です。給与収入188万円(合計所得123万円)までは段階的に控除が受けられ、150万円(合計所得85万円)までは特定扶養親族と同じ63万円のままです。</p>
+  <h3 class="faq-q">103万円の壁はなくなったのですか?</h3>
+  <p class="faq-a">扶養の判定ラインは123万円に上がりました。ただし社会保険の扶養(106万円・130万円)は別制度で、そちらは変わっていません。</p>
+  <h3 class="faq-q">同居老親等とは誰のことですか?</h3>
+  <p class="faq-a">70歳以上の扶養親族のうち、納税者本人または配偶者の直系尊属(父母・祖父母)で、同居している人です。控除額が48万円から58万円に増えます。</p>
+  <h3 class="faq-q">配偶者の年収が133万円を超えるとどうなりますか?</h3>
+  <p class="faq-a">合計所得金額が133万円を超えると配偶者特別控除も使えなくなります。給与収入では約201万5千円が目安です。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_salary: "年収を0以上の数値で入力してください。",
+    invalid_age: "年齢を0〜130の整数で入力してください。",
+    invalid_cohabiting: "同居老親等の選択を確認してください。",
+    invalid_taxpayer_income: "あなたの年収を0以上の数値で入力してください。"
+  };
+  var KIND_LABEL = {
+    under16: "16歳未満のため扶養控除の対象外",
+    general: "一般の控除対象扶養親族",
+    specific: "特定扶養親族",
+    elderly: "老人扶養親族(同居老親等以外)",
+    elderly_cohabiting: "同居老親等",
+    specific_special: "特定親族特別控除",
+    none: "所得が多いため控除の対象外",
+    spouse: "配偶者控除",
+    spouse_elderly: "配偶者控除(老人控除対象配偶者)",
+    spouse_special: "配偶者特別控除",
+    over_taxpayer_income: "あなたの合計所得金額が1,000万円を超えるため対象外"
+  };
+  var TIER_LABEL = ["900万円以下", "900万円超950万円以下", "950万円超1,000万円以下"];
+
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var modeEl = document.getElementById("mode");
+  var salaryEl = document.getElementById("salary");
+  var ageEl = document.getElementById("age");
+  var cohabitEl = document.getElementById("cohabit");
+  var cohabitWrap = document.getElementById("cohabit-wrap");
+  var taxpayerEl = document.getElementById("taxpayer");
+  var taxpayerWrap = document.getElementById("taxpayer-wrap");
+  var advSalaryEl = document.getElementById("adv-salary");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function yen(n) { return n.toLocaleString("ja-JP") + "円"; }
+  function man(n) { return (n / 10000).toLocaleString("ja-JP") + "万円"; }
+
+  function syncMode() {
+    var spouse = modeEl.value === "spouse";
+    taxpayerWrap.hidden = !spouse;
+    cohabitWrap.hidden = spouse;
+  }
+
+  function runAdv() {
+    if (advSalaryEl.value === "") { advBox.hidden = true; return; }
+    var r = FuyoKojoCalc.salaryToIncome(parseFloat(advSalaryEl.value));
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML = '<div class="result-main">合計所得金額 ' + esc(yen(r.incomeYen)) + "</div>" +
+      "<p>給与所得控除額: " + esc(yen(r.deductionYen)) + "</p>";
+    advBox.hidden = false;
+  }
+
+  function run() {
+    if (salaryEl.value === "" || ageEl.value === "") { box.hidden = true; return; }
+    var salary = parseFloat(salaryEl.value);
+    var age = parseInt(ageEl.value, 10);
+    var r, extra = "";
+    if (modeEl.value === "spouse") {
+      if (taxpayerEl.value === "") { box.hidden = true; return; }
+      var t = FuyoKojoCalc.salaryToIncome(parseFloat(taxpayerEl.value));
+      if (!t.ok) {
+        box.innerHTML = '<p class="result-error">' + esc(ERRORS.invalid_taxpayer_income) + "</p>";
+        box.hidden = false;
+        return;
+      }
+      r = FuyoKojoCalc.spouseDeduction(salary, age, t.incomeYen);
+      if (r.ok && r.tier >= 0) {
+        extra = "<li>あなたの合計所得金額: " + esc(yen(t.incomeYen)) + "(" + esc(TIER_LABEL[r.tier]) + "の区分)</li>";
+      }
+    } else {
+      r = FuyoKojoCalc.dependentDeduction(salary, age, cohabitEl.value === "1");
+    }
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var income = r.incomeYen !== undefined ? r.incomeYen : r.spouseIncomeYen;
+    var html = '<div class="result-main">' +
+      (r.eligible ? "控除額 " + esc(man(r.deductionYen)) : "控除なし") + "</div><ul>" +
+      "<li>区分: " + esc(KIND_LABEL[r.kind] || r.kind) + "</li>" +
+      "<li>その人の合計所得金額: " + esc(yen(income)) + "</li>" + extra + "</ul>";
+    box.innerHTML = html;
+    box.hidden = false;
+  }
+
+  modeEl.addEventListener("change", function () { syncMode(); run(); });
+  [salaryEl, ageEl, cohabitEl, taxpayerEl].forEach(function (el) {
+    el.addEventListener("input", run);
+    el.addEventListener("change", run);
+  });
+  advSalaryEl.addEventListener("input", runAdv);
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  syncMode();
+})();
+</script>
+</body>
+</html>

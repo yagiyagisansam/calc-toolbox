@@ -1,0 +1,169 @@
+{
+  "tool": "lumen",
+  "module": "calc.js",
+  "global": "LumenCalc",
+  "cases": [
+    {
+      "name": "代表例: 8畳は標準3,800lm(下限3,300〜上限4,300lm)",
+      "func": "recommend",
+      "args": [8],
+      "expect": { "ok": true, "rankJo": 8, "standardLm": 3800, "minLm": 3300, "maxLm": 4300, "fixtures": 1, "overMax": false }
+    },
+    {
+      "name": "代表例: 6畳は標準3,200lm(下限2,700〜上限3,700lm)",
+      "func": "recommend",
+      "args": [6],
+      "expect": { "ok": true, "rankJo": 6, "standardLm": 3200, "minLm": 2700, "maxLm": 3700 }
+    },
+    {
+      "name": "境界値: 4.5畳ちょうどは最小ランク(標準2,700lm)",
+      "func": "recommend",
+      "args": [4.5],
+      "expect": { "ok": true, "rankJo": 4.5, "standardLm": 2700, "minLm": 2200, "maxLm": 3200 }
+    },
+    {
+      "name": "境界値: 4.6畳は1つ上の〜6畳ランクになる",
+      "func": "recommend",
+      "args": [4.6],
+      "expect": { "ok": true, "rankJo": 6, "standardLm": 3200 }
+    },
+    {
+      "name": "境界値: 14畳ちょうどは1器具で対応できる最大ランク(標準5,600lm)",
+      "func": "recommend",
+      "args": [14],
+      "expect": { "ok": true, "rankJo": 14, "standardLm": 5600, "maxLm": 6100, "fixtures": 1, "overMax": false }
+    },
+    {
+      "name": "境界値超え: 14.1畳は1器具の畳数表示の範囲外で2灯に分ける",
+      "func": "recommend",
+      "args": [14.1],
+      "expect": { "ok": true, "overMax": true, "fixtures": 2, "perFixtureTatami": 7.1, "rankJo": 8 }
+    },
+    {
+      "name": "広い部屋: 20畳は2灯に分けて1灯あたり10畳ランク(4,400lm)",
+      "func": "recommend",
+      "args": [20],
+      "expect": { "ok": true, "fixtures": 2, "perFixtureTatami": 10, "standardLm": 4400 }
+    },
+    {
+      "name": "広い部屋: 30畳は3灯に分けて1灯あたり10畳ランク",
+      "func": "recommend",
+      "args": [30],
+      "expect": { "ok": true, "fixtures": 3, "perFixtureTatami": 10, "rankJo": 10 }
+    },
+    {
+      "name": "異常入力: 広さ0畳はエラー",
+      "func": "recommend",
+      "args": [0],
+      "expect": { "ok": false, "code": "invalid_tatami" }
+    },
+    {
+      "name": "異常入力: 広さが負の値はエラー",
+      "func": "recommend",
+      "args": [-8],
+      "expect": { "ok": false, "code": "invalid_tatami" }
+    },
+    {
+      "name": "異常入力: 広さが数値でないときはエラー",
+      "func": "recommend",
+      "args": ["abc"],
+      "expect": { "ok": false, "code": "invalid_tatami" }
+    },
+    {
+      "name": "異常入力: 広さが上限超え(200畳)はエラー",
+      "func": "recommend",
+      "args": [200],
+      "expect": { "ok": false, "code": "invalid_tatami" }
+    },
+    {
+      "name": "面積換算: 9.72㎡は6.0畳(1畳=1.62㎡)",
+      "func": "fromSquareMeters",
+      "args": [9.72],
+      "expect": { "ok": true, "tatami": 6 }
+    },
+    {
+      "name": "面積換算: 13㎡は8.0畳",
+      "func": "fromSquareMeters",
+      "args": [13],
+      "expect": { "ok": true, "tatami": 8 }
+    },
+    {
+      "name": "異常入力: 面積0㎡はエラー(0除算にしない)",
+      "func": "fromSquareMeters",
+      "args": [0],
+      "expect": { "ok": false, "code": "invalid_area" }
+    },
+    {
+      "name": "異常入力: 面積が上限超え(500㎡)はエラー",
+      "func": "fromSquareMeters",
+      "args": [500],
+      "expect": { "ok": false, "code": "invalid_area" }
+    },
+    {
+      "name": "天井高: 基準の2.4mは補正なし(倍率1.00)",
+      "func": "ceilingFactor",
+      "args": [2.4],
+      "expect": { "ok": true, "factor": 1 }
+    },
+    {
+      "name": "天井高: 2.7mは(2.0/1.7)²=1.38倍",
+      "func": "ceilingFactor",
+      "args": [2.7],
+      "expect": { "ok": true, "factor": 1.38 }
+    },
+    {
+      "name": "天井高: 3.0mは(2.3/1.7)²=1.83倍",
+      "func": "ceilingFactor",
+      "args": [3],
+      "expect": { "ok": true, "factor": 1.83 }
+    },
+    {
+      "name": "境界値: 天井高1.4mは範囲外でエラー",
+      "func": "ceilingFactor",
+      "args": [1.4],
+      "expect": { "ok": false, "code": "invalid_ceiling" }
+    },
+    {
+      "name": "調整: 8畳・100lx・天井2.4mは標準どおり3,800lm",
+      "func": "adjusted",
+      "args": [8],
+      "expect": { "ok": true, "standardLm": 3800, "luxFactor": 1, "ceilingFactor": 1, "requiredLm": 3800 }
+    },
+    {
+      "name": "調整: 8畳を150lx相当にすると1.5倍の5,700lm",
+      "func": "adjusted",
+      "args": [8, 150],
+      "expect": { "ok": true, "luxFactor": 1.5, "requiredLm": 5700 }
+    },
+    {
+      "name": "調整: 8畳・天井2.7mは1.38倍の5,240lm",
+      "func": "adjusted",
+      "args": [8, 100, 2.7],
+      "expect": { "ok": true, "ceilingFactor": 1.38, "requiredLm": 5240 }
+    },
+    {
+      "name": "調整: 20畳は2灯合計8,800lm(1灯4,400lm)",
+      "func": "adjusted",
+      "args": [20, 100, 2.4],
+      "expect": { "ok": true, "fixtures": 2, "requiredPerFixtureLm": 4400, "requiredLm": 8800 }
+    },
+    {
+      "name": "異常入力: 目標照度が範囲外(5lx)はエラー",
+      "func": "adjusted",
+      "args": [8, 5],
+      "expect": { "ok": false, "code": "invalid_lux" }
+    },
+    {
+      "name": "異常入力: 天井高が範囲外(10m)はエラー",
+      "func": "adjusted",
+      "args": [8, 100, 10],
+      "expect": { "ok": false, "code": "invalid_ceiling" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "adjusted",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_tatami" }
+    }
+  ]
+}

@@ -1,0 +1,145 @@
+{
+  "tool": "gearratio",
+  "module": "calc.js",
+  "global": "GearRatioCalc",
+  "cases": [
+    {
+      "name": "出典の例1: 50T/25T(ギア比2.0)・ケイデンス80・周長2100mm → 20.16km/h",
+      "func": "calculate",
+      "args": [50, 25, 2100, 80],
+      "expect": { "ok": true, "ratio": 2, "speedKmh": 20.16, "developmentM": 4.2 }
+    },
+    {
+      "name": "出典の例2: ギア比3.0・ケイデンス90・周長2100mm → 34.02km/h",
+      "func": "calculate",
+      "args": [60, 20, 2100, 90],
+      "expect": { "ok": true, "ratio": 3, "speedKmh": 34.02, "developmentM": 6.3 }
+    },
+    {
+      "name": "トップギア: 50T/11T・ケイデンス90・周長2111mm → 約51.82km/h",
+      "func": "calculate",
+      "args": [50, 11, 2111, 90],
+      "expect": { "ok": true, "ratio": 4.545, "speedKmh": 51.82, "gearInch": 120.25 }
+    },
+    {
+      "name": "ヒルクライム用: 34T/32T・ケイデンス70・周長2111mm → 約9.42km/h",
+      "func": "calculate",
+      "args": [34, 32, 2111, 70],
+      "expect": { "ok": true, "ratio": 1.063, "speedKmh": 9.42, "gearInch": 28.11 }
+    },
+    {
+      "name": "境界値: ケイデンス0なら速度も0(展開長・ギアインチは出る)",
+      "func": "calculate",
+      "args": [50, 25, 2100, 0],
+      "expect": { "ok": true, "speedKmh": 0, "developmentM": 4.2, "gearInch": 52.63 }
+    },
+    {
+      "name": "境界値: 前後とも1Tならギア比1.0",
+      "func": "calculate",
+      "args": [1, 1, 2100, 60],
+      "expect": { "ok": true, "ratio": 1, "developmentM": 2.1 }
+    },
+    {
+      "name": "ホイール外径: 周長2100mmは約26.32インチ",
+      "func": "calculate",
+      "args": [50, 25, 2100, 80],
+      "expect": { "ok": true, "wheelDiameterInch": 26.32 }
+    },
+    {
+      "name": "ケイデンス逆算: 20.16km/hを出すには80rpm(出典の例の逆算)",
+      "func": "cadenceForSpeed",
+      "args": [50, 25, 2100, 20.16],
+      "expect": { "ok": true, "cadenceRpm": 80 }
+    },
+    {
+      "name": "ケイデンス逆算: 目標速度0km/hなら0rpm",
+      "func": "cadenceForSpeed",
+      "args": [50, 25, 2100, 0],
+      "expect": { "ok": true, "cadenceRpm": 0 }
+    },
+    {
+      "name": "ケイデンス逆算: 目標速度が負の値はエラー",
+      "func": "cadenceForSpeed",
+      "args": [50, 25, 2100, -1],
+      "expect": { "ok": false, "code": "invalid_speed" }
+    },
+    {
+      "name": "周長の推定: 700×25C(リム622mm+幅25mm)は約2111mm",
+      "func": "circumferenceFromEtrto",
+      "args": [622, 25],
+      "expect": { "ok": true, "circumferenceMm": 2111, "outerDiameterMm": 672 }
+    },
+    {
+      "name": "周長の推定: 26インチMTB(リム559mm+幅50mm)は約2070mm",
+      "func": "circumferenceFromEtrto",
+      "args": [559, 50],
+      "expect": { "ok": true, "circumferenceMm": 2070, "outerDiameterMm": 659 }
+    },
+    {
+      "name": "周長の推定: リム径0mmはエラー",
+      "func": "circumferenceFromEtrto",
+      "args": [0, 25],
+      "expect": { "ok": false, "code": "invalid_rim" }
+    },
+    {
+      "name": "周長の推定: タイヤ幅0mmはエラー",
+      "func": "circumferenceFromEtrto",
+      "args": [622, 0],
+      "expect": { "ok": false, "code": "invalid_width" }
+    },
+    {
+      "name": "異常入力: フロント歯数0はエラー",
+      "func": "calculate",
+      "args": [0, 25, 2100, 80],
+      "expect": { "ok": false, "code": "invalid_front" }
+    },
+    {
+      "name": "異常入力: フロント歯数が小数はエラー",
+      "func": "calculate",
+      "args": [50.5, 25, 2100, 80],
+      "expect": { "ok": false, "code": "invalid_front" }
+    },
+    {
+      "name": "異常入力: フロント歯数が数値でないときはエラー",
+      "func": "calculate",
+      "args": ["abc", 25, 2100, 80],
+      "expect": { "ok": false, "code": "invalid_front" }
+    },
+    {
+      "name": "異常入力: リア歯数0はエラー(0除算にしない)",
+      "func": "calculate",
+      "args": [50, 0, 2100, 80],
+      "expect": { "ok": false, "code": "invalid_rear" }
+    },
+    {
+      "name": "異常入力: タイヤ周長0mmはエラー",
+      "func": "calculate",
+      "args": [50, 25, 0, 80],
+      "expect": { "ok": false, "code": "invalid_circumference" }
+    },
+    {
+      "name": "異常入力: タイヤ周長が上限5000mmを超えるとエラー",
+      "func": "calculate",
+      "args": [50, 25, 6000, 80],
+      "expect": { "ok": false, "code": "invalid_circumference" }
+    },
+    {
+      "name": "異常入力: ケイデンスが負の値はエラー",
+      "func": "calculate",
+      "args": [50, 25, 2100, -1],
+      "expect": { "ok": false, "code": "invalid_cadence" }
+    },
+    {
+      "name": "異常入力: ケイデンスが上限300rpmを超えるとエラー",
+      "func": "calculate",
+      "args": [50, 25, 2100, 301],
+      "expect": { "ok": false, "code": "invalid_cadence" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_front" }
+    }
+  ]
+}

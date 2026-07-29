@@ -1,0 +1,145 @@
+{
+  "tool": "kami",
+  "module": "calc.js",
+  "global": "KamiCalc",
+  "cases": [
+    {
+      "name": "A4は210×297mm(JIS P 0138)",
+      "func": "size",
+      "args": ["A", 4],
+      "expect": { "ok": true, "name": "A4", "shortMm": 210, "longMm": 297 }
+    },
+    {
+      "name": "B5は182×257mm(JIS-B。ISO-Bとは異なる)",
+      "func": "size",
+      "args": ["B", 5],
+      "expect": { "ok": true, "name": "B5", "shortMm": 182, "longMm": 257 }
+    },
+    {
+      "name": "境界値: A0は841×1189mm(基準サイズ)",
+      "func": "size",
+      "args": ["A", 0],
+      "expect": { "ok": true, "shortMm": 841, "longMm": 1189, "areaMm2": 999949 }
+    },
+    {
+      "name": "境界値: B0は1030×1456mm(基準サイズ)",
+      "func": "size",
+      "args": ["B", 0],
+      "expect": { "ok": true, "shortMm": 1030, "longMm": 1456 }
+    },
+    {
+      "name": "境界値: 表の下限A10は26×37mm",
+      "func": "size",
+      "args": ["A", 10],
+      "expect": { "ok": true, "shortMm": 26, "longMm": 37 }
+    },
+    {
+      "name": "A4を300dpiにすると2480×3508px",
+      "func": "pixels",
+      "args": ["A", 4, 300],
+      "expect": { "ok": true, "shortPx": 2480, "longPx": 3508, "shortInch": 8.27, "longInch": 11.69 }
+    },
+    {
+      "name": "A4を350dpi(印刷入稿の標準)にすると2894×4093px",
+      "func": "pixels",
+      "args": ["A", 4, 350],
+      "expect": { "ok": true, "shortPx": 2894, "longPx": 4093 }
+    },
+    {
+      "name": "A4を72dpiにすると595×842px(PDFのポイント寸法と一致)",
+      "func": "pixels",
+      "args": ["A", 4, 72],
+      "expect": { "ok": true, "shortPx": 595, "longPx": 842 }
+    },
+    {
+      "name": "B5を350dpiにすると2508×3541px(同人誌の入稿サイズ)",
+      "func": "pixels",
+      "args": ["B", 5, 350],
+      "expect": { "ok": true, "shortPx": 2508, "longPx": 3541 }
+    },
+    {
+      "name": "塗り足し3mmを四辺に付けたA4は216×303mm・350dpiで2976×4175px",
+      "func": "withBleed",
+      "args": ["A", 4, 350, 3],
+      "expect": { "ok": true, "shortMm": 216, "longMm": 303, "shortPx": 2976, "longPx": 4175 }
+    },
+    {
+      "name": "境界値: 塗り足し0mmは元の寸法と同じ",
+      "func": "withBleed",
+      "args": ["A", 4, 350, 0],
+      "expect": { "ok": true, "shortMm": 210, "longMm": 297, "shortPx": 2894 }
+    },
+    {
+      "name": "面積比: B5はA4の約0.75倍(B判のほうが大きい)",
+      "func": "areaRatio",
+      "args": ["B", 5, "A", 4],
+      "expect": { "ok": true, "ratio": 0.75, "percent": 75 }
+    },
+    {
+      "name": "面積比: A4はA3のちょうど半分",
+      "func": "areaRatio",
+      "args": ["A", 4, "A", 3],
+      "expect": { "ok": true, "ratio": 0.5, "percent": 50 }
+    },
+    {
+      "name": "面積比: 同じサイズ同士は1倍",
+      "func": "areaRatio",
+      "args": ["A", 4, "A", 4],
+      "expect": { "ok": true, "ratio": 1, "percent": 100 }
+    },
+    {
+      "name": "異常入力: C判など未対応の規格はエラー",
+      "func": "size",
+      "args": ["C", 4],
+      "expect": { "ok": false, "code": "invalid_series" }
+    },
+    {
+      "name": "異常入力: プロトタイプのプロパティ名を規格に渡してもエラー",
+      "func": "size",
+      "args": ["toString", 4],
+      "expect": { "ok": false, "code": "invalid_series" }
+    },
+    {
+      "name": "異常入力: 表にないA11はエラー",
+      "func": "size",
+      "args": ["A", 11],
+      "expect": { "ok": false, "code": "invalid_number" }
+    },
+    {
+      "name": "異常入力: 番号が負の値はエラー",
+      "func": "size",
+      "args": ["A", -1],
+      "expect": { "ok": false, "code": "invalid_number" }
+    },
+    {
+      "name": "異常入力: 番号が小数はエラー",
+      "func": "size",
+      "args": ["A", 2.5],
+      "expect": { "ok": false, "code": "invalid_number" }
+    },
+    {
+      "name": "異常入力: 解像度0dpiはエラー(0除算にしない)",
+      "func": "pixels",
+      "args": ["A", 4, 0],
+      "expect": { "ok": false, "code": "invalid_dpi" }
+    },
+    {
+      "name": "異常入力: 解像度が上限4800dpiを超えるとエラー",
+      "func": "pixels",
+      "args": ["A", 4, 5000],
+      "expect": { "ok": false, "code": "invalid_dpi" }
+    },
+    {
+      "name": "異常入力: 塗り足しが負の値はエラー",
+      "func": "withBleed",
+      "args": ["A", 4, 350, -1],
+      "expect": { "ok": false, "code": "invalid_bleed" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "size",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_series" }
+    }
+  ]
+}

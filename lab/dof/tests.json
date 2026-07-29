@@ -1,0 +1,145 @@
+{
+  "tool": "dof",
+  "module": "calc.js",
+  "global": "DofCalc",
+  "cases": [
+    {
+      "name": "代表例: 50mm・F2.8・3m・許容錯乱円0.03mm → 2.730m〜3.331m(深度0.601m)",
+      "func": "calculate",
+      "args": [50, 2.8, 3, 0.03],
+      "expect": { "ok": true, "nearM": 2.73, "farM": 3.331, "frontM": 0.27, "rearM": 0.331, "totalM": 0.601, "isFarInfinite": false }
+    },
+    {
+      "name": "同条件の過焦点距離は29.812m(f²/(δ・F)+f)",
+      "func": "hyperfocal",
+      "args": [50, 2.8, 0.03],
+      "expect": { "ok": true, "hyperfocalM": 29.812 }
+    },
+    {
+      "name": "後方の深度は前方より大きい(50mm F2.8 3mで前0.270m・後0.331m)",
+      "func": "calculate",
+      "args": [50, 2.8, 3, 0.03],
+      "expect": { "ok": true, "frontM": 0.27, "rearM": 0.331 }
+    },
+    {
+      "name": "境界の直前: 29.7mではまだ奥端が有限(過焦点距離29.812mの手前)",
+      "func": "calculate",
+      "args": [50, 2.8, 29.7, 0.03],
+      "expect": { "ok": true, "isFarInfinite": false, "nearM": 14.89 }
+    },
+    {
+      "name": "境界: 29.8mでは奥端が無限遠になり farM は null",
+      "func": "calculate",
+      "args": [50, 2.8, 29.8, 0.03],
+      "expect": { "ok": true, "isFarInfinite": true, "farM": null, "totalM": null, "nearM": 14.915 }
+    },
+    {
+      "name": "明るい望遠は極端に浅い: 85mm・F1.4・2m・0.033mmで深度0.049m",
+      "func": "calculate",
+      "args": [85, 1.4, 2, 0.033],
+      "expect": { "ok": true, "nearM": 1.976, "farM": 2.025, "totalM": 0.049 }
+    },
+    {
+      "name": "広角を絞ると無限遠まで入る: 24mm・F8・5m・0.033mm(過焦点距離2.206m)",
+      "func": "calculate",
+      "args": [24, 8, 5, 0.033],
+      "expect": { "ok": true, "isFarInfinite": true, "nearM": 1.536, "hyperfocalM": 2.206 }
+    },
+    {
+      "name": "接写は数mmしかない: 100mm・F16・0.3m・0.033mmで深度0.006m",
+      "func": "calculate",
+      "args": [100, 16, 0.3, 0.033],
+      "expect": { "ok": true, "nearM": 0.297, "farM": 0.303, "totalM": 0.006 }
+    },
+    {
+      "name": "許容錯乱円: フルサイズは0.033mm(対角43.27mm÷1300)",
+      "func": "cocForSensor",
+      "args": ["fullframe"],
+      "expect": { "ok": true, "cocMm": 0.033 }
+    },
+    {
+      "name": "許容錯乱円: マイクロフォーサーズは0.017mm(対角21.64mm÷1300)",
+      "func": "cocForSensor",
+      "args": ["m43"],
+      "expect": { "ok": true, "cocMm": 0.017 }
+    },
+    {
+      "name": "許容錯乱円: 1型は0.012mm(対角15.86mm÷1300)",
+      "func": "cocForSensor",
+      "args": ["type1"],
+      "expect": { "ok": true, "cocMm": 0.012 }
+    },
+    {
+      "name": "境界: 許容錯乱円の上限0.2mmでも計算できる",
+      "func": "calculate",
+      "args": [50, 2.8, 3, 0.2],
+      "expect": { "ok": true, "nearM": 1.814, "farM": 9.044 }
+    },
+    {
+      "name": "異常入力: 焦点距離0mmはエラー",
+      "func": "calculate",
+      "args": [0, 2.8, 3, 0.03],
+      "expect": { "ok": false, "code": "invalid_focal" }
+    },
+    {
+      "name": "異常入力: 焦点距離が負の値はエラー",
+      "func": "calculate",
+      "args": [-50, 2.8, 3, 0.03],
+      "expect": { "ok": false, "code": "invalid_focal" }
+    },
+    {
+      "name": "異常入力: 数値でない焦点距離はエラー",
+      "func": "calculate",
+      "args": ["abc", 2.8, 3, 0.03],
+      "expect": { "ok": false, "code": "invalid_focal" }
+    },
+    {
+      "name": "異常入力: F値0はエラー(0除算にならない)",
+      "func": "calculate",
+      "args": [50, 0, 3, 0.03],
+      "expect": { "ok": false, "code": "invalid_fnumber" }
+    },
+    {
+      "name": "異常入力: F値が上限(100)超はエラー",
+      "func": "calculate",
+      "args": [50, 200, 3, 0.03],
+      "expect": { "ok": false, "code": "invalid_fnumber" }
+    },
+    {
+      "name": "異常入力: 被写体距離0mはエラー",
+      "func": "calculate",
+      "args": [50, 2.8, 0, 0.03],
+      "expect": { "ok": false, "code": "invalid_distance" }
+    },
+    {
+      "name": "異常入力: 被写体距離が焦点距離以下(50mmレンズで0.04m)はエラー",
+      "func": "calculate",
+      "args": [50, 2.8, 0.04, 0.03],
+      "expect": { "ok": false, "code": "invalid_distance" }
+    },
+    {
+      "name": "異常入力: 被写体距離が上限(10000m)超はエラー",
+      "func": "calculate",
+      "args": [50, 2.8, 10001, 0.03],
+      "expect": { "ok": false, "code": "invalid_distance" }
+    },
+    {
+      "name": "異常入力: 許容錯乱円0mmはエラー(0除算にならない)",
+      "func": "calculate",
+      "args": [50, 2.8, 3, 0],
+      "expect": { "ok": false, "code": "invalid_coc" }
+    },
+    {
+      "name": "異常入力: 存在しないセンサー名はエラー",
+      "func": "cocForSensor",
+      "args": ["zz"],
+      "expect": { "ok": false, "code": "invalid_sensor" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_focal" }
+    }
+  ]
+}

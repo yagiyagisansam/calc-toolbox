@@ -1,0 +1,213 @@
+{
+  "tool": "egfr",
+  "module": "calc.js",
+  "global": "EgfrCalc",
+  "cases": [
+    {
+      "name": "学会早見表と一致: 男性・Cr1.00・50歳は63.1(G2)",
+      "func": "calculate",
+      "args": [1.0, 50, "male"],
+      "expect": {
+        "ok": true,
+        "egfr": 63.1,
+        "stage": "G2"
+      }
+    },
+    {
+      "name": "学会早見表と一致: 女性・Cr1.00・50歳は46.6(男性値×0.739・G3a)",
+      "func": "calculate",
+      "args": [1.0, 50, "female"],
+      "expect": {
+        "ok": true,
+        "egfr": 46.6,
+        "stage": "G3a"
+      }
+    },
+    {
+      "name": "学会早見表と一致: 男性・Cr0.60・20歳は143.6(G1)",
+      "func": "calculate",
+      "args": [0.6, 20, "male"],
+      "expect": {
+        "ok": true,
+        "egfr": 143.6,
+        "stage": "G1"
+      }
+    },
+    {
+      "name": "学会早見表と一致: 女性・Cr0.60・20歳は106.1(G1)",
+      "func": "calculate",
+      "args": [0.6, 20, "female"],
+      "expect": {
+        "ok": true,
+        "egfr": 106.1,
+        "stage": "G1"
+      }
+    },
+    {
+      "name": "学会早見表と一致: 男性・Cr0.80・80歳は70.4(G2)",
+      "func": "calculate",
+      "args": [0.8, 80, "male"],
+      "expect": {
+        "ok": true,
+        "egfr": 70.4,
+        "stage": "G2"
+      }
+    },
+    {
+      "name": "学会早見表と一致: 男性・Cr1.10・70歳は51.6(G3a)",
+      "func": "calculate",
+      "args": [1.1, 70, "male"],
+      "expect": {
+        "ok": true,
+        "egfr": 51.6,
+        "stage": "G3a"
+      }
+    },
+    {
+      "name": "学会早見表と一致: 女性・Cr0.70・60歳は65.4(G2)",
+      "func": "calculate",
+      "args": [0.7, 60, "female"],
+      "expect": {
+        "ok": true,
+        "egfr": 65.4,
+        "stage": "G2"
+      }
+    },
+    {
+      "name": "重度: 男性・Cr5.0・60歳はG5(15未満)",
+      "func": "calculate",
+      "args": [5.0, 60, "male"],
+      "expect": {
+        "ok": true,
+        "stage": "G5"
+      }
+    },
+    {
+      "name": "区分判定: 90ちょうどはG1",
+      "func": "stageOf",
+      "args": [90],
+      "expect": "G1"
+    },
+    {
+      "name": "区分判定: 89.99はG2",
+      "func": "stageOf",
+      "args": [89.99],
+      "expect": "G2"
+    },
+    {
+      "name": "区分判定: 60ちょうどはG2",
+      "func": "stageOf",
+      "args": [60],
+      "expect": "G2"
+    },
+    {
+      "name": "区分判定: 45ちょうどはG3a、44.99はG3b",
+      "func": "stageOf",
+      "args": [44.99],
+      "expect": "G3b"
+    },
+    {
+      "name": "区分判定: 30ちょうどはG3b",
+      "func": "stageOf",
+      "args": [30],
+      "expect": "G3b"
+    },
+    {
+      "name": "区分判定: 15ちょうどはG4、14.99はG5",
+      "func": "stageOf",
+      "args": [14.99],
+      "expect": "G5"
+    },
+    {
+      "name": "逆算: 男性50歳でeGFR60になる血清クレアチニン値は1.05mg/dL",
+      "func": "creatinineFor",
+      "args": [60, 50, "male"],
+      "expect": {
+        "ok": true,
+        "crMgDl": 1.05
+      }
+    },
+    {
+      "name": "逆算の検算: 男性50歳・Cr1.05(小数第2位に丸めた値)を戻すとeGFR59.8でG3a側に入る",
+      "func": "calculate",
+      "args": [1.05, 50, "male"],
+      "expect": {
+        "ok": true,
+        "egfr": 59.8,
+        "stage": "G3a"
+      }
+    },
+    {
+      "name": "境界値: 年齢18歳(下限)は計算できる",
+      "func": "calculate",
+      "args": [1.0, 18, "male"],
+      "expect": {
+        "ok": true,
+        "stage": "G2"
+      }
+    },
+    {
+      "name": "異常入力: 年齢17歳(下限未満)はエラー",
+      "func": "calculate",
+      "args": [1.0, 17, "male"],
+      "expect": {
+        "ok": false,
+        "code": "invalid_age"
+      }
+    },
+    {
+      "name": "異常入力: 血清クレアチニンが0はエラー",
+      "func": "calculate",
+      "args": [0, 50, "male"],
+      "expect": {
+        "ok": false,
+        "code": "invalid_cr"
+      }
+    },
+    {
+      "name": "異常入力: 血清クレアチニンが負の値はエラー",
+      "func": "calculate",
+      "args": [-1, 50, "male"],
+      "expect": {
+        "ok": false,
+        "code": "invalid_cr"
+      }
+    },
+    {
+      "name": "異常入力: 血清クレアチニンが上限超過(50)はエラー",
+      "func": "calculate",
+      "args": [50, 50, "male"],
+      "expect": {
+        "ok": false,
+        "code": "invalid_cr"
+      }
+    },
+    {
+      "name": "異常入力: 血清クレアチニンが数値でない場合はエラー",
+      "func": "calculate",
+      "args": ["1.0", 50, "male"],
+      "expect": {
+        "ok": false,
+        "code": "invalid_cr"
+      }
+    },
+    {
+      "name": "異常入力: 性別の指定が不正な場合はエラー",
+      "func": "calculate",
+      "args": [1.0, 50, "男"],
+      "expect": {
+        "ok": false,
+        "code": "invalid_sex"
+      }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": {
+        "ok": false,
+        "code": "invalid_cr"
+      }
+    }
+  ]
+}

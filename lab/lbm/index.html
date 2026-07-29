@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>除脂肪体重・FFMI計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="体重と体脂肪率から除脂肪体重(筋肉量の目安)と、身長で補正したFFMI(除脂肪量指数)を計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>除脂肪体重・FFMI計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>性別
+      <select id="sex">
+        <option value="male">男性</option>
+        <option value="female">女性</option>
+      </select>
+    </label>
+    <div class="field-row">
+      <label>身長(cm)
+        <input type="number" id="height" inputmode="decimal" step="0.1" min="100" max="250" placeholder="175">
+      </label>
+      <label>体重(kg)
+        <input type="number" id="weight" inputmode="decimal" step="0.1" min="20" max="300" placeholder="70">
+      </label>
+      <label>体脂肪率(%)
+        <span class="field-note">体組成計の値でOK</span>
+        <input type="number" id="fat" inputmode="decimal" step="0.1" min="1" max="70" placeholder="20">
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 体脂肪率が分からないときの推定・目標FFMIの逆算</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">身長と体重だけからの推定除脂肪体重</h3>
+      <p class="adv-note">体組成計がないときの目安です。3つの式で結果が異なるため、幅として見てください。</p>
+      <div class="tool-result" id="adv-est" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">目標のFFMIに必要な除脂肪体重</h3>
+      <p class="adv-note">身長補正前のFFMIで指定します。</p>
+      <label>目標FFMI
+        <input type="number" id="target" inputmode="decimal" step="0.1" min="10" max="30" placeholder="20">
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    FFMIの<strong>上限25.0</strong>は、1995年の論文でステロイドを使っていない<strong>男性アスリート</strong>を対象に観察された値です。一般の人の健康基準ではなく、女性についての同じ基準はこの論文にはありません。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>体組成計で「体脂肪率○%」まで分かったあと、<strong>脂肪以外の重さ(除脂肪体重＝筋肉・骨・水分の合計)</strong>と、それを身長で割った<strong>FFMI</strong>がわかります。体重やBMIと違って身長差の影響を除けるので、筋トレやダイエットの進み具合を比べる指標になります。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>性別・身長・体重を入れます。</li>
+    <li>体組成計で測った体脂肪率を入れると、その瞬間に除脂肪体重とFFMIが表示されます。</li>
+    <li>体脂肪率が分からないときは「＋詳細機能」の推定式を使ってください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>体脂肪量</strong> = 体重 × 体脂肪率 ÷ 100</li>
+    <li><strong>除脂肪体重(LBM)</strong> = 体重 − 体脂肪量 = 体重 × (1 − 体脂肪率 ÷ 100)</li>
+    <li><strong>FFMI</strong> = 除脂肪体重(kg) ÷ 身長(m)²</li>
+    <li><strong>身長補正FFMI</strong> = FFMI + 6.3 × (1.80 − 身長(m))(身長1.8mの人に揃えた値)</li>
+    <li><strong>推定除脂肪体重(Boer式)</strong> = 男性 0.407×体重 + 0.267×身長 − 19.2 / 女性 0.252×体重 + 0.473×身長 − 48.3(身長はcm)</li>
+    <li><strong>推定除脂肪体重(James式)</strong> = 男性 1.1×体重 − 128×(体重÷身長)² / 女性 1.07×体重 − 148×(体重÷身長)²</li>
+    <li><strong>推定除脂肪体重(Hume式)</strong> = 男性 0.32810×体重 + 0.33929×身長 − 29.5336 / 女性 0.29569×体重 + 0.41813×身長 − 43.2933</li>
+  </ul>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>Kouri EM, Pope HG Jr, Katz DL, Oliva P. "Fat-free mass index in users and nonusers of anabolic-androgenic steroids." Clin J Sport Med. 1995;5(4):223-8. PMID: 7496846(FFMIの定義、身長補正 6.3×(1.80m−身長)、非使用者の上限25.0)<br>
+      <a href="https://pubmed.ncbi.nlm.nih.gov/7496846/" rel="noopener" target="_blank">https://pubmed.ncbi.nlm.nih.gov/7496846/</a>(2026年7月29日参照)</li>
+    <li>Calculator.net「Lean Body Mass Calculator」(除脂肪体重の定義、Boer / James / Hume の推定式)<br>
+      <a href="https://www.calculator.net/lean-body-mass-calculator.html" rel="noopener" target="_blank">https://www.calculator.net/lean-body-mass-calculator.html</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>身長補正の係数は原著論文どおり<strong>6.3</strong>を使っています。ウェブ上の計算機には6.1を使うものもあり、身長が1.8mから離れるほど結果に差が出ます。</li>
+    <li>体脂肪率は家庭用体組成計の値でかまいませんが、機種・時間帯・水分量で数%ずれます。除脂肪体重もその分ぶれます。</li>
+    <li>除脂肪体重は筋肉だけでなく、骨・内臓・体水分を含んだ重さです。筋肉量そのものではありません。</li>
+    <li>上限25.0は男性アスリートを対象とした観察値です。健康・不健康を判定する基準ではありません。</li>
+    <li>推定式(Boer / James / Hume)は体脂肪率を使わないため、体格が平均から外れる人ほど誤差が大きくなります。</li>
+    <li>成長期の子ども、妊娠中の方、むくみのある方には当てはまりません。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">BMIと何が違いますか?</h3>
+  <p class="faq-a">BMIは体重をそのまま身長の二乗で割るため、脂肪と筋肉を区別できません。FFMIは脂肪を除いた重さだけを使うので、「筋肉質で体重が重い」のか「脂肪が多くて重い」のかを分けて見られます。</p>
+  <h3 class="faq-q">身長補正FFMIは何のためにありますか?</h3>
+  <p class="faq-a">FFMIは背の低い人ほど高く出やすい性質があるため、身長1.8mの人に揃えて比べられるようにした値です。他人と比較するときはこちらを使います。</p>
+  <h3 class="faq-q">目安としてどのくらいの値ですか?</h3>
+  <p class="faq-a">出典の論文では、ステロイドを使っていない男性アスリートの身長補正FFMIが25.0までに収まり、プレステロイド時代(1939〜1959年)のミスター・アメリカ受賞者の平均が25.4だったと報告されています。一般の男性はこれよりかなり低い値になります。</p>
+  <h3 class="faq-q">体脂肪率が分からないときはどうすればよいですか?</h3>
+  <p class="faq-a">「＋詳細機能」の推定式で、身長と体重だけからおおよその除脂肪体重を出せます。ただし3つの式で結果が数kg違うため、幅として捉えてください。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_sex: "性別を選び直してください。",
+    invalid_height: "身長を100〜250cmの範囲で入力してください。",
+    invalid_weight: "体重を20〜300kgの範囲で入力してください。",
+    invalid_body_fat: "体脂肪率を1〜70%の範囲で入力してください。",
+    invalid_target_ffmi: "目標FFMIを10〜30の範囲で入力してください。"
+  };
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  var box = document.getElementById("result");
+  var estBox = document.getElementById("adv-est");
+  var advBox = document.getElementById("adv-result");
+  var sexEl = document.getElementById("sex");
+  var hEl = document.getElementById("height");
+  var wEl = document.getElementById("weight");
+  var fEl = document.getElementById("fat");
+  var tEl = document.getElementById("target");
+
+  function run() {
+    if (hEl.value === "" || wEl.value === "") { box.hidden = true; estBox.hidden = true; runTarget(); return; }
+    var h = parseFloat(hEl.value), w = parseFloat(wEl.value);
+
+    var e = LbmCalc.estimateLbm(sexEl.value, h, w);
+    if (e.ok) {
+      estBox.innerHTML = "<p>Boer式 " + esc(e.boer.toFixed(1)) + " kg / James式 " + esc(e.james.toFixed(1)) +
+        " kg / Hume式 " + esc(e.hume.toFixed(1)) + " kg</p>";
+      estBox.hidden = false;
+    } else {
+      estBox.hidden = true;
+    }
+
+    if (fEl.value === "") { box.hidden = true; runTarget(); return; }
+    var r = LbmCalc.calculate(sexEl.value, h, w, parseFloat(fEl.value));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      runTarget();
+      return;
+    }
+    var body = '<div class="result-main">除脂肪体重 ' + esc(r.leanMassKg.toFixed(1)) + " kg</div>" +
+      "<p>体脂肪量 " + esc(r.fatMassKg.toFixed(1)) + " kg</p>" +
+      "<p>FFMI " + esc(r.ffmi.toFixed(1)) + " / 身長補正FFMI " + esc(r.normalizedFfmi.toFixed(1)) + "</p>";
+    if (r.overMaleLimit === true) {
+      body += "<p>身長補正FFMIが、出典の論文で示された男性アスリートの上限25.0を超えています。体脂肪率の測定値がずれている可能性もあります。</p>";
+    }
+    box.innerHTML = body;
+    box.hidden = false;
+    runTarget();
+  }
+
+  function runTarget() {
+    if (hEl.value === "" || tEl.value === "") { advBox.hidden = true; return; }
+    var r = LbmCalc.leanMassForFfmi(parseFloat(hEl.value), parseFloat(tEl.value));
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML = '<div class="result-main">除脂肪体重 ' + esc(r.leanMassKg.toFixed(1)) + " kg</div>" +
+      "<p>この身長で目標のFFMIに届くために必要な、脂肪以外の重さです。</p>";
+    advBox.hidden = false;
+  }
+
+  [hEl, wEl, fEl].forEach(function (el) { el.addEventListener("input", run); });
+  tEl.addEventListener("input", runTarget);
+  sexEl.addEventListener("change", run);
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

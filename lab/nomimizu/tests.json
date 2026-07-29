@@ -1,0 +1,127 @@
+{
+  "tool": "nomimizu",
+  "module": "calc.js",
+  "global": "NomimizuCalc",
+  "cases": [
+    {
+      "name": "a式の代表例: 体重60kg・6時間・係数5は脱水量1,800mL、補給量1,260mL",
+      "func": "simple",
+      "args": [60, 6, 5],
+      "expect": { "ok": true, "consumptionMl": 1800, "consumptionKcal": 1800, "intakeMinMl": 1260, "intakeMaxMl": 1800 }
+    },
+    {
+      "name": "夏日の係数7では同じ条件で脱水量2,520mL・補給量1,764mL",
+      "func": "simple",
+      "args": [60, 6, 7],
+      "expect": { "ok": true, "consumptionMl": 2520, "intakeMinMl": 1764 }
+    },
+    {
+      "name": "係数を省略すると原典の標準値5が使われる",
+      "func": "simple",
+      "args": [60, 6],
+      "expect": { "ok": true, "coef": 5, "consumptionMl": 1800 }
+    },
+    {
+      "name": "体重50kg・日帰り8時間・係数6は脱水量2,400mL",
+      "func": "simple",
+      "args": [50, 8, 6],
+      "expect": { "ok": true, "consumptionMl": 2400, "intakeMinMl": 1680 }
+    },
+    {
+      "name": "b式の代表例: 体重60kg+装備10kg、5時間・水平8km・上昇1km・下降1kmは1,540mL",
+      "func": "general",
+      "args": [60, 10, 5, 8, 1, 1],
+      "expect": { "ok": true, "totalWeightKg": 70, "constant": 22, "consumptionMl": 1540, "intakeMinMl": 1078 }
+    },
+    {
+      "name": "b式: 装備0kgでも計算できる(体重60kg・3時間だけなら324mL)",
+      "func": "general",
+      "args": [60, 0, 3, 0, 0, 0],
+      "expect": { "ok": true, "totalWeightKg": 60, "constant": 5.4, "consumptionMl": 324 }
+    },
+    {
+      "name": "b式: 標高差1,200m登って下りる日帰り(体重55kg+装備8kg、7時間・水平10km)",
+      "func": "general",
+      "args": [55, 8, 7, 10, 1.2, 1.2],
+      "expect": { "ok": true, "totalWeightKg": 63, "constant": 28.32, "consumptionMl": 1784, "intakeMinMl": 1249 }
+    },
+    {
+      "name": "補給ペース: 1,260mLを6時間で割ると1時間あたり210mL、3時間超なので電解質も必要",
+      "func": "pace",
+      "args": [1260, 6],
+      "expect": { "ok": true, "perHourMl": 210, "needsElectrolyte": true, "waterWeightKg": 1.26 }
+    },
+    {
+      "name": "補給ペース: 行動時間がちょうど3時間なら電解質の追加補給は不要の扱い",
+      "func": "pace",
+      "args": [600, 3],
+      "expect": { "ok": true, "perHourMl": 200, "needsElectrolyte": false }
+    },
+    {
+      "name": "境界値: 体重200kg・24時間・係数10でも計算できる",
+      "func": "simple",
+      "args": [200, 24, 10],
+      "expect": { "ok": true, "consumptionMl": 48000 }
+    },
+    {
+      "name": "異常入力: 体重0kgはエラー",
+      "func": "simple",
+      "args": [0, 6, 5],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 行動時間0時間はエラー",
+      "func": "simple",
+      "args": [60, 0, 5],
+      "expect": { "ok": false, "code": "invalid_hours" }
+    },
+    {
+      "name": "異常入力: 係数0はエラー",
+      "func": "simple",
+      "args": [60, 6, 0],
+      "expect": { "ok": false, "code": "invalid_coef" }
+    },
+    {
+      "name": "異常入力: 係数が大きすぎる(20)はエラー",
+      "func": "simple",
+      "args": [60, 6, 20],
+      "expect": { "ok": false, "code": "invalid_coef" }
+    },
+    {
+      "name": "異常入力: 体重が数値でないときはエラー",
+      "func": "simple",
+      "args": ["abc", 6, 5],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "simple",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: b式で装備重量が負の値はエラー",
+      "func": "general",
+      "args": [60, -5, 5, 8, 1, 1],
+      "expect": { "ok": false, "code": "invalid_gear" }
+    },
+    {
+      "name": "異常入力: b式で上昇距離が負の値はエラー",
+      "func": "general",
+      "args": [60, 10, 5, 8, -1, 1],
+      "expect": { "ok": false, "code": "invalid_distance" }
+    },
+    {
+      "name": "異常入力: 補給量0mLはエラー",
+      "func": "pace",
+      "args": [0, 6],
+      "expect": { "ok": false, "code": "invalid_intake" }
+    },
+    {
+      "name": "異常入力: 行動時間が24時間を超えるとエラー",
+      "func": "simple",
+      "args": [60, 25, 5],
+      "expect": { "ok": false, "code": "invalid_hours" }
+    }
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "tool": "suibun",
+  "module": "calc.js",
+  "global": "SuibunCalc",
+  "cases": [
+    {
+      "name": "成人男性(19歳以上)の総水分量の目安は3,700mL、うち飲み物から2,997mL",
+      "func": "adequateIntake",
+      "args": [30, "male"],
+      "expect": { "ok": true, "totalWaterMl": 3700, "fromDrinksMl": 2997, "fromFoodMl": 703 }
+    },
+    {
+      "name": "成人女性(19歳以上)の総水分量の目安は2,700mL、うち飲み物から2,187mL",
+      "func": "adequateIntake",
+      "args": [30, "female"],
+      "expect": { "ok": true, "totalWaterMl": 2700, "fromDrinksMl": 2187 }
+    },
+    {
+      "name": "境界値: 18歳男性は3,300mL、19歳男性から3,700mLになる",
+      "func": "adequateIntake",
+      "args": [18, "male"],
+      "expect": { "ok": true, "totalWaterMl": 3300 }
+    },
+    {
+      "name": "境界値: 19歳男性は3,700mL",
+      "func": "adequateIntake",
+      "args": [19, "male"],
+      "expect": { "ok": true, "totalWaterMl": 3700 }
+    },
+    {
+      "name": "9〜13歳は男子2,400mL・女子2,100mL",
+      "func": "adequateIntake",
+      "args": [10, "female"],
+      "expect": { "ok": true, "totalWaterMl": 2100 }
+    },
+    {
+      "name": "4〜8歳は性別によらず1,700mL",
+      "func": "adequateIntake",
+      "args": [5, "male"],
+      "expect": { "ok": true, "totalWaterMl": 1700 }
+    },
+    {
+      "name": "下限: 生後6か月まで(0.5歳)は700mL",
+      "func": "adequateIntake",
+      "args": [0.5, "female"],
+      "expect": { "ok": true, "totalWaterMl": 700 }
+    },
+    {
+      "name": "体重からの簡易法: 82kgはおよそ2,670mL(約2.7L)",
+      "func": "weightBased",
+      "args": [82],
+      "expect": { "ok": true, "ml": 2670, "mlPerKg": 32.6 }
+    },
+    {
+      "name": "体重からの簡易法: 60kgはおよそ1,960mL",
+      "func": "weightBased",
+      "args": [60],
+      "expect": { "ok": true, "ml": 1960 }
+    },
+    {
+      "name": "運動の追加: ふつうの環境で1時間なら500〜750mL",
+      "func": "exerciseAddition",
+      "args": [1, "normal"],
+      "expect": { "ok": true, "minMl": 500, "maxMl": 750 }
+    },
+    {
+      "name": "運動の追加: 暑い環境で2時間なら1,000〜1,660mL",
+      "func": "exerciseAddition",
+      "args": [2, "hot"],
+      "expect": { "ok": true, "minMl": 1000, "maxMl": 1660 }
+    },
+    {
+      "name": "境界値: 運動時間0時間なら追加は0mL",
+      "func": "exerciseAddition",
+      "args": [0, "cool"],
+      "expect": { "ok": true, "minMl": 0, "maxMl": 0 }
+    },
+    {
+      "name": "総合計算: 30歳男性・70kg・運動1時間・ふつうは飲み物3,497〜3,747mL",
+      "func": "calculate",
+      "args": [30, "male", 70, 1, "normal"],
+      "expect": { "ok": true, "totalWaterMl": 3700, "fromDrinksMl": 2997, "drinkMinMl": 3497, "drinkMaxMl": 3747, "weightBasedMl": 2280 }
+    },
+    {
+      "name": "総合計算: 運動なしなら飲み物の目安は上下限とも同じ値になる",
+      "func": "calculate",
+      "args": [30, "female", 55, 0, "normal"],
+      "expect": { "ok": true, "drinkMinMl": 2187, "drinkMaxMl": 2187, "glassesMin": 10.9 }
+    },
+    {
+      "name": "異常入力: 年齢が負の値はエラー",
+      "func": "calculate",
+      "args": [-1, "male", 70, 1, "normal"],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "異常入力: 性別が不正な文字列はエラー",
+      "func": "calculate",
+      "args": [30, "other", 70, 1, "normal"],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    },
+    {
+      "name": "異常入力: 体重0kgはエラー",
+      "func": "calculate",
+      "args": [30, "male", 0, 1, "normal"],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 環境の指定が不正な文字列はエラー",
+      "func": "calculate",
+      "args": [30, "male", 70, 1, "freezing"],
+      "expect": { "ok": false, "code": "invalid_condition" }
+    },
+    {
+      "name": "異常入力: 運動時間が負の値はエラー",
+      "func": "exerciseAddition",
+      "args": [-1, "normal"],
+      "expect": { "ok": false, "code": "invalid_hours" }
+    },
+    {
+      "name": "異常入力: 体重が数値でないときはエラー",
+      "func": "weightBased",
+      "args": ["abc"],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    },
+    {
+      "name": "異常入力: 年齢が上限を超える(130歳)はエラー",
+      "func": "adequateIntake",
+      "args": [130, "male"],
+      "expect": { "ok": false, "code": "invalid_age" }
+    }
+  ]
+}

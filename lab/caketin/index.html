@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>ケーキ型サイズ換算(分量計算)(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="レシピの型と手持ちの型のサイズが違うとき、材料の分量倍率を計算します。丸型・角型・パウンド型対応。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>
+    /* 出典の長いURLが画面からはみ出さないようにする */
+    .sources a { overflow-wrap: anywhere; word-break: break-word; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>ケーキ型サイズ換算(分量計算)</h1>
+  <form class="tool-form" id="tool-form">
+    <span class="field-note">レシピの型</span>
+    <div class="field-row">
+      <label>形
+        <select id="from-shape">
+          <option value="round" selected>丸型</option>
+          <option value="square">角型・パウンド型</option>
+        </select>
+      </label>
+      <label>直径 / 縦(cm)
+        <input type="number" id="from-a" inputmode="decimal" step="0.5" min="0" max="200" value="18">
+      </label>
+      <label>横(cm)
+        <span class="field-note">角型のみ</span>
+        <input type="number" id="from-b" inputmode="decimal" step="0.5" min="0" max="200" placeholder="正方形なら空欄">
+      </label>
+    </div>
+
+    <span class="field-note">手持ちの型</span>
+    <div class="field-row">
+      <label>形
+        <select id="to-shape">
+          <option value="round" selected>丸型</option>
+          <option value="square">角型・パウンド型</option>
+        </select>
+      </label>
+      <label>直径 / 縦(cm)
+        <input type="number" id="to-a" inputmode="decimal" step="0.5" min="0" max="200" value="15">
+      </label>
+      <label>横(cm)
+        <span class="field-note">角型のみ</span>
+        <input type="number" id="to-b" inputmode="decimal" step="0.5" min="0" max="200" placeholder="正方形なら空欄">
+      </label>
+    </div>
+
+    <label>レシピの材料の量(g など)
+      <span class="field-note">代表的な材料をひとつ入れると、換算後の量が出ます</span>
+      <input type="number" id="amount" inputmode="decimal" step="1" min="0" max="1000000" placeholder="例: 100">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 高さも合わせて容積で換算する</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">容積(底面積 × 高さ)で比べる</h3>
+      <p class="adv-note">シフォン型やパウンド型のように高さが大きく違う型を使うときは、底面積ではなく容積で比べます。</p>
+      <div class="field-row">
+        <label>レシピの型の高さ(cm)
+          <input type="number" id="from-h" inputmode="decimal" step="0.5" min="0" max="200" value="6">
+        </label>
+        <label>手持ちの型の高さ(cm)
+          <input type="number" id="to-h" inputmode="decimal" step="0.5" min="0" max="200" value="6">
+        </label>
+      </div>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    倍率は材料の量だけの話です。<strong>焼き時間と温度は倍率では決まりません。</strong>生地の厚みが変わるため、竹串を刺して様子を見ながら調整してください(浅くなれば短く、深くなれば長く)。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>レシピの型と手持ちの型のサイズが違うとき、<strong>材料を何倍にすればよいか</strong>がわかります。「18cm型のレシピを15cm型で焼きたい」「丸型のレシピをパウンド型で作りたい」といった場面にどうぞ。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>レシピに書かれている型の形とサイズを入れます。</li>
+    <li>手持ちの型の形とサイズを入れると、その瞬間に倍率が出ます。ボタンは不要です。</li>
+    <li>材料の量を入れると、換算後の量も表示されます。</li>
+    <li>高さがかなり違う型を使うときは「＋詳細機能」で容積の比を確認してください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>丸型どうし</strong>: 倍率 =(使いたい型の半径)² ÷(レシピの型の半径)²</li>
+    <li><strong>角型どうし</strong>: 倍率 =(使いたい型の底面積)÷(レシピの型の底面積)</li>
+    <li><strong>形が違う場合</strong>: 同じく底面積の比。丸型の底面積は 円周率 ×(直径÷2)²、角型は 縦 × 横</li>
+    <li><strong>高さも合わせる場合</strong>: 倍率 =(使いたい型の容積)÷(レシピの型の容積)。容積 = 底面積 × 高さ</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>よくある換算の目安(出典の値と一致することを確認)</caption>
+      <thead><tr><th>レシピの型</th><th>手持ちの型</th><th>倍率</th></tr></thead>
+      <tbody>
+        <tr><td>丸型18cm</td><td>丸型15cm</td><td>0.694(約0.7)</td></tr>
+        <tr><td>スクエア型18cm</td><td>スクエア型15cm</td><td>0.694(約0.7)</td></tr>
+        <tr><td>スクエア型18cm</td><td>丸型18cm</td><td>0.785(約0.8)</td></tr>
+        <tr><td>丸型18cm</td><td>スクエア型18cm</td><td>1.273(約1.27)</td></tr>
+        <tr><td>丸型15cm</td><td>丸型18cm</td><td>1.44</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典</h3>
+  <ul class="sources">
+    <li>cotta「持ってる型でお菓子を焼きたい！型に合わせたレシピの計算方法」(丸型は半径の二乗、スクエア型は底面積、形が違う場合は0.785/1.27、その他の型は容積)<br>
+      <a href="https://www.cotta.jp/special/article/?p=31531" rel="noopener" target="_blank">https://www.cotta.jp/special/article/?p=31531</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>計算方法は上記ページの内容にもとづき、<strong>2026年7月29日時点</strong>で確認したものです。</li>
+    <li>底面積だけで比べると、高さが違う型では生地の厚みが変わります。高さも合わせたいときは「＋詳細機能」の容積比を使ってください。</li>
+    <li>シフォン型の中央の筒、底が広がっている型、丸みのある型の形状差は反映していません。正確に知りたい場合は、型に水を入れて重さを量る方法(水1g = 1cm³)で容積を求めてください。</li>
+    <li>卵のように個数で数える材料は端数が出ます。溶き卵にして重さで量ると調整しやすくなります。</li>
+    <li><strong>焼き時間と温度は倍率では決まりません。</strong>厚みが増えれば低温で長く、薄くなれば短めにするなど、様子を見ながら調整してください。</li>
+    <li>ベーキングパウダーなど少量の材料も同じ倍率でかけますが、極端に小さい量になる場合は計量しやすい単位に丸めてください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">なぜ直径の比ではなく半径の二乗の比なのですか?</h3>
+  <p class="faq-a">生地の量は面積に比例するためです。直径が0.83倍(15÷18)でも面積は0.83² = 約0.69倍にしかなりません。直径の比で計算すると生地が多すぎて溢れます。</p>
+  <h3 class="faq-q">同じ18cmでも丸型と角型で量が違うのはなぜですか?</h3>
+  <p class="faq-a">底面積が違うためです。18cmの正方形は324cm²、直径18cmの円は約254cm²で、円のほうが約0.785倍(π÷4)しかありません。</p>
+  <h3 class="faq-q">倍率が中途半端な数字になったらどうしますか?</h3>
+  <p class="faq-a">0.694なら0.7、1.273なら1.3のように、扱いやすい数字に丸めて構いません。少し多い分には型に入る範囲で問題ありませんが、8分目を超えると溢れるので注意してください。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_from_shape: "レシピの型の形を選び直してください。",
+    invalid_from_size: "レシピの型のサイズを0より大きい値で入力してください。",
+    invalid_to_shape: "手持ちの型の形を選び直してください。",
+    invalid_to_size: "手持ちの型のサイズを0より大きい値で入力してください。",
+    invalid_from_height: "レシピの型の高さを0より大きい値で入力してください。",
+    invalid_to_height: "手持ちの型の高さを0より大きい値で入力してください。",
+    invalid_amount: "材料の量を0以上で入力してください。",
+    invalid_ratio: "倍率を計算できませんでした。サイズを確認してください。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var ids = ["from-shape", "from-a", "from-b", "to-shape", "to-a", "to-b", "amount", "from-h", "to-h"];
+  var els = {};
+  ids.forEach(function (id) { els[id] = document.getElementById(id); });
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function optional(id) { return els[id].value === "" ? null : parseFloat(els[id].value); }
+
+  function run() {
+    if (els["from-a"].value === "" || els["to-a"].value === "") {
+      box.hidden = true; advBox.hidden = true; return;
+    }
+    var r = CakeTinCalc.ratioByArea(
+      els["from-shape"].value, parseFloat(els["from-a"].value), optional("from-b"),
+      els["to-shape"].value, parseFloat(els["to-a"].value), optional("to-b"));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      advBox.hidden = true;
+      return;
+    }
+    var html = '<div class="result-main">材料を ' + esc(r.ratio) + " 倍</div>" +
+      "<p>レシピの型の底面積 " + esc(r.fromAreaCm2) + "cm² → 手持ちの型 " + esc(r.toAreaCm2) + "cm²</p>";
+    if (els.amount.value !== "") {
+      var s = CakeTinCalc.scale(parseFloat(els.amount.value), r.ratio);
+      html += s.ok
+        ? "<p>" + esc(els.amount.value) + " → <strong>" + esc(s.value) + "</strong></p>"
+        : '<p class="result-error">' + esc(ERRORS[s.code] || "入力値を確認してください。") + "</p>";
+    }
+    box.innerHTML = html;
+    box.hidden = false;
+
+    var v = CakeTinCalc.ratioByVolume(
+      els["from-shape"].value, parseFloat(els["from-a"].value), optional("from-b"),
+      els["from-h"].value === "" ? 0 : parseFloat(els["from-h"].value),
+      els["to-shape"].value, parseFloat(els["to-a"].value), optional("to-b"),
+      els["to-h"].value === "" ? 0 : parseFloat(els["to-h"].value));
+    if (!v.ok) {
+      advBox.innerHTML = "<p>" + esc(ERRORS[v.code] || "入力値を確認してください。") + "</p>";
+    } else {
+      var html2 = "<p>容積で比べた倍率: <strong>" + esc(v.ratio) + " 倍</strong></p>" +
+        "<p>レシピの型 " + esc(v.fromVolumeCm3) + "cm³ → 手持ちの型 " + esc(v.toVolumeCm3) + "cm³</p>";
+      if (els.amount.value !== "") {
+        var s2 = CakeTinCalc.scale(parseFloat(els.amount.value), v.ratio);
+        if (s2.ok) html2 += "<p>" + esc(els.amount.value) + " → <strong>" + esc(s2.value) + "</strong></p>";
+      }
+      advBox.innerHTML = html2;
+    }
+    advBox.hidden = false;
+  }
+
+  ids.forEach(function (id) {
+    els[id].addEventListener("input", run);
+    els[id].addEventListener("change", run);
+  });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
+})();
+</script>
+</body>
+</html>

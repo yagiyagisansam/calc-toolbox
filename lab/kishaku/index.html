@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>希釈倍率計算(液肥・洗剤・消毒液)(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="原液濃度と作りたい濃度・量から、必要な原液量と水の量を計算します。%とppmの両方に対応。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>希釈倍率計算(液肥・洗剤・消毒液)</h1>
+  <form class="tool-form" id="tool-form">
+    <div class="field-row">
+      <label>原液の濃度
+        <span class="field-note">ハイター等は約6%</span>
+        <input type="number" id="stock" inputmode="decimal" step="any" min="0" placeholder="6">
+      </label>
+      <label>単位
+        <select id="stock-unit">
+          <option value="percent" selected>%</option>
+          <option value="ppm">ppm</option>
+        </select>
+      </label>
+    </div>
+    <div class="field-row">
+      <label>作りたい濃度
+        <span class="field-note">消毒用は0.02%または0.1%</span>
+        <input type="number" id="target" inputmode="decimal" step="any" min="0" placeholder="0.02">
+      </label>
+      <label>単位
+        <select id="target-unit">
+          <option value="percent" selected>%</option>
+          <option value="ppm">ppm</option>
+        </select>
+      </label>
+    </div>
+    <div class="field-row">
+      <label>量(mL)
+        <input type="number" id="amount" inputmode="numeric" step="1" min="1" placeholder="3000">
+      </label>
+      <label>量の意味
+        <select id="basis">
+          <option value="total" selected>できあがり量</option>
+          <option value="water">用意する水の量</option>
+        </select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 希釈倍率から逆算する</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">「1000倍に薄める」から原液量を出す</h3>
+      <p class="adv-note">液肥や業務用洗剤のように、濃度ではなく倍率で指定されている場合に使います。</p>
+      <div class="field-row">
+        <label>希釈倍率(倍)
+          <input type="number" id="ratio" inputmode="numeric" step="1" min="1" placeholder="1000">
+        </label>
+        <label>量(mL)
+          <input type="number" id="ratio-amount" inputmode="numeric" step="1" min="1" placeholder="1000">
+        </label>
+      </div>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    「できあがり量」と「水の量」で必要な原液量が変わります。<strong>水◯Lに原液◯mL</strong>という書き方の資料が多いので、その場合は「用意する水の量」を選んでください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>原液の濃度と作りたい濃度から、<strong>希釈倍率</strong>と<strong>必要な原液量・水の量</strong>がわかります。%とppmが混ざっていても自動で換算します。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>原液の濃度(ボトルの表示)と、作りたい濃度を入れます。単位は%とppmのどちらでも構いません。</li>
+    <li>作りたい量を入れると、その瞬間に原液量と水の量が出ます。</li>
+    <li>「1000倍に薄める」のように倍率で指定されている場合は「＋詳細機能」を使ってください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>希釈倍率</strong> = 原液濃度 ÷ 作りたい濃度</li>
+    <li><strong>原液量(できあがり量基準)</strong> = できあがり量 ÷ 希釈倍率、<strong>水の量</strong> = できあがり量 − 原液量</li>
+    <li><strong>原液量(水の量基準)</strong> = 水の量 ÷ (希釈倍率 − 1)、できあがり量 = 水の量 + 原液量</li>
+    <li><strong>単位換算</strong>: 1% = 10,000ppm</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>次亜塩素酸ナトリウムの希釈倍率(千葉県 印旛保健所の資料)</caption>
+      <thead><tr><th>原液の濃度</th><th>0.02%にする</th><th>0.1%にする</th></tr></thead>
+      <tbody>
+        <tr><td>1%</td><td>50倍</td><td>10倍</td></tr>
+        <tr><td>6%</td><td>300倍</td><td>60倍</td></tr>
+        <tr><td>12%</td><td>600倍</td><td>120倍</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>千葉県 印旛保健所「消毒液の作り方(次亜塩素酸ナトリウムの希釈液)」<br>
+      <a href="https://www.pref.chiba.lg.jp/kenzu/hokenshi/saigai/documents/siryou10syoudokuekinotukurikata.pdf" rel="noopener" target="_blank">https://www.pref.chiba.lg.jp/kenzu/hokenshi/saigai/documents/siryou10syoudokuekinotukurikata.pdf</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li><strong>基準の時点:</strong> 希釈倍率の例は2026年7月29日時点の上記資料の記載内容です。</li>
+    <li>液体を混ぜたときの体積変化や比重の違いは考慮せず、体積を単純に足し合わせています。</li>
+    <li>次亜塩素酸ナトリウム(塩素系漂白剤)は<strong>酸性の製品と混ぜると有毒ガスが発生します</strong>。換気し、金属・皮膚への付着を避けてください。作り置きはせず、その都度使い切ってください。</li>
+    <li>農薬・医薬品・業務用洗剤は、必ず製品ラベルの指示に従ってください。ラベルの指示が本ツールと異なる場合はラベルが優先です。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">1%は何ppmですか?</h3>
+  <p class="faq-a">10,000ppmです。0.1%=1,000ppm、0.02%=200ppmになります。</p>
+  <h3 class="faq-q">「水3Lに原液10mL」と「できあがり3Lで原液10mL」はどう違いますか?</h3>
+  <p class="faq-a">前者はできあがりが3,010mLになり、後者は3,000mLちょうどです。希釈倍率が大きい(数百倍)ときは差はごくわずかですが、10倍程度だと無視できない差になります。</p>
+  <h3 class="faq-q">ペットボトルのキャップは何mLですか?</h3>
+  <p class="faq-a">千葉県の資料では、ペットボトルのキャップが約5mL、漂白剤のキャップが約20〜25mLとされています。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_unit: "濃度の値と単位を確認してください。",
+    invalid_stock: "原液の濃度は0より大きく100%以下で入力してください。",
+    invalid_target: "作りたい濃度は0より大きく、原液の濃度以下にしてください。",
+    invalid_amount: "量は1mL以上1,000,000mL以下で入力してください。",
+    invalid_basis: "量の意味の指定が正しくありません。",
+    invalid_ratio: "希釈倍率は1倍以上で入力してください(水の量基準では1倍は指定できません)。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var stockEl = document.getElementById("stock");
+  var stockUnitEl = document.getElementById("stock-unit");
+  var targetEl = document.getElementById("target");
+  var targetUnitEl = document.getElementById("target-unit");
+  var amountEl = document.getElementById("amount");
+  var basisEl = document.getElementById("basis");
+  var ratioEl = document.getElementById("ratio");
+  var ratioAmountEl = document.getElementById("ratio-amount");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function ml(v) {
+    return v.toLocaleString("ja-JP") + " mL";
+  }
+
+  function run() {
+    if (stockEl.value === "" || targetEl.value === "" || amountEl.value === "") { box.hidden = true; return; }
+    var r = KishakuCalc.byConcentration(
+      parseFloat(stockEl.value), stockUnitEl.value,
+      parseFloat(targetEl.value), targetUnitEl.value,
+      parseFloat(amountEl.value), basisEl.value
+    );
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false; return;
+    }
+    box.innerHTML = '<div class="result-main">' + esc(String(r.ratio)) + " 倍に希釈</div>" +
+      "<p>原液 " + esc(ml(r.stockMl)) + " ＋ 水 " + esc(ml(r.waterMl)) + "</p>" +
+      "<p>できあがり: " + esc(ml(r.totalMl)) + "(" + esc(String(r.targetPpm)) + " ppm)</p>";
+    box.hidden = false;
+  }
+
+  function runAdv() {
+    if (ratioEl.value === "" || ratioAmountEl.value === "") { advBox.hidden = true; return; }
+    var r = KishakuCalc.byRatio(parseFloat(ratioEl.value), parseFloat(ratioAmountEl.value), basisEl.value);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false; return;
+    }
+    advBox.innerHTML = '<div class="result-main">原液 ' + esc(ml(r.stockMl)) + "</div>" +
+      "<p>水 " + esc(ml(r.waterMl)) + " / できあがり " + esc(ml(r.totalMl)) + "</p>";
+    advBox.hidden = false;
+  }
+
+  [stockEl, stockUnitEl, targetEl, targetUnitEl, amountEl].forEach(function (el) {
+    el.addEventListener("input", run);
+    el.addEventListener("change", run);
+  });
+  [ratioEl, ratioAmountEl].forEach(function (el) { el.addEventListener("input", runAdv); });
+  basisEl.addEventListener("change", function () { run(); runAdv(); });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

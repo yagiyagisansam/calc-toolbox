@@ -1,0 +1,175 @@
+{
+  "tool": "kutsu",
+  "module": "calc.js",
+  "global": "KutsuCalc",
+  "cases": [
+    {
+      "name": "男子用 足長25.0cm・足囲249mmは25.0EE(JIS付表1)",
+      "func": "jisSize",
+      "args": ["men", 25.0, 249],
+      "expect": { "ok": true, "sizeCm": 25, "widthCode": "EE", "standardGirthMm": 249, "diffMm": 0, "outOfTable": false, "label": "男子用" }
+    },
+    {
+      "name": "男子用 足長24.0cm・足囲237mmは24.0E(JIS付表1)",
+      "func": "jisSize",
+      "args": ["men", 24.0, 237],
+      "expect": { "ok": true, "sizeCm": 24, "widthCode": "E", "standardGirthMm": 237 }
+    },
+    {
+      "name": "男子用 足長25.0cm・足囲219mmは25.0A(表の最も細い記号)",
+      "func": "jisSize",
+      "args": ["men", 25.0, 219],
+      "expect": { "ok": true, "widthCode": "A", "standardGirthMm": 219, "outOfTable": false }
+    },
+    {
+      "name": "男子用 足長26.5cm・足囲264mmは26.5EEE(0.5cm刻みで+3mm)",
+      "func": "jisSize",
+      "args": ["men", 26.5, 264],
+      "expect": { "ok": true, "sizeCm": 26.5, "widthCode": "EEE", "standardGirthMm": 264 }
+    },
+    {
+      "name": "足長は0.5cm刻みに丸める(24.3cm→24.5cm)",
+      "func": "jisSize",
+      "args": ["men", 24.3, 240],
+      "expect": { "ok": true, "sizeCm": 24.5, "widthCode": "E", "standardGirthMm": 240 }
+    },
+    {
+      "name": "女子用 足長23.0cm・足囲222mmは23.0D(JIS付表2)",
+      "func": "jisSize",
+      "args": ["women", 23.0, 222],
+      "expect": { "ok": true, "sizeCm": 23, "widthCode": "D", "standardGirthMm": 222, "label": "女子用" }
+    },
+    {
+      "name": "女子用 足長23.5cm・足囲231mmは23.5E(JIS付表2)",
+      "func": "jisSize",
+      "args": ["women", 23.5, 231],
+      "expect": { "ok": true, "widthCode": "E", "standardGirthMm": 231 }
+    },
+    {
+      "name": "女子用 足長27.0cm・足囲276mmは27.0F(付表2の最も広い記号)",
+      "func": "jisSize",
+      "args": ["women", 27.0, 276],
+      "expect": { "ok": true, "widthCode": "F", "standardGirthMm": 276, "outOfTable": false }
+    },
+    {
+      "name": "足囲が表より広い場合はG超として返す(男子用25.0cm・290mm)",
+      "func": "jisSize",
+      "args": ["men", 25.0, 290],
+      "expect": { "ok": true, "widthCode": "G超", "outOfTable": true }
+    },
+    {
+      "name": "足囲が表より細い場合はA未満として返す(男子用25.0cm・205mm)",
+      "func": "jisSize",
+      "args": ["men", 25.0, 205],
+      "expect": { "ok": true, "widthCode": "A未満", "outOfTable": true }
+    },
+    {
+      "name": "境界値: 男子用の下限20.0cmは計算できる",
+      "func": "jisSize",
+      "args": ["men", 20.0, 189],
+      "expect": { "ok": true, "sizeCm": 20, "widthCode": "A", "standardGirthMm": 189 }
+    },
+    {
+      "name": "境界値: 女子用の下限19.5cmは計算できる",
+      "func": "jisSize",
+      "args": ["women", 19.5, 183],
+      "expect": { "ok": true, "sizeCm": 19.5, "widthCode": "A", "standardGirthMm": 183 }
+    },
+    {
+      "name": "境界値: 男子用30.5cmは付表1の範囲外",
+      "func": "jisSize",
+      "args": ["men", 30.5, 260],
+      "expect": { "ok": false, "code": "invalid_length" }
+    },
+    {
+      "name": "境界値: 女子用27.5cmは付表2の範囲外",
+      "func": "jisSize",
+      "args": ["women", 27.5, 260],
+      "expect": { "ok": false, "code": "invalid_length" }
+    },
+    {
+      "name": "換算: メンズ足長25.0cmはUS7.5/UK6.5/EU39/JP25",
+      "func": "convert",
+      "args": ["men", 25.0],
+      "expect": { "ok": true, "us": 7.5, "uk": 6.5, "eu": 39, "jp": 25 }
+    },
+    {
+      "name": "換算: メンズ足長27.1cmはUS10/UK9/EU43/JP27",
+      "func": "convert",
+      "args": ["men", 27.1],
+      "expect": { "ok": true, "us": 10, "uk": 9, "eu": 43, "jp": 27 }
+    },
+    {
+      "name": "換算: 表にない足長は「足長以上で最も小さい行」を選ぶ(23.6cm→23.7cmの行)",
+      "func": "convert",
+      "args": ["men", 23.6],
+      "expect": { "ok": true, "rowFootLengthCm": 23.7, "us": 6, "jp": 23.5 }
+    },
+    {
+      "name": "換算: ウィメンズ足長22.0cmはUS5/UK3/EU35/JP22",
+      "func": "convert",
+      "args": ["women", 22.0],
+      "expect": { "ok": true, "us": 5, "uk": 3, "eu": 35, "jp": 22 }
+    },
+    {
+      "name": "換算: ウィメンズ足長24.1cmはUS7.5/UK5.5/EU38/JP24",
+      "func": "convert",
+      "args": ["women", 24.1],
+      "expect": { "ok": true, "us": 7.5, "uk": 5.5, "eu": 38, "jp": 24 }
+    },
+    {
+      "name": "換算: 表より大きい足長(メンズ31cm)は範囲外",
+      "func": "convert",
+      "args": ["men", 31],
+      "expect": { "ok": false, "code": "invalid_length" }
+    },
+    {
+      "name": "まとめ: JIS表示と換算を同時に返す(メンズ25.0cm/249mm)",
+      "func": "all",
+      "args": ["men", 25.0, 249],
+      "expect": { "ok": true, "jis": { "widthCode": "EE" }, "conv": { "us": 7.5 } }
+    },
+    {
+      "name": "まとめ: 換算表の範囲外の足長ならconvはnull(男子用21.0cm)",
+      "func": "all",
+      "args": ["men", 21.0, 195],
+      "expect": { "ok": true, "jis": { "widthCode": "A" }, "conv": null }
+    },
+    {
+      "name": "換算: 表の最小行より小さい足長(メンズ23.0cm)は範囲外",
+      "func": "convert",
+      "args": ["men", 23.0],
+      "expect": { "ok": false, "code": "invalid_length" }
+    },
+    {
+      "name": "境界値: 表の最小行のハーフサイズ下(メンズ23.3cm)までは換算できる",
+      "func": "convert",
+      "args": ["men", 23.3],
+      "expect": { "ok": true, "rowFootLengthCm": 23.7, "us": 6 }
+    },
+    {
+      "name": "異常入力: 性別区分が不正はエラー",
+      "func": "jisSize",
+      "args": ["kids", 25, 249],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    },
+    {
+      "name": "異常入力: 足囲0mmはエラー",
+      "func": "jisSize",
+      "args": ["men", 25, 0],
+      "expect": { "ok": false, "code": "invalid_girth" }
+    },
+    {
+      "name": "異常入力: 数値でない足長はエラー",
+      "func": "jisSize",
+      "args": ["men", "abc", 249],
+      "expect": { "ok": false, "code": "invalid_length" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "jisSize",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    }
+  ]
+}

@@ -1,0 +1,147 @@
+{
+  "tool": "hyperfocal",
+  "module": "calc.js",
+  "global": "HyperfocalCalc",
+  "cases": [
+    {
+      "name": "出典の計算例: f=50mm・F2・許容錯乱円径3.45μmで過焦点距離362.32m(362,318.8mm)",
+      "func": "hyperfocal",
+      "args": [50, 2, 0.00345],
+      "expect": { "ok": true, "hyperfocalM": 362.32, "nearM": 181.16 }
+    },
+    {
+      "name": "フルサイズ24mm・F11(許容錯乱円径0.0333mm)は過焦点距離1.57m、手前0.79mから無限遠",
+      "func": "hyperfocal",
+      "args": [24, 11, 0.0333],
+      "expect": { "ok": true, "hyperfocalM": 1.57, "nearM": 0.79 }
+    },
+    {
+      "name": "フルサイズ50mm・F8(許容錯乱円径0.0333mm)は過焦点距離9.38m",
+      "func": "hyperfocal",
+      "args": [50, 8, 0.0333],
+      "expect": { "ok": true, "hyperfocalM": 9.38, "nearM": 4.69 }
+    },
+    {
+      "name": "絞りを2段開けると(F8→F4)過焦点距離は2倍になる",
+      "func": "hyperfocal",
+      "args": [50, 4, 0.0333],
+      "expect": { "ok": true, "hyperfocalM": 18.77 }
+    },
+    {
+      "name": "許容錯乱円径: フルサイズ(36×24mm)は対角43.2666mm、0.0333mm",
+      "func": "cocFromSensor",
+      "args": [36, 24],
+      "expect": { "ok": true, "diagonalMm": 43.2666, "cocMm": 0.0333 }
+    },
+    {
+      "name": "許容錯乱円径: APS-C(23.5×15.7mm)は対角28.262mm、0.0217mm",
+      "func": "cocFromSensor",
+      "args": [23.5, 15.7],
+      "expect": { "ok": true, "diagonalMm": 28.262, "cocMm": 0.0217 }
+    },
+    {
+      "name": "許容錯乱円径: マイクロフォーサーズ(17.3×13mm)は対角21.64mm、0.0166mm",
+      "func": "cocFromSensor",
+      "args": [17.3, 13],
+      "expect": { "ok": true, "diagonalMm": 21.64, "cocMm": 0.0166 }
+    },
+    {
+      "name": "過焦点系列: 出典の例と同じ H, H/2, H/3, H/4 の並び",
+      "func": "sequence",
+      "args": [50, 2, 0.00345, 5],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "0": { "n": 1, "focusM": 362.32, "nearM": 181.16, "farM": null },
+          "1": { "n": 2, "focusM": 181.16, "nearM": 120.77, "farM": 362.32 },
+          "2": { "n": 3, "focusM": 120.77, "nearM": 90.58, "farM": 181.16 },
+          "length": 5
+        }
+      }
+    },
+    {
+      "name": "境界値: 焦点距離1mm(下限)でも計算できる",
+      "func": "hyperfocal",
+      "args": [1, 2, 0.0333],
+      "expect": { "ok": true, "hyperfocalM": 0.02 }
+    },
+    {
+      "name": "境界値: F値0.5(下限)でも計算できる",
+      "func": "hyperfocal",
+      "args": [50, 0.5, 0.0333],
+      "expect": { "ok": true, "hyperfocalM": 150.15 }
+    },
+    {
+      "name": "境界値: 許容錯乱円径0.0001mm(下限)でも計算できる",
+      "func": "hyperfocal",
+      "args": [50, 2, 0.0001],
+      "expect": { "ok": true, "hyperfocalM": 12500 }
+    },
+    {
+      "name": "異常入力: 焦点距離0mmはエラー",
+      "func": "hyperfocal",
+      "args": [0, 8, 0.0333],
+      "expect": { "ok": false, "code": "invalid_focal" }
+    },
+    {
+      "name": "異常入力: 焦点距離が負の値はエラー",
+      "func": "hyperfocal",
+      "args": [-50, 8, 0.0333],
+      "expect": { "ok": false, "code": "invalid_focal" }
+    },
+    {
+      "name": "異常入力: 焦点距離が範囲超過(3001mm)はエラー",
+      "func": "hyperfocal",
+      "args": [3001, 8, 0.0333],
+      "expect": { "ok": false, "code": "invalid_focal" }
+    },
+    {
+      "name": "異常入力: F値0はエラー(0除算にならない)",
+      "func": "hyperfocal",
+      "args": [50, 0, 0.0333],
+      "expect": { "ok": false, "code": "invalid_fnumber" }
+    },
+    {
+      "name": "異常入力: F値が範囲超過(200)はエラー",
+      "func": "hyperfocal",
+      "args": [50, 200, 0.0333],
+      "expect": { "ok": false, "code": "invalid_fnumber" }
+    },
+    {
+      "name": "異常入力: 許容錯乱円径0mmはエラー(0除算にならない)",
+      "func": "hyperfocal",
+      "args": [50, 8, 0],
+      "expect": { "ok": false, "code": "invalid_coc" }
+    },
+    {
+      "name": "異常入力: 許容錯乱円径が数値でないときはエラー",
+      "func": "hyperfocal",
+      "args": [50, 8, "0.0333"],
+      "expect": { "ok": false, "code": "invalid_coc" }
+    },
+    {
+      "name": "異常入力: 過焦点系列の項数が1(範囲外)はエラー",
+      "func": "sequence",
+      "args": [50, 8, 0.0333, 1],
+      "expect": { "ok": false, "code": "invalid_count" }
+    },
+    {
+      "name": "異常入力: 過焦点系列の項数が整数でないときはエラー",
+      "func": "sequence",
+      "args": [50, 8, 0.0333, 3.5],
+      "expect": { "ok": false, "code": "invalid_count" }
+    },
+    {
+      "name": "異常入力: センサー寸法0mmはエラー",
+      "func": "cocFromSensor",
+      "args": [0, 24],
+      "expect": { "ok": false, "code": "invalid_size" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "hyperfocal",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_focal" }
+    }
+  ]
+}

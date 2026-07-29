@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>EV・PHEV 充電時間と航続距離の計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="バッテリー容量・充電率・充電出力から満充電までの時間を、電費から航続距離を計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>EV・PHEV 充電時間と航続距離の計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>バッテリー容量(kWh)
+      <span class="field-note">カタログの総電力量。例: 60</span>
+      <input type="number" id="capacity" inputmode="decimal" step="any" min="0.1" max="500" placeholder="60">
+    </label>
+    <div class="field-row">
+      <label>現在の充電率(%)
+        <input type="number" id="from" inputmode="numeric" step="1" min="0" max="100" placeholder="20">
+      </label>
+      <label>目標の充電率(%)
+        <input type="number" id="to" inputmode="numeric" step="1" min="0" max="100" placeholder="80">
+      </label>
+    </div>
+    <label>充電出力(kW)
+      <select id="power-preset">
+        <option value="3">普通充電 3kW(200V 15A)</option>
+        <option value="6">普通充電 6kW(200V 30A)</option>
+        <option value="40">急速充電 40kW(全国平均の目安)</option>
+        <option value="50" selected>急速充電 50kW</option>
+        <option value="90">急速充電 90kW</option>
+        <option value="150">急速充電 150kW</option>
+        <option value="custom">自分で入力する</option>
+      </select>
+    </label>
+    <label id="power-label" hidden>充電出力(kW)を自分で入力
+      <input type="number" id="power" inputmode="decimal" step="any" min="0.1" max="400" placeholder="50">
+    </label>
+    <label>電費(km/kWh)
+      <span class="field-note">1kWhで何km走れるか。目安は5〜7</span>
+      <input type="number" id="consumption" inputmode="decimal" step="any" min="0.1" max="50" placeholder="7">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 時間を決めて充電したときの走行距離・充電効率</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">この時間だけ充電したら何km走れるか</h3>
+      <p class="adv-note">高速道路の休憩時間に合わせて充電するときの目安です。</p>
+      <label>充電する時間(分)
+        <input type="number" id="minutes" inputmode="numeric" step="1" min="1" max="1440" placeholder="30">
+      </label>
+      <h3 class="adv-h">充電効率</h3>
+      <p class="adv-note">充電器からバッテリーに入るまでの損失を見込んだ係数です(既定0.9)。</p>
+      <label>充電効率(0.3〜1)
+        <input type="number" id="efficiency" inputmode="decimal" step="0.01" min="0.3" max="1" placeholder="0.9">
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    出力が一定という前提の<strong>理論値</strong>です。実際の急速充電はバッテリー保護のため充電率が上がるほど出力が絞られるため、これより時間がかかります。経済産業省の資料でも、50kW級の充電器で30分の充電について「少なくとも10kWh」という見込みが示されています。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>「この急速充電器で30分入れたら何km走れるか」「自宅の200Vで朝までに満タンになるか」がわかります。旅行の計画や、自宅充電設備を選ぶときの目安になります。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>バッテリー容量・現在の充電率・目標の充電率を入れます。</li>
+    <li>充電出力を選ぶと、その瞬間に充電時間が表示されます。</li>
+    <li>電費を入れると、目標の充電率で走れる距離もわかります。</li>
+    <li>「＋詳細機能」で「30分だけ充電したら何km走れるか」も計算できます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>充電に入る電力量(kWh)</strong> = バッテリー容量 × (目標% − 現在%) ÷ 100</li>
+    <li><strong>充電時間(時間)</strong> = 充電に入る電力量 ÷ (充電出力(kW) × 充電効率)</li>
+    <li><strong>航続距離(km)</strong> = バッテリー容量 × 充電率% ÷ 100 × 電費(km/kWh)</li>
+    <li><strong>時間を決めた場合の電力量</strong> = 充電出力(kW) × 時間(分) ÷ 60 × 充電効率</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>充電出力の目安(経済産業省「充電インフラ整備促進に向けた指針」令和5年10月)</caption>
+      <thead><tr><th>種類</th><th>出力</th><th>資料の記述</th></tr></thead>
+      <tbody>
+        <tr><td>普通充電</td><td>3kW</td><td>現在は3kWが大半</td></tr>
+        <tr><td>普通充電</td><td>6kW / 10kW</td><td>6kW や今後の10kW導入で総出力を増強</td></tr>
+        <tr><td>急速充電</td><td>約40kW</td><td>現状の平均的な出力は約40kW</td></tr>
+        <tr><td>急速充電</td><td>50kW / 90kW / 150kW</td><td>50kW未満57%・50〜90kW未満31%・90kW以上12%(2023年3月)。需要の多い場所は150kWも設置</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>経済産業省「充電インフラ整備促進に向けた指針」(令和5年10月)<br>
+      <a href="https://www.meti.go.jp/shingikai/mono_info_service/charging_infrastructure/pdf/20231018_1.pdf" rel="noopener" target="_blank">https://www.meti.go.jp/shingikai/mono_info_service/charging_infrastructure/pdf/20231018_1.pdf</a>(2026年7月29日参照)</li>
+    <li>経済産業省「充電インフラ整備促進に関する取組」(指針の掲載ページ)<br>
+      <a href="https://www.meti.go.jp/policy/mono_info_service/mono/automobile/charging-infra-fukyu.html" rel="noopener" target="_blank">https://www.meti.go.jp/policy/mono_info_service/mono/automobile/charging-infra-fukyu.html</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>充電出力の区分は<strong>令和5年10月時点</strong>の経済産業省の資料によります(2023年3月の設置状況を含む)。今後の高出力化で状況は変わります。</li>
+    <li>充電効率0.9は損失を見込んだ<strong>仮定値</strong>で、出典に定められた数値ではありません。気温・充電器・車種で変わります。</li>
+    <li>急速充電はバッテリー保護のため、充電率が上がるほど出力が絞られます(テーパリング)。特に80%以降は大きく遅くなるため、計算値より時間がかかります。</li>
+    <li>充電器側の上限だけでなく、車両側の受入可能出力にも上限があります。150kWの充電器でも車が50kWまでしか受け入れられなければ50kWで充電されます。</li>
+    <li>電費は季節と走り方で大きく変わります。冬季は暖房で3〜4割落ちることがあります。</li>
+    <li>バッテリー容量は「総電力量」と「使用可能電力量」で異なる場合があります。カタログの表記をご確認ください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">なぜ80%までしか充電しないほうがよいのですか?</h3>
+  <p class="faq-a">急速充電では80%を超えると出力が大きく絞られ、同じ時間で入る電力量が減るためです。高速道路の移動中は80%までで切り上げて次の充電器に向かうほうが、全体の所要時間は短くなることが多くあります。</p>
+  <h3 class="faq-q">自宅の200Vは何kWですか?</h3>
+  <p class="faq-a">一般的な200V/15Aのコンセントで約3kW、200V/30Aの充電設備で約6kWです。60kWhのEVを20%から100%まで充電する場合、3kWなら約18時間、6kWなら約9時間かかります。</p>
+  <h3 class="faq-q">電費の目安はどれくらいですか?</h3>
+  <p class="faq-a">車種によりますが5〜7km/kWh程度が一般的です。経済産業省の資料でも7km/kWhを例として使っています。冬季や高速走行では4km/kWh台まで落ちることがあります。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_capacity: "バッテリー容量を0.1〜500kWhの範囲で入力してください。",
+    invalid_from: "現在の充電率を0〜100%の範囲で入力してください。",
+    invalid_to: "目標の充電率を0〜100%の範囲で入力してください。",
+    invalid_order: "目標の充電率は現在の充電率より大きい値にしてください。",
+    invalid_power: "充電出力を0.1〜400kWの範囲で入力してください。",
+    invalid_efficiency: "充電効率を0.3〜1の範囲で入力してください。",
+    invalid_consumption: "電費を0.1〜50km/kWhの範囲で入力してください。",
+    invalid_soc: "充電率を0〜100%の範囲で入力してください。",
+    invalid_minutes: "充電する時間を1〜1440分の範囲で入力してください。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var capacityEl = document.getElementById("capacity");
+  var fromEl = document.getElementById("from");
+  var toEl = document.getElementById("to");
+  var presetEl = document.getElementById("power-preset");
+  var powerLabel = document.getElementById("power-label");
+  var powerEl = document.getElementById("power");
+  var consumptionEl = document.getElementById("consumption");
+  var minutesEl = document.getElementById("minutes");
+  var efficiencyEl = document.getElementById("efficiency");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function currentPower() {
+    if (presetEl.value === "custom") {
+      return powerEl.value === "" ? NaN : parseFloat(powerEl.value);
+    }
+    return parseFloat(presetEl.value);
+  }
+  function currentEfficiency() {
+    return efficiencyEl.value === "" ? 0.9 : parseFloat(efficiencyEl.value);
+  }
+
+  function run() {
+    powerLabel.hidden = presetEl.value !== "custom";
+    if (capacityEl.value === "" || fromEl.value === "" || toEl.value === "") { box.hidden = true; runAdv(); return; }
+    var r = EvCalc.chargeTime(
+      parseFloat(capacityEl.value), parseFloat(fromEl.value),
+      parseFloat(toEl.value), currentPower(), currentEfficiency()
+    );
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      runAdv();
+      return;
+    }
+    var html = '<div class="result-main">' +
+      (r.hoursPart > 0 ? esc(r.hoursPart) + "時間" : "") + esc(r.minutesPart) + "分</div>" +
+      "<p>充電に入る電力量: " + esc(r.energyKwh) + "kWh</p>";
+    if (consumptionEl.value !== "") {
+      var g = EvCalc.rangeKm(parseFloat(capacityEl.value), parseFloat(toEl.value), parseFloat(consumptionEl.value));
+      if (g.ok) {
+        html += "<p>目標の充電率で走れる距離: " + esc(g.rangeKm) + "km(" + esc(g.usableKwh) + "kWh分)</p>";
+      } else {
+        html += '<p class="result-error">' + esc(ERRORS[g.code] || "電費を確認してください。") + "</p>";
+      }
+    }
+    box.innerHTML = html;
+    box.hidden = false;
+    runAdv();
+  }
+
+  function runAdv() {
+    if (minutesEl.value === "" || consumptionEl.value === "") { advBox.hidden = true; return; }
+    var r = EvCalc.addedRange(
+      parseFloat(minutesEl.value), currentPower(),
+      parseFloat(consumptionEl.value), currentEfficiency()
+    );
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML = '<div class="result-main">およそ ' + esc(r.rangeKm) + "km 走れる分</div>" +
+      "<p>入る電力量: " + esc(r.energyKwh) + "kWh</p>";
+    advBox.hidden = false;
+  }
+
+  [capacityEl, fromEl, toEl, powerEl, consumptionEl, minutesEl, efficiencyEl].forEach(function (el) {
+    el.addEventListener("input", run);
+  });
+  presetEl.addEventListener("change", run);
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

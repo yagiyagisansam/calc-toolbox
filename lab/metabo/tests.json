@@ -1,0 +1,187 @@
+{
+  "tool": "metabo",
+  "module": "calc.js",
+  "global": "MetaboCalc",
+  "cases": [
+    {
+      "name": "基準該当: 男性・腹囲90cm・血圧135/88・中性脂肪160・HDL45・空腹時血糖115(リスク3つ)",
+      "func": "judge",
+      "args": ["male", 90, 135, 88, 160, 45, 115],
+      "expect": { "ok": true, "waistOver": true, "riskLipid": true, "riskBloodPressure": true, "riskGlucose": true, "riskCount": 3, "result": "applicable" }
+    },
+    {
+      "name": "予備群該当: 男性・腹囲86cm・血圧132/80・脂質と血糖は基準内(リスク1つ)",
+      "func": "judge",
+      "args": ["male", 86, 132, 80, 120, 55, 95],
+      "expect": { "ok": true, "waistOver": true, "riskCount": 1, "result": "pre" }
+    },
+    {
+      "name": "非該当: 腹囲が基準未満ならリスクが多くても非該当(男性80cm)",
+      "func": "judge",
+      "args": ["male", 80, 150, 95, 200, 35, 130],
+      "expect": { "ok": true, "waistOver": false, "riskCount": 3, "result": "not" }
+    },
+    {
+      "name": "非該当: 腹囲は基準以上でも追加リスク0なら非該当",
+      "func": "judge",
+      "args": ["male", 90, 120, 75, 100, 60, 90],
+      "expect": { "ok": true, "waistOver": true, "riskCount": 0, "result": "not" }
+    },
+    {
+      "name": "境界値: 男性の腹囲ちょうど85cmは基準以上",
+      "func": "judge",
+      "args": ["male", 85, 120, 75, 100, 60, 90],
+      "expect": { "ok": true, "waistOver": true, "waistLimitCm": 85 }
+    },
+    {
+      "name": "境界値: 男性の腹囲84.9cmは基準未満",
+      "func": "judge",
+      "args": ["male", 84.9, 120, 75, 100, 60, 90],
+      "expect": { "ok": true, "waistOver": false }
+    },
+    {
+      "name": "境界値: 女性の腹囲ちょうど90cmは基準以上(85cmでは基準未満)",
+      "func": "judge",
+      "args": ["female", 90, 120, 75, 100, 60, 90],
+      "expect": { "ok": true, "waistOver": true, "waistLimitCm": 90 }
+    },
+    {
+      "name": "境界値: 女性・腹囲85cmは基準未満で非該当",
+      "func": "judge",
+      "args": ["female", 85, 140, 90, 200, 30, 130],
+      "expect": { "ok": true, "waistOver": false, "result": "not" }
+    },
+    {
+      "name": "境界値: 中性脂肪ちょうど150mg/dLは脂質リスクあり",
+      "func": "judge",
+      "args": ["male", 90, 120, 75, 150, 60, 90],
+      "expect": { "ok": true, "riskLipid": true, "riskCount": 1, "result": "pre" }
+    },
+    {
+      "name": "境界値: 中性脂肪149mg/dL・HDLちょうど40mg/dLは脂質リスクなし",
+      "func": "judge",
+      "args": ["male", 90, 120, 75, 149, 40, 90],
+      "expect": { "ok": true, "riskLipid": false, "riskCount": 0 }
+    },
+    {
+      "name": "境界値: HDL39mg/dLは脂質リスクあり",
+      "func": "judge",
+      "args": ["male", 90, 120, 75, 100, 39, 90],
+      "expect": { "ok": true, "riskLipid": true }
+    },
+    {
+      "name": "境界値: 収縮期ちょうど130mmHgは血圧リスクあり",
+      "func": "judge",
+      "args": ["male", 90, 130, 70, 100, 60, 90],
+      "expect": { "ok": true, "riskBloodPressure": true }
+    },
+    {
+      "name": "境界値: 129/85は拡張期側で血圧リスクあり",
+      "func": "judge",
+      "args": ["male", 90, 129, 85, 100, 60, 90],
+      "expect": { "ok": true, "riskBloodPressure": true }
+    },
+    {
+      "name": "境界値: 129/84は血圧リスクなし",
+      "func": "judge",
+      "args": ["male", 90, 129, 84, 100, 60, 90],
+      "expect": { "ok": true, "riskBloodPressure": false, "riskCount": 0, "result": "not" }
+    },
+    {
+      "name": "境界値: 空腹時血糖ちょうど110mg/dLは血糖リスクあり",
+      "func": "judge",
+      "args": ["male", 90, 120, 75, 100, 60, 110],
+      "expect": { "ok": true, "riskGlucose": true }
+    },
+    {
+      "name": "境界値: 空腹時血糖109mg/dLは血糖リスクなし",
+      "func": "judge",
+      "args": ["male", 90, 120, 75, 100, 60, 109],
+      "expect": { "ok": true, "riskGlucose": false }
+    },
+    {
+      "name": "HbA1c: 空腹時血糖が正常でもHbA1c6.0%以上なら血糖リスクあり",
+      "func": "judgeFull",
+      "args": [{ "sex": "male", "waistCm": 90, "systolic": 120, "diastolic": 75, "triglyceride": 100, "hdl": 60, "fastingGlucose": 100, "hba1c": 6.0 }],
+      "expect": { "ok": true, "riskGlucose": true, "riskCount": 1, "result": "pre" }
+    },
+    {
+      "name": "HbA1c: 5.9%なら血糖リスクなし",
+      "func": "judgeFull",
+      "args": [{ "sex": "male", "waistCm": 90, "systolic": 120, "diastolic": 75, "triglyceride": 100, "hdl": 60, "fastingGlucose": 100, "hba1c": 5.9 }],
+      "expect": { "ok": true, "riskGlucose": false, "riskCount": 0 }
+    },
+    {
+      "name": "服薬: 血圧と脂質の薬を飲んでいれば値が正常でもリスク2つで基準該当",
+      "func": "judgeFull",
+      "args": [{ "sex": "female", "waistCm": 92, "systolic": 118, "diastolic": 72, "triglyceride": 90, "hdl": 65, "fastingGlucose": 90, "medBloodPressure": true, "medLipid": true }],
+      "expect": { "ok": true, "riskCount": 2, "result": "applicable" }
+    },
+    {
+      "name": "内臓脂肪面積: 腹囲が基準未満でも100cm²以上なら判定に進む",
+      "func": "judgeFull",
+      "args": [{ "sex": "male", "waistCm": 80, "systolic": 135, "diastolic": 80, "triglyceride": 160, "hdl": 60, "fastingGlucose": 90, "visceralFatAreaCm2": 100 }],
+      "expect": { "ok": true, "waistOver": true, "riskCount": 2, "result": "applicable" }
+    },
+    {
+      "name": "異常入力: 性別の指定が不正ならエラー",
+      "func": "judge",
+      "args": ["other", 90, 120, 75, 100, 60, 90],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    },
+    {
+      "name": "異常入力: 腹囲0cmはエラー",
+      "func": "judge",
+      "args": ["male", 0, 120, 75, 100, 60, 90],
+      "expect": { "ok": false, "code": "invalid_waist" }
+    },
+    {
+      "name": "異常入力: 腹囲が数値でないときはエラー",
+      "func": "judge",
+      "args": ["male", "abc", 120, 75, 100, 60, 90],
+      "expect": { "ok": false, "code": "invalid_waist" }
+    },
+    {
+      "name": "異常入力: HDLが負の値はエラー",
+      "func": "judge",
+      "args": ["male", 90, 120, 75, 100, -1, 90],
+      "expect": { "ok": false, "code": "invalid_hdl" }
+    },
+    {
+      "name": "異常入力: 空腹時血糖が範囲外(99999)はエラー",
+      "func": "judge",
+      "args": ["male", 90, 120, 75, 100, 60, 99999],
+      "expect": { "ok": false, "code": "invalid_glucose" }
+    },
+    {
+      "name": "異常入力: HbA1cが範囲外(30%)はエラー",
+      "func": "judgeFull",
+      "args": [{ "sex": "male", "waistCm": 90, "systolic": 120, "diastolic": 75, "triglyceride": 100, "hdl": 60, "fastingGlucose": 90, "hba1c": 30 }],
+      "expect": { "ok": false, "code": "invalid_hba1c" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "judge",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    },
+    {
+      "name": "腹囲の差: 男性92cmは基準まであと7cm",
+      "func": "waistGap",
+      "args": ["male", 92],
+      "expect": { "ok": true, "waistLimitCm": 85, "overCm": 7 }
+    },
+    {
+      "name": "腹囲の差: 基準未満なら0cm",
+      "func": "waistGap",
+      "args": ["female", 80],
+      "expect": { "ok": true, "waistLimitCm": 90, "overCm": 0 }
+    },
+    {
+      "name": "異常入力: 腹囲の差で性別が不正ならエラー",
+      "func": "waistGap",
+      "args": ["x", 90],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    }
+  ]
+}

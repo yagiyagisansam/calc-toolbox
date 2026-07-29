@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>壁紙クロスの必要メーター数計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="部屋の寸法から壁紙の必要巾数とメーター数を計算します。リピート柄の割増にも対応。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>
+    /* 長い出典URLが横スクロールを起こさないようにする(このページ内だけの調整) */
+    .sources a { overflow-wrap: anywhere; word-break: break-word; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>壁紙クロスの必要メーター数計算</h1>
+  <form class="tool-form" id="tool-form">
+    <div class="field-row">
+      <label>壁の横幅(cm)
+        <span class="field-note">張る面の合計。例: 340</span>
+        <input type="number" id="wall-w" inputmode="decimal" step="any" min="10" placeholder="340">
+      </label>
+      <label>天井高(cm)
+        <span class="field-note">例: 240</span>
+        <input type="number" id="wall-h" inputmode="decimal" step="any" min="10" placeholder="240">
+      </label>
+    </div>
+    <div class="field-row">
+      <label>クロス幅(cm)
+        <span class="field-note">商品仕様の「巾」。国内品は92前後が主流</span>
+        <input type="number" id="roll-w" inputmode="decimal" step="any" min="30" value="90">
+      </label>
+      <label>柄の縦リピート(cm)
+        <span class="field-note">無地は0のまま</span>
+        <input type="number" id="repeat" inputmode="decimal" step="any" min="0" value="0">
+      </label>
+    </div>
+    <label>窓・ドアなど開口部の合計面積(m²・任意)
+      <span class="field-note">必要メーター数は変わりません。実際に張る面積の参考です</span>
+      <input type="number" id="openings" inputmode="decimal" step="any" min="0" value="0">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 部屋の間口・奥行きから壁の横幅を出す</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">四方の壁をまとめて張り替える場合</h3>
+      <p class="adv-note">部屋の間口と奥行きから、壁一周の横幅を計算します。出た値を上の「壁の横幅」に入れてください。</p>
+      <div class="field-row">
+        <label>間口(cm)
+          <input type="number" id="room-w" inputmode="decimal" step="any" min="10" placeholder="360">
+        </label>
+        <label>奥行き(cm)
+          <input type="number" id="room-d" inputmode="decimal" step="any" min="10" placeholder="270">
+        </label>
+      </div>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    壁紙は<strong>足りないと同じロットが手に入らない</strong>ことがあります。特に初めて施工する場合は、表示される「推奨量(1割増し)」で発注することをおすすめします。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>DIYで壁紙を張り替えるとき、<strong>何巾必要で、何メートル買えばいいか</strong>がわかります。柄物クロスのリピート(柄の繰り返し)による割増にも対応しています。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>張りたい壁の横幅(cm)と天井高(cm)を入れます。複数の面を張る場合は横幅を合計してください。</li>
+    <li>クロス幅は商品仕様の「巾」を入れます。既定値の90cmは出典の計算方法に合わせた安全側の値です。</li>
+    <li>柄物の場合は縦リピート寸法(cm)を入れます。無地は0のままにしてください。</li>
+    <li>部屋を一周張り替えるときは「＋詳細機能」で間口と奥行きから横幅を出せます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>必要巾数</strong> = 壁の横幅 ÷ クロス幅(切り上げ)</li>
+    <li><strong>1巾の長さ(無地)</strong> = 天井高 + 切りしろ10cm</li>
+    <li><strong>1巾の長さ(柄物)</strong> = 縦リピート寸法 × ((天井高 ÷ 縦リピート寸法)を切り上げ + 1)</li>
+    <li><strong>必要メーター数</strong> = 1巾の長さ × 必要巾数</li>
+    <li><strong>発注量</strong> = 必要メーター数を1m単位で切り上げ / <strong>推奨量</strong> = その1割増し</li>
+  </ul>
+  <p>柄物で「+1リピート」するのは、隣の巾と柄を合わせるために1巾ごとに縦リピート1つ分の余裕が必要なためです(出典のリリカラの解説による)。</p>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>リリカラ(壁紙メーカー)「壁紙クロスの必要メーター数の計算方法を徹底解説!」(無地・柄物の計算手順と計算例)<br>
+      <a href="https://shop.lilycolor.co.jp/blogs/how-to/wallpaper-measure" rel="noopener" target="_blank">https://shop.lilycolor.co.jp/blogs/how-to/wallpaper-measure</a>(2026年7月29日参照)</li>
+    <li>DIYショップRESTA「壁紙クロスの必要サイズ(数量)の測り方」(クロス幅約90cm・切りしろ+10cm)<br>
+      <a href="https://www.diy-shop.jp/info/diy_sz.html" rel="noopener" target="_blank">https://www.diy-shop.jp/info/diy_sz.html</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>クロス幅の既定値90cmは、上記出典が「壁紙の幅は約90cmで計算する」としているのに合わせた値です。国内で流通するクロスの実巾は<strong>92cm前後</strong>の製品が多いため、実際の商品仕様に合わせて入力してください。90cmで計算すると巾数が多めに出て安全側になります。</li>
+    <li>窓・ドアなどの開口部は<strong>差し引いていません</strong>。巾数は壁の横幅で決まるためです。開口部の面積は実際に張る面積の参考としてのみ表示しています。</li>
+    <li>柄物は柄合わせのため必ず端材が出ます。リピート寸法が天井高で割り切れない場合はさらに余りが増えます。</li>
+    <li>天井・入隅出隅の回り込み、下地処理、廻り縁・巾木の有無は考慮していません。</li>
+    <li>初めて施工する場合は失敗を見込んで1割程度多めに購入することをおすすめします(推奨量として表示)。</li>
+    <li>販売単位は商品によって異なります(1m単位・0.5m単位・ロール単位など)。発注前に商品ページを確認してください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">クロス幅は90cmと92cmのどちらを入れればいいですか?</h3>
+  <p class="faq-a">商品仕様に書かれた実際の巾を入れるのが正確です。わからない場合は90cmのままにしておくと巾数が多めに出て安全側になります。</p>
+  <h3 class="faq-q">窓やドアの分は差し引かなくていいのですか?</h3>
+  <p class="faq-a">必要巾数は壁の横幅で決まるため、開口部があっても巾数は減りません。大きな掃き出し窓が壁一面を占める場合など、明らかに巾数が減るケースだけ横幅を調整してください。</p>
+  <h3 class="faq-q">柄物だと必要量が増えるのはなぜですか?</h3>
+  <p class="faq-a">隣り合う巾で柄をそろえる必要があり、1巾ごとに縦リピート1つ分の余裕を見るためです。リピートが大きい柄ほど必要量が増えます。</p>
+  <h3 class="faq-q">部屋全体を張り替えるときはどう入力しますか?</h3>
+  <p class="faq-a">「＋詳細機能」で間口と奥行きを入れると、壁一周の横幅((間口+奥行き)×2)が出ます。その値を「壁の横幅」に入れてください。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_wall_width: "壁の横幅を10〜5000cmの範囲で入力してください。",
+    invalid_height: "天井高を10〜1000cmの範囲で入力してください。",
+    invalid_roll_width: "クロス幅を30〜300cmの範囲で入力してください。",
+    invalid_repeat: "縦リピート寸法を0〜500cmの範囲で入力してください。",
+    invalid_openings: "開口部の面積を0以上の数値で入力してください。",
+    invalid_room_width: "間口を10〜5000cmの範囲で入力してください。",
+    invalid_room_depth: "奥行きを10〜5000cmの範囲で入力してください。"
+  };
+
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var wwEl = document.getElementById("wall-w");
+  var whEl = document.getElementById("wall-h");
+  var rwEl = document.getElementById("roll-w");
+  var repEl = document.getElementById("repeat");
+  var opEl = document.getElementById("openings");
+  var roomWEl = document.getElementById("room-w");
+  var roomDEl = document.getElementById("room-d");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function num(el, fallback) {
+    return el.value === "" ? fallback : parseFloat(el.value);
+  }
+
+  function runAdv() {
+    if (roomWEl.value === "" || roomDEl.value === "") { advBox.hidden = true; return; }
+    var r = KabegamiCalc.perimeter(parseFloat(roomWEl.value), parseFloat(roomDEl.value));
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML = '<div class="result-main">壁一周 ' + esc(r.wallWidthCm.toLocaleString("ja-JP")) + " cm</div>" +
+      "<p>(間口 + 奥行き) × 2 の値です。上の「壁の横幅」に入れてください。</p>";
+    advBox.hidden = false;
+  }
+
+  function run() {
+    if (wwEl.value === "" || whEl.value === "") { box.hidden = true; return; }
+    var r = KabegamiCalc.calculate(
+      parseFloat(wwEl.value), parseFloat(whEl.value),
+      num(rwEl, 90), num(repEl, 0), num(opEl, 0)
+    );
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var html = '<div class="result-main">必要 ' + esc(r.totalM.toFixed(2)) + " m(発注 " +
+      esc(String(r.orderM)) + " m)</div><ul>" +
+      "<li>必要巾数: " + esc(String(r.panels)) + "巾</li>" +
+      "<li>1巾あたりの長さ: " + esc(r.panelLengthCm.toFixed(1)) + "cm" +
+      (r.patterned ? "(柄 " + esc(String(r.repeatCount)) + "個分)" : "(天井高 + 切りしろ10cm)") + "</li>" +
+      "<li><strong>初めて施工する場合の推奨量: " + esc(String(r.recommendedM)) + " m</strong>(1割増し)</li>" +
+      "<li>壁の面積: " + esc(r.wallAreaM2.toFixed(2)) + " m&sup2;";
+    if (r.netAreaM2 !== r.wallAreaM2) {
+      html += " / 開口部を除いた実張り面積: " + esc(r.netAreaM2.toFixed(2)) + " m&sup2;";
+    }
+    html += "</li></ul>";
+    box.innerHTML = html;
+    box.hidden = false;
+  }
+
+  [wwEl, whEl, rwEl, repEl, opEl].forEach(function (el) { el.addEventListener("input", run); });
+  [roomWEl, roomDEl].forEach(function (el) { el.addEventListener("input", runAdv); });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

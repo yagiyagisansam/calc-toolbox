@@ -1,0 +1,337 @@
+{
+  "tool": "menkyo-koshin",
+  "module": "calc.js",
+  "global": "MenkyoKoshinCalc",
+  "cases": [
+    {
+      "name": "更新期間: 有効期限2027年4月15日なら誕生日は3月15日、更新期間は2月15日〜4月15日",
+      "func": "renewalPeriod",
+      "args": [2027, 4, 15],
+      "expect": {
+        "ok": true,
+        "start": { "y": 2027, "m": 2, "d": 15 },
+        "birthday": { "y": 2027, "m": 3, "d": 15 },
+        "end": { "y": 2027, "m": 4, "d": 15 }
+      }
+    },
+    {
+      "name": "更新期間: 年をまたぐ場合(有効期限2027年1月10日→開始は2026年11月10日)",
+      "func": "renewalPeriod",
+      "args": [2027, 1, 10],
+      "expect": {
+        "ok": true,
+        "start": { "y": 2026, "m": 11, "d": 10 },
+        "birthday": { "y": 2026, "m": 12, "d": 10 },
+        "end": { "y": 2027, "m": 1, "d": 10 }
+      }
+    },
+    {
+      "name": "更新期間: 応当日がない月は末日に丸める(有効期限2027年4月30日→開始は2月28日)",
+      "func": "renewalPeriod",
+      "args": [2027, 4, 30],
+      "expect": {
+        "ok": true,
+        "start": { "y": 2027, "m": 2, "d": 28 },
+        "birthday": { "y": 2027, "m": 3, "d": 30 }
+      }
+    },
+    {
+      "name": "判定: 更新期間より前(2026年7月29日時点で有効期限2027年4月15日)",
+      "func": "statusOn",
+      "args": [2027, 4, 15, 2026, 7, 29],
+      "expect": {
+        "ok": true,
+        "status": "before",
+        "daysToStart": 201,
+        "daysToEnd": 260
+      }
+    },
+    {
+      "name": "判定: 更新期間中(2026年7月29日時点で有効期限2026年8月15日・残り17日)",
+      "func": "statusOn",
+      "args": [2026, 8, 15, 2026, 7, 29],
+      "expect": {
+        "ok": true,
+        "status": "open",
+        "daysToEnd": 17
+      }
+    },
+    {
+      "name": "判定: 有効期限を過ぎている(2026年7月29日時点で有効期限2026年6月15日)",
+      "func": "statusOn",
+      "args": [2026, 6, 15, 2026, 7, 29],
+      "expect": {
+        "ok": true,
+        "status": "expired",
+        "daysToEnd": -44
+      }
+    },
+    {
+      "name": "境界値: 更新期間の初日ちょうどは手続きできる",
+      "func": "statusOn",
+      "args": [2026, 8, 15, 2026, 6, 15],
+      "expect": {
+        "ok": true,
+        "status": "open",
+        "daysToStart": 0
+      }
+    },
+    {
+      "name": "境界値: 更新期間の初日の前日はまだ手続きできない",
+      "func": "statusOn",
+      "args": [2026, 8, 15, 2026, 6, 14],
+      "expect": {
+        "ok": true,
+        "status": "before",
+        "daysToStart": 1
+      }
+    },
+    {
+      "name": "境界値: 有効期限当日は更新期間内(残り0日)",
+      "func": "statusOn",
+      "args": [2026, 8, 15, 2026, 8, 15],
+      "expect": {
+        "ok": true,
+        "status": "open",
+        "daysToEnd": 0
+      }
+    },
+    {
+      "name": "区分: 継続5年以上・違反なし・40歳は優良運転者(講習30分・有効期間5年)",
+      "func": "classify",
+      "args": [10, 0, false, 40],
+      "expect": {
+        "ok": true,
+        "legalCategory": "excellent",
+        "lectureCategory": "excellent",
+        "lectureMinutes": 30,
+        "validYears": 5
+      }
+    },
+    {
+      "name": "区分: 継続5年以上・軽微違反1回のみ・40歳は一般運転者(講習1時間・有効期間5年)",
+      "func": "classify",
+      "args": [10, 1, false, 40],
+      "expect": {
+        "ok": true,
+        "legalCategory": "general",
+        "lectureMinutes": 60,
+        "validYears": 5
+      }
+    },
+    {
+      "name": "区分: 軽微違反2回は違反運転者等(講習2時間・有効期間3年)",
+      "func": "classify",
+      "args": [10, 2, false, 40],
+      "expect": {
+        "ok": true,
+        "legalCategory": "violator",
+        "lectureCategory": "violator",
+        "lectureMinutes": 120,
+        "validYears": 3
+      }
+    },
+    {
+      "name": "区分: 軽微違反1回でも人身事故があれば違反運転者等になる",
+      "func": "classify",
+      "args": [10, 1, true, 40],
+      "expect": {
+        "ok": true,
+        "legalCategory": "violator",
+        "validYears": 3
+      }
+    },
+    {
+      "name": "区分: 継続5年未満・違反なしは法律上は違反運転者等だが講習は初回更新者講習(2時間・3年)",
+      "func": "classify",
+      "args": [3, 0, false, 22],
+      "expect": {
+        "ok": true,
+        "legalCategory": "violator",
+        "lectureCategory": "first",
+        "lectureMinutes": 120,
+        "validYears": 3
+      }
+    },
+    {
+      "name": "区分: 継続5年未満でも軽微違反2回なら違反運転者講習になる",
+      "func": "classify",
+      "args": [3, 2, false, 22],
+      "expect": {
+        "ok": true,
+        "lectureCategory": "violator",
+        "validYears": 3
+      }
+    },
+    {
+      "name": "境界値: 継続5年ちょうど・違反なしは優良運転者",
+      "func": "classify",
+      "args": [5, 0, false, 40],
+      "expect": {
+        "ok": true,
+        "legalCategory": "excellent",
+        "validYears": 5
+      }
+    },
+    {
+      "name": "境界値: 更新日の年齢70歳の優良運転者は有効期間4年",
+      "func": "classify",
+      "args": [10, 0, false, 70],
+      "expect": {
+        "ok": true,
+        "legalCategory": "excellent",
+        "validYears": 4
+      }
+    },
+    {
+      "name": "境界値: 更新日の年齢71歳以上の優良運転者は有効期間3年",
+      "func": "classify",
+      "args": [10, 0, false, 71],
+      "expect": {
+        "ok": true,
+        "legalCategory": "excellent",
+        "validYears": 3
+      }
+    },
+    {
+      "name": "境界値: 更新日の年齢69歳の一般運転者は有効期間5年のまま",
+      "func": "classify",
+      "args": [10, 1, false, 69],
+      "expect": {
+        "ok": true,
+        "legalCategory": "general",
+        "validYears": 5
+      }
+    },
+    {
+      "name": "高齢者の特例: 69歳は高齢者講習も認知機能検査も不要",
+      "func": "elderlyRequirement",
+      "args": [69],
+      "expect": {
+        "ok": true,
+        "elderlyLecture": false,
+        "cognitiveTest": false
+      }
+    },
+    {
+      "name": "高齢者の特例: 70歳から高齢者講習が必要(認知機能検査はまだ不要)",
+      "func": "elderlyRequirement",
+      "args": [70],
+      "expect": {
+        "ok": true,
+        "elderlyLecture": true,
+        "cognitiveTest": false
+      }
+    },
+    {
+      "name": "高齢者の特例: 75歳から認知機能検査等も必要",
+      "func": "elderlyRequirement",
+      "args": [75],
+      "expect": {
+        "ok": true,
+        "elderlyLecture": true,
+        "cognitiveTest": true,
+        "skillTestPossible": true
+      }
+    },
+    {
+      "name": "次回の有効期限: 2027年4月15日に5年区分で更新すると2032年4月15日",
+      "func": "nextExpiry",
+      "args": [2027, 4, 15, 5],
+      "expect": {
+        "ok": true,
+        "next": { "y": 2032, "m": 4, "d": 15 }
+      }
+    },
+    {
+      "name": "次回の有効期限: 3年区分なら2030年4月15日",
+      "func": "nextExpiry",
+      "args": [2027, 4, 15, 3],
+      "expect": {
+        "ok": true,
+        "next": { "y": 2030, "m": 4, "d": 15 }
+      }
+    },
+    {
+      "name": "異常入力: 存在しない日付(2027年2月30日)はエラー",
+      "func": "renewalPeriod",
+      "args": [2027, 2, 30],
+      "expect": {
+        "ok": false,
+        "code": "invalid_expiry"
+      }
+    },
+    {
+      "name": "異常入力: 月が13はエラー",
+      "func": "renewalPeriod",
+      "args": [2027, 13, 1],
+      "expect": {
+        "ok": false,
+        "code": "invalid_expiry"
+      }
+    },
+    {
+      "name": "異常入力: 年が範囲外(1900年)はエラー",
+      "func": "renewalPeriod",
+      "args": [1900, 4, 15],
+      "expect": {
+        "ok": false,
+        "code": "invalid_expiry"
+      }
+    },
+    {
+      "name": "異常入力: 日付が数値でない場合はエラー",
+      "func": "renewalPeriod",
+      "args": ["2027", 4, 15],
+      "expect": {
+        "ok": false,
+        "code": "invalid_expiry"
+      }
+    },
+    {
+      "name": "異常入力: 継続年数が負の値はエラー",
+      "func": "classify",
+      "args": [-1, 0, false, 40],
+      "expect": {
+        "ok": false,
+        "code": "invalid_years"
+      }
+    },
+    {
+      "name": "異常入力: 違反回数が小数はエラー",
+      "func": "classify",
+      "args": [10, 1.5, false, 40],
+      "expect": {
+        "ok": false,
+        "code": "invalid_violations"
+      }
+    },
+    {
+      "name": "異常入力: 年齢が範囲外(15歳)はエラー",
+      "func": "classify",
+      "args": [10, 0, false, 15],
+      "expect": {
+        "ok": false,
+        "code": "invalid_age"
+      }
+    },
+    {
+      "name": "異常入力: 有効期間の年数が3・4・5以外はエラー",
+      "func": "nextExpiry",
+      "args": [2027, 4, 15, 6],
+      "expect": {
+        "ok": false,
+        "code": "invalid_valid_years"
+      }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "renewalPeriod",
+      "args": [],
+      "expect": {
+        "ok": false,
+        "code": "invalid_expiry"
+      }
+    }
+  ]
+}

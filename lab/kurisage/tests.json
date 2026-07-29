@@ -1,0 +1,145 @@
+{
+  "tool": "kurisage",
+  "module": "calc.js",
+  "global": "KurisageCalc",
+  "cases": [
+    {
+      "name": "繰上げ60歳0か月(0.4%)は-24.0%・損益分岐80歳10か月",
+      "func": "calculate",
+      "args": [60, 0, "b"],
+      "expect": { "ok": true, "type": "kuriage", "ratePct": -24, "offsetMonths": -60, "breakEvenYears": 80, "breakEvenMonths": 10 }
+    },
+    {
+      "name": "繰上げ64歳0か月(0.4%)は-4.8%・損益分岐84歳10か月",
+      "func": "calculate",
+      "args": [64, 0, "b"],
+      "expect": { "ok": true, "type": "kuriage", "ratePct": -4.8, "breakEvenYears": 84, "breakEvenMonths": 10 }
+    },
+    {
+      "name": "境界値: 65歳0か月ちょうどは増減なし・損益分岐なし",
+      "func": "calculate",
+      "args": [65, 0, "b"],
+      "expect": { "ok": true, "type": "normal", "ratePct": 0, "offsetMonths": 0, "breakEvenTotalMonths": null }
+    },
+    {
+      "name": "65歳6か月の請求は66歳前なので増額されない",
+      "func": "calculate",
+      "args": [65, 6, "b"],
+      "expect": { "ok": true, "type": "normal", "ratePct": 0 }
+    },
+    {
+      "name": "繰下げ66歳0か月は+8.4%・損益分岐77歳11か月",
+      "func": "calculate",
+      "args": [66, 0, "b"],
+      "expect": { "ok": true, "type": "kurisage", "ratePct": 8.4, "offsetMonths": 12, "breakEvenYears": 77, "breakEvenMonths": 11 }
+    },
+    {
+      "name": "繰下げ70歳0か月は+42.0%・損益分岐81歳11か月",
+      "func": "calculate",
+      "args": [70, 0, "b"],
+      "expect": { "ok": true, "type": "kurisage", "ratePct": 42, "breakEvenYears": 81, "breakEvenMonths": 11 }
+    },
+    {
+      "name": "境界値: 繰下げ上限75歳0か月は+84.0%・損益分岐86歳11か月",
+      "func": "calculate",
+      "args": [75, 0, "b"],
+      "expect": { "ok": true, "type": "kurisage", "ratePct": 84, "offsetMonths": 120, "breakEvenYears": 86, "breakEvenMonths": 11 }
+    },
+    {
+      "name": "繰下げ72歳3か月は+60.9%・損益分岐84歳2か月",
+      "func": "calculate",
+      "args": [72, 3, "b"],
+      "expect": { "ok": true, "type": "kurisage", "ratePct": 60.9, "breakEvenYears": 84, "breakEvenMonths": 2 }
+    },
+    {
+      "name": "昭和37年4月1日以前生まれ(0.5%)の60歳繰上げは-30.0%・損益分岐76歳8か月",
+      "func": "calculate",
+      "args": [60, 0, "a"],
+      "expect": { "ok": true, "ratePct": -30, "breakEvenYears": 76, "breakEvenMonths": 8, "groupLabel": "昭和27年4月2日〜昭和37年4月1日生まれ" }
+    },
+    {
+      "name": "年金額: 本来78万円を70歳から受け取ると年110万7600円",
+      "func": "amount",
+      "args": [780000, 70, 0, "b"],
+      "expect": { "ok": true, "annualYen": 1107600, "monthlyYen": 92300, "diffAnnualYen": 327600 }
+    },
+    {
+      "name": "年金額: 本来78万900円を60歳から受け取ると年59万3484円",
+      "func": "amount",
+      "args": [780900, 60, 0, "b"],
+      "expect": { "ok": true, "annualYen": 593484, "diffAnnualYen": -187416 }
+    },
+    {
+      "name": "年金額: 65歳受給なら本来の額のまま",
+      "func": "amount",
+      "args": [1000000, 65, 0, "b"],
+      "expect": { "ok": true, "annualYen": 1000000, "diffAnnualYen": 0 }
+    },
+    {
+      "name": "一覧: 昭和27年4月1日以前生まれは60〜70歳の11行で上限+42%",
+      "func": "table",
+      "args": ["c"],
+      "expect": { "ok": true, "rows": { "length": 11, "0": { "age": 60, "ratePct": -30 }, "10": { "age": 70, "ratePct": 42 } } }
+    },
+    {
+      "name": "一覧: 昭和37年4月2日以降生まれは60〜75歳の16行",
+      "func": "table",
+      "args": ["b"],
+      "expect": { "ok": true, "rows": { "length": 16, "15": { "age": 75, "ratePct": 84 } } }
+    },
+    {
+      "name": "異常入力: 昭和27年4月1日以前生まれで71歳は繰下げ上限超過",
+      "func": "calculate",
+      "args": [71, 0, "c"],
+      "expect": { "ok": false, "code": "age_out_of_range" }
+    },
+    {
+      "name": "境界値: 75歳1か月は範囲外",
+      "func": "calculate",
+      "args": [75, 1, "b"],
+      "expect": { "ok": false, "code": "age_out_of_range" }
+    },
+    {
+      "name": "異常入力: 59歳はエラー",
+      "func": "calculate",
+      "args": [59, 0, "b"],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "異常入力: 76歳はエラー",
+      "func": "calculate",
+      "args": [76, 0, "b"],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "異常入力: 月数12はエラー",
+      "func": "calculate",
+      "args": [65, 12, "b"],
+      "expect": { "ok": false, "code": "invalid_month" }
+    },
+    {
+      "name": "異常入力: 数値でない年齢はエラー",
+      "func": "calculate",
+      "args": ["abc", 0],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "異常入力: 存在しない生年月日区分はエラー",
+      "func": "calculate",
+      "args": [65, 0, "z"],
+      "expect": { "ok": false, "code": "invalid_group" }
+    },
+    {
+      "name": "異常入力: 年金額が負はエラー",
+      "func": "amount",
+      "args": [-1, 65, 0, "b"],
+      "expect": { "ok": false, "code": "invalid_pension" }
+    }
+  ]
+}

@@ -1,0 +1,145 @@
+{
+  "tool": "shitsugyo",
+  "module": "calc.js",
+  "global": "ShitsugyoCalc",
+  "cases": [
+    {
+      "name": "代表例: 6か月180万円・35歳・12年・自己都合は日額6,207円×120日=744,840円",
+      "func": "calculate",
+      "args": [1800000, 35, 12, "self"],
+      "expect": { "ok": true, "dailyWage": 10000, "benefit": 6207, "days": 120, "total": 744840 }
+    },
+    {
+      "name": "会社都合は同じ条件でも所定給付日数が240日になる",
+      "func": "calculate",
+      "args": [1800000, 35, 12, "company"],
+      "expect": { "ok": true, "benefit": 6207, "days": 240, "total": 1489680 }
+    },
+    {
+      "name": "賃金日額が上限を超えると45〜59歳の上限17,740円で頭打ちになる",
+      "func": "calculate",
+      "args": [4000000, 50, 25, "self"],
+      "expect": { "ok": true, "rawDailyWage": 22222, "dailyWage": 17740, "capped": "upper", "benefit": 8870, "days": 150, "total": 1330500 }
+    },
+    {
+      "name": "賃金日額が下限を下回ると3,014円が適用され日額は下限2,411円になる",
+      "func": "calculate",
+      "args": [500000, 25, 3, "self"],
+      "expect": { "ok": true, "rawDailyWage": 2777, "dailyWage": 3014, "capped": "lower", "benefit": 2411, "days": 90 }
+    },
+    {
+      "name": "境界値: 賃金日額5,339円は給付率80%で日額4,271円(厚労省リーフレットの値)",
+      "func": "dailyBenefit",
+      "args": [5339, 30],
+      "expect": { "ok": true, "benefit": 4271, "rate": 80 }
+    },
+    {
+      "name": "境界値: 賃金日額5,340円ちょうどは日額4,272円(厚労省リーフレットの値)",
+      "func": "dailyBenefit",
+      "args": [5340, 30],
+      "expect": { "ok": true, "benefit": 4272 }
+    },
+    {
+      "name": "境界値: 賃金日額13,140円ちょうどは日額6,570円(厚労省リーフレットの値)",
+      "func": "dailyBenefit",
+      "args": [13140, 30],
+      "expect": { "ok": true, "benefit": 6570, "rate": 50 }
+    },
+    {
+      "name": "境界値: 60〜64歳は賃金日額11,800円で日額5,310円(厚労省リーフレットの値)",
+      "func": "dailyBenefit",
+      "args": [11800, 62],
+      "expect": { "ok": true, "benefit": 5310 }
+    },
+    {
+      "name": "60〜64歳の中間帯は2つの式の低い方を採る(賃金日額8,000円→5,120円)",
+      "func": "dailyBenefit",
+      "args": [8000, 62],
+      "expect": { "ok": true, "benefit": 5120 }
+    },
+    {
+      "name": "境界値: 賃金日額の下限3,014円は日額2,411円",
+      "func": "dailyBenefit",
+      "args": [3014, 20],
+      "expect": { "ok": true, "benefit": 2411 }
+    },
+    {
+      "name": "所定給付日数: 自己都合・12年は120日",
+      "func": "benefitDays",
+      "args": [40, 12, "self"],
+      "expect": { "ok": true, "days": 120 }
+    },
+    {
+      "name": "所定給付日数: 自己都合・20年以上は150日",
+      "func": "benefitDays",
+      "args": [55, 20, "self"],
+      "expect": { "ok": true, "days": 150 }
+    },
+    {
+      "name": "所定給付日数: 会社都合・45〜59歳・20年以上は最長の330日",
+      "func": "benefitDays",
+      "args": [50, 22, "company"],
+      "expect": { "ok": true, "days": 330 }
+    },
+    {
+      "name": "所定給付日数: 会社都合・30〜34歳・1年以上5年未満は120日",
+      "func": "benefitDays",
+      "args": [32, 3, "company"],
+      "expect": { "ok": true, "days": 120 }
+    },
+    {
+      "name": "自己都合で被保険者期間が1年未満は受給資格なし",
+      "func": "calculate",
+      "args": [1800000, 35, 0.5, "self"],
+      "expect": { "ok": false, "code": "insufficient_insured_period" }
+    },
+    {
+      "name": "会社都合なら被保険者期間6か月以上で90日受給できる",
+      "func": "calculate",
+      "args": [1800000, 35, 0.6, "company"],
+      "expect": { "ok": true, "days": 90, "total": 558630 }
+    },
+    {
+      "name": "会社都合でも被保険者期間6か月未満は受給資格なし",
+      "func": "benefitDays",
+      "args": [35, 0.4, "company"],
+      "expect": { "ok": false, "code": "insufficient_insured_period" }
+    },
+    {
+      "name": "異常入力: 賃金合計0円はエラー",
+      "func": "calculate",
+      "args": [0, 35, 12, "self"],
+      "expect": { "ok": false, "code": "invalid_wage" }
+    },
+    {
+      "name": "異常入力: 65歳以上は対象外(高年齢求職者給付金のため)",
+      "func": "calculate",
+      "args": [1800000, 70, 12, "self"],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "異常入力: 離職理由が不正な文字列はエラー",
+      "func": "calculate",
+      "args": [1800000, 35, 12, "unknown"],
+      "expect": { "ok": false, "code": "invalid_reason" }
+    },
+    {
+      "name": "異常入力: 賃金合計が数値でないときはエラー",
+      "func": "calculate",
+      "args": ["abc", 35, 12, "self"],
+      "expect": { "ok": false, "code": "invalid_wage" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "異常入力: 被保険者期間が負の値はエラー",
+      "func": "benefitDays",
+      "args": [35, -1, "self"],
+      "expect": { "ok": false, "code": "invalid_years" }
+    }
+  ]
+}

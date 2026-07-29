@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>部屋の広さから必要ルーメン計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="畳数から、シーリングライトに必要な明るさ(lm)と適用畳数の目安を計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>/* 長いURLがはみ出さないようにする(shared/style.cssは変更しない) */
+  .sources a { word-break: break-all; overflow-wrap: anywhere; }</style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>部屋の広さから必要ルーメン計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>部屋の広さ(畳)
+      <span class="field-note">例: 8。㎡しかわからないときは下の欄に入れてください</span>
+      <input type="number" id="jo" inputmode="decimal" step="0.5" min="0.5" max="100" placeholder="8">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="area-form">
+    <span class="field-note">面積(㎡)から畳数に直す</span>
+    <label>部屋の面積(㎡)
+      <input type="number" id="sqm" inputmode="decimal" step="0.1" min="0.1" max="200" placeholder="13">
+    </label>
+    <div class="tool-result" id="result-b" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 明るさの好みと天井高で調整する</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">明るさの好みと天井高で調整</h3>
+      <p class="adv-note">適用畳数の基準は「机上面100lx」が目安です。手元作業を多くしたい部屋、天井の高い部屋では不足しがちです。</p>
+      <div class="field-row">
+        <label>明るさの好み
+          <select id="lux">
+            <option value="75">控えめ(75lx相当・寝室など)</option>
+            <option value="100" selected>標準(100lx相当)</option>
+            <option value="150">明るめ(150lx相当・書斎や在宅ワーク)</option>
+          </select>
+        </label>
+        <label>天井高(m)
+          <input type="number" id="ceiling" inputmode="decimal" step="0.1" min="1.5" max="6" value="2.4">
+        </label>
+      </div>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    適用畳数の表示は<strong>1器具を部屋の中央に付けた場合</strong>の目安です。家具の配置、壁紙の色、ダウンライトの併用によって体感は変わります。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>畳数を入れるだけで、<strong>「◯畳用」のシーリングライトが何ルーメンなのか</strong>がわかります。天井が高い部屋や在宅ワーク部屋で明るさが足りるかも確認できます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>部屋の広さを畳数で入れます。入れた瞬間に必要な明るさが出ます。</li>
+    <li>㎡しかわからないときは2段目に面積を入れると畳数に直せます。</li>
+    <li>明るさの好みや天井高を反映したいときは「＋詳細機能」を開いてください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>必要な明るさ</strong> = 日本照明工業会 ガイドA121 の適用畳数と定格光束の表から、部屋の広さ以上のランクを選ぶ</li>
+    <li><strong>標準定格光束</strong> = 各ランクで机上面の平均照度が100lxになる目安の光束</li>
+    <li><strong>畳数への換算</strong> = 面積(㎡) ÷ 1.62(不動産広告の表示基準)</li>
+    <li><strong>明るさの好み</strong> = 標準定格光束 × 目標照度 ÷ 100lx(比例計算)</li>
+    <li><strong>天井高の補正</strong> = ((天井高 − 0.7m) ÷ (2.4m − 0.7m))²(逆二乗則による本ツール独自の概算)</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>LEDシーリングライトの適用畳数と定格光束(日本照明工業会 ガイドA121)</caption>
+      <thead><tr><th>適用畳数</th><th>標準定格光束</th><th>下限値</th><th>上限値</th></tr></thead>
+      <tbody>
+        <tr><td>〜4.5畳</td><td>2,700 lm</td><td>2,200 lm</td><td>3,200 lm</td></tr>
+        <tr><td>〜6畳</td><td>3,200 lm</td><td>2,700 lm</td><td>3,700 lm</td></tr>
+        <tr><td>〜8畳</td><td>3,800 lm</td><td>3,300 lm</td><td>4,300 lm</td></tr>
+        <tr><td>〜10畳</td><td>4,400 lm</td><td>3,900 lm</td><td>4,900 lm</td></tr>
+        <tr><td>〜12畳</td><td>5,000 lm</td><td>4,500 lm</td><td>5,500 lm</td></tr>
+        <tr><td>〜14畳</td><td>5,600 lm</td><td>5,100 lm</td><td>6,100 lm</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>一般社団法人 日本照明工業会「LED照明器具の適用畳数について」(ガイドA121:2023にもとづく表示基準)<br>
+      <a href="https://www.jlma.or.jp/led-navi/contents/cont22_LEDCeiling.htm" rel="noopener" target="_blank">https://www.jlma.or.jp/led-navi/contents/cont22_LEDCeiling.htm</a>(2026年7月29日参照。数値表は画像のため下記2件で数値を確認)</li>
+    <li>三菱電機 よくあるご質問「LED居室用シーリングの畳数にあわせた明るさ」(ガイドA121の下限値・上限値)<br>
+      <a href="https://faq01.mitsubishielectric.co.jp/faq/show/6067" rel="noopener" target="_blank">https://faq01.mitsubishielectric.co.jp/faq/show/6067</a>(2026年7月29日参照)</li>
+    <li>大光電機「『適用畳数』の表示基準」(標準定格光束と光束値の範囲)<br>
+      <a href="https://www2.lighting-daiko.co.jp/support/maintenance/tatami.html" rel="noopener" target="_blank">https://www2.lighting-daiko.co.jp/support/maintenance/tatami.html</a>(2026年7月29日参照)</li>
+    <li>不動産公正取引協議会連合会「不動産の表示に関する公正競争規約・同施行規則」(畳1枚=1.62㎡の表示基準)<br>
+      <a href="https://www.rftc.jp/koseikyosokiyaku/" rel="noopener" target="_blank">https://www.rftc.jp/koseikyosokiyaku/</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>適用畳数の表は<strong>ガイドA121:2023</strong>(2026年7月29日時点)にもとづきます。改訂で変わることがあります。</li>
+    <li>日本照明工業会は16畳以上について、照度均斉度を考慮し1器具での畳数表示を設けていません。本ツールで14畳を超える場合は複数灯に分けた前提で表示します。</li>
+    <li><strong>天井高の補正はJLMAの基準にはありません。</strong>本ツールが天井高2.4m・机上面0.7mを基準に、逆二乗則で概算した独自の目安です。</li>
+    <li>明るさの好みによる調整は「標準定格光束＝机上面100lx」の記述からの比例計算です。実際の照度は反射率・器具の配光で変わります。</li>
+    <li>畳の実寸は地域・種類で異なります。面積からの換算は不動産広告の表示基準(1畳=1.62㎡)を使っています。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">「8畳用」と書かれた器具は何ルーメンですか?</h3>
+  <p class="faq-a">標準は3,800lmで、3,300〜4,300lmの範囲であれば「〜8畳」と表示できます。同じ8畳用でも1,000lmの差が出ることがあります。</p>
+  <h3 class="faq-q">在宅ワークの部屋が暗く感じます</h3>
+  <p class="faq-a">適用畳数は机上面100lxが目安です。手元での作業が中心なら、1ランク上の器具にするかデスクライトを足すのが現実的です。</p>
+  <h3 class="faq-q">16畳のリビングはどう選べばよいですか?</h3>
+  <p class="faq-a">日本照明工業会は16畳以上の1器具表示を設けていません。2灯に分ける、ダウンライトを併用するなど複数の光源で明るさと均一さを確保してください。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_tatami: "部屋の広さは0.5〜100畳の数値で入力してください。",
+    invalid_area: "面積は0.1〜200㎡の数値で入力してください。",
+    invalid_lux: "明るさの好みを選び直してください。",
+    invalid_ceiling: "天井高は1.5〜6mの数値で入力してください。"
+  };
+  var box = document.getElementById("result");
+  var boxB = document.getElementById("result-b");
+  var advBox = document.getElementById("adv-result");
+  var joEl = document.getElementById("jo");
+  var sqmEl = document.getElementById("sqm");
+  var luxEl = document.getElementById("lux");
+  var ceilingEl = document.getElementById("ceiling");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function lm(v) { return Math.round(v).toLocaleString("ja-JP") + " lm"; }
+  function err(target, code) {
+    target.innerHTML = '<p class="result-error">' + esc(ERRORS[code] || "入力値を確認してください。") + "</p>";
+    target.hidden = false;
+  }
+
+  function run() {
+    if (joEl.value === "") { box.hidden = true; runAdv(); return; }
+    var r = LumenCalc.recommend(parseFloat(joEl.value));
+    if (!r.ok) { err(box, r.code); runAdv(); return; }
+    box.innerHTML =
+      '<div class="result-main">' + esc(lm(r.standardLm)) +
+      (r.fixtures > 1 ? " ×" + esc(String(r.fixtures)) + "灯" : "") + "</div>" +
+      "<p>適用畳数の表示: 〜" + esc(String(r.rankJo)) + "畳(下限 " + esc(lm(r.minLm)) +
+      " 〜 上限 " + esc(lm(r.maxLm)) + ")</p>" +
+      (r.overMax
+        ? "<p>14畳を超えるため、1器具での畳数表示はありません。" + esc(String(r.fixtures)) +
+          "灯に分けて1灯あたり " + esc(r.perFixtureTatami.toFixed(1)) + "畳として計算しました。</p>"
+        : "<p>机上面の平均照度100lxを目安とした標準の明るさです。</p>");
+    box.hidden = false;
+    runAdv();
+  }
+
+  function runB() {
+    if (sqmEl.value === "") { boxB.hidden = true; return; }
+    var r = LumenCalc.fromSquareMeters(parseFloat(sqmEl.value));
+    if (!r.ok) { err(boxB, r.code); return; }
+    boxB.innerHTML = '<div class="result-main">約' + esc(r.tatami.toFixed(1)) + " 畳</div>" +
+      "<p>1畳=1.62㎡(不動産広告の表示基準)で換算しています。上の欄にこの畳数を入れてください。</p>";
+    boxB.hidden = false;
+  }
+
+  function runAdv() {
+    if (joEl.value === "" || ceilingEl.value === "") { advBox.hidden = true; return; }
+    var r = LumenCalc.adjusted(parseFloat(joEl.value), parseFloat(luxEl.value), parseFloat(ceilingEl.value));
+    if (!r.ok) { err(advBox, r.code); return; }
+    advBox.innerHTML =
+      '<div class="result-main">必要な明るさ ' + esc(lm(r.requiredLm)) + "</div>" +
+      (r.fixtures > 1 ? "<p>1灯あたり " + esc(lm(r.requiredPerFixtureLm)) + " ×" + esc(String(r.fixtures)) + "灯</p>" : "") +
+      "<p>標準 " + esc(lm(r.standardLm)) + " × 明るさ " + esc(r.luxFactor.toFixed(2)) +
+      "倍 × 天井高 " + esc(r.ceilingFactor.toFixed(2)) + "倍</p>" +
+      "<p>天井高の補正は本ツール独自の概算です(日本照明工業会の基準に天井高の規定はありません)。</p>";
+    advBox.hidden = false;
+  }
+
+  joEl.addEventListener("input", run);
+  sqmEl.addEventListener("input", runB);
+  luxEl.addEventListener("change", runAdv);
+  ceilingEl.addEventListener("input", runAdv);
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  document.getElementById("area-form").addEventListener("submit", function (e) { e.preventDefault(); runB(); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+{
+  "tool": "iryohi",
+  "module": "calc.js",
+  "global": "IryohiCalc",
+  "cases": [
+    {
+      "name": "代表例: 医療費50万円・補填0円・総所得500万円は控除額40万円",
+      "func": "deduction",
+      "args": [500000, 0, 5000000],
+      "expect": { "ok": true, "netMedical": 500000, "threshold": 100000, "usesRatio": false, "deduction": 400000, "capped": false }
+    },
+    {
+      "name": "補填あり: 医療費50万円・保険金15万円・総所得500万円は控除額25万円",
+      "func": "deduction",
+      "args": [500000, 150000, 5000000],
+      "expect": { "ok": true, "netMedical": 350000, "threshold": 100000, "deduction": 250000 }
+    },
+    {
+      "name": "総所得200万円未満: 総所得150万円なら足切りは5%の75,000円、医療費20万円で控除125,000円",
+      "func": "deduction",
+      "args": [200000, 0, 1500000],
+      "expect": { "ok": true, "threshold": 75000, "usesRatio": true, "deduction": 125000 }
+    },
+    {
+      "name": "境界値: 総所得200万円ちょうどは10万円の方(5%も同額の100,000円)",
+      "func": "threshold",
+      "args": [2000000],
+      "expect": { "ok": true, "threshold": 100000, "usesRatio": false }
+    },
+    {
+      "name": "境界値: 総所得1,999,999円は5%適用で足切り99,999円(1円未満切り捨て)",
+      "func": "threshold",
+      "args": [1999999],
+      "expect": { "ok": true, "threshold": 99999, "usesRatio": true }
+    },
+    {
+      "name": "上限: 医療費300万円・総所得1,000万円は控除額200万円で頭打ち",
+      "func": "deduction",
+      "args": [3000000, 0, 10000000],
+      "expect": { "ok": true, "deduction": 2000000, "capped": true }
+    },
+    {
+      "name": "境界値: 控除額がちょうど200万円(医療費210万円・総所得1,000万円)は頭打ちにならない",
+      "func": "deduction",
+      "args": [2100000, 0, 10000000],
+      "expect": { "ok": true, "deduction": 2000000, "capped": false }
+    },
+    {
+      "name": "足切り以下: 医療費8万円・総所得500万円は控除額0円",
+      "func": "deduction",
+      "args": [80000, 0, 5000000],
+      "expect": { "ok": true, "deduction": 0 }
+    },
+    {
+      "name": "補填が医療費を上回る場合も控除額はマイナスにならず0円",
+      "func": "deduction",
+      "args": [500000, 600000, 5000000],
+      "expect": { "ok": true, "netMedical": 0, "deduction": 0 }
+    },
+    {
+      "name": "還付目安: 控除40万円・所得税率20%なら所得税8万円・復興特別1,680円・住民税4万円で合計121,680円",
+      "func": "refund",
+      "args": [500000, 0, 5000000, 20],
+      "expect": { "ok": true, "deduction": 400000, "incomeTax": 80000, "reconstructionTax": 1680, "residentTax": 40000, "total": 121680 }
+    },
+    {
+      "name": "還付目安: 控除125,000円・所得税率5%なら合計18,881円",
+      "func": "refund",
+      "args": [200000, 0, 1500000, 5],
+      "expect": { "ok": true, "deduction": 125000, "incomeTax": 6250, "reconstructionTax": 131, "residentTax": 12500, "total": 18881 }
+    },
+    {
+      "name": "還付目安: 控除額0円なら還付も0円",
+      "func": "refund",
+      "args": [80000, 0, 5000000, 20],
+      "expect": { "ok": true, "deduction": 0, "incomeTax": 0, "reconstructionTax": 0, "residentTax": 0, "total": 0 }
+    },
+    {
+      "name": "税率判定: 課税所得300万円は10%・控除額97,500円",
+      "func": "taxRateFromTaxable",
+      "args": [3000000],
+      "expect": { "ok": true, "rate": 10, "quickDeduction": 97500 }
+    },
+    {
+      "name": "税率判定の境界: 課税所得1,949,000円は5%",
+      "func": "taxRateFromTaxable",
+      "args": [1949000],
+      "expect": { "ok": true, "rate": 5, "quickDeduction": 0 }
+    },
+    {
+      "name": "税率判定の境界: 課税所得1,950,000円ちょうどは10%",
+      "func": "taxRateFromTaxable",
+      "args": [1950000],
+      "expect": { "ok": true, "rate": 10 }
+    },
+    {
+      "name": "税率判定の境界: 課税所得40,000,000円ちょうどは最高税率45%",
+      "func": "taxRateFromTaxable",
+      "args": [40000000],
+      "expect": { "ok": true, "rate": 45, "quickDeduction": 4796000 }
+    },
+    {
+      "name": "税率判定の境界: 課税所得0円は5%",
+      "func": "taxRateFromTaxable",
+      "args": [0],
+      "expect": { "ok": true, "rate": 5 }
+    },
+    {
+      "name": "異常入力: 医療費が負の値はエラー",
+      "func": "deduction",
+      "args": [-1, 0, 5000000],
+      "expect": { "ok": false, "code": "invalid_medical" }
+    },
+    {
+      "name": "異常入力: 補填額が数値でないときはエラー",
+      "func": "deduction",
+      "args": [500000, "abc", 5000000],
+      "expect": { "ok": false, "code": "invalid_compensated" }
+    },
+    {
+      "name": "異常入力: 総所得が負の値はエラー",
+      "func": "deduction",
+      "args": [500000, 0, -1],
+      "expect": { "ok": false, "code": "invalid_income" }
+    },
+    {
+      "name": "異常入力: 所得税率が範囲外(50%)はエラー",
+      "func": "refund",
+      "args": [500000, 0, 5000000, 50],
+      "expect": { "ok": false, "code": "invalid_rate" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "deduction",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_medical" }
+    },
+    {
+      "name": "異常入力: 課税所得が負の値はエラー",
+      "func": "taxRateFromTaxable",
+      "args": [-100],
+      "expect": { "ok": false, "code": "invalid_taxable" }
+    }
+  ]
+}

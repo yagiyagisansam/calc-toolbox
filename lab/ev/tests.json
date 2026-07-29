@@ -1,0 +1,139 @@
+{
+  "tool": "ev",
+  "module": "calc.js",
+  "global": "EvCalc",
+  "cases": [
+    {
+      "name": "急速充電: 60kWh・20%→80%を50kW(効率0.9)で36kWh・48分",
+      "func": "chargeTime",
+      "args": [60, 20, 80, 50, 0.9],
+      "expect": { "ok": true, "energyKwh": 36, "hours": 0.8, "totalMinutes": 48, "hoursPart": 0, "minutesPart": 48 }
+    },
+    {
+      "name": "自宅200V(6kW): 60kWh・20%→100%は48kWhで8時間53分",
+      "func": "chargeTime",
+      "args": [60, 20, 100, 6, 0.9],
+      "expect": { "ok": true, "energyKwh": 48, "totalMinutes": 533, "hoursPart": 8, "minutesPart": 53 }
+    },
+    {
+      "name": "普通充電3kWでは同じ48kWhに17時間47分かかる",
+      "func": "chargeTime",
+      "args": [60, 20, 100, 3, 0.9],
+      "expect": { "ok": true, "totalMinutes": 1067, "hoursPart": 17, "minutesPart": 47 }
+    },
+    {
+      "name": "境界: 充電効率1.0(損失なし)なら40kWhを50kWで48分",
+      "func": "chargeTime",
+      "args": [40, 0, 100, 50, 1],
+      "expect": { "ok": true, "energyKwh": 40, "hours": 0.8, "totalMinutes": 48 }
+    },
+    {
+      "name": "航続距離: 60kWh・残量80%・電費7km/kWhで336km",
+      "func": "rangeKm",
+      "args": [60, 80, 7],
+      "expect": { "ok": true, "usableKwh": 48, "rangeKm": 336 }
+    },
+    {
+      "name": "境界: 残量0%なら走れる距離は0km",
+      "func": "rangeKm",
+      "args": [60, 0, 7],
+      "expect": { "ok": true, "usableKwh": 0, "rangeKm": 0 }
+    },
+    {
+      "name": "境界: 残量100%なら60kWh全部で420km",
+      "func": "rangeKm",
+      "args": [60, 100, 7],
+      "expect": { "ok": true, "usableKwh": 60, "rangeKm": 420 }
+    },
+    {
+      "name": "30分の急速充電(50kW・効率0.9)で22.5kWh入り、電費7km/kWhで157.5km",
+      "func": "addedRange",
+      "args": [30, 50, 7, 0.9],
+      "expect": { "ok": true, "energyKwh": 22.5, "rangeKm": 157.5 }
+    },
+    {
+      "name": "損失なしなら30分50kWで25kWh・175km(理論上の最大)",
+      "func": "addedRange",
+      "args": [30, 50, 7, 1],
+      "expect": { "ok": true, "energyKwh": 25, "rangeKm": 175 }
+    },
+    {
+      "name": "異常入力: 目標が現在より小さいときはエラー",
+      "func": "chargeTime",
+      "args": [60, 80, 20, 50],
+      "expect": { "ok": false, "code": "invalid_order" }
+    },
+    {
+      "name": "異常入力: 目標と現在が同じときはエラー",
+      "func": "chargeTime",
+      "args": [60, 80, 80, 50],
+      "expect": { "ok": false, "code": "invalid_order" }
+    },
+    {
+      "name": "異常入力: バッテリー容量0kWhはエラー",
+      "func": "chargeTime",
+      "args": [0, 20, 80, 50],
+      "expect": { "ok": false, "code": "invalid_capacity" }
+    },
+    {
+      "name": "異常入力: 現在の充電率が負の値はエラー",
+      "func": "chargeTime",
+      "args": [60, -1, 80, 50],
+      "expect": { "ok": false, "code": "invalid_from" }
+    },
+    {
+      "name": "異常入力: 目標の充電率が100%超はエラー",
+      "func": "chargeTime",
+      "args": [60, 20, 101, 50],
+      "expect": { "ok": false, "code": "invalid_to" }
+    },
+    {
+      "name": "異常入力: 充電出力0kWはエラー(0除算にならない)",
+      "func": "chargeTime",
+      "args": [60, 20, 80, 0],
+      "expect": { "ok": false, "code": "invalid_power" }
+    },
+    {
+      "name": "異常入力: 充電効率0はエラー(0除算にならない)",
+      "func": "chargeTime",
+      "args": [60, 20, 80, 50, 0],
+      "expect": { "ok": false, "code": "invalid_efficiency" }
+    },
+    {
+      "name": "異常入力: 充電出力が上限(400kW)超はエラー",
+      "func": "chargeTime",
+      "args": [60, 20, 80, 500],
+      "expect": { "ok": false, "code": "invalid_power" }
+    },
+    {
+      "name": "異常入力: 数値でないバッテリー容量はエラー",
+      "func": "chargeTime",
+      "args": ["abc", 20, 80, 50],
+      "expect": { "ok": false, "code": "invalid_capacity" }
+    },
+    {
+      "name": "異常入力: 電費0km/kWhはエラー",
+      "func": "rangeKm",
+      "args": [60, 80, 0],
+      "expect": { "ok": false, "code": "invalid_consumption" }
+    },
+    {
+      "name": "異常入力: 数値でない充電率はエラー",
+      "func": "rangeKm",
+      "args": [60, "abc", 7],
+      "expect": { "ok": false, "code": "invalid_soc" }
+    },
+    {
+      "name": "異常入力: 充電時間0分はエラー",
+      "func": "addedRange",
+      "args": [0, 50, 7],
+      "expect": { "ok": false, "code": "invalid_minutes" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "chargeTime",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_capacity" }
+    }
+  ]
+}

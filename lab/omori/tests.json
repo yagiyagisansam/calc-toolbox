@@ -1,0 +1,145 @@
+{
+  "tool": "omori",
+  "module": "calc.js",
+  "global": "OmoriCalc",
+  "cases": [
+    {
+      "name": "1号は3.75g(計量単位令の1もんめ=3.75g)",
+      "func": "convert",
+      "args": [1, "go", "g"],
+      "expect": { "ok": true, "value": 3.75, "gram": 3.75, "go": 1 }
+    },
+    {
+      "name": "1ozは28.3495g(28.349523125gを小数第4位で四捨五入)",
+      "func": "convert",
+      "args": [1, "oz", "g"],
+      "expect": { "ok": true, "value": 28.3495, "oz": 1 }
+    },
+    {
+      "name": "1ozは7.5599号(28.349523125÷3.75)",
+      "func": "convert",
+      "args": [1, "oz", "go"],
+      "expect": { "ok": true, "value": 7.5599, "gram": 28.3495 }
+    },
+    {
+      "name": "船釣りの30号は112.5g・3.9683oz",
+      "func": "convert",
+      "args": [30, "go", "oz"],
+      "expect": { "ok": true, "value": 3.9683, "gram": 112.5, "go": 30 }
+    },
+    {
+      "name": "逆方向: 3.75gはちょうど1号",
+      "func": "convert",
+      "args": [3.75, "g", "go"],
+      "expect": { "ok": true, "value": 1 }
+    },
+    {
+      "name": "同じ単位への換算は値が変わらない(5号→5号)",
+      "func": "convert",
+      "args": [5, "go", "go"],
+      "expect": { "ok": true, "value": 5, "gram": 18.75 }
+    },
+    {
+      "name": "小さい値: 0.1号は0.375g(小数第4位まで残る)",
+      "func": "convert",
+      "args": [0.1, "go", "g"],
+      "expect": { "ok": true, "value": 0.375, "oz": 0.0132 }
+    },
+    {
+      "name": "大きい値: 100号は375g・13.2277oz",
+      "func": "convert",
+      "args": [100, "go", "g"],
+      "expect": { "ok": true, "value": 375, "oz": 13.2277 }
+    },
+    {
+      "name": "境界値: 上限の1000000号も計算できる",
+      "func": "convert",
+      "args": [1000000, "go", "g"],
+      "expect": { "ok": true, "value": 3750000 }
+    },
+    {
+      "name": "分数表記: 1/8ozは3.5437g・0.945号(釣具表記の3.5gより少し重い)",
+      "func": "fromOunceFraction",
+      "args": [1, 8],
+      "expect": { "ok": true, "oz": 0.125, "gram": 3.5437, "go": 0.945 }
+    },
+    {
+      "name": "分数表記: 3/4ozは21.2621g・5.6699号",
+      "func": "fromOunceFraction",
+      "args": [3, 4],
+      "expect": { "ok": true, "oz": 0.75, "gram": 21.2621, "go": 5.6699 }
+    },
+    {
+      "name": "分数表記: 1/2ozは14.1748g・3.7799号",
+      "func": "fromOunceFraction",
+      "args": [1, 2],
+      "expect": { "ok": true, "gram": 14.1748, "go": 3.7799 }
+    },
+    {
+      "name": "オンス換算表は13行あり、4行目が1/8oz",
+      "func": "ounceTable",
+      "args": [],
+      "expect": { "3": { "label": "1/8", "gram": 3.5437, "go": 0.945 }, "length": 13 }
+    },
+    {
+      "name": "号数換算表は16行あり、先頭が0.5号=1.875g",
+      "func": "goTable",
+      "args": [],
+      "expect": { "0": { "go": 0.5, "gram": 1.875 }, "length": 16 }
+    },
+    {
+      "name": "異常入力: 0はエラー",
+      "func": "convert",
+      "args": [0, "go", "g"],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 負の値はエラー",
+      "func": "convert",
+      "args": [-5, "go", "g"],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 上限超過(1000001)はエラー",
+      "func": "convert",
+      "args": [1000001, "go", "g"],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 数値でない値はエラー",
+      "func": "convert",
+      "args": ["abc", "go", "g"],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "convert",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 知らない単位(lb)はエラー",
+      "func": "convert",
+      "args": [1, "lb", "g"],
+      "expect": { "ok": false, "code": "invalid_unit" }
+    },
+    {
+      "name": "異常入力: 変換先の単位が知らないものはエラー",
+      "func": "convert",
+      "args": [1, "go", "kg"],
+      "expect": { "ok": false, "code": "invalid_unit" }
+    },
+    {
+      "name": "異常入力: 分数の分母0はエラー(0で割らない)",
+      "func": "fromOunceFraction",
+      "args": [1, 0],
+      "expect": { "ok": false, "code": "invalid_denominator" }
+    },
+    {
+      "name": "異常入力: 分数の分子が負の値はエラー",
+      "func": "fromOunceFraction",
+      "args": [-1, 8],
+      "expect": { "ok": false, "code": "invalid_numerator" }
+    }
+  ]
+}

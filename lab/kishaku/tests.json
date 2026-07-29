@@ -1,0 +1,163 @@
+{
+  "tool": "kishaku",
+  "module": "calc.js",
+  "global": "KishakuCalc",
+  "cases": [
+    {
+      "name": "原液6%から0.02%は300倍(千葉県資料と一致)",
+      "func": "byConcentration",
+      "args": [6, "percent", 0.02, "percent", 3000],
+      "expect": { "ok": true, "ratio": 300, "stockMl": 10, "waterMl": 2990, "totalMl": 3000, "targetPpm": 200 }
+    },
+    {
+      "name": "原液1%から0.02%は50倍(千葉県資料と一致)",
+      "func": "byConcentration",
+      "args": [1, "percent", 0.02, "percent", 3000],
+      "expect": { "ok": true, "ratio": 50, "stockMl": 60, "waterMl": 2940 }
+    },
+    {
+      "name": "原液12%から0.02%は600倍(千葉県資料と一致)",
+      "func": "byConcentration",
+      "args": [12, "percent", 0.02, "percent", 3000],
+      "expect": { "ok": true, "ratio": 600, "stockMl": 5, "waterMl": 2995 }
+    },
+    {
+      "name": "原液6%から0.1%は60倍(千葉県資料と一致)",
+      "func": "byConcentration",
+      "args": [6, "percent", 0.1, "percent", 3000],
+      "expect": { "ok": true, "ratio": 60, "stockMl": 50, "waterMl": 2950 }
+    },
+    {
+      "name": "原液1%から0.1%は10倍(千葉県資料と一致)",
+      "func": "byConcentration",
+      "args": [1, "percent", 0.1, "percent", 3000],
+      "expect": { "ok": true, "ratio": 10, "stockMl": 300, "waterMl": 2700 }
+    },
+    {
+      "name": "水の量基準: 水3Lに1%原液を加えて0.1%にするには約333mL",
+      "func": "byConcentration",
+      "args": [1, "percent", 0.1, "percent", 3000, "water"],
+      "expect": { "ok": true, "ratio": 10, "stockMl": 333.33, "waterMl": 3000, "totalMl": 3333.33 }
+    },
+    {
+      "name": "水の量基準: 水3Lに6%原液を加えて0.02%にするには約10mL",
+      "func": "byConcentration",
+      "args": [6, "percent", 0.02, "percent", 3000, "water"],
+      "expect": { "ok": true, "ratio": 300, "stockMl": 10.03, "waterMl": 3000 }
+    },
+    {
+      "name": "ppm指定: 50,000ppmから200ppmは250倍",
+      "func": "byConcentration",
+      "args": [50000, "ppm", 200, "ppm", 1000],
+      "expect": { "ok": true, "ratio": 250, "stockMl": 4, "waterMl": 996, "stockPercent": 5 }
+    },
+    {
+      "name": "単位混在: 原液6%から200ppmは300倍",
+      "func": "byConcentration",
+      "args": [6, "percent", 200, "ppm", 1000],
+      "expect": { "ok": true, "ratio": 300, "stockMl": 3.33 }
+    },
+    {
+      "name": "境界値: 目標濃度が原液と同じなら1倍(希釈なし)",
+      "func": "byConcentration",
+      "args": [6, "percent", 6, "percent", 1000],
+      "expect": { "ok": true, "ratio": 1, "stockMl": 1000, "waterMl": 0 }
+    },
+    {
+      "name": "境界値: 原液100%でも計算できる",
+      "func": "byConcentration",
+      "args": [100, "percent", 1, "percent", 1000],
+      "expect": { "ok": true, "ratio": 100, "stockMl": 10, "waterMl": 990 }
+    },
+    {
+      "name": "倍率指定: 1000倍の液肥を1L作るには原液1mL",
+      "func": "byRatio",
+      "args": [1000, 1000],
+      "expect": { "ok": true, "stockMl": 1, "waterMl": 999, "totalMl": 1000 }
+    },
+    {
+      "name": "倍率指定(水の量基準): 水1Lに200倍なら原液約5.03mL",
+      "func": "byRatio",
+      "args": [200, 1000, "water"],
+      "expect": { "ok": true, "stockMl": 5.03, "waterMl": 1000, "totalMl": 1005.03 }
+    },
+    {
+      "name": "希釈後の濃度: 6%を300倍で0.02%(200ppm)",
+      "func": "resultConcentration",
+      "args": [6, "percent", 300],
+      "expect": { "ok": true, "percent": 0.02, "ppm": 200 }
+    },
+    {
+      "name": "希釈後の濃度: 5%を250倍で0.02%(200ppm)",
+      "func": "resultConcentration",
+      "args": [5, "percent", 250],
+      "expect": { "ok": true, "percent": 0.02, "ppm": 200 }
+    },
+    {
+      "name": "単位換算: 1%は10,000ppm",
+      "func": "toPercent",
+      "args": [10000, "ppm"],
+      "expect": 1
+    },
+    {
+      "name": "異常入力: 目標濃度が原液より濃いのはエラー",
+      "func": "byConcentration",
+      "args": [1, "percent", 6, "percent", 1000],
+      "expect": { "ok": false, "code": "invalid_target" }
+    },
+    {
+      "name": "異常入力: 原液濃度0%はエラー",
+      "func": "byConcentration",
+      "args": [0, "percent", 0.02, "percent", 1000],
+      "expect": { "ok": false, "code": "invalid_stock" }
+    },
+    {
+      "name": "異常入力: 原液濃度101%は範囲外",
+      "func": "byConcentration",
+      "args": [101, "percent", 1, "percent", 1000],
+      "expect": { "ok": false, "code": "invalid_stock" }
+    },
+    {
+      "name": "異常入力: 単位の指定が不正はエラー",
+      "func": "byConcentration",
+      "args": [6, "mg", 0.02, "percent", 1000],
+      "expect": { "ok": false, "code": "invalid_unit" }
+    },
+    {
+      "name": "異常入力: 作る量0mLはエラー",
+      "func": "byConcentration",
+      "args": [6, "percent", 0.02, "percent", 0],
+      "expect": { "ok": false, "code": "invalid_amount" }
+    },
+    {
+      "name": "異常入力: 量が負の値はエラー",
+      "func": "byRatio",
+      "args": [100, -500],
+      "expect": { "ok": false, "code": "invalid_amount" }
+    },
+    {
+      "name": "異常入力: 倍率0.5倍(濃くする)はエラー",
+      "func": "byRatio",
+      "args": [0.5, 1000],
+      "expect": { "ok": false, "code": "invalid_ratio" }
+    },
+    {
+      "name": "異常入力: 水の量基準で1倍(水を加えられない)はエラー",
+      "func": "byRatio",
+      "args": [1, 1000, "water"],
+      "expect": { "ok": false, "code": "invalid_ratio" }
+    },
+    {
+      "name": "異常入力: 数値でない濃度はエラー",
+      "func": "byConcentration",
+      "args": ["abc", "percent", 0.02, "percent", 1000],
+      "expect": { "ok": false, "code": "invalid_unit" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "byConcentration",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_unit" }
+    }
+  ]
+}

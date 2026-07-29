@@ -1,0 +1,157 @@
+{
+  "tool": "jidoshazei",
+  "module": "calc.js",
+  "global": "JidoshazeiCalc",
+  "cases": [
+    {
+      "name": "自家用1500cc・2020年登録は新税率30,500円",
+      "func": "annualTax",
+      "args": [1500, "private", 2020, 5, 2026, "gasoline"],
+      "expect": { "ok": true, "taxYen": 30500, "heavy": false, "rateEra": "new", "bracketLabel": "1,000cc超1,500cc以下" }
+    },
+    {
+      "name": "境界値: 1000ccちょうどは最初の区分(新税率25,000円)",
+      "func": "annualTax",
+      "args": [1000, "private", 2021, 4, 2026, "gasoline"],
+      "expect": { "ok": true, "taxYen": 25000, "bracketLabel": "1,000cc以下" }
+    },
+    {
+      "name": "境界値: 6000cc超は最上位区分(新税率110,000円)",
+      "func": "annualTax",
+      "args": [6600, "private", 2020, 1, 2026, "gasoline"],
+      "expect": { "ok": true, "taxYen": 110000, "bracketLabel": "6,000cc超" }
+    },
+    {
+      "name": "境界値: 2019年9月登録は旧税率39,500円(1,800cc)",
+      "func": "annualTax",
+      "args": [1800, "private", 2019, 9, 2026, "eco"],
+      "expect": { "ok": true, "taxYen": 39500, "rateEra": "old", "heavy": false }
+    },
+    {
+      "name": "境界値: 2019年10月登録は新税率36,000円(1,800cc)",
+      "func": "annualTax",
+      "args": [1800, "private", 2019, 10, 2026, "gasoline"],
+      "expect": { "ok": true, "taxYen": 36000, "rateEra": "new" }
+    },
+    {
+      "name": "重課なし: 2015年1月登録ガソリン車は2026年度時点でまだ13年超でない",
+      "func": "annualTax",
+      "args": [1800, "private", 2015, 1, 2026, "gasoline"],
+      "expect": { "ok": true, "taxYen": 39500, "heavy": false, "heavyFromFiscalYear": 2028 }
+    },
+    {
+      "name": "重課あり: 2010年6月登録ガソリン車は2026年度に45,400円",
+      "func": "annualTax",
+      "args": [1800, "private", 2010, 6, 2026, "gasoline"],
+      "expect": { "ok": true, "taxYen": 45400, "baseTaxYen": 39500, "heavy": true, "heavyFromFiscalYear": 2024 }
+    },
+    {
+      "name": "重課あり: 2012年4月登録ディーゼル車は12年経過の2024年度から重課",
+      "func": "annualTax",
+      "args": [1998, "private", 2012, 4, 2026, "diesel"],
+      "expect": { "ok": true, "taxYen": 45400, "heavy": true, "heavyFromFiscalYear": 2024 }
+    },
+    {
+      "name": "重課なし: 電気自動車等は年数に関係なく重課の対象外",
+      "func": "annualTax",
+      "args": [1800, "private", 2005, 6, 2026, "eco"],
+      "expect": { "ok": true, "taxYen": 39500, "heavy": false, "heavyFromFiscalYear": null }
+    },
+    {
+      "name": "営業用2000ccは9,500円、13年超で10,900円に重課",
+      "func": "annualTax",
+      "args": [2000, "business", 2010, 5, 2026, "gasoline"],
+      "expect": { "ok": true, "taxYen": 10900, "baseTaxYen": 9500, "heavy": true, "rateEra": "business" }
+    },
+    {
+      "name": "月割(新規登録5月): 30,500円の10か月分は25,400円",
+      "func": "prorate",
+      "args": [30500, 5, "register"],
+      "expect": { "ok": true, "months": 10, "taxYen": 25400 }
+    },
+    {
+      "name": "境界値: 4月登録は11か月分(39,500円→36,200円)",
+      "func": "prorate",
+      "args": [39500, 4, "register"],
+      "expect": { "ok": true, "months": 11, "taxYen": 36200 }
+    },
+    {
+      "name": "境界値: 3月登録はその年度の月割課税なし(0か月)",
+      "func": "prorate",
+      "args": [30500, 3, "register"],
+      "expect": { "ok": true, "months": 0, "taxYen": 0 }
+    },
+    {
+      "name": "月割(抹消12月): 9か月分22,800円・還付相当7,700円",
+      "func": "prorate",
+      "args": [30500, 12, "cancel"],
+      "expect": { "ok": true, "months": 9, "taxYen": 22800, "refundYen": 7700 }
+    },
+    {
+      "name": "境界値: 3月抹消は12か月分で還付なし",
+      "func": "prorate",
+      "args": [30500, 3, "cancel"],
+      "expect": { "ok": true, "months": 12, "taxYen": 30500, "refundYen": 0 }
+    },
+    {
+      "name": "まとめて計算: 1500cc自家用2020年登録を6月に新規登録した場合",
+      "func": "calculate",
+      "args": [{ "cc": 1500, "use": "private", "firstRegYear": 2020, "firstRegMonth": 6, "fiscalYear": 2026, "fuel": "gasoline", "month": 6, "kind": "register" }],
+      "expect": { "ok": true, "annual": { "taxYen": 30500 }, "prorated": { "months": 9, "taxYen": 22800 } }
+    },
+    {
+      "name": "まとめて計算: 月を指定しなければ月割は返さない",
+      "func": "calculate",
+      "args": [{ "cc": 2000, "use": "private", "firstRegYear": 2022, "firstRegMonth": 4, "fiscalYear": 2026 }],
+      "expect": { "ok": true, "annual": { "taxYen": 36000 }, "prorated": null }
+    },
+    {
+      "name": "年度の判定: 3月は前年度扱い",
+      "func": "fiscalYearOf",
+      "args": [2026, 3],
+      "expect": 2025
+    },
+    {
+      "name": "異常入力: 排気量0はエラー",
+      "func": "annualTax",
+      "args": [0, "private", 2020, 5, 2026, "gasoline"],
+      "expect": { "ok": false, "code": "invalid_displacement" }
+    },
+    {
+      "name": "異常入力: 用途の指定が不正はエラー",
+      "func": "annualTax",
+      "args": [1500, "xxx", 2020, 5, 2026, "gasoline"],
+      "expect": { "ok": false, "code": "invalid_use" }
+    },
+    {
+      "name": "異常入力: 登録月13はエラー",
+      "func": "annualTax",
+      "args": [1500, "private", 2020, 13, 2026, "gasoline"],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 数値でない排気量はエラー",
+      "func": "annualTax",
+      "args": ["abc", "private", 2020, 5, 2026, "gasoline"],
+      "expect": { "ok": false, "code": "invalid_displacement" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "annualTax",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_displacement" }
+    },
+    {
+      "name": "異常入力: 月割の月が0はエラー",
+      "func": "prorate",
+      "args": [30500, 0, "register"],
+      "expect": { "ok": false, "code": "invalid_month" }
+    },
+    {
+      "name": "異常入力: 月割の年額が負はエラー",
+      "func": "prorate",
+      "args": [-1, 5, "register"],
+      "expect": { "ok": false, "code": "invalid_tax" }
+    }
+  ]
+}

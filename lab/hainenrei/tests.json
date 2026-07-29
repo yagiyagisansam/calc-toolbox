@@ -1,0 +1,133 @@
+{
+  "tool": "hainenrei",
+  "module": "calc.js",
+  "global": "HainenreiCalc",
+  "cases": [
+    {
+      "name": "学会誌の対比表と一致: 男性170cm・18歳・%FEV1 90%(FEV1 3.9942L)は肺年齢33.9歳",
+      "func": "calculate",
+      "args": [3.9942, 170, "male", 18],
+      "expect": { "ok": true, "lungAge": 33.9, "predictedFev1": 4.438, "percentPredicted": 90 }
+    },
+    {
+      "name": "学会誌の対比表と一致: 女性160cm・18歳・%FEV1 90%(FEV1 2.8071L)は肺年齢32.2歳",
+      "func": "calculate",
+      "args": [2.8071, 160, "female", 18],
+      "expect": { "ok": true, "lungAge": 32.2, "predictedFev1": 3.119, "percentPredicted": 90 }
+    },
+    {
+      "name": "学会誌の対比表と一致: 男性180cm・18歳・%FEV1 90%は肺年齢35.1歳",
+      "func": "calculate",
+      "args": [4.3182, 180, "male", 18],
+      "expect": { "ok": true, "lungAge": 35.1 }
+    },
+    {
+      "name": "学会誌の対比表と一致: 男性140cm・18歳・%FEV1 90%は肺年齢30.0歳",
+      "func": "calculate",
+      "args": [3.0222, 140, "male", 18],
+      "expect": { "ok": true, "lungAge": 30 }
+    },
+    {
+      "name": "予測値ちょうどなら肺年齢は実年齢と等しい(男性170cm・40歳・FEV1 3.822L)",
+      "func": "calculate",
+      "args": [3.822, 170, "male", 40],
+      "expect": { "ok": true, "lungAge": 40, "diff": 0, "percentPredicted": 100, "outOfRange": false }
+    },
+    {
+      "name": "予測値ちょうどなら肺年齢は実年齢と等しい(女性160cm・50歳・FEV1 2.415L)",
+      "func": "calculate",
+      "args": [2.415, 160, "female", 50],
+      "expect": { "ok": true, "lungAge": 50, "diff": 0, "percentPredicted": 100 }
+    },
+    {
+      "name": "FEV1が予測値より低いと肺年齢は実年齢より高く出る(男性170cm・40歳・FEV1 3.0L)",
+      "func": "calculate",
+      "args": [3, 170, "male", 40],
+      "expect": { "ok": true, "lungAge": 69.4, "diff": 29.4, "percentPredicted": 78.5, "outOfRange": false }
+    },
+    {
+      "name": "肺年齢が対象年齢18〜95歳を外れたら outOfRange が立つ",
+      "func": "calculate",
+      "args": [1.5, 170, "male", 40],
+      "expect": { "ok": true, "lungAge": 122.9, "outOfRange": true }
+    },
+    {
+      "name": "予測1秒量: 男性170cm・40歳は3.822L",
+      "func": "predictedFev1",
+      "args": [170, "male", 40],
+      "expect": { "ok": true, "predictedFev1": 3.822 }
+    },
+    {
+      "name": "予測1秒量: 女性155cm・60歳は2.085L",
+      "func": "predictedFev1",
+      "args": [155, "female", 60],
+      "expect": { "ok": true, "predictedFev1": 2.085 }
+    },
+    {
+      "name": "逆算: 男性170cmで肺年齢40歳になるFEV1は3.822L",
+      "func": "fev1ForLungAge",
+      "args": [170, "male", 40],
+      "expect": { "ok": true, "requiredFev1": 3.822 }
+    },
+    {
+      "name": "逆算: 境界値の18歳(対象年齢の下限)でも計算できる",
+      "func": "fev1ForLungAge",
+      "args": [170, "male", 18],
+      "expect": { "ok": true, "requiredFev1": 4.438 }
+    },
+    {
+      "name": "逆算: 境界値の95歳(対象年齢の上限)でも計算できる",
+      "func": "fev1ForLungAge",
+      "args": [160, "female", 95],
+      "expect": { "ok": true, "requiredFev1": 1.425 }
+    },
+    {
+      "name": "逆算: 対象年齢を外れる目標(17歳)はエラー",
+      "func": "fev1ForLungAge",
+      "args": [170, "male", 17],
+      "expect": { "ok": false, "code": "invalid_target_age" }
+    },
+    {
+      "name": "異常入力: FEV1が0はエラー",
+      "func": "calculate",
+      "args": [0, 170, "male", 40],
+      "expect": { "ok": false, "code": "invalid_fev1" }
+    },
+    {
+      "name": "異常入力: FEV1が負の値はエラー",
+      "func": "calculate",
+      "args": [-1, 170, "male", 40],
+      "expect": { "ok": false, "code": "invalid_fev1" }
+    },
+    {
+      "name": "異常入力: 性別が不正な文字列はエラー",
+      "func": "calculate",
+      "args": [3.5, 170, "other", 40],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    },
+    {
+      "name": "異常入力: 身長が範囲外(90cm)はエラー",
+      "func": "calculate",
+      "args": [3.5, 90, "male", 40],
+      "expect": { "ok": false, "code": "invalid_height" }
+    },
+    {
+      "name": "異常入力: 実年齢が負の値はエラー",
+      "func": "calculate",
+      "args": [3.5, 170, "male", -1],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "異常入力: FEV1が数値でないときはエラー",
+      "func": "calculate",
+      "args": ["abc", 170, "male", 40],
+      "expect": { "ok": false, "code": "invalid_fev1" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    }
+  ]
+}

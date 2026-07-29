@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>カウプ指数(乳幼児)計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="乳幼児の身長・体重からカウプ指数を計算し、幼児の肥満度とあわせて発育の目安を示します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>カウプ指数(乳幼児)計算</h1>
+  <form class="tool-form" id="tool-form">
+    <div class="field-row">
+      <label>体重(kg)
+        <input type="number" id="weight" inputmode="decimal" step="0.01" min="0.5" max="40" placeholder="9.0">
+      </label>
+      <label>身長(cm)
+        <span class="field-note">2歳未満は寝かせて測った値</span>
+        <input type="number" id="height" inputmode="decimal" step="0.1" min="35" max="140" placeholder="75">
+      </label>
+      <label>月齢(か月)
+        <input type="number" id="age" inputmode="numeric" step="1" min="0" max="71" placeholder="12">
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 幼児の肥満度(身長別標準体重との比較)</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">身長別標準体重と肥満度</h3>
+      <p class="adv-note">身長70cm以上120cm未満の幼児について、同じ身長の子の標準的な体重と比べて何%ずれているかを計算します。乳幼児では±15%以内が「ふつう」です。</p>
+      <label>性別
+        <select id="sex">
+          <option value="male">男児</option>
+          <option value="female">女児</option>
+        </select>
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    カウプ指数は<strong>月齢・年齢とともに大きく変動する</strong>ため、乳幼児期を通した単一の基準で判断すると誤りやすいことが公的な評価マニュアルで指摘されています。ここで示す15〜19は「一応の基準」です。心配なときは母子健康手帳の成長曲線と健診でご確認ください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>赤ちゃん・幼児の身長と体重から<strong>カウプ指数(乳幼児のBMI)</strong>を計算し、標準とされる範囲に入っているかがわかります。あわせて、より判定に向いている<strong>身長別標準体重に対する肥満度</strong>も計算できます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>体重(kg)と身長(cm)、月齢を入れます。</li>
+    <li>入力した瞬間にカウプ指数と位置づけが表示されます。</li>
+    <li>身長70cm以上120cm未満なら、「＋詳細機能」で性別を選ぶと肥満度も出ます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>カウプ指数</strong> = 体重(kg) ÷ 身長(m)² (＝ 体重(g) ÷ 身長(cm)² × 10 と同じ値。乳幼児のBMI)</li>
+    <li><strong>一応の基準</strong> = 15〜19 が標準の体格とされる範囲</li>
+    <li><strong>身長別標準体重(男児)</strong> = 0.00206 × 身長² − 0.1166 × 身長 + 6.5273(身長はcm)</li>
+    <li><strong>身長別標準体重(女児)</strong> = 0.00249 × 身長² − 0.1858 × 身長 + 9.0360(身長はcm)</li>
+    <li><strong>肥満度(%)</strong> = (実測体重 − 身長別標準体重) ÷ 身長別標準体重 × 100</li>
+    <li><strong>肥満度の判定</strong> = 乳幼児では ±15%以内を「ふつう」とする</li>
+  </ul>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>国立保健医療科学院「乳幼児身体発育 評価マニュアル」(平成23年度厚生労働科学研究費補助金 成育疾患克服等次世代育成基盤研究事業、平成24年3月)<br>
+      <a href="https://www.niph.go.jp/soshiki/07shougai/hatsuiku/index.files/katsuyou_130805.pdf" rel="noopener" target="_blank">https://www.niph.go.jp/soshiki/07shougai/hatsuiku/index.files/katsuyou_130805.pdf</a>(2026年7月29日参照)</li>
+    <li>厚生労働省「乳幼児身体発育調査」(標準体重の式のもとになった調査)<br>
+      <a href="https://www.mhlw.go.jp/toukei/list/73-22.html" rel="noopener" target="_blank">https://www.mhlw.go.jp/toukei/list/73-22.html</a>(2026年7月29日参照)</li>
+    <li>日本小児内分泌学会「日本人小児の体格の評価」(同じ幼児期の標準体重の式を掲載)<br>
+      <a href="https://jspe.umin.jp/medical/taikaku.html" rel="noopener" target="_blank">https://jspe.umin.jp/medical/taikaku.html</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>カウプ指数はBMIと同じ計算です。「体重(g)÷身長(cm)²×10」で求めても同じ値になります。</li>
+    <li>15〜19という区分は評価マニュアルが示す<strong>一応の基準</strong>で、月齢による変動は織り込んでいません。判定には成長曲線(BMIパーセンタイル曲線)や健診での評価が必要です。</li>
+    <li>カウプ指数は生後3か月ごろから使われる指標です。それより低い月齢では参考になりません。</li>
+    <li>身長は2歳未満は寝かせて(仰臥位)、2歳以上は立って(立位)測る決まりです。測り方が違うと値が変わります。</li>
+    <li>肥満度の式は<strong>身長70cm以上120cm未満の幼児</strong>にだけ使えます。この範囲外では計算しません。</li>
+    <li>標準体重の式は平成12年(2000年)の乳幼児身体発育調査に基づくものです。</li>
+    <li>このツールは医学的な診断をするものではありません。発育に不安があるときは小児科や自治体の健診にご相談ください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">カウプ指数とBMIは違うものですか?</h3>
+  <p class="faq-a">同じ計算です。乳幼児のBMIを「カウプ指数」と呼び分けているだけで、体重(kg)÷身長(m)² で求めます。</p>
+  <h3 class="faq-q">数値が15を下回りましたが痩せすぎでしょうか?</h3>
+  <p class="faq-a">カウプ指数は月齢とともに大きく変わります(乳児期にいったん高くなり、その後下がります)。単一の基準だけで判断せず、母子健康手帳の成長曲線に沿って増えているかを見てください。気になるときは健診でご相談ください。</p>
+  <h3 class="faq-q">肥満度とカウプ指数はどちらを見ればよいですか?</h3>
+  <p class="faq-a">日本では身長別標準体重を使った肥満度がよく使われます。同じ身長の子と比べるため、身長の高い・低いによる偏りが出にくいのが理由です。ただし身長70cm以上120cm未満でしか計算できません。</p>
+  <h3 class="faq-q">月齢はどう数えますか?</h3>
+  <p class="faq-a">生まれた日から数えた満月齢です。たとえば1歳0か月なら12、2歳6か月なら30と入れてください。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_weight: "体重を0.5〜40kgの範囲で入力してください。",
+    invalid_height: "身長を35〜140cmの範囲で入力してください。",
+    invalid_age: "月齢を0〜71か月(5歳11か月まで)の範囲で入力してください。",
+    invalid_sex: "性別を選び直してください。",
+    out_of_range: "肥満度は身長70cm以上120cm未満の幼児にだけ計算できます。"
+  };
+  var BANDS = {
+    low: "一応の基準(15〜19)より低め",
+    standard: "一応の基準(15〜19)の範囲内",
+    high: "一応の基準(15〜19)より高め"
+  };
+  var CATEGORIES = {
+    under: "標準体重より15%以上少ない",
+    normal: "ふつう(±15%以内)",
+    over: "標準体重より15%以上多い"
+  };
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var wEl = document.getElementById("weight");
+  var hEl = document.getElementById("height");
+  var aEl = document.getElementById("age");
+  var sexEl = document.getElementById("sex");
+
+  function run() {
+    if (wEl.value === "" || hEl.value === "" || aEl.value === "") { box.hidden = true; advBox.hidden = true; return; }
+    var w = parseFloat(wEl.value), h = parseFloat(hEl.value), a = parseFloat(aEl.value);
+    var r = KaupCalc.calculate(w, h, a);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      advBox.hidden = true;
+      return;
+    }
+    var body = '<div class="result-main">カウプ指数 ' + esc(r.index.toFixed(1)) + "</div>" +
+      "<p>" + esc(BANDS[r.band]) + "</p>";
+    if (!r.inKaupAge) {
+      body += "<p>生後3か月ごろからの指標です。それより低い月齢では参考になりません。</p>";
+    }
+    body += "<p>身長は" + (r.standingHeight ? "立位(立って)" : "仰臥位(寝かせて)") + "測った値を使ってください。</p>";
+    box.innerHTML = body;
+    box.hidden = false;
+
+    var o = KaupCalc.obesityDegree(w, h, sexEl.value);
+    if (!o.ok) {
+      advBox.innerHTML = '<p class="result-error">' + esc(ERRORS[o.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML = '<div class="result-main">肥満度 ' + esc(o.degree > 0 ? "+" + o.degree.toFixed(1) : o.degree.toFixed(1)) + " %</div>" +
+      "<p>" + esc(CATEGORIES[o.category]) + "</p>" +
+      "<p>この身長の標準体重は " + esc(o.standardWeightKg.toFixed(2)) + " kg です。</p>";
+    advBox.hidden = false;
+  }
+
+  [wEl, hEl, aEl].forEach(function (el) { el.addEventListener("input", run); });
+  sexEl.addEventListener("change", run);
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

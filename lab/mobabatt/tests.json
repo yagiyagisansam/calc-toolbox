@@ -1,0 +1,163 @@
+{
+  "tool": "mobabatt",
+  "module": "calc.js",
+  "global": "MobabattCalc",
+  "cases": [
+    {
+      "name": "出典の計算例と一致: 5000mAh(3.7V)は18.5Wh",
+      "func": "whFromMah",
+      "args": [5000],
+      "expect": { "ok": true, "wh": 18.5, "ah": 5, "voltage": 3.7 }
+    },
+    {
+      "name": "代表例: 10000mAh(3.7V)は37Wh",
+      "func": "whFromMah",
+      "args": [10000],
+      "expect": { "ok": true, "wh": 37 }
+    },
+    {
+      "name": "代表例: 20000mAh(3.7V)は74Wh(機内持ち込み可)",
+      "func": "whFromMah",
+      "args": [20000],
+      "expect": { "ok": true, "wh": 74 }
+    },
+    {
+      "name": "電圧を変えられる: 10000mAh×3.85Vは38.5Wh",
+      "func": "whFromMah",
+      "args": [10000, 3.85],
+      "expect": { "ok": true, "wh": 38.5, "voltage": 3.85 }
+    },
+    {
+      "name": "異常系: 容量0はエラー",
+      "func": "whFromMah",
+      "args": [0],
+      "expect": { "ok": false, "code": "invalid_mah" }
+    },
+    {
+      "name": "異常系: 容量が負の値はエラー",
+      "func": "whFromMah",
+      "args": [-20000],
+      "expect": { "ok": false, "code": "invalid_mah" }
+    },
+    {
+      "name": "異常系: 容量が数値でないときはエラー",
+      "func": "whFromMah",
+      "args": ["abc"],
+      "expect": { "ok": false, "code": "invalid_mah" }
+    },
+    {
+      "name": "異常系: 電圧0はエラー",
+      "func": "whFromMah",
+      "args": [10000, 0],
+      "expect": { "ok": false, "code": "invalid_voltage" }
+    },
+    {
+      "name": "逆算: 100Whは3.7Vで27,027mAhにあたる",
+      "func": "mahFromWh",
+      "args": [100],
+      "expect": { "ok": true, "mah": 27027 }
+    },
+    {
+      "name": "逆算: 160Wh(持ち込みの上限)は3.7Vで43,243.2mAh",
+      "func": "mahFromWh",
+      "args": [160],
+      "expect": { "ok": true, "mah": 43243.2 }
+    },
+    {
+      "name": "異常系: 逆算でWh0はエラー",
+      "func": "mahFromWh",
+      "args": [0],
+      "expect": { "ok": false, "code": "invalid_wh" }
+    },
+    {
+      "name": "判定: 74Whは100Wh以下の区分で機内持ち込み可(1名2個まで)",
+      "func": "flightStatus",
+      "args": [74],
+      "expect": { "ok": true, "carryOn": true, "maxCount": 2, "category": "under100", "checkedBaggage": false }
+    },
+    {
+      "name": "境界値: 100Whちょうどは100Wh以下の区分",
+      "func": "flightStatus",
+      "args": [100],
+      "expect": { "ok": true, "carryOn": true, "category": "under100" }
+    },
+    {
+      "name": "境界値: 100Whを少しでも超えると100〜160Whの区分になる",
+      "func": "flightStatus",
+      "args": [100.01],
+      "expect": { "ok": true, "carryOn": true, "category": "100to160" }
+    },
+    {
+      "name": "境界値: 160Whちょうどは持ち込み可(1名2個まで)",
+      "func": "flightStatus",
+      "args": [160],
+      "expect": { "ok": true, "carryOn": true, "maxCount": 2, "category": "100to160" }
+    },
+    {
+      "name": "境界値: 160Whを超えると持ち込み不可",
+      "func": "flightStatus",
+      "args": [160.01],
+      "expect": { "ok": true, "carryOn": false, "maxCount": 0, "category": "over160" }
+    },
+    {
+      "name": "預け入れ荷物には容量にかかわらず入れられない",
+      "func": "flightStatus",
+      "args": [18.5],
+      "expect": { "ok": true, "checkedBaggage": false }
+    },
+    {
+      "name": "異常系: 判定でWhが負の値はエラー",
+      "func": "flightStatus",
+      "args": [-1],
+      "expect": { "ok": false, "code": "invalid_wh" }
+    },
+    {
+      "name": "充電回数: 20000mAh×効率0.7÷4000mAhは3.5回",
+      "func": "chargeCount",
+      "args": [20000, 4000],
+      "expect": { "ok": true, "count": 3.5, "usableMah": 14000, "efficiency": 0.7 }
+    },
+    {
+      "name": "充電回数: 10000mAh×効率0.7÷3000mAhは2.3回",
+      "func": "chargeCount",
+      "args": [10000, 3000],
+      "expect": { "ok": true, "count": 2.3, "usableMah": 7000 }
+    },
+    {
+      "name": "境界値: 効率1.0(損失なし)なら10000÷3000で3.3回",
+      "func": "chargeCount",
+      "args": [10000, 3000, 1],
+      "expect": { "ok": true, "count": 3.3, "usableMah": 10000 }
+    },
+    {
+      "name": "異常系: 端末のバッテリー容量0はエラー",
+      "func": "chargeCount",
+      "args": [20000, 0],
+      "expect": { "ok": false, "code": "invalid_device_mah" }
+    },
+    {
+      "name": "異常系: 効率が範囲外(0.1)はエラー",
+      "func": "chargeCount",
+      "args": [20000, 4000, 0.1],
+      "expect": { "ok": false, "code": "invalid_efficiency" }
+    },
+    {
+      "name": "まとめ計算: 20000mAhは74Wh・持ち込み可・4000mAhの端末を3.5回充電",
+      "func": "calculate",
+      "args": [20000, 3.7, 4000],
+      "expect": { "ok": true, "wh": 74, "carryOn": true, "maxCount": 2, "count": 3.5 }
+    },
+    {
+      "name": "まとめ計算: 45000mAh(166.5Wh)は160Wh超で持ち込み不可",
+      "func": "calculate",
+      "args": [45000, 3.7],
+      "expect": { "ok": true, "wh": 166.5, "carryOn": false, "maxCount": 0, "category": "over160" }
+    },
+    {
+      "name": "異常系: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_mah" }
+    }
+  ]
+}

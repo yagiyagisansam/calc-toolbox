@@ -1,0 +1,181 @@
+{
+  "tool": "juryozei",
+  "module": "calc.js",
+  "global": "JuryozeiCalc",
+  "cases": [
+    {
+      "name": "継続検査2年・車両重量1.4トン・エコカー以外13年未満は24,600円(税額表の~1.5t欄)",
+      "func": "calculate",
+      "args": [1400, 2, "normal", false],
+      "expect": { "ok": true, "taxYen": 24600, "step": 3 }
+    },
+    {
+      "name": "継続検査2年・1.4トン・13年経過は34,200円に重課される",
+      "func": "calculate",
+      "args": [1400, 2, "over13", false],
+      "expect": { "ok": true, "taxYen": 34200 }
+    },
+    {
+      "name": "継続検査2年・1.4トン・18年経過は37,800円に重課される",
+      "func": "calculate",
+      "args": [1400, 2, "over18", false],
+      "expect": { "ok": true, "taxYen": 37800 }
+    },
+    {
+      "name": "継続検査2年・1.4トン・エコカー(本則税率)は15,000円",
+      "func": "calculate",
+      "args": [1400, 2, "standard", false],
+      "expect": { "ok": true, "taxYen": 15000 }
+    },
+    {
+      "name": "エコカー減税の免税は税額0円",
+      "func": "calculate",
+      "args": [1400, 2, "exempt", false],
+      "expect": { "ok": true, "taxYen": 0 }
+    },
+    {
+      "name": "境界: 車両重量500kg(0.5トンちょうど)は1段目で継続2年エコカー外8,200円",
+      "func": "calculate",
+      "args": [500, 2, "normal", false],
+      "expect": { "ok": true, "taxYen": 8200, "step": 1 }
+    },
+    {
+      "name": "境界: 車両重量501kgは2段目に上がり継続2年エコカー外16,400円",
+      "func": "calculate",
+      "args": [501, 2, "normal", false],
+      "expect": { "ok": true, "taxYen": 16400, "step": 2 }
+    },
+    {
+      "name": "上限: 車両重量3,000kg(3トン)は6段目で継続2年エコカー外49,200円",
+      "func": "calculate",
+      "args": [3000, 2, "normal", false],
+      "expect": { "ok": true, "taxYen": 49200, "step": 6 }
+    },
+    {
+      "name": "新車新規登録3年・1.4トン・軽減なしは36,900円(税額表の~1.5t欄)",
+      "func": "calculate",
+      "args": [1400, 3, "normal", false],
+      "expect": { "ok": true, "taxYen": 36900 }
+    },
+    {
+      "name": "新車新規登録3年・1.4トン・75%軽減は5,600円(22,500円×0.25を100円未満切捨て)",
+      "func": "calculate",
+      "args": [1400, 3, "reduce75", false],
+      "expect": { "ok": true, "taxYen": 5600, "baseYen": 22500 }
+    },
+    {
+      "name": "新車新規登録3年・1.4トン・50%軽減は11,200円(22,500円×0.5=11,250を切捨て)",
+      "func": "calculate",
+      "args": [1400, 3, "reduce50", false],
+      "expect": { "ok": true, "taxYen": 11200 }
+    },
+    {
+      "name": "新車新規登録3年・1.4トン・25%軽減は16,800円(22,500円×0.75=16,875を切捨て)",
+      "func": "calculate",
+      "args": [1400, 3, "reduce25", false],
+      "expect": { "ok": true, "taxYen": 16800 }
+    },
+    {
+      "name": "軽自動車の継続検査2年・エコカー以外は重量に関係なく6,600円",
+      "func": "calculate",
+      "args": [0, 2, "normal", true],
+      "expect": { "ok": true, "taxYen": 6600, "step": 1 }
+    },
+    {
+      "name": "軽自動車の継続検査2年・18年経過は8,800円",
+      "func": "calculate",
+      "args": [0, 2, "over18", true],
+      "expect": { "ok": true, "taxYen": 8800 }
+    },
+    {
+      "name": "軽自動車の新車新規登録3年・軽減なしは9,900円",
+      "func": "calculate",
+      "args": [0, 3, "normal", true],
+      "expect": { "ok": true, "taxYen": 9900 }
+    },
+    {
+      "name": "軽自動車の新車新規登録3年・75%軽減は1,800円(7,500円×0.25=1,875を切捨て)",
+      "func": "calculate",
+      "args": [0, 3, "reduce75", true],
+      "expect": { "ok": true, "taxYen": 1800 }
+    },
+    {
+      "name": "段数: 1kgでも0.5トン以下として1段目",
+      "func": "weightStep",
+      "args": [1],
+      "expect": 1
+    },
+    {
+      "name": "段数: 2,600kgは6段目(税額表の~3t欄)",
+      "func": "weightStep",
+      "args": [2600],
+      "expect": 6
+    },
+    {
+      "name": "重課区分: 経過12年はまだ重課なし",
+      "func": "gradeByAge",
+      "args": [12],
+      "expect": { "ok": true, "grade": "normal" }
+    },
+    {
+      "name": "境界: 経過13年ちょうどから13年経過の重課",
+      "func": "gradeByAge",
+      "args": [13],
+      "expect": { "ok": true, "grade": "over13" }
+    },
+    {
+      "name": "境界: 経過18年ちょうどから18年経過の重課",
+      "func": "gradeByAge",
+      "args": [18],
+      "expect": { "ok": true, "grade": "over18" }
+    },
+    {
+      "name": "異常入力: 車両重量0kgはエラー",
+      "func": "calculate",
+      "args": [0, 2, "normal", false],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 車両重量が負の値はエラー",
+      "func": "calculate",
+      "args": [-100, 2, "normal", false],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 車両重量が表の上限(3トン)超はエラー",
+      "func": "calculate",
+      "args": [3001, 2, "normal", false],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 数値でない車両重量はエラー",
+      "func": "calculate",
+      "args": ["abc", 2, "normal", false],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 車検期間4年はエラー",
+      "func": "calculate",
+      "args": [1400, 4, "normal", false],
+      "expect": { "ok": false, "code": "invalid_years" }
+    },
+    {
+      "name": "異常入力: 区分が不正な文字列はエラー",
+      "func": "calculate",
+      "args": [1400, 2, "zzz", false],
+      "expect": { "ok": false, "code": "invalid_grade" }
+    },
+    {
+      "name": "異常入力: 経過年数が負の値はエラー",
+      "func": "gradeByAge",
+      "args": [-1],
+      "expect": { "ok": false, "code": "invalid_elapsed" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    }
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "tool": "teinen",
+  "module": "calc.js",
+  "global": "TeinenCalc",
+  "cases": [
+    {
+      "name": "年齢到達日は誕生日の前日: 1966年4月1日生まれの満60歳は2026年3月31日",
+      "func": "ageAttainmentDate",
+      "args": [1966, 4, 1, 60],
+      "expect": { "ok": true, "iso": "2026-03-31" }
+    },
+    {
+      "name": "1日違いで年度がまたがる: 1966年4月2日生まれの満60歳は2026年4月1日",
+      "func": "ageAttainmentDate",
+      "args": [1966, 4, 2, 60],
+      "expect": { "ok": true, "iso": "2026-04-01" }
+    },
+    {
+      "name": "うるう日生まれ(うるう年に到達): 1964年2月29日生まれの満60歳は2024年2月28日",
+      "func": "ageAttainmentDate",
+      "args": [1964, 2, 29, 60],
+      "expect": { "ok": true, "iso": "2024-02-28" }
+    },
+    {
+      "name": "うるう日生まれ(平年に到達): 1964年2月29日生まれの満61歳は2025年2月28日",
+      "func": "ageAttainmentDate",
+      "args": [1964, 2, 29, 61],
+      "expect": { "ok": true, "iso": "2025-02-28" }
+    },
+    {
+      "name": "境界値: 年齢0歳の到達日は生年月日の前日",
+      "func": "ageAttainmentDate",
+      "args": [1966, 8, 15, 0],
+      "expect": { "ok": true, "iso": "1966-08-14" }
+    },
+    {
+      "name": "誕生日規定・定年60歳(1966年8月15日生まれ): 退職日2026年8月14日・再雇用1826日",
+      "func": "retirementDate",
+      "args": [1966, 8, 15, 60, "birthday"],
+      "expect": { "ok": true, "retirementDate": { "iso": "2026-08-14" }, "age65Date": { "iso": "2031-08-14" }, "reemploymentDays": 1826, "reemploymentMonths": 60, "needsMeasureTo65": true }
+    },
+    {
+      "name": "月末規定・定年60歳: 退職日2026年8月31日・再雇用1809日",
+      "func": "retirementDate",
+      "args": [1966, 8, 15, 60, "end_of_month"],
+      "expect": { "ok": true, "retirementDate": { "iso": "2026-08-31" }, "reemploymentDays": 1809 }
+    },
+    {
+      "name": "年度末規定・定年60歳: 退職日2027年3月31日・再雇用1597日",
+      "func": "retirementDate",
+      "args": [1966, 8, 15, 60, "end_of_fiscal_year"],
+      "expect": { "ok": true, "retirementDate": { "iso": "2027-03-31" }, "reemploymentDays": 1597 }
+    },
+    {
+      "name": "年度末規定・4月2日生まれ: 到達日2026年4月1日なので退職日は2027年3月31日(丸1年後)",
+      "func": "retirementDate",
+      "args": [1966, 4, 2, 60, "end_of_fiscal_year"],
+      "expect": { "ok": true, "attainmentDate": { "iso": "2026-04-01" }, "retirementDate": { "iso": "2027-03-31" }, "reemploymentDays": 1462, "reemploymentMonths": 48 }
+    },
+    {
+      "name": "定年63歳なら再雇用はちょうど2年(730日)",
+      "func": "retirementDate",
+      "args": [1966, 8, 15, 63, "birthday"],
+      "expect": { "ok": true, "reemploymentDays": 730, "reemploymentMonths": 24 }
+    },
+    {
+      "name": "境界値: 定年65歳は再雇用期間0日・第9条の対象外で第10条の2の努力義務の対象",
+      "func": "retirementDate",
+      "args": [1966, 8, 15, 65, "birthday"],
+      "expect": { "ok": true, "reemploymentDays": 0, "needsMeasureTo65": false, "effortTo70": true }
+    },
+    {
+      "name": "境界値: 定年70歳は第10条の2の努力義務の対象外",
+      "func": "retirementDate",
+      "args": [1966, 8, 15, 70, "birthday"],
+      "expect": { "ok": true, "reemploymentDays": 0, "needsMeasureTo65": false, "effortTo70": false }
+    },
+    {
+      "name": "境界値: 法律の下限である定年60歳は受け付ける",
+      "func": "retirementDate",
+      "args": [1966, 8, 15, 60, "birthday"],
+      "expect": { "ok": true, "needsMeasureTo65": true }
+    },
+    {
+      "name": "異常入力: 定年59歳は高年齢者雇用安定法第8条に反するためエラー",
+      "func": "retirementDate",
+      "args": [1966, 8, 15, 59, "birthday"],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "異常入力: 存在しない日付(2月30日)はエラー",
+      "func": "retirementDate",
+      "args": [1966, 2, 30, 60, "birthday"],
+      "expect": { "ok": false, "code": "invalid_birth_date" }
+    },
+    {
+      "name": "異常入力: 13月はエラー",
+      "func": "ageAttainmentDate",
+      "args": [1966, 13, 1, 60],
+      "expect": { "ok": false, "code": "invalid_birth_date" }
+    },
+    {
+      "name": "異常入力: 生年が数値でないときはエラー",
+      "func": "ageAttainmentDate",
+      "args": ["abc", 1, 1, 60],
+      "expect": { "ok": false, "code": "invalid_birth_date" }
+    },
+    {
+      "name": "異常入力: 生年が範囲外(1800年)はエラー",
+      "func": "ageAttainmentDate",
+      "args": [1800, 1, 1, 60],
+      "expect": { "ok": false, "code": "invalid_birth_date" }
+    },
+    {
+      "name": "異常入力: 年齢が負の値はエラー",
+      "func": "ageAttainmentDate",
+      "args": [1966, 1, 1, -1],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "異常入力: 年齢が小数はエラー",
+      "func": "ageAttainmentDate",
+      "args": [1966, 1, 1, 60.5],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "異常入力: 未知の退職日規定はエラー",
+      "func": "retirementDate",
+      "args": [1966, 8, 15, 60, "next_year"],
+      "expect": { "ok": false, "code": "invalid_rule" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "retirementDate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_rule" }
+    }
+  ]
+}

@@ -1,0 +1,163 @@
+{
+  "tool": "led",
+  "module": "calc.js",
+  "global": "LedCalc",
+  "cases": [
+    {
+      "name": "代表例: 5V・Vf2.0V・20mAは(5-2)÷0.02=150Ω、消費電力0.06W",
+      "func": "calculate",
+      "args": [5, 2, 20],
+      "expect": { "ok": true, "resistorV": 3, "ohm": 150, "watt": 0.06, "milliWatt": 60, "e24": 150 }
+    },
+    {
+      "name": "青色LED: 5V・Vf3.2V・20mAは90Ω、E24では91Ω(実電流19.78mA)",
+      "func": "calculate",
+      "args": [5, 3.2, 20],
+      "expect": { "ok": true, "ohm": 90, "e24": 91, "e24Up": 91, "actualCurrentMa": 19.78 }
+    },
+    {
+      "name": "12V電源: Vf2.0V・20mAは500Ω、E24では510Ω",
+      "func": "calculate",
+      "args": [12, 2, 20],
+      "expect": { "ok": true, "ohm": 500, "watt": 0.2, "e24": 510, "recommendedWatt": 0.5 }
+    },
+    {
+      "name": "直列2個: 5V・Vf2.0V×2個・20mAは(5-4)÷0.02=50Ω",
+      "func": "calculate",
+      "args": [5, 2, 20, 2],
+      "expect": { "ok": true, "resistorV": 1, "ohm": 50, "e24": 51 }
+    },
+    {
+      "name": "3.3V電源(Raspberry Pi): Vf2.0V・10mAは130Ω(E24にちょうどある)",
+      "func": "calculate",
+      "args": [3.3, 2, 10],
+      "expect": { "ok": true, "ohm": 130, "e24": 130, "actualCurrentMa": 10 }
+    },
+    {
+      "name": "定格電力: 消費7.28Wなら2倍以上で10Wを推奨",
+      "func": "calculate",
+      "args": [24, 3.2, 350],
+      "expect": { "ok": true, "watt": 7.28, "recommendedWatt": 10 }
+    },
+    {
+      "name": "E12系列も返す: 5V・Vf3.2Vの90ΩはE12で82Ω(近い)・100Ω(以上で最小)",
+      "func": "calculate",
+      "args": [5, 3.2, 20],
+      "expect": { "ok": true, "e12": 82, "e12Up": 100 }
+    },
+    {
+      "name": "異常系: LEDの合計順電圧が電源電圧以上だと点灯できずエラー",
+      "func": "calculate",
+      "args": [5, 2, 20, 3],
+      "expect": { "ok": false, "code": "voltage_too_low" }
+    },
+    {
+      "name": "境界値: 電源電圧とVfがちょうど同じ(余裕0)もエラー",
+      "func": "calculate",
+      "args": [2, 2, 20],
+      "expect": { "ok": false, "code": "voltage_too_low" }
+    },
+    {
+      "name": "異常系: 電源電圧0はエラー",
+      "func": "calculate",
+      "args": [0, 2, 20],
+      "expect": { "ok": false, "code": "invalid_supply" }
+    },
+    {
+      "name": "異常系: 電源電圧が負の値はエラー",
+      "func": "calculate",
+      "args": [-5, 2, 20],
+      "expect": { "ok": false, "code": "invalid_supply" }
+    },
+    {
+      "name": "異常系: 電源電圧が数値でないときはエラー",
+      "func": "calculate",
+      "args": ["abc", 2, 20],
+      "expect": { "ok": false, "code": "invalid_supply" }
+    },
+    {
+      "name": "異常系: 順電圧0はエラー",
+      "func": "calculate",
+      "args": [5, 0, 20],
+      "expect": { "ok": false, "code": "invalid_vf" }
+    },
+    {
+      "name": "異常系: 電流0はエラー(0除算にならない)",
+      "func": "calculate",
+      "args": [5, 2, 0],
+      "expect": { "ok": false, "code": "invalid_current" }
+    },
+    {
+      "name": "異常系: 電流が負の値はエラー",
+      "func": "calculate",
+      "args": [5, 2, -20],
+      "expect": { "ok": false, "code": "invalid_current" }
+    },
+    {
+      "name": "異常系: LEDの個数0はエラー",
+      "func": "calculate",
+      "args": [5, 2, 20, 0],
+      "expect": { "ok": false, "code": "invalid_count" }
+    },
+    {
+      "name": "異常系: LEDの個数が小数はエラー",
+      "func": "calculate",
+      "args": [5, 2, 20, 1.5],
+      "expect": { "ok": false, "code": "invalid_count" }
+    },
+    {
+      "name": "異常系: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_supply" }
+    },
+    {
+      "name": "逆算: 5V・Vf2.0Vに150Ωを使うと20mA流れる",
+      "func": "currentFromOhm",
+      "args": [5, 2, 150],
+      "expect": { "ok": true, "currentMa": 20, "watt": 0.06 }
+    },
+    {
+      "name": "逆算: 5V・Vf2.0Vに220Ωを使うと13.64mAに減る",
+      "func": "currentFromOhm",
+      "args": [5, 2, 220],
+      "expect": { "ok": true, "currentMa": 13.64, "milliWatt": 40.91 }
+    },
+    {
+      "name": "逆算: 5V・Vf3.2Vに91Ω(E24)を使うと19.78mA",
+      "func": "currentFromOhm",
+      "args": [5, 3.2, 91],
+      "expect": { "ok": true, "currentMa": 19.78 }
+    },
+    {
+      "name": "異常系: 逆算で抵抗値0はエラー(0除算にならない)",
+      "func": "currentFromOhm",
+      "args": [5, 2, 0],
+      "expect": { "ok": false, "code": "invalid_ohm" }
+    },
+    {
+      "name": "異常系: 逆算でも電圧が足りなければエラー",
+      "func": "currentFromOhm",
+      "args": [5, 2, 150, 3],
+      "expect": { "ok": false, "code": "voltage_too_low" }
+    },
+    {
+      "name": "最大個数: 5V電源でVf2.0Vなら直列2個まで(3個だと6Vで足りない)",
+      "func": "maxSeriesCount",
+      "args": [5, 2],
+      "expect": { "ok": true, "maxCount": 2 }
+    },
+    {
+      "name": "最大個数: 12V電源でVf3.2Vなら直列3個まで",
+      "func": "maxSeriesCount",
+      "args": [12, 3.2],
+      "expect": { "ok": true, "maxCount": 3 }
+    },
+    {
+      "name": "境界値: 電源電圧がVfより低いと最大個数は0",
+      "func": "maxSeriesCount",
+      "args": [1, 2],
+      "expect": { "ok": true, "maxCount": 0 }
+    }
+  ]
+}

@@ -1,0 +1,159 @@
+{
+  "tool": "bpmdelay",
+  "module": "calc.js",
+  "global": "BpmDelayCalc",
+  "cases": [
+    {
+      "name": "出典の例: BPM120の4分音符は 60000÷120 = 500ms",
+      "func": "quarterMs",
+      "args": [120],
+      "expect": { "ok": true, "ms": 500 }
+    },
+    {
+      "name": "BPM140の4分音符は428.57ms",
+      "func": "quarterMs",
+      "args": [140],
+      "expect": { "ok": true, "ms": 428.57 }
+    },
+    {
+      "name": "出典の例: BPM120の8分音符は250ms(LFO 4Hz)",
+      "func": "noteMs",
+      "args": [120, 8],
+      "expect": { "ok": true, "ms": 250, "hz": 4, "name": "8分音符" }
+    },
+    {
+      "name": "出典の例: BPM120の16分音符は125ms",
+      "func": "noteMs",
+      "args": [120, 16],
+      "expect": { "ok": true, "ms": 125, "hz": 8 }
+    },
+    {
+      "name": "出典の例: BPM120の付点4分音符は750ms(500×1.5)",
+      "func": "noteMs",
+      "args": [120, 4, "dotted"],
+      "expect": { "ok": true, "ms": 750, "name": "付点4分音符" }
+    },
+    {
+      "name": "BPM120の付点8分音符は375ms(500×0.75)",
+      "func": "noteMs",
+      "args": [120, 8, "dotted"],
+      "expect": { "ok": true, "ms": 375 }
+    },
+    {
+      "name": "BPM120の付点16分音符は187.5ms(500×0.375)",
+      "func": "noteMs",
+      "args": [120, 16, "dotted"],
+      "expect": { "ok": true, "ms": 187.5 }
+    },
+    {
+      "name": "BPM120の3連8分音符は166.67ms(250×2÷3)",
+      "func": "noteMs",
+      "args": [120, 8, "triplet"],
+      "expect": { "ok": true, "ms": 166.67, "hz": 6, "name": "3連8分音符" }
+    },
+    {
+      "name": "BPM120の3連4分音符は333.33ms",
+      "func": "noteMs",
+      "args": [120, 4, "triplet"],
+      "expect": { "ok": true, "ms": 333.33, "hz": 3 }
+    },
+    {
+      "name": "BPM120の全音符は2000ms(4分音符の4倍)",
+      "func": "noteMs",
+      "args": [120, 1],
+      "expect": { "ok": true, "ms": 2000, "hz": 0.5, "name": "全音符" }
+    },
+    {
+      "name": "BPM120の32分音符は62.5ms",
+      "func": "noteMs",
+      "args": [120, 32],
+      "expect": { "ok": true, "ms": 62.5, "hz": 16 }
+    },
+    {
+      "name": "修飾を省略すると通常の音符として扱う",
+      "func": "noteMs",
+      "args": [120, 4],
+      "expect": { "ok": true, "ms": 500, "name": "4分音符" }
+    },
+    {
+      "name": "BPM174(ドラムンベース)の8分音符は172.41ms",
+      "func": "noteMs",
+      "args": [174, 8],
+      "expect": { "ok": true, "ms": 172.41 }
+    },
+    {
+      "name": "境界値: BPMの下限20は4分音符3000ms",
+      "func": "quarterMs",
+      "args": [20],
+      "expect": { "ok": true, "ms": 3000 }
+    },
+    {
+      "name": "境界値: BPMの上限999は4分音符60.06ms",
+      "func": "quarterMs",
+      "args": [999],
+      "expect": { "ok": true, "ms": 60.06 }
+    },
+    {
+      "name": "異常入力: BPMが下限未満(19)はエラー",
+      "func": "noteMs",
+      "args": [19, 4],
+      "expect": { "ok": false, "code": "invalid_bpm" }
+    },
+    {
+      "name": "異常入力: BPMが上限超(1000)はエラー",
+      "func": "noteMs",
+      "args": [1000, 4],
+      "expect": { "ok": false, "code": "invalid_bpm" }
+    },
+    {
+      "name": "異常入力: BPM0はエラー(0除算にしない)",
+      "func": "noteMs",
+      "args": [0, 4],
+      "expect": { "ok": false, "code": "invalid_bpm" }
+    },
+    {
+      "name": "異常入力: BPMが数値でないときはエラー",
+      "func": "noteMs",
+      "args": ["abc", 4],
+      "expect": { "ok": false, "code": "invalid_bpm" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "noteMs",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_bpm" }
+    },
+    {
+      "name": "異常入力: 存在しない音符の分母(5)はエラー",
+      "func": "noteMs",
+      "args": [120, 5],
+      "expect": { "ok": false, "code": "invalid_denominator" }
+    },
+    {
+      "name": "異常入力: 存在しない修飾はエラー",
+      "func": "noteMs",
+      "args": [120, 4, "x"],
+      "expect": { "ok": false, "code": "invalid_modifier" }
+    },
+    {
+      "name": "一覧: BPM120は6行(全音符〜32分音符)を返す",
+      "func": "table",
+      "args": [120],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "0": { "denominator": 1, "normalMs": 2000, "dottedMs": 3000 },
+          "3": { "denominator": 8, "normalMs": 250, "dottedMs": 375, "tripletMs": 166.67 },
+          "5": { "denominator": 32, "normalMs": 62.5 },
+          "length": 6
+        }
+      }
+    },
+    {
+      "name": "異常入力: 一覧でもBPMが範囲外ならエラー",
+      "func": "table",
+      "args": [0],
+      "expect": { "ok": false, "code": "invalid_bpm" }
+    }
+  ]
+}

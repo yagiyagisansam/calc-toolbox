@@ -1,0 +1,139 @@
+{
+  "tool": "brinkman",
+  "module": "calc.js",
+  "global": "BrinkmanCalc",
+  "cases": [
+    {
+      "name": "1日20本を20年で指数400(肺がんリスクの目安)・20パックイヤー",
+      "func": "calculate",
+      "args": [20, 20],
+      "expect": { "ok": true, "index": 400, "level": "over_400", "packYears": 20, "insuranceEligible": true }
+    },
+    {
+      "name": "1日20本を30年で指数600",
+      "func": "calculate",
+      "args": [20, 30],
+      "expect": { "ok": true, "index": 600, "level": "over_600", "packYears": 30 }
+    },
+    {
+      "name": "1日20本を60年で指数1200(喉頭がんリスクの目安)",
+      "func": "calculate",
+      "args": [20, 60],
+      "expect": { "ok": true, "index": 1200, "level": "over_1200" }
+    },
+    {
+      "name": "境界値: 1日10本を20年で指数200ちょうど(保険適用の目安)",
+      "func": "calculate",
+      "args": [10, 20],
+      "expect": { "ok": true, "index": 200, "level": "over_200", "insuranceEligible": true }
+    },
+    {
+      "name": "1日15本を15年で指数225・11.3パックイヤー",
+      "func": "calculate",
+      "args": [15, 15],
+      "expect": { "ok": true, "index": 225, "level": "over_200", "packYears": 11.3 }
+    },
+    {
+      "name": "境界値: 1日0本なら指数0で区分は200未満",
+      "func": "calculate",
+      "args": [0, 30],
+      "expect": { "ok": true, "index": 0, "level": "under_200", "insuranceEligible": false }
+    },
+    {
+      "name": "境界値: 喫煙年数0年なら指数0",
+      "func": "calculate",
+      "args": [30, 0],
+      "expect": { "ok": true, "index": 0, "level": "under_200" }
+    },
+    {
+      "name": "区分: 199は200未満",
+      "func": "levelOf",
+      "args": [199],
+      "expect": "under_200"
+    },
+    {
+      "name": "区分: 399は200以上400未満",
+      "func": "levelOf",
+      "args": [399],
+      "expect": "over_200"
+    },
+    {
+      "name": "区分: 400ちょうどは400以上",
+      "func": "levelOf",
+      "args": [400],
+      "expect": "over_400"
+    },
+    {
+      "name": "区分: 600ちょうどは600以上",
+      "func": "levelOf",
+      "args": [600],
+      "expect": "over_600"
+    },
+    {
+      "name": "区分: 1200ちょうどは1200以上",
+      "func": "levelOf",
+      "args": [1200],
+      "expect": "over_1200"
+    },
+    {
+      "name": "到達年数: 1日20本を10年吸った人が400に達するのはあと10年",
+      "func": "yearsToReach",
+      "args": [20, 10, 400],
+      "expect": { "ok": true, "alreadyReached": false, "moreYears": 10 }
+    },
+    {
+      "name": "到達年数: すでに400を超えていればalreadyReachedがtrue",
+      "func": "yearsToReach",
+      "args": [20, 25, 400],
+      "expect": { "ok": true, "alreadyReached": true, "moreYears": 0 }
+    },
+    {
+      "name": "到達年数: 1日0本では到達しないためエラー(0除算にしない)",
+      "func": "yearsToReach",
+      "args": [0, 10, 400],
+      "expect": { "ok": false, "code": "invalid_cigarettes" }
+    },
+    {
+      "name": "到達年数: 目標が0はエラー",
+      "func": "yearsToReach",
+      "args": [20, 10, 0],
+      "expect": { "ok": false, "code": "invalid_target" }
+    },
+    {
+      "name": "異常入力: 本数が負の値はエラー",
+      "func": "calculate",
+      "args": [-1, 10],
+      "expect": { "ok": false, "code": "invalid_cigarettes" }
+    },
+    {
+      "name": "異常入力: 本数が数値でないときはエラー",
+      "func": "calculate",
+      "args": ["abc", 10],
+      "expect": { "ok": false, "code": "invalid_cigarettes" }
+    },
+    {
+      "name": "異常入力: 本数が上限200本を超えるとエラー",
+      "func": "calculate",
+      "args": [201, 10],
+      "expect": { "ok": false, "code": "invalid_cigarettes" }
+    },
+    {
+      "name": "異常入力: 喫煙年数が負の値はエラー",
+      "func": "calculate",
+      "args": [20, -1],
+      "expect": { "ok": false, "code": "invalid_years" }
+    },
+    {
+      "name": "異常入力: 喫煙年数が上限100年を超えるとエラー",
+      "func": "calculate",
+      "args": [20, 101],
+      "expect": { "ok": false, "code": "invalid_years" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_cigarettes" }
+    }
+  ]
+}

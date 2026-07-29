@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>登録免許税 計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="不動産の所有権移転・保存登記や抵当権設定にかかる登録免許税を、軽減措置つきで計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>登録免許税 計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>固定資産税評価額(円)
+      <span class="field-note">売買価格ではなく、固定資産課税台帳に登録された価格</span>
+      <input type="number" id="value" inputmode="numeric" step="1000" min="1" placeholder="15000000">
+    </label>
+    <label>登記の種類
+      <select id="kind">
+        <option value="baibai_tochi">土地 — 売買による所有権移転</option>
+        <option value="hozon">建物 — 所有権保存(新築)</option>
+        <option value="baibai_tateya">建物 — 売買による所有権移転(中古)</option>
+        <option value="sozoku_tochi">土地 — 相続による所有権移転</option>
+        <option value="sozoku_tateya">建物 — 相続による所有権移転</option>
+        <option value="zoyo">贈与・交換・収用等による所有権移転</option>
+      </select>
+    </label>
+    <label id="genmen-label">
+      <input type="checkbox" id="genmen" checked> 軽減税率を適用する
+      <span class="field-note" id="genmen-note"></span>
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 抵当権設定と住宅購入時の合計</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">抵当権設定登記(住宅ローン)</h3>
+      <p class="adv-note">課税標準は不動産の価額ではなく<strong>債権金額(借入額)</strong>です。</p>
+      <label>ローン借入額(円)
+        <input type="number" id="loan" inputmode="numeric" step="10000" min="1" placeholder="30000000">
+      </label>
+      <div class="tool-result" id="loan-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">住宅購入時の合計(土地＋建物＋抵当権)</h3>
+      <p class="adv-note">土地の評価額は上の入力欄、借入額はこの上の欄を使います。建物の評価額をここに入れてください。</p>
+      <div class="field-row">
+        <label>建物の評価額(円)
+          <input type="number" id="bvalue" inputmode="numeric" step="1000" min="1" placeholder="10000000">
+        </label>
+        <label>建物の登記
+          <select id="bkind">
+            <option value="hozon">新築(所有権保存)</option>
+            <option value="baibai_tateya">中古(売買による移転)</option>
+          </select>
+        </label>
+      </div>
+      <div class="tool-result" id="total-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    税率と軽減措置の適用期限は<strong>2026年(令和8年)7月29日時点</strong>のものです。軽減を受けるには要件(住宅用家屋の証明書、床面積50平方メートル以上など)を満たす必要があります。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>住宅の購入や相続登記でかかる<strong>登録免許税の額</strong>がわかります。土地・建物・抵当権それぞれの税率が異なり、<strong>軽減措置があるかどうかで数十万円変わる</strong>ため、諸費用の見積もりに使えます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>固定資産税評価額を円で入れます(納税通知書や評価証明書に載っています)。</li>
+    <li>登記の種類を選ぶとすぐ税額が出ます。軽減税率のチェックを外すと本則の税額と比べられます。</li>
+    <li>住宅ローンの抵当権や、土地＋建物＋抵当権の合計は「＋詳細機能」で計算できます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>課税標準</strong> = 不動産の価額(固定資産税評価額)。千円未満は切り捨て、全額が千円未満なら千円</li>
+    <li><strong>税額</strong> = 課税標準 × 税率。百円未満は切り捨て、千円未満なら千円</li>
+    <li><strong>抵当権設定の課税標準</strong> = 債権金額(借入額)。不動産の価額ではない</li>
+    <li><strong>相続した土地の免税</strong> = 課税標準が100万円以下なら税額0円(令和9年3月31日まで)</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>不動産登記の税率(2026年7月29日時点)</caption>
+      <thead><tr><th>登記の種類</th><th>課税標準</th><th>本則</th><th>軽減税率</th><th>軽減の適用期限</th></tr></thead>
+      <tbody>
+        <tr><td>土地 売買による所有権移転</td><td>不動産の価額</td><td>2.0%</td><td>1.5%</td><td>令和11年3月31日</td></tr>
+        <tr><td>建物 所有権保存(新築)</td><td>不動産の価額</td><td>0.4%</td><td>0.15%(住宅用家屋)</td><td>令和9年3月31日</td></tr>
+        <tr><td>建物 売買による所有権移転</td><td>不動産の価額</td><td>2.0%</td><td>0.3%(住宅用家屋)</td><td>令和9年3月31日</td></tr>
+        <tr><td>相続による所有権移転</td><td>不動産の価額</td><td>0.4%</td><td>—</td><td>—</td></tr>
+        <tr><td>贈与・交換・収用等による移転</td><td>不動産の価額</td><td>2.0%</td><td>—</td><td>—</td></tr>
+        <tr><td>抵当権の設定</td><td>債権金額</td><td>0.4%</td><td>0.1%(住宅取得資金)</td><td>令和9年3月31日</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>国税庁 タックスアンサー No.7191「登録免許税の税額表」[令和7年4月1日現在法令等]<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/inshi/7191.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/inshi/7191.htm</a>(2026年7月29日参照)</li>
+    <li>国税庁「登録免許税の税率の軽減措置に関するお知らせ」(令和8年4月・税務署)。令和8年度税制改正により土地の売買移転登記の軽減(1.5%)の適用期限が令和11年3月31日まで3年延長されたことの一次資料<br>
+      <a href="https://www.nta.go.jp/publication/pamph/sonota/0020003-124_01.pdf" rel="noopener" target="_blank">https://www.nta.go.jp/publication/pamph/sonota/0020003-124_01.pdf</a>(2026年7月29日参照)</li>
+    <li>登録免許税法(昭和42年法律第35号) 別表第一・第15条(課税標準の端数計算)・第19条(定率課税の場合の最低税額)<br>
+      <a href="https://laws.e-gov.go.jp/law/342AC0000000035" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/342AC0000000035</a>(2026年7月29日参照)</li>
+    <li>国税通則法(昭和37年法律第66号) 第118条第1項(課税標準の千円未満切り捨て)・第119条第1項(確定金額の百円未満切り捨て)<br>
+      <a href="https://laws.e-gov.go.jp/law/337AC0000000066" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/337AC0000000066</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>税率と軽減措置の適用期限は<strong>2026年(令和8年)7月29日時点</strong>のものです。土地の売買移転登記の軽減(1.5%)は令和8年度税制改正で<strong>令和11年3月31日まで</strong>延長されました。住宅用家屋と抵当権の軽減は<strong>令和9年3月31日まで</strong>です。</li>
+    <li>課税標準は固定資産課税台帳に登録された価格です。<strong>売買価格や住宅ローンの借入額ではありません</strong>(抵当権設定登記だけは債権金額が課税標準です)。</li>
+    <li>住宅用家屋の軽減を受けるには、市区町村長の証明書を登記申請書に添付し、床面積50平方メートル以上、新築または取得後1年以内の登記であることなどの要件を満たす必要があります。登記した後で証明書を出しても適用されません。</li>
+    <li>認定長期優良住宅・認定低炭素住宅などのさらに低い税率(0.1%など)には対応していません。</li>
+    <li>司法書士報酬、印紙税、不動産取得税など登録免許税以外の費用は含みません。</li>
+    <li>実際の納付額は法務局・登記所または税務署でご確認ください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">土地の1.5%の軽減はいつまで使えますか?</h3>
+  <p class="faq-a">令和11年(2029年)3月31日までに登記を受ける場合です。令和8年度の税制改正で、それまでの令和8年3月31日から3年延長されました。</p>
+  <h3 class="faq-q">相続登記の登録免許税が0円になることがあると聞きました。</h3>
+  <p class="faq-a">相続により土地を取得した場合で、課税標準となる不動産の価額が100万円以下のときは免税です(令和9年3月31日まで)。また、相続で土地を取得した人が移転登記をする前に亡くなった場合の登記も免税になります。</p>
+  <h3 class="faq-q">抵当権設定の税額はなぜ評価額で計算しないのですか?</h3>
+  <p class="faq-a">登録免許税法の別表第一で、抵当権の設定登記の課税標準は「債権金額」と定められているためです。3,000万円を借りた場合、住宅取得資金の軽減が使えれば 3,000万円×0.1% = 3万円 になります。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_value: "固定資産税評価額は1円〜1000億円の範囲で入力してください。",
+    invalid_loan: "ローン借入額は1円〜1000億円の範囲で入力してください。",
+    invalid_kind: "登記の種類を選び直してください。",
+    genmen_not_available: "この登記に軽減税率はありません。"
+  };
+  var GENMEN_NOTE = {
+    baibai_tochi: "租税特別措置法72条 1.5%(令和11年3月31日まで)",
+    hozon: "住宅用家屋 0.15%(令和9年3月31日まで)",
+    baibai_tateya: "住宅用家屋 0.3%(令和9年3月31日まで)",
+    sozoku_tochi: "軽減税率はありません",
+    sozoku_tateya: "軽減税率はありません",
+    zoyo: "軽減税率はありません"
+  };
+  var HAS_GENMEN = { baibai_tochi: true, hozon: true, baibai_tateya: true };
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function el(id) { return document.getElementById(id); }
+  function numOf(id) { return parseFloat(el(id).value); }
+  function has(id) { return el(id).value.trim() !== ""; }
+  function yen(v) { return v.toLocaleString("ja-JP") + "円"; }
+  function show(box, r, render) {
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML = render(r);
+    box.hidden = false;
+  }
+
+  var box = el("result");
+  var loanBox = el("loan-result");
+  var totalBox = el("total-result");
+  var genmenEl = el("genmen");
+
+  function syncGenmen() {
+    var kind = el("kind").value;
+    var available = HAS_GENMEN[kind] === true;
+    genmenEl.disabled = !available;
+    if (!available) genmenEl.checked = false;
+    el("genmen-note").textContent = GENMEN_NOTE[kind] || "";
+  }
+
+  function runMain() {
+    syncGenmen();
+    if (!has("value")) { box.hidden = true; return; }
+    var r = TorokuzeiCalc.calculate(numOf("value"), el("kind").value, genmenEl.checked);
+    show(box, r, function (x) {
+      if (x.exempt) {
+        return '<div class="result-main">0円(免税)</div>' +
+          "<p>相続した土地で課税標準が100万円以下のため免税です(令和9年3月31日まで)。</p>";
+      }
+      return '<div class="result-main">' + esc(yen(x.tax)) + "</div>" +
+        "<p>課税標準 " + esc(yen(x.base)) + " × 税率 " + esc(x.ratePct) + "%" +
+        (x.genmenApplied ? "(軽減税率)" : "(本則)") + "</p>";
+    });
+    runTotal();
+  }
+
+  function runLoan() {
+    if (!has("loan")) { loanBox.hidden = true; runTotal(); return; }
+    var r = TorokuzeiCalc.teitoken(numOf("loan"), genmenEl.checked);
+    show(loanBox, r, function (x) {
+      return '<div class="result-main">' + esc(yen(x.tax)) + "</div>" +
+        "<p>債権金額 " + esc(yen(x.base)) + " × 税率 " + esc(x.ratePct) + "%" +
+        (x.genmenApplied ? "(住宅取得資金の軽減)" : "(本則)") + "</p>";
+    });
+    runTotal();
+  }
+
+  function runTotal() {
+    if (!has("value") || !has("bvalue")) { totalBox.hidden = true; return; }
+    var loan = has("loan") ? numOf("loan") : 0;
+    var r = TorokuzeiCalc.purchaseTotal(numOf("value"), numOf("bvalue"), el("bkind").value, genmenEl.checked, loan);
+    show(totalBox, r, function (x) {
+      var html = '<div class="result-main">合計 ' + esc(yen(x.total)) + "</div>";
+      html += '<div class="table-scroll"><table class="data-table"><thead><tr><th>登記</th><th>税率</th><th>税額</th></tr></thead><tbody>';
+      html += "<tr><td>土地(売買移転)</td><td>" + esc(x.land.ratePct) + "%</td><td>" + esc(yen(x.land.tax)) + "</td></tr>";
+      html += "<tr><td>建物</td><td>" + esc(x.building.ratePct) + "%</td><td>" + esc(yen(x.building.tax)) + "</td></tr>";
+      if (x.teitoken) {
+        html += "<tr><td>抵当権設定</td><td>" + esc(x.teitoken.ratePct) + "%</td><td>" + esc(yen(x.teitoken.tax)) + "</td></tr>";
+      }
+      html += "</tbody></table></div>";
+      return html;
+    });
+  }
+
+  el("value").addEventListener("input", runMain);
+  el("kind").addEventListener("change", runMain);
+  genmenEl.addEventListener("change", function () { runMain(); runLoan(); });
+  el("loan").addEventListener("input", runLoan);
+  el("bvalue").addEventListener("input", runTotal);
+  el("bkind").addEventListener("change", runTotal);
+  el("tool-form").addEventListener("submit", function (e) { e.preventDefault(); runMain(); });
+  runMain();
+  runLoan();
+})();
+</script>
+</body>
+</html>

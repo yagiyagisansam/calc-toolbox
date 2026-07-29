@@ -1,0 +1,157 @@
+{
+  "tool": "saidai-sanso",
+  "module": "calc.js",
+  "global": "Vo2maxCalc",
+  "cases": [
+    {
+      "name": "Cooperテスト: 2400mは (2400-504.9)/44.73 = 42.4",
+      "func": "cooper",
+      "args": [2400],
+      "expect": { "ok": true, "vo2max": 42.4 }
+    },
+    {
+      "name": "Cooperテスト: 2800mは51.3",
+      "func": "cooper",
+      "args": [2800],
+      "expect": { "ok": true, "vo2max": 51.3 }
+    },
+    {
+      "name": "Cooperテスト: 2000mは33.4",
+      "func": "cooper",
+      "args": [2000],
+      "expect": { "ok": true, "vo2max": 33.4 }
+    },
+    {
+      "name": "境界値: 距離の下限800mでも計算できる",
+      "func": "cooper",
+      "args": [800],
+      "expect": { "ok": true, "vo2max": 6.6 }
+    },
+    {
+      "name": "異常入力: 距離が下限未満(799m)はエラー",
+      "func": "cooper",
+      "args": [799],
+      "expect": { "ok": false, "code": "invalid_distance" }
+    },
+    {
+      "name": "異常入力: 距離が上限超(5801m)はエラー",
+      "func": "cooper",
+      "args": [5801],
+      "expect": { "ok": false, "code": "invalid_distance" }
+    },
+    {
+      "name": "異常入力: 距離が数値でないときはエラー",
+      "func": "cooper",
+      "args": ["abc"],
+      "expect": { "ok": false, "code": "invalid_distance" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "cooper",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_distance" }
+    },
+    {
+      "name": "最大心拍数の推定: 40歳は 208 - 0.7×40 = 180",
+      "func": "maxHrFromAge",
+      "args": [40],
+      "expect": { "ok": true, "maxHr": 180 }
+    },
+    {
+      "name": "最大心拍数の推定: 20歳は194",
+      "func": "maxHrFromAge",
+      "args": [20],
+      "expect": { "ok": true, "maxHr": 194 }
+    },
+    {
+      "name": "異常入力: 年齢が下限未満(12歳)はエラー",
+      "func": "maxHrFromAge",
+      "args": [12],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "心拍法: 最大190・安静60は 15.3×190/60 = 48.5",
+      "func": "byHeartRate",
+      "args": [190, 60],
+      "expect": { "ok": true, "vo2max": 48.5, "ratio": 3.17 }
+    },
+    {
+      "name": "心拍法: 最大180・安静50は55.1",
+      "func": "byHeartRate",
+      "args": [180, 50],
+      "expect": { "ok": true, "vo2max": 55.1 }
+    },
+    {
+      "name": "異常入力: 安静時心拍が最大心拍以上はエラー(0除算・逆転を防ぐ)",
+      "func": "byHeartRate",
+      "args": [180, 180],
+      "expect": { "ok": false, "code": "invalid_hr_order" }
+    },
+    {
+      "name": "異常入力: 安静時心拍が下限未満(24)はエラー",
+      "func": "byHeartRate",
+      "args": [180, 24],
+      "expect": { "ok": false, "code": "invalid_rest_hr" }
+    },
+    {
+      "name": "異常入力: 最大心拍が上限超(251)はエラー",
+      "func": "byHeartRate",
+      "args": [251, 60],
+      "expect": { "ok": false, "code": "invalid_max_hr" }
+    },
+    {
+      "name": "評価: 25歳男性でVO2max 51.4は「非常に優れている」",
+      "func": "rating",
+      "args": [51.4, 25, "male"],
+      "expect": { "ok": true, "label": "非常に優れている", "thresholds": { "0": 51.3, "1": 42.4, "2": 33.4, "3": 24.5 } }
+    },
+    {
+      "name": "境界値: 25歳男性でVO2max 42.4ちょうどは「優れている」",
+      "func": "rating",
+      "args": [42.4, 25, "male"],
+      "expect": { "ok": true, "label": "優れている" }
+    },
+    {
+      "name": "境界値: 25歳男性でVO2max 42.3は「平均的」",
+      "func": "rating",
+      "args": [42.3, 25, "male"],
+      "expect": { "ok": true, "label": "平均的" }
+    },
+    {
+      "name": "評価: 25歳女性でVO2max 40は「優れている」(基準が男性より低い)",
+      "func": "rating",
+      "args": [40, 25, "female"],
+      "expect": { "ok": true, "label": "優れている", "thresholds": { "0": 42.4, "1": 33.4, "2": 26.7, "3": 20 } }
+    },
+    {
+      "name": "異常入力: 性別の指定が不正はエラー",
+      "func": "rating",
+      "args": [50, 25, "x"],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    },
+    {
+      "name": "まとめて: 25歳男性が2500m走ると44.6で「優れている」",
+      "func": "cooperWithRating",
+      "args": [2500, 25, "male"],
+      "expect": { "ok": true, "vo2max": 44.6, "label": "優れている" }
+    },
+    {
+      "name": "まとめて: 55歳女性が1500m走ると22.2で「平均的」",
+      "func": "cooperWithRating",
+      "args": [1500, 55, "female"],
+      "expect": { "ok": true, "vo2max": 22.2, "label": "平均的" }
+    },
+    {
+      "name": "まとめて: 40歳男性・安静時心拍60は推定最大心拍180でVO2max 45.9",
+      "func": "heartRateWithRating",
+      "args": [60, 40, "male"],
+      "expect": { "ok": true, "vo2max": 45.9, "maxHr": 180, "estimatedMaxHr": true, "label": "非常に優れている" }
+    },
+    {
+      "name": "まとめて: 実測の最大心拍185を渡すと推定を使わない",
+      "func": "heartRateWithRating",
+      "args": [60, 40, "male", 185],
+      "expect": { "ok": true, "vo2max": 47.2, "maxHr": 185, "estimatedMaxHr": false }
+    }
+  ]
+}

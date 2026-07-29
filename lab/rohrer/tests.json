@@ -1,0 +1,154 @@
+{
+  "tool": "rohrer",
+  "module": "calc.js",
+  "global": "RohrerCalc",
+  "cases": [
+    {
+      "name": "小学5年生くらい(150cm/40kg)は118.5で標準",
+      "func": "calculate",
+      "args": [150, 40],
+      "expect": { "ok": true, "index": 118.5, "category": "標準" }
+    },
+    {
+      "name": "小学4年生くらい(140cm/35kg)は127.6で標準",
+      "func": "calculate",
+      "args": [140, 35],
+      "expect": { "ok": true, "index": 127.6, "category": "標準" }
+    },
+    {
+      "name": "中学生くらい(160cm/55kg)は134.3で標準",
+      "func": "calculate",
+      "args": [160, 55],
+      "expect": { "ok": true, "index": 134.3, "category": "標準" }
+    },
+    {
+      "name": "同じ体型でも身長が高いと指数が下がる(170cm/55kg)",
+      "func": "calculate",
+      "args": [170, 55],
+      "expect": { "ok": true, "index": 111.9, "category": "やややせている" }
+    },
+    {
+      "name": "境界値: 指数ちょうど100(100cm/10kg)はやややせている",
+      "func": "calculate",
+      "args": [100, 10],
+      "expect": { "ok": true, "index": 100, "category": "やややせている" }
+    },
+    {
+      "name": "境界値: 指数99(100cm/9.9kg)はやせすぎ",
+      "func": "calculate",
+      "args": [100, 9.9],
+      "expect": { "ok": true, "index": 99, "category": "やせすぎ" }
+    },
+    {
+      "name": "境界値: 指数ちょうど115(100cm/11.5kg)は標準",
+      "func": "calculate",
+      "args": [100, 11.5],
+      "expect": { "ok": true, "index": 115, "category": "標準" }
+    },
+    {
+      "name": "境界値: 指数ちょうど145(100cm/14.5kg)はやや太っている",
+      "func": "calculate",
+      "args": [100, 14.5],
+      "expect": { "ok": true, "index": 145, "category": "やや太っている" }
+    },
+    {
+      "name": "境界値: 指数ちょうど160(100cm/16kg)は太りすぎ",
+      "func": "calculate",
+      "args": [100, 16],
+      "expect": { "ok": true, "index": 160, "category": "太りすぎ" }
+    },
+    {
+      "name": "境界値: 身長の下限80cmでも計算できる",
+      "func": "calculate",
+      "args": [80, 10],
+      "expect": { "ok": true, "index": 195.3, "category": "太りすぎ" }
+    },
+    {
+      "name": "境界値: 身長の上限200cmでも計算できる",
+      "func": "calculate",
+      "args": [200, 100],
+      "expect": { "ok": true, "index": 125, "category": "標準" }
+    },
+    {
+      "name": "標準体重の範囲: 150cmは38.8kg(指数115)〜48.9kg(指数145)",
+      "func": "standardWeightRange",
+      "args": [150],
+      "expect": { "ok": true, "minKg": 38.8, "maxKg": 48.9 }
+    },
+    {
+      "name": "標準体重の範囲: 140cmは31.6kg〜39.8kg",
+      "func": "standardWeightRange",
+      "args": [140],
+      "expect": { "ok": true, "minKg": 31.6, "maxKg": 39.8 }
+    },
+    {
+      "name": "境目の早見表: 140cmは指数100で27.4kg・160で43.9kg",
+      "func": "boundaryTable",
+      "args": [140],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "0": { "index": 100, "weightKg": 27.4 },
+          "1": { "index": 115, "weightKg": 31.6 },
+          "2": { "index": 145, "weightKg": 39.8 },
+          "3": { "index": 160, "weightKg": 43.9 },
+          "length": 4
+        }
+      }
+    },
+    {
+      "name": "異常入力: 身長0はエラー(0で割らない)",
+      "func": "calculate",
+      "args": [0, 40],
+      "expect": { "ok": false, "code": "invalid_height" }
+    },
+    {
+      "name": "異常入力: 身長が負の値はエラー",
+      "func": "calculate",
+      "args": [-150, 40],
+      "expect": { "ok": false, "code": "invalid_height" }
+    },
+    {
+      "name": "異常入力: 身長が範囲超過(250cm)はエラー",
+      "func": "calculate",
+      "args": [250, 40],
+      "expect": { "ok": false, "code": "invalid_height" }
+    },
+    {
+      "name": "異常入力: 体重0はエラー",
+      "func": "calculate",
+      "args": [150, 0],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 体重が負の値はエラー",
+      "func": "calculate",
+      "args": [150, -10],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 体重が範囲超過(300kg)はエラー",
+      "func": "calculate",
+      "args": [150, 300],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 数値でない身長はエラー",
+      "func": "calculate",
+      "args": ["abc", 40],
+      "expect": { "ok": false, "code": "invalid_height" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_height" }
+    },
+    {
+      "name": "異常入力: 標準体重の範囲で身長が範囲外はエラー",
+      "func": "standardWeightRange",
+      "args": [50],
+      "expect": { "ok": false, "code": "invalid_height" }
+    }
+  ]
+}

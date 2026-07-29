@@ -1,0 +1,229 @@
+{
+  "tool": "kabegami",
+  "module": "calc.js",
+  "global": "KabegamiCalc",
+  "cases": [
+    {
+      "name": "出典の例(無地): 横幅340cm・天井高240cm・クロス幅90cmなら4巾×250cm=10m",
+      "func": "calculate",
+      "args": [340, 240, 90, 0],
+      "expect": {
+        "ok": true,
+        "panels": 4,
+        "panelLengthCm": 250,
+        "totalM": 10,
+        "orderM": 10,
+        "patterned": false
+      }
+    },
+    {
+      "name": "出典の例(柄物): 縦リピート64cmなら240÷64=3.75→4に柄合わせ分1つを足して5柄・320cm・合計12.8m(発注13m)",
+      "func": "calculate",
+      "args": [340, 240, 90, 64],
+      "expect": {
+        "ok": true,
+        "panels": 4,
+        "repeatCount": 5,
+        "panelLengthCm": 320,
+        "totalM": 12.8,
+        "orderM": 13,
+        "patterned": true
+      }
+    },
+    {
+      "name": "クロス幅92cm: 横幅330cmは330÷92=3.58→4巾",
+      "func": "calculate",
+      "args": [330, 250, 92, 0],
+      "expect": {
+        "ok": true,
+        "panels": 4,
+        "panelLengthCm": 260,
+        "totalM": 10.4,
+        "orderM": 11
+      }
+    },
+    {
+      "name": "境界値: 横幅がクロス幅でちょうど割り切れるとき巾数は切り上げない(360÷90=4巾)",
+      "func": "calculate",
+      "args": [360, 240, 90, 0],
+      "expect": {
+        "ok": true,
+        "panels": 4,
+        "totalM": 10
+      }
+    },
+    {
+      "name": "境界値: 横幅がクロス幅を1cm超えると巾数が1つ増える(361÷90→5巾)",
+      "func": "calculate",
+      "args": [361, 240, 90, 0],
+      "expect": {
+        "ok": true,
+        "panels": 5,
+        "totalM": 12.5
+      }
+    },
+    {
+      "name": "境界値: 天井高がリピートで割り切れる場合も柄合わせ分1つを足す(240÷60=4→5柄)",
+      "func": "calculate",
+      "args": [340, 240, 90, 60],
+      "expect": {
+        "ok": true,
+        "repeatCount": 5,
+        "panelLengthCm": 300,
+        "totalM": 12
+      }
+    },
+    {
+      "name": "クロス幅を省略すると出典の90cmで計算する",
+      "func": "calculate",
+      "args": [340, 240],
+      "expect": {
+        "ok": true,
+        "panels": 4,
+        "panelLengthCm": 250,
+        "totalM": 10,
+        "patterned": false
+      }
+    },
+    {
+      "name": "推奨量は必要メーター数の1割増しを1m単位で切り上げる(12.8m→15m)",
+      "func": "calculate",
+      "args": [340, 240, 90, 64],
+      "expect": {
+        "ok": true,
+        "recommendedM": 15
+      }
+    },
+    {
+      "name": "壁面積と開口部: 横幅1260cm・天井高240cmで開口部5m²なら実張り面積25.24m²",
+      "func": "calculate",
+      "args": [1260, 240, 90, 0, 5],
+      "expect": {
+        "ok": true,
+        "panels": 14,
+        "wallAreaM2": 30.24,
+        "netAreaM2": 25.24,
+        "totalM": 35
+      }
+    },
+    {
+      "name": "開口部が壁面積より大きくても実張り面積は0未満にならない",
+      "func": "calculate",
+      "args": [340, 240, 90, 0, 100],
+      "expect": {
+        "ok": true,
+        "wallAreaM2": 8.16,
+        "netAreaM2": 0
+      }
+    },
+    {
+      "name": "部屋一周: 間口360cm・奥行き270cmの壁の合計横幅は1260cm",
+      "func": "perimeter",
+      "args": [360, 270],
+      "expect": {
+        "ok": true,
+        "wallWidthCm": 1260
+      }
+    },
+    {
+      "name": "境界値: 壁の横幅の下限10cmでも計算できる",
+      "func": "calculate",
+      "args": [10, 240, 90, 0],
+      "expect": {
+        "ok": true,
+        "panels": 1,
+        "totalM": 2.5
+      }
+    },
+    {
+      "name": "異常入力: 壁の横幅が0はエラー",
+      "func": "calculate",
+      "args": [0, 240, 90, 0],
+      "expect": {
+        "ok": false,
+        "code": "invalid_wall_width"
+      }
+    },
+    {
+      "name": "異常入力: 壁の横幅が負の値はエラー",
+      "func": "calculate",
+      "args": [-340, 240, 90, 0],
+      "expect": {
+        "ok": false,
+        "code": "invalid_wall_width"
+      }
+    },
+    {
+      "name": "異常入力: 天井高が0はエラー",
+      "func": "calculate",
+      "args": [340, 0, 90, 0],
+      "expect": {
+        "ok": false,
+        "code": "invalid_height"
+      }
+    },
+    {
+      "name": "異常入力: 天井高が上限超過(1001cm)はエラー",
+      "func": "calculate",
+      "args": [340, 1001, 90, 0],
+      "expect": {
+        "ok": false,
+        "code": "invalid_height"
+      }
+    },
+    {
+      "name": "異常入力: クロス幅が0はエラー(0除算を起こさない)",
+      "func": "calculate",
+      "args": [340, 240, 0, 0],
+      "expect": {
+        "ok": false,
+        "code": "invalid_roll_width"
+      }
+    },
+    {
+      "name": "異常入力: リピート寸法が負の値はエラー",
+      "func": "calculate",
+      "args": [340, 240, 90, -10],
+      "expect": {
+        "ok": false,
+        "code": "invalid_repeat"
+      }
+    },
+    {
+      "name": "異常入力: リピート寸法が上限超過(501cm)はエラー",
+      "func": "calculate",
+      "args": [340, 240, 90, 501],
+      "expect": {
+        "ok": false,
+        "code": "invalid_repeat"
+      }
+    },
+    {
+      "name": "異常入力: 開口部の面積が負の値はエラー",
+      "func": "calculate",
+      "args": [340, 240, 90, 0, -1],
+      "expect": {
+        "ok": false,
+        "code": "invalid_openings"
+      }
+    },
+    {
+      "name": "異常入力: 壁の横幅が数値でない場合はエラー",
+      "func": "calculate",
+      "args": ["340cm", 240, 90, 0],
+      "expect": {
+        "ok": false,
+        "code": "invalid_wall_width"
+      }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": {
+        "ok": false,
+        "code": "invalid_wall_width"
+      }
+    }
+  ]
+}

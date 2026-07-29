@@ -1,0 +1,169 @@
+{
+  "tool": "eto",
+  "module": "calc.js",
+  "global": "EtoCalc",
+  "cases": [
+    {
+      "name": "史実で検証: 672年は壬申(壬申の乱)",
+      "func": "fromYear",
+      "args": [672],
+      "expect": { "ok": true, "kanshi": "壬申", "kan": "壬", "shi": "申", "kanshiYomi": "みずのえさる" }
+    },
+    {
+      "name": "史実で検証: 1868年は戊辰(戊辰戦争)",
+      "func": "fromYear",
+      "args": [1868],
+      "expect": { "ok": true, "kanshi": "戊辰", "kan": "戊", "shi": "辰" }
+    },
+    {
+      "name": "史実で検証: 1924年は甲子(六十干支の1番目)",
+      "func": "fromYear",
+      "args": [1924],
+      "expect": { "ok": true, "kanshi": "甲子", "kanshiIndex": 0, "animal": "ねずみ" }
+    },
+    {
+      "name": "60年周期の確認: 1924年の60年後の1984年も甲子",
+      "func": "fromYear",
+      "args": [1984],
+      "expect": { "ok": true, "kanshi": "甲子", "kanshiIndex": 0 }
+    },
+    {
+      "name": "2024年は甲辰(たつ年)・六十干支の41番目(0始まりで40)",
+      "func": "fromYear",
+      "args": [2024],
+      "expect": { "ok": true, "kanshi": "甲辰", "kanshiIndex": 40, "animal": "たつ(竜)", "kanIndex": 0, "shiIndex": 4 }
+    },
+    {
+      "name": "2026年は丙午(ひのえうま)",
+      "func": "fromYear",
+      "args": [2026],
+      "expect": { "ok": true, "kanshi": "丙午", "kanshiYomi": "ひのえうま", "animal": "うま" }
+    },
+    {
+      "name": "境界値: 西暦4年は甲子(計算の基準点)",
+      "func": "fromYear",
+      "args": [4],
+      "expect": { "ok": true, "kanshi": "甲子", "kanshiIndex": 0 }
+    },
+    {
+      "name": "境界値: 西暦1年(下限)は辛酉",
+      "func": "fromYear",
+      "args": [1],
+      "expect": { "ok": true, "kanshi": "辛酉" }
+    },
+    {
+      "name": "境界値: 西暦3000年(上限)も計算できる",
+      "func": "fromYear",
+      "args": [3000],
+      "expect": { "ok": true, "kanshi": "庚申" }
+    },
+    {
+      "name": "異常系: 西暦0年はエラー",
+      "func": "fromYear",
+      "args": [0],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "異常系: 上限(3000年)超はエラー",
+      "func": "fromYear",
+      "args": [3001],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "異常系: 年が小数はエラー",
+      "func": "fromYear",
+      "args": [2024.5],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "異常系: 年が数値でないときはエラー",
+      "func": "fromYear",
+      "args": ["abc"],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "異常系: 引数なしはエラー",
+      "func": "fromYear",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "年男・年女: 1988年(辰年)生まれは2024年(辰年)に該当・36歳",
+      "func": "isToshiotoko",
+      "args": [1988, 2024],
+      "expect": { "ok": true, "isMatch": true, "shi": "辰", "age": 36 }
+    },
+    {
+      "name": "年男・年女: 1988年生まれは2025年(巳年)には該当しない",
+      "func": "isToshiotoko",
+      "args": [1988, 2025],
+      "expect": { "ok": true, "isMatch": false, "age": 37 }
+    },
+    {
+      "name": "境界値: 生まれた年そのものは年男・年女に該当する(0歳)",
+      "func": "isToshiotoko",
+      "args": [2024, 2024],
+      "expect": { "ok": true, "isMatch": true, "age": 0 }
+    },
+    {
+      "name": "異常系: 基準年が生まれ年より前はエラー",
+      "func": "isToshiotoko",
+      "args": [2000, 1990],
+      "expect": { "ok": false, "code": "invalid_order" }
+    },
+    {
+      "name": "次の年男・年女: 1988年生まれが2026年から見ると2036年(48歳)",
+      "func": "nextToshiotoko",
+      "args": [1988, 2026],
+      "expect": { "ok": true, "year": 2036, "age": 48 }
+    },
+    {
+      "name": "次の年男・年女: 基準年が該当年のときは次の12年後を返す",
+      "func": "nextToshiotoko",
+      "args": [1988, 2024],
+      "expect": { "ok": true, "year": 2036 }
+    },
+    {
+      "name": "次の年男・年女: 生まれた年から見ると12歳の年",
+      "func": "nextToshiotoko",
+      "args": [2024, 2024],
+      "expect": { "ok": true, "year": 2036, "age": 12 }
+    },
+    {
+      "name": "異常系: 次の年男・年女で基準年が生まれ年より前はエラー",
+      "func": "nextToshiotoko",
+      "args": [2000, 1990],
+      "expect": { "ok": false, "code": "invalid_order" }
+    },
+    {
+      "name": "還暦: 1966年(丙午)生まれは2026年に還暦・満60歳",
+      "func": "kanreki",
+      "args": [1966],
+      "expect": { "ok": true, "year": 2026, "age": 60, "kanshi": "丙午" }
+    },
+    {
+      "name": "還暦: 1964年(甲辰)生まれは2024年に還暦",
+      "func": "kanreki",
+      "args": [1964],
+      "expect": { "ok": true, "year": 2024, "kanshi": "甲辰" }
+    },
+    {
+      "name": "異常系: 還暦の計算で生まれ年が不正ならエラー",
+      "func": "kanreki",
+      "args": [0],
+      "expect": { "ok": false, "code": "invalid_year" }
+    },
+    {
+      "name": "六十干支: 通し番号0は甲子、59は癸亥",
+      "func": "fromKanshiIndex",
+      "args": [59],
+      "expect": { "ok": true, "kanshi": "癸亥", "kanshiYomi": "みずのとい" }
+    },
+    {
+      "name": "異常系: 六十干支の通し番号60はエラー(0〜59まで)",
+      "func": "fromKanshiIndex",
+      "args": [60],
+      "expect": { "ok": false, "code": "invalid_index" }
+    }
+  ]
+}

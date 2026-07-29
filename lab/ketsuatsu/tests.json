@@ -1,0 +1,175 @@
+{
+  "tool": "ketsuatsu",
+  "module": "calc.js",
+  "global": "KetsuatsuCalc",
+  "cases": [
+    {
+      "name": "診察室: 110/70は正常血圧",
+      "func": "classify",
+      "args": [110, 70, "office"],
+      "expect": { "ok": true, "category": "normal", "level": 0, "isHypertension": false }
+    },
+    {
+      "name": "診察室: 125/78は正常高値血圧",
+      "func": "classify",
+      "args": [125, 78, "office"],
+      "expect": { "ok": true, "category": "high_normal", "level": 1 }
+    },
+    {
+      "name": "境界値: 診察室119/79は正常血圧、120/79で正常高値血圧に変わる",
+      "func": "classify",
+      "args": [119, 79, "office"],
+      "expect": { "ok": true, "category": "normal" }
+    },
+    {
+      "name": "境界値: 診察室120/79ちょうどは正常高値血圧",
+      "func": "classify",
+      "args": [120, 79, "office"],
+      "expect": { "ok": true, "category": "high_normal", "systolicLevel": 1, "diastolicLevel": 0 }
+    },
+    {
+      "name": "診察室: 135/85は高値血圧",
+      "func": "classify",
+      "args": [135, 85, "office"],
+      "expect": { "ok": true, "category": "elevated", "level": 2 }
+    },
+    {
+      "name": "拡張期のみ高い: 診察室118/85は高値血圧(重い方の区分を採る)",
+      "func": "classify",
+      "args": [118, 85, "office"],
+      "expect": { "ok": true, "category": "elevated", "systolicLevel": 0, "diastolicLevel": 2 }
+    },
+    {
+      "name": "境界値: 診察室140/90ちょうどはI度高血圧",
+      "func": "classify",
+      "args": [140, 90, "office"],
+      "expect": { "ok": true, "category": "grade1", "isHypertension": true, "isolatedSystolic": false }
+    },
+    {
+      "name": "孤立性収縮期高血圧: 診察室150/85は上だけ高い",
+      "func": "classify",
+      "args": [150, 85, "office"],
+      "expect": { "ok": true, "category": "grade1", "isolatedSystolic": true }
+    },
+    {
+      "name": "診察室: 165/105はII度高血圧",
+      "func": "classify",
+      "args": [165, 105, "office"],
+      "expect": { "ok": true, "category": "grade2", "level": 4 }
+    },
+    {
+      "name": "境界値: 診察室180/110ちょうどはIII度高血圧",
+      "func": "classify",
+      "args": [180, 110, "office"],
+      "expect": { "ok": true, "category": "grade3", "level": 5 }
+    },
+    {
+      "name": "診察室: 179/109はII度高血圧(III度の一歩手前)",
+      "func": "classify",
+      "args": [179, 109, "office"],
+      "expect": { "ok": true, "category": "grade2" }
+    },
+    {
+      "name": "家庭: 114/74は正常血圧(診察室より5mmHg低い基準)",
+      "func": "classify",
+      "args": [114, 74, "home"],
+      "expect": { "ok": true, "category": "normal" }
+    },
+    {
+      "name": "境界値: 家庭115/74ちょうどは正常高値血圧",
+      "func": "classify",
+      "args": [115, 74, "home"],
+      "expect": { "ok": true, "category": "high_normal" }
+    },
+    {
+      "name": "境界値: 家庭135/85ちょうどはI度高血圧",
+      "func": "classify",
+      "args": [135, 85, "home"],
+      "expect": { "ok": true, "category": "grade1", "isHypertension": true }
+    },
+    {
+      "name": "家庭: 145/84はII度高血圧かつ孤立性収縮期高血圧",
+      "func": "classify",
+      "args": [145, 84, "home"],
+      "expect": { "ok": true, "category": "grade2", "isolatedSystolic": true }
+    },
+    {
+      "name": "同じ値でも場所で分類が変わる: 130/80は診察室で高値血圧・家庭でも高値血圧",
+      "func": "classify",
+      "args": [130, 80, "home"],
+      "expect": { "ok": true, "category": "elevated" }
+    },
+    {
+      "name": "異常入力: 収縮期が範囲外(320)はエラー",
+      "func": "classify",
+      "args": [320, 90, "office"],
+      "expect": { "ok": false, "code": "invalid_systolic" }
+    },
+    {
+      "name": "異常入力: 拡張期が範囲外(250)はエラー",
+      "func": "classify",
+      "args": [140, 250, "office"],
+      "expect": { "ok": false, "code": "invalid_diastolic" }
+    },
+    {
+      "name": "異常入力: 収縮期が拡張期以下はエラー",
+      "func": "classify",
+      "args": [120, 130, "office"],
+      "expect": { "ok": false, "code": "invalid_pair" }
+    },
+    {
+      "name": "異常入力: 測定場所の指定が不正ならエラー",
+      "func": "classify",
+      "args": [120, 80, "clinic"],
+      "expect": { "ok": false, "code": "invalid_place" }
+    },
+    {
+      "name": "異常入力: 数値でない収縮期はエラー",
+      "func": "classify",
+      "args": ["abc", 80, "office"],
+      "expect": { "ok": false, "code": "invalid_systolic" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "classify",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_systolic" }
+    },
+    {
+      "name": "比較: 診察室150/95・家庭120/75は白衣高血圧",
+      "func": "compareOfficeHome",
+      "args": [150, 95, 120, 75],
+      "expect": { "ok": true, "type": "white_coat", "officeHypertension": true, "homeHypertension": false }
+    },
+    {
+      "name": "比較: 診察室130/80・家庭140/90は仮面高血圧",
+      "func": "compareOfficeHome",
+      "args": [130, 80, 140, 90],
+      "expect": { "ok": true, "type": "masked" }
+    },
+    {
+      "name": "比較: 診察室150/95・家庭140/90は持続性高血圧",
+      "func": "compareOfficeHome",
+      "args": [150, 95, 140, 90],
+      "expect": { "ok": true, "type": "sustained" }
+    },
+    {
+      "name": "比較: 診察室120/75・家庭118/72はどちらも高血圧でない",
+      "func": "compareOfficeHome",
+      "args": [120, 75, 118, 72],
+      "expect": { "ok": true, "type": "normotension" }
+    },
+    {
+      "name": "しきい値: 家庭血圧の高血圧基準は135/85",
+      "func": "thresholds",
+      "args": ["home"],
+      "expect": { "ok": true, "htSbp": 135, "htDbp": 85 }
+    },
+    {
+      "name": "異常入力: しきい値取得で場所の指定が不正ならエラー",
+      "func": "thresholds",
+      "args": ["x"],
+      "expect": { "ok": false, "code": "invalid_place" }
+    }
+  ]
+}

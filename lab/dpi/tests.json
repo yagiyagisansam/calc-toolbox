@@ -1,0 +1,219 @@
+{
+  "tool": "dpi",
+  "module": "calc.js",
+  "global": "DpiCalc",
+  "cases": [
+    {
+      "name": "出典の例と一致: A4(210×297mm)を350dpiで印刷するには2,894×4,093px必要",
+      "func": "requiredPixels",
+      "args": [210, 297, 350],
+      "expect": {
+        "ok": true,
+        "pxWidth": 2894,
+        "pxHeight": 4093
+      }
+    },
+    {
+      "name": "逆算の検算: 2,894×4,093pxを350dpiで印刷すると210.0×297.0mm",
+      "func": "printSize",
+      "args": [2894, 4093, 350],
+      "expect": {
+        "ok": true,
+        "widthMm": 210,
+        "heightMm": 297,
+        "widthCm": 21,
+        "heightCm": 29.7
+      }
+    },
+    {
+      "name": "基本の定義: 1px÷1dpi×25.4 = 25.4mm(1インチ)",
+      "func": "printSize",
+      "args": [1, 1, 1],
+      "expect": {
+        "ok": true,
+        "widthMm": 25.4,
+        "heightMm": 25.4
+      }
+    },
+    {
+      "name": "1200万画素相当(4000×3000px)を350dpiで印刷すると290.3×217.7mm",
+      "func": "printSize",
+      "args": [4000, 3000, 350],
+      "expect": {
+        "ok": true,
+        "widthMm": 290.3,
+        "heightMm": 217.7,
+        "widthCm": 29.03
+      }
+    },
+    {
+      "name": "ポスター用の200dpiなら4000×3000pxで508.0×381.0mm印刷できる",
+      "func": "printSize",
+      "args": [4000, 3000, 200],
+      "expect": {
+        "ok": true,
+        "widthMm": 508,
+        "heightMm": 381
+      }
+    },
+    {
+      "name": "実効dpi: 2,894pxを210mm幅で印刷すると350dpi",
+      "func": "effectiveDpi",
+      "args": [2894, 210],
+      "expect": {
+        "ok": true,
+        "dpi": 350
+      }
+    },
+    {
+      "name": "実効dpi: 1,000pxを210mm幅で印刷すると約121dpi(印刷には不足)",
+      "func": "effectiveDpi",
+      "args": [1000, 210],
+      "expect": {
+        "ok": true,
+        "dpi": 121
+      }
+    },
+    {
+      "name": "名刺(91×55mm)を350dpiで印刷するには1,254×758px必要",
+      "func": "requiredPixels",
+      "args": [91, 55, 350],
+      "expect": {
+        "ok": true,
+        "pxWidth": 1254,
+        "pxHeight": 758
+      }
+    },
+    {
+      "name": "用紙判定: 4000×3000pxはA4・350dpiには届かない(実効342.1dpi)",
+      "func": "checkPaper",
+      "args": [4000, 3000, "a4", 350],
+      "expect": {
+        "ok": true,
+        "fits": false,
+        "effectiveDpi": 342.1,
+        "neededPxWidth": 2894,
+        "neededPxHeight": 4093
+      }
+    },
+    {
+      "name": "用紙判定: 3000×4200pxならA4・350dpiに耐える(向きの回転も許容)",
+      "func": "checkPaper",
+      "args": [3000, 4200, "a4", 350],
+      "expect": {
+        "ok": true,
+        "fits": true
+      }
+    },
+    {
+      "name": "用紙判定: 4000×3000pxでもポスター向けの200dpiならA4に十分",
+      "func": "checkPaper",
+      "args": [4000, 3000, "a4", 200],
+      "expect": {
+        "ok": true,
+        "fits": true
+      }
+    },
+    {
+      "name": "用紙判定: dpiを省略すると350dpiで判定する",
+      "func": "checkPaper",
+      "args": [3000, 4200, "a4"],
+      "expect": {
+        "ok": true,
+        "fits": true,
+        "neededPxWidth": 2894
+      }
+    },
+    {
+      "name": "境界値: 必要ピクセル数はちょうど割り切れない場合に切り上げる(297mm@350dpiは4092.5→4093)",
+      "func": "requiredPixels",
+      "args": [1, 297, 350],
+      "expect": {
+        "ok": true,
+        "pxHeight": 4093
+      }
+    },
+    {
+      "name": "境界値: 解像度の下限1dpiは計算できる",
+      "func": "requiredPixels",
+      "args": [210, 297, 1],
+      "expect": {
+        "ok": true,
+        "pxWidth": 9,
+        "pxHeight": 12
+      }
+    },
+    {
+      "name": "異常入力: 横ピクセル数が0はエラー",
+      "func": "printSize",
+      "args": [0, 3000, 350],
+      "expect": {
+        "ok": false,
+        "code": "invalid_px_width"
+      }
+    },
+    {
+      "name": "異常入力: 縦ピクセル数が負の値はエラー",
+      "func": "printSize",
+      "args": [4000, -3000, 350],
+      "expect": {
+        "ok": false,
+        "code": "invalid_px_height"
+      }
+    },
+    {
+      "name": "異常入力: 解像度が0はエラー(0除算を起こさない)",
+      "func": "printSize",
+      "args": [4000, 3000, 0],
+      "expect": {
+        "ok": false,
+        "code": "invalid_dpi"
+      }
+    },
+    {
+      "name": "異常入力: 解像度が上限超過(10001dpi)はエラー",
+      "func": "printSize",
+      "args": [4000, 3000, 10001],
+      "expect": {
+        "ok": false,
+        "code": "invalid_dpi"
+      }
+    },
+    {
+      "name": "異常入力: ピクセル数が数値でない場合はエラー",
+      "func": "printSize",
+      "args": ["4000px", 3000, 350],
+      "expect": {
+        "ok": false,
+        "code": "invalid_px_width"
+      }
+    },
+    {
+      "name": "異常入力: 印刷したい幅が0はエラー",
+      "func": "requiredPixels",
+      "args": [0, 297, 350],
+      "expect": {
+        "ok": false,
+        "code": "invalid_width"
+      }
+    },
+    {
+      "name": "異常入力: 存在しない用紙の指定はエラー",
+      "func": "checkPaper",
+      "args": [4000, 3000, "a0", 350],
+      "expect": {
+        "ok": false,
+        "code": "invalid_paper"
+      }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "printSize",
+      "args": [],
+      "expect": {
+        "ok": false,
+        "code": "invalid_px_width"
+      }
+    }
+  ]
+}

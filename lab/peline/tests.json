@@ -1,0 +1,163 @@
+{
+  "tool": "peline",
+  "module": "calc.js",
+  "global": "PelineCalc",
+  "cases": [
+    {
+      "name": "ナイロン1号は4lb・1.814kg・0.165mm",
+      "func": "convert",
+      "args": ["nylon", "gou", 1],
+      "expect": { "ok": true, "gou": 1, "lb": 4, "kg": 1.814, "mm": 0.165 }
+    },
+    {
+      "name": "ナイロン2号は8lb・0.235mm",
+      "func": "convert",
+      "args": ["nylon", "gou", 2],
+      "expect": { "ok": true, "lb": 8, "kg": 3.629, "mm": 0.235 }
+    },
+    {
+      "name": "ナイロン5号は20lb・0.370mm(号数×4lbが崩れる手前)",
+      "func": "convert",
+      "args": ["nylon", "gou", 5],
+      "expect": { "ok": true, "lb": 20, "mm": 0.37 }
+    },
+    {
+      "name": "ナイロン10号は35lb(号数×4lbにはならない)",
+      "func": "convert",
+      "args": ["nylon", "gou", 10],
+      "expect": { "ok": true, "lb": 35, "mm": 0.52 }
+    },
+    {
+      "name": "逆引き: ナイロン12lbは3号・0.285mm",
+      "func": "convert",
+      "args": ["nylon", "lb", 12],
+      "expect": { "ok": true, "gou": 3, "mm": 0.285 }
+    },
+    {
+      "name": "フロロカーボンはナイロンと同じ規格(3号=12lb・0.285mm)",
+      "func": "convert",
+      "args": ["fluoro", "gou", 3],
+      "expect": { "ok": true, "lb": 12, "mm": 0.285 }
+    },
+    {
+      "name": "直径から逆引き: ナイロン0.165mmは1号・4lb",
+      "func": "convert",
+      "args": ["nylon", "mm", 0.165],
+      "expect": { "ok": true, "gou": 1, "lb": 4 }
+    },
+    {
+      "name": "PE1号は20lb・9.072kg・0.171mm",
+      "func": "convert",
+      "args": ["pe", "gou", 1],
+      "expect": { "ok": true, "lb": 20, "kg": 9.072, "mm": 0.171 }
+    },
+    {
+      "name": "PE2号は40lb・0.242mm(同じ号数でもナイロンよりずっと強い)",
+      "func": "convert",
+      "args": ["pe", "gou", 2],
+      "expect": { "ok": true, "lb": 40, "mm": 0.242 }
+    },
+    {
+      "name": "逆引き: PE40lbは2号",
+      "func": "convert",
+      "args": ["pe", "lb", 40],
+      "expect": { "ok": true, "gou": 2, "mm": 0.242 }
+    },
+    {
+      "name": "表にない号数は補間する: ナイロン1.1号は4.4lb・0.175mm",
+      "func": "convert",
+      "args": ["nylon", "gou", 1.1],
+      "expect": { "ok": true, "gou": 1.1, "lb": 4.4, "mm": 0.175 }
+    },
+    {
+      "name": "境界値: ナイロンの下限0.25号は1lb・0.083mm",
+      "func": "convert",
+      "args": ["nylon", "gou", 0.25],
+      "expect": { "ok": true, "lb": 1, "kg": 0.454, "mm": 0.083 }
+    },
+    {
+      "name": "境界値: ナイロンの上限20号は60lb・0.740mm",
+      "func": "convert",
+      "args": ["nylon", "gou", 20],
+      "expect": { "ok": true, "lb": 60, "kg": 27.216, "mm": 0.74 }
+    },
+    {
+      "name": "境界値: PEの下限0.1号は4lb・0.054mm",
+      "func": "convert",
+      "args": ["pe", "gou", 0.1],
+      "expect": { "ok": true, "lb": 4, "mm": 0.054 }
+    },
+    {
+      "name": "境界値: PEの上限10号は130lb・0.540mm",
+      "func": "convert",
+      "args": ["pe", "gou", 10],
+      "expect": { "ok": true, "lb": 130, "mm": 0.54 }
+    },
+    {
+      "name": "単位換算: 20lbは9.072kg(1lb=0.45359237kg)",
+      "func": "lbToKg",
+      "args": [20],
+      "expect": { "ok": true, "kg": 9.072 }
+    },
+    {
+      "name": "早見表: ナイロンの表は27行あり、先頭が0.25号",
+      "func": "table",
+      "args": ["nylon"],
+      "expect": { "ok": true, "rows": { "0": { "gou": 0.25, "lb": 1, "mm": 0.083 }, "length": 27 } }
+    },
+    {
+      "name": "早見表: PEの表は20行あり、末尾が10号",
+      "func": "table",
+      "args": ["pe"],
+      "expect": { "ok": true, "rows": { "19": { "gou": 10, "lb": 130, "mm": 0.54 }, "length": 20 } }
+    },
+    {
+      "name": "異常入力: 範囲外の号数(ナイロン21号)はエラー",
+      "func": "convert",
+      "args": ["nylon", "gou", 21],
+      "expect": { "ok": false, "code": "out_of_range" }
+    },
+    {
+      "name": "異常入力: 範囲外の号数(ナイロン0.2号)はエラー",
+      "func": "convert",
+      "args": ["nylon", "gou", 0.2],
+      "expect": { "ok": false, "code": "out_of_range" }
+    },
+    {
+      "name": "異常入力: 号数0はエラー",
+      "func": "convert",
+      "args": ["nylon", "gou", 0],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 号数が負の値はエラー",
+      "func": "convert",
+      "args": ["nylon", "gou", -1],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 号数が数値でないときはエラー",
+      "func": "convert",
+      "args": ["nylon", "gou", "1"],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 未対応のライン種別はエラー",
+      "func": "convert",
+      "args": ["wire", "gou", 1],
+      "expect": { "ok": false, "code": "invalid_type" }
+    },
+    {
+      "name": "異常入力: 未対応の単位はエラー",
+      "func": "convert",
+      "args": ["nylon", "inch", 1],
+      "expect": { "ok": false, "code": "invalid_unit" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "convert",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_type" }
+    }
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "tool": "lbm",
+  "module": "calc.js",
+  "global": "LbmCalc",
+  "cases": [
+    {
+      "name": "代表例: 男性175cm・70kg・体脂肪20%は除脂肪56.0kg、FFMI18.3、身長補正18.6",
+      "func": "calculate",
+      "args": ["male", 175, 70, 20],
+      "expect": { "ok": true, "fatMassKg": 14, "leanMassKg": 56, "ffmi": 18.3, "normalizedFfmi": 18.6, "overMaleLimit": false }
+    },
+    {
+      "name": "身長180cmちょうどなら身長補正でFFMIは変わらない(68÷3.24=21.0)",
+      "func": "calculate",
+      "args": ["male", 180, 80, 15],
+      "expect": { "ok": true, "leanMassKg": 68, "ffmi": 21, "normalizedFfmi": 21 }
+    },
+    {
+      "name": "女性160cm・55kg・体脂肪25%は除脂肪41.3kg、FFMI16.1、身長補正17.4",
+      "func": "calculate",
+      "args": ["female", 160, 55, 25],
+      "expect": { "ok": true, "fatMassKg": 13.8, "leanMassKg": 41.3, "ffmi": 16.1, "normalizedFfmi": 17.4, "overMaleLimit": null }
+    },
+    {
+      "name": "男性170cm・90kg・体脂肪10%は身長補正FFMI28.7で上限25.0を超える",
+      "func": "calculate",
+      "args": ["male", 170, 90, 10],
+      "expect": { "ok": true, "leanMassKg": 81, "ffmi": 28, "normalizedFfmi": 28.7, "overMaleLimit": true }
+    },
+    {
+      "name": "境界値: 身長補正FFMIがちょうど25.0のときは上限超えとしない(180cm・81kg・体脂肪0%相当)",
+      "func": "calculate",
+      "args": ["male", 180, 81.81818181818181, 1],
+      "expect": { "ok": true, "normalizedFfmi": 25, "overMaleLimit": false }
+    },
+    {
+      "name": "境界値: 体脂肪率1%(下限)でも計算できる",
+      "func": "calculate",
+      "args": ["male", 180, 80, 1],
+      "expect": { "ok": true, "fatMassKg": 0.8, "leanMassKg": 79.2 }
+    },
+    {
+      "name": "境界値: 体脂肪率70%(上限)でも計算できる",
+      "func": "calculate",
+      "args": ["female", 160, 100, 70],
+      "expect": { "ok": true, "fatMassKg": 70, "leanMassKg": 30 }
+    },
+    {
+      "name": "推定式: 男性180cm・80kgのBoer式は61.4kg、James式62.7kg、Hume式57.8kg",
+      "func": "estimateLbm",
+      "args": ["male", 180, 80],
+      "expect": { "ok": true, "boer": 61.4, "james": 62.7, "hume": 57.8 }
+    },
+    {
+      "name": "推定式: 女性160cm・55kgのBoer式は41.2kg、James式41.4kg、Hume式39.9kg",
+      "func": "estimateLbm",
+      "args": ["female", 160, 55],
+      "expect": { "ok": true, "boer": 41.2, "james": 41.4, "hume": 39.9 }
+    },
+    {
+      "name": "逆算: 身長180cmでFFMI20を達成するには除脂肪体重64.8kgが必要",
+      "func": "leanMassForFfmi",
+      "args": [180, 20],
+      "expect": { "ok": true, "leanMassKg": 64.8 }
+    },
+    {
+      "name": "逆算: 身長170cmでFFMI22を達成するには除脂肪体重63.6kgが必要",
+      "func": "leanMassForFfmi",
+      "args": [170, 22],
+      "expect": { "ok": true, "leanMassKg": 63.6 }
+    },
+    {
+      "name": "異常入力: 性別の指定が不正なときはエラー",
+      "func": "calculate",
+      "args": ["other", 175, 70, 20],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    },
+    {
+      "name": "異常入力: 身長0cmはエラー(0除算にならない)",
+      "func": "calculate",
+      "args": ["male", 0, 70, 20],
+      "expect": { "ok": false, "code": "invalid_height" }
+    },
+    {
+      "name": "異常入力: 身長が範囲超過(251cm)はエラー",
+      "func": "calculate",
+      "args": ["male", 251, 70, 20],
+      "expect": { "ok": false, "code": "invalid_height" }
+    },
+    {
+      "name": "異常入力: 体重が負の値はエラー",
+      "func": "calculate",
+      "args": ["male", 175, -70, 20],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 体重が範囲超過(301kg)はエラー",
+      "func": "calculate",
+      "args": ["male", 175, 301, 20],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 体脂肪率0%はエラー",
+      "func": "calculate",
+      "args": ["male", 175, 70, 0],
+      "expect": { "ok": false, "code": "invalid_body_fat" }
+    },
+    {
+      "name": "異常入力: 体脂肪率100%はエラー",
+      "func": "calculate",
+      "args": ["male", 175, 70, 100],
+      "expect": { "ok": false, "code": "invalid_body_fat" }
+    },
+    {
+      "name": "異常入力: 体脂肪率が数値でないときはエラー",
+      "func": "calculate",
+      "args": ["male", 175, 70, "20%"],
+      "expect": { "ok": false, "code": "invalid_body_fat" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    },
+    {
+      "name": "異常入力: 目標FFMIが範囲外(35)はエラー",
+      "func": "leanMassForFfmi",
+      "args": [180, 35],
+      "expect": { "ok": false, "code": "invalid_target_ffmi" }
+    },
+    {
+      "name": "異常入力: 推定式に不正な身長を渡すとエラー",
+      "func": "estimateLbm",
+      "args": ["male", 99, 80],
+      "expect": { "ok": false, "code": "invalid_height" }
+    }
+  ]
+}

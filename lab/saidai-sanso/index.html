@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>VO2max(最大酸素摂取量)推定(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="12分間走の距離や安静時心拍から最大酸素摂取量を推定し、年代・性別ごとの評価を表示します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>VO2max(最大酸素摂取量)推定</h1>
+  <form class="tool-form" id="tool-form">
+    <label>推定方法
+      <select id="method">
+        <option value="cooper">Cooperテスト(12分間走の距離から)</option>
+        <option value="hr">安静時心拍から</option>
+      </select>
+    </label>
+    <label id="dist-label">12分間走の距離(m)
+      <span class="field-note">12分間で走れた距離。歩いた場合も入れられます</span>
+      <input type="number" id="dist" inputmode="numeric" step="10" min="800" max="5800" value="2400">
+    </label>
+    <label id="rest-label" hidden>安静時心拍数(拍/分)
+      <span class="field-note">起床直後に安静のまま測った値</span>
+      <input type="number" id="rest" inputmode="numeric" step="1" min="25" max="250" value="60">
+    </label>
+    <div class="field-row">
+      <label>年齢(歳)
+        <input type="number" id="age" inputmode="numeric" step="1" min="13" max="99" value="40">
+      </label>
+      <label>性別
+        <select id="sex">
+          <option value="male">男性</option>
+          <option value="female">女性</option>
+        </select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 実測の最大心拍を使う・評価の境界値</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">最大心拍数を実測値で指定する</h3>
+      <p class="adv-note">空欄にすると「208 − 0.7 × 年齢」で推定します。心拍計で測った最大値があればこちらを使ってください。</p>
+      <label>最大心拍数(拍/分)
+        <input type="number" id="maxhr" inputmode="numeric" step="1" min="25" max="250" placeholder="推定値を使う場合は空欄">
+      </label>
+      <div class="tool-result" id="maxhr-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">年代・性別ごとの評価の境界</h3>
+      <p class="adv-note">選んだ年齢・性別での評価の境界値(VO2max)です。</p>
+      <div class="tool-result" id="thr-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    この値は<strong>推定値</strong>です。実験室での呼気ガス分析による実測値とは異なります。スマートウォッチの表示値と食い違うのは、機種ごとに推定式が違うためです。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>持久力の客観的な指標である<strong>最大酸素摂取量(VO2max)</strong>を、特別な機器なしに推定できます。12分間走の距離か安静時心拍のどちらかがあれば計算でき、<strong>同年代・同性のなかでの位置</strong>もわかります。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>推定方法を選びます。走れる環境があればCooperテスト(12分間走)のほうが精度が高めです。</li>
+    <li>距離(または安静時心拍)と年齢・性別を入れると、VO2maxと評価がすぐ出ます。</li>
+    <li>心拍計で測った最大心拍数がある場合は「＋詳細機能」で指定できます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>Cooperテスト</strong>: VO2max = (12分間走の距離m − 504.9) ÷ 44.73</li>
+    <li><strong>安静時心拍法</strong>: VO2max = 15.3 × (最大心拍数 ÷ 安静時心拍数)</li>
+    <li><strong>最大心拍数の推定</strong> = 208 − 0.7 × 年齢</li>
+    <li><strong>評価の境界</strong> = Cooperテストの走行距離の評価表を、上の式でVO2maxに換算した値</li>
+  </ul>
+  <p>単位は ml/kg/分(体重1kgあたり1分間に取り込める酸素の量)です。VO2max = (距離m − 504.9) ÷ 44.73 は、出典に載っている VO2max = 22.351 × 距離km − 11.288 と同じ式です(1 ÷ 44.73 = 0.022356)。</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>Cooperテスト(12分間走)の評価の目安(距離m)</caption>
+      <thead><tr><th>年齢</th><th colspan="2">非常に優れている</th><th colspan="2">優れている</th><th colspan="2">平均的</th></tr>
+      <tr><th></th><th>男性</th><th>女性</th><th>男性</th><th>女性</th><th>男性</th><th>女性</th></tr></thead>
+      <tbody>
+        <tr><td>13〜19歳</td><td>2800〜</td><td>2300〜</td><td>2400〜</td><td>2000〜</td><td>2000〜</td><td>1700〜</td></tr>
+        <tr><td>20〜29歳</td><td>2800〜</td><td>2400〜</td><td>2400〜</td><td>2000〜</td><td>2000〜</td><td>1700〜</td></tr>
+        <tr><td>30〜39歳</td><td>2600〜</td><td>2300〜</td><td>2200〜</td><td>1900〜</td><td>1800〜</td><td>1600〜</td></tr>
+        <tr><td>40〜49歳</td><td>2500〜</td><td>2200〜</td><td>2100〜</td><td>1800〜</td><td>1700〜</td><td>1500〜</td></tr>
+        <tr><td>50歳以上</td><td>2400〜</td><td>2100〜</td><td>2000〜</td><td>1700〜</td><td>1600〜</td><td>1400〜</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>Omni Calculator「VO2 Max Calculator」(安静時心拍法 VO2max = 15.3 × 最大心拍 ÷ 安静時心拍、最大心拍数の推定式 208 − 0.7 × 年齢の出典)<br>
+      <a href="https://www.omnicalculator.com/sports/vo2-max" rel="noopener" target="_blank">https://www.omnicalculator.com/sports/vo2-max</a>(2026年7月29日参照)</li>
+    <li>Topend Sports「Cooper 12 Minute Run Test」(Cooperテストの式と年代・性別ごとの評価表の出典)<br>
+      <a href="https://www.topendsports.com/testing/tests/cooper.htm" rel="noopener" target="_blank">https://www.topendsports.com/testing/tests/cooper.htm</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>いずれの方法も<strong>推定値</strong>です。Cooperテストの原著(1968年)は米空軍の隊員115名を対象とした回帰式で、実測値との相関は約0.90です。</li>
+    <li>安静時心拍法は、安静時心拍数を正しく測れているかに強く左右されます。起床直後に横になったまま測るのが望ましく、運動直後やカフェイン摂取後の値では大きくずれます。</li>
+    <li>評価の境界は、Cooperテストの走行距離の評価表を換算したものです。境界値ちょうどの場合は<strong>上の区分</strong>として判定しています。</li>
+    <li>Cooperテストは12分間全力で走り続ける必要があります。運動習慣のない方、持病のある方、体調のすぐれない方は行わないでください。実施前に医師にご相談ください。</li>
+    <li>13歳未満は評価表の対象外のため計算できません。</li>
+    <li>体重・体脂肪率・気温・高度・路面は考慮していません。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">スマートウォッチの値と違うのはなぜですか?</h3>
+  <p class="faq-a">機種ごとに推定の方法(心拍とペースの関係、GPSの精度、個人の履歴データなど)が異なるためです。どちらも推定値なので、絶対値を比べるより、同じ方法で測り続けて変化を見るほうが役に立ちます。</p>
+  <h3 class="faq-q">VO2maxはどれくらいが「良い」のですか?</h3>
+  <p class="faq-a">年齢と性別で基準が変わります。20代男性なら42前後で「優れている」、51以上で「非常に優れている」です。加齢とともに基準は下がります。</p>
+  <h3 class="faq-q">12分間走らずに測る方法はありますか?</h3>
+  <p class="faq-a">安静時心拍法が使えます。安静時心拍が低いほど推定値は高くなります(最大心拍 ÷ 安静時心拍 × 15.3)。手軽ですが、Cooperテストより誤差は大きくなります。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_distance: "12分間走の距離は800〜5800mの範囲で入力してください。",
+    invalid_age: "年齢は13〜99歳の範囲で入力してください。",
+    invalid_sex: "性別を選び直してください。",
+    invalid_max_hr: "最大心拍数は25〜250拍/分の範囲で入力してください。",
+    invalid_rest_hr: "安静時心拍数は25〜250拍/分の範囲で入力してください。",
+    invalid_hr_order: "安静時心拍数は最大心拍数より小さい値にしてください。",
+    invalid_vo2max: "VO2maxを計算できませんでした。"
+  };
+  var LABELS = ["非常に優れている", "優れている", "平均的", "やや低い"];
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function el(id) { return document.getElementById(id); }
+  function numOf(id) { return parseFloat(el(id).value); }
+  function has(id) { return el(id).value.trim() !== ""; }
+
+  var box = el("result");
+  var maxhrBox = el("maxhr-result");
+  var thrBox = el("thr-result");
+
+  function run() {
+    var method = el("method").value;
+    var isCooper = method === "cooper";
+    el("dist-label").hidden = !isCooper;
+    el("rest-label").hidden = isCooper;
+
+    if (!has("age")) { box.hidden = true; thrBox.hidden = true; return; }
+    var age = numOf("age");
+    var sex = el("sex").value;
+    var r;
+    if (isCooper) {
+      if (!has("dist")) { box.hidden = true; thrBox.hidden = true; return; }
+      r = Vo2maxCalc.cooperWithRating(numOf("dist"), age, sex);
+    } else {
+      if (!has("rest")) { box.hidden = true; thrBox.hidden = true; return; }
+      r = Vo2maxCalc.heartRateWithRating(numOf("rest"), age, sex, has("maxhr") ? numOf("maxhr") : undefined);
+    }
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      thrBox.hidden = true;
+      return;
+    }
+    var extra = "";
+    if (r.maxHr !== undefined) {
+      extra = "<p>最大心拍数 " + esc(r.maxHr) + " 拍/分" +
+        (r.estimatedMaxHr ? "(年齢から推定)" : "(入力値)") + "</p>";
+    }
+    box.innerHTML = '<div class="result-main">VO2max ' + esc(r.vo2max) + " ml/kg/分</div>" +
+      "<p>同年代・同性のなかで <strong>" + esc(r.label) + "</strong></p>" + extra;
+    box.hidden = false;
+    renderThresholds(r.thresholds);
+  }
+
+  function renderThresholds(thresholds) {
+    if (!thresholds) { thrBox.hidden = true; return; }
+    var html = '<div class="table-scroll"><table class="data-table">' +
+      "<thead><tr><th>評価</th><th>VO2max</th></tr></thead><tbody>";
+    for (var i = 0; i < thresholds.length; i++) {
+      html += "<tr><td>" + esc(LABELS[i]) + "</td><td>" + esc(thresholds[i]) + " 以上</td></tr>";
+    }
+    html += "<tr><td>低い</td><td>" + esc(thresholds[thresholds.length - 1]) + " 未満</td></tr>";
+    html += "</tbody></table></div>";
+    thrBox.innerHTML = html;
+    thrBox.hidden = false;
+  }
+
+  function runMaxHr() {
+    if (!has("age")) { maxhrBox.hidden = true; return; }
+    if (has("maxhr")) {
+      maxhrBox.innerHTML = "<p>入力された最大心拍数 " + esc(numOf("maxhr")) + " 拍/分 を使います。</p>";
+      maxhrBox.hidden = false;
+    } else {
+      var m = Vo2maxCalc.maxHrFromAge(numOf("age"));
+      if (!m.ok) {
+        maxhrBox.innerHTML = '<p class="result-error">' + esc(ERRORS[m.code]) + "</p>";
+      } else {
+        maxhrBox.innerHTML = "<p>年齢から推定した最大心拍数: <strong>" + esc(m.maxHr) + "</strong> 拍/分(208 − 0.7 × " +
+          esc(numOf("age")) + ")</p>";
+      }
+      maxhrBox.hidden = false;
+    }
+    run();
+  }
+
+  ["dist", "rest", "age"].forEach(function (id) { el(id).addEventListener("input", run); });
+  el("maxhr").addEventListener("input", runMaxHr);
+  el("age").addEventListener("input", runMaxHr);
+  el("method").addEventListener("change", run);
+  el("sex").addEventListener("change", run);
+  el("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  runMaxHr();
+})();
+</script>
+</body>
+</html>

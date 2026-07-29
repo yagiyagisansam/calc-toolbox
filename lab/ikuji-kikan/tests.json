@@ -1,0 +1,133 @@
+{
+  "tool": "ikuji-kikan",
+  "module": "calc.js",
+  "global": "IkujiKikanCalc",
+  "cases": [
+    {
+      "name": "代表例: 2026年5月10日生まれ → 一歳到達日は2027年5月9日(誕生日の前日)",
+      "func": "calculate",
+      "args": [2026, 5, 10],
+      "expect": { "ok": true, "age1Date": "2027-05-09", "age1m2Date": "2027-07-09", "age1m6Date": "2027-11-09", "age2Date": "2028-05-09", "maxTimes": 2 }
+    },
+    {
+      "name": "1月1日生まれは一歳到達日が前年の12月31日になる",
+      "func": "calculate",
+      "args": [2026, 1, 1],
+      "expect": { "ok": true, "age1Date": "2026-12-31", "age1m2Date": "2027-02-28", "age1m6Date": "2027-06-30", "age2Date": "2027-12-31" }
+    },
+    {
+      "name": "うるう日生まれ: 2024年2月29日 → 応当日がないので2025年2月28日に一歳到達",
+      "func": "calculate",
+      "args": [2024, 2, 29],
+      "expect": { "ok": true, "age1Date": "2025-02-28", "age1m6Date": "2025-08-28", "age2Date": "2026-02-28" }
+    },
+    {
+      "name": "月末生まれ: 2024年3月31日 → 1歳6か月は応当日がなく2025年9月30日に満了",
+      "func": "calculate",
+      "args": [2024, 3, 31],
+      "expect": { "ok": true, "age1Date": "2025-03-30", "age1m6Date": "2025-09-30", "age2Date": "2026-03-30" }
+    },
+    {
+      "name": "出生時育児休業: 予定日どおりの出生なら出生日から56日後(2026-07-05)まで",
+      "func": "postnatalWindow",
+      "args": [2026, 5, 10],
+      "expect": { "ok": true, "startDate": "2026-05-10", "endDate": "2026-07-05", "windowDays": 57, "maxDays": 28, "maxTimes": 2 }
+    },
+    {
+      "name": "出生時育児休業: 予定日より早く生まれた場合は出生日から予定日+56日まで",
+      "func": "postnatalWindow",
+      "args": [2026, 5, 10, 2026, 5, 20],
+      "expect": { "ok": true, "startDate": "2026-05-10", "endDate": "2026-07-15", "windowDays": 67 }
+    },
+    {
+      "name": "出生時育児休業: 予定日より遅く生まれた場合は予定日から出生日+56日まで",
+      "func": "postnatalWindow",
+      "args": [2026, 5, 20, 2026, 5, 10],
+      "expect": { "ok": true, "startDate": "2026-05-10", "endDate": "2026-07-15", "windowDays": 67 }
+    },
+    {
+      "name": "月数計算: 2026年5月10日から12か月後の満了日は2027年5月9日",
+      "func": "expiryAfterMonths",
+      "args": [2026, 5, 10, 12],
+      "expect": { "y": 2027, "m": 5, "d": 9 }
+    },
+    {
+      "name": "月数計算: 2026年3月31日から1か月後は応当日がなく2026年4月30日に満了",
+      "func": "expiryAfterMonths",
+      "args": [2026, 3, 31, 1],
+      "expect": { "y": 2026, "m": 4, "d": 30 }
+    },
+    {
+      "name": "月数計算: 年をまたぐ場合(2026年12月15日から3か月後)は2027年3月14日",
+      "func": "expiryAfterMonths",
+      "args": [2026, 12, 15, 3],
+      "expect": { "y": 2027, "m": 3, "d": 14 }
+    },
+    {
+      "name": "境界: 12月31日生まれの一歳到達日は翌年12月30日",
+      "func": "calculate",
+      "args": [2026, 12, 31],
+      "expect": { "ok": true, "age1Date": "2027-12-30" }
+    },
+    {
+      "name": "異常入力: 存在しない日付(2026年2月30日)はエラー",
+      "func": "calculate",
+      "args": [2026, 2, 30],
+      "expect": { "ok": false, "code": "invalid_birth_date" }
+    },
+    {
+      "name": "異常入力: 月が13はエラー",
+      "func": "calculate",
+      "args": [2026, 13, 1],
+      "expect": { "ok": false, "code": "invalid_birth_date" }
+    },
+    {
+      "name": "異常入力: 月が0はエラー",
+      "func": "calculate",
+      "args": [2026, 0, 1],
+      "expect": { "ok": false, "code": "invalid_birth_date" }
+    },
+    {
+      "name": "異常入力: 日が0はエラー",
+      "func": "calculate",
+      "args": [2026, 5, 0],
+      "expect": { "ok": false, "code": "invalid_birth_date" }
+    },
+    {
+      "name": "異常入力: 年が範囲外(1899年)はエラー",
+      "func": "calculate",
+      "args": [1899, 1, 1],
+      "expect": { "ok": false, "code": "invalid_birth_date" }
+    },
+    {
+      "name": "異常入力: 年が範囲外(2201年)はエラー",
+      "func": "calculate",
+      "args": [2201, 1, 1],
+      "expect": { "ok": false, "code": "invalid_birth_date" }
+    },
+    {
+      "name": "異常入力: 日が整数でない(10.5日)はエラー",
+      "func": "calculate",
+      "args": [2026, 5, 10.5],
+      "expect": { "ok": false, "code": "invalid_birth_date" }
+    },
+    {
+      "name": "異常入力: 数値でない年はエラー",
+      "func": "calculate",
+      "args": ["abc", 5, 10],
+      "expect": { "ok": false, "code": "invalid_birth_date" }
+    },
+    {
+      "name": "異常入力: 出産予定日が存在しない日付はエラー",
+      "func": "postnatalWindow",
+      "args": [2026, 5, 10, 2026, 2, 30],
+      "expect": { "ok": false, "code": "invalid_due_date" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_birth_date" }
+    }
+  ]
+}

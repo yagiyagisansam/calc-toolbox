@@ -1,0 +1,163 @@
+{
+  "tool": "renryo",
+  "module": "calc.js",
+  "global": "RenryoCalc",
+  "cases": [
+    {
+      "name": "代表例: 四六判90kgは坪量104.7g/m²(0.788×1.091m×1000枚)",
+      "func": "toBasisWeight",
+      "args": ["shiroku", 90],
+      "expect": { "ok": true, "basisWeightGsm": 104.7, "areaM2": 0.859708, "sheetsPerRen": 1000 }
+    },
+    {
+      "name": "代表例: 四六判70kgは坪量81.4g/m²",
+      "func": "toBasisWeight",
+      "args": ["shiroku", 70],
+      "expect": { "ok": true, "basisWeightGsm": 81.4 }
+    },
+    {
+      "name": "代表例: 菊判62.5kgは坪量104.7g/m²(四六判90kgとほぼ同じ厚さ)",
+      "func": "toBasisWeight",
+      "args": ["kiku", 62.5],
+      "expect": { "ok": true, "basisWeightGsm": 104.7, "areaM2": 0.597204 }
+    },
+    {
+      "name": "検算しやすい例: A列本判(0.625×0.880m=0.55m²)55kgは坪量ちょうど100g/m²",
+      "func": "toBasisWeight",
+      "args": ["a", 55],
+      "expect": { "ok": true, "basisWeightGsm": 100, "areaM2": 0.55 }
+    },
+    {
+      "name": "検算しやすい例: ハトロン判(0.9×1.2m=1.08m²)108kgは坪量ちょうど100g/m²",
+      "func": "toBasisWeight",
+      "args": ["hatron", 108],
+      "expect": { "ok": true, "basisWeightGsm": 100, "areaM2": 1.08 }
+    },
+    {
+      "name": "板紙: 1連100枚で計算すると坪量は10倍になる(四六判90kg)",
+      "func": "toBasisWeight",
+      "args": ["shiroku", 90, 100],
+      "expect": { "ok": true, "basisWeightGsm": 1046.9, "sheetsPerRen": 100 }
+    },
+    {
+      "name": "逆換算: 坪量104.7g/m²の四六判は連量90.0kg",
+      "func": "toRenryo",
+      "args": ["shiroku", 104.7],
+      "expect": { "ok": true, "renryoKg": 90 }
+    },
+    {
+      "name": "逆換算: 坪量100g/m²のB列本判は連量83.0kg",
+      "func": "toRenryo",
+      "args": ["b", 100],
+      "expect": { "ok": true, "renryoKg": 83, "areaM2": 0.830025 }
+    },
+    {
+      "name": "判型換算: 四六判90kgは菊判では62.5kg相当",
+      "func": "convert",
+      "args": ["shiroku", 90, "kiku"],
+      "expect": { "ok": true, "basisWeightGsm": 104.7, "renryoKg": 62.5 }
+    },
+    {
+      "name": "判型換算: 同じ判型を指定すれば連量は変わらない",
+      "func": "convert",
+      "args": ["shiroku", 90, "shiroku"],
+      "expect": { "ok": true, "renryoKg": 90 }
+    },
+    {
+      "name": "1枚の重さ: 坪量90g/m²のA4(210×297mm=0.06237m²)は5.61g",
+      "func": "sheetWeight",
+      "args": [90, 210, 297],
+      "expect": { "ok": true, "gram": 5.61, "areaM2": 0.06237 }
+    },
+    {
+      "name": "1枚の重さ: 坪量104.7g/m²のA5(148×210mm)は3.25g",
+      "func": "sheetWeight",
+      "args": [104.7, 148, 210],
+      "expect": { "ok": true, "gram": 3.25 }
+    },
+    {
+      "name": "冊子: A5・本文104.7g/m²40ページ(20枚)+表紙180g/m²4ページ(2枚)で76.27g",
+      "func": "bookletWeight",
+      "args": [104.7, 148, 210, 40, 180],
+      "expect": { "ok": true, "bodySheets": 20, "coverSheets": 2, "bodyGram": 65.08, "coverGram": 11.19, "totalGram": 76.27 }
+    },
+    {
+      "name": "冊子: 表紙を指定しなければ本文だけ(A4・90g/m²・4ページ=2枚で11.23g)",
+      "func": "bookletWeight",
+      "args": [90, 210, 297, 4],
+      "expect": { "ok": true, "bodySheets": 2, "coverSheets": 0, "totalGram": 11.23 }
+    },
+    {
+      "name": "境界値: 奇数ページは切り上げて枚数を数える(5ページ=3枚)",
+      "func": "bookletWeight",
+      "args": [100, 100, 100, 5],
+      "expect": { "ok": true, "bodySheets": 3, "totalGram": 3 }
+    },
+    {
+      "name": "異常入力: 判型の指定が不正ならエラー",
+      "func": "toBasisWeight",
+      "args": ["shikishi", 90],
+      "expect": { "ok": false, "code": "invalid_size" }
+    },
+    {
+      "name": "異常入力: 連量0kgはエラー(0除算にしない)",
+      "func": "toBasisWeight",
+      "args": ["shiroku", 0],
+      "expect": { "ok": false, "code": "invalid_renryo" }
+    },
+    {
+      "name": "異常入力: 連量が負の値はエラー",
+      "func": "toBasisWeight",
+      "args": ["shiroku", -90],
+      "expect": { "ok": false, "code": "invalid_renryo" }
+    },
+    {
+      "name": "異常入力: 連量が数値でないときはエラー",
+      "func": "toBasisWeight",
+      "args": ["shiroku", "abc"],
+      "expect": { "ok": false, "code": "invalid_renryo" }
+    },
+    {
+      "name": "異常入力: 1連の枚数0枚はエラー",
+      "func": "toBasisWeight",
+      "args": ["shiroku", 90, 0],
+      "expect": { "ok": false, "code": "invalid_sheets" }
+    },
+    {
+      "name": "異常入力: 坪量0g/m²はエラー",
+      "func": "toRenryo",
+      "args": ["shiroku", 0],
+      "expect": { "ok": false, "code": "invalid_basis_weight" }
+    },
+    {
+      "name": "異常入力: 仕上がり幅0mmはエラー",
+      "func": "sheetWeight",
+      "args": [90, 0, 297],
+      "expect": { "ok": false, "code": "invalid_width" }
+    },
+    {
+      "name": "異常入力: 仕上がり高さが上限超え(5000mm)はエラー",
+      "func": "sheetWeight",
+      "args": [90, 210, 5000],
+      "expect": { "ok": false, "code": "invalid_height" }
+    },
+    {
+      "name": "異常入力: ページ数0はエラー",
+      "func": "bookletWeight",
+      "args": [90, 210, 297, 0],
+      "expect": { "ok": false, "code": "invalid_pages" }
+    },
+    {
+      "name": "異常入力: 表紙の坪量が負の値はエラー",
+      "func": "bookletWeight",
+      "args": [90, 210, 297, 40, -1],
+      "expect": { "ok": false, "code": "invalid_cover_weight" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "toBasisWeight",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_size" }
+    }
+  ]
+}

@@ -1,0 +1,190 @@
+{
+  "tool": "shuban",
+  "module": "calc.js",
+  "global": "ShubanCalc",
+  "cases": [
+    {
+      "name": "2026年1月1日は木曜なので2026-W01(週の月曜は前年12月29日)",
+      "func": "isoWeek",
+      "args": [2026, 1, 1],
+      "expect": {
+        "ok": true, "isoYear": 2026, "week": 1, "weekday": 4, "label": "2026-W01",
+        "mondayIso": "2025-12-29", "sundayIso": "2026-01-04"
+      }
+    },
+    {
+      "name": "年をまたぐ例: 2025年12月29日(月)は翌年の2026-W01に入る",
+      "func": "isoWeek",
+      "args": [2025, 12, 29],
+      "expect": { "ok": true, "isoYear": 2026, "week": 1, "weekday": 1 }
+    },
+    {
+      "name": "年をまたぐ例: 2027年1月1日(金)は前年の2026-W53に入る",
+      "func": "isoWeek",
+      "args": [2027, 1, 1],
+      "expect": { "ok": true, "isoYear": 2026, "week": 53, "weekday": 5, "label": "2026-W53" }
+    },
+    {
+      "name": "年をまたぐ例: 2024年12月30日(月)は翌年の2025-W01に入る",
+      "func": "isoWeek",
+      "args": [2024, 12, 30],
+      "expect": { "ok": true, "isoYear": 2025, "week": 1, "mondayIso": "2024-12-30" }
+    },
+    {
+      "name": "年をまたぐ例: 2021年1月1日(金)は前年の2020-W53に入る",
+      "func": "isoWeek",
+      "args": [2021, 1, 1],
+      "expect": { "ok": true, "isoYear": 2020, "week": 53 }
+    },
+    {
+      "name": "境界値: 2026年12月31日は木曜なので2026-W53(その年最後の週)",
+      "func": "isoWeek",
+      "args": [2026, 12, 31],
+      "expect": { "ok": true, "isoYear": 2026, "week": 53, "weekday": 4 }
+    },
+    {
+      "name": "普通の日付: 2026年7月29日(水)は2026-W31",
+      "func": "isoWeek",
+      "args": [2026, 7, 29],
+      "expect": {
+        "ok": true, "isoYear": 2026, "week": 31, "weekday": 3,
+        "mondayIso": "2026-07-27", "sundayIso": "2026-08-02"
+      }
+    },
+    {
+      "name": "うるう年の2月29日も正しく扱える(2024年2月29日は2024-W09)",
+      "func": "isoWeek",
+      "args": [2024, 2, 29],
+      "expect": { "ok": true, "isoYear": 2024, "week": 9, "weekday": 4 }
+    },
+    {
+      "name": "週番号から日付: 2026-W01は12月29日(月)〜1月4日(日)の7日間",
+      "func": "weekRange",
+      "args": [2026, 1],
+      "expect": {
+        "ok": true, "mondayIso": "2025-12-29", "sundayIso": "2026-01-04",
+        "days": { "0": { "iso": "2025-12-29", "weekday": 1 }, "6": { "iso": "2026-01-04", "weekday": 7 }, "length": 7 }
+      }
+    },
+    {
+      "name": "週番号から日付: 2026-W53は12月28日(月)〜翌年1月3日(日)",
+      "func": "weekRange",
+      "args": [2026, 53],
+      "expect": { "ok": true, "mondayIso": "2026-12-28", "sundayIso": "2027-01-03" }
+    },
+    {
+      "name": "週番号から日付: 2026-W31は7月27日(月)〜8月2日(日)",
+      "func": "weekRange",
+      "args": [2026, 31],
+      "expect": { "ok": true, "mondayIso": "2026-07-27", "sundayIso": "2026-08-02", "label": "2026-W31" }
+    },
+    {
+      "name": "1年の週数: 1月1日が木曜の2026年は53週",
+      "func": "weeksInYear",
+      "args": [2026],
+      "expect": { "ok": true, "weeks": 53 }
+    },
+    {
+      "name": "1年の週数: 2025年は52週",
+      "func": "weeksInYear",
+      "args": [2025],
+      "expect": { "ok": true, "weeks": 52 }
+    },
+    {
+      "name": "1年の週数: うるう年で1月1日が水曜の2020年は53週",
+      "func": "weeksInYear",
+      "args": [2020],
+      "expect": { "ok": true, "weeks": 53 }
+    },
+    {
+      "name": "1年の週数: うるう年でも1月1日が月曜の2024年は52週",
+      "func": "weeksInYear",
+      "args": [2024],
+      "expect": { "ok": true, "weeks": 52 }
+    },
+    {
+      "name": "別の数え方: 1月1日を含む週を第1週(月曜始まり)だと2026年1月5日は第2週",
+      "func": "simpleWeek",
+      "args": [2026, 1, 5, 1],
+      "expect": { "ok": true, "week": 2, "startIso": "2026-01-05", "endIso": "2026-01-11" }
+    },
+    {
+      "name": "別の数え方: 日曜始まりにすると週の初日が1月4日に変わる",
+      "func": "simpleWeek",
+      "args": [2026, 1, 5, 7],
+      "expect": { "ok": true, "week": 2, "startIso": "2026-01-04", "endIso": "2026-01-10" }
+    },
+    {
+      "name": "別の数え方: 1月1日そのものは必ず第1週",
+      "func": "simpleWeek",
+      "args": [2026, 1, 1, 1],
+      "expect": { "ok": true, "week": 1 }
+    },
+    {
+      "name": "異常入力: 存在しない日付(2026年2月30日)はエラー",
+      "func": "isoWeek",
+      "args": [2026, 2, 30],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: うるう年でない年の2月29日はエラー",
+      "func": "isoWeek",
+      "args": [2026, 2, 29],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 月が13はエラー",
+      "func": "isoWeek",
+      "args": [2026, 13, 1],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 日が0はエラー",
+      "func": "isoWeek",
+      "args": [2026, 1, 0],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 年が範囲外(1582)はエラー",
+      "func": "isoWeek",
+      "args": [1582, 1, 1],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 数値でない日付はエラー",
+      "func": "isoWeek",
+      "args": ["abc", 1, 1],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "isoWeek",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 52週しかない2025年に第53週を指定するとエラー",
+      "func": "weekRange",
+      "args": [2025, 53],
+      "expect": { "ok": false, "code": "invalid_week" }
+    },
+    {
+      "name": "異常入力: 週番号0はエラー",
+      "func": "weekRange",
+      "args": [2026, 0],
+      "expect": { "ok": false, "code": "invalid_week" }
+    },
+    {
+      "name": "異常入力: 週番号が負の値はエラー",
+      "func": "weekRange",
+      "args": [2026, -1],
+      "expect": { "ok": false, "code": "invalid_week" }
+    },
+    {
+      "name": "異常入力: 週の開始曜日が8はエラー",
+      "func": "simpleWeek",
+      "args": [2026, 1, 5, 8],
+      "expect": { "ok": false, "code": "invalid_start_weekday" }
+    }
+  ]
+}

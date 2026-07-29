@@ -1,0 +1,197 @@
+{
+  "tool": "shokyaku",
+  "module": "calc.js",
+  "global": "ShokyakuCalc",
+  "cases": [
+    {
+      "name": "償却率参照: 耐用年数4年の定額法は0.250",
+      "func": "rateOf",
+      "args": [4, "straight"],
+      "expect": { "ok": true, "rate": 0.25, "revisedRate": null, "guaranteeRate": null }
+    },
+    {
+      "name": "償却率参照: 耐用年数10年の定率法は償却率0.200・改定償却率0.250・保証率0.06552",
+      "func": "rateOf",
+      "args": [10, "declining"],
+      "expect": { "ok": true, "rate": 0.2, "revisedRate": 0.25, "guaranteeRate": 0.06552 }
+    },
+    {
+      "name": "境界値: 耐用年数2年(表の下限)は定額法0.500・定率法1.000",
+      "func": "rateOf",
+      "args": [2, "declining"],
+      "expect": { "ok": true, "rate": 1, "revisedRate": null, "guaranteeRate": null }
+    },
+    {
+      "name": "境界値: 耐用年数100年(表の上限)の定額法は0.010",
+      "func": "rateOf",
+      "args": [100, "straight"],
+      "expect": { "ok": true, "rate": 0.01 }
+    },
+    {
+      "name": "定額法: 取得価額30万円・4年・1月供用は毎年75,000円、4年目は備忘価額1円を残し74,999円",
+      "func": "schedule",
+      "args": [300000, 4, "straight", 1],
+      "expect": {
+        "ok": true,
+        "rate": 0.25,
+        "firstYearMonths": 12,
+        "totalDepreciation": 299999,
+        "rows": {
+          "0": { "year": 1, "months": 12, "depreciation": 75000, "remaining": 225000 },
+          "3": { "year": 4, "depreciation": 74999, "remaining": 1 },
+          "length": 4
+        }
+      }
+    },
+    {
+      "name": "定額法の月数按分: 24万円・4年・10月供用は初年度3か月分の15,000円、5年目で終わる",
+      "func": "schedule",
+      "args": [240000, 4, "straight", 10],
+      "expect": {
+        "ok": true,
+        "firstYearMonths": 3,
+        "totalDepreciation": 239999,
+        "rows": {
+          "0": { "year": 1, "months": 3, "depreciation": 15000 },
+          "1": { "year": 2, "months": 12, "depreciation": 60000 },
+          "4": { "year": 5, "depreciation": 44999, "remaining": 1 },
+          "length": 5
+        }
+      }
+    },
+    {
+      "name": "定率法(国税庁の例): 100万円・10年は1年目20万円、6年目まで残高×0.200",
+      "func": "schedule",
+      "args": [1000000, 10, "declining", 1],
+      "expect": {
+        "ok": true,
+        "rate": 0.2,
+        "revisedRate": 0.25,
+        "guaranteeAmount": 65520,
+        "rows": {
+          "0": { "year": 1, "depreciation": 200000, "remaining": 800000 },
+          "1": { "year": 2, "depreciation": 160000, "remaining": 640000 },
+          "5": { "year": 6, "depreciation": 65536, "remaining": 262144, "switched": false },
+          "length": 10
+        }
+      }
+    },
+    {
+      "name": "定率法の改定償却率への切替: 100万円・10年は7年目に改定取得価額262,144円×0.250=65,536円へ切替",
+      "func": "schedule",
+      "args": [1000000, 10, "declining", 1],
+      "expect": {
+        "ok": true,
+        "totalDepreciation": 999999,
+        "rows": {
+          "6": { "year": 7, "depreciation": 65536, "switched": true },
+          "8": { "year": 9, "depreciation": 65536, "remaining": 65536 },
+          "9": { "year": 10, "depreciation": 65535, "remaining": 1 }
+        }
+      }
+    },
+    {
+      "name": "定率法: 30万円・4年は1年目15万円、4年目に改定償却率1.000で残高を償却しきる",
+      "func": "schedule",
+      "args": [300000, 4, "declining", 1],
+      "expect": {
+        "ok": true,
+        "rate": 0.5,
+        "guaranteeAmount": 37497,
+        "rows": {
+          "0": { "depreciation": 150000 },
+          "2": { "depreciation": 37500 },
+          "3": { "depreciation": 37499, "remaining": 1, "switched": true },
+          "length": 4
+        }
+      }
+    },
+    {
+      "name": "初年度だけ: パソコン20万円・4年・7月供用の定額法は6か月分25,000円",
+      "func": "firstYear",
+      "args": [200000, 4, "straight", 7],
+      "expect": { "ok": true, "months": 6, "depreciation": 25000, "remaining": 175000 }
+    },
+    {
+      "name": "境界値: 12月供用は初年度1か月分だけ",
+      "func": "firstYear",
+      "args": [240000, 4, "straight", 12],
+      "expect": { "ok": true, "months": 1, "depreciation": 5000 }
+    },
+    {
+      "name": "境界値: 1月供用は初年度12か月分",
+      "func": "firstYear",
+      "args": [240000, 4, "straight", 1],
+      "expect": { "ok": true, "months": 12, "depreciation": 60000 }
+    },
+    {
+      "name": "耐用年数2年の定率法は償却率1.000で初年度に全額(備忘価額1円を残す)",
+      "func": "schedule",
+      "args": [100000, 2, "declining", 1],
+      "expect": {
+        "ok": true,
+        "rows": { "0": { "depreciation": 99999, "remaining": 1 }, "length": 1 }
+      }
+    },
+    {
+      "name": "異常入力: 取得価額0円はエラー",
+      "func": "schedule",
+      "args": [0, 4, "straight", 1],
+      "expect": { "ok": false, "code": "invalid_cost" }
+    },
+    {
+      "name": "異常入力: 取得価額が負の値はエラー",
+      "func": "schedule",
+      "args": [-100000, 4, "straight", 1],
+      "expect": { "ok": false, "code": "invalid_cost" }
+    },
+    {
+      "name": "異常入力: 耐用年数1年(表の範囲外)はエラー",
+      "func": "schedule",
+      "args": [300000, 1, "straight", 1],
+      "expect": { "ok": false, "code": "invalid_life" }
+    },
+    {
+      "name": "異常入力: 耐用年数101年(表の範囲外)はエラー",
+      "func": "rateOf",
+      "args": [101, "straight"],
+      "expect": { "ok": false, "code": "invalid_life" }
+    },
+    {
+      "name": "異常入力: 耐用年数が整数でないときはエラー",
+      "func": "rateOf",
+      "args": [4.5, "straight"],
+      "expect": { "ok": false, "code": "invalid_life" }
+    },
+    {
+      "name": "異常入力: 未対応の償却方法はエラー",
+      "func": "rateOf",
+      "args": [4, "old_declining"],
+      "expect": { "ok": false, "code": "invalid_method" }
+    },
+    {
+      "name": "異常入力: 事業供用月が0はエラー",
+      "func": "schedule",
+      "args": [300000, 4, "straight", 0],
+      "expect": { "ok": false, "code": "invalid_month" }
+    },
+    {
+      "name": "異常入力: 事業供用月が13はエラー",
+      "func": "schedule",
+      "args": [300000, 4, "straight", 13],
+      "expect": { "ok": false, "code": "invalid_month" }
+    },
+    {
+      "name": "異常入力: 取得価額が数値でないときはエラー",
+      "func": "schedule",
+      "args": ["300000", 4, "straight", 1],
+      "expect": { "ok": false, "code": "invalid_cost" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "schedule",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_cost" }
+    }
+  ]
+}

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>過焦点距離 計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="焦点距離・F値・センサーサイズから過焦点距離を計算し、手前から無限遠までピントが合う置きピン位置を求めます。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>過焦点距離 計算</h1>
+  <form class="tool-form" id="tool-form">
+    <div class="field-row">
+      <label>焦点距離(mm)
+        <input type="number" id="focal" inputmode="decimal" step="0.1" min="1" max="3000" placeholder="24">
+      </label>
+      <label>F値
+        <input type="number" id="fnum" inputmode="decimal" step="0.1" min="0.5" max="128" placeholder="11">
+      </label>
+    </div>
+    <label>センサーサイズ
+      <span class="field-note">許容錯乱円径は「対角線 ÷ 1300」で決めています</span>
+      <select id="sensor"></select>
+    </label>
+    <label id="coc-wrap" hidden>許容錯乱円径(mm)
+      <input type="number" id="coc" inputmode="decimal" step="0.0001" min="0.0001" max="1" placeholder="0.0333">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 過焦点系列(H/2, H/3 … の早見表)</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">どこにピントを置くと、どこからどこまで合うか</h3>
+      <p class="adv-note">過焦点距離を整数で割った距離にピントを合わせたときの、被写界深度の近点と遠点の一覧です。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    許容錯乱円径は「どこまでのボケを許すか」という<strong>決めごと</strong>です。ここでは一般的な「画面対角線の1300分の1」を使っていますが、大きく引き伸ばす場合や等倍で見る場合はもっと小さい値にする必要があります。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>風景や星景でパンフォーカスにしたいとき、<strong>どこにピントを置けば手前から無限遠まで合うか</strong>がわかります。過焦点距離にピントを合わせると、その半分の距離から無限遠までが被写界深度に入ります。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>使うレンズの焦点距離とF値を入れます。</li>
+    <li>カメラのセンサーサイズを選ぶと、その瞬間に過焦点距離が表示されます。</li>
+    <li>表示された距離にピントを合わせれば、その半分の距離から無限遠までがピントの合う範囲になります。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>過焦点距離 H</strong> = 焦点距離² ÷ (F値 × 許容錯乱円径)(長さの単位はすべてmm)</li>
+    <li><strong>近点</strong> = H ÷ 2(ここから無限遠までが被写界深度)</li>
+    <li><strong>許容錯乱円径</strong> = センサーの対角線 ÷ 1300</li>
+    <li><strong>過焦点系列</strong> = H, H/2, H/3, … と整数で割った数列。ある項にピントを合わせると、その両隣が被写界深度の遠点と近点になる</li>
+  </ul>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>東芝テリー株式会社「知っていると便利な光学知識 - 被写界深度と過焦点距離・過焦点系列」<br>
+      <a href="https://www.toshiba-teli.co.jp/technology/technical/t0019_DoF_HyperfocalDistance.htm" rel="noopener" target="_blank">https://www.toshiba-teli.co.jp/technology/technical/t0019_DoF_HyperfocalDistance.htm</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>この式はニュートンの結像公式に基づくもので、過焦点距離を<strong>前側焦点から測った値</strong>として求めます。レンズの主点から測る流儀では焦点距離の分(数十mm)だけ長くなりますが、通常の撮影距離では無視できます。</li>
+    <li>許容錯乱円径は「対角線÷1300」を既定にしています。大きく引き伸ばす、等倍で確認する、といった場合はこの値では甘くなります。センサーサイズで「自分で入力」を選べば任意の値を指定できます。</li>
+    <li>回折の影響は考慮していません。絞り込みすぎると回折によって全体の解像が落ちるため、計算どおりのシャープさにはなりません。</li>
+    <li>被写界深度は「ここから急にボケる」という境目があるものではなく、徐々に変化します。厳密さが必要なときは少し余裕をとってください。</li>
+    <li>センサー寸法は代表的な公称値です。機種によって数値が異なることがあります。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">過焦点距離にピントを合わせると、どこからどこまで合いますか?</h3>
+  <p class="faq-a">過焦点距離の半分の距離から無限遠までです。たとえば過焦点距離が1.6mなら、0.8mから無限遠までが被写界深度に入ります。</p>
+  <h3 class="faq-q">無限遠にピントを合わせるのとどう違いますか?</h3>
+  <p class="faq-a">無限遠に合わせると、手前側の限界は過焦点距離そのもの(上の例なら1.6m)までしか合いません。過焦点距離に合わせたほうが、手前がその半分まで伸びる分だけ得になります。</p>
+  <h3 class="faq-q">広角レンズのほうが数値が小さいのはなぜですか?</h3>
+  <p class="faq-a">過焦点距離は焦点距離の二乗に比例するためです。焦点距離が半分になると過焦点距離は4分の1になり、より手前までピントが合います。</p>
+  <h3 class="faq-q">許容錯乱円径は変えたほうがよいですか?</h3>
+  <p class="faq-a">大きなプリントを作る、画面等倍で細部を確認する、といった用途では「対角線÷1300」では甘すぎます。その場合は値を小さく(たとえば半分に)して計算すると、より安全側の過焦点距離になります。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_focal: "焦点距離を1〜3000mmの範囲で入力してください。",
+    invalid_fnumber: "F値を0.5〜128の範囲で入力してください。",
+    invalid_coc: "許容錯乱円径を0.0001〜1mmの範囲で入力してください。",
+    invalid_count: "表示する項数の指定が正しくありません。",
+    invalid_size: "センサー寸法の指定が正しくありません。"
+  };
+  /* 代表的なセンサーの公称寸法(mm)。許容錯乱円径は対角線÷1300で求める */
+  var SENSORS = [
+    ["ff", "フルサイズ(36×24mm)", 36, 24],
+    ["apsc", "APS-C(23.5×15.7mm)", 23.5, 15.7],
+    ["apsc_canon", "APS-C・キヤノン(22.3×14.9mm)", 22.3, 14.9],
+    ["m43", "マイクロフォーサーズ(17.3×13mm)", 17.3, 13],
+    ["one", "1インチ(13.2×8.8mm)", 13.2, 8.8],
+    ["custom", "自分で入力", 0, 0]
+  ];
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function dist(m) {
+    return m >= 1000 ? (m / 1000).toFixed(2) + " km" : m.toFixed(2) + " m";
+  }
+
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var focalEl = document.getElementById("focal");
+  var fnumEl = document.getElementById("fnum");
+  var sensorEl = document.getElementById("sensor");
+  var cocEl = document.getElementById("coc");
+  var cocWrap = document.getElementById("coc-wrap");
+
+  var opts = "";
+  for (var i = 0; i < SENSORS.length; i++) {
+    opts += '<option value="' + SENSORS[i][0] + '"' + (i === 0 ? " selected" : "") + ">" + SENSORS[i][1] + "</option>";
+  }
+  sensorEl.innerHTML = opts;
+
+  function currentCoc() {
+    for (var i = 0; i < SENSORS.length; i++) {
+      if (SENSORS[i][0] === sensorEl.value) {
+        if (SENSORS[i][0] === "custom") {
+          return cocEl.value === "" ? null : parseFloat(cocEl.value);
+        }
+        var r = HyperfocalCalc.cocFromSensor(SENSORS[i][2], SENSORS[i][3]);
+        return r.ok ? r.cocMm : null;
+      }
+    }
+    return null;
+  }
+
+  function run() {
+    cocWrap.hidden = sensorEl.value !== "custom";
+    if (focalEl.value === "" || fnumEl.value === "") { box.hidden = true; advBox.hidden = true; return; }
+    var coc = currentCoc();
+    if (coc === null) { box.hidden = true; advBox.hidden = true; return; }
+
+    var f = parseFloat(focalEl.value), n = parseFloat(fnumEl.value);
+    var r = HyperfocalCalc.hyperfocal(f, n, coc);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      advBox.hidden = true;
+      return;
+    }
+    box.innerHTML = '<div class="result-main">' + esc(dist(r.hyperfocalM)) + " にピント</div>" +
+      "<p>この距離に合わせると <strong>" + esc(dist(r.nearM)) + " から無限遠</strong> までが被写界深度に入ります。</p>" +
+      "<p>許容錯乱円径 " + esc(coc.toFixed(4)) + " mm で計算しています。</p>";
+    box.hidden = false;
+
+    var s = HyperfocalCalc.sequence(f, n, coc, 6);
+    if (!s.ok) { advBox.hidden = true; return; }
+    var t = '<div class="table-scroll"><table class="data-table"><thead><tr><th>ピント位置</th><th>近点</th><th>遠点</th></tr></thead><tbody>';
+    for (var k = 0; k < s.rows.length; k++) {
+      var row = s.rows[k];
+      t += "<tr><td>H/" + esc(row.n) + " = " + esc(dist(row.focusM)) + "</td><td>" + esc(dist(row.nearM)) + "</td><td>" +
+        (row.farM === null ? "無限遠" : esc(dist(row.farM))) + "</td></tr>";
+    }
+    t += "</tbody></table></div>";
+    advBox.innerHTML = t;
+    advBox.hidden = false;
+  }
+
+  [focalEl, fnumEl, cocEl].forEach(function (el) { el.addEventListener("input", run); });
+  sensorEl.addEventListener("change", run);
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+{
+  "tool": "paint",
+  "module": "calc.js",
+  "global": "PaintCalc",
+  "cases": [
+    {
+      "name": "出典の例と一致: 0.11kg/m2×150m2の1回塗り=16.5kg、15kg缶なら2缶",
+      "func": "byCoverage",
+      "args": [150, 0.11, 1, 0, 15],
+      "expect": { "ok": true, "requiredKg": 16.5, "cans": 2, "purchaseKg": 30, "surplusKg": 13.5 }
+    },
+    {
+      "name": "2回塗り＋ロス10%: 150m2×0.11×2×1.1=36.3kg、15kg缶で3缶",
+      "func": "byCoverage",
+      "args": [150, 0.11, 2, 10, 15],
+      "expect": {
+        "ok": true, "requiredKg": 36.3, "perCoatKg": 18.15,
+        "cans": 3, "purchaseKg": 45, "surplusKg": 8.7
+      }
+    },
+    {
+      "name": "缶の内容量を省略すると必要量だけ返り、缶数はnull",
+      "func": "byCoverage",
+      "args": [150, 0.11, 2, 0],
+      "expect": { "ok": true, "requiredKg": 33, "cans": null, "purchaseKg": null }
+    },
+    {
+      "name": "境界値: ロス率0%なら割り増しなし(100m2×0.2×3回=60kg)",
+      "func": "byCoverage",
+      "args": [100, 0.2, 3, 0],
+      "expect": { "ok": true, "requiredKg": 60, "perCoatKg": 20 }
+    },
+    {
+      "name": "境界値: ロス率100%なら必要量が2倍(100m2×0.2×1回=20kg→40kg)",
+      "func": "byCoverage",
+      "args": [100, 0.2, 1, 100],
+      "expect": { "ok": true, "requiredKg": 40 }
+    },
+    {
+      "name": "境界値: ちょうど割り切れるときは缶数を余計に増やさない(10kg必要・10kg缶で1缶)",
+      "func": "byCoverage",
+      "args": [100, 0.1, 1, 0, 10],
+      "expect": { "ok": true, "requiredKg": 10, "cans": 1, "surplusKg": 0 }
+    },
+    {
+      "name": "塗り面積から: 100m2を8m2/Lで2回塗り=25L、4L缶なら7缶",
+      "func": "bySpreadRate",
+      "args": [100, 8, 2, 0, 4],
+      "expect": { "ok": true, "requiredL": 25, "perCoatL": 12.5, "cans": 7, "purchaseL": 28, "surplusL": 3 }
+    },
+    {
+      "name": "塗り面積から＋ロス10%: 27.5Lになるが4L缶7缶(28L)で足りる",
+      "func": "bySpreadRate",
+      "args": [100, 8, 2, 10, 4],
+      "expect": { "ok": true, "requiredL": 27.5, "cans": 7, "surplusL": 0.5 }
+    },
+    {
+      "name": "塗り面積から: 20m2を10m2/Lで1回塗りは2L",
+      "func": "bySpreadRate",
+      "args": [20, 10, 1, 0],
+      "expect": { "ok": true, "requiredL": 2, "cans": null }
+    },
+    {
+      "name": "境界値: 塗り回数の上限10回も計算できる",
+      "func": "byCoverage",
+      "args": [10, 0.1, 10, 0],
+      "expect": { "ok": true, "requiredKg": 10, "perCoatKg": 1 }
+    },
+    {
+      "name": "外壁面積の目安: 延床120m2×1.3=156m2",
+      "func": "estimateWallArea",
+      "args": [120],
+      "expect": { "ok": true, "wallAreaM2": 156 }
+    },
+    {
+      "name": "外壁面積の目安: 係数1.7を指定すると延床100m2で170m2",
+      "func": "estimateWallArea",
+      "args": [100, 1.7],
+      "expect": { "ok": true, "wallAreaM2": 170 }
+    },
+    {
+      "name": "異常入力: 塗装面積0はエラー",
+      "func": "byCoverage",
+      "args": [0, 0.11, 2, 10, 15],
+      "expect": { "ok": false, "code": "invalid_area" }
+    },
+    {
+      "name": "異常入力: 塗装面積が負の値はエラー",
+      "func": "byCoverage",
+      "args": [-150, 0.11, 2, 10, 15],
+      "expect": { "ok": false, "code": "invalid_area" }
+    },
+    {
+      "name": "異常入力: 塗り回数0はエラー",
+      "func": "byCoverage",
+      "args": [150, 0.11, 0, 10, 15],
+      "expect": { "ok": false, "code": "invalid_coats" }
+    },
+    {
+      "name": "異常入力: 塗り回数が整数でない(2.5回)はエラー",
+      "func": "byCoverage",
+      "args": [150, 0.11, 2.5, 10, 15],
+      "expect": { "ok": false, "code": "invalid_coats" }
+    },
+    {
+      "name": "異常入力: 標準塗布量0はエラー",
+      "func": "byCoverage",
+      "args": [150, 0, 2, 10, 15],
+      "expect": { "ok": false, "code": "invalid_rate" }
+    },
+    {
+      "name": "異常入力: 1缶の内容量0はエラー(0で割らない)",
+      "func": "byCoverage",
+      "args": [150, 0.11, 2, 10, 0],
+      "expect": { "ok": false, "code": "invalid_can" }
+    },
+    {
+      "name": "異常入力: ロス率が負の値はエラー",
+      "func": "byCoverage",
+      "args": [150, 0.11, 2, -10, 15],
+      "expect": { "ok": false, "code": "invalid_loss" }
+    },
+    {
+      "name": "異常入力: ロス率が100%超はエラー",
+      "func": "byCoverage",
+      "args": [150, 0.11, 2, 150, 15],
+      "expect": { "ok": false, "code": "invalid_loss" }
+    },
+    {
+      "name": "異常入力: 標準塗り面積0はエラー(0で割らない)",
+      "func": "bySpreadRate",
+      "args": [100, 0, 2, 0, 4],
+      "expect": { "ok": false, "code": "invalid_spread" }
+    },
+    {
+      "name": "異常入力: 数値でない面積はエラー",
+      "func": "byCoverage",
+      "args": ["abc", 0.11, 2, 10, 15],
+      "expect": { "ok": false, "code": "invalid_area" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "byCoverage",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_area" }
+    },
+    {
+      "name": "異常入力: 外壁面積の目安で係数が範囲外(5)はエラー",
+      "func": "estimateWallArea",
+      "args": [120, 5],
+      "expect": { "ok": false, "code": "invalid_factor" }
+    }
+  ]
+}

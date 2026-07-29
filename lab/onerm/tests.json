@@ -1,0 +1,180 @@
+{
+  "tool": "onerm",
+  "module": "calc.js",
+  "global": "OnermCalc",
+  "cases": [
+    {
+      "name": "Epley: 100kg×10回は100×(1+10/30)=133.3kg",
+      "func": "oneRm",
+      "args": [100, 10],
+      "expect": { "ok": true, "oneRm": 133.3, "formula": "epley", "lowConfidence": false }
+    },
+    {
+      "name": "Brzycki: 100kg×10回は100×36/27=133.3kg(10回では2式が一致する)",
+      "func": "oneRm",
+      "args": [100, 10, "brzycki"],
+      "expect": { "ok": true, "oneRm": 133.3, "formula": "brzycki" }
+    },
+    {
+      "name": "Epley: 100kg×5回は100×35/30=116.7kg",
+      "func": "oneRm",
+      "args": [100, 5],
+      "expect": { "ok": true, "oneRm": 116.7 }
+    },
+    {
+      "name": "Brzycki: 100kg×5回は100×36/32=112.5kg(Epleyより低め)",
+      "func": "oneRm",
+      "args": [100, 5, "brzycki"],
+      "expect": { "ok": true, "oneRm": 112.5 }
+    },
+    {
+      "name": "Brzycki: 60kg×8回は60×36/29=74.5kg",
+      "func": "oneRm",
+      "args": [60, 8, "brzycki"],
+      "expect": { "ok": true, "oneRm": 74.5 }
+    },
+    {
+      "name": "Epley: 60kg×8回は60×38/30=76.0kg",
+      "func": "oneRm",
+      "args": [60, 8],
+      "expect": { "ok": true, "oneRm": 76 }
+    },
+    {
+      "name": "境界値: 1回のときはEpleyでも挙げた重量そのもの(100kg)",
+      "func": "oneRm",
+      "args": [100, 1],
+      "expect": { "ok": true, "oneRm": 100 }
+    },
+    {
+      "name": "境界値: 1回のときはBrzyckiでも挙げた重量そのもの(100kg)",
+      "func": "oneRm",
+      "args": [100, 1, "brzycki"],
+      "expect": { "ok": true, "oneRm": 100 }
+    },
+    {
+      "name": "13回を超えると推定の誤差が大きい印(lowConfidence)が立つ",
+      "func": "oneRm",
+      "args": [100, 13],
+      "expect": { "ok": true, "oneRm": 143.3, "lowConfidence": true }
+    },
+    {
+      "name": "境界値: 12回はまだlowConfidenceにならない",
+      "func": "oneRm",
+      "args": [100, 12],
+      "expect": { "ok": true, "oneRm": 140, "lowConfidence": false }
+    },
+    {
+      "name": "異常系: 重量0はエラー",
+      "func": "oneRm",
+      "args": [0, 5],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常系: 重量が負の値はエラー",
+      "func": "oneRm",
+      "args": [-100, 5],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常系: 重量が上限(1000kg)超はエラー",
+      "func": "oneRm",
+      "args": [1001, 5],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常系: 重量が数値でないときはエラー",
+      "func": "oneRm",
+      "args": ["abc", 5],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常系: 反復回数0はエラー",
+      "func": "oneRm",
+      "args": [100, 0],
+      "expect": { "ok": false, "code": "invalid_reps" }
+    },
+    {
+      "name": "異常系: 反復回数が上限(30回)超はエラー(Brzycki式が37回で破綻するため)",
+      "func": "oneRm",
+      "args": [100, 31],
+      "expect": { "ok": false, "code": "invalid_reps" }
+    },
+    {
+      "name": "異常系: 反復回数が小数はエラー",
+      "func": "oneRm",
+      "args": [100, 5.5],
+      "expect": { "ok": false, "code": "invalid_reps" }
+    },
+    {
+      "name": "異常系: 知らない推定式名はエラー",
+      "func": "oneRm",
+      "args": [100, 5, "xyz"],
+      "expect": { "ok": false, "code": "invalid_formula" }
+    },
+    {
+      "name": "2式比較: 100kg×5回はEpley116.7・Brzycki112.5・平均114.6",
+      "func": "bothFormulas",
+      "args": [100, 5],
+      "expect": { "ok": true, "epley": 116.7, "brzycki": 112.5, "average": 114.6 }
+    },
+    {
+      "name": "2式比較: 10回では両式とも133.3で一致する",
+      "func": "bothFormulas",
+      "args": [100, 10],
+      "expect": { "ok": true, "epley": 133.3, "brzycki": 133.3, "average": 133.3 }
+    },
+    {
+      "name": "逆算: 1RM120kgでEpleyの5回は85.71%の102.9kg",
+      "func": "weightForReps",
+      "args": [120, 5],
+      "expect": { "ok": true, "weight": 102.9, "percent": 85.71 }
+    },
+    {
+      "name": "逆算: 1RM120kgでBrzyckiの5回は88.89%の106.7kg",
+      "func": "weightForReps",
+      "args": [120, 5, "brzycki"],
+      "expect": { "ok": true, "weight": 106.7, "percent": 88.89 }
+    },
+    {
+      "name": "逆算: 1回は1RMそのもの(100%)",
+      "func": "weightForReps",
+      "args": [120, 1],
+      "expect": { "ok": true, "weight": 120, "percent": 100 }
+    },
+    {
+      "name": "%換算表(Epley): 1回100%・5回85.71%・10回75%の12行",
+      "func": "percentTable",
+      "args": ["epley"],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "0": { "reps": 1, "percent": 100 },
+          "4": { "reps": 5, "percent": 85.71 },
+          "9": { "reps": 10, "percent": 75 },
+          "length": 12
+        }
+      }
+    },
+    {
+      "name": "%換算表(Brzycki): 5回88.89%・10回75%(10回は両式で一致)",
+      "func": "percentTable",
+      "args": ["brzycki"],
+      "expect": {
+        "ok": true,
+        "rows": { "4": { "reps": 5, "percent": 88.89 }, "9": { "reps": 10, "percent": 75 } }
+      }
+    },
+    {
+      "name": "異常系: %換算表で知らない式名はエラー",
+      "func": "percentTable",
+      "args": ["xyz"],
+      "expect": { "ok": false, "code": "invalid_formula" }
+    },
+    {
+      "name": "異常系: 引数なしはエラー",
+      "func": "oneRm",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+ "dof": {
+  "ok": false,
+  "note": "Error: 横方向にはみ出している"
+ },
+ "ev": {
+  "ok": false,
+  "note": "Error: 横方向にはみ出している"
+ },
+ "furusato": {
+  "ok": false,
+  "note": "Error: 横方向にはみ出している"
+ },
+ "himando": {
+  "ok": false,
+  "note": "Error: 横方向にはみ出している"
+ },
+ "hiryo": {
+  "ok": false,
+  "note": "Error: 横方向にはみ出している"
+ },
+ "ikuji-kikan": {
+  "ok": false,
+  "note": "Error: 横方向にはみ出している"
+ },
+ "juryozei": {
+  "ok": false,
+  "note": "Error: 横方向にはみ出している"
+ },
+ "taishokukin": {
+  "ok": false,
+  "note": "Error: 横方向にはみ出している"
+ },
+ "whr": {
+  "ok": false,
+  "note": "Error: 横方向にはみ出している"
+ },
+ "yakudoshi": {
+  "ok": true,
+  "note": ""
+ }
+}

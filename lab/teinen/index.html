@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>定年退職日・再雇用期間 計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="生年月日と会社の定年年齢・退職日の規定から、定年退職日と65歳までの再雇用期間を計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>
+    /* 出典の長いURLが画面からはみ出さないようにする */
+    .sources a { overflow-wrap: anywhere; word-break: break-word; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>定年退職日・再雇用期間 計算</h1>
+  <form class="tool-form" id="tool-form">
+    <span class="field-note">生年月日</span>
+    <div class="field-row">
+      <label>年
+        <select id="by"></select>
+      </label>
+      <label>月
+        <select id="bm"></select>
+      </label>
+      <label>日
+        <select id="bd"></select>
+      </label>
+    </div>
+    <div class="field-row">
+      <label>会社の定年年齢
+        <select id="age"></select>
+      </label>
+      <label>退職日の規定
+        <select id="rule">
+          <option value="birthday" selected>年齢到達日(誕生日の前日)</option>
+          <option value="end_of_month">到達日の属する月の末日</option>
+          <option value="end_of_fiscal_year">到達日の属する年度の3月31日</option>
+        </select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 法律上の位置づけと日付の内訳</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">計算の内訳</h3>
+      <p class="adv-note">年齢到達日・65歳到達日と、高年齢者雇用安定法での位置づけを表示します。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    退職日をいつにするかは<strong>会社の就業規則</strong>で決まります。ここで出るのは代表的な3つの規定にあてはめた場合の日付です。必ず自社の規定をご確認ください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>生年月日と定年年齢を入れるだけで、<strong>定年退職日と、そこから65歳までの再雇用期間</strong>がわかります。「年齢は誕生日の前日に上がる」という法律のルールも自動で反映するので、4月1日生まれのような境目の人も正しく出ます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>生年月日を選びます。</li>
+    <li>会社の定年年齢を選びます(法律上、定年は60歳を下回れません)。</li>
+    <li>就業規則の退職日の規定を選ぶと、その瞬間に退職日と再雇用期間が出ます。ボタンは不要です。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>年齢到達日</strong> = 誕生日の前日。年齢計算ニ関スル法律により出生の日から起算し、民法第143条を準用するため、応当日の前日の満了で加齢する</li>
+    <li><strong>定年退職日</strong> = 規定に応じて 年齢到達日 / 到達日の属する月の末日 / 到達日の属する年度(4月〜翌3月)の3月31日</li>
+    <li><strong>65歳到達日</strong> = 65歳の誕生日の前日</li>
+    <li><strong>再雇用期間</strong> = 退職日の翌日から65歳到達日までの日数(両端を含む)</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>高年齢者等の雇用の安定等に関する法律の定め</caption>
+      <thead><tr><th>条文</th><th>内容</th><th>性質</th></tr></thead>
+      <tbody>
+        <tr><td>第8条</td><td>定年を定める場合、60歳を下回ることができない(厚生労働省令で定める業務を除く)</td><td>義務</td></tr>
+        <tr><td>第9条</td><td>定年が65歳未満の事業主は、65歳までの安定した雇用を確保するため「定年の引上げ」「継続雇用制度の導入」「定年の定めの廃止」のいずれかを講じなければならない</td><td>義務</td></tr>
+        <tr><td>第10条の2</td><td>定年が65歳以上70歳未満の事業主等は、65歳から70歳までの安定した雇用を確保するよう努めなければならない</td><td>努力義務</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>年齢計算ニ関スル法律(明治35年法律第50号)「年齢ハ出生ノ日ヨリ之ヲ起算ス」「民法第百四十三条ノ規定ハ年齢ノ計算ニ之ヲ準用ス」(e-Gov法令検索)<br>
+      <a href="https://laws.e-gov.go.jp/law/135AC1000000050" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/135AC1000000050</a>(2026年7月29日参照)</li>
+    <li>高年齢者等の雇用の安定等に関する法律(昭和46年法律第68号)第8条・第9条・第10条の2(e-Gov法令検索・令和4年10月1日施行版)<br>
+      <a href="https://laws.e-gov.go.jp/law/346AC0000000068" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/346AC0000000068</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>法令の内容は<strong>2026年7月29日時点</strong>の現行法(高年齢者雇用安定法は令和4年10月1日施行の版)によります。</li>
+    <li>退職日は会社の就業規則で決まります。ここで扱うのは代表的な3つの規定だけで、「誕生日当日」「誕生日の属する年度末の直前の給与締日」など別の定めをしている会社もあります。</li>
+    <li>年度は4月1日から翌年3月31日までとしています。</li>
+    <li>2月29日生まれの年齢到達日は、平年では2月28日になります。</li>
+    <li>再雇用の実際の契約期間・更新の可否・労働条件は会社の制度によります。ここで出るのは法律が求める65歳までの期間の長さの目安です。</li>
+    <li>年金の受給開始時期(原則65歳)、在職老齢年金による調整、雇用保険の高年齢雇用継続給付などは計算していません。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">なぜ誕生日の前日が「年齢到達日」なのですか?</h3>
+  <p class="faq-a">年齢計算ニ関スル法律により、年齢は出生の日から起算し、民法第143条を準用するためです。起算日が誕生日当日なので、その1年後の応当日の「前日の終了時」に1歳加わります。4月1日生まれが早生まれ扱いになるのもこのルールによるものです。</p>
+  <h3 class="faq-q">定年は60歳のままでも違法ではないのですか?</h3>
+  <p class="faq-a">違法ではありません。第8条が禁じているのは60歳を下回る定年です。ただし定年が65歳未満の場合、第9条により65歳までの雇用確保措置(定年の引上げ・継続雇用制度・定年の廃止のいずれか)を講じることが義務づけられています。</p>
+  <h3 class="faq-q">70歳まで働けるようになったと聞きましたが?</h3>
+  <p class="faq-a">第10条の2により、65歳から70歳までの就業確保措置が<strong>努力義務</strong>として定められています。義務ではないため、実際に70歳まで働けるかは会社の制度次第です。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_birth_date: "生年月日を選び直してください。",
+    invalid_age: "定年年齢は60歳以上80歳以下で選んでください。",
+    invalid_rule: "退職日の規定を選び直してください。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var byEl = document.getElementById("by");
+  var bmEl = document.getElementById("bm");
+  var bdEl = document.getElementById("bd");
+  var ageEl = document.getElementById("age");
+  var ruleEl = document.getElementById("rule");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function fill(el, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function val(el) { return parseInt(el.value, 10); }
+  function daysInMonth(y, m) { return new Date(Date.UTC(y, m, 0)).getUTCDate(); }
+  function jp(d) { return d.year + "年" + d.month + "月" + d.day + "日"; }
+
+  fill(byEl, 1940, 2010, "年", 1966);
+  fill(bmEl, 1, 12, "月", 8);
+  fill(bdEl, 1, 31, "日", 15);
+  fill(ageEl, 60, 80, "歳", 60);
+
+  function adjustDays() {
+    var keep = val(bdEl);
+    var max = daysInMonth(val(byEl), val(bmEl));
+    fill(bdEl, 1, max, "日", Math.min(keep, max));
+  }
+
+  function run() {
+    adjustDays();
+    var r = TeinenCalc.retirementDate(val(byEl), val(bmEl), val(bdEl), val(ageEl), ruleEl.value);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      advBox.hidden = true;
+      return;
+    }
+    var years = Math.floor(r.reemploymentMonths / 12);
+    var months = Math.round((r.reemploymentMonths - years * 12) * 10) / 10;
+    box.innerHTML =
+      '<div class="result-main">定年退職日 ' + esc(jp(r.retirementDate)) + "</div>" +
+      (r.reemploymentDays > 0
+        ? "<p>65歳到達日(" + esc(jp(r.age65Date)) + ")まで " + esc(r.reemploymentDays.toLocaleString("ja-JP")) +
+          "日(約" + esc(years) + "年" + esc(months) + "か月)の再雇用期間があります。</p>"
+        : "<p>65歳到達日(" + esc(jp(r.age65Date)) + ")を過ぎているため、65歳までの再雇用期間はありません。</p>");
+    box.hidden = false;
+
+    advBox.innerHTML =
+      "<p>年齢到達日(満" + esc(val(ageEl)) + "歳になる日): " + esc(jp(r.attainmentDate)) + "</p>" +
+      "<p>65歳到達日: " + esc(jp(r.age65Date)) + "</p>" +
+      "<p>再雇用期間: " + esc(r.reemploymentDays.toLocaleString("ja-JP")) + "日(約" + esc(r.reemploymentMonths) + "か月)</p>" +
+      "<p>" + (r.needsMeasureTo65
+        ? "定年が65歳未満のため、会社には第9条の高年齢者雇用確保措置(65歳までの雇用確保)が義務づけられます。"
+        : r.effortTo70
+          ? "定年が65歳以上70歳未満のため、会社には第10条の2の高年齢者就業確保措置(70歳まで)が努力義務として求められます。"
+          : "定年が70歳以上のため、第9条・第10条の2いずれの措置の対象にもなりません。") + "</p>";
+    advBox.hidden = false;
+  }
+
+  [byEl, bmEl, bdEl, ageEl, ruleEl].forEach(function (el) { el.addEventListener("change", run); });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
+})();
+</script>
+</body>
+</html>

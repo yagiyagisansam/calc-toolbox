@@ -1,0 +1,251 @@
+{
+  "tool": "tairyoku",
+  "module": "calc.js",
+  "global": "TairyokuCalc",
+  "cases": [
+    {
+      "name": "年齢区分: 6歳・11歳は6〜11歳区分、12歳は12〜19歳区分",
+      "func": "groupForAge",
+      "args": [11],
+      "expect": { "ok": true, "group": "6-11" }
+    },
+    {
+      "name": "年齢区分: 20歳から20〜64歳区分になる",
+      "func": "groupForAge",
+      "args": [20],
+      "expect": { "ok": true, "group": "20-64" }
+    },
+    {
+      "name": "異常系: 65歳は対応範囲外(65〜79歳の要項は未対応)",
+      "func": "groupForAge",
+      "args": [65],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "異常系: 5歳は対応範囲外",
+      "func": "groupForAge",
+      "args": [5],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "境界値: 20〜64歳男子の握力62kg以上は10点、61kgは9点",
+      "func": "scoreEvent",
+      "args": ["20-64", "male", "grip", 62],
+      "expect": { "ok": true, "score": 10 }
+    },
+    {
+      "name": "境界値: 20〜64歳男子の握力61kgは9点(58〜61の区分)",
+      "func": "scoreEvent",
+      "args": ["20-64", "male", "grip", 61],
+      "expect": { "ok": true, "score": 9 }
+    },
+    {
+      "name": "境界値: 20〜64歳男子の握力31kg以下は最低の1点",
+      "func": "scoreEvent",
+      "args": ["20-64", "male", "grip", 31],
+      "expect": { "ok": true, "score": 1 }
+    },
+    {
+      "name": "時間種目(小さいほどよい): 男子の急歩8分47秒(527秒)以下は10点",
+      "func": "scoreEvent",
+      "args": ["20-64", "male", "walk", 527],
+      "expect": { "ok": true, "score": 10 }
+    },
+    {
+      "name": "時間種目: 男子の急歩528秒は9点、15分28秒(928秒)以上は1点",
+      "func": "scoreEvent",
+      "args": ["20-64", "male", "walk", 928],
+      "expect": { "ok": true, "score": 1 }
+    },
+    {
+      "name": "境界値: 20〜64歳女子の上体起こし0回は1点、1回は2点",
+      "func": "scoreEvent",
+      "args": ["20-64", "female", "situp", 1],
+      "expect": { "ok": true, "score": 2 }
+    },
+    {
+      "name": "境界値: 20〜64歳女子の上体起こし0回は1点",
+      "func": "scoreEvent",
+      "args": ["20-64", "female", "situp", 0],
+      "expect": { "ok": true, "score": 1 }
+    },
+    {
+      "name": "境界値: 12〜19歳男子の50m走6.6秒以下は10点、6.7秒は9点",
+      "func": "scoreEvent",
+      "args": ["12-19", "male", "run50", 6.7],
+      "expect": { "ok": true, "score": 9 }
+    },
+    {
+      "name": "境界値: 6〜11歳女子のソフトボール投げ5mは3点、4mは2点",
+      "func": "scoreEvent",
+      "args": ["6-11", "female", "ballthrow", 5],
+      "expect": { "ok": true, "score": 3 }
+    },
+    {
+      "name": "境界値: 12〜19歳女子のハンドボール投げ11mは4点、10mは3点",
+      "func": "scoreEvent",
+      "args": ["12-19", "female", "handball", 10],
+      "expect": { "ok": true, "score": 3 }
+    },
+    {
+      "name": "異常系: 記録が負の値はエラー",
+      "func": "scoreEvent",
+      "args": ["20-64", "male", "grip", -1],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常系: 記録が数値でないときはエラー",
+      "func": "scoreEvent",
+      "args": ["20-64", "male", "grip", "abc"],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常系: 知らない種目名はエラー",
+      "func": "scoreEvent",
+      "args": ["20-64", "male", "xx", 10],
+      "expect": { "ok": false, "code": "invalid_event" }
+    },
+    {
+      "name": "異常系: 知らない年齢区分はエラー",
+      "func": "scoreEvent",
+      "args": ["xx", "male", "grip", 10],
+      "expect": { "ok": false, "code": "invalid_group" }
+    },
+    {
+      "name": "異常系: 知らない性別はエラー",
+      "func": "scoreEvent",
+      "args": ["20-64", "x", "grip", 50],
+      "expect": { "ok": false, "code": "invalid_gender" }
+    },
+    {
+      "name": "総合評価: 25歳は49点でA、48点でB",
+      "func": "rankOf",
+      "args": ["20-64", 25, 49],
+      "expect": { "ok": true, "rank": "A" }
+    },
+    {
+      "name": "総合評価: 25歳48点はB",
+      "func": "rankOf",
+      "args": ["20-64", 25, 48],
+      "expect": { "ok": true, "rank": "B" }
+    },
+    {
+      "name": "総合評価: 64歳は15点でD、14点以下でE",
+      "func": "rankOf",
+      "args": ["20-64", 64, 14],
+      "expect": { "ok": true, "rank": "E" }
+    },
+    {
+      "name": "総合評価: 12歳は51点以上でA、21点以下でE",
+      "func": "rankOf",
+      "args": ["12-19", 12, 51],
+      "expect": { "ok": true, "rank": "A" }
+    },
+    {
+      "name": "総合評価: 6歳は39点以上でA",
+      "func": "rankOf",
+      "args": ["6-11", 6, 39],
+      "expect": { "ok": true, "rank": "A" }
+    },
+    {
+      "name": "総合評価: 11歳45点はE(46点以上がD)",
+      "func": "rankOf",
+      "args": ["6-11", 11, 45],
+      "expect": { "ok": true, "rank": "E" }
+    },
+    {
+      "name": "異常系: 総合評価で年齢が区分の範囲外はエラー",
+      "func": "rankOf",
+      "args": ["6-11", 12, 40],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "体力年齢: 46点以上は20〜24歳",
+      "func": "fitnessAge",
+      "args": [46],
+      "expect": { "ok": true, "minAge": 20, "maxAge": 24 }
+    },
+    {
+      "name": "体力年齢: 45点は25〜29歳(境界の1点下)",
+      "func": "fitnessAge",
+      "args": [45],
+      "expect": { "ok": true, "minAge": 25, "maxAge": 29 }
+    },
+    {
+      "name": "体力年齢: 19点以下は75〜79歳",
+      "func": "fitnessAge",
+      "args": [19],
+      "expect": { "ok": true, "minAge": 75, "maxAge": 79 }
+    },
+    {
+      "name": "異常系: 体力年齢で合計点が上限(60)超はエラー",
+      "func": "fitnessAge",
+      "args": [61],
+      "expect": { "ok": false, "code": "invalid_total" }
+    },
+    {
+      "name": "総合: 40歳男子6種目すべて中位なら合計34点・評価C・体力年齢45〜49歳",
+      "func": "evaluate",
+      "args": [40, "male", { "grip": 45, "situp": 20, "sitreach": 45, "sidestep": 46, "walk": 700, "standjump": 215 }],
+      "expect": {
+        "ok": true,
+        "group": "20-64",
+        "total": 34,
+        "maxTotal": 60,
+        "complete": true,
+        "rank": "C",
+        "usedEndurance": "walk",
+        "fitnessAgeMin": 45,
+        "fitnessAgeMax": 49
+      }
+    },
+    {
+      "name": "総合: 急歩の代わりに20mシャトルランを入れても計算できる",
+      "func": "evaluate",
+      "args": [40, "male", { "grip": 45, "situp": 20, "sitreach": 45, "sidestep": 46, "shuttle": 50, "standjump": 215 }],
+      "expect": { "ok": true, "total": 34, "usedEndurance": "shuttle", "rank": "C" }
+    },
+    {
+      "name": "総合: 種目が足りないときは合計だけ出し、評価は保留になる",
+      "func": "evaluate",
+      "args": [40, "male", { "grip": 45, "situp": 20 }],
+      "expect": { "ok": true, "total": 10, "complete": false, "rank": null, "fitnessAgeMin": null }
+    },
+    {
+      "name": "総合: 10歳女子8種目すべて6点なら合計48点・評価D(体力年齢は判定なし)",
+      "func": "evaluate",
+      "args": [10, "female", { "grip": 13, "situp": 14, "sitreach": 33, "sidestep": 32, "shuttle": 26, "run50": 9.7, "standjump": 134, "ballthrow": 11 }],
+      "expect": { "ok": true, "group": "6-11", "total": 48, "maxTotal": 80, "rank": "D", "fitnessAgeMin": null }
+    },
+    {
+      "name": "総合: 15歳男子8種目すべて6点なら合計48点・評価C",
+      "func": "evaluate",
+      "args": [15, "male", { "grip": 38, "situp": 25, "sitreach": 44, "sidestep": 49, "endurance": 382, "run50": 7.5, "standjump": 218, "handball": 25 }],
+      "expect": { "ok": true, "group": "12-19", "total": 48, "maxTotal": 80, "rank": "C", "usedEndurance": "endurance" }
+    },
+    {
+      "name": "異常系: 総合計算で年齢が範囲外はエラー",
+      "func": "evaluate",
+      "args": [5, "male", {}],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "異常系: 総合計算で性別が不正はエラー",
+      "func": "evaluate",
+      "args": [40, "x", {}],
+      "expect": { "ok": false, "code": "invalid_gender" }
+    },
+    {
+      "name": "異常系: 総合計算で記録がオブジェクトでないときはエラー",
+      "func": "evaluate",
+      "args": [40, "male", null],
+      "expect": { "ok": false, "code": "invalid_records" }
+    },
+    {
+      "name": "異常系: 引数なしはエラー",
+      "func": "evaluate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_age" }
+    }
+  ]
+}

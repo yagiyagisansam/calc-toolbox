@@ -1,0 +1,145 @@
+{
+  "tool": "petfood",
+  "module": "calc.js",
+  "global": "PetFoodCalc",
+  "cases": [
+    {
+      "name": "出典の計算例: 3kgの子犬(係数3)・400kcal/100g・1日2回 → DER479kcal・1日120g・1回60g",
+      "func": "calculate",
+      "args": [3, 3, 400, 2],
+      "expect": { "ok": true, "derKcal": 479, "gramsPerDay": 120, "gramsPerMeal": 60 }
+    },
+    {
+      "name": "RER: 体重1kgは70×1=70kcal",
+      "func": "rer",
+      "args": [1],
+      "expect": { "ok": true, "rerKcal": 70 }
+    },
+    {
+      "name": "RER: 体重16kgは16の0.75乗=8なので70×8=560kcal",
+      "func": "rer",
+      "args": [16],
+      "expect": { "ok": true, "rerKcal": 560 }
+    },
+    {
+      "name": "RER: 体重3kgは約159.57kcal(出典の電卓手順では159.56)",
+      "func": "rer",
+      "args": [3],
+      "expect": { "ok": true, "rerKcal": 159.57 }
+    },
+    {
+      "name": "去勢済み成犬5kg(係数1.6)・350kcal/100g・1日2回 → DER374kcal・1日107g",
+      "func": "calculate",
+      "args": [5, 1.6, 350, 2],
+      "expect": { "ok": true, "rerKcal": 234.06, "derKcal": 374, "gramsPerDay": 107, "gramsPerMeal": 53.5 }
+    },
+    {
+      "name": "避妊済み成猫4kg(係数1.2)・400kcal/100g・1日2回 → DER238kcal・1日60g",
+      "func": "calculate",
+      "args": [4, 1.2, 400, 2],
+      "expect": { "ok": true, "rerKcal": 197.99, "derKcal": 238, "gramsPerDay": 60, "gramsPerMeal": 30 }
+    },
+    {
+      "name": "給餌回数を省略すると1日1回分=1日量と同じ",
+      "func": "calculate",
+      "args": [5, 1.6, 350],
+      "expect": { "ok": true, "gramsPerDay": 107, "gramsPerMeal": 107 }
+    },
+    {
+      "name": "活動係数: 避妊・去勢している成犬は1.6",
+      "func": "factorFor",
+      "args": ["dog", "adult_neutered"],
+      "expect": { "ok": true, "min": 1.6, "max": 1.6, "mid": 1.6 }
+    },
+    {
+      "name": "活動係数: 避妊・去勢していない成犬は1.8",
+      "func": "factorFor",
+      "args": ["dog", "adult_intact"],
+      "expect": { "ok": true, "min": 1.8, "max": 1.8 }
+    },
+    {
+      "name": "活動係数: 減量が必要な猫は0.8(犬の1.0と異なる)",
+      "func": "factorFor",
+      "args": ["cat", "weight_loss"],
+      "expect": { "ok": true, "min": 0.8, "max": 0.8 }
+    },
+    {
+      "name": "活動係数: 幅がある区分(犬の産後授乳期4.0〜8.0)は中央値6.0も返す",
+      "func": "factorFor",
+      "args": ["dog", "lactation"],
+      "expect": { "ok": true, "min": 4, "max": 8, "mid": 6 }
+    },
+    {
+      "name": "活動係数: 体重増加が見込まれる犬は1.2〜1.4(中央値1.3)",
+      "func": "factorFor",
+      "args": ["dog", "weight_gain"],
+      "expect": { "ok": true, "min": 1.2, "max": 1.4, "mid": 1.3 }
+    },
+    {
+      "name": "活動係数: 犬猫以外の種別はエラー",
+      "func": "factorFor",
+      "args": ["bird", "adult_neutered"],
+      "expect": { "ok": false, "code": "invalid_species" }
+    },
+    {
+      "name": "活動係数: 表にない区分はエラー",
+      "func": "factorFor",
+      "args": ["dog", "unknown_stage"],
+      "expect": { "ok": false, "code": "invalid_factor_key" }
+    },
+    {
+      "name": "活動係数: プロトタイプのプロパティ名を渡してもエラーになる",
+      "func": "factorFor",
+      "args": ["dog", "toString"],
+      "expect": { "ok": false, "code": "invalid_factor_key" }
+    },
+    {
+      "name": "異常入力: 体重0kgはエラー",
+      "func": "calculate",
+      "args": [0, 1.6, 350],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 体重が負の値はエラー",
+      "func": "calculate",
+      "args": [-1, 1.6, 350],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 体重が上限200kgを超えるとエラー",
+      "func": "calculate",
+      "args": [201, 1.6, 350],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 体重が数値でないときはエラー",
+      "func": "calculate",
+      "args": ["abc", 1.6, 350],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 活動係数0はエラー",
+      "func": "calculate",
+      "args": [5, 0, 350],
+      "expect": { "ok": false, "code": "invalid_factor" }
+    },
+    {
+      "name": "異常入力: フードのカロリー0kcalはエラー(0除算にしない)",
+      "func": "calculate",
+      "args": [5, 1.6, 0],
+      "expect": { "ok": false, "code": "invalid_kcal" }
+    },
+    {
+      "name": "異常入力: 給餌回数0回はエラー",
+      "func": "calculate",
+      "args": [5, 1.6, 350, 0],
+      "expect": { "ok": false, "code": "invalid_meals" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    }
+  ]
+}

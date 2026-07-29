@@ -1,0 +1,157 @@
+{
+  "tool": "onkai",
+  "module": "calc.js",
+  "global": "OnkaiCalc",
+  "cases": [
+    {
+      "name": "基準ピッチそのもの: A4は440Hz(MIDIノート番号69)",
+      "func": "noteToFreq",
+      "args": ["A4", 440],
+      "expect": { "ok": true, "freq": 440, "midi": 69, "name": "A4", "octave": 4 }
+    },
+    {
+      "name": "1オクターブ上は2倍: A5は880Hz",
+      "func": "noteToFreq",
+      "args": ["A5", 440],
+      "expect": { "ok": true, "freq": 880, "midi": 81 }
+    },
+    {
+      "name": "1オクターブ下は1/2: A3は220Hz",
+      "func": "noteToFreq",
+      "args": ["A3", 440],
+      "expect": { "ok": true, "freq": 220, "midi": 57 }
+    },
+    {
+      "name": "中央ハ C4 は261.63Hz(MIDIノート番号60)",
+      "func": "noteToFreq",
+      "args": ["C4", 440],
+      "expect": { "ok": true, "freq": 261.63, "midi": 60, "nameJa": "ハ" }
+    },
+    {
+      "name": "半音上の C#4 は277.18Hz。フラット表記 Db4 も同じ音",
+      "func": "noteToFreq",
+      "args": ["Db4", 440],
+      "expect": { "ok": true, "freq": 277.18, "midi": 61, "name": "C#4", "nameFlat": "Db4" }
+    },
+    {
+      "name": "基準ピッチ442Hzに合わせるとA4は442Hz、C4は262.81Hzになる",
+      "func": "noteToFreq",
+      "args": ["C4", 442],
+      "expect": { "ok": true, "freq": 262.81, "midi": 60 }
+    },
+    {
+      "name": "基準ピッチを省略すると440Hzが使われる",
+      "func": "noteToFreq",
+      "args": ["A4"],
+      "expect": { "ok": true, "freq": 440 }
+    },
+    {
+      "name": "小さい文字や♯♭記号でも読み取れる(a4 と A♭4)",
+      "func": "noteToFreq",
+      "args": ["A♭4", 440],
+      "expect": { "ok": true, "freq": 415.3, "midi": 68, "name": "G#4" }
+    },
+    {
+      "name": "境界値: MIDIノート番号0(C-1)は8.18Hz",
+      "func": "noteToFreq",
+      "args": ["C-1", 440],
+      "expect": { "ok": true, "midi": 0, "freq": 8.18 }
+    },
+    {
+      "name": "境界値: MIDIノート番号127(G9)は12543.85Hz",
+      "func": "midiToFreq",
+      "args": [127, 440],
+      "expect": { "ok": true, "name": "G9", "freq": 12543.85 }
+    },
+    {
+      "name": "周波数から音名: 440Hzちょうどは A4 でずれ0セント",
+      "func": "freqToNote",
+      "args": [440, 440],
+      "expect": { "ok": true, "name": "A4", "midi": 69, "cents": 0 }
+    },
+    {
+      "name": "周波数から音名: 445Hzは A4 より19.6セント高い",
+      "func": "freqToNote",
+      "args": [445, 440],
+      "expect": { "ok": true, "name": "A4", "cents": 19.6, "exactFreq": 440 }
+    },
+    {
+      "name": "セント差: 1オクターブ(440Hz→880Hz)は1200セント",
+      "func": "cents",
+      "args": [440, 880],
+      "expect": { "ok": true, "cents": 1200, "ratio": 2 }
+    },
+    {
+      "name": "セント差: 同じ周波数どうしは0セント",
+      "func": "cents",
+      "args": [440, 440],
+      "expect": { "ok": true, "cents": 0, "ratio": 1 }
+    },
+    {
+      "name": "セント補正: 440Hzを+100セント(半音)動かすと466.16Hz",
+      "func": "shiftCents",
+      "args": [440, 100],
+      "expect": { "ok": true, "freq": 466.16 }
+    },
+    {
+      "name": "セント補正: 440Hzを−1200セント動かすと220Hz",
+      "func": "shiftCents",
+      "args": [440, -1200],
+      "expect": { "ok": true, "freq": 220 }
+    },
+    {
+      "name": "異常入力: 存在しない音名(H4)はエラー",
+      "func": "noteToFreq",
+      "args": ["H4", 440],
+      "expect": { "ok": false, "code": "invalid_note" }
+    },
+    {
+      "name": "異常入力: オクターブ番号がない音名(A)はエラー",
+      "func": "noteToFreq",
+      "args": ["A", 440],
+      "expect": { "ok": false, "code": "invalid_note" }
+    },
+    {
+      "name": "異常入力: 空文字はエラー",
+      "func": "noteToFreq",
+      "args": ["", 440],
+      "expect": { "ok": false, "code": "invalid_note" }
+    },
+    {
+      "name": "異常入力: MIDIノート番号の範囲を超える音名(C10)はエラー",
+      "func": "noteToFreq",
+      "args": ["C10", 440],
+      "expect": { "ok": false, "code": "note_out_of_range" }
+    },
+    {
+      "name": "異常入力: 基準ピッチが範囲外(300Hz)はエラー",
+      "func": "noteToFreq",
+      "args": ["A4", 300],
+      "expect": { "ok": false, "code": "invalid_ref_pitch" }
+    },
+    {
+      "name": "異常入力: 周波数0Hzはエラー",
+      "func": "freqToNote",
+      "args": [0, 440],
+      "expect": { "ok": false, "code": "invalid_freq" }
+    },
+    {
+      "name": "異常入力: セント差で0を指定するとエラー(0で割らない)",
+      "func": "cents",
+      "args": [0, 440],
+      "expect": { "ok": false, "code": "invalid_freq" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "noteToFreq",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_note" }
+    },
+    {
+      "name": "異常入力: MIDIノート番号が範囲外(200)はエラー",
+      "func": "midiToFreq",
+      "args": [200, 440],
+      "expect": { "ok": false, "code": "invalid_midi" }
+    }
+  ]
+}

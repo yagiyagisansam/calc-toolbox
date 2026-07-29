@@ -1,0 +1,139 @@
+{
+  "tool": "mets",
+  "module": "calc.js",
+  "global": "MetsCalc",
+  "cases": [
+    {
+      "name": "歩行3メッツ60分・体重60kgは3メッツ・時/189kcal",
+      "func": "calculate",
+      "args": [3, 60, 60],
+      "expect": { "ok": true, "hours": 1, "exerciseMetsHour": 3, "kcal": 189, "netKcal": 126 }
+    },
+    {
+      "name": "4メッツ30分・体重70kgは2メッツ・時/147kcal",
+      "func": "calculate",
+      "args": [4, 30, 70],
+      "expect": { "ok": true, "exerciseMetsHour": 2, "kcal": 147, "netKcal": 110.3 }
+    },
+    {
+      "name": "8メッツ45分・体重55kgは6メッツ・時/346.5kcal",
+      "func": "calculate",
+      "args": [8, 45, 55],
+      "expect": { "ok": true, "exerciseMetsHour": 6, "kcal": 346.5, "netKcal": 303.2 }
+    },
+    {
+      "name": "安静座位1メッツは正味の消費が0kcal",
+      "func": "calculate",
+      "args": [1, 60, 60],
+      "expect": { "ok": true, "exerciseMetsHour": 1, "kcal": 63, "netKcal": 0 }
+    },
+    {
+      "name": "境界値: 下限0.5メッツでも計算でき、正味は0kcal",
+      "func": "calculate",
+      "args": [0.5, 60, 60],
+      "expect": { "ok": true, "exerciseMetsHour": 0.5, "kcal": 31.5, "netKcal": 0 }
+    },
+    {
+      "name": "境界値: 上限30メッツ60分・体重60kgは1890kcal",
+      "func": "calculate",
+      "args": [30, 60, 60],
+      "expect": { "ok": true, "exerciseMetsHour": 30, "kcal": 1890, "netKcal": 1827 }
+    },
+    {
+      "name": "境界値: 週23メッツ・時ちょうどで推奨値を満たす",
+      "func": "weekly",
+      "args": [23, 60, 1],
+      "expect": { "ok": true, "weeklyMetsHour": 23, "countsForGuideline": true, "meetsGuideline": true, "shortfallMetsHour": 0 }
+    },
+    {
+      "name": "境界値直下: 週22メッツ・時は1メッツ・時不足",
+      "func": "weekly",
+      "args": [22, 60, 1],
+      "expect": { "ok": true, "weeklyMetsHour": 22, "meetsGuideline": false, "shortfallMetsHour": 1 }
+    },
+    {
+      "name": "歩行3メッツ60分を週7回は21メッツ・時で2メッツ・時不足",
+      "func": "weekly",
+      "args": [3, 60, 7],
+      "expect": { "ok": true, "weeklyMetsHour": 21, "meetsGuideline": false, "shortfallMetsHour": 2 }
+    },
+    {
+      "name": "境界値: 3メッツ未満は週23メッツ・時の対象外",
+      "func": "weekly",
+      "args": [2.5, 60, 10],
+      "expect": { "ok": true, "weeklyMetsHour": 25, "countsForGuideline": false, "meetsGuideline": false, "shortfallMetsHour": 23 }
+    },
+    {
+      "name": "境界値: 3メッツちょうどは対象になる",
+      "func": "weekly",
+      "args": [3, 60, 8],
+      "expect": { "ok": true, "weeklyMetsHour": 24, "countsForGuideline": true, "meetsGuideline": true }
+    },
+    {
+      "name": "まとめ: 4メッツ30分を週5回・体重70kgは週10メッツ・時/735kcal",
+      "func": "summary",
+      "args": [4, 30, 70, 5],
+      "expect": { "ok": true, "per": { "kcal": 147 }, "week": { "weeklyMetsHour": 10, "meetsGuideline": false }, "weeklyKcal": 735 }
+    },
+    {
+      "name": "異常入力: メッツ0はエラー",
+      "func": "calculate",
+      "args": [0, 60, 60],
+      "expect": { "ok": false, "code": "invalid_mets" }
+    },
+    {
+      "name": "異常入力: メッツ31は範囲外",
+      "func": "calculate",
+      "args": [31, 60, 60],
+      "expect": { "ok": false, "code": "invalid_mets" }
+    },
+    {
+      "name": "異常入力: 運動時間0分はエラー",
+      "func": "calculate",
+      "args": [3, 0, 60],
+      "expect": { "ok": false, "code": "invalid_minutes" }
+    },
+    {
+      "name": "異常入力: 運動時間が1日超はエラー",
+      "func": "calculate",
+      "args": [3, 1441, 60],
+      "expect": { "ok": false, "code": "invalid_minutes" }
+    },
+    {
+      "name": "異常入力: 体重0kgはエラー",
+      "func": "calculate",
+      "args": [3, 60, 0],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 体重が負の値はエラー",
+      "func": "calculate",
+      "args": [3, 60, -70],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 体重400kgは範囲外",
+      "func": "calculate",
+      "args": [3, 60, 400],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 数値でないメッツはエラー",
+      "func": "calculate",
+      "args": ["abc", 60, 60],
+      "expect": { "ok": false, "code": "invalid_mets" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_mets" }
+    },
+    {
+      "name": "異常入力: 週の回数0はエラー",
+      "func": "weekly",
+      "args": [3, 60, 0],
+      "expect": { "ok": false, "code": "invalid_times" }
+    }
+  ]
+}

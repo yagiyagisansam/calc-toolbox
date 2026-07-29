@@ -1,0 +1,127 @@
+{
+  "tool": "koteishisan",
+  "module": "calc.js",
+  "global": "KoteishisanCalc",
+  "cases": [
+    {
+      "name": "土地1,200万円/150m2・家屋800万円・都計あり: 固定14万円+都計3.6万円=17.6万円",
+      "func": "calculate",
+      "args": [12000000, 8000000, 150, true],
+      "expect": { "ok": true, "landBaseYen": 2000000, "cityLandBaseYen": 4000000, "fixedTaxYen": 140000, "cityTaxYen": 36000, "totalYen": 176000 }
+    },
+    {
+      "name": "土地2,000万円/300m2は200m2まで1/6・超過分1/3: 固定202,200円+都計56,600円",
+      "func": "calculate",
+      "args": [20000000, 10000000, 300, true],
+      "expect": { "ok": true, "landBaseYen": 4444000, "cityLandBaseYen": 8888000, "fixedTaxYen": 202200, "cityTaxYen": 56600, "totalYen": 258800 }
+    },
+    {
+      "name": "都市計画税がない区域なら固定資産税だけ",
+      "func": "calculate",
+      "args": [12000000, 8000000, 150, false],
+      "expect": { "ok": true, "fixedTaxYen": 140000, "cityTaxYen": 0, "totalYen": 140000 }
+    },
+    {
+      "name": "境界値: 土地面積200m2ちょうどは全部が小規模住宅用地(1/6)",
+      "func": "calculate",
+      "args": [12000000, 0, 200, false],
+      "expect": { "ok": true, "landBaseYen": 2000000, "fixedTaxYen": 28000 }
+    },
+    {
+      "name": "境界値: 評価額0円・面積0m2でも壊れず税額0円",
+      "func": "calculate",
+      "args": [0, 0, 0, false],
+      "expect": { "ok": true, "fixedTaxYen": 0, "cityTaxYen": 0, "totalYen": 0 }
+    },
+    {
+      "name": "免税点: 土地の課税標準16.6万円・家屋10万円はどちらも課税されない",
+      "func": "calculate",
+      "args": [1000000, 100000, 100, false],
+      "expect": { "ok": true, "landExempt": true, "buildingExempt": true, "totalYen": 0 }
+    },
+    {
+      "name": "住宅用地の特例を外すと評価額そのものが課税標準(1,200万円×1.4%=16.8万円)",
+      "func": "calculateDetailed",
+      "args": [12000000, 0, 150, false, 1, 1.4, 0.3, false, false],
+      "expect": { "ok": true, "landBaseYen": 12000000, "fixedTaxYen": 168000 }
+    },
+    {
+      "name": "新築住宅の減額(家屋の固定資産税が2分の1): 固定84,000円",
+      "func": "calculateDetailed",
+      "args": [12000000, 8000000, 150, true, 1, 1.4, 0.3, true, true],
+      "expect": { "ok": true, "fixedTaxYen": 84000, "cityTaxYen": 36000, "totalYen": 120000 }
+    },
+    {
+      "name": "2戸のアパートは小規模住宅用地の枠が400m2になり300m2すべてが1/6",
+      "func": "calculateDetailed",
+      "args": [20000000, 10000000, 300, false, 2],
+      "expect": { "ok": true, "landBaseYen": 3333000, "fixedTaxYen": 186600 }
+    },
+    {
+      "name": "税率を条例の1.5%にした場合",
+      "func": "calculateDetailed",
+      "args": [12000000, 8000000, 150, false, 1, 1.5, 0.3, true, false],
+      "expect": { "ok": true, "fixedTaxYen": 150000 }
+    },
+    {
+      "name": "異常入力: 土地の評価額が負の値はエラー",
+      "func": "calculate",
+      "args": [-1, 0, 0, false],
+      "expect": { "ok": false, "code": "invalid_land_value" }
+    },
+    {
+      "name": "異常入力: 土地の評価額が数値でないときはエラー",
+      "func": "calculate",
+      "args": ["abc", 0, 0, false],
+      "expect": { "ok": false, "code": "invalid_land_value" }
+    },
+    {
+      "name": "異常入力: 家屋の評価額が負の値はエラー",
+      "func": "calculate",
+      "args": [0, -1, 0, false],
+      "expect": { "ok": false, "code": "invalid_building_value" }
+    },
+    {
+      "name": "異常入力: 土地面積が負の値はエラー",
+      "func": "calculate",
+      "args": [0, 0, -1, false],
+      "expect": { "ok": false, "code": "invalid_area" }
+    },
+    {
+      "name": "異常入力: 土地面積が上限100万m2を超えるとエラー",
+      "func": "calculate",
+      "args": [0, 0, 1000001, false],
+      "expect": { "ok": false, "code": "invalid_area" }
+    },
+    {
+      "name": "異常入力: 住戸数0はエラー",
+      "func": "calculateDetailed",
+      "args": [0, 0, 0, false, 0],
+      "expect": { "ok": false, "code": "invalid_units" }
+    },
+    {
+      "name": "異常入力: 固定資産税の税率が99%はエラー",
+      "func": "calculateDetailed",
+      "args": [0, 0, 0, false, 1, 99],
+      "expect": { "ok": false, "code": "invalid_fixed_rate" }
+    },
+    {
+      "name": "異常入力: 都市計画税の税率が制限税率0.3%を超えるとエラー",
+      "func": "calculateDetailed",
+      "args": [0, 0, 0, false, 1, 1.4, 0.5],
+      "expect": { "ok": false, "code": "invalid_city_rate" }
+    },
+    {
+      "name": "境界値: 都市計画税の税率0.3%ちょうどは受け付ける",
+      "func": "calculateDetailed",
+      "args": [12000000, 8000000, 150, true, 1, 1.4, 0.3],
+      "expect": { "ok": true, "cityTaxYen": 36000 }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_land_value" }
+    }
+  ]
+}

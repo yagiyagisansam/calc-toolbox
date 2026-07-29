@@ -1,0 +1,151 @@
+{
+  "tool": "himando",
+  "module": "calc.js",
+  "global": "HimandoCalc",
+  "cases": [
+    {
+      "name": "文科省の参考値と一致: 男子17歳・170.6cmの標準体重は61.0kg",
+      "func": "standardWeight",
+      "args": ["male", 17, 170.6],
+      "expect": { "ok": true, "standardWeightKg": 61 }
+    },
+    {
+      "name": "文科省の参考値と一致: 女子17歳・157.9cmの標準体重は52.1kg",
+      "func": "standardWeight",
+      "args": ["female", 17, 157.9],
+      "expect": { "ok": true, "standardWeightKg": 52.1 }
+    },
+    {
+      "name": "文科省の参考値と一致: 男子5歳・110.4cmの標準体重は18.9kg",
+      "func": "standardWeight",
+      "args": ["male", 5, 110.4],
+      "expect": { "ok": true, "standardWeightKg": 18.9, "a": 0.386, "b": 23.699 }
+    },
+    {
+      "name": "文科省の参考値と一致: 女子11歳・147.4cmの標準体重は39.5kg",
+      "func": "standardWeight",
+      "args": ["female", 11, 147.4],
+      "expect": { "ok": true, "standardWeightKg": 39.5, "a": 0.803, "b": 78.846 }
+    },
+    {
+      "name": "文科省の参考値と一致: 男子12歳・153.8cmの標準体重は44.8kg",
+      "func": "standardWeight",
+      "args": ["male", 12, 153.8],
+      "expect": { "ok": true, "standardWeightKg": 44.8 }
+    },
+    {
+      "name": "標準体重ちょうどなら肥満度0%で標準(男子12歳154cm・44.94kg)",
+      "func": "calculate",
+      "args": ["male", 12, 154, 44.94],
+      "expect": { "ok": true, "standardWeightKg": 44.9, "degreePercent": 0, "category": "標準" }
+    },
+    {
+      "name": "境界: 肥満度+20.0%ちょうどは肥満傾向(男子12歳154cm・53.93kg)",
+      "func": "calculate",
+      "args": ["male", 12, 154, 53.93],
+      "expect": { "ok": true, "degreePercent": 20, "category": "肥満傾向" }
+    },
+    {
+      "name": "境界の直前: 肥満度+19.9%は標準(男子12歳154cm・53.9kg)",
+      "func": "calculate",
+      "args": ["male", 12, 154, 53.9],
+      "expect": { "ok": true, "degreePercent": 19.9, "category": "標準" }
+    },
+    {
+      "name": "境界: 肥満度−20.0%ちょうどは痩身傾向(男子12歳154cm・35.95kg)",
+      "func": "calculate",
+      "args": ["male", 12, 154, 35.95],
+      "expect": { "ok": true, "degreePercent": -20, "category": "痩身傾向" }
+    },
+    {
+      "name": "境界の直前: 肥満度−19.9%は標準(男子12歳154cm・36.0kg)",
+      "func": "calculate",
+      "args": ["male", 12, 154, 36],
+      "expect": { "ok": true, "degreePercent": -19.9, "category": "標準" }
+    },
+    {
+      "name": "女子は男子と係数が違う(女子12歳154cm→標準45.7kg、50kgで肥満度9.5%)",
+      "func": "calculate",
+      "args": ["female", 12, 154, 50],
+      "expect": { "ok": true, "standardWeightKg": 45.7, "degreePercent": 9.5, "category": "標準" }
+    },
+    {
+      "name": "肥満傾向・痩身傾向の境界体重(男子12歳154cm)は53.93kg以上と35.95kg以下",
+      "func": "thresholds",
+      "args": ["male", 12, 154],
+      "expect": { "ok": true, "standardWeightKg": 44.9, "obeseFromKg": 53.93, "thinUpToKg": 35.95 }
+    },
+    {
+      "name": "境界: 5歳は計算できる(下限)",
+      "func": "standardWeight",
+      "args": ["male", 5, 110],
+      "expect": { "ok": true, "standardWeightKg": 18.8 }
+    },
+    {
+      "name": "境界: 17歳は計算できる(上限)",
+      "func": "standardWeight",
+      "args": ["female", 17, 158],
+      "expect": { "ok": true, "standardWeightKg": 52.1 }
+    },
+    {
+      "name": "異常入力: 4歳は範囲外でエラー",
+      "func": "calculate",
+      "args": ["male", 4, 100, 16],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "異常入力: 18歳は範囲外でエラー",
+      "func": "calculate",
+      "args": ["male", 18, 170, 60],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "異常入力: 年齢が整数でない(10.5歳)はエラー",
+      "func": "calculate",
+      "args": ["male", 10.5, 140, 35],
+      "expect": { "ok": false, "code": "invalid_age" }
+    },
+    {
+      "name": "異常入力: 性別の指定が不正はエラー",
+      "func": "calculate",
+      "args": ["x", 12, 154, 45],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    },
+    {
+      "name": "異常入力: 身長が下限(80cm)未満はエラー",
+      "func": "calculate",
+      "args": ["male", 12, 79, 40],
+      "expect": { "ok": false, "code": "invalid_height" }
+    },
+    {
+      "name": "異常入力: 数値でない身長はエラー",
+      "func": "calculate",
+      "args": ["male", 12, "abc", 40],
+      "expect": { "ok": false, "code": "invalid_height" }
+    },
+    {
+      "name": "異常入力: 体重0kgはエラー",
+      "func": "calculate",
+      "args": ["male", 12, 154, 0],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 体重が負の値はエラー",
+      "func": "calculate",
+      "args": ["male", 12, 154, -10],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "適用範囲外: 12歳で身長90cmは標準体重が0以下になり計算できない",
+      "func": "standardWeight",
+      "args": ["male", 12, 90],
+      "expect": { "ok": false, "code": "invalid_result" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    }
+  ]
+}

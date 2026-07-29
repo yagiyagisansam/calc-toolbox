@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>登山の必要水分量計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="体重と行動時間・季節から、登山中の脱水量と持っていくべき水の量を山本正嘉の指針で計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>
+    /* 出典の長いURLが画面からはみ出さないようにする */
+    .sources a { overflow-wrap: anywhere; word-break: break-word; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>登山の必要水分量計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>体重(kg)
+      <span class="field-note">装備を持たない自分の体重です</span>
+      <input type="number" id="weight" inputmode="decimal" step="0.1" min="0" max="200" placeholder="例: 60">
+    </label>
+    <label>行動予定時間(h)
+      <span class="field-note">コースタイムの合計。休憩を含みます</span>
+      <input type="number" id="hours" inputmode="decimal" step="0.5" min="0" max="24" placeholder="例: 6">
+    </label>
+    <label>環境温の目安(係数)
+      <select id="coef">
+        <option value="5" selected>25℃未満のふつうの条件(係数5)</option>
+        <option value="6">25℃以上の夏日(係数6)</option>
+        <option value="7">暑さが強い夏日(係数7)</option>
+        <option value="4">汗をかきにくい・涼しい(係数4)</option>
+      </select>
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 装備重量と距離まで入れる汎用式(b式)</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">装備重量・歩行距離・標高差から計算する</h3>
+      <p class="adv-note">原典のb式です。ザック・衣服・靴の重量と、水平距離・累積の上昇/下降を入れます。</p>
+      <div class="field-row">
+        <label>装備重量(kg)
+          <input type="number" id="gear" inputmode="decimal" step="0.1" min="0" max="200" placeholder="例: 10">
+        </label>
+        <label>水平方向の歩行距離(km)
+          <input type="number" id="horizontal" inputmode="decimal" step="0.1" min="0" max="200" placeholder="例: 8">
+        </label>
+      </div>
+      <div class="field-row">
+        <label>累積の上昇(m)
+          <input type="number" id="ascent" inputmode="numeric" step="10" min="0" max="20000" placeholder="例: 1000">
+        </label>
+        <label>累積の下降(m)
+          <input type="number" id="descent" inputmode="numeric" step="10" min="0" max="20000" placeholder="例: 1000">
+        </label>
+      </div>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    この式が示すのは<strong>登山条件が最もよいときの消費量</strong>です。強風・暑熱・悪路・積雪・藪では消費量が2倍以上になることがあります(原典の注記)。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>体重と行動時間を入れるだけで、<strong>登山中に失う水分の量と、持っていくべき水の量</strong>がわかります。水は1Lで1kg。持ちすぎれば疲れ、足りなければ危険という判断を、根拠のある数字で決められます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>体重(kg)と行動予定時間(h)を入れると、その瞬間に脱水量と補給量が表示されます。</li>
+    <li>夏日(気温25℃以上)に登るときは係数を6か7に変えてください。</li>
+    <li>ザックの重さや標高差まで考えたいときは「＋詳細機能」のb式を使ってください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>a式(簡易式)</strong> 行動中の水分消費量(mL) = 体重(kg) × 行動時間(h) × 5</li>
+    <li><strong>係数「5」</strong> は個人差や季節を考えて増減してよい。環境温が25℃以上(夏日)の場合は6〜7とする</li>
+    <li><strong>b式(汎用式)</strong> 消費量 = (体重 + ザック・衣服・靴などの重量)(kg) × (1.8×行動時間(h) + 0.3×水平方向への歩行距離(km) + 10.0×累積の上昇距離(km) + 0.6×累積の下降距離(km))</li>
+    <li><strong>補給量</strong> = 消費量の7割以上。最低でも1時間ごとに補給する</li>
+    <li>消費量の数値は水分(mL)とエネルギー(kcal)で共通です</li>
+  </ul>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>山本正嘉「登山時のエネルギー・水分補給に関する『現実的』な指針の作成」登山医学 vol.32(1) 36-44, 2012<br>
+      図5「行動中におけるエネルギーと水分補給の指針」の内容を掲載した解説記事:
+      <a href="https://machida77.hatenadiary.jp/entry/20230712/1689118089" rel="noopener" target="_blank">https://machida77.hatenadiary.jp/entry/20230712/1689118089</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>a式は「軽装かつ標準的なペースで、整備された無積雪期の登山道を歩く場合」を想定した簡易式です。</li>
+    <li>補給量は消費量の7割以上が目安です。残りは食事や行動食に含まれる水分でまかなうことになります。</li>
+    <li>行動開始前に250〜500mL程度を飲んでおくとよい、とされています。</li>
+    <li>行動時間が3時間を超える場合は、塩分など電解質の補給も行ってください(食品に含まれていればそれで代用できます)。</li>
+    <li>水場や山小屋で補給できるかどうかで、持っていく量は変わります。計画に合わせて調整してください。</li>
+    <li>体調・持病・服薬がある場合は医師の指示を優先してください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">「脱水量」と「持っていく量」は同じですか?</h3>
+  <p class="faq-a">違います。失った分と同じだけ運ぶのは重くて現実的でないため、原典では消費量の7割以上を補給する指針になっています。このツールは7割を下限、消費量そのものを上限として幅で表示します。</p>
+  <h3 class="faq-q">係数はどう選べばよいですか?</h3>
+  <p class="faq-a">原典では標準を5とし、環境温が25℃以上の夏日には6〜7としています。汗をかきやすい人は多めに、涼しい時期や汗をかきにくい人は少なめに調整してかまいません。</p>
+  <h3 class="faq-q">水は何回に分けて飲めばよいですか?</h3>
+  <p class="faq-a">原典では「最低でも1時間ごとに補給する」とされています。のどが渇く前に、こまめに少しずつ飲むのが基本です。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_weight: "体重は0より大きい数値で入力してください。",
+    invalid_hours: "行動予定時間は0より大きく24以下で入力してください。",
+    invalid_coef: "係数を選び直してください。",
+    invalid_gear: "装備重量は0以上の数値で入力してください。",
+    invalid_distance: "距離は0以上の数値で入力してください。",
+    invalid_intake: "補給量を計算できませんでした。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var weightEl = document.getElementById("weight");
+  var hoursEl = document.getElementById("hours");
+  var coefEl = document.getElementById("coef");
+  var gearEl = document.getElementById("gear");
+  var horizontalEl = document.getElementById("horizontal");
+  var ascentEl = document.getElementById("ascent");
+  var descentEl = document.getElementById("descent");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function ml(n) {
+    return n.toLocaleString("ja-JP") + "mL";
+  }
+
+  function renderPace(r, hours) {
+    var p = NomimizuCalc.pace(r.intakeMinMl, hours);
+    if (!p.ok) return "";
+    return "<p>1時間あたり およそ " + esc(ml(p.perHourMl)) + " のペースで、最低1時間ごとに補給します。" +
+      "行動前に " + esc(p.preHydrationMinMl) + "〜" + esc(p.preHydrationMaxMl) + "mL 飲んでおくとよいとされています。</p>" +
+      (p.needsElectrolyte ? "<p>行動時間が3時間を超えるため、塩分など電解質の補給もしてください。</p>" : "");
+  }
+
+  function run() {
+    if (weightEl.value === "" || hoursEl.value === "") { box.hidden = true; runAdv(); return; }
+    var hours = parseFloat(hoursEl.value);
+    var r = NomimizuCalc.simple(parseFloat(weightEl.value), hours, parseFloat(coefEl.value));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      runAdv();
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">持っていく水 ' + esc(ml(r.intakeMinMl)) + " 〜 " + esc(ml(r.intakeMaxMl)) + "</div>" +
+      "<p>行動中に失う水分(脱水量)は およそ " + esc(ml(r.consumptionMl)) +
+      "、同じ数値がエネルギー消費量(" + esc(r.consumptionKcal.toLocaleString("ja-JP")) + "kcal)にもあたります。</p>" +
+      "<p>水 " + esc(ml(r.intakeMinMl)) + " の重さは およそ " +
+      esc((Math.round(r.intakeMinMl / 10) / 100) + "kg") + " です。</p>" +
+      renderPace(r, hours);
+    box.hidden = false;
+    runAdv();
+  }
+
+  function runAdv() {
+    if (weightEl.value === "" || hoursEl.value === "" || gearEl.value === "" ||
+      horizontalEl.value === "" || ascentEl.value === "" || descentEl.value === "") {
+      advBox.hidden = true;
+      return;
+    }
+    var hours = parseFloat(hoursEl.value);
+    var r = NomimizuCalc.general(
+      parseFloat(weightEl.value),
+      parseFloat(gearEl.value),
+      hours,
+      parseFloat(horizontalEl.value),
+      parseFloat(ascentEl.value) / 1000,
+      parseFloat(descentEl.value) / 1000
+    );
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">持っていく水 ' + esc(ml(r.intakeMinMl)) + " 〜 " + esc(ml(r.intakeMaxMl)) + "</div>" +
+      "<p>体重+装備 " + esc(r.totalWeightKg + "kg") + " × 消費定数 " + esc(r.constant) +
+      " = 消費量 " + esc(ml(r.consumptionMl)) + "(" + esc(r.consumptionKcal.toLocaleString("ja-JP")) + "kcal)</p>" +
+      renderPace(r, hours);
+    advBox.hidden = false;
+  }
+
+  [weightEl, hoursEl, gearEl, horizontalEl, ascentEl, descentEl].forEach(function (el) {
+    el.addEventListener("input", run);
+  });
+  coefEl.addEventListener("change", run);
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

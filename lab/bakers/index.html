@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>ベーカーズパーセント計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="粉量を変えたときの水・塩・砂糖・イースト・油脂の分量を、ベーカーズパーセントから自動計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>
+    /* 出典の長いURLが画面からはみ出さないようにする */
+    .sources a { overflow-wrap: anywhere; word-break: break-word; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>ベーカーズパーセント計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>粉の量(g)
+      <span class="field-note">小麦粉・全粒粉などの合計。これを100%とします</span>
+      <input type="number" id="flour" inputmode="decimal" step="1" min="0" placeholder="例: 250">
+    </label>
+    <div class="field-row">
+      <label>加水率(%)
+        <input type="number" id="water" inputmode="decimal" step="0.1" min="0" max="1000" value="70">
+      </label>
+      <label>塩(%)
+        <input type="number" id="salt" inputmode="decimal" step="0.1" min="0" max="1000" value="2">
+      </label>
+    </div>
+    <div class="field-row">
+      <label>砂糖(%)
+        <input type="number" id="sugar" inputmode="decimal" step="0.1" min="0" max="1000" value="5">
+      </label>
+      <label>イースト(%)
+        <input type="number" id="yeast" inputmode="decimal" step="0.1" min="0" max="1000" value="1">
+      </label>
+    </div>
+    <label>油脂(%)
+      <input type="number" id="fat" inputmode="decimal" step="0.1" min="0" max="1000" value="3">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 粉量の変更・生地量からの逆算・目安の配合</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">粉量を変える</h3>
+      <p class="adv-note">上の分量を、別の粉量に置き換えたときの各材料のグラム数を出します。</p>
+      <label>変更後の粉の量(g)
+        <input type="number" id="new-flour" inputmode="decimal" step="1" min="0" placeholder="例: 300">
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">できあがりの生地量から粉の量を逆算する</h3>
+      <p class="adv-note">「生地500gにしたい」ときに必要な粉の量を、上の配合(%)から求めます。</p>
+      <label>作りたい生地の総量(g)
+        <input type="number" id="total-dough" inputmode="decimal" step="1" min="0" placeholder="例: 500">
+      </label>
+      <div class="tool-result" id="adv-result2" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">目安の配合</h3>
+      <div class="table-scroll">
+        <table class="data-table">
+          <caption>ベーカーズパーセントの目安(富澤商店)</caption>
+          <thead><tr><th>材料</th><th>目安</th><th>用途</th></tr></thead>
+          <tbody>
+            <tr><td>水(加水率)</td><td>65〜70%</td><td>食パン・菓子パン</td></tr>
+            <tr><td>水(加水率)</td><td>70〜80%</td><td>ハード系のパン</td></tr>
+            <tr><td>塩</td><td>1.7%</td><td>菓子パン系</td></tr>
+            <tr><td>塩</td><td>2%</td><td>フランスパンなどリーンな生地</td></tr>
+            <tr><td>砂糖</td><td>0〜15%</td><td>発酵の安定・焼き色</td></tr>
+            <tr><td>バター(油脂)</td><td>0〜15%</td><td>生地の柔らかさ</td></tr>
+            <tr><td>イースト(ドライ)</td><td>1.5〜2%</td><td>菓子パン</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    分量は<strong>0.1g単位</strong>まで表示します。塩とイーストはわずかな差で仕上がりが変わるため、0.1g単位のスケールで量ってください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>粉の量を入れるだけで、<strong>水・塩・砂糖・イースト・油脂のグラム数</strong>が一度に出ます。「レシピの粉250gを300gに増やしたい」ときの計算し直しを、0.1g単位で間違えずにできます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>粉の量(g)を入れると、その瞬間に各材料のグラム数が表示されます。ボタンは不要です。</li>
+    <li>レシピに合わせて加水率や塩の%を書き換えてください。使わない材料は0にします。</li>
+    <li>粉量の変更や、生地量からの逆算をしたいときは「＋詳細機能」を開いてください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>材料の分量(g)</strong> = 粉の分量(g) × 材料のベーカーズ%(÷100)</li>
+    <li><strong>材料のベーカーズ%</strong> = 材料の分量(g) ÷ 粉の分量(g) × 100</li>
+    <li><strong>粉の量の逆算</strong> = 生地の総量(g) ÷ (1 + 各材料の%の合計 ÷ 100)</li>
+    <li>粉を100%とし、粉に対する割合で配合を表すのがベーカーズパーセントです。合計は100%を超えます</li>
+  </ul>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>富澤商店「ベーカーズパーセントとは？パンの基本配合」<br>
+      <a href="https://tomiz.com/column/bakerspercent/" rel="noopener" target="_blank">https://tomiz.com/column/bakerspercent/</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>複数の粉(強力粉+全粒粉など)を使う場合は、その合計を「粉の量」として入れてください。</li>
+    <li>液体は重量(g)で扱います。水は1mL=1gで換算できますが、牛乳や卵は比重が異なります。</li>
+    <li>発酵種(ルヴァン・中種)を使う配合では、種に含まれる粉と水も粉量・加水量に数えるのが一般的です。このツールは入力した値をそのまま計算します。</li>
+    <li>生地は焼成で水分が飛ぶため、生地量とパンの重さは同じになりません。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">合計が100%を超えるのはなぜですか?</h3>
+  <p class="faq-a">ベーカーズパーセントは粉そのものを100%と決める表し方だからです。粉に対して水を70%入れれば合計は170%になります。全体に占める割合ではありません。</p>
+  <h3 class="faq-q">生イーストとドライイーストは同じ%でよいですか?</h3>
+  <p class="faq-a">違います。一般にインスタントドライイーストは生イーストの3分の1程度の量で使います。レシピがどちらを指しているか確認してください。</p>
+  <h3 class="faq-q">加水率を上げると何が変わりますか?</h3>
+  <p class="faq-a">生地がゆるくなり扱いにくくなりますが、クラム(内側)の気泡が大きく、しっとりした食感になります。ハード系のパンでは70〜80%が目安です。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_flour: "粉の量は0より大きい数値で入力してください。",
+    invalid_percents: "材料の割合を1つ以上入力してください。",
+    invalid_percent_value: "材料の割合は0%以上1000%以下で入力してください。",
+    invalid_grams: "材料の分量を入力してください。",
+    invalid_gram_value: "材料の分量は0g以上の数値で入力してください。",
+    invalid_total: "生地の総量は0より大きい数値で入力してください。"
+  };
+  var LABELS = { water: "水", salt: "塩", sugar: "砂糖", yeast: "イースト", fat: "油脂" };
+  var KEYS = ["water", "salt", "sugar", "yeast", "fat"];
+
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var advBox2 = document.getElementById("adv-result2");
+  var flourEl = document.getElementById("flour");
+  var newFlourEl = document.getElementById("new-flour");
+  var totalDoughEl = document.getElementById("total-dough");
+  var pctEls = {};
+  KEYS.forEach(function (k) { pctEls[k] = document.getElementById(k); });
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function readPercents() {
+    var p = {};
+    for (var i = 0; i < KEYS.length; i++) {
+      var v = pctEls[KEYS[i]].value;
+      p[KEYS[i]] = v === "" ? 0 : parseFloat(v);
+    }
+    return p;
+  }
+
+  function itemsHtml(items, unit) {
+    var html = "<ul>";
+    for (var i = 0; i < KEYS.length; i++) {
+      var k = KEYS[i];
+      if (!items[k]) continue;
+      html += "<li>" + esc(LABELS[k]) + " " + esc(items[k].grams) + "g" +
+        (unit ? "(" + esc(items[k].percent) + "%)" : "") + "</li>";
+    }
+    return html + "</ul>";
+  }
+
+  function run() {
+    if (flourEl.value === "") { box.hidden = true; runAdv(); runTotal(); return; }
+    var r = BakersCalc.fromFlour(parseFloat(flourEl.value), readPercents());
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false; runAdv(); runTotal(); return;
+    }
+    box.innerHTML =
+      '<div class="result-main">生地の総量 ' + esc(r.totalG) + " g</div>" +
+      "<p>粉 " + esc(r.flourG) + "g(100%)に対して</p>" +
+      itemsHtml(r.items, true) +
+      "<p>合計 " + esc(r.totalPercent) + "%</p>";
+    box.hidden = false;
+    runAdv();
+    runTotal();
+  }
+
+  function runAdv() {
+    if (flourEl.value === "" || newFlourEl.value === "") { advBox.hidden = true; return; }
+    var base = BakersCalc.fromFlour(parseFloat(flourEl.value), readPercents());
+    if (!base.ok) { advBox.hidden = true; return; }
+    var grams = {};
+    KEYS.forEach(function (k) { if (base.items[k]) grams[k] = base.items[k].grams; });
+    var r = BakersCalc.scale(parseFloat(flourEl.value), parseFloat(newFlourEl.value), grams);
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML =
+      '<div class="result-main">粉 ' + esc(r.flourG) + " g のとき</div>" +
+      "<p>倍率 " + esc(r.factor) + " 倍。生地の総量は " + esc(r.totalG) + "g になります。</p>" +
+      itemsHtml(r.items, false);
+    advBox.hidden = false;
+  }
+
+  function runTotal() {
+    if (totalDoughEl.value === "") { advBox2.hidden = true; return; }
+    var r = BakersCalc.flourFromTotal(parseFloat(totalDoughEl.value), readPercents());
+    if (!r.ok) {
+      advBox2.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      advBox2.hidden = false;
+      return;
+    }
+    advBox2.innerHTML =
+      '<div class="result-main">粉 ' + esc(r.flourG) + " g</div>" +
+      "<p>合計 " + esc(r.totalPercent) + "% の配合で生地 " + esc(totalDoughEl.value) + "g を作るのに必要な粉の量です。</p>" +
+      itemsHtml(r.items, false);
+    advBox2.hidden = false;
+  }
+
+  var inputs = [flourEl, newFlourEl, totalDoughEl];
+  KEYS.forEach(function (k) { inputs.push(pctEls[k]); });
+  inputs.forEach(function (el) { el.addEventListener("input", run); });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

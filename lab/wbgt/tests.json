@@ -1,0 +1,175 @@
+{
+  "tool": "wbgt",
+  "module": "calc.js",
+  "global": "WbgtCalc",
+  "cases": [
+    {
+      "name": "室内: 気温30℃・湿度60%は簡易推定図でWBGT26℃(警戒)",
+      "func": "estimateIndoor",
+      "args": [30, 60],
+      "expect": { "ok": true, "wbgt": 26, "method": "indoor_chart" }
+    },
+    {
+      "name": "室内: 気温28℃・湿度70%はWBGT25℃(警戒の下限ちょうど)",
+      "func": "estimateIndoor",
+      "args": [28, 70],
+      "expect": { "ok": true, "wbgt": 25 }
+    },
+    {
+      "name": "室内: 気温35℃・湿度50%はWBGT29℃(厳重警戒)",
+      "func": "estimateIndoor",
+      "args": [35, 50],
+      "expect": { "ok": true, "wbgt": 29 }
+    },
+    {
+      "name": "室内: 格子点の間は線形補間(30.5℃・60%は26と27の中間で26.5)",
+      "func": "estimateIndoor",
+      "args": [30.5, 60],
+      "expect": { "ok": true, "wbgt": 26.5 }
+    },
+    {
+      "name": "境界値: 図の下限(21℃・湿度20%)はWBGT14℃",
+      "func": "estimateIndoor",
+      "args": [21, 20],
+      "expect": { "ok": true, "wbgt": 14 }
+    },
+    {
+      "name": "境界値: 図の上限(40℃・湿度100%)はWBGT40℃",
+      "func": "estimateIndoor",
+      "args": [40, 100],
+      "expect": { "ok": true, "wbgt": 40 }
+    },
+    {
+      "name": "範囲外: 室内推定は気温20.9℃(図の下限未満)では計算しない",
+      "func": "estimateIndoor",
+      "args": [20.9, 60],
+      "expect": { "ok": false, "code": "out_of_chart" }
+    },
+    {
+      "name": "範囲外: 室内推定は湿度19%(図の下限未満)では計算しない",
+      "func": "estimateIndoor",
+      "args": [30, 19],
+      "expect": { "ok": false, "code": "out_of_chart" }
+    },
+    {
+      "name": "異常入力: 室内推定で気温が数値でないときはエラー",
+      "func": "estimateIndoor",
+      "args": ["abc", 60],
+      "expect": { "ok": false, "code": "invalid_temp" }
+    },
+    {
+      "name": "屋外: 気温30℃・湿度60%(日射0.8kW/m²・風速1m/s)はWBGT28.6℃",
+      "func": "estimateOutdoor",
+      "args": [30, 60],
+      "expect": { "ok": true, "wbgt": 28.6, "solarKwm2": 0.8, "windMs": 1 }
+    },
+    {
+      "name": "環境省の式: 日射も風もない条件(30℃・60%)ではWBGT25.5℃",
+      "func": "estimateByFormula",
+      "args": [30, 60, 0, 0],
+      "expect": { "ok": true, "wbgt": 25.5, "method": "env_formula" }
+    },
+    {
+      "name": "環境省の式: 35℃・70%・日射0.8・風速1m/sはWBGT34.6℃",
+      "func": "estimateByFormula",
+      "args": [35, 70, 0.8, 1],
+      "expect": { "ok": true, "wbgt": 34.6 }
+    },
+    {
+      "name": "境界値: 湿度0%でも式は計算できる(30℃・日射0・風0でWBGT17.99→18)",
+      "func": "estimateByFormula",
+      "args": [30, 0, 0, 0],
+      "expect": { "ok": true, "wbgt": 18 }
+    },
+    {
+      "name": "異常入力: 日射量が範囲外(3kW/m²)はエラー",
+      "func": "estimateByFormula",
+      "args": [30, 60, 3, 1],
+      "expect": { "ok": false, "code": "invalid_solar" }
+    },
+    {
+      "name": "異常入力: 風速が負の値はエラー",
+      "func": "estimateByFormula",
+      "args": [30, 60, 0.8, -1],
+      "expect": { "ok": false, "code": "invalid_wind" }
+    },
+    {
+      "name": "異常入力: 湿度が101%はエラー",
+      "func": "estimateByFormula",
+      "args": [30, 101, 0.8, 1],
+      "expect": { "ok": false, "code": "invalid_humidity" }
+    },
+    {
+      "name": "異常入力: 気温が範囲外(999)はエラー",
+      "func": "estimateByFormula",
+      "args": [999, 60, 0.8, 1],
+      "expect": { "ok": false, "code": "invalid_temp" }
+    },
+    {
+      "name": "境界値: WBGT31.0はちょうど「危険」",
+      "func": "dailyLevel",
+      "args": [31],
+      "expect": { "ok": true, "key": "danger" }
+    },
+    {
+      "name": "境界値: WBGT30.9は「厳重警戒」",
+      "func": "dailyLevel",
+      "args": [30.9],
+      "expect": { "ok": true, "key": "severe_warning" }
+    },
+    {
+      "name": "境界値: WBGT25.0はちょうど「警戒」、24.9は「注意」",
+      "func": "dailyLevel",
+      "args": [24.9],
+      "expect": { "ok": true, "key": "caution" }
+    },
+    {
+      "name": "境界値: WBGT25.0は「警戒」",
+      "func": "dailyLevel",
+      "args": [25],
+      "expect": { "ok": true, "key": "warning" }
+    },
+    {
+      "name": "運動指針: WBGT31以上は運動原則中止",
+      "func": "sportsLevel",
+      "args": [31],
+      "expect": { "ok": true, "key": "stop" }
+    },
+    {
+      "name": "運動指針: WBGT21未満はほぼ安全",
+      "func": "sportsLevel",
+      "args": [20.9],
+      "expect": { "ok": true, "key": "almost_safe" }
+    },
+    {
+      "name": "運動指針: WBGT21ちょうどは注意",
+      "func": "sportsLevel",
+      "args": [21],
+      "expect": { "ok": true, "key": "caution" }
+    },
+    {
+      "name": "異常入力: 指針の判定で数値でない値はエラー",
+      "func": "dailyLevel",
+      "args": ["abc"],
+      "expect": { "ok": false, "code": "invalid_wbgt" }
+    },
+    {
+      "name": "まとめ: 室内30℃60%はWBGT26で日常「警戒」・運動「警戒」",
+      "func": "estimate",
+      "args": [30, 60, "indoor"],
+      "expect": { "ok": true, "wbgt": 26, "dailyKey": "warning", "sportsKey": "warning" }
+    },
+    {
+      "name": "まとめ: 屋外30℃60%はWBGT28.6で日常「厳重警戒」",
+      "func": "estimate",
+      "args": [30, 60, "outdoor"],
+      "expect": { "ok": true, "wbgt": 28.6, "dailyKey": "severe_warning" }
+    },
+    {
+      "name": "異常入力: 場所の指定が不正ならエラー",
+      "func": "estimate",
+      "args": [30, 60, "car"],
+      "expect": { "ok": false, "code": "invalid_place" }
+    }
+  ]
+}

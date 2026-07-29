@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>うるう年判定・次のうるう年(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="指定した年がうるう年か判定し、前後のうるう年と2月29日生まれの年齢の扱いを示します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>うるう年判定・次のうるう年</h1>
+  <form class="tool-form" id="tool-form">
+    <label>調べる年(西暦)
+      <span class="field-note">1583〜9999年</span>
+      <input type="number" id="year" inputmode="numeric" step="1" min="1583" max="9999" placeholder="2026">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 範囲内のうるう年一覧・2月29日生まれの年齢</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">範囲を指定してうるう年を一覧する</h3>
+      <p class="adv-note">契約日数や給与計算で「この期間に何日あるか」を確認するときに使えます(最大2000年分)。</p>
+      <div class="field-row">
+        <label>開始年
+          <input type="number" id="from" inputmode="numeric" step="1" min="1583" max="9999" placeholder="2020">
+        </label>
+        <label>終了年
+          <input type="number" id="to" inputmode="numeric" step="1" min="1583" max="9999" placeholder="2040">
+        </label>
+      </div>
+      <div class="tool-result" id="adv-list" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">2月29日生まれなど、基準日時点の満年齢</h3>
+      <p class="adv-note">2月29日生まれの人は、平年には2月28日の終了時に年齢が1つ増えます。</p>
+      <div class="field-row">
+        <label>生年<select id="b-year"></select></label>
+        <label>月<select id="b-month"></select></label>
+        <label>日<select id="b-day"></select></label>
+      </div>
+      <div class="field-row">
+        <label>基準日(年)<select id="r-year"></select></label>
+        <label>月<select id="r-month"></select></label>
+        <label>日<select id="r-day"></select></label>
+      </div>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    ここで扱うのは<strong>グレゴリオ暦</strong>の置閏法です。日本がグレゴリオ暦を採用したのは明治6年(1873年)1月1日で、それ以前の日本の暦(太陰太陽暦)には当てはまりません。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>その年が<strong>うるう年かどうか</strong>と、<strong>前後のうるう年</strong>がわかります。「4年に1度」ではない例外(1900年や2100年は平年)も正しく判定します。2月29日生まれの人の年齢の扱いも確認できます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>調べたい年(西暦)を入れると、その瞬間に判定結果が表示されます。</li>
+    <li>期間内のうるう年の数や合計日数を知りたいときは「＋詳細機能」で開始年と終了年を入れます。</li>
+    <li>2月29日生まれの満年齢も「＋詳細機能」で確認できます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>うるう年の判定</strong> = 4で割り切れる年はうるう年。ただし100で割り切れる年は平年、400で割り切れる年はうるう年</li>
+    <li><strong>1年の平均の長さ</strong> = 365.2425日(400年で97回のうるう年、合計146,097日)</li>
+    <li><strong>年齢の起算</strong> = 出生の日から起算する(年齢計算ニ関スル法律)</li>
+    <li><strong>年齢が増える瞬間</strong> = 起算日に応当する日の前日の終了時。応当する日がない年(2月29日生まれの平年)はその月の末日＝2月28日の終了時(民法第143条第2項)</li>
+  </ul>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>国立天文台 暦計算室「暦Wiki/グレゴリオ暦」<br>
+      <a href="https://eco.mtk.nao.ac.jp/koyomi/wiki/A5B0A5ECA5B4A5EAA5AACEF1.html" rel="noopener" target="_blank">https://eco.mtk.nao.ac.jp/koyomi/wiki/A5B0A5ECA5B4A5EAA5AACEF1.html</a>(2026年7月29日参照)</li>
+    <li>国立天文台「どの年がうるう年になるの?」<br>
+      <a href="https://www.nao.ac.jp/faq/a0306.html" rel="noopener" target="_blank">https://www.nao.ac.jp/faq/a0306.html</a>(2026年7月29日参照)</li>
+    <li>年齢計算ニ関スル法律(明治35年法律第50号)(e-Gov法令検索)<br>
+      <a href="https://laws.e-gov.go.jp/law/135AC1000000050" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/135AC1000000050</a>(2026年7月29日参照)</li>
+    <li>民法(明治29年法律第89号) 第143条(e-Gov法令検索)<br>
+      <a href="https://laws.e-gov.go.jp/law/129AC0000000089" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/129AC0000000089</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>グレゴリオ暦の置閏法だけを扱います。ユリウス暦(4年に1度、例外なし)や日本の旧暦には当てはまりません。</li>
+    <li>対応する年の範囲は1583年〜9999年です。</li>
+    <li>年齢は満年齢(法律上の数え方)です。誕生日の前日の終了時に1つ増えるため、たとえば4月1日生まれの人は3月31日の終了時に年齢が増えます。</li>
+    <li>2月29日生まれの人が平年に年齢を重ねる日は、法律上は2月28日の終了時です。実務上「3月1日に1つ増える」と扱う説明も見かけますが、結果として3月1日には増えている点は同じです。</li>
+    <li>閏秒(うるう秒)はうるう年とは別のしくみで、ここでは扱いません。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">なぜ100年に1度は平年になるのですか?</h3>
+  <p class="faq-a">1年の実際の長さは365.2422日ほどで、4年に1度うるう年を置くだけでは少し進みすぎるためです。400年で3回うるう年を減らすことで、1年の平均を365.2425日に近づけています。</p>
+  <h3 class="faq-q">次に「4年おき」が崩れるのはいつですか?</h3>
+  <p class="faq-a">2100年です。2096年の次のうるう年は2104年で、8年空きます(2100年は100で割り切れ、400では割り切れないため平年)。</p>
+  <h3 class="faq-q">2月29日生まれの人は誕生日がない年はどうなりますか?</h3>
+  <p class="faq-a">法律上は、応当する日がないため2月28日の終了時に年齢が1つ増えます。役所の手続きや契約上の年齢もこの数え方になります。</p>
+  <h3 class="faq-q">400年でうるう年は何回ありますか?</h3>
+  <p class="faq-a">97回です。400年の合計日数は146,097日で、平均すると1年365.2425日になります。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_year: "年を1583〜9999の整数で入力してください。",
+    invalid_range: "開始年は終了年より前にしてください。",
+    too_wide: "範囲が広すぎます(2000年分までにしてください)。",
+    invalid_birth_date: "生年月日を選び直してください。",
+    invalid_reference_date: "基準日を選び直してください。",
+    reference_before_birth: "基準日が生年月日より前になっています。"
+  };
+  var REASONS = {
+    div400: "400で割り切れるため",
+    div100: "100で割り切れて400で割り切れないため",
+    div4: "4で割り切れるため",
+    common: "4で割り切れないため"
+  };
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  var box = document.getElementById("result");
+  var listBox = document.getElementById("adv-list");
+  var advBox = document.getElementById("adv-result");
+  var yearEl = document.getElementById("year");
+  var fromEl = document.getElementById("from");
+  var toEl = document.getElementById("to");
+
+  function run() {
+    if (yearEl.value === "") { box.hidden = true; return; }
+    var y = parseInt(yearEl.value, 10);
+    var r = UruudoshiCalc.neighbours(y);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    var d = UruudoshiCalc.isLeap(y);
+    box.innerHTML = '<div class="result-main">' + esc(y) + "年は" + (r.leap ? "うるう年" : "平年") + "</div>" +
+      "<p>" + esc(REASONS[d.reason]) + "(この年は " + esc(d.days) + " 日、2月は " + (r.leap ? "29" : "28") + " 日まで)</p>" +
+      "<p>直前のうるう年 " + (r.previous === null ? "範囲外" : esc(r.previous) + "年") +
+      " / 直後のうるう年 " + (r.next === null ? "範囲外" : esc(r.next) + "年") + "</p>";
+    box.hidden = false;
+  }
+
+  function runList() {
+    if (fromEl.value === "" || toEl.value === "") { listBox.hidden = true; return; }
+    var r = UruudoshiCalc.listLeapYears(parseInt(fromEl.value, 10), parseInt(toEl.value, 10));
+    if (!r.ok) {
+      listBox.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      listBox.hidden = false;
+      return;
+    }
+    var shown = r.years.slice(0, 200).join("、");
+    listBox.innerHTML = '<div class="result-main">うるう年 ' + esc(r.count) + " 回</div>" +
+      "<p>この範囲の合計日数 " + esc(r.days.toLocaleString("ja-JP")) + " 日</p>" +
+      "<p>" + esc(shown) + (r.years.length > 200 ? " ほか" : "") + "</p>";
+    listBox.hidden = false;
+  }
+
+  var today = new Date();
+  function fillSelect(id, from, to, suffix, selected) {
+    var h = "";
+    for (var v = from; v <= to; v++) h += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    document.getElementById(id).innerHTML = h;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function val(id) { return parseInt(document.getElementById(id).value, 10); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId);
+    var max = daysInMonth(val(yId), val(mId));
+    fillSelect(dId, 1, max, "日", Math.min(keep, max));
+  }
+  fillSelect("b-year", 1900, today.getFullYear(), "年", 2000);
+  fillSelect("b-month", 1, 12, "月", 2);
+  fillSelect("b-day", 1, 29, "日", 29);
+  fillSelect("r-year", 1900, today.getFullYear() + 50, "年", today.getFullYear());
+  fillSelect("r-month", 1, 12, "月", today.getMonth() + 1);
+  fillSelect("r-day", 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), "日", today.getDate());
+
+  function runAge() {
+    adjustDays("b-year", "b-month", "b-day");
+    adjustDays("r-year", "r-month", "r-day");
+    var r = UruudoshiCalc.ageOn(
+      val("b-year"), val("b-month"), val("b-day"),
+      val("r-year"), val("r-month"), val("r-day")
+    );
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    var body = '<div class="result-main">満 ' + esc(r.age) + " 歳</div>";
+    if (r.isFeb29Birth) {
+      body += "<p>2月29日生まれです。基準日の年に年齢が増えるのは " + esc(r.birthdayThisYear) +
+        " の終了時になります。</p>";
+    } else {
+      body += "<p>基準日の年に年齢が増えるのは " + esc(r.birthdayThisYear) + " の前日の終了時です。</p>";
+    }
+    advBox.innerHTML = body;
+    advBox.hidden = false;
+  }
+
+  yearEl.addEventListener("input", run);
+  [fromEl, toEl].forEach(function (el) { el.addEventListener("input", runList); });
+  ["b-year", "b-month", "b-day", "r-year", "r-month", "r-day"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", runAge);
+  });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  runAge();
+})();
+</script>
+</body>
+</html>

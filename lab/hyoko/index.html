@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>標高から山頂の気温を計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="麓の気温と標高差から山頂の推定気温を出し、風速を加えた体感温度も計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>標高から山頂の気温を計算</h1>
+  <form class="tool-form" id="tool-form">
+    <div class="field-row">
+      <label>麓の標高(m)
+        <span class="field-note">登山口や最寄りの観測地点</span>
+        <input type="number" id="base-alt" inputmode="numeric" step="10" min="-500" max="9000" value="0">
+      </label>
+      <label>麓の気温(℃)
+        <input type="number" id="base-temp" inputmode="decimal" step="0.1" min="-60" max="60" value="30">
+      </label>
+    </div>
+    <div class="field-row">
+      <label>目的地の標高(m)
+        <input type="number" id="target-alt" inputmode="numeric" step="10" min="-500" max="9000" value="3776">
+      </label>
+      <label>目的地の風速(m/s)
+        <input type="number" id="wind" inputmode="decimal" step="0.5" min="0" max="60" value="10">
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 気温減率を変える・標高ごとの一覧</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">気温減率(℃/100m)</h3>
+      <p class="adv-note">既定は登山でよく使われる0.6℃/100mです。0.65は日本気象協会の目安(標高1000mで6.5℃低下)、0.5は湿った大気での目安です。</p>
+      <label>気温減率
+        <select id="lapse">
+          <option value="0.5">0.5℃/100m(湿った大気)</option>
+          <option value="0.6" selected>0.6℃/100m(登山の目安・既定)</option>
+          <option value="0.65">0.65℃/100m(日本気象協会・標準大気)</option>
+          <option value="1">1.0℃/100m(乾燥断熱減率)</option>
+        </select>
+      </label>
+
+      <h3 class="adv-h">標高ごとの気温</h3>
+      <p class="adv-note">麓の気温を基準に、500mごとの推定気温と体感温度です。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    <strong>夏でも山頂は冬並みの寒さ</strong>になります。海抜0mで30℃でも、富士山頂(3776m)は7℃前後、風速10m/sなら体感はマイナスです。防寒装備は必ず持ってください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>登る山の<strong>山頂の気温と、風を加えた体感温度</strong>がわかります。麓の予報気温と標高だけで計算できるので、<strong>服装や防寒装備を決める判断材料</strong>になります。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>麓(登山口)の標高と、天気予報に出ている気温を入れます。</li>
+    <li>目的地(山頂など)の標高と、予想される風速を入れると気温と体感温度がすぐ出ます。</li>
+    <li>気温減率を変えたいときや標高ごとの一覧を見たいときは「＋詳細機能」を開いてください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>目的地の気温</strong> = 麓の気温 − 気温減率(℃/100m) × 標高差(m) ÷ 100</li>
+    <li><strong>気温減率</strong> = 既定0.6℃/100m(一般には0.5〜0.65℃/100mの範囲)</li>
+    <li><strong>体感温度</strong> = 気温 − 風速(m/s) × 1℃</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>麓(標高0m)が30℃のときの推定気温(0.6℃/100m)</caption>
+      <thead><tr><th>標高</th><th>推定気温</th><th>風速10m/sの体感温度</th></tr></thead>
+      <tbody>
+        <tr><td>1,000m</td><td>24.0℃</td><td>14.0℃</td></tr>
+        <tr><td>2,000m</td><td>18.0℃</td><td>8.0℃</td></tr>
+        <tr><td>3,000m</td><td>12.0℃</td><td>2.0℃</td></tr>
+        <tr><td>3,776m(富士山)</td><td>7.3℃</td><td>-2.7℃</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>コトバンク「気温減率」(デジタル大辞泉「100メートル増すごとにセ氏0.5〜0.6度低くなる」、世界大百科事典「平均的には0.65℃/100mである」の出典)<br>
+      <a href="https://kotobank.jp/word/%E6%B0%97%E6%B8%A9%E6%B8%9B%E7%8E%87-155657" rel="noopener" target="_blank">https://kotobank.jp/word/気温減率-155657</a>(2026年7月29日参照)</li>
+    <li>日本気象協会 tenki.jp「登山で知っておきたい気温の知識『寒さ』編」(2025年9月11日掲載)。「標高が1000m上がると、気温はおよそ6.5℃下がります」「風速が1m/s強くなるごとに体感温度は1℃ずつ下がると言われています」の出典<br>
+      <a href="https://tenki.jp/mountain/column/tenkijp_labo/2025/09/11/32714.html" rel="noopener" target="_blank">https://tenki.jp/mountain/column/tenkijp_labo/2025/09/11/32714.html</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>気温減率は大気の状態で変わります。既定の0.6℃/100mは目安であり、実際は0.5〜0.65℃/100m程度の幅があります。</li>
+    <li>体感温度の「風速1m/sにつき1℃低下」は<strong>わかりやすさを優先した目安</strong>です。実際には風が強くなるほど1m/sあたりの低下量は小さくなるため、強風時はこの計算より下がりすぎた値になります。</li>
+    <li>放射冷却・逆転層(上空のほうが暖かい状態)・フェーン現象があると、計算どおりにはなりません。</li>
+    <li>日射・湿度・濡れ(雨や汗)は考慮していません。濡れた状態では体感温度はさらに大きく下がります。</li>
+    <li>実際の山の気象は急変します。必ず最新の山岳気象予報も確認してください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">気温減率は0.6と0.65のどちらを使えばよいですか?</h3>
+  <p class="faq-a">どちらも目安です。0.65℃/100m(標高1000mで6.5℃低下)は標準大気の値で、日本気象協会の登山向け解説でも使われています。0.6℃/100mは登山の現場でよく使われる概算です。安全側に見るなら大きいほう(0.65)で計算してください。</p>
+  <h3 class="faq-q">夏の富士山でも防寒具は必要ですか?</h3>
+  <p class="faq-a">必要です。麓が30℃でも山頂は7℃前後で、風速10m/sなら体感はマイナスになります。真冬の平地と同じ服装が必要になる計算です。</p>
+  <h3 class="faq-q">下山するときの気温も計算できますか?</h3>
+  <p class="faq-a">できます。麓の標高より低い場所を目的地にすると標高差が負になり、気温は上がる方向で計算されます。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_base_alt: "麓の標高は-500〜9000mの範囲で入力してください。",
+    invalid_base_temp: "麓の気温は-60〜60℃の範囲で入力してください。",
+    invalid_target_alt: "目的地の標高は-500〜9000mの範囲で入力してください。",
+    invalid_lapse: "気温減率を選び直してください。",
+    invalid_temp: "気温の計算結果が範囲外です。入力値を確認してください。",
+    invalid_wind: "風速は0〜60m/sの範囲で入力してください。"
+  };
+  var IDS = ["base-alt", "base-temp", "target-alt", "wind"];
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function el(id) { return document.getElementById(id); }
+  function numOf(id) { return parseFloat(el(id).value); }
+
+  var box = el("result");
+  var advBox = el("adv-result");
+
+  function run() {
+    var ready = IDS.every(function (id) { return el(id).value.trim() !== ""; });
+    if (!ready) { box.hidden = true; advBox.hidden = true; return; }
+    var lapse = parseFloat(el("lapse").value);
+    var r = HyokoCalc.calculate(numOf("base-alt"), numOf("base-temp"), numOf("target-alt"), numOf("wind"), lapse);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      advBox.hidden = true;
+      return;
+    }
+    box.innerHTML = '<div class="result-main">' + esc(r.tempC) + " ℃</div>" +
+      "<p>体感温度 <strong>" + esc(r.feltC) + " ℃</strong>(風速 " + esc(r.windDropC) + "m/s による低下)</p>" +
+      "<p>標高差 " + esc(r.diffM) + "m / 気温の変化 " + esc(-r.dropC) + "℃(" + esc(r.lapsePer100) + "℃/100m)</p>";
+    box.hidden = false;
+    renderTable(r.lapsePer100);
+  }
+
+  function renderTable(lapse) {
+    var baseAlt = numOf("base-alt");
+    var baseTemp = numOf("base-temp");
+    var wind = numOf("wind");
+    var html = '<div class="table-scroll"><table class="data-table">' +
+      "<thead><tr><th>標高</th><th>推定気温</th><th>体感温度</th></tr></thead><tbody>";
+    var rows = 0;
+    for (var alt = 0; alt <= 4000 && rows < 12; alt += 500) {
+      var r = HyokoCalc.calculate(baseAlt, baseTemp, alt, wind, lapse);
+      if (!r.ok) continue;
+      html += "<tr><td>" + esc(alt.toLocaleString("ja-JP")) + "m</td><td>" + esc(r.tempC) +
+        "℃</td><td>" + esc(r.feltC) + "℃</td></tr>";
+      rows++;
+    }
+    html += "</tbody></table></div>";
+    advBox.innerHTML = html;
+    advBox.hidden = rows === 0;
+  }
+
+  IDS.forEach(function (id) { el(id).addEventListener("input", run); });
+  el("lapse").addEventListener("change", run);
+  el("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+{
+  "tool": "fuyo-kojo",
+  "module": "calc.js",
+  "global": "FuyoKojoCalc",
+  "cases": [
+    {
+      "name": "給与所得: 収入123万円なら控除65万円・合計所得58万円(令和7年分以後の壁)",
+      "func": "salaryToIncome",
+      "args": [1230000],
+      "expect": {
+        "ok": true,
+        "deductionYen": 650000,
+        "incomeYen": 580000
+      }
+    },
+    {
+      "name": "境界値: 収入190万円までは給与所得控除が最低額の65万円",
+      "func": "salaryToIncome",
+      "args": [1900000],
+      "expect": {
+        "ok": true,
+        "deductionYen": 650000,
+        "incomeYen": 1250000
+      }
+    },
+    {
+      "name": "境界値: 収入360万円は収入×30%+8万円=116万円(次の区分と連続する)",
+      "func": "salaryToIncome",
+      "args": [3600000],
+      "expect": {
+        "ok": true,
+        "deductionYen": 1160000,
+        "incomeYen": 2440000
+      }
+    },
+    {
+      "name": "境界値: 収入660万円は収入×20%+44万円=176万円",
+      "func": "salaryToIncome",
+      "args": [6600000],
+      "expect": {
+        "ok": true,
+        "deductionYen": 1760000,
+        "incomeYen": 4840000
+      }
+    },
+    {
+      "name": "上限: 収入850万円超は給与所得控除195万円で頭打ち",
+      "func": "salaryToIncome",
+      "args": [12000000],
+      "expect": {
+        "ok": true,
+        "deductionYen": 1950000,
+        "incomeYen": 10050000
+      }
+    },
+    {
+      "name": "境界値: 収入65万円以下は給与所得控除が収入額で頭打ちになり所得0円",
+      "func": "salaryToIncome",
+      "args": [600000],
+      "expect": {
+        "ok": true,
+        "deductionYen": 600000,
+        "incomeYen": 0
+      }
+    },
+    {
+      "name": "扶養控除: 20歳・収入123万円ちょうどは特定扶養親族で63万円",
+      "func": "dependentDeduction",
+      "args": [1230000, 20, false],
+      "expect": {
+        "ok": true,
+        "incomeYen": 580000,
+        "kind": "specific",
+        "deductionYen": 630000,
+        "eligible": true
+      }
+    },
+    {
+      "name": "特定親族特別控除: 20歳・収入150万円(所得85万円ちょうど)は63万円",
+      "func": "dependentDeduction",
+      "args": [1500000, 20, false],
+      "expect": {
+        "ok": true,
+        "incomeYen": 850000,
+        "kind": "specific_special",
+        "deductionYen": 630000
+      }
+    },
+    {
+      "name": "境界値: 20歳・収入188万円(所得123万円ちょうど)は特定親族特別控除の下限で3万円",
+      "func": "dependentDeduction",
+      "args": [1880000, 20, false],
+      "expect": {
+        "ok": true,
+        "incomeYen": 1230000,
+        "kind": "specific_special",
+        "deductionYen": 30000,
+        "eligible": true
+      }
+    },
+    {
+      "name": "扶養控除なし: 20歳・収入200万円(所得132万円)は123万円を超えるため控除0円",
+      "func": "dependentDeduction",
+      "args": [2000000, 20, false],
+      "expect": {
+        "ok": true,
+        "incomeYen": 1320000,
+        "kind": "none",
+        "deductionYen": 0,
+        "eligible": false
+      }
+    },
+    {
+      "name": "扶養控除: 17歳・収入100万円は一般の控除対象扶養親族で38万円",
+      "func": "dependentDeduction",
+      "args": [1000000, 17, false],
+      "expect": {
+        "ok": true,
+        "kind": "general",
+        "deductionYen": 380000
+      }
+    },
+    {
+      "name": "境界値: 15歳は16歳未満なので扶養控除の対象外(控除0円)",
+      "func": "dependentDeduction",
+      "args": [0, 15, false],
+      "expect": {
+        "ok": true,
+        "kind": "under16",
+        "deductionYen": 0,
+        "eligible": false
+      }
+    },
+    {
+      "name": "境界値: 16歳ちょうどは一般の控除対象扶養親族で38万円",
+      "func": "dependentDeduction",
+      "args": [0, 16, false],
+      "expect": {
+        "ok": true,
+        "kind": "general",
+        "deductionYen": 380000
+      }
+    },
+    {
+      "name": "境界値: 23歳になると特定扶養親族ではなくなり38万円に戻る",
+      "func": "dependentDeduction",
+      "args": [0, 23, false],
+      "expect": {
+        "ok": true,
+        "kind": "general",
+        "deductionYen": 380000
+      }
+    },
+    {
+      "name": "老人扶養親族: 75歳・同居老親等は58万円",
+      "func": "dependentDeduction",
+      "args": [0, 75, true],
+      "expect": {
+        "ok": true,
+        "kind": "elderly_cohabiting",
+        "deductionYen": 580000
+      }
+    },
+    {
+      "name": "老人扶養親族: 75歳・同居老親等以外は48万円",
+      "func": "dependentDeduction",
+      "args": [0, 75, false],
+      "expect": {
+        "ok": true,
+        "kind": "elderly",
+        "deductionYen": 480000
+      }
+    },
+    {
+      "name": "配偶者控除: 配偶者収入123万円・本人所得500万円なら38万円",
+      "func": "spouseDeduction",
+      "args": [1230000, 45, 5000000],
+      "expect": {
+        "ok": true,
+        "spouseIncomeYen": 580000,
+        "tier": 0,
+        "kind": "spouse",
+        "deductionYen": 380000
+      }
+    },
+    {
+      "name": "老人控除対象配偶者: 70歳・本人所得920万円(第2区分)なら32万円",
+      "func": "spouseDeduction",
+      "args": [0, 70, 9200000],
+      "expect": {
+        "ok": true,
+        "tier": 1,
+        "kind": "spouse_elderly",
+        "deductionYen": 320000
+      }
+    },
+    {
+      "name": "配偶者特別控除: 配偶者収入160万円(所得95万円ちょうど)・本人所得500万円なら38万円",
+      "func": "spouseDeduction",
+      "args": [1600000, 45, 5000000],
+      "expect": {
+        "ok": true,
+        "spouseIncomeYen": 950000,
+        "kind": "spouse_special",
+        "deductionYen": 380000
+      }
+    },
+    {
+      "name": "配偶者特別控除: 配偶者収入201万円(所得132.7万円)は下限の3万円",
+      "func": "spouseDeduction",
+      "args": [2010000, 45, 5000000],
+      "expect": {
+        "ok": true,
+        "spouseIncomeYen": 1327000,
+        "kind": "spouse_special",
+        "deductionYen": 30000
+      }
+    },
+    {
+      "name": "配偶者控除なし: 配偶者の所得が133万円を超えると控除0円",
+      "func": "spouseDeduction",
+      "args": [2100000, 45, 5000000],
+      "expect": {
+        "ok": true,
+        "kind": "none",
+        "deductionYen": 0,
+        "eligible": false
+      }
+    },
+    {
+      "name": "境界値: 本人の合計所得が1,000万円ちょうどなら第3区分で13万円",
+      "func": "spouseDeduction",
+      "args": [0, 45, 10000000],
+      "expect": {
+        "ok": true,
+        "tier": 2,
+        "kind": "spouse",
+        "deductionYen": 130000
+      }
+    },
+    {
+      "name": "境界値: 本人の合計所得が1,000万円を超えると配偶者控除は使えない",
+      "func": "spouseDeduction",
+      "args": [0, 45, 10000001],
+      "expect": {
+        "ok": true,
+        "tier": -1,
+        "kind": "over_taxpayer_income",
+        "deductionYen": 0,
+        "eligible": false
+      }
+    },
+    {
+      "name": "境界値: 本人の合計所得900万円ちょうどは第1区分で38万円",
+      "func": "spouseDeduction",
+      "args": [0, 45, 9000000],
+      "expect": {
+        "ok": true,
+        "tier": 0,
+        "deductionYen": 380000
+      }
+    },
+    {
+      "name": "異常入力: 給与収入が負の値はエラー",
+      "func": "salaryToIncome",
+      "args": [-100000],
+      "expect": {
+        "ok": false,
+        "code": "invalid_salary"
+      }
+    },
+    {
+      "name": "異常入力: 給与収入が数値でない場合はエラー",
+      "func": "dependentDeduction",
+      "args": ["103万円", 20, false],
+      "expect": {
+        "ok": false,
+        "code": "invalid_salary"
+      }
+    },
+    {
+      "name": "異常入力: 年齢が負の値はエラー",
+      "func": "dependentDeduction",
+      "args": [0, -1, false],
+      "expect": {
+        "ok": false,
+        "code": "invalid_age"
+      }
+    },
+    {
+      "name": "異常入力: 年齢が小数はエラー",
+      "func": "dependentDeduction",
+      "args": [0, 20.5, false],
+      "expect": {
+        "ok": false,
+        "code": "invalid_age"
+      }
+    },
+    {
+      "name": "異常入力: 本人の合計所得金額が数値でない場合はエラー",
+      "func": "spouseDeduction",
+      "args": [0, 45, "500万円"],
+      "expect": {
+        "ok": false,
+        "code": "invalid_taxpayer_income"
+      }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "salaryToIncome",
+      "args": [],
+      "expect": {
+        "ok": false,
+        "code": "invalid_salary"
+      }
+    }
+  ]
+}

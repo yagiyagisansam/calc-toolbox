@@ -1,0 +1,127 @@
+{
+  "tool": "bakers",
+  "module": "calc.js",
+  "global": "BakersCalc",
+  "cases": [
+    {
+      "name": "代表例: 粉250gで加水70%・塩2%・砂糖5%・イースト1%・油脂3%の分量",
+      "func": "fromFlour",
+      "args": [250, { "water": 70, "salt": 2, "sugar": 5, "yeast": 1, "fat": 3 }],
+      "expect": { "ok": true, "flourG": 250, "items": { "water": { "grams": 175 }, "salt": { "grams": 5 }, "sugar": { "grams": 12.5 }, "yeast": { "grams": 2.5 }, "fat": { "grams": 7.5 } }, "totalPercent": 181, "totalG": 452.5 }
+    },
+    {
+      "name": "加水率65%の食パン: 粉300gなら水195g",
+      "func": "fromFlour",
+      "args": [300, { "water": 65 }],
+      "expect": { "ok": true, "items": { "water": { "grams": 195 } }, "totalG": 495 }
+    },
+    {
+      "name": "0.1g単位まで出る: 粉235gで塩1.7%は3.995g→4.0g",
+      "func": "fromFlour",
+      "args": [235, { "salt": 1.7 }],
+      "expect": { "ok": true, "items": { "salt": { "grams": 4 } } }
+    },
+    {
+      "name": "ハード系の高加水80%: 粉500gなら水400g",
+      "func": "fromFlour",
+      "args": [500, { "water": 80, "salt": 2 }],
+      "expect": { "ok": true, "items": { "water": { "grams": 400 }, "salt": { "grams": 10 } }, "totalG": 910 }
+    },
+    {
+      "name": "逆算: 粉250g・水175g・塩5gはベーカーズ70%と2%",
+      "func": "toPercent",
+      "args": [250, { "water": 175, "salt": 5 }],
+      "expect": { "ok": true, "items": { "water": { "percent": 70 }, "salt": { "percent": 2 } }, "totalPercent": 172 }
+    },
+    {
+      "name": "粉量を250g→300gに増やすと各材料も1.2倍になる",
+      "func": "scale",
+      "args": [250, 300, { "water": 175, "salt": 5, "yeast": 2.5 }],
+      "expect": { "ok": true, "factor": 1.2, "flourG": 300, "items": { "water": { "grams": 210, "before": 175 }, "salt": { "grams": 6 }, "yeast": { "grams": 3 } }, "totalG": 519 }
+    },
+    {
+      "name": "粉量を減らす方向にも使える(300g→200gは水130g)",
+      "func": "scale",
+      "args": [300, 200, { "water": 195 }],
+      "expect": { "ok": true, "factor": 0.6667, "items": { "water": { "grams": 130 } } }
+    },
+    {
+      "name": "生地500gを作るのに必要な粉量は289.0g(合計173%)",
+      "func": "flourFromTotal",
+      "args": [500, { "water": 70, "salt": 2, "yeast": 1 }],
+      "expect": { "ok": true, "flourG": 289, "totalPercent": 173, "totalG": 500 }
+    },
+    {
+      "name": "境界値: 割合0%の材料は0gになる",
+      "func": "fromFlour",
+      "args": [250, { "water": 70, "sugar": 0 }],
+      "expect": { "ok": true, "items": { "sugar": { "grams": 0 } }, "totalG": 425 }
+    },
+    {
+      "name": "境界値: 上限の1000%でも計算できる",
+      "func": "fromFlour",
+      "args": [100, { "water": 1000 }],
+      "expect": { "ok": true, "items": { "water": { "grams": 1000 } } }
+    },
+    {
+      "name": "異常入力: 粉0gはエラー(0で割らない)",
+      "func": "fromFlour",
+      "args": [0, { "water": 70 }],
+      "expect": { "ok": false, "code": "invalid_flour" }
+    },
+    {
+      "name": "異常入力: 粉が負の値はエラー",
+      "func": "fromFlour",
+      "args": [-250, { "water": 70 }],
+      "expect": { "ok": false, "code": "invalid_flour" }
+    },
+    {
+      "name": "異常入力: 材料の指定がnullはエラー",
+      "func": "fromFlour",
+      "args": [250, null],
+      "expect": { "ok": false, "code": "invalid_percents" }
+    },
+    {
+      "name": "異常入力: 材料が1つもないときはエラー",
+      "func": "fromFlour",
+      "args": [250, {}],
+      "expect": { "ok": false, "code": "invalid_percents" }
+    },
+    {
+      "name": "異常入力: 割合が負の値はエラー",
+      "func": "fromFlour",
+      "args": [250, { "water": -1 }],
+      "expect": { "ok": false, "code": "invalid_percent_value" }
+    },
+    {
+      "name": "異常入力: 割合が上限を超える(2000%)はエラー",
+      "func": "fromFlour",
+      "args": [250, { "water": 2000 }],
+      "expect": { "ok": false, "code": "invalid_percent_value" }
+    },
+    {
+      "name": "異常入力: 分量が数値でないときはエラー",
+      "func": "toPercent",
+      "args": [250, { "water": "abc" }],
+      "expect": { "ok": false, "code": "invalid_gram_value" }
+    },
+    {
+      "name": "異常入力: 粉が数値でないときはエラー",
+      "func": "fromFlour",
+      "args": ["abc", { "water": 70 }],
+      "expect": { "ok": false, "code": "invalid_flour" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "fromFlour",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_flour" }
+    },
+    {
+      "name": "異常入力: 生地の総量0gはエラー",
+      "func": "flourFromTotal",
+      "args": [0, { "water": 70 }],
+      "expect": { "ok": false, "code": "invalid_total" }
+    }
+  ]
+}

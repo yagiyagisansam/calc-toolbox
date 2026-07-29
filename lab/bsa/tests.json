@@ -1,0 +1,293 @@
+{
+  "tool": "bsa",
+  "module": "calc.js",
+  "global": "BsaCalc",
+  "cases": [
+    {
+      "name": "JCOG体表面積表と一致: 藤本式・身長135cm/体重31kgは1.055m²(表は小数第3位表示)",
+      "func": "calculate",
+      "args": [
+        135,
+        31,
+        "fujimoto"
+      ],
+      "expect": {
+        "ok": true,
+        "bsa": 1.0547,
+        "formula": "fujimoto"
+      }
+    },
+    {
+      "name": "JCOG体表面積表と一致: 藤本式・身長149cm/体重45kgは1.329m²(表は小数第3位表示)",
+      "func": "calculate",
+      "args": [
+        149,
+        45,
+        "fujimoto"
+      ],
+      "expect": {
+        "ok": true,
+        "bsa": 1.3286
+      }
+    },
+    {
+      "name": "JCOG体表面積表と一致: 藤本式・身長143cm/体重75kgは1.622m²(表は小数第3位表示)",
+      "func": "calculate",
+      "args": [
+        143,
+        75,
+        "fujimoto"
+      ],
+      "expect": {
+        "ok": true,
+        "bsa": 1.6221
+      }
+    },
+    {
+      "name": "JCOG体表面積表と一致: 藤本式・身長135cm/体重99kgは1.766m²(表は小数第3位表示)",
+      "func": "calculate",
+      "args": [
+        135,
+        99,
+        "fujimoto"
+      ],
+      "expect": {
+        "ok": true,
+        "bsa": 1.7662
+      }
+    },
+    {
+      "name": "標準的な体格: 藤本式・身長170cm/体重60kgは約1.6476m²",
+      "func": "calculate",
+      "args": [
+        170,
+        60,
+        "fujimoto"
+      ],
+      "expect": {
+        "ok": true,
+        "bsa": 1.6476
+      }
+    },
+    {
+      "name": "DuBois式: 身長170cm/体重60kgは約1.6949m²(藤本式より大きめに出る)",
+      "func": "calculate",
+      "args": [
+        170,
+        60,
+        "dubois"
+      ],
+      "expect": {
+        "ok": true,
+        "bsa": 1.6949,
+        "formula": "dubois"
+      }
+    },
+    {
+      "name": "DuBois式: 身長160cm/体重50kgは約1.5011m²",
+      "func": "calculate",
+      "args": [
+        160,
+        50,
+        "dubois"
+      ],
+      "expect": {
+        "ok": true,
+        "bsa": 1.5011
+      }
+    },
+    {
+      "name": "式の省略時は藤本式が使われる",
+      "func": "calculate",
+      "args": [
+        170,
+        60
+      ],
+      "expect": {
+        "ok": true,
+        "bsa": 1.6476,
+        "formula": "fujimoto"
+      }
+    },
+    {
+      "name": "両方の式を比較: 身長170cm/体重60kgの差は約0.0474m²",
+      "func": "both",
+      "args": [
+        170,
+        60
+      ],
+      "expect": {
+        "ok": true,
+        "fujimoto": 1.6476,
+        "dubois": 1.6949,
+        "diff": 0.0474
+      }
+    },
+    {
+      "name": "投与量の目安: 身長170cm/体重60kgで80mg/m²なら約131.81mg",
+      "func": "doseFromBsa",
+      "args": [
+        170,
+        60,
+        80,
+        "fujimoto"
+      ],
+      "expect": {
+        "ok": true,
+        "bsa": 1.6476,
+        "dose": 131.81
+      }
+    },
+    {
+      "name": "境界値: 身長の下限30cmは計算できる",
+      "func": "calculate",
+      "args": [
+        30,
+        1,
+        "fujimoto"
+      ],
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "name": "境界値: 身長の上限250cmは計算できる",
+      "func": "calculate",
+      "args": [
+        250,
+        300,
+        "fujimoto"
+      ],
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "name": "異常入力: 身長が下限未満(29cm)はエラー",
+      "func": "calculate",
+      "args": [
+        29,
+        60,
+        "fujimoto"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_height"
+      }
+    },
+    {
+      "name": "異常入力: 身長が上限超過(251cm)はエラー",
+      "func": "calculate",
+      "args": [
+        251,
+        60,
+        "fujimoto"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_height"
+      }
+    },
+    {
+      "name": "異常入力: 身長0はエラー",
+      "func": "calculate",
+      "args": [
+        0,
+        60,
+        "fujimoto"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_height"
+      }
+    },
+    {
+      "name": "異常入力: 体重0はエラー",
+      "func": "calculate",
+      "args": [
+        170,
+        0,
+        "fujimoto"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_weight"
+      }
+    },
+    {
+      "name": "異常入力: 体重が負の値はエラー",
+      "func": "calculate",
+      "args": [
+        170,
+        -60,
+        "fujimoto"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_weight"
+      }
+    },
+    {
+      "name": "異常入力: 体重が上限超過(301kg)はエラー",
+      "func": "calculate",
+      "args": [
+        170,
+        301,
+        "fujimoto"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_weight"
+      }
+    },
+    {
+      "name": "異常入力: 身長が数値でない場合はエラー",
+      "func": "calculate",
+      "args": [
+        "170cm",
+        60,
+        "fujimoto"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_height"
+      }
+    },
+    {
+      "name": "異常入力: 存在しない計算式の指定はエラー",
+      "func": "calculate",
+      "args": [
+        170,
+        60,
+        "mosteller"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_formula"
+      }
+    },
+    {
+      "name": "異常入力: 投与量が0はエラー",
+      "func": "doseFromBsa",
+      "args": [
+        170,
+        60,
+        0,
+        "fujimoto"
+      ],
+      "expect": {
+        "ok": false,
+        "code": "invalid_dose"
+      }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": {
+        "ok": false,
+        "code": "invalid_height"
+      }
+    }
+  ]
+}

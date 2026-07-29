@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>固定資産税・都市計画税 計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="土地と家屋の評価額から、年間の固定資産税・都市計画税を住宅用地の特例込みで概算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>
+    /* 出典の長いURLが画面からはみ出さないようにする */
+    .sources a { overflow-wrap: anywhere; word-break: break-word; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>固定資産税・都市計画税 計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>土地の評価額(円)
+      <span class="field-note">課税明細書の土地の「価格(評価額)」。売買価格ではありません</span>
+      <input type="number" id="land" inputmode="numeric" step="100000" min="0" max="100000000000" placeholder="例: 12000000">
+    </label>
+    <label>土地の面積(m²)
+      <span class="field-note">200m²までは課税標準が6分の1になります</span>
+      <input type="number" id="area" inputmode="decimal" step="any" min="0" max="1000000" placeholder="例: 150">
+    </label>
+    <label>家屋の評価額(円)
+      <span class="field-note">課税明細書の家屋の「価格(評価額)」</span>
+      <input type="number" id="building" inputmode="numeric" step="100000" min="0" max="100000000000" placeholder="例: 8000000">
+    </label>
+    <label>都市計画税
+      <select id="city">
+        <option value="1" selected>課される(市街化区域)</option>
+        <option value="0">課されない</option>
+      </select>
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 住戸数・税率・新築減額・非住宅用地</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">条件を変えて計算する</h3>
+      <p class="adv-note">アパート等は住戸数ぶん小規模住宅用地の枠(200m²/戸)が増えます。税率は市町村の条例で標準と異なる場合があります。</p>
+      <div class="field-row">
+        <label>住戸の数
+          <input type="number" id="units" inputmode="numeric" step="1" min="1" max="1000" value="1">
+        </label>
+        <label>固定資産税の税率(%)
+          <input type="number" id="frate" inputmode="decimal" step="0.1" min="0" max="10" value="1.4">
+        </label>
+        <label>都市計画税の税率(%)
+          <input type="number" id="crate" inputmode="decimal" step="0.01" min="0" max="0.3" value="0.3">
+        </label>
+      </div>
+      <label>土地の用途
+        <select id="res">
+          <option value="1" selected>住宅の敷地(住宅用地の特例あり)</option>
+          <option value="0">住宅の敷地でない(特例なし)</option>
+        </select>
+      </label>
+      <label>新築住宅の減額
+        <select id="newhouse">
+          <option value="0" selected>適用しない</option>
+          <option value="1">適用する(家屋の固定資産税が2分の1)</option>
+        </select>
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    土地の税額は<strong>負担調整措置</strong>(前年度の課税標準と比べてなだらかに上げる仕組み)で実際にはこれより低くなることがよくあります。正確な額は課税明細書・納税通知書でご確認ください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>土地と家屋の評価額を入れるだけで、<strong>毎年かかる固定資産税・都市計画税のおおよその額</strong>がわかります。住宅用地の特例(200m²まで6分の1)も自動で反映します。マイホーム購入前のランニングコスト試算や、実家の維持費の把握にどうぞ。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>課税明細書に載っている土地・家屋の「価格(評価額)」と土地の面積を入れます。</li>
+    <li>市街化区域なら都市計画税は「課される」のままにします。</li>
+    <li>入力が揃った瞬間に年税額が表示されます。ボタンは不要です。</li>
+    <li>アパートや税率が標準と違う自治体の場合は「＋詳細機能」で条件を変えてください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>固定資産税の土地の課税標準</strong> = 評価額のうち200m²×戸数までの部分 × 6分の1 + それを超える部分 × 3分の1</li>
+    <li><strong>都市計画税の土地の課税標準</strong> = 同じ区分で、200m²までは3分の1、超える部分は3分の2</li>
+    <li><strong>固定資産税</strong> =(土地の課税標準 + 家屋の課税標準)× 1.4%(標準税率)</li>
+    <li><strong>都市計画税</strong> =(土地の課税標準 + 家屋の評価額)× 0.3%(制限税率。これを超えられない)</li>
+    <li><strong>免税点</strong> = 課税標準が 土地30万円未満・家屋20万円未満なら課税されない</li>
+    <li><strong>端数処理</strong> = 課税標準は1,000円未満切捨て、税額は100円未満切捨て</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>住宅用地の課税標準の特例</caption>
+      <thead><tr><th>区分</th><th>固定資産税</th><th>都市計画税</th></tr></thead>
+      <tbody>
+        <tr><td>小規模住宅用地(200m²以下の部分)</td><td>価格の6分の1</td><td>価格の3分の1</td></tr>
+        <tr><td>一般住宅用地(200m²を超える部分)</td><td>価格の3分の1</td><td>価格の3分の2</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>新築住宅の減額(令和13年3月31日までの新築。居住部分の床面積120m²まで)</caption>
+      <thead><tr><th>住宅の種別</th><th>期間</th><th>減額割合</th></tr></thead>
+      <tbody>
+        <tr><td>一般の住宅</td><td>3年度分</td><td>2分の1</td></tr>
+        <tr><td>3階建以上で耐火構造の住宅</td><td>5年度分</td><td>2分の1</td></tr>
+        <tr><td>一般の長期優良住宅</td><td>5年度分</td><td>2分の1</td></tr>
+        <tr><td>3階建以上で耐火構造の長期優良住宅</td><td>7年度分</td><td>2分の1</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>総務省「地方税制度|固定資産税」(税率1.4%、住宅用地の特例1/6・1/3、新築住宅の減額)<br>
+      <a href="https://www.soumu.go.jp/main_sosiki/jichi_zeisei/czaisei/czaisei_seido/150790_15.html" rel="noopener" target="_blank">https://www.soumu.go.jp/main_sosiki/jichi_zeisei/czaisei/czaisei_seido/150790_15.html</a>(2026年7月29日参照)</li>
+    <li>総務省「地方税制度|固定資産税の概要」(標準税率1.4%、免税点 土地30万円・家屋20万円)<br>
+      <a href="https://www.soumu.go.jp/main_sosiki/jichi_zeisei/czaisei/czaisei_seido/149767_08.html" rel="noopener" target="_blank">https://www.soumu.go.jp/main_sosiki/jichi_zeisei/czaisei/czaisei_seido/149767_08.html</a>(2026年7月29日参照)</li>
+    <li>地方税法(昭和25年法律第226号)第350条・第349条の3の2・第702条の3・第702条の4(e-Gov法令検索)<br>
+      <a href="https://laws.e-gov.go.jp/law/325AC0000000226" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/325AC0000000226</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>税率・特例・免税点はいずれも<strong>2026(令和8)年7月29日時点の現行規定</strong>です。家屋の免税点は令和9年度以後の年度分から30万円に変わります(償却資産も150万円から180万円へ)。</li>
+    <li><strong>負担調整措置は考慮していません。</strong>評価額がそのまま課税標準になる前提のため、特に土地の税額は実際より高めに出ることがあります。</li>
+    <li>土地は全体が住宅の敷地であるものとして計算します。店舗併用や一部が駐車場の場合は実際と異なります。</li>
+    <li>税率は市町村が条例で決めます。1.4%・0.3%と異なる自治体では「＋詳細機能」で実際の税率を入れてください。</li>
+    <li>償却資産(事業用の設備など)、区分所有マンションの敷地の按分、市町村独自の減免は扱っていません。</li>
+    <li>評価額は3年に一度(評価替え)見直されます。宅地は地価公示価格などの7割を目途に評価されます。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">評価額はどこで確認できますか?</h3>
+  <p class="faq-a">毎年4〜6月ごろに市町村から届く納税通知書に同封される「課税明細書」に、土地・家屋それぞれの価格(評価額)が載っています。東京23区は都税事務所から届きます。</p>
+  <h3 class="faq-q">更地にすると税金が上がるというのは本当ですか?</h3>
+  <p class="faq-a">本当です。住宅用地の特例(200m²まで課税標準6分の1)は住宅の敷地であることが条件のため、住宅を取り壊して更地にすると特例が外れ、土地の税額が大きく上がります。</p>
+  <h3 class="faq-q">都市計画税はどこでもかかりますか?</h3>
+  <p class="faq-a">いいえ。原則として市街化区域内の土地・家屋にかかる税で、区域外なら課されません。税率も0.3%を上限に市町村が条例で定めます。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_land_value: "土地の評価額を0円以上で入力してください。",
+    invalid_building_value: "家屋の評価額を0円以上で入力してください。",
+    invalid_area: "土地の面積を0m²以上1,000,000m²以下で入力してください。",
+    invalid_units: "住戸の数を1以上の整数で入力してください。",
+    invalid_fixed_rate: "固定資産税の税率を0〜10%で入力してください。",
+    invalid_city_rate: "都市計画税の税率は0〜0.3%の範囲で入力してください。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var landEl = document.getElementById("land");
+  var areaEl = document.getElementById("area");
+  var buildEl = document.getElementById("building");
+  var cityEl = document.getElementById("city");
+  var unitsEl = document.getElementById("units");
+  var frateEl = document.getElementById("frate");
+  var crateEl = document.getElementById("crate");
+  var resEl = document.getElementById("res");
+  var newEl = document.getElementById("newhouse");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function yen(n) { return Number(n).toLocaleString("ja-JP") + "円"; }
+  function num(el, fallback) { return el.value === "" ? fallback : parseFloat(el.value); }
+
+  function run() {
+    if (landEl.value === "" || areaEl.value === "" || buildEl.value === "") {
+      box.hidden = true; advBox.hidden = true; return;
+    }
+    var r = KoteishisanCalc.calculateDetailed(
+      parseFloat(landEl.value),
+      parseFloat(buildEl.value),
+      parseFloat(areaEl.value),
+      cityEl.value === "1",
+      num(unitsEl, 1),
+      num(frateEl, 1.4),
+      num(crateEl, 0.3),
+      resEl.value === "1",
+      newEl.value === "1"
+    );
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      advBox.hidden = true;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">年額 ' + esc(yen(r.totalYen)) + "</div>" +
+      "<p>固定資産税 " + esc(yen(r.fixedTaxYen)) + " + 都市計画税 " + esc(yen(r.cityTaxYen)) +
+      " / 月あたり約 " + esc(Math.round(r.monthlyYen).toLocaleString("ja-JP")) + "円</p>" +
+      (r.landExempt ? "<p>土地は課税標準が免税点(30万円)未満のため課税されません。</p>" : "") +
+      (r.buildingExempt ? "<p>家屋は課税標準が免税点(20万円)未満のため課税されません。</p>" : "");
+    box.hidden = false;
+
+    advBox.innerHTML =
+      "<p>固定資産税の土地の課税標準: " + esc(yen(r.landBaseYen)) + "</p>" +
+      "<p>都市計画税の土地の課税標準: " + esc(yen(r.cityLandBaseYen)) + "</p>" +
+      "<p>家屋の課税標準: " + esc(yen(r.buildingBaseYen)) + "</p>" +
+      "<p>1期あたり(年4期の場合): 約" + esc(yen(Math.round(r.totalYen / 4))) + "</p>";
+    advBox.hidden = false;
+  }
+
+  [landEl, areaEl, buildEl, unitsEl, frateEl, crateEl].forEach(function (el) { el.addEventListener("input", run); });
+  [cityEl, resEl, newEl].forEach(function (el) { el.addEventListener("change", run); });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

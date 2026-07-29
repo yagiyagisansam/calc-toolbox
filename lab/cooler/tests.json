@@ -1,0 +1,163 @@
+{
+  "tool": "cooler",
+  "module": "calc.js",
+  "global": "CoolerCalc",
+  "cases": [
+    {
+      "name": "代表例: 20Lのクーラーボックスは1日あたり保冷剤2,000g(容量×100g)",
+      "func": "coolantByWeight",
+      "args": [20],
+      "expect": { "ok": true, "gramPerDay": 2000, "totalGram": 2000, "volumeL": 2, "days": 1 }
+    },
+    {
+      "name": "日数分: 20Lで2日分は4,000g(1日ごとに同量を補充する前提)",
+      "func": "coolantByWeight",
+      "args": [20, 2],
+      "expect": { "ok": true, "totalGram": 4000, "volumeL": 4, "days": 2 }
+    },
+    {
+      "name": "代表例: 35Lなら1日3,500g",
+      "func": "coolantByWeight",
+      "args": [35],
+      "expect": { "ok": true, "gramPerDay": 3500, "volumeL": 3.5 }
+    },
+    {
+      "name": "1/4の目安: 20Lなら保冷剤5L(5,000g)",
+      "func": "coolantByQuarter",
+      "args": [20],
+      "expect": { "ok": true, "volumeL": 5, "gram": 5000 }
+    },
+    {
+      "name": "1/4の目安: 50Lなら保冷剤12.5L",
+      "func": "coolantByQuarter",
+      "args": [50],
+      "expect": { "ok": true, "volumeL": 12.5, "gram": 12500 }
+    },
+    {
+      "name": "空き容量: 20Lに保冷剤5L・食材10Lなら残り5L(使用率75%)",
+      "func": "space",
+      "args": [20, 5, 10],
+      "expect": { "ok": true, "usedL": 15, "remainL": 5, "fits": true, "usageRate": 75 }
+    },
+    {
+      "name": "境界値: ちょうど容量いっぱい(20Lに5L+15L)は入る",
+      "func": "space",
+      "args": [20, 5, 15],
+      "expect": { "ok": true, "remainL": 0, "fits": true, "usageRate": 100 }
+    },
+    {
+      "name": "境界値超え: 20Lに5L+16Lは1L入りきらない",
+      "func": "space",
+      "args": [20, 5, 16],
+      "expect": { "ok": true, "remainL": -1, "fits": false }
+    },
+    {
+      "name": "境界値: 食材0Lでも計算できる",
+      "func": "space",
+      "args": [20, 5, 0],
+      "expect": { "ok": true, "usedL": 5, "remainL": 15, "fits": true }
+    },
+    {
+      "name": "まとめ: 20L・1泊(2日)・食材10Lは保冷剤4,000g(4L)で残り6L",
+      "func": "plan",
+      "args": [20, 1, 10],
+      "expect": { "ok": true, "days": 2, "coolantGram": 4000, "coolantVolumeL": 4, "remainL": 6, "fits": true }
+    },
+    {
+      "name": "まとめ: 日帰り(0泊)は1日分で計算する",
+      "func": "plan",
+      "args": [20, 0, 10],
+      "expect": { "ok": true, "days": 1, "coolantGram": 2000, "remainL": 8 }
+    },
+    {
+      "name": "まとめ: 1/4基準では泊数によらず容量の1/4(20Lなら5L)",
+      "func": "plan",
+      "args": [20, 2, 10, "quarter"],
+      "expect": { "ok": true, "days": 3, "coolantVolumeL": 5, "remainL": 5, "basis": "quarter" }
+    },
+    {
+      "name": "まとめ: 泊数が多いと保冷剤だけで容量を超える(20L・4泊・食材5L)",
+      "func": "plan",
+      "args": [20, 4, 5],
+      "expect": { "ok": true, "days": 5, "coolantVolumeL": 10, "usedL": 15, "fits": true }
+    },
+    {
+      "name": "まとめ: 20L・9泊・食材5Lは入りきらない",
+      "func": "plan",
+      "args": [20, 9, 5],
+      "expect": { "ok": true, "days": 10, "coolantVolumeL": 20, "fits": false }
+    },
+    {
+      "name": "異常入力: 容量0Lはエラー(0除算にしない)",
+      "func": "coolantByWeight",
+      "args": [0],
+      "expect": { "ok": false, "code": "invalid_capacity" }
+    },
+    {
+      "name": "異常入力: 容量が負の値はエラー",
+      "func": "coolantByWeight",
+      "args": [-20],
+      "expect": { "ok": false, "code": "invalid_capacity" }
+    },
+    {
+      "name": "異常入力: 容量が数値でないときはエラー",
+      "func": "coolantByWeight",
+      "args": ["abc"],
+      "expect": { "ok": false, "code": "invalid_capacity" }
+    },
+    {
+      "name": "異常入力: 容量が上限超え(2000L)はエラー",
+      "func": "coolantByQuarter",
+      "args": [2000],
+      "expect": { "ok": false, "code": "invalid_capacity" }
+    },
+    {
+      "name": "異常入力: 日数0はエラー",
+      "func": "coolantByWeight",
+      "args": [20, 0],
+      "expect": { "ok": false, "code": "invalid_days" }
+    },
+    {
+      "name": "異常入力: 空き容量計算で食材が負の値はエラー",
+      "func": "space",
+      "args": [20, 5, -1],
+      "expect": { "ok": false, "code": "invalid_food" }
+    },
+    {
+      "name": "異常入力: 泊数が負の値はエラー",
+      "func": "plan",
+      "args": [20, -1, 10],
+      "expect": { "ok": false, "code": "invalid_nights" }
+    },
+    {
+      "name": "異常入力: 目安の取り方の指定が不正ならエラー",
+      "func": "plan",
+      "args": [20, 1, 10, "guess"],
+      "expect": { "ok": false, "code": "invalid_basis" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "plan",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_capacity" }
+    },
+    {
+      "name": "外気温の区分: 35℃ちょうどは最も暑い区分",
+      "func": "temperatureBand",
+      "args": [35],
+      "expect": { "ok": true, "key": "very_hot" }
+    },
+    {
+      "name": "外気温の区分: 24.9℃は穏やかな区分",
+      "func": "temperatureBand",
+      "args": [24.9],
+      "expect": { "ok": true, "key": "mild" }
+    },
+    {
+      "name": "異常入力: 外気温が範囲外(100℃)はエラー",
+      "func": "temperatureBand",
+      "args": [100],
+      "expect": { "ok": false, "code": "invalid_temp" }
+    }
+  ]
+}

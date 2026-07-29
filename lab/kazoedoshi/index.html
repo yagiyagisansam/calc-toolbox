@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>数え年・満年齢 変換(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="生年月日と基準日から数え年と満年齢を同時に求め、七五三・厄年・還暦などの節目年を表示します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>数え年・満年齢 変換</h1>
+  <form class="tool-form" id="tool-form">
+    <span class="field-note">生年月日</span>
+    <div class="field-row">
+      <label>年
+        <select id="b-year"></select>
+      </label>
+      <label>月
+        <select id="b-month"></select>
+      </label>
+      <label>日
+        <select id="b-day"></select>
+      </label>
+    </div>
+    <span class="field-note">基準日(この日の時点での年齢を計算します)</span>
+    <div class="field-row">
+      <label>年
+        <select id="r-year"></select>
+      </label>
+      <label>月
+        <select id="r-month"></select>
+      </label>
+      <label>日
+        <select id="r-day"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 厄年の判定・これから迎える節目の年</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">厄年(数え年で数えます)</h3>
+      <p class="adv-note">神社本庁によると、厄年は男性25・42・61歳、女性19・33・37(・61)歳。前後の年が前厄・後厄です。</p>
+      <label>性別
+        <select id="sex">
+          <option value="male">男性</option>
+          <option value="female">女性</option>
+        </select>
+      </label>
+      <div class="tool-result" id="yaku-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">これから迎える節目の年</h3>
+      <p class="adv-note">七五三・厄年・賀寿(還暦など)を、基準日の年以降について西暦で表示します。</p>
+      <div class="tool-result" id="mile-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    満年齢は法律(年齢計算ニ関スル法律)に基づく計算です。<strong>七五三・厄年・賀寿は宗教的な慣習</strong>で法的な定めはなく、地域や社寺によって数え方が異なります。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>生年月日から<strong>数え年と満年齢を同時に</strong>確認できます。神社の厄年表や法要・七五三の案内は数え年で書かれていることが多いため、<strong>「自分は今年どれに当たるか」</strong>をその場で調べられます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>生年月日を選びます。選んだ瞬間に満年齢と数え年が出ます。</li>
+    <li>基準日は初期値が今日です。「来年の1月1日時点」など別の日で見たいときは変更してください。</li>
+    <li>厄年やこれから迎える節目の年を見たいときは「＋詳細機能」を開いてください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>満年齢</strong> = 基準年 − 生年(その年の誕生日を迎えていなければ さらに −1)</li>
+    <li><strong>数え年</strong> = 基準年 − 生年 + 1(生まれた年を1歳とし、元日ごとに1歳加える)</li>
+    <li><strong>数え年と満年齢の関係</strong> = 誕生日を迎えていれば 満年齢+1、迎える前なら 満年齢+2</li>
+  </ul>
+  <p>年齢計算ニ関スル法律は「年齢ハ出生ノ日ヨリ之ヲ起算ス」「民法第百四十三条ノ規定ハ年齢ノ計算ニ之ヲ準用ス」と定めています。この結果、年齢は誕生日の前日の終了時(＝誕生日の午前0時)に1つ増えます。つまり<strong>誕生日当日から新しい年齢</strong>です。</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>賀寿(長寿の祝い)の年齢 — 神社本庁</caption>
+      <thead><tr><th>名称</th><th>年齢</th><th>名称</th><th>年齢</th></tr></thead>
+      <tbody>
+        <tr><td>還暦</td><td>61</td><td>米寿</td><td>88</td></tr>
+        <tr><td>古稀</td><td>70</td><td>卒寿</td><td>90</td></tr>
+        <tr><td>喜寿</td><td>77</td><td>白寿</td><td>99</td></tr>
+        <tr><td>傘寿</td><td>80</td><td>百寿・紀寿</td><td>100</td></tr>
+        <tr><td>半寿</td><td>81</td><td>茶寿</td><td>108</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>年齢計算ニ関スル法律(明治35年法律第50号)<br>
+      <a href="https://laws.e-gov.go.jp/law/135AC1000000050" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/135AC1000000050</a>(2026年7月29日参照)</li>
+    <li>年齢のとなえ方に関する法律(昭和24年法律第96号・昭和25年1月1日施行)。数え年ではなく満年齢で言い表すことを定めた法律<br>
+      <a href="https://laws.e-gov.go.jp/law/324AC0100000096" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/324AC0100000096</a>(2026年7月29日参照)</li>
+    <li>神社本庁「厄祓い」(厄年は数え年、男性25・42・61歳、女性19・33・37歳、男性42歳と女性33歳が大厄)<br>
+      <a href="https://www.jinjahoncho.or.jp/omairi/yakubarai/" rel="noopener" target="_blank">https://www.jinjahoncho.or.jp/omairi/yakubarai/</a>(2026年7月29日参照)</li>
+    <li>神社本庁「長寿を祝う神事」(賀寿の年齢の一覧)<br>
+      <a href="https://www.jinjahoncho.or.jp/omairi/choju/" rel="noopener" target="_blank">https://www.jinjahoncho.or.jp/omairi/choju/</a>(2026年7月29日参照)</li>
+    <li>神社本庁「七五三」(3歳の髪置、5歳の袴着、7歳の帯解)<br>
+      <a href="https://www.jinjahoncho.or.jp/omairi/shichigosan/" rel="noopener" target="_blank">https://www.jinjahoncho.or.jp/omairi/shichigosan/</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>2月29日生まれの方は、平年は<strong>3月1日から</strong>新しい満年齢になります(民法143条2項ただし書により、期間は2月28日の終了時に満了するため)。うるう年は2月29日当日に上がります。</li>
+    <li>数え年は「生まれた年を1歳とし、元日ごとに1歳加える」数え方です。誕生日は関係ありません。</li>
+    <li>七五三・厄年・賀寿は宗教的な慣習であり、<strong>法的な定めはありません</strong>。地域や社寺により数え方(数え年か満年齢か)が異なります。神社本庁は賀寿について「数え年、満年齢のいずれで数えても差し支えない」としています。</li>
+    <li>神社本庁の七五三の解説には、数え年と満年齢のどちらで行うかの記載がありません。本ツールでは節目の一覧を数え年で表示しています。お参りの時期は社寺にご確認ください。</li>
+    <li>対応する生年は1868年から2200年までです。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">数え年と満年齢はいくつ違いますか?</h3>
+  <p class="faq-a">その年の誕生日を迎えていれば1つ、まだ迎えていなければ2つ、数え年のほうが大きくなります。</p>
+  <h3 class="faq-q">厄年はいつからいつまでですか?</h3>
+  <p class="faq-a">数え年で数えるため、元日から大晦日までがその厄年に当たります。前厄・後厄を含めると3年間続きます。ただし社寺によっては立春を区切りとする場合もあります。</p>
+  <h3 class="faq-q">なぜ日本では満年齢が使われるようになったのですか?</h3>
+  <p class="faq-a">昭和24年に「年齢のとなえ方に関する法律」が定められ、昭和25年1月1日から、国民は数え年ではなく満年齢で年齢を言い表すよう努めることとされたためです。国や地方公共団体の機関は満年齢で表示する義務があります。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_birth_date: "生年月日を正しく選んでください。",
+    invalid_ref_date: "基準日を正しく選んでください。",
+    ref_before_birth: "基準日が生年月日より前になっています。",
+    invalid_age: "年齢を計算できませんでした。",
+    invalid_sex: "性別を選び直してください。",
+    invalid_birth_year: "生年が対応範囲外です。",
+    invalid_from_year: "基準の年が対応範囲外です。",
+    invalid_limit: "件数の指定が不正です。"
+  };
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function el(id) { return document.getElementById(id); }
+  function val(id) { return parseInt(el(id).value, 10); }
+  function fill(id, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el(id).innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+  function adjustDays(yId, mId, dId) {
+    var keep = val(dId) || 1;
+    var max = daysInMonth(val(yId), val(mId));
+    fill(dId, 1, max, "日", Math.min(keep, max));
+  }
+
+  var today = new Date();
+  var thisYear = today.getFullYear();
+  fill("b-year", 1900, thisYear, "年", thisYear - 30);
+  fill("b-month", 1, 12, "月", 1);
+  fill("b-day", 1, 31, "日", 1);
+  fill("r-year", 1900, 2200, "年", thisYear);
+  fill("r-month", 1, 12, "月", today.getMonth() + 1);
+  fill("r-day", 1, 31, "日", today.getDate());
+
+  var box = el("result");
+  var yakuBox = el("yaku-result");
+  var mileBox = el("mile-result");
+
+  function run() {
+    adjustDays("b-year", "b-month", "b-day");
+    adjustDays("r-year", "r-month", "r-day");
+    var r = KazoedoshiCalc.calculate(
+      val("b-year"), val("b-month"), val("b-day"),
+      val("r-year"), val("r-month"), val("r-day")
+    );
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      yakuBox.hidden = true;
+      mileBox.hidden = true;
+      return;
+    }
+    var g = KazoedoshiCalc.gaju(r.kazoedoshi);
+    box.innerHTML = '<div class="result-main">満 ' + esc(r.mannenrei) + " 歳 / 数え " + esc(r.kazoedoshi) + " 歳</div>" +
+      "<p>基準日の時点でその年の誕生日を" + (r.hadBirthday ? "迎えています" : "まだ迎えていません") +
+      "(数え年は満年齢の " + (r.hadBirthday ? "1" : "2") + " つ上)</p>" +
+      (g.ok && g.name ? "<p>この数え年は <strong>" + esc(g.name) + "</strong> にあたります。</p>" : "");
+    box.hidden = false;
+    runYaku(r.kazoedoshi);
+    runMilestones();
+  }
+
+  function runYaku(kazoedoshi) {
+    var y = KazoedoshiCalc.yakudoshi(kazoedoshi, el("sex").value);
+    if (!y.ok) {
+      yakuBox.innerHTML = '<p class="result-error">' + esc(ERRORS[y.code] || "判定できませんでした。") + "</p>";
+      yakuBox.hidden = false;
+      return;
+    }
+    yakuBox.innerHTML = y.kind
+      ? '<div class="result-main">' + esc(y.kind) + "</div><p>数え" + esc(y.honyaku) + "歳の厄年に当たります" +
+        (y.taiyaku ? "(大厄)" : "") + "。</p>"
+      : '<div class="result-main">厄年ではありません</div>';
+    yakuBox.hidden = false;
+  }
+
+  function runMilestones() {
+    var m = KazoedoshiCalc.milestones(val("b-year"), el("sex").value, val("r-year"), 8);
+    if (!m.ok) {
+      mileBox.innerHTML = '<p class="result-error">' + esc(ERRORS[m.code] || "計算できませんでした。") + "</p>";
+      mileBox.hidden = false;
+      return;
+    }
+    if (m.items.length === 0) {
+      mileBox.innerHTML = "<p>この先に該当する節目はありません。</p>";
+      mileBox.hidden = false;
+      return;
+    }
+    var html = '<div class="table-scroll"><table class="data-table">' +
+      "<thead><tr><th>西暦</th><th>数え年</th><th>区分</th><th>内容</th></tr></thead><tbody>";
+    m.items.forEach(function (it) {
+      html += "<tr><td>" + esc(it.year) + "年</td><td>" + esc(it.kazoedoshi) + "歳</td><td>" +
+        esc(it.type) + "</td><td>" + esc(it.name) + "</td></tr>";
+    });
+    html += "</tbody></table></div>";
+    mileBox.innerHTML = html;
+    mileBox.hidden = false;
+  }
+
+  ["b-year", "b-month", "b-day", "r-year", "r-month", "r-day"].forEach(function (id) {
+    el(id).addEventListener("change", run);
+  });
+  el("sex").addEventListener("change", run);
+  el("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
+})();
+</script>
+</body>
+</html>

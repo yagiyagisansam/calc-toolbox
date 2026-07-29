@@ -1,0 +1,162 @@
+{
+  "tool": "getsurei",
+  "module": "calc.js",
+  "global": "GetsureiCalc",
+  "cases": [
+    {
+      "name": "国立天文台と照合: 2026年1月1日の次の満月は1月3日19時03分",
+      "func": "nextPhase",
+      "args": [2026, 1, 1, 0, 0, "full"],
+      "expect": { "ok": true, "year": 2026, "month": 1, "day": 3, "hour": 19, "minute": 3, "label": "望(満月)" }
+    },
+    {
+      "name": "国立天文台と照合: 2026年1月1日の次の新月は1月19日4時52分",
+      "func": "nextPhase",
+      "args": [2026, 1, 1, 0, 0, "new"],
+      "expect": { "ok": true, "year": 2026, "month": 1, "day": 19, "hour": 4, "minute": 52 }
+    },
+    {
+      "name": "国立天文台と照合: 2026年7月1日の次の満月は7月29日23時36分",
+      "func": "nextPhase",
+      "args": [2026, 7, 1, 0, 0, "full"],
+      "expect": { "ok": true, "year": 2026, "month": 7, "day": 29, "hour": 23, "minute": 36 }
+    },
+    {
+      "name": "国立天文台と照合: 2026年7月29日の次の新月は8月13日2時37分",
+      "func": "nextPhase",
+      "args": [2026, 7, 29, 0, 0, "new"],
+      "expect": { "ok": true, "year": 2026, "month": 8, "day": 13, "hour": 2, "minute": 37 }
+    },
+    {
+      "name": "国立天文台と照合: 2026年3月1日の次の上弦は3月26日4時18分",
+      "func": "nextPhase",
+      "args": [2026, 3, 1, 0, 0, "first"],
+      "expect": { "ok": true, "year": 2026, "month": 3, "day": 26, "hour": 4, "minute": 18, "label": "上弦" }
+    },
+    {
+      "name": "国立天文台と照合: 2026年9月1日の次の下弦は9月4日16時51分",
+      "func": "nextPhase",
+      "args": [2026, 9, 1, 0, 0, "last"],
+      "expect": { "ok": true, "year": 2026, "month": 9, "day": 4, "hour": 16, "minute": 51, "label": "下弦" }
+    },
+    {
+      "name": "月齢: 2026年7月14日18時44分は朔ちょうどで月齢0.0",
+      "func": "moonAge",
+      "args": [2026, 7, 14, 18, 44],
+      "expect": {
+        "ok": true, "age": 0, "phase": "新月(朔)", "illumination": 0,
+        "lastNewMoon": { "year": 2026, "month": 7, "day": 14, "hour": 18, "minute": 44 }
+      }
+    },
+    {
+      "name": "月齢: 2026年7月29日23時36分(望)は月齢15.2で満月",
+      "func": "moonAge",
+      "args": [2026, 7, 29, 23, 36],
+      "expect": {
+        "ok": true, "age": 15.2, "phase": "満月(望)",
+        "fullMoon": { "year": 2026, "month": 7, "day": 29, "hour": 23, "minute": 36 },
+        "nextNewMoon": { "year": 2026, "month": 8, "day": 13, "hour": 2, "minute": 37 }
+      }
+    },
+    {
+      "name": "月齢: 2026年7月21日20時06分(上弦)は月齢7.1で輝面比47.1%",
+      "func": "moonAge",
+      "args": [2026, 7, 21, 20, 6],
+      "expect": { "ok": true, "age": 7.1, "phase": "上弦の月", "illumination": 47.1 }
+    },
+    {
+      "name": "月齢: 2026年7月29日12時は満月の直前で月齢14.7",
+      "func": "moonAge",
+      "args": [2026, 7, 29, 12, 0],
+      "expect": { "ok": true, "age": 14.7, "phase": "満月(望)" }
+    },
+    {
+      "name": "月齢: 2026年8月13日2時37分(朔)は次の周期の始まりで月齢0.0",
+      "func": "moonAge",
+      "args": [2026, 8, 13, 2, 37],
+      "expect": {
+        "ok": true, "age": 0,
+        "lastNewMoon": { "year": 2026, "month": 8, "day": 13, "hour": 2, "minute": 37 },
+        "fullMoon": { "year": 2026, "month": 8, "day": 28, "hour": 13, "minute": 19 }
+      }
+    },
+    {
+      "name": "時刻を省略すると0時0分として計算する",
+      "func": "moonAge",
+      "args": [2026, 8, 13],
+      "expect": { "ok": true, "lastNewMoon": { "year": 2026, "month": 7, "day": 14 } }
+    },
+    {
+      "name": "境界値: 対応範囲の下限1900年1月1日でも計算できる",
+      "func": "moonAge",
+      "args": [1900, 1, 1],
+      "expect": { "ok": true, "nextNewMoon": { "year": 1900, "month": 1, "day": 1 } }
+    },
+    {
+      "name": "境界値: 対応範囲の上限2100年12月31日23時59分でも計算できる",
+      "func": "moonAge",
+      "args": [2100, 12, 31, 23, 59],
+      "expect": { "ok": true, "lastNewMoon": { "year": 2100, "month": 12, "day": 31 } }
+    },
+    {
+      "name": "異常入力: 存在しない日付(2月30日)はエラー",
+      "func": "moonAge",
+      "args": [2026, 2, 30],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 対応範囲外の年(1899年)はエラー",
+      "func": "moonAge",
+      "args": [1899, 1, 1],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 対応範囲外の年(2101年)はエラー",
+      "func": "moonAge",
+      "args": [2101, 1, 1],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 月0はエラー",
+      "func": "moonAge",
+      "args": [2026, 0, 1],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 時が24はエラー",
+      "func": "moonAge",
+      "args": [2026, 7, 29, 24, 0],
+      "expect": { "ok": false, "code": "invalid_time" }
+    },
+    {
+      "name": "異常入力: 分が-1はエラー",
+      "func": "moonAge",
+      "args": [2026, 7, 29, 0, -1],
+      "expect": { "ok": false, "code": "invalid_time" }
+    },
+    {
+      "name": "異常入力: 年が数値でないときはエラー",
+      "func": "moonAge",
+      "args": ["abc", 1, 1],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "moonAge",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_date" }
+    },
+    {
+      "name": "異常入力: 存在しない月相の指定はエラー",
+      "func": "nextPhase",
+      "args": [2026, 1, 1, 0, 0, "x"],
+      "expect": { "ok": false, "code": "invalid_kind" }
+    },
+    {
+      "name": "異常入力: nextPhaseでも日付が不正ならエラー",
+      "func": "nextPhase",
+      "args": [2026, 13, 1, 0, 0, "new"],
+      "expect": { "ok": false, "code": "invalid_date" }
+    }
+  ]
+}

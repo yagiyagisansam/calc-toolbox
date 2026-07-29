@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>肥料の施肥量計算(N-P-K)(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="施したい成分量と肥料の保証成分量(N-P-K)から、実際に撒く肥料の重さを計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>肥料の施肥量計算(N-P-K)</h1>
+  <form class="tool-form" id="tool-form">
+    <label>面積(m²)
+      <span class="field-note">畑や花壇の広さ。例: 10</span>
+      <input type="number" id="area" inputmode="decimal" step="any" min="0.01" max="1000000" placeholder="10">
+    </label>
+    <label>施したい窒素の量(g/m²)
+      <span class="field-note">施肥基準の kg/10a は、そのまま g/m² として使えます。例: 2</span>
+      <input type="number" id="target" inputmode="decimal" step="any" min="0.001" max="10000" placeholder="2">
+    </label>
+    <span class="field-note">肥料袋の成分表示(保証成分量 %)</span>
+    <div class="field-row">
+      <label>窒素 N(%)
+        <input type="number" id="n" inputmode="decimal" step="any" min="0.1" max="100" placeholder="14">
+      </label>
+      <label>りん酸 P(%)
+        <input type="number" id="p" inputmode="decimal" step="any" min="0" max="100" placeholder="14">
+      </label>
+      <label>加里 K(%)
+        <input type="number" id="k" inputmode="decimal" step="any" min="0" max="100" placeholder="14">
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 成分量から肥料の重さだけを求める</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">成分量 → 肥料の重さ</h3>
+      <p class="adv-note">面積を使わず、「この成分を◯g入れたい」から肥料の重さを直接求めます。</p>
+      <div class="field-row">
+        <label>施したい成分量(g)
+          <input type="number" id="adv-target" inputmode="decimal" step="any" min="0.001" placeholder="20">
+        </label>
+        <label>その成分の保証成分量(%)
+          <input type="number" id="adv-percent" inputmode="decimal" step="any" min="0.1" max="100" placeholder="14">
+        </label>
+      </div>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    袋に書かれた「1m²あたり100g」は<strong>肥料そのものの重さ</strong>で、成分の量ではありません。8-8-8と14-14-14では同じ成分量を入れるのに必要な肥料の重さが1.75倍違います。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>施したい成分量から、<strong>実際に撒く肥料の重さ</strong>がわかります。同時に入るりん酸・加里の量も出るので、入れすぎで根を傷めるのを防げます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>面積と、1m²あたり施したい窒素の量を入れます。</li>
+    <li>肥料袋の成分表示(例: 14-14-14)をN・P・Kの欄に入れると、その瞬間に必要な肥料の重さが出ます。</li>
+    <li>「＋詳細機能」では面積を使わずに、成分量から肥料の重さだけを求められます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>施す成分の総量(g)</strong> = 面積(m²) × 1m²あたりの成分量(g/m²)</li>
+    <li><strong>肥料の重さ(g)</strong> = 施す成分の総量(g) ÷ (保証成分量(%) ÷ 100)</li>
+    <li><strong>同時に入るりん酸(g)</strong> = 肥料の重さ × りん酸の保証成分量(%) ÷ 100</li>
+    <li><strong>単位換算</strong> = 1 kg/10a = 1 g/m²(10a = 1,000m² なので 1,000g ÷ 1,000m²)</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>窒素20gを入れるのに必要な肥料の重さ</caption>
+      <thead><tr><th>肥料の表示</th><th>必要な肥料</th><th>同時に入るりん酸</th><th>同時に入る加里</th></tr></thead>
+      <tbody>
+        <tr><td>8-8-8</td><td>250.0g</td><td>20.0g</td><td>20.0g</td></tr>
+        <tr><td>10-10-10</td><td>200.0g</td><td>20.0g</td><td>20.0g</td></tr>
+        <tr><td>14-14-14</td><td>142.9g</td><td>20.0g</td><td>20.0g</td></tr>
+        <tr><td>10-18-15</td><td>200.0g</td><td>36.0g</td><td>30.0g</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>肥料の品質の確保等に関する法律(昭和25年法律第127号)第2条第3項「保証成分量」の定義<br>
+      <a href="https://laws.e-gov.go.jp/law/325AC0000000127" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/325AC0000000127</a>(2026年7月29日参照)</li>
+    <li>農林水産省「施肥基準」(作物ごとの施肥成分量 kg/10a)<br>
+      <a href="https://www.maff.go.jp/j/seisan/kankyo/hozen_type/h_sehi_kizyun/pdf/tuti232.pdf" rel="noopener" target="_blank">https://www.maff.go.jp/j/seisan/kankyo/hozen_type/h_sehi_kizyun/pdf/tuti232.pdf</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>「保証成分量」は法律上、含有を保証する主成分の<strong>最小量</strong>を百分比で表したものです(2026年7月29日時点の肥料の品質の確保等に関する法律第2条第3項)。実際の含有量はこれ以上のことがあります。</li>
+    <li>日本の肥料表示の「りん酸」「加里」は、慣行として五酸化二りん(P2O5)・酸化カリウム(K2O)に換算した量で表されます。元素のP・Kそのものの量ではありません。</li>
+    <li>土壌にもともとある養分や、堆肥・前作の残肥からの供給は考慮していません。実際の施肥設計では土壌診断の結果に応じて減らします。</li>
+    <li>農林水産省の資料でも「速効性の肥料を多量に施用すると濃度障害等を引き起こしやすいので、一度に窒素成分で10a当たり20kg以下とすることが望ましい」とされています(=1m²あたり20g以下)。</li>
+    <li>窒素を基準に量を決めると、りん酸や加里が過剰になることがあります。結果に出る量を確認してください。</li>
+    <li>家庭菜園では元肥と追肥に分けて施すのが一般的です。ここで出るのは合計量の目安です。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">「14-14-14」の数字は何を表していますか?</h3>
+  <p class="faq-a">左から窒素(N)・りん酸(P)・加里(K)の保証成分量を%で表したものです。14-14-14の肥料100gには、窒素・りん酸・加里がそれぞれ14gずつ入っています。</p>
+  <h3 class="faq-q">袋に「1m²あたり100g」と書いてあるのに、計算結果が違います。</h3>
+  <p class="faq-a">袋の表示は肥料そのものの重さで、成分の量ではありません。同じ「100g」でも8-8-8なら窒素8g、14-14-14なら窒素14gが入ります。作物ごとの施肥基準(成分量)から逆算するのがこのツールの使い方です。</p>
+  <h3 class="faq-q">kg/10a を m² に直すにはどうしますか?</h3>
+  <p class="faq-a">10a = 1,000m² なので、1 kg/10a はそのまま 1 g/m² になります。「窒素8kg/10a」なら「窒素8g/m²」と読み替えてください。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_area: "面積を0.01〜1000000m²の範囲で入力してください。",
+    invalid_target: "施したい成分量を0より大きい値で入力してください。",
+    invalid_guarantee: "窒素の保証成分量を0.1〜100%の範囲で入力してください。",
+    invalid_phosphate: "りん酸の保証成分量を0〜100%の範囲で入力してください。",
+    invalid_potash: "加里の保証成分量を0〜100%の範囲で入力してください。",
+    invalid_standard: "施肥基準の値を0以上で入力してください。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var areaEl = document.getElementById("area");
+  var targetEl = document.getElementById("target");
+  var nEl = document.getElementById("n");
+  var pEl = document.getElementById("p");
+  var kEl = document.getElementById("k");
+  var advTargetEl = document.getElementById("adv-target");
+  var advPercentEl = document.getElementById("adv-percent");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function run() {
+    if (areaEl.value === "" || targetEl.value === "" || nEl.value === "") { box.hidden = true; return; }
+    var r = HiryoCalc.calculate(
+      parseFloat(areaEl.value), parseFloat(targetEl.value), parseFloat(nEl.value),
+      pEl.value === "" ? 0 : parseFloat(pEl.value),
+      kEl.value === "" ? 0 : parseFloat(kEl.value)
+    );
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">肥料 ' + esc(r.fertilizerGram.toFixed(1)) + "g(" + esc(r.fertilizerKg.toFixed(2)) + "kg)</div>" +
+      "<p>1m²あたり " + esc(r.fertilizerPerM2Gram.toFixed(1)) + "g</p>" +
+      "<p>入る窒素の総量: " + esc(r.totalNitrogenGram.toFixed(1)) + "g</p>" +
+      "<p>同時に入るりん酸: " + esc(r.phosphateGram.toFixed(1)) + "g(1m²あたり " + esc(r.phosphatePerM2Gram.toFixed(1)) + "g)</p>" +
+      "<p>同時に入る加里: " + esc(r.potashGram.toFixed(1)) + "g(1m²あたり " + esc(r.potashPerM2Gram.toFixed(1)) + "g)</p>";
+    box.hidden = false;
+  }
+
+  function runAdv() {
+    if (advTargetEl.value === "" || advPercentEl.value === "") { advBox.hidden = true; return; }
+    var r = HiryoCalc.fertilizerAmount(parseFloat(advTargetEl.value), parseFloat(advPercentEl.value));
+    if (!r.ok) {
+      advBox.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      advBox.hidden = false;
+      return;
+    }
+    advBox.innerHTML = '<div class="result-main">肥料 ' + esc(r.fertilizerGram.toFixed(1)) + "g</div>";
+    advBox.hidden = false;
+  }
+
+  [areaEl, targetEl, nEl, pEl, kEl].forEach(function (el) { el.addEventListener("input", run); });
+  [advTargetEl, advPercentEl].forEach(function (el) { el.addEventListener("input", runAdv); });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

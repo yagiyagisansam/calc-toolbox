@@ -1,0 +1,145 @@
+{
+  "tool": "kabuma",
+  "module": "calc.js",
+  "global": "KabumaCalc",
+  "cases": [
+    {
+      "name": "代表例: 畝5m・株間50cm・2条・予備10%なら1条11株、合計22株、必要25本",
+      "func": "calculate",
+      "args": [5, 50, 2, 10],
+      "expect": { "ok": true, "perRow": 11, "perRowNoEdge": 10, "total": 22, "needed": 25, "spareCount": 3 }
+    },
+    {
+      "name": "予備なし: 畝5m・株間50cm・2条なら必要本数は22本のまま",
+      "func": "calculate",
+      "args": [5, 50, 2, 0],
+      "expect": { "ok": true, "total": 22, "needed": 22, "spareCount": 0 }
+    },
+    {
+      "name": "1条だけ: 畝3m・株間30cmは11株(300÷30=10区間、両端に植えて+1)",
+      "func": "calculate",
+      "args": [3, 30, 1, 0],
+      "expect": { "ok": true, "perRow": 11, "total": 11 }
+    },
+    {
+      "name": "割り切れない場合: 畝1m・株間30cmは区間3つで4株",
+      "func": "calculate",
+      "args": [1, 30, 1, 0],
+      "expect": { "ok": true, "perRow": 4, "perRowNoEdge": 3 }
+    },
+    {
+      "name": "境界値: 畝0.9m・株間30cmはちょうど3区間で4株(浮動小数で1株減らない)",
+      "func": "calculate",
+      "args": [0.9, 30, 1, 0],
+      "expect": { "ok": true, "perRow": 4, "perRowNoEdge": 3 }
+    },
+    {
+      "name": "境界値: 株間が畝の長さより大きいときは1株だけ",
+      "func": "calculate",
+      "args": [0.3, 50, 1, 0],
+      "expect": { "ok": true, "perRow": 1, "perRowNoEdge": 0, "total": 1 }
+    },
+    {
+      "name": "ダイコン(株間30cm)を畝10m・1条で作ると34株、予備20%で41本",
+      "func": "calculate",
+      "args": [10, 30, 1, 20],
+      "expect": { "ok": true, "perRow": 34, "total": 34, "needed": 41 }
+    },
+    {
+      "name": "条数から: 畝幅120cm・条間60cm・端なしは3条",
+      "func": "rowsFromBedWidth",
+      "args": [120, 60, 0],
+      "expect": { "ok": true, "rows": 3, "usableCm": 120 }
+    },
+    {
+      "name": "条数から: 畝幅120cm・条間60cm・端を30cm空けると2条(二条植えの標準)",
+      "func": "rowsFromBedWidth",
+      "args": [120, 60, 30],
+      "expect": { "ok": true, "rows": 2, "usableCm": 60 }
+    },
+    {
+      "name": "条数から: 畝幅120cm・条間30cm・端を15cm空けると4条",
+      "func": "rowsFromBedWidth",
+      "args": [120, 30, 15],
+      "expect": { "ok": true, "rows": 4, "usableCm": 90 }
+    },
+    {
+      "name": "境界値: 端の空きが畝幅の半分ちょうどなら1条",
+      "func": "rowsFromBedWidth",
+      "args": [60, 30, 30],
+      "expect": { "ok": true, "rows": 1, "usableCm": 0 }
+    },
+    {
+      "name": "面積確認: 畝5m×幅120cmに22株なら1株あたり2,727cm²",
+      "func": "areaPerPlant",
+      "args": [5, 120, 22],
+      "expect": { "ok": true, "areaM2": 6, "perPlantCm2": 2727 }
+    },
+    {
+      "name": "異常入力: 畝の長さ0mはエラー",
+      "func": "calculate",
+      "args": [0, 50, 1, 0],
+      "expect": { "ok": false, "code": "invalid_length" }
+    },
+    {
+      "name": "異常入力: 畝の長さが負の値はエラー",
+      "func": "calculate",
+      "args": [-5, 50, 1, 0],
+      "expect": { "ok": false, "code": "invalid_length" }
+    },
+    {
+      "name": "異常入力: 株間0cmはエラー(0除算にならない)",
+      "func": "calculate",
+      "args": [5, 0, 1, 0],
+      "expect": { "ok": false, "code": "invalid_spacing" }
+    },
+    {
+      "name": "異常入力: 株間が範囲超過(501cm)はエラー",
+      "func": "calculate",
+      "args": [5, 501, 1, 0],
+      "expect": { "ok": false, "code": "invalid_spacing" }
+    },
+    {
+      "name": "異常入力: 条数0はエラー",
+      "func": "calculate",
+      "args": [5, 50, 0, 0],
+      "expect": { "ok": false, "code": "invalid_rows" }
+    },
+    {
+      "name": "異常入力: 条数が整数でないときはエラー",
+      "func": "calculate",
+      "args": [5, 50, 2.5, 0],
+      "expect": { "ok": false, "code": "invalid_rows" }
+    },
+    {
+      "name": "異常入力: 予備率が負の値はエラー",
+      "func": "calculate",
+      "args": [5, 50, 1, -10],
+      "expect": { "ok": false, "code": "invalid_spare" }
+    },
+    {
+      "name": "異常入力: 畝の長さが数値でないときはエラー",
+      "func": "calculate",
+      "args": ["5", 50, 1, 0],
+      "expect": { "ok": false, "code": "invalid_length" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_length" }
+    },
+    {
+      "name": "異常入力: 端の空きが畝幅の半分を超えるときはエラー",
+      "func": "rowsFromBedWidth",
+      "args": [60, 30, 40],
+      "expect": { "ok": false, "code": "out_of_range" }
+    },
+    {
+      "name": "異常入力: 株数0で面積を割ろうとするとエラー",
+      "func": "areaPerPlant",
+      "args": [5, 120, 0],
+      "expect": { "ok": false, "code": "invalid_count" }
+    }
+  ]
+}

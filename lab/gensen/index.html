@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>報酬の源泉徴収税額 計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="原稿料・デザイン料などの報酬から差し引かれる源泉徴収税額と手取りを計算します(逆算も可)。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>/* 長いURLがはみ出さないようにする(shared/style.cssは変更しない) */
+  .sources a { word-break: break-all; overflow-wrap: anywhere; }</style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>報酬の源泉徴収税額 計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>報酬額(消費税抜き、円)
+      <span class="field-note">請求書に書く報酬・料金の本体価格。例: 100000</span>
+      <input type="number" id="reward" inputmode="numeric" step="1" min="0" placeholder="100000">
+    </label>
+    <div class="field-row">
+      <label>消費税率(%)
+        <select id="ctrate">
+          <option value="10">10%</option>
+          <option value="8">8%(軽減税率)</option>
+          <option value="0">請求しない(0%)</option>
+        </select>
+      </label>
+      <label>請求書の書き方
+        <select id="sep">
+          <option value="1">報酬と消費税を区分表示する</option>
+          <option value="0">税込金額だけを書く</option>
+        </select>
+      </label>
+    </div>
+    <label>支払先の区分
+      <select id="payee">
+        <option value="0">個人(源泉徴収あり)</option>
+        <option value="1">法人(原稿料等は源泉徴収なし)</option>
+      </select>
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 手取りから報酬額を逆算する</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">希望の手取りから請求額を逆算</h3>
+      <p class="adv-note">「振込で◯円ほしい」から、請求書に書く税抜の報酬額を求めます。上の消費税率・請求書の書き方・支払先の設定をそのまま使います。</p>
+      <label>希望する手取り(振込)額(円)
+        <input type="number" id="net" inputmode="numeric" step="1" min="1" placeholder="100000">
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    この計算は<strong>原稿料・講演料・デザイン料など(所得税法第204条第1項第1号)</strong>の税率にもとづく概算です。司法書士・外交員・ホステスなどへの報酬は別の計算式が定められています。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>報酬額を入れるだけで、<strong>源泉徴収される税額と実際に振り込まれる手取り</strong>がわかります。消費税を区分表示するかどうかで対象金額が変わる点も比べられます。手取りからの逆算もできます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>税抜の報酬額を円で入れます。入れた瞬間に税額と手取りが出ます。</li>
+    <li>消費税率と、請求書で報酬・消費税を区分表示するかどうかを選びます。</li>
+    <li>支払先が法人の場合は「法人」を選ぶと源泉徴収なしで計算します。</li>
+    <li>「振込で◯円ほしい」から逆算したいときは「＋詳細機能」を開いてください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>対象金額が100万円以下</strong> = 支払金額 × 10.21%</li>
+    <li><strong>対象金額が100万円超</strong> = (支払金額 − 100万円) × 20.42% + 102,100円</li>
+    <li><strong>端数</strong> = 求めた税額の1円未満を切り捨て</li>
+    <li><strong>消費税の扱い</strong> = 原則は消費税等を含めた金額が対象。請求書で報酬額と消費税額が明確に区分されている場合は、報酬額のみを対象としても差し支えない</li>
+    <li><strong>手取り</strong> = 税込請求額 − 源泉徴収税額</li>
+  </ul>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>国税庁 タックスアンサー No.2795「原稿料や講演料等を支払ったとき」(ページ表記の基準時点: 令和7年4月1日現在法令等)<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/gensen/2795.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/gensen/2795.htm</a>(2026年7月29日参照)</li>
+    <li>国税庁 タックスアンサー No.2792「源泉徴収が必要な報酬・料金等とは」(消費税等の取扱い)<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/gensen/2792.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/gensen/2792.htm</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>税率は<strong>令和7年4月1日現在法令等</strong>にもとづきます。10.21%・20.42%は所得税と復興特別所得税を合わせた率で、復興特別所得税は令和19年12月31日までに生ずる所得に課されます。</li>
+    <li>100万円の判定は「同一人に対し1回に支払われる金額」で行います。1年間の合計ではありません。</li>
+    <li>支払先が法人の場合、原稿料・デザイン料等は源泉徴収の対象外です(馬主である法人への競馬の賞金など例外があります)。</li>
+    <li>報酬の種類によって税率や計算式が異なります。士業・外交員・ホステス・広告宣伝のための賞金などは別の規定です。</li>
+    <li>ここで計算するのは源泉徴収される額であり、最終的な所得税は確定申告で精算されます。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">消費税は源泉徴収の対象に入りますか?</h3>
+  <p class="faq-a">原則は消費税等を含めた金額が対象です。ただし請求書等で報酬・料金の額と消費税等の額が明確に区分されている場合は、報酬・料金の額のみを対象としても差し支えないとされています。</p>
+  <h3 class="faq-q">なぜ10%ではなく10.21%なのですか?</h3>
+  <p class="faq-a">所得税10%に復興特別所得税(所得税額の2.1%)が上乗せされるためです。10% × 1.021 = 10.21% になります。</p>
+  <h3 class="faq-q">100万円を超えると全額が20.42%になりますか?</h3>
+  <p class="faq-a">なりません。100万円までの部分は10.21%(=102,100円)で、100万円を超えた部分だけが20.42%です。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_reward: "報酬額は0円〜100億円の数値で入力してください。",
+    invalid_target: "対象金額は0円〜100億円の数値で入力してください。",
+    invalid_tax_rate: "消費税率を選び直してください。",
+    invalid_net_pay: "手取り額は1円〜100億円の数値で入力してください。",
+    not_found: "その手取り額になる報酬額は求められませんでした。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var rewardEl = document.getElementById("reward");
+  var ctRateEl = document.getElementById("ctrate");
+  var sepEl = document.getElementById("sep");
+  var payeeEl = document.getElementById("payee");
+  var netEl = document.getElementById("net");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function yen(v) { return Math.round(v).toLocaleString("ja-JP") + "円"; }
+  function err(target, code) {
+    target.innerHTML = '<p class="result-error">' + esc(ERRORS[code] || "入力値を確認してください。") + "</p>";
+    target.hidden = false;
+  }
+  function opts() {
+    return [parseFloat(ctRateEl.value), sepEl.value === "1", payeeEl.value === "1"];
+  }
+
+  function run() {
+    if (rewardEl.value === "") { box.hidden = true; return; }
+    var o = opts();
+    var r = GensenCalc.calculate(parseFloat(rewardEl.value), o[0], o[1], o[2]);
+    if (!r.ok) { err(box, r.code); return; }
+    box.innerHTML =
+      '<div class="result-main">源泉徴収 ' + esc(yen(r.taxYen)) + " / 手取り " + esc(yen(r.netPayYen)) + "</div>" +
+      "<p>請求額(税込): " + esc(yen(r.grossYen)) + "(報酬 " + esc(yen(r.rewardYen)) +
+      " + 消費税 " + esc(yen(r.consumptionTaxYen)) + ")</p>" +
+      "<p>源泉徴収の対象金額: " + esc(yen(r.targetYen)) +
+      (r.taxYen === 0 && payeeEl.value === "1" ? " / 法人あてのため源泉徴収なし" :
+        " / 適用: " + (r.bracket === "low" ? "100万円以下 10.21%" : "100万円超 20.42%+102,100円")) + "</p>";
+    box.hidden = false;
+  }
+
+  function runReverse() {
+    if (netEl.value === "") { advBox.hidden = true; return; }
+    var o = opts();
+    var r = GensenCalc.reverseFromNetPay(parseFloat(netEl.value), o[0], o[1], o[2]);
+    if (!r.ok) { err(advBox, r.code); return; }
+    advBox.innerHTML =
+      '<div class="result-main">税抜の報酬額 ' + esc(yen(r.rewardYen)) + "</div>" +
+      "<p>請求額(税込) " + esc(yen(r.grossYen)) + " − 源泉徴収 " + esc(yen(r.taxYen)) +
+      " = 手取り " + esc(yen(r.netPayYen)) + "</p>" +
+      (r.exact ? "" : "<p>端数の切り捨てがあるため、手取りはちょうど一致せず少し多くなります。</p>");
+    advBox.hidden = false;
+  }
+
+  rewardEl.addEventListener("input", run);
+  netEl.addEventListener("input", runReverse);
+  [ctRateEl, sepEl, payeeEl].forEach(function (el) {
+    el.addEventListener("change", function () { run(); runReverse(); });
+  });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

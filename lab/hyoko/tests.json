@@ -1,0 +1,145 @@
+{
+  "tool": "hyoko",
+  "module": "calc.js",
+  "global": "HyokoCalc",
+  "cases": [
+    {
+      "name": "代表例: 標高1000mで25℃なら、3000mは2000m差で12℃下がり13.0℃",
+      "func": "temperature",
+      "args": [1000, 25, 3000],
+      "expect": { "ok": true, "tempC": 13, "diffM": 2000, "dropC": 12, "lapsePer100": 0.6 }
+    },
+    {
+      "name": "富士山: 海抜0mで30℃なら山頂3776mは7.3℃(0.6℃/100m)",
+      "func": "temperature",
+      "args": [0, 30, 3776],
+      "expect": { "ok": true, "tempC": 7.3, "dropC": 22.7 }
+    },
+    {
+      "name": "気温減率0.65℃/100m(日本気象協会の目安)なら富士山頂は5.5℃",
+      "func": "temperature",
+      "args": [0, 30, 3776, 0.65],
+      "expect": { "ok": true, "tempC": 5.5, "dropC": 24.5, "lapsePer100": 0.65 }
+    },
+    {
+      "name": "出典の確認: 0.65℃/100mで標高1000m上がると6.5℃下がる",
+      "func": "temperature",
+      "args": [0, 30, 1000, 0.65],
+      "expect": { "ok": true, "tempC": 23.5, "dropC": 6.5 }
+    },
+    {
+      "name": "湿潤な大気(0.5℃/100m)なら富士山頂は11.1℃",
+      "func": "temperature",
+      "args": [0, 30, 3776, 0.5],
+      "expect": { "ok": true, "tempC": 11.1, "dropC": 18.9 }
+    },
+    {
+      "name": "下る場合: 2000mで10℃なら500mは19.0℃(標高差が負)",
+      "func": "temperature",
+      "args": [2000, 10, 500],
+      "expect": { "ok": true, "tempC": 19, "diffM": -1500, "dropC": -9 }
+    },
+    {
+      "name": "境界値: 標高差0mなら気温は変わらない",
+      "func": "temperature",
+      "args": [0, 20, 0],
+      "expect": { "ok": true, "tempC": 20, "diffM": 0, "dropC": 0 }
+    },
+    {
+      "name": "境界値: 気温減率の下限0.3℃/100mでも計算できる",
+      "func": "temperature",
+      "args": [0, 20, 1000, 0.3],
+      "expect": { "ok": true, "tempC": 17, "dropC": 3 }
+    },
+    {
+      "name": "境界値: 気温減率の上限1.0℃/100m(乾燥断熱減率)でも計算できる",
+      "func": "temperature",
+      "args": [0, 20, 1000, 1],
+      "expect": { "ok": true, "tempC": 10, "dropC": 10 }
+    },
+    {
+      "name": "異常入力: 気温減率が下限未満(0.29)はエラー",
+      "func": "temperature",
+      "args": [0, 20, 1000, 0.29],
+      "expect": { "ok": false, "code": "invalid_lapse" }
+    },
+    {
+      "name": "異常入力: 気温減率が上限超(1.01)はエラー",
+      "func": "temperature",
+      "args": [0, 20, 1000, 1.01],
+      "expect": { "ok": false, "code": "invalid_lapse" }
+    },
+    {
+      "name": "異常入力: 麓の標高が範囲外(-501m)はエラー",
+      "func": "temperature",
+      "args": [-501, 20, 1000],
+      "expect": { "ok": false, "code": "invalid_base_alt" }
+    },
+    {
+      "name": "異常入力: 麓の気温が範囲外(61℃)はエラー",
+      "func": "temperature",
+      "args": [0, 61, 1000],
+      "expect": { "ok": false, "code": "invalid_base_temp" }
+    },
+    {
+      "name": "異常入力: 目的地の標高が範囲外(9001m)はエラー",
+      "func": "temperature",
+      "args": [0, 20, 9001],
+      "expect": { "ok": false, "code": "invalid_target_alt" }
+    },
+    {
+      "name": "異常入力: 標高が数値でないときはエラー",
+      "func": "temperature",
+      "args": ["abc", 20, 1000],
+      "expect": { "ok": false, "code": "invalid_base_alt" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "temperature",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_base_alt" }
+    },
+    {
+      "name": "体感温度: 7.3℃で風速5m/sなら2.3℃",
+      "func": "windChill",
+      "args": [7.3, 5],
+      "expect": { "ok": true, "feltC": 2.3, "dropC": 5 }
+    },
+    {
+      "name": "体感温度: 0℃で風速10m/sなら-10℃",
+      "func": "windChill",
+      "args": [0, 10],
+      "expect": { "ok": true, "feltC": -10 }
+    },
+    {
+      "name": "境界値: 風速0なら体感温度は気温と同じ",
+      "func": "windChill",
+      "args": [10, 0],
+      "expect": { "ok": true, "feltC": 10, "dropC": 0 }
+    },
+    {
+      "name": "異常入力: 風速が負の値はエラー",
+      "func": "windChill",
+      "args": [20, -1],
+      "expect": { "ok": false, "code": "invalid_wind" }
+    },
+    {
+      "name": "異常入力: 風速が上限超(61m/s)はエラー",
+      "func": "windChill",
+      "args": [20, 61],
+      "expect": { "ok": false, "code": "invalid_wind" }
+    },
+    {
+      "name": "まとめて: 海抜0mで30℃・富士山頂3776m・風速10m/sは気温7.3℃/体感-2.7℃",
+      "func": "calculate",
+      "args": [0, 30, 3776, 10],
+      "expect": { "ok": true, "tempC": 7.3, "feltC": -2.7, "windDropC": 10 }
+    },
+    {
+      "name": "まとめて: 500mで20℃・2500m・風速5m/s・0.65℃/100mは気温7.0℃/体感2.0℃",
+      "func": "calculate",
+      "args": [500, 20, 2500, 5, 0.65],
+      "expect": { "ok": true, "tempC": 7, "feltC": 2, "dropC": 13 }
+    }
+  ]
+}

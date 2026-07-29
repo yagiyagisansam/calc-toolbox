@@ -1,0 +1,151 @@
+{
+  "tool": "gensen",
+  "module": "calc.js",
+  "global": "GensenCalc",
+  "cases": [
+    {
+      "name": "代表例: 対象金額10万円は10.21%で10,210円",
+      "func": "withholding",
+      "args": [100000],
+      "expect": { "ok": true, "taxYen": 10210, "rate": 0.1021, "bracket": "low" }
+    },
+    {
+      "name": "境界値: 対象金額ちょうど100万円は10.21%で102,100円",
+      "func": "withholding",
+      "args": [1000000],
+      "expect": { "ok": true, "taxYen": 102100, "bracket": "low" }
+    },
+    {
+      "name": "境界値超え: 100万円+1円は(1円×20.42%+102,100円)を切り捨てて102,100円",
+      "func": "withholding",
+      "args": [1000001],
+      "expect": { "ok": true, "taxYen": 102100, "rate": 0.2042, "bracket": "high" }
+    },
+    {
+      "name": "国税庁の例: 対象金額150万円は204,200円",
+      "func": "withholding",
+      "args": [1500000],
+      "expect": { "ok": true, "taxYen": 204200, "bracket": "high" }
+    },
+    {
+      "name": "端数処理: 12,345円は1,260.4245円を切り捨てて1,260円",
+      "func": "withholding",
+      "args": [12345],
+      "expect": { "ok": true, "taxYen": 1260 }
+    },
+    {
+      "name": "境界値: 対象金額0円は税額0円",
+      "func": "withholding",
+      "args": [0],
+      "expect": { "ok": true, "taxYen": 0 }
+    },
+    {
+      "name": "異常入力: 対象金額が負の値はエラー",
+      "func": "withholding",
+      "args": [-1],
+      "expect": { "ok": false, "code": "invalid_target" }
+    },
+    {
+      "name": "異常入力: 数値でない対象金額はエラー",
+      "func": "withholding",
+      "args": ["abc"],
+      "expect": { "ok": false, "code": "invalid_target" }
+    },
+    {
+      "name": "異常入力: 対象金額が上限超え(200億円)はエラー",
+      "func": "withholding",
+      "args": [20000000000],
+      "expect": { "ok": false, "code": "invalid_target" }
+    },
+    {
+      "name": "区分表示あり: 報酬10万円+消費税10%は税額10,210円・手取り99,790円",
+      "func": "calculate",
+      "args": [100000, 10, true],
+      "expect": { "ok": true, "consumptionTaxYen": 10000, "grossYen": 110000, "targetYen": 100000, "taxYen": 10210, "netPayYen": 99790 }
+    },
+    {
+      "name": "区分表示なし: 税込11万円が対象になり税額11,231円・手取り98,769円",
+      "func": "calculate",
+      "args": [100000, 10, false],
+      "expect": { "ok": true, "targetYen": 110000, "taxYen": 11231, "netPayYen": 98769 }
+    },
+    {
+      "name": "100万円超: 報酬150万円+消費税10%は税額204,200円・手取り1,445,800円",
+      "func": "calculate",
+      "args": [1500000, 10, true],
+      "expect": { "ok": true, "grossYen": 1650000, "taxYen": 204200, "netPayYen": 1445800, "bracket": "high" }
+    },
+    {
+      "name": "法人あて: 原稿料等は源泉徴収不要なので税額0円・手取りは税込全額",
+      "func": "calculate",
+      "args": [100000, 10, true, true],
+      "expect": { "ok": true, "taxYen": 0, "netPayYen": 110000 }
+    },
+    {
+      "name": "消費税率0%: 報酬10万円そのままが対象で手取り89,790円",
+      "func": "calculate",
+      "args": [100000, 0, true],
+      "expect": { "ok": true, "consumptionTaxYen": 0, "grossYen": 100000, "taxYen": 10210, "netPayYen": 89790 }
+    },
+    {
+      "name": "境界値: 報酬0円は消費税も税額も0円",
+      "func": "calculate",
+      "args": [0, 10, true],
+      "expect": { "ok": true, "consumptionTaxYen": 0, "taxYen": 0, "netPayYen": 0 }
+    },
+    {
+      "name": "異常入力: 報酬額が負の値はエラー",
+      "func": "calculate",
+      "args": [-1, 10, true],
+      "expect": { "ok": false, "code": "invalid_reward" }
+    },
+    {
+      "name": "異常入力: 消費税率が範囲外(200%)はエラー",
+      "func": "calculate",
+      "args": [100000, 200, true],
+      "expect": { "ok": false, "code": "invalid_tax_rate" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_reward" }
+    },
+    {
+      "name": "逆算: 手取り99,790円になる税抜報酬は100,000円",
+      "func": "reverseFromNetPay",
+      "args": [99790, 10, true],
+      "expect": { "ok": true, "rewardYen": 100000, "taxYen": 10210, "netPayYen": 99790, "exact": true }
+    },
+    {
+      "name": "逆算: 手取り1,445,800円になる税抜報酬は1,500,000円(100万円超の式)",
+      "func": "reverseFromNetPay",
+      "args": [1445800, 10, true],
+      "expect": { "ok": true, "rewardYen": 1500000, "netPayYen": 1445800, "exact": true }
+    },
+    {
+      "name": "逆算: 手取りちょうど100万円にするには税抜1,002,344円",
+      "func": "reverseFromNetPay",
+      "args": [1000000, 10, true],
+      "expect": { "ok": true, "rewardYen": 1002344, "netPayYen": 1000000, "exact": true }
+    },
+    {
+      "name": "異常入力: 逆算の手取り0円はエラー",
+      "func": "reverseFromNetPay",
+      "args": [0, 10, true],
+      "expect": { "ok": false, "code": "invalid_net_pay" }
+    },
+    {
+      "name": "異常入力: 逆算の手取りが数値でないときはエラー",
+      "func": "reverseFromNetPay",
+      "args": ["abc", 10, true],
+      "expect": { "ok": false, "code": "invalid_net_pay" }
+    },
+    {
+      "name": "異常入力: 逆算で消費税率が負の値はエラー",
+      "func": "reverseFromNetPay",
+      "args": [99790, -1, true],
+      "expect": { "ok": false, "code": "invalid_tax_rate" }
+    }
+  ]
+}

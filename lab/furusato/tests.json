@@ -1,0 +1,151 @@
+{
+  "tool": "furusato",
+  "module": "calc.js",
+  "global": "FurusatoCalc",
+  "cases": [
+    {
+      "name": "総務省の式: 所得割23.8万円・所得税率10%なら上限61,656円(47,600÷0.7979+2,000)",
+      "func": "limitFromResidentTax",
+      "args": [238000, 10],
+      "expect": { "ok": true, "limitYen": 61656, "safeLimitYen": 61000, "denominator": 0.7979 }
+    },
+    {
+      "name": "総務省の式: 所得割11.4万円・所得税率5%なら上限28,856円(22,800÷0.84895+2,000)",
+      "func": "limitFromResidentTax",
+      "args": [114000, 5],
+      "expect": { "ok": true, "limitYen": 28856, "denominator": 0.84895 }
+    },
+    {
+      "name": "境界: 所得税率0%なら分母は0.9ちょうど(所得割50万円で113,111円)",
+      "func": "limitFromResidentTax",
+      "args": [500000, 0],
+      "expect": { "ok": true, "limitYen": 113111, "denominator": 0.9 }
+    },
+    {
+      "name": "境界: 住民税所得割額が0円なら上限は自己負担分の2,000円だけ",
+      "func": "limitFromResidentTax",
+      "args": [0, 5],
+      "expect": { "ok": true, "limitYen": 2000 }
+    },
+    {
+      "name": "高所得: 所得割100万円・所得税率20%なら上限289,438円",
+      "func": "limitFromResidentTax",
+      "args": [1000000, 20],
+      "expect": { "ok": true, "limitYen": 289438, "denominator": 0.6958 }
+    },
+    {
+      "name": "年収500万円・社会保険料75万円・独身の概算(所得割23.8万円→上限61,656円)",
+      "func": "estimate",
+      "args": [5000000, 750000, false, 0],
+      "expect": { "ok": true, "salaryIncomeYen": 3560000, "taxableIncomeYen": 2130000, "ratePercent": 10, "shotokuwariYen": 238000, "limitYen": 61656 }
+    },
+    {
+      "name": "年収300万円・社会保険料45万円・独身の概算(税率5%区分)",
+      "func": "estimate",
+      "args": [3000000, 450000, false, 0],
+      "expect": { "ok": true, "salaryIncomeYen": 2020000, "ratePercent": 5, "shotokuwariYen": 114000, "limitYen": 28856 }
+    },
+    {
+      "name": "配偶者控除ありは所得税38万円・住民税33万円が差し引かれる(年収700万円)",
+      "func": "estimate",
+      "args": [7000000, 1050000, true, 0],
+      "expect": { "ok": true, "salaryIncomeYen": 5200000, "residentTaxableYen": 3390000, "shotokuwariYen": 339000, "limitYen": 86973 }
+    },
+    {
+      "name": "境界: 収入0円なら所得割0円・上限2,000円",
+      "func": "estimate",
+      "args": [0, 0, false, 0],
+      "expect": { "ok": true, "salaryIncomeYen": 0, "ratePercent": 0, "shotokuwariYen": 0, "limitYen": 2000 }
+    },
+    {
+      "name": "給与所得控除: 収入190万円ちょうどは最低額65万円(令和7年分以降)",
+      "func": "salaryDeduction",
+      "args": [1900000],
+      "expect": 650000
+    },
+    {
+      "name": "給与所得控除: 収入850万円超は上限195万円",
+      "func": "salaryDeduction",
+      "args": [10000000],
+      "expect": 1950000
+    },
+    {
+      "name": "基礎控除: 合計所得132万円ちょうどは95万円(令和7・8年分)",
+      "func": "basicDeduction",
+      "args": [1320000],
+      "expect": 950000
+    },
+    {
+      "name": "基礎控除: 合計所得132万円超336万円以下は88万円(令和7・8年分)",
+      "func": "basicDeduction",
+      "args": [1320001],
+      "expect": 880000
+    },
+    {
+      "name": "基礎控除: 合計所得2,500万円超は0円",
+      "func": "basicDeduction",
+      "args": [25000001],
+      "expect": 0
+    },
+    {
+      "name": "税率: 課税所得1,949,000円ちょうどは5%",
+      "func": "taxRatePercent",
+      "args": [1949000],
+      "expect": 5
+    },
+    {
+      "name": "税率: 課税所得1,950,000円は10%に上がる",
+      "func": "taxRatePercent",
+      "args": [1950000],
+      "expect": 10
+    },
+    {
+      "name": "控除の内訳: 上限ちょうどの寄附なら自己負担は2,000円",
+      "func": "breakdown",
+      "args": [61656, 238000, 10],
+      "expect": { "ok": true, "totalYen": 59656, "selfPayYen": 2000, "cappedBySpecialLimit": false }
+    },
+    {
+      "name": "控除の内訳: 上限を超えて寄附すると特例分が頭打ちになり自己負担が増える",
+      "func": "breakdown",
+      "args": [100000, 238000, 10],
+      "expect": { "ok": true, "residentSpecialYen": 47600, "selfPayYen": 32595, "cappedBySpecialLimit": true }
+    },
+    {
+      "name": "異常入力: 住民税所得割額が負の値はエラー",
+      "func": "limitFromResidentTax",
+      "args": [-1, 10],
+      "expect": { "ok": false, "code": "invalid_resident_tax" }
+    },
+    {
+      "name": "異常入力: 数値でない住民税所得割額はエラー",
+      "func": "limitFromResidentTax",
+      "args": ["abc", 10],
+      "expect": { "ok": false, "code": "invalid_resident_tax" }
+    },
+    {
+      "name": "異常入力: 速算表にない所得税率(15%)はエラー",
+      "func": "limitFromResidentTax",
+      "args": [238000, 15],
+      "expect": { "ok": false, "code": "invalid_tax_rate" }
+    },
+    {
+      "name": "異常入力: 年収が負の値はエラー",
+      "func": "estimate",
+      "args": [-100, 0, false, 0],
+      "expect": { "ok": false, "code": "invalid_income" }
+    },
+    {
+      "name": "異常入力: 社会保険料が数値でないときはエラー",
+      "func": "estimate",
+      "args": [5000000, "abc", false, 0],
+      "expect": { "ok": false, "code": "invalid_social_insurance" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "limitFromResidentTax",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_resident_tax" }
+    }
+  ]
+}

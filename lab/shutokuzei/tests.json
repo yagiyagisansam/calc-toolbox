@@ -1,0 +1,151 @@
+{
+  "tool": "shutokuzei",
+  "module": "calc.js",
+  "global": "ShutokuzeiCalc",
+  "cases": [
+    {
+      "name": "新築住宅の家屋: 評価額1,500万円−控除1,200万円=300万円の3%で90,000円",
+      "func": "houseTax",
+      "args": [15000000, 12000000],
+      "expect": { "ok": true, "taxableBase": 3000000, "rate": 0.03, "tax": 90000 }
+    },
+    {
+      "name": "境界値: 評価額が控除額以下なら課税標準0円で税額0円",
+      "func": "houseTax",
+      "args": [10000000, 12000000],
+      "expect": { "ok": true, "taxableBase": 0, "tax": 0 }
+    },
+    {
+      "name": "住宅以外の家屋は税率4%(評価額2,000万円→800,000円)",
+      "func": "nonHouseTax",
+      "args": [20000000],
+      "expect": { "ok": true, "rate": 0.04, "tax": 800000 }
+    },
+    {
+      "name": "中古住宅の控除額: 平成9年4月1日以後の新築は1,200万円",
+      "func": "usedHouseDeduction",
+      "args": [2000, 5],
+      "expect": { "ok": true, "deduction": 12000000 }
+    },
+    {
+      "name": "境界値: 平成9年3月新築は1,000万円、平成9年4月新築は1,200万円",
+      "func": "usedHouseDeduction",
+      "args": [1997, 3],
+      "expect": { "ok": true, "deduction": 10000000 }
+    },
+    {
+      "name": "中古住宅の控除額: 昭和60年7月〜平成元年3月の新築は450万円",
+      "func": "usedHouseDeduction",
+      "args": [1986, 1],
+      "expect": { "ok": true, "deduction": 4500000 }
+    },
+    {
+      "name": "中古住宅の控除額: 昭和56年7月〜昭和60年6月の新築は420万円",
+      "func": "usedHouseDeduction",
+      "args": [1982, 3],
+      "expect": { "ok": true, "deduction": 4200000 }
+    },
+    {
+      "name": "昭和56年6月30日以前の新築は控除額が別扱いになる",
+      "func": "usedHouseDeduction",
+      "args": [1980, 1],
+      "expect": { "ok": false, "code": "built_before_1981_07" }
+    },
+    {
+      "name": "土地の軽減: 評価額3,000万円・地積300㎡・床面積50㎡は450,000−150,000=300,000円",
+      "func": "landTax",
+      "args": [30000000, 300, 50, 1],
+      "expect": { "ok": true, "baseTax": 450000, "reductionB": 150000, "reduction": 150000, "tax": 300000, "cappedArea": 100 }
+    },
+    {
+      "name": "土地の軽減: 床面積の2倍が200㎡を超えると200㎡で頭打ちになり税額0円",
+      "func": "landTax",
+      "args": [20000000, 150, 100, 1],
+      "expect": { "ok": true, "baseTax": 300000, "cappedArea": 200, "reductionB": 400000, "tax": 0 }
+    },
+    {
+      "name": "土地の軽減: 計算式イが小さいときは45,000円(ア)が適用される",
+      "func": "landTax",
+      "args": [1000000, 200, 20, 1],
+      "expect": { "ok": true, "baseTax": 15000, "reductionB": 3000, "reduction": 45000, "tax": 0 }
+    },
+    {
+      "name": "異常入力: 地積0㎡は0で割ることになるためエラー",
+      "func": "landTax",
+      "args": [30000000, 0, 50, 1],
+      "expect": { "ok": false, "code": "invalid_land_area" }
+    },
+    {
+      "name": "異常入力: 持分が0はエラー",
+      "func": "landTax",
+      "args": [30000000, 300, 50, 0],
+      "expect": { "ok": false, "code": "invalid_share" }
+    },
+    {
+      "name": "異常入力: 床面積が負の値はエラー",
+      "func": "landTax",
+      "args": [30000000, 300, -10, 1],
+      "expect": { "ok": false, "code": "invalid_floor_area" }
+    },
+    {
+      "name": "宅地の課税標準は価格の1/2(2,000万円→課税標準1,000万円・税額300,000円)",
+      "func": "plainLandTax",
+      "args": [20000000, true],
+      "expect": { "ok": true, "taxableBase": 10000000, "tax": 300000 }
+    },
+    {
+      "name": "宅地以外の土地は1/2の特例がない(2,000万円→税額600,000円)",
+      "func": "plainLandTax",
+      "args": [20000000, false],
+      "expect": { "ok": true, "taxableBase": 20000000, "tax": 600000 }
+    },
+    {
+      "name": "免税点: 令和8年3月以前に取得した土地は10万円",
+      "func": "exemptionLimit",
+      "args": ["land", 2026, 3],
+      "expect": { "ok": true, "limit": 100000 }
+    },
+    {
+      "name": "境界値: 令和8年4月以降に取得した土地の免税点は16万円",
+      "func": "exemptionLimit",
+      "args": ["land", 2026, 4],
+      "expect": { "ok": true, "limit": 160000 }
+    },
+    {
+      "name": "免税点: 令和8年4月以降に新築した家屋は66万円",
+      "func": "exemptionLimit",
+      "args": ["newBuilding", 2026, 7],
+      "expect": { "ok": true, "limit": 660000 }
+    },
+    {
+      "name": "異常入力: 免税点の種類が不正な文字列はエラー",
+      "func": "exemptionLimit",
+      "args": ["car", 2026, 7],
+      "expect": { "ok": false, "code": "invalid_kind" }
+    },
+    {
+      "name": "新築住宅+敷地の合計: 家屋90,000円+土地300,000円=390,000円(軽減なしなら900,000円)",
+      "func": "newHouseTotal",
+      "args": [15000000, 30000000, 300, 50],
+      "expect": { "ok": true, "houseTax": 90000, "landTax": 300000, "total": 390000, "totalBefore": 900000, "saved": 510000 }
+    },
+    {
+      "name": "異常入力: 評価額が数値でないときはエラー",
+      "func": "houseTax",
+      "args": ["abc", 12000000],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "houseTax",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常入力: 新築年が範囲外(1800年)はエラー",
+      "func": "usedHouseDeduction",
+      "args": [1800, 1],
+      "expect": { "ok": false, "code": "invalid_built_date" }
+    }
+  ]
+}

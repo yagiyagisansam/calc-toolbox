@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>月齢・月の満ち欠け計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="指定した日時の月齢と月相(新月・上弦・満月・下弦)、次の満月・新月の日時を表示します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>月齢・月の満ち欠け計算</h1>
+  <form class="tool-form" id="tool-form">
+    <span class="field-note">日付(日本標準時)</span>
+    <div class="field-row">
+      <label>年
+        <select id="year"></select>
+      </label>
+      <label>月
+        <select id="month"></select>
+      </label>
+      <label>日
+        <select id="day"></select>
+      </label>
+    </div>
+    <div class="field-row">
+      <label>時
+        <select id="hour"></select>
+      </label>
+      <label>分
+        <select id="minute"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: この周期の朔弦望・次の満月と新月</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">この周期の朔弦望</h3>
+      <p class="adv-note">指定日を含む1朔望月(新月から次の新月まで)の4つの時刻です。</p>
+      <div class="tool-result" id="cycle-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">指定日より後の朔弦望</h3>
+      <p class="adv-note">指定した日時のあとに最初に来る新月・上弦・満月・下弦です。</p>
+      <div class="tool-result" id="next-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    時刻はすべて<strong>日本標準時(JST)</strong>です。朔弦望の時刻は国立天文台 暦計算室が公表する2026年の値(全50件)と照合し、誤差1分以内で一致することを確認しています。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>指定した日の<strong>月齢・月の形・次の満月と新月の日時</strong>がわかります。お月見の計画、釣りや農作業の目安、月を入れた写真の撮影計画などに使えます。すべて端末内で計算するため通信は不要です。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>調べたい日付を選びます。初期値は今日です。</li>
+    <li>選んだ瞬間に月齢・月相・輝面比が表示されます。</li>
+    <li>次の満月や新月の日時を知りたいときは「＋詳細機能」を開いてください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>月齢</strong> = 指定日時 − 直前の朔(新月)の時刻(日数)</li>
+    <li><strong>朔弦望の時刻</strong> = Jean Meeus『Astronomical Algorithms』第49章の截断三角級数で計算</li>
+    <li><strong>輝面比</strong> = (1 − cos(2π × 朔からの経過割合)) ÷ 2 × 100(概算)</li>
+  </ul>
+  <p>平均朔望月(29.530589日)で割る簡易な方法は、実際の朔とのずれが最大で±0.6日ほどになります。本ツールでは月と太陽の運動の不均一さを補正する級数展開を使い、分単位の精度で朔弦望を求めています。力学時から世界時への変換にはΔT = 69秒を用いています。</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>国立天文台の公表値との照合(2026年・抜粋)</caption>
+      <thead><tr><th>月相</th><th>国立天文台</th><th>本ツール</th></tr></thead>
+      <tbody>
+        <tr><td>望(満月)</td><td>2026年1月3日 19時03分</td><td>2026年1月3日 19時03分</td></tr>
+        <tr><td>朔(新月)</td><td>2026年1月19日 4時52分</td><td>2026年1月19日 4時52分</td></tr>
+        <tr><td>上弦</td><td>2026年3月26日 4時18分</td><td>2026年3月26日 4時18分</td></tr>
+        <tr><td>望(満月)</td><td>2026年7月29日 23時36分</td><td>2026年7月29日 23時36分</td></tr>
+        <tr><td>朔(新月)</td><td>2026年8月13日 2時37分</td><td>2026年8月13日 2時37分</td></tr>
+        <tr><td>下弦</td><td>2026年9月4日 16時51分</td><td>2026年9月4日 16時51分</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>国立天文台 暦計算室(朔弦望・月齢)。本ツールの計算結果は同室が公表する令和8年(2026年)暦要項「朔弦望」の全50件と照合し、いずれも誤差1分以内で一致することを確認<br>
+      <a href="https://eco.mtk.nao.ac.jp/koyomi/" rel="noopener" target="_blank">https://eco.mtk.nao.ac.jp/koyomi/</a>(2026年7月29日参照)</li>
+    <li>Jean Meeus「Astronomical Algorithms」第49章 Phases of the Moon(朔弦望の計算に用いた級数展開の出典)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>時刻はすべて<strong>日本標準時(JST = 世界時+9時間)</strong>です。</li>
+    <li>月齢は「直前の朔からの経過日数」です。国立天文台の定義と同じですが、暦の上での「〇日月」(旧暦の日付)とは異なります。</li>
+    <li>輝面比は、朔から次の朔までを1周期とみなした<strong>概算</strong>です。厳密な位相角の計算ではないため、数%の誤差があります。</li>
+    <li>朔望月の長さは一定ではなく、29.3日から29.8日程度まで変動します。本ツールはその変動を反映しています。</li>
+    <li>月の出・月の入りの時刻、方位・高度は計算していません。観測地点によって見え方は変わります。</li>
+    <li>対応範囲は西暦1900年〜2100年です。正式な暦の値は国立天文台の公表値をご確認ください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">月齢15が必ず満月ではないのはなぜですか?</h3>
+  <p class="faq-a">朔望月の長さが約29.3〜29.8日と一定でないためです。満月(望)になる月齢は13.8〜15.8程度の幅で変動します。本ツールは望の時刻そのものを計算しているので、正確な満月の日時がわかります。</p>
+  <h3 class="faq-q">十五夜(中秋の名月)は満月ですか?</h3>
+  <p class="faq-a">必ずしも一致しません。十五夜は旧暦8月15日という暦の上の日付で、実際の望の時刻とは1〜2日ずれることがあります。</p>
+  <h3 class="faq-q">なぜ平均朔望月で割る方法を使っていないのですか?</h3>
+  <p class="faq-a">月と太陽の運動は一定ではないため、平均値(29.530589日)で割るだけだと実際の朔と最大±0.6日ほどずれます。撮影や観察の計画には使いにくいため、補正項を含む級数展開で分単位まで求めています。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_date: "日付は1900年〜2100年の実在する日を選んでください。",
+    invalid_time: "時刻を正しく選んでください。",
+    invalid_kind: "月相の指定が不正です。"
+  };
+  var KINDS = [["new", "新月(朔)"], ["first", "上弦"], ["full", "満月(望)"], ["last", "下弦"]];
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function el(id) { return document.getElementById(id); }
+  function val(id) { return parseInt(el(id).value, 10); }
+  function pad(n) { return n < 10 ? "0" + n : String(n); }
+  function fmt(o) {
+    return o.year + "年" + o.month + "月" + o.day + "日 " + o.hour + "時" + pad(o.minute) + "分";
+  }
+  function fill(id, from, to, suffix, selected) {
+    var html = "";
+    for (var v = from; v <= to; v++) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el(id).innerHTML = html;
+  }
+  function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+
+  var today = new Date();
+  fill("year", 1900, 2100, "年", today.getFullYear());
+  fill("month", 1, 12, "月", today.getMonth() + 1);
+  fill("day", 1, daysInMonth(today.getFullYear(), today.getMonth() + 1), "日", today.getDate());
+  fill("hour", 0, 23, "時", today.getHours());
+  fill("minute", 0, 59, "分", 0);
+
+  var box = el("result");
+  var cycleBox = el("cycle-result");
+  var nextBox = el("next-result");
+
+  function adjustDays() {
+    var keep = val("day") || 1;
+    var max = daysInMonth(val("year"), val("month"));
+    fill("day", 1, max, "日", Math.min(keep, max));
+  }
+
+  function run() {
+    adjustDays();
+    var y = val("year"), m = val("month"), d = val("day"), hh = val("hour"), mi = val("minute");
+    var r = GetsureiCalc.moonAge(y, m, d, hh, mi);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      cycleBox.hidden = true;
+      nextBox.hidden = true;
+      return;
+    }
+    box.innerHTML = '<div class="result-main">月齢 ' + esc(r.age) + "</div>" +
+      "<p><strong>" + esc(r.phase) + "</strong> / 輝面比 約" + esc(r.illumination) + "%(概算)</p>" +
+      "<p>直前の新月: " + esc(fmt(r.lastNewMoon)) + "</p>";
+    box.hidden = false;
+
+    cycleBox.innerHTML = '<div class="table-scroll"><table class="data-table">' +
+      "<thead><tr><th>月相</th><th>日時(日本標準時)</th></tr></thead><tbody>" +
+      "<tr><td>朔(新月)</td><td>" + esc(fmt(r.lastNewMoon)) + "</td></tr>" +
+      "<tr><td>上弦</td><td>" + esc(fmt(r.firstQuarter)) + "</td></tr>" +
+      "<tr><td>望(満月)</td><td>" + esc(fmt(r.fullMoon)) + "</td></tr>" +
+      "<tr><td>下弦</td><td>" + esc(fmt(r.lastQuarter)) + "</td></tr>" +
+      "<tr><td>次の朔(新月)</td><td>" + esc(fmt(r.nextNewMoon)) + "</td></tr>" +
+      "</tbody></table><p>この周期の長さ: " + esc(r.cycleDays) + " 日</p></div>";
+    cycleBox.hidden = false;
+
+    var html = '<div class="table-scroll"><table class="data-table">' +
+      "<thead><tr><th>月相</th><th>日時</th><th>あと</th></tr></thead><tbody>";
+    KINDS.forEach(function (k) {
+      var n = GetsureiCalc.nextPhase(y, m, d, hh, mi, k[0]);
+      if (!n.ok) return;
+      html += "<tr><td>" + esc(k[1]) + "</td><td>" + esc(fmt(n)) + "</td><td>" +
+        esc(n.daysUntil) + "日</td></tr>";
+    });
+    html += "</tbody></table></div>";
+    nextBox.innerHTML = html;
+    nextBox.hidden = false;
+  }
+
+  ["year", "month", "day", "hour", "minute"].forEach(function (id) {
+    el(id).addEventListener("change", run);
+  });
+  el("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
+})();
+</script>
+</body>
+</html>

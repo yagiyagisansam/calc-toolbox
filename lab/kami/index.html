@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>紙のサイズ(A判・B判)変換(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="A0〜A10・B0〜B10の寸法をmm/インチで表示し、解像度別のピクセル数と塗り足し込みのサイズも計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>
+    /* 出典の長いURLが画面からはみ出さないようにする */
+    .sources a { overflow-wrap: anywhere; word-break: break-word; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>紙のサイズ(A判・B判)変換</h1>
+  <form class="tool-form" id="tool-form">
+    <div class="field-row">
+      <label>用紙規格
+        <select id="series">
+          <option value="A" selected>A判(A列)</option>
+          <option value="B">B判(B列・JIS-B)</option>
+        </select>
+      </label>
+      <label>サイズ番号
+        <select id="num"></select>
+      </label>
+    </div>
+    <label>解像度(dpi)
+      <span class="field-note">印刷入稿は350dpi、写真プリントは300dpi、Web表示は72dpiが目安</span>
+      <input type="number" id="dpi" inputmode="numeric" step="1" min="1" max="4800" value="350">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 塗り足し込みのサイズ・別サイズとの面積比</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">塗り足し(裁ち落とし)を含めた入稿サイズ</h3>
+      <p class="adv-note">仕上がりの四辺に塗り足しを足した寸法です。何mm必要かは印刷所の指定に従ってください(3mmが多い)。</p>
+      <label>塗り足し(一辺・mm)
+        <input type="number" id="bleed" inputmode="decimal" step="0.5" min="0" max="50" value="3">
+      </label>
+
+      <h3 class="adv-h">別のサイズとの面積比</h3>
+      <div class="field-row">
+        <label>比べる規格
+          <select id="series2">
+            <option value="A">A判</option>
+            <option value="B" selected>B判</option>
+          </select>
+        </label>
+        <label>比べる番号
+          <select id="num2"></select>
+        </label>
+      </div>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    日本のB判(JIS-B)は<strong>国際規格のISO-Bとは寸法が違います</strong>。B5はJISでは182×257mmですが、ISO-Bでは176×250mmです。海外の印刷所に出すときは注意してください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>A判・B判の<strong>正確なmm寸法と、入稿に必要なピクセル数</strong>がすぐわかります。「B5とA4はどちらが大きいか」「A4を350dpiで作るなら何ピクセルか」「塗り足し3mm込みだと何ピクセルか」といった確認にどうぞ。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>用紙規格(A判/B判)とサイズ番号を選びます。</li>
+    <li>解像度(dpi)を入れると、その瞬間にmm・インチ・ピクセル数が表示されます。ボタンは不要です。</li>
+    <li>入稿データを作るときは「＋詳細機能」で塗り足し込みのピクセル数を確認してください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>寸法</strong> = JIS P 0138:1998「紙加工仕上寸法」の表の値(下表)</li>
+    <li><strong>インチ</strong> = mm ÷ 25.4</li>
+    <li><strong>ピクセル数</strong> = mm ÷ 25.4 × dpi(1px単位で四捨五入)</li>
+    <li><strong>塗り足し込みの寸法</strong> = 仕上がり寸法 + 塗り足し × 2(四辺に足すため)</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>JIS P 0138:1998 の仕上がり寸法(mm)</caption>
+      <thead><tr><th>番号</th><th>A列</th><th>B列(JIS-B)</th></tr></thead>
+      <tbody id="size-table"></tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>日本産業規格 JIS P 0138:1998「紙加工仕上寸法」(日本規格協会 JSA Group Webdesk 書誌)<br>
+      <a href="https://webdesk.jsa.or.jp/books/W11M0090/index/?bunsyo_id=JIS+P+0138:1998" rel="noopener" target="_blank">https://webdesk.jsa.or.jp/books/W11M0090/index/?bunsyo_id=JIS+P+0138:1998</a>(2026年7月29日参照)</li>
+    <li>日本産業標準調査会(JISC)JIS検索<br>
+      <a href="https://www.jisc.go.jp/app/jis/general/GnrJISSearch.html" rel="noopener" target="_blank">https://www.jisc.go.jp/app/jis/general/GnrJISSearch.html</a>(2026年7月29日参照)</li>
+    <li>JIS P 0138:1998 本文の寸法表(A列 A0〜A10 / B列 B0〜B10)<br>
+      <a href="https://kikakurui.com/p/P0138-1998-01.html" rel="noopener" target="_blank">https://kikakurui.com/p/P0138-1998-01.html</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>寸法は<strong>JIS P 0138:1998</strong>によるもので、2026年7月29日時点で有効な規格です。</li>
+    <li>A列はISO 216のAシリーズと同じですが、<strong>B列は日本独自のJIS-B</strong>で、ISO-Bシリーズとは寸法が異なります。</li>
+    <li>規格の表にあるのはA0〜A10・B0〜B10です。それ以外の番号は扱っていません。</li>
+    <li>ピクセル数は四捨五入するため、規格の寸法と往復すると0.1mm程度ずれることがあります。</li>
+    <li>塗り足しの必要量は規格ではなく<strong>印刷所ごとの指定</strong>です。必ず入稿先の仕様を確認してください。</li>
+    <li>写真用紙のL判・2L判、名刺サイズなどはこの規格の対象外です。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">B5とA4はどちらが大きいですか?</h3>
+  <p class="faq-a">A4(210×297mm)のほうが大きく、B5(182×257mm)はA4の約75%の面積です。日本のB判は同じ番号のA判より小さくなります(B4はA4より大きい)。</p>
+  <h3 class="faq-q">なぜ番号が1増えると半分になるのですか?</h3>
+  <p class="faq-a">A0・B0を基準に、長辺を半分に折るとひとつ小さい番号のサイズになるよう設計されているためです。縦横比が1:√2(約1.414)で一定なので、折っても同じ形が保たれます。</p>
+  <h3 class="faq-q">入稿は何dpiで作ればよいですか?</h3>
+  <p class="faq-a">商業印刷は原寸350dpi、モノクロの線画は600〜1200dpiが一般的です。ただし印刷所によって指定が異なるので、必ず入稿先の仕様を確認してください。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_series: "用紙規格を選び直してください。",
+    invalid_number: "サイズ番号を選び直してください。",
+    invalid_dpi: "解像度を1〜4800dpiで入力してください。",
+    invalid_bleed: "塗り足しを0〜50mmで入力してください。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var seriesEl = document.getElementById("series");
+  var numEl = document.getElementById("num");
+  var dpiEl = document.getElementById("dpi");
+  var bleedEl = document.getElementById("bleed");
+  var series2El = document.getElementById("series2");
+  var num2El = document.getElementById("num2");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function fillNumbers(el, selected) {
+    var html = "";
+    for (var i = 0; i <= 10; i++) {
+      html += '<option value="' + i + '"' + (i === selected ? " selected" : "") + ">" + i + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  fillNumbers(numEl, 4);
+  fillNumbers(num2El, 5);
+
+  var rows = "";
+  for (var i = 0; i <= 10; i++) {
+    var a = KamiCalc.size("A", i);
+    var b = KamiCalc.size("B", i);
+    rows += "<tr><td>" + i + "</td><td>A" + i + ": " + a.shortMm + "×" + a.longMm +
+      "</td><td>B" + i + ": " + b.shortMm + "×" + b.longMm + "</td></tr>";
+  }
+  document.getElementById("size-table").innerHTML = rows;
+
+  function run() {
+    var series = seriesEl.value;
+    var n = parseInt(numEl.value, 10);
+    var dpi = dpiEl.value === "" ? 350 : parseFloat(dpiEl.value);
+    var r = KamiCalc.pixels(series, n, dpi);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      advBox.hidden = true;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">' + esc(r.name) + " : " + esc(r.shortMm) + " × " + esc(r.longMm) + " mm</div>" +
+      "<p>" + esc(r.shortInch) + " × " + esc(r.longInch) + " インチ</p>" +
+      "<p>" + esc(dpi) + "dpi なら " + esc(r.shortPx.toLocaleString("ja-JP")) + " × " +
+      esc(r.longPx.toLocaleString("ja-JP")) + " px</p>";
+    box.hidden = false;
+
+    var html = "";
+    var bl = KamiCalc.withBleed(series, n, dpi, bleedEl.value === "" ? 0 : parseFloat(bleedEl.value));
+    if (!bl.ok) {
+      html += "<p>" + esc(ERRORS[bl.code] || "入力値を確認してください。") + "</p>";
+    } else {
+      html += "<p>塗り足し込み: " + esc(bl.shortMm) + " × " + esc(bl.longMm) + " mm(" +
+        esc(bl.shortPx.toLocaleString("ja-JP")) + " × " + esc(bl.longPx.toLocaleString("ja-JP")) + " px)</p>";
+    }
+    var ar = KamiCalc.areaRatio(series2El.value, parseInt(num2El.value, 10), series, n);
+    if (ar.ok) {
+      var other = KamiCalc.size(series2El.value, parseInt(num2El.value, 10));
+      html += "<p>" + esc(other.name) + "(" + esc(other.shortMm) + "×" + esc(other.longMm) + "mm)は " +
+        esc(r.name) + " の面積の " + esc(ar.percent) + "%(" + esc(ar.ratio) + "倍)</p>";
+    }
+    advBox.innerHTML = html;
+    advBox.hidden = false;
+  }
+
+  [dpiEl, bleedEl].forEach(function (el) { el.addEventListener("input", run); });
+  [seriesEl, numEl, series2El, num2El].forEach(function (el) { el.addEventListener("change", run); });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
+})();
+</script>
+</body>
+</html>

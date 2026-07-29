@@ -1,0 +1,139 @@
+{
+  "tool": "yakudoshi",
+  "module": "calc.js",
+  "global": "YakudoshiCalc",
+  "cases": [
+    {
+      "name": "神社本庁の令和8年用の表と一致: 昭和60年(1985)生の男性は2026年に数え42歳の大厄",
+      "func": "calculate",
+      "args": [1985, "male", 2026],
+      "expect": { "ok": true, "kazoedoshi": 42, "status": "honyaku", "honyakuAge": 42, "isTaiyaku": true }
+    },
+    {
+      "name": "神社本庁の表と一致: 平成6年(1994)生の女性は2026年に数え33歳の大厄",
+      "func": "calculate",
+      "args": [1994, "female", 2026],
+      "expect": { "ok": true, "kazoedoshi": 33, "status": "honyaku", "honyakuAge": 33, "isTaiyaku": true }
+    },
+    {
+      "name": "神社本庁の表と一致: 平成15年(2003)生の男性は2026年に数え24歳で25歳の前厄",
+      "func": "calculate",
+      "args": [2003, "male", 2026],
+      "expect": { "ok": true, "kazoedoshi": 24, "status": "maeyaku", "honyakuAge": 25 }
+    },
+    {
+      "name": "神社本庁の表と一致: 平成13年(2001)生の男性は2026年に数え26歳で25歳の後厄",
+      "func": "calculate",
+      "args": [2001, "male", 2026],
+      "expect": { "ok": true, "kazoedoshi": 26, "status": "atoyaku", "honyakuAge": 25 }
+    },
+    {
+      "name": "神社本庁の表と一致: 昭和41年(1966)生は男女とも2026年に数え61歳の本厄",
+      "func": "calculate",
+      "args": [1966, "female", 2026],
+      "expect": { "ok": true, "kazoedoshi": 61, "status": "honyaku", "honyakuAge": 61, "isTaiyaku": false }
+    },
+    {
+      "name": "神社本庁の表と一致: 平成元年(1989)生の女性は2026年に数え38歳で37歳の後厄",
+      "func": "calculate",
+      "args": [1989, "female", 2026],
+      "expect": { "ok": true, "kazoedoshi": 38, "status": "atoyaku", "honyakuAge": 37 }
+    },
+    {
+      "name": "神社本庁の表と一致: 平成3年(1991)生の女性は2026年に数え36歳で37歳の前厄",
+      "func": "calculate",
+      "args": [1991, "female", 2026],
+      "expect": { "ok": true, "kazoedoshi": 36, "status": "maeyaku", "honyakuAge": 37 }
+    },
+    {
+      "name": "神社本庁の表と一致: 平成20年(2008)生の女性は2026年に数え19歳の本厄",
+      "func": "calculate",
+      "args": [2008, "female", 2026],
+      "expect": { "ok": true, "kazoedoshi": 19, "status": "honyaku", "honyakuAge": 19 }
+    },
+    {
+      "name": "厄年でない年は none(1980年生の男性は2026年に数え47歳)",
+      "func": "calculate",
+      "args": [1980, "male", 2026],
+      "expect": { "ok": true, "kazoedoshi": 47, "status": "none", "honyakuAge": null, "isTaiyaku": false }
+    },
+    {
+      "name": "女性の厄年は19・33・37・61歳の4つ(男性は25・42・61歳の3つ)",
+      "func": "schedule",
+      "args": [1994, "female"],
+      "expect": { "ok": true, "rows": { "length": 4, "1": { "honyakuAge": 33, "maeyakuYear": 2025, "honyakuYear": 2026, "atoyakuYear": 2027, "isTaiyaku": true } } }
+    },
+    {
+      "name": "一覧: 1985年生の男性の大厄は2026年(前厄2025年・後厄2027年)",
+      "func": "schedule",
+      "args": [1985, "male"],
+      "expect": { "ok": true, "rows": { "length": 3, "1": { "honyakuAge": 42, "maeyakuYear": 2025, "honyakuYear": 2026, "atoyakuYear": 2027 }, "2": { "honyakuAge": 61, "honyakuYear": 2045 } } }
+    },
+    {
+      "name": "数え年: 1985年生の2026年は42歳(その年 − 生年 + 1)",
+      "func": "kazoedoshi",
+      "args": [1985, 2026],
+      "expect": { "ok": true, "kazoedoshi": 42 }
+    },
+    {
+      "name": "境界: 生まれた年はすでに数え1歳",
+      "func": "kazoedoshi",
+      "args": [2026, 2026],
+      "expect": { "ok": true, "kazoedoshi": 1 }
+    },
+    {
+      "name": "異常入力: 生年が範囲外(1899年)はエラー",
+      "func": "calculate",
+      "args": [1899, "male", 2026],
+      "expect": { "ok": false, "code": "invalid_birth_year" }
+    },
+    {
+      "name": "異常入力: 生年が範囲外(2201年)はエラー",
+      "func": "calculate",
+      "args": [2201, "male", 2201],
+      "expect": { "ok": false, "code": "invalid_birth_year" }
+    },
+    {
+      "name": "異常入力: 性別の指定が不正はエラー",
+      "func": "calculate",
+      "args": [1985, "x", 2026],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    },
+    {
+      "name": "異常入力: 基準年が生年より前はエラー",
+      "func": "calculate",
+      "args": [2027, "male", 2026],
+      "expect": { "ok": false, "code": "invalid_base_year" }
+    },
+    {
+      "name": "異常入力: 生年が整数でないはエラー",
+      "func": "calculate",
+      "args": [1985.5, "male", 2026],
+      "expect": { "ok": false, "code": "invalid_birth_year" }
+    },
+    {
+      "name": "異常入力: 数値でない生年はエラー",
+      "func": "calculate",
+      "args": ["abc", "male", 2026],
+      "expect": { "ok": false, "code": "invalid_birth_year" }
+    },
+    {
+      "name": "異常入力: 基準年が数値でないはエラー",
+      "func": "calculate",
+      "args": [1985, "male", "abc"],
+      "expect": { "ok": false, "code": "invalid_base_year" }
+    },
+    {
+      "name": "異常入力: 一覧で性別が不正はエラー",
+      "func": "schedule",
+      "args": [1985, "x"],
+      "expect": { "ok": false, "code": "invalid_sex" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_birth_year" }
+    }
+  ]
+}

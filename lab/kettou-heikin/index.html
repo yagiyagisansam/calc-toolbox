@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>HbA1c⇔推定平均血糖(eAG)換算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="HbA1c(NGSP値)から推定平均血糖値(eAG)を、逆に平均血糖からHbA1cを換算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>
+    /* 長い出典URLが横スクロールを起こさないようにする(このページ内だけの調整) */
+    .sources a { overflow-wrap: anywhere; word-break: break-word; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>HbA1c ⇔ 推定平均血糖(eAG)換算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>HbA1c(NGSP値・%)
+      <span class="field-note">健康診断の結果の「HbA1c」。例: 6.5</span>
+      <input type="number" id="a1c" inputmode="decimal" step="0.1" min="4" max="20" placeholder="6.5">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="reverse-form">
+    <label>平均血糖値から逆にHbA1cを調べる(mg/dL)
+      <span class="field-note">血糖自己測定の平均値など。例: 150</span>
+      <input type="number" id="eag" inputmode="decimal" step="1" min="68" max="528" placeholder="150">
+    </label>
+    <div class="tool-result" id="result-b" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: HbA1cと平均血糖の換算表</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">HbA1c 5%〜12%の早見表</h3>
+      <p class="adv-note">HbA1cが1%変わると平均血糖はおよそ29mg/dL変わります。</p>
+      <div class="tool-result" id="adv-result" aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    eAGは<strong>過去1〜2か月の平均血糖の推定値</strong>です。実際に測った特定の時刻の血糖値ではありません。貧血や腎不全があるとHbA1cが実際の血糖を反映しないことがあります。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>HbA1cという「%」の数字が、<strong>毎日の血糖値でいうとどのくらいか</strong>に翻訳できます。血糖自己測定の値と健診結果を同じものさしで比べたいときに使えます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>健診結果のHbA1c(%)を入れると、その場で推定平均血糖値(mg/dL・mmol/L)が出ます。</li>
+    <li>逆に平均血糖値からHbA1cを知りたい場合は、2段目に平均血糖値(mg/dL)を入れてください。</li>
+    <li>おおまかな対応は「＋詳細機能」の換算表で確認できます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>eAG(mg/dL)</strong> = 28.7 × HbA1c(%) − 46.7</li>
+    <li><strong>eAG(mmol/L)</strong> = 1.59 × HbA1c(%) − 2.59</li>
+    <li><strong>HbA1c(%)</strong> = (eAG(mg/dL) + 46.7) ÷ 28.7</li>
+  </ul>
+  <p>2008年のADAG研究(507名を対象)で報告された回帰式です(R² = 0.84)。mg/dL と mmol/L は原著が別々に示した式のため、互いに厳密な単位換算にはなりません。</p>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>Nathan DM, Kuenen J, Borg R, Zheng H, Schoenfeld D, Heine RJ; A1c-Derived Average Glucose (ADAG) Study Group.
+      「Translating the A1C assay into estimated average glucose values」Diabetes Care. 2008 Aug;31(8):1473-8. (PMID: 18540046)<br>
+      <a href="https://pubmed.ncbi.nlm.nih.gov/18540046/" rel="noopener" target="_blank">https://pubmed.ncbi.nlm.nih.gov/18540046/</a>(2026年7月29日参照)</li>
+    <li>日本糖尿病学会「日常臨床及び特定健診・保健指導におけるHbA1c国際標準化(NGSP値)の基本方針・表記ガイドライン」<br>
+      <a href="https://www.jds.or.jp/uploads/files/document/HbA1c_basicpolicy,signage-guideline.pdf" rel="noopener" target="_blank">https://www.jds.or.jp/uploads/files/document/HbA1c_basicpolicy,signage-guideline.pdf</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>HbA1cは<strong>NGSP値</strong>を前提にしています。日本では<strong>2012年4月1日</strong>から日常臨床でもNGSP値で報告されています。それ以前のJDS値はNGSP値よりおよそ0.4%低い値です。</li>
+    <li>eAGは推定値です。同じHbA1cでも、実際の平均血糖には個人差があります。</li>
+    <li>貧血、腎不全、肝硬変、異常ヘモグロビン症、最近の輸血・大量出血、鉄欠乏などがあると、HbA1cが実際の血糖を反映しません。</li>
+    <li>HbA1cは直近1〜2か月の平均を反映します。数日の食事や運動の影響はすぐには表れません。</li>
+    <li>計算に使った式は欧米中心の研究(ADAG研究)によるものです。診断・治療の判断には使えません。</li>
+    <li>結果の丸めは mg/dL が小数第1位、mmol/L が小数第2位、HbA1c が小数第1位です。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">eAGと空腹時血糖値は同じものですか?</h3>
+  <p class="faq-a">違います。eAGは食前・食後を含めた1日を通した平均の推定値です。空腹時血糖値より高めに出るのが普通です。</p>
+  <h3 class="faq-q">HbA1cが1%下がると平均血糖はどのくらい下がりますか?</h3>
+  <p class="faq-a">式の傾きが28.7なので、約29mg/dL下がる計算になります。</p>
+  <h3 class="faq-q">昔の検査結果と比べたいのですが、値が違って見えます。</h3>
+  <p class="faq-a">2012年3月以前の結果はJDS値の可能性があります。JDS値にはおよそ0.4%を足すとNGSP値に相当します。</p>
+  <h3 class="faq-q">mmol/Lの値がmg/dLを18で割った値と一致しません。</h3>
+  <p class="faq-a">原著が mg/dL と mmol/L それぞれについて別の回帰式を示しているためです。本ツールはどちらも原著の式のまま計算しています。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_a1c: "HbA1cを4〜20%の範囲で入力してください。",
+    invalid_eag: "平均血糖値を68〜528mg/dLの範囲で入力してください。"
+  };
+
+  var box = document.getElementById("result");
+  var boxB = document.getElementById("result-b");
+  var advBox = document.getElementById("adv-result");
+  var a1cEl = document.getElementById("a1c");
+  var eagEl = document.getElementById("eag");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function run() {
+    if (a1cEl.value === "") { box.hidden = true; return; }
+    var r = KettouHeikinCalc.toEag(parseFloat(a1cEl.value));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML = '<div class="result-main">推定平均血糖 ' + esc(r.eagMgDl.toFixed(1)) + " mg/dL</div>" +
+      "<p>" + esc(r.eagMmolL.toFixed(2)) + " mmol/L に相当します(過去1〜2か月の平均の推定値)。</p>";
+    box.hidden = false;
+  }
+
+  function runB() {
+    if (eagEl.value === "") { boxB.hidden = true; return; }
+    var r = KettouHeikinCalc.fromEag(parseFloat(eagEl.value));
+    if (!r.ok) {
+      boxB.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      boxB.hidden = false;
+      return;
+    }
+    boxB.innerHTML = '<div class="result-main">HbA1c ' + esc(r.a1c.toFixed(1)) + " %</div>" +
+      "<p>平均血糖 " + esc(r.eagMgDl.toFixed(1)) + " mg/dL に相当するHbA1c(NGSP値)です。</p>";
+    boxB.hidden = false;
+  }
+
+  function renderTable() {
+    var t = KettouHeikinCalc.table(5, 12, 0.5);
+    if (!t.ok) { advBox.innerHTML = ""; return; }
+    var rows = "";
+    for (var i = 0; i < t.rows.length; i++) {
+      rows += "<tr><td>" + esc(t.rows[i].a1c.toFixed(1)) + " %</td><td>" +
+        esc(t.rows[i].eagMgDl.toFixed(1)) + " mg/dL</td><td>" +
+        esc(t.rows[i].eagMmolL.toFixed(2)) + " mmol/L</td></tr>";
+    }
+    advBox.innerHTML = '<div class="table-scroll"><table class="data-table">' +
+      "<thead><tr><th>HbA1c</th><th>推定平均血糖</th><th>(mmol/L)</th></tr></thead><tbody>" +
+      rows + "</tbody></table></div>";
+  }
+
+  a1cEl.addEventListener("input", run);
+  eagEl.addEventListener("input", runB);
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  document.getElementById("reverse-form").addEventListener("submit", function (e) { e.preventDefault(); runB(); });
+  renderTable();
+})();
+</script>
+</body>
+</html>

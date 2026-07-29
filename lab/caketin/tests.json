@@ -1,0 +1,151 @@
+{
+  "tool": "caketin",
+  "module": "calc.js",
+  "global": "CakeTinCalc",
+  "cases": [
+    {
+      "name": "出典の例: 丸型18cmのレシピを丸型15cmで焼くと倍率0.694(約0.7)",
+      "func": "ratioByArea",
+      "args": ["round", 18, null, "round", 15, null],
+      "expect": { "ok": true, "ratio": 0.694, "fromAreaCm2": 254.47, "toAreaCm2": 176.71 }
+    },
+    {
+      "name": "出典の例: スクエア型18cm→15cmも倍率0.694(225÷324)",
+      "func": "ratioByArea",
+      "args": ["square", 18, null, "square", 15, null],
+      "expect": { "ok": true, "ratio": 0.694, "fromAreaCm2": 324, "toAreaCm2": 225 }
+    },
+    {
+      "name": "出典の例: 同じ一辺のスクエア型→丸型は0.785(約0.8)",
+      "func": "ratioByArea",
+      "args": ["square", 18, null, "round", 18, null],
+      "expect": { "ok": true, "ratio": 0.785 }
+    },
+    {
+      "name": "出典の例: 同じ一辺の丸型→スクエア型は1.273(約1.27)",
+      "func": "ratioByArea",
+      "args": ["round", 18, null, "square", 18, null],
+      "expect": { "ok": true, "ratio": 1.273 }
+    },
+    {
+      "name": "小さい型のレシピを大きい型で: 丸15cm→18cmは1.44倍",
+      "func": "ratioByArea",
+      "args": ["round", 15, null, "round", 18, null],
+      "expect": { "ok": true, "ratio": 1.44 }
+    },
+    {
+      "name": "パウンド型(18×8cm)は丸型18cmの0.566倍",
+      "func": "ratioByArea",
+      "args": ["round", 18, null, "square", 18, 8],
+      "expect": { "ok": true, "ratio": 0.566, "toAreaCm2": 144 }
+    },
+    {
+      "name": "境界値: 同じ型どうしは倍率1.0",
+      "func": "ratioByArea",
+      "args": ["round", 18, null, "round", 18, null],
+      "expect": { "ok": true, "ratio": 1 }
+    },
+    {
+      "name": "容積で比べる: 高さが同じなら底面積の比と一致する(0.694)",
+      "func": "ratioByVolume",
+      "args": ["round", 18, null, 6, "round", 15, null, 6],
+      "expect": { "ok": true, "ratio": 0.694, "fromVolumeCm3": 1526.8, "toVolumeCm3": 1060.3 }
+    },
+    {
+      "name": "容積で比べる: 高さが半分になれば倍率も半分(0.347)",
+      "func": "ratioByVolume",
+      "args": ["round", 18, null, 6, "round", 15, null, 3],
+      "expect": { "ok": true, "ratio": 0.347 }
+    },
+    {
+      "name": "底面積: 丸型18cmは約254.47cm²",
+      "func": "area",
+      "args": ["round", 18],
+      "expect": { "ok": true, "areaCm2": 254.46900494077323 }
+    },
+    {
+      "name": "底面積: スクエア型18cm(横を省略)は324cm²",
+      "func": "area",
+      "args": ["square", 18],
+      "expect": { "ok": true, "areaCm2": 324 }
+    },
+    {
+      "name": "分量換算: 100gに倍率0.694をかけると69.4g",
+      "func": "scale",
+      "args": [100, 0.694],
+      "expect": { "ok": true, "value": 69.4 }
+    },
+    {
+      "name": "分量換算: 卵3個に倍率1.27をかけると3.8個(実際は端数を調整する)",
+      "func": "scale",
+      "args": [3, 1.27],
+      "expect": { "ok": true, "value": 3.8 }
+    },
+    {
+      "name": "境界値: 分量0はエラーにせず0を返す",
+      "func": "scale",
+      "args": [0, 0.694],
+      "expect": { "ok": true, "value": 0 }
+    },
+    {
+      "name": "異常入力: 対応していない形(oval)はエラー",
+      "func": "area",
+      "args": ["oval", 18],
+      "expect": { "ok": false, "code": "invalid_shape" }
+    },
+    {
+      "name": "異常入力: 直径0cmはエラー",
+      "func": "area",
+      "args": ["round", 0],
+      "expect": { "ok": false, "code": "invalid_size" }
+    },
+    {
+      "name": "異常入力: 直径が負の値はエラー",
+      "func": "area",
+      "args": ["round", -1],
+      "expect": { "ok": false, "code": "invalid_size" }
+    },
+    {
+      "name": "異常入力: サイズが数値でないときはエラー",
+      "func": "area",
+      "args": ["round", "abc"],
+      "expect": { "ok": false, "code": "invalid_size" }
+    },
+    {
+      "name": "異常入力: レシピの型のサイズ0はエラー(0除算にしない)",
+      "func": "ratioByArea",
+      "args": ["round", 0, null, "round", 15, null],
+      "expect": { "ok": false, "code": "invalid_from_size" }
+    },
+    {
+      "name": "異常入力: 手持ちの型のサイズ0はエラー",
+      "func": "ratioByArea",
+      "args": ["round", 18, null, "round", 0, null],
+      "expect": { "ok": false, "code": "invalid_to_size" }
+    },
+    {
+      "name": "異常入力: レシピの型の高さ0cmはエラー",
+      "func": "ratioByVolume",
+      "args": ["round", 18, null, 0, "round", 15, null, 6],
+      "expect": { "ok": false, "code": "invalid_from_height" }
+    },
+    {
+      "name": "異常入力: 倍率0はエラー",
+      "func": "scale",
+      "args": [100, 0],
+      "expect": { "ok": false, "code": "invalid_ratio" }
+    },
+    {
+      "name": "異常入力: 分量が負の値はエラー",
+      "func": "scale",
+      "args": [-1, 1],
+      "expect": { "ok": false, "code": "invalid_amount" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "ratioByArea",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_from_shape" }
+    }
+  ]
+}

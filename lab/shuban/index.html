@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>ISO週番号・第何週 計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="日付からISO 8601の週番号を求め、週番号からその週の月曜〜日曜の日付を出します。1月1日を含む週を第1週とする数え方にも対応。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>.sources a { overflow-wrap: anywhere; word-break: break-word; }</style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>ISO週番号・第何週 計算</h1>
+  <form class="tool-form" id="date-form">
+    <span class="field-note">日付から週番号を調べる</span>
+    <div class="field-row">
+      <label>年
+        <input type="number" id="year" inputmode="numeric" step="1" min="1583" max="9999" placeholder="2026">
+      </label>
+      <label>月
+        <input type="number" id="month" inputmode="numeric" step="1" min="1" max="12" placeholder="7">
+      </label>
+      <label>日
+        <input type="number" id="day" inputmode="numeric" step="1" min="1" max="31" placeholder="29">
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <form class="tool-form" id="week-form">
+    <span class="field-note">週番号からその週の日付を調べる</span>
+    <div class="field-row">
+      <label>年(ISO週年)
+        <input type="number" id="wyear" inputmode="numeric" step="1" min="1583" max="9999" placeholder="2026">
+      </label>
+      <label>週番号
+        <input type="number" id="week" inputmode="numeric" step="1" min="1" max="53" placeholder="32">
+      </label>
+    </div>
+    <div class="tool-result" id="week-result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 「1月1日を含む週が第1週」の数え方</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">社内カレンダーでよく使う数え方</h3>
+      <p class="adv-note">1月1日を含む週を第1週とし、週の開始曜日を選べます。ISO 8601とは結果が異なることがあります。上の日付欄の値を使います。</p>
+      <label>週の開始曜日
+        <select id="start">
+          <option value="1" selected>月曜始まり</option>
+          <option value="7">日曜始まり</option>
+          <option value="2">火曜始まり</option>
+          <option value="3">水曜始まり</option>
+          <option value="4">木曜始まり</option>
+          <option value="5">金曜始まり</option>
+          <option value="6">土曜始まり</option>
+        </select>
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    ISO 8601 の週は<strong>月曜始まり</strong>で、<strong>その年の最初の木曜日を含む週(=1月4日を含む週)が第1週</strong>です。年末年始の日付は隣の年の週に入ることがあり、その週が属する年を「ISO週年」と呼びます。1年は52週または53週になります。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>「WK32納品」のような<strong>週番号がいつなのか</strong>、逆に<strong>ある日付が第何週なのか</strong>がわかります。製造業・物流・外資系のスケジュール確認にどうぞ。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>上の欄に年・月・日を入れると、ISO週番号(例: 2026-W31)がその場で出ます。</li>
+    <li>下の欄に年と週番号を入れると、その週の月曜〜日曜の日付が出ます。</li>
+    <li>社内カレンダーの「第何週」を調べたいときは「＋詳細機能」を開いてください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>ISO週年</strong> = その日を含む週の木曜日が属する年</li>
+    <li><strong>週番号</strong> = ⌊(その木曜日の年内通日 − 1)÷ 7⌋ + 1</li>
+    <li><strong>週の月曜日</strong> = その日 −(曜日番号 − 1)日(月曜=1 … 日曜=7)</li>
+    <li><strong>1年の週数</strong> = 1月1日が木曜の年、またはうるう年で1月1日が水曜の年は53週。それ以外は52週</li>
+  </ul>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>ISO「ISO 8601 Date and time format」<br>
+      <a href="https://www.iso.org/iso-8601-date-and-time-format.html" rel="noopener" target="_blank">https://www.iso.org/iso-8601-date-and-time-format.html</a>(2026年7月29日参照)</li>
+    <li>ISO 8601-1:2019「Date and time — Representations for information interchange — Part 1: Basic rules」<br>
+      <a href="https://www.iso.org/standard/70907.html" rel="noopener" target="_blank">https://www.iso.org/standard/70907.html</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>日付はすべて<strong>グレゴリオ暦</strong>として扱います。時差は考えず、暦日だけで計算します。</li>
+    <li>ISO週番号は<strong>月曜始まり固定</strong>です。日曜始まりの週番号が必要な場合は「＋詳細機能」の数え方をお使いください(値が変わります)。</li>
+    <li>年末年始は「日付の年」と「ISO週年」が食い違います。例えば2027年1月1日は2026-W53です。週番号を伝えるときは年もあわせて書いてください。</li>
+    <li>Microsoft Excel の WEEKNUM 関数は既定でISO 8601と異なる数え方をします(ISO準拠にするには ISOWEEKNUM 関数を使います)。</li>
+    <li>1583年より前は対象外です(グレゴリオ暦の導入前)。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">1月1日はいつも第1週ですか?</h3>
+  <p class="faq-a">ISO 8601ではそうとは限りません。1月1日が金・土・日にあたる年は、その日は前の年の最終週(第52週または第53週)に入ります。例えば2027年1月1日は金曜なので2026-W53です。</p>
+  <h3 class="faq-q">53週まである年はどんな年ですか?</h3>
+  <p class="faq-a">1月1日が木曜の年、またはうるう年で1月1日が水曜の年です。2020年・2026年・2032年などが53週あります。</p>
+  <h3 class="faq-q">「第32週」と言われたら何月ごろですか?</h3>
+  <p class="faq-a">年によって数日ずれますが、おおむね8月上旬です。正確な日付は下の欄に年と週番号を入れて確認してください。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_date: "実在する日付を、年1583〜9999の範囲で入力してください。",
+    invalid_year: "年は1583〜9999の整数で入力してください。",
+    invalid_week: "週番号はその年に存在する範囲(1〜52または1〜53)で入力してください。",
+    invalid_start_weekday: "週の開始曜日を選び直してください。"
+  };
+  var WD = ["月", "火", "水", "木", "金", "土", "日"];
+  var box = document.getElementById("result");
+  var weekBox = document.getElementById("week-result");
+  var advBox = document.getElementById("adv-result");
+  var yEl = document.getElementById("year");
+  var mEl = document.getElementById("month");
+  var dEl = document.getElementById("day");
+  var wyEl = document.getElementById("wyear");
+  var wEl = document.getElementById("week");
+  var startEl = document.getElementById("start");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function err(target, code) {
+    target.innerHTML = '<p class="result-error">' + esc(ERRORS[code] || "入力値を確認してください。") + "</p>";
+    target.hidden = false;
+  }
+  function filled(els) {
+    return els.every(function (el) { return el.value.trim() !== ""; });
+  }
+
+  function runDate() {
+    if (!filled([yEl, mEl, dEl])) { box.hidden = true; return; }
+    var r = ShubanCalc.isoWeek(
+      parseInt(yEl.value, 10), parseInt(mEl.value, 10), parseInt(dEl.value, 10)
+    );
+    if (!r.ok) { err(box, r.code); return; }
+    var w = ShubanCalc.weeksInYear(r.isoYear);
+    box.innerHTML =
+      '<div class="result-main">' + esc(r.label) + "</div>" +
+      "<p>" + esc(r.iso) + "(" + esc(WD[r.weekday - 1]) + "曜)は、ISO週年 " + esc(r.isoYear) +
+      " 年の第 " + esc(r.week) + " 週です。</p>" +
+      "<p>この週: " + esc(r.mondayIso) + "(月)〜" + esc(r.sundayIso) + "(日)</p>" +
+      (w.ok ? "<p>" + esc(r.isoYear) + "年は全部で " + esc(w.weeks) + " 週あります。</p>" : "");
+    box.hidden = false;
+  }
+
+  function runWeek() {
+    if (!filled([wyEl, wEl])) { weekBox.hidden = true; return; }
+    var r = ShubanCalc.weekRange(parseInt(wyEl.value, 10), parseInt(wEl.value, 10));
+    if (!r.ok) { err(weekBox, r.code); return; }
+    var rows = "";
+    r.days.forEach(function (d) {
+      rows += "<tr><td>" + esc(WD[d.weekday - 1]) + "</td><td>" + esc(d.iso) + "</td></tr>";
+    });
+    weekBox.innerHTML =
+      '<div class="result-main">' + esc(r.mondayIso) + " 〜 " + esc(r.sundayIso) + "</div>" +
+      "<p>" + esc(r.label) + " の7日間</p>" +
+      '<div class="table-scroll"><table class="data-table">' +
+      "<thead><tr><th>曜日</th><th>日付</th></tr></thead><tbody>" + rows + "</tbody></table></div>";
+    weekBox.hidden = false;
+  }
+
+  function runAdv() {
+    if (!filled([yEl, mEl, dEl])) { advBox.hidden = true; return; }
+    var r = ShubanCalc.simpleWeek(
+      parseInt(yEl.value, 10), parseInt(mEl.value, 10), parseInt(dEl.value, 10),
+      parseInt(startEl.value, 10)
+    );
+    if (!r.ok) { err(advBox, r.code); return; }
+    advBox.innerHTML =
+      '<div class="result-main">第 ' + esc(r.week) + " 週</div>" +
+      "<p>この週: " + esc(r.startIso) + " 〜 " + esc(r.endIso) + "</p>" +
+      "<p>1月1日を含む週を第1週とする数え方です。ISO 8601の週番号とは異なることがあります。</p>";
+    advBox.hidden = false;
+  }
+
+  function runAll() { runDate(); runWeek(); runAdv(); }
+  [yEl, mEl, dEl, wyEl, wEl].forEach(function (el) { el.addEventListener("input", runAll); });
+  startEl.addEventListener("change", runAll);
+  ["date-form", "week-form"].forEach(function (id) {
+    document.getElementById(id).addEventListener("submit", function (e) { e.preventDefault(); runAll(); });
+  });
+})();
+</script>
+</body>
+</html>

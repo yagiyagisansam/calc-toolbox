@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>減価償却費 計算(定額法・定率法)(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="取得価額と法定耐用年数から、定額法・定率法による各年の減価償却費と未償却残高を計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>減価償却費 計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>取得価額(円)
+      <span class="field-note">本体価格に加え、購入手数料や設置費用など使えるようにするまでの費用を含みます</span>
+      <input type="number" id="cost" inputmode="numeric" step="1000" min="1" placeholder="300000">
+    </label>
+    <div class="field-row">
+      <label>法定耐用年数(年)
+        <input type="number" id="life" inputmode="numeric" step="1" min="2" max="100" placeholder="4">
+      </label>
+      <label>償却方法
+        <select id="method">
+          <option value="straight">定額法</option>
+          <option value="declining">定率法(200%定率法)</option>
+        </select>
+      </label>
+      <label>事業に使い始めた月
+        <select id="month"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 年ごとの償却費と未償却残高の一覧</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">償却スケジュール</h3>
+      <p class="adv-note">償却が終わる年まで、各年の償却費・償却累計額・未償却残高を表示します。最後に備忘価額1円が残ります。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    <strong>個人事業主(会計期間が1月1日〜12月31日)</strong>を前提としています。定額法は平成19年4月1日以後、定率法は平成24年4月1日以後に取得した資産の償却率(200%定率法)を使います。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>パソコンや車などを買ったとき、<strong>その年に経費にできる減価償却費</strong>と<strong>翌年以降に残る未償却残高</strong>がわかります。定額法と定率法を切り替えて比べられるので、どちらを選ぶかの検討にも使えます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>取得価額(買った金額に付随費用を足した額)を入れます。</li>
+    <li>その資産の法定耐用年数を入れます(パソコンは4年、軽自動車は4年、普通自動車は6年など)。</li>
+    <li>償却方法と、事業に使い始めた月を選ぶと、初年度の償却費が表示されます。全年分は「＋詳細機能」で確認できます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>定額法</strong> = 取得価額 × 定額法の償却率</li>
+    <li><strong>定率法(1年目)</strong> = 取得価額 × 定率法の償却率</li>
+    <li><strong>定率法(2年目以降)</strong> = 期首未償却残高 × 定率法の償却率(これを調整前償却額といいます)</li>
+    <li><strong>定率法(調整前償却額 &lt; 償却保証額になった年以後)</strong> = 改定取得価額 × 改定償却率(以後は毎年同額)</li>
+    <li><strong>償却保証額</strong> = 取得価額 × 保証率</li>
+    <li><strong>年の中途で使い始めた年</strong> = 上記の額 × その年に業務に使用していた月数 ÷ 12</li>
+    <li><strong>償却の下限</strong> = 有形減価償却資産は取得価額から1円(備忘価額)を引いた額まで</li>
+  </ul>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>国税庁 タックスアンサー No.2106「定額法と定率法による減価償却」<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2106.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2106.htm</a>(2026年7月29日参照)</li>
+    <li>国税庁 タックスアンサー No.2100「減価償却のあらまし」<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2100.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2100.htm</a>(2026年7月29日参照)</li>
+    <li>減価償却資産の耐用年数等に関する省令(昭和40年大蔵省令第15号) 別表第八(定額法の償却率表)・別表第十(定率法の償却率、改定償却率及び保証率の表)<br>
+      <a href="https://laws.e-gov.go.jp/law/340M50000040015" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/340M50000040015</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>会計期間が1月1日〜12月31日の<strong>個人事業主</strong>を前提にしています。法人は事業年度が異なるため、初年度の月数の数え方が変わります。</li>
+    <li>取得時期によって使える償却方法・償却率が異なります。このツールは<strong>定額法は平成19年4月1日以後</strong>、<strong>定率法は平成24年4月1日以後</strong>に取得した資産に対応しています。それより前に取得した資産(旧定額法・旧定率法・250%定率法)には使えません。</li>
+    <li>個人事業主の法定償却方法は定額法です。定率法を選ぶには、原則として届出が必要です。</li>
+    <li>家事使用と兼用している資産は、事業に使っている割合を掛けた額が必要経費になります。このツールは事業専用として計算します。</li>
+    <li>取得価額が10万円未満のもの、使用可能期間が1年未満のものは、全額をその年の必要経費にできます(減価償却しません)。</li>
+    <li>各年の償却費は1円未満切り捨てにしています。実際の申告では端数処理が異なる場合があります。</li>
+    <li>法定耐用年数は資産の種類ごとに省令で決まっています。判断に迷う場合は出典の耐用年数表で確認してください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">なぜ最後に1円だけ残るのですか?</h3>
+  <p class="faq-a">有形減価償却資産は「取得価額から1円を控除した金額」まで償却できると決められているためです。この1円を備忘価額といい、その資産を持っている間は帳簿に残ります。</p>
+  <h3 class="faq-q">定額法と定率法はどちらが得ですか?</h3>
+  <p class="faq-a">償却できる総額は同じですが、定率法は最初の年に多く経費にできます。早く経費化したいなら定率法、毎年の経費を均等にしたいなら定額法です。個人事業主が定率法を使うには届出が必要です。</p>
+  <h3 class="faq-q">「改定償却率」とは何ですか?</h3>
+  <p class="faq-a">定率法では償却費が年々小さくなり、耐用年数内に償却しきれません。そこで、償却費が償却保証額を下回った年からは、その年の未償却残高(改定取得価額)に改定償却率を掛けた同じ額を毎年償却して、耐用年数の終わりにちょうど償却が終わるようにしています。</p>
+  <h3 class="faq-q">年の途中で買った場合はどうなりますか?</h3>
+  <p class="faq-a">事業に使い始めた月から12月までの月数で按分します。たとえば10月から使い始めたなら3か月分です。1か月に満たない端数は1か月として数えます。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_cost: "取得価額を1円以上で入力してください。",
+    invalid_life: "法定耐用年数を2〜100年の整数で入力してください。",
+    invalid_method: "償却方法を選び直してください。",
+    invalid_month: "事業に使い始めた月を選び直してください。"
+  };
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function yen(n) { return n.toLocaleString("ja-JP"); }
+
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var costEl = document.getElementById("cost");
+  var lifeEl = document.getElementById("life");
+  var methodEl = document.getElementById("method");
+  var monthEl = document.getElementById("month");
+
+  var opts = "";
+  for (var m = 1; m <= 12; m++) opts += '<option value="' + m + '"' + (m === 1 ? " selected" : "") + ">" + m + "月</option>";
+  monthEl.innerHTML = opts;
+
+  function run() {
+    if (costEl.value === "" || lifeEl.value === "") { box.hidden = true; advBox.hidden = true; return; }
+    var r = ShokyakuCalc.schedule(
+      parseFloat(costEl.value),
+      parseInt(lifeEl.value, 10),
+      methodEl.value,
+      parseInt(monthEl.value, 10)
+    );
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      advBox.hidden = true;
+      return;
+    }
+    var first = r.rows[0];
+    box.innerHTML =
+      '<div class="result-main">初年度 ' + esc(yen(first.depreciation)) + " 円</div>" +
+      "<p>償却率 " + esc(r.rate.toFixed(3)) + " / 初年度の月数 " + esc(first.months) + "か月 / 年末の未償却残高 " + esc(yen(first.remaining)) + " 円</p>" +
+      "<p>償却が終わるまで " + esc(r.rows.length) + " 年、償却できる総額 " + esc(yen(r.totalDepreciation)) + " 円" +
+      (r.guaranteeAmount !== null ? " / 償却保証額 " + esc(yen(r.guaranteeAmount)) + " 円" : "") + "</p>";
+    box.hidden = false;
+
+    var t = '<div class="table-scroll"><table class="data-table"><thead><tr><th>年</th><th>月数</th><th>償却費</th><th>償却累計</th><th>未償却残高</th></tr></thead><tbody>';
+    for (var i = 0; i < r.rows.length; i++) {
+      var row = r.rows[i];
+      t += "<tr><td>" + esc(row.year) + "年目" + (row.switched ? "(改定)" : "") + "</td><td>" + esc(row.months) + "</td><td>" +
+        esc(yen(row.depreciation)) + "</td><td>" + esc(yen(row.accumulated)) + "</td><td>" + esc(yen(row.remaining)) + "</td></tr>";
+    }
+    t += "</tbody></table></div>";
+    advBox.innerHTML = t;
+    advBox.hidden = false;
+  }
+
+  [costEl, lifeEl].forEach(function (el) { el.addEventListener("input", run); });
+  [methodEl, monthEl].forEach(function (el) { el.addEventListener("change", run); });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

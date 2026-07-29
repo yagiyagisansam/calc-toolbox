@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>釣り糸 号数⇔lb⇔mm 換算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="ナイロン・フロロ・PEラインの号数と強度(lb・kg)、標準直径(mm)を相互に換算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>釣り糸 号数⇔lb⇔mm 換算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>ライン種別
+      <select id="type">
+        <option value="nylon">ナイロン</option>
+        <option value="fluoro">フロロカーボン</option>
+        <option value="pe">PE</option>
+      </select>
+    </label>
+    <div class="field-row">
+      <label>入力する単位
+        <select id="unit">
+          <option value="gou">号数</option>
+          <option value="lb">ポンド(lb)</option>
+          <option value="mm">直径(mm)</option>
+        </select>
+      </label>
+      <label>数値
+        <input type="number" id="value" inputmode="decimal" step="0.01" min="0.01" placeholder="1">
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 号数の早見表</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">選んだ種別の換算表</h3>
+      <p class="adv-note">日本釣用品工業会(JAFTMA)の標準規格を参考にした一覧です。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    「号」は本来<strong>太さの単位</strong>で、強度の単位ではありません。同じ号数でも製品によって強度は変わります。とくにPEは編み本数(4本・8本など)や製法で大きく差が出ます。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>海外製ラインの<strong>lb表記</strong>と国産の<strong>号数表記</strong>を行き来できます。リールの糸巻き量を調べるときに必要な<strong>標準直径(mm)</strong>や、ドラグ設定の目安になる<strong>kg</strong>もまとめて出ます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>ライン種別(ナイロン・フロロカーボン・PE)を選びます。</li>
+    <li>手元にある表記の単位(号数・lb・mm)を選び、数値を入れます。</li>
+    <li>入力した瞬間に、ほかの単位に換算した値が表示されます。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>号数 ⇔ lb ⇔ mm</strong> = 日本釣用品工業会(JAFTMA)の標準規格に基づく換算表を引く</li>
+    <li><strong>表にない値</strong> = 隣り合う2点から補間する(直径は「直径の二乗が号数に比例する」性質を使う)</li>
+    <li><strong>kg</strong> = ポンド × 0.45359237(1ポンドの正確な値)</li>
+    <li><strong>強度の目安(ナイロン・フロロ)</strong> = 1号 ≒ 4lb ≒ 1.8kg(5号あたりから比例からずれる)</li>
+    <li><strong>強度の目安(PE)</strong> = 2.5号までは 号数 × 20lb、3〜6号は 号数 × 15lb 程度</li>
+  </ul>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>TSURI HACK「釣り糸(ライン)の号数とポンドについて。太さの規格について正しく知ろう!(換算表付き)」(日本釣用品工業会 JAFTMA の標準規格を参考にした換算表)<br>
+      <a href="https://tsurihack.com/2746" rel="noopener" target="_blank">https://tsurihack.com/2746</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>号数は太さの単位です。強度(lb・kg)との対応は規格上の<strong>目安</strong>で、実際の強力は製品ごとに異なります。</li>
+    <li>PEラインの太さの標準規格は本来「デニール」です(1号＝200デニール)。太さはメーカーによって異なり、4本撚り・8本撚りでも差が出ます。</li>
+    <li>フロロカーボンはナイロンと同じ号数・直径の規格を使いますが、比重が大きく(沈みやすく)、伸びが少ないという違いがあります。</li>
+    <li>kg は 1lb = 0.45359237kg で計算しています。出典の表に載っている kg 値とは、丸め方の違いで数g程度ずれることがあります。</li>
+    <li>表の範囲(ナイロン・フロロは0.25〜20号、PEは0.1〜10号)を外れる値は換算できません。</li>
+    <li>表示される強度は直線強力の目安です。結束すると強度は落ちるため、実釣ではノットの強さも考慮してください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">同じ号数なのにPEのほうがずっと強いのはなぜですか?</h3>
+  <p class="faq-a">号数は太さの単位だからです。PEは超高分子量ポリエチレンの繊維を編んだ糸で、同じ太さでもナイロンの数倍の強度があります。1号で比べるとナイロン4lbに対しPEは20lb程度です。</p>
+  <h3 class="faq-q">「1号＝4ポンド」で覚えてよいですか?</h3>
+  <p class="faq-a">ナイロン・フロロなら5号くらいまではおおむね合います。それより太くなると比例から外れ、10号は40lbではなく35lbです。PEにはこの目安は使えません。</p>
+  <h3 class="faq-q">リールの糸巻き量はどの数値で調べますか?</h3>
+  <p class="faq-a">直径(mm)ではなく号数で表記されているのが一般的です。海外製ラインでlb表記しかない場合は、このツールで号数に換算してからスプールの表記と比べてください。</p>
+  <h3 class="faq-q">リーダーの太さはどう決めますか?</h3>
+  <p class="faq-a">一般にPEの強度(lb)と同じかやや強いフロロ・ナイロンを合わせます。このツールでPEのlbを出し、その値でフロロの号数を逆引きすると選びやすくなります。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_type: "ライン種別を選び直してください。",
+    invalid_unit: "入力する単位を選び直してください。",
+    invalid_value: "0より大きい数値を入力してください。",
+    out_of_range: "換算表の範囲外です(ナイロン・フロロは0.25〜20号、PEは0.1〜10号)。"
+  };
+  var UNIT_LABEL = { gou: "号", lb: "lb", mm: "mm" };
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var typeEl = document.getElementById("type");
+  var unitEl = document.getElementById("unit");
+  var valEl = document.getElementById("value");
+
+  function run() {
+    renderTable();
+    if (valEl.value === "") { box.hidden = true; return; }
+    var r = PelineCalc.convert(typeEl.value, unitEl.value, parseFloat(valEl.value));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      return;
+    }
+    box.innerHTML = '<div class="result-main">' + esc(r.gou) + " 号 / " + esc(r.lb) + " lb</div>" +
+      "<p>標準直径 " + esc(r.mm.toFixed(3)) + " mm / 強度の目安 " + esc(r.kg.toFixed(2)) + " kg</p>" +
+      "<p>入力: " + esc(valEl.value) + " " + esc(UNIT_LABEL[unitEl.value] || "") + "</p>";
+    box.hidden = false;
+  }
+
+  function renderTable() {
+    var t = PelineCalc.table(typeEl.value);
+    if (!t.ok) { advBox.hidden = true; return; }
+    var h = '<div class="table-scroll"><table class="data-table"><thead><tr><th>号数</th><th>lb</th><th>kg</th><th>直径(mm)</th></tr></thead><tbody>';
+    for (var i = 0; i < t.rows.length; i++) {
+      var r = t.rows[i];
+      h += "<tr><td>" + esc(r.gou) + "号</td><td>" + esc(r.lb) + "</td><td>" + esc(r.kg.toFixed(3)) + "</td><td>" + esc(r.mm.toFixed(3)) + "</td></tr>";
+    }
+    h += "</tbody></table></div>";
+    advBox.innerHTML = h;
+    advBox.hidden = false;
+  }
+
+  valEl.addEventListener("input", run);
+  [typeEl, unitEl].forEach(function (el) { el.addEventListener("change", run); });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  renderTable();
+})();
+</script>
+</body>
+</html>

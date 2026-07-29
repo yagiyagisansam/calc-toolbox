@@ -1,0 +1,172 @@
+{
+  "tool": "kyusu",
+  "module": "calc.js",
+  "global": "KyusuCalc",
+  "cases": [
+    {
+      "name": "定義: 1級(Q)は0.25mm",
+      "func": "convert",
+      "args": [1, "Q", "mm"],
+      "expect": { "ok": true, "value": 0.25, "mm": 0.25 }
+    },
+    {
+      "name": "定義: 1歯(H)は級と同じ0.25mm",
+      "func": "convert",
+      "args": [1, "H", "mm"],
+      "expect": { "ok": true, "value": 0.25 }
+    },
+    {
+      "name": "定義: 1ポイント(1/72インチ)は0.35278mm",
+      "func": "convert",
+      "args": [1, "pt", "mm"],
+      "expect": { "ok": true, "value": 0.35278 }
+    },
+    {
+      "name": "定義: 1インチはちょうど72ポイント",
+      "func": "convert",
+      "args": [1, "inch", "pt"],
+      "expect": { "ok": true, "value": 72, "mm": 25.4 }
+    },
+    {
+      "name": "定義: 1アメリカ式ポイント(1/72.27インチ)は0.35146mm(Adobeの記載と一致)",
+      "func": "convert",
+      "args": [1, "apt", "mm"],
+      "expect": { "ok": true, "value": 0.35146 }
+    },
+    {
+      "name": "換算係数: 1級は0.70866ポイント",
+      "func": "convert",
+      "args": [1, "Q", "pt"],
+      "expect": { "ok": true, "value": 0.70866 }
+    },
+    {
+      "name": "換算係数: 1ポイントは1.41111級",
+      "func": "convert",
+      "args": [1, "pt", "Q"],
+      "expect": { "ok": true, "value": 1.41111 }
+    },
+    {
+      "name": "実用例: 4級はちょうど1mm(級が使いやすい理由)",
+      "func": "convert",
+      "args": [4, "Q", "mm"],
+      "expect": { "ok": true, "value": 1 }
+    },
+    {
+      "name": "実用例: 本文によく使う13級は3.25mm・9.2126ポイント",
+      "func": "convert",
+      "args": [13, "Q", "pt"],
+      "expect": { "ok": true, "value": 9.2126, "mm": 3.25 }
+    },
+    {
+      "name": "実用例: 10ポイントは14.11111級",
+      "func": "convert",
+      "args": [10, "pt", "Q"],
+      "expect": { "ok": true, "value": 14.11111 }
+    },
+    {
+      "name": "境界値: 級と歯は同じ単位なので1H=1Q",
+      "func": "convert",
+      "args": [1, "H", "Q"],
+      "expect": { "ok": true, "value": 1 }
+    },
+    {
+      "name": "境界値: 0は変換できて0になる",
+      "func": "convert",
+      "args": [0, "Q", "pt"],
+      "expect": { "ok": true, "value": 0 }
+    },
+    {
+      "name": "異常系: 負の値はエラー",
+      "func": "convert",
+      "args": [-1, "Q", "pt"],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常系: 上限(1000000)超はエラー",
+      "func": "convert",
+      "args": [1000001, "Q", "pt"],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常系: 数値でない値はエラー",
+      "func": "convert",
+      "args": ["abc", "Q", "pt"],
+      "expect": { "ok": false, "code": "invalid_value" }
+    },
+    {
+      "name": "異常系: 知らない元の単位はエラー",
+      "func": "convert",
+      "args": [1, "xx", "pt"],
+      "expect": { "ok": false, "code": "invalid_from" }
+    },
+    {
+      "name": "異常系: 知らない変換先の単位はエラー",
+      "func": "convert",
+      "args": [1, "Q", "xx"],
+      "expect": { "ok": false, "code": "invalid_to" }
+    },
+    {
+      "name": "異常系: 引数なしはエラー",
+      "func": "convert",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_from" }
+    },
+    {
+      "name": "一括換算: 13級は6単位すべてに換算される(pt=9.2126・mm=3.25)",
+      "func": "convertAll",
+      "args": [13, "Q"],
+      "expect": {
+        "ok": true,
+        "rows": {
+          "0": { "unit": "Q", "value": 13 },
+          "1": { "unit": "H", "value": 13 },
+          "2": { "unit": "pt", "value": 9.2126 },
+          "4": { "unit": "mm", "value": 3.25 },
+          "length": 6
+        }
+      }
+    },
+    {
+      "name": "異常系: 一括換算で知らない単位はエラー",
+      "func": "convertAll",
+      "args": [13, "xx"],
+      "expect": { "ok": false, "code": "invalid_from" }
+    },
+    {
+      "name": "行送り: 13級の1.75倍は22.75歯・行間9.75歯(5.6875mm)",
+      "func": "lineSpacing",
+      "args": [13, 1.75],
+      "expect": { "ok": true, "leading": 22.75, "gap": 9.75, "leadingMm": 5.6875 }
+    },
+    {
+      "name": "行送り: 13級の1.5倍は19.5歯・行間6.5歯",
+      "func": "lineSpacing",
+      "args": [13, 1.5],
+      "expect": { "ok": true, "leading": 19.5, "gap": 6.5 }
+    },
+    {
+      "name": "行送り: 単位をポイントにしても計算できる(10pt×1.75=17.5pt)",
+      "func": "lineSpacing",
+      "args": [10, 1.75, "pt"],
+      "expect": { "ok": true, "leading": 17.5, "gap": 7.5, "unit": "pt" }
+    },
+    {
+      "name": "境界値: 行送り倍率1.0(下限)は行間0",
+      "func": "lineSpacing",
+      "args": [13, 1],
+      "expect": { "ok": true, "leading": 13, "gap": 0 }
+    },
+    {
+      "name": "異常系: 行送り倍率が1未満はエラー",
+      "func": "lineSpacing",
+      "args": [13, 0.5],
+      "expect": { "ok": false, "code": "invalid_ratio" }
+    },
+    {
+      "name": "異常系: 行送りの文字サイズ0はエラー",
+      "func": "lineSpacing",
+      "args": [0, 1.5],
+      "expect": { "ok": false, "code": "invalid_value" }
+    }
+  ]
+}

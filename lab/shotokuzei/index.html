@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>所得税額 計算(速算表)(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="課税される所得金額から、所得税と復興特別所得税を含めた税額を国税庁の速算表で計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>
+    /* 出典の長いURLが画面からはみ出さないようにする */
+    .sources a { overflow-wrap: anywhere; word-break: break-word; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>所得税額 計算(速算表)</h1>
+  <form class="tool-form" id="tool-form">
+    <label>課税される所得金額(円)
+      <span class="field-note">各種控除を差し引いたあとの金額です。年収や売上ではありません</span>
+      <input type="number" id="income" inputmode="numeric" step="1000" min="0" placeholder="例: 3000000">
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 限界税率と速算表</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">あと1円稼いだときにかかる税率</h3>
+      <p class="adv-note">上で入れた課税所得での限界税率と、次の段階に上がるまでの金額を表示します。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+
+      <h3 class="adv-h">所得税の速算表</h3>
+      <p class="adv-note">国税庁 タックスアンサー No.2260 の速算表(令和7年4月1日現在法令等)です。</p>
+      <div class="table-scroll">
+        <table class="data-table">
+          <caption>所得税の速算表</caption>
+          <thead><tr><th>課税される所得金額</th><th>税率</th><th>控除額</th></tr></thead>
+          <tbody id="bracket-rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    この計算は<strong>総合課税の所得税だけ</strong>の概算です。住民税・国民健康保険料、住宅ローン控除などの税額控除、源泉徴収税額、予定納税額は含みません。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>確定申告書に書く「課税される所得金額」を入れるだけで、<strong>所得税と復興特別所得税を合わせた納付税額</strong>がわかります。確定申告の前におおよその納税額を見積もりたいときにどうぞ。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>課税される所得金額(円)を入れると、その瞬間に税額が下に表示されます。ボタンは不要です。</li>
+    <li>課税される所得金額は「収入 − 必要経費(または給与所得控除) − 各種所得控除」で求めた金額です。</li>
+    <li>限界税率や速算表そのものを見たいときは「＋詳細機能」を開いてください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>課税される所得金額</strong> = 入力額の1,000円未満を切り捨てた金額</li>
+    <li><strong>所得税額</strong> = 課税される所得金額 × 税率 − 控除額(速算表)</li>
+    <li><strong>復興特別所得税額</strong> = 所得税額(基準所得税額) × 2.1%</li>
+    <li><strong>納付税額</strong> = (所得税額 + 復興特別所得税額)の100円未満を切り捨てた金額</li>
+  </ul>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>国税庁「タックスアンサー No.2260 所得税の税率」(令和7年4月1日現在法令等)<br>
+      <a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2260.htm" rel="noopener" target="_blank">https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2260.htm</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>税率と控除額は<strong>令和7年4月1日現在の法令</strong>に基づく速算表の値です。税制改正で変わることがあります。</li>
+    <li>復興特別所得税は平成25年分から令和19年分までの各年分に課されます。</li>
+    <li>株式の譲渡所得・退職所得・山林所得などの分離課税は対象外です。</li>
+    <li>住民税(所得割はおおむね10%)は別に課税されます。この計算には含みません。</li>
+    <li>実際の納税額は税務署または税理士にご確認ください。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">「課税される所得金額」はどこを見ればわかりますか?</h3>
+  <p class="faq-a">確定申告書 第一表の「課税される所得金額」欄(30番)の金額です。年末調整の場合は源泉徴収票の「給与所得控除後の金額」から「所得控除の額の合計額」を引いた金額がこれにあたります。</p>
+  <h3 class="faq-q">税率が上がると手取りが減ることはありますか?</h3>
+  <p class="faq-a">ありません。日本の所得税は超過累進課税で、段階を超えた部分だけに高い税率がかかります。速算表の控除額はその調整のためのものです。</p>
+  <h3 class="faq-q">住民税も一緒に計算できますか?</h3>
+  <p class="faq-a">このツールは所得税と復興特別所得税だけを計算します。住民税は所得割がおおむね10%(都道府県民税4%+市町村民税6%)と均等割で、所得控除の額も所得税とは異なります。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_income: "課税される所得金額は0円以上の数値で入力してください。"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var incomeEl = document.getElementById("income");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function yen(n) {
+    return n.toLocaleString("ja-JP") + "円";
+  }
+
+  function fillTable() {
+    var t = ShotokuzeiCalc.table();
+    var html = "";
+    for (var i = 0; i < t.rows.length; i++) {
+      var r = t.rows[i];
+      var range = r.upper === null
+        ? (r.lower.toLocaleString("ja-JP") + "円以上")
+        : ((r.lower === 0 ? "1,000" : r.lower.toLocaleString("ja-JP")) + "円 〜 " + r.upper.toLocaleString("ja-JP") + "円");
+      html += "<tr><td>" + esc(range) + "</td><td>" +
+        esc(Math.round(r.rate * 100) + "%") + "</td><td>" + esc(yen(r.deduction)) + "</td></tr>";
+    }
+    document.getElementById("bracket-rows").innerHTML = html;
+  }
+
+  function run() {
+    if (incomeEl.value === "") { box.hidden = true; advBox.hidden = true; return; }
+    var r = ShotokuzeiCalc.calculate(parseFloat(incomeEl.value));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      advBox.hidden = true;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">' + esc(yen(r.totalTaxRounded)) + "</div>" +
+      "<p>所得税 " + esc(yen(r.incomeTax)) + " + 復興特別所得税 " + esc(yen(r.reconstructionTax)) +
+      " = " + esc(yen(r.totalTax)) + "(100円未満切り捨て)</p>" +
+      "<p>課税される所得金額 " + esc(yen(r.taxableIncome)) + " / 税率 " +
+      esc(Math.round(r.rate * 100) + "%") + " / 控除額 " + esc(yen(r.deduction)) +
+      " / 課税所得に対する割合 " + esc(r.effectiveRate + "%") + "</p>";
+    box.hidden = false;
+
+    var m = ShotokuzeiCalc.marginal(parseFloat(incomeEl.value));
+    if (m.ok) {
+      advBox.innerHTML =
+        '<div class="result-main">限界税率 ' + esc(m.marginalRateWithReconstruction + "%") + "</div>" +
+        "<p>所得税だけなら " + esc(m.marginalRate + "%") + "(復興特別所得税を含めると " +
+        esc(m.marginalRateWithReconstruction + "%") + ")です。</p>" +
+        (m.nextBracketAt === null
+          ? "<p>これが速算表の一番上の段階です。</p>"
+          : "<p>次の段階(" + esc(yen(m.nextBracketAt)) + "以上)まであと " + esc(yen(m.toNextBracket)) + " です。</p>");
+      advBox.hidden = false;
+    } else {
+      advBox.hidden = true;
+    }
+  }
+
+  fillTable();
+  incomeEl.addEventListener("input", run);
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

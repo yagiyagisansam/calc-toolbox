@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>タイヤ外径・メーター誤差計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="インチアップ前後のタイヤ外径差と、スピードメーターの誤差・保安基準の判定を計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>タイヤ外径・メーター誤差計算</h1>
+  <form class="tool-form" id="tool-form">
+    <span class="field-note">変更前(純正)のサイズ</span>
+    <div class="field-row">
+      <label>幅(mm)
+        <input type="number" id="ow" inputmode="numeric" step="5" min="100" max="500" placeholder="195">
+      </label>
+      <label>扁平率(%)
+        <input type="number" id="oa" inputmode="numeric" step="5" min="20" max="100" placeholder="65">
+      </label>
+      <label>リム径(inch)
+        <input type="number" id="or" inputmode="decimal" step="0.5" min="8" max="30" placeholder="15">
+      </label>
+    </div>
+    <span class="field-note">変更後のサイズ</span>
+    <div class="field-row">
+      <label>幅(mm)
+        <input type="number" id="nw" inputmode="numeric" step="5" min="100" max="500" placeholder="205">
+      </label>
+      <label>扁平率(%)
+        <input type="number" id="na" inputmode="numeric" step="5" min="20" max="100" placeholder="55">
+      </label>
+      <label>リム径(inch)
+        <input type="number" id="nr" inputmode="decimal" step="0.5" min="8" max="30" placeholder="16">
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 速度計の基準(細目告示第148条)の判定</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">製作時期を選んで判定する</h3>
+      <p class="adv-note">検査は通常、メーターが40km/hを指した状態で行います。製作時期によって許容範囲が異なります。</p>
+      <label>自動車の製作時期
+        <select id="era">
+          <option value="h19" selected>平成19年1月1日以降に製作</option>
+          <option value="h18">平成18年12月31日までに製作</option>
+        </select>
+      </label>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    外径は<strong>呼び寸法から計算した理論値</strong>です。実際の外径は銘柄・空気圧・荷重で数mm変わります。車検の合否は最終的に運輸支局・指定工場でご確認ください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>インチアップやスタッドレス購入で<strong>タイヤの外径がどれだけ変わるか</strong>、そして<strong>スピードメーターがどれだけずれるか</strong>がわかります。保安基準の速度計の範囲に収まるかも判定します。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>変更前(純正)のタイヤサイズを、幅・扁平率・リム径の順に入れます(例: 195/65R15)。</li>
+    <li>変更後のサイズも同じように入れると、その瞬間に外径差とメーター誤差が出ます。</li>
+    <li>保安基準に収まるかは「＋詳細機能」で製作時期を選んで確認してください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>外径(mm)</strong> = リム径(inch) × 25.4 + 幅(mm) × 扁平率(%) ÷ 100 × 2</li>
+    <li><strong>外径差(%)</strong> = (変更後の外径 − 変更前の外径) ÷ 変更前の外径 × 100</li>
+    <li><strong>実速度 V2</strong> = 指示速度 V1 × (変更後の外径 ÷ 変更前の外径)<br>メーターは変更前の外径で校正されている前提です。</li>
+    <li><strong>速度計の基準</strong>(細目告示第148条、四輪車)<br>
+      平成18年12月31日までに製作: 10(V1−6)/11 ≦ V2 ≦ (100/90)V1<br>
+      平成19年1月1日以降に製作: 10(V1−6)/11 ≦ V2 ≦ V1<br>
+      V1=速度計の指示速度、V2=速度計試験機で計測した速度(km/h)</li>
+  </ul>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>国土交通省「道路運送車両の保安基準の細目を定める告示」第148条(速度計等)<br>
+      <a href="https://www.mlit.go.jp/jidosha/kijyun/saimokukokuji/saikoku_148_00.pdf" rel="noopener" target="_blank">https://www.mlit.go.jp/jidosha/kijyun/saimokukokuji/saikoku_148_00.pdf</a>(2026年7月29日参照)</li>
+    <li>道路運送車両の保安基準(昭和26年運輸省令第67号) 第46条(速度計等)<br>
+      <a href="https://laws.e-gov.go.jp/law/326M50000800067" rel="noopener" target="_blank">https://laws.e-gov.go.jp/law/326M50000800067</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li><strong>基準の時点:</strong> 判定式は、国土交通省が公開している細目告示第148条のPDF(<strong>2003年9月26日時点</strong>の条文)によります。その後の改正で許容範囲が変わっている可能性があるため、実際の合否は運輸支局・指定工場でご確認ください。</li>
+    <li>外径は呼び寸法からの理論値です。銘柄・空気圧・荷重によって実測値は数mm変わります。</li>
+    <li>タイヤの外径以外にも、はみ出し・フェンダー干渉・荷重指数(ロードインデックス)・速度記号の適合が必要です。本ツールでは判定していません。</li>
+    <li>二輪自動車・三輪自動車・カタピラ及びそりを有する軽自動車は別の式(10(V1−8)/11 が下限)になります。本ツールは四輪車のみを扱います。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">外径は何%まで変えてよいですか?</h3>
+  <p class="faq-a">保安基準は外径そのものではなく、速度計の指示と実速度の関係で決まります。外径が大きくなるとメーターが実速度より遅く表示され、上限側で外れやすくなります。本ツールの判定で確認してください。</p>
+  <h3 class="faq-q">扁平率とは何ですか?</h3>
+  <p class="faq-a">タイヤの断面高さが断面幅の何%かを表す数字です。195/65R15なら65%で、断面高さは195×0.65=126.75mmになります。</p>
+  <h3 class="faq-q">インチアップしても外径を変えないコツはありますか?</h3>
+  <p class="faq-a">リム径を1インチ(25.4mm)上げるぶん、断面高さを片側12.7mm下げれば外径はほぼ同じになります。幅を広げる場合は扁平率をさらに下げて調整します。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_width: "幅は100〜500mmで入力してください。",
+    invalid_aspect: "扁平率は20〜100%で入力してください。",
+    invalid_rim: "リム径は8〜30インチで入力してください。",
+    invalid_diameter: "外径を計算できませんでした。",
+    invalid_era: "製作時期の指定が正しくありません。",
+    invalid_speed: "指示速度が範囲外です。",
+    invalid_input: "入力値を確認してください。"
+  };
+  var ids = ["ow", "oa", "or", "nw", "na", "nr"];
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var eraEl = document.getElementById("era");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function val(id) { return parseFloat(document.getElementById(id).value); }
+
+  function run() {
+    for (var i = 0; i < ids.length; i++) {
+      if (document.getElementById(ids[i]).value === "") { box.hidden = true; advBox.hidden = true; return; }
+    }
+    var r = TiresizeCalc.calculate({
+      oldWidthMm: val("ow"), oldAspectPct: val("oa"), oldRimInch: val("or"),
+      newWidthMm: val("nw"), newAspectPct: val("na"), newRimInch: val("nr"),
+      era: eraEl.value
+    });
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false; advBox.hidden = true; return;
+    }
+    var s = r.size;
+    box.innerHTML = '<div class="result-main">外径差 ' + esc((s.diffMm > 0 ? "+" : "") + s.diffMm) + " mm(" +
+      esc((s.diffPct > 0 ? "+" : "") + s.diffPct) + "%)</div>" +
+      "<p>変更前 " + esc(String(s.oldOuterMm)) + "mm → 変更後 " + esc(String(s.newOuterMm)) + "mm</p>" +
+      "<p>メーター40km/h表示時の実速度: " + esc(String(s.actualSpeedAt40)) + " km/h(メーター誤差 " +
+      esc((s.speedoErrorPct > 0 ? "+" : "") + s.speedoErrorPct) + "%)</p>";
+    box.hidden = false;
+
+    var j = r.judge;
+    advBox.innerHTML = '<div class="result-main">' + (j.pass ? "基準内" : "基準外") + "</div>" +
+      "<p>" + esc(j.eraLabel) + " / 指示速度 " + esc(String(j.v1)) + "km/h のとき、許容される実速度は " +
+      esc(String(j.minV2)) + "〜" + esc(String(j.maxV2)) + " km/h</p>" +
+      "<p>計算上の実速度: " + esc(String(j.v2)) + " km/h</p>";
+    advBox.hidden = false;
+  }
+  ids.forEach(function (id) { document.getElementById(id).addEventListener("input", run); });
+  eraEl.addEventListener("change", run);
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>自動車重量税の計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="車両重量・車検の有効期間・エコカー減税の区分・経過年数から、車検時に納める自動車重量税を計算します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>自動車重量税の計算</h1>
+  <form class="tool-form" id="tool-form">
+    <label>車種
+      <select id="kind">
+        <option value="passenger">乗用車(自家用)</option>
+        <option value="kei">軽自動車(自家用・二輪を除く)</option>
+      </select>
+    </label>
+    <label id="weight-label">車両重量(kg)
+      <span class="field-note">車検証の「車両重量」。例: 1400</span>
+      <input type="number" id="weight" inputmode="numeric" step="10" min="1" max="3000" placeholder="1400">
+    </label>
+    <label>車検の区分
+      <select id="years">
+        <option value="2">継続検査(車検)・2年</option>
+        <option value="3">新車新規登録・3年</option>
+        <option value="1">1年(貨物など有効期間1年の場合)</option>
+      </select>
+    </label>
+    <label>初度登録からの経過年数(年)
+      <span class="field-note">軽自動車は初度検査から。13年・18年で重課になります</span>
+      <input type="number" id="elapsed" inputmode="numeric" step="1" min="0" max="100" placeholder="5">
+    </label>
+    <label>エコカー減税の区分
+      <select id="eco">
+        <option value="auto">エコカー以外(減税なし)</option>
+        <option value="exempt">免税</option>
+        <option value="standard">本則税率(エコカー)</option>
+        <option value="reduce75">75%軽減(新車新規登録時)</option>
+        <option value="reduce50">50%軽減(新車新規登録時)</option>
+        <option value="reduce25">25%軽減(新車新規登録時)</option>
+      </select>
+    </label>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 13年経過・18年経過で税額がどれだけ増えるか</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">経過年数ごとの比較</h3>
+      <p class="adv-note">同じ車両重量・同じ車検期間で、エコカー以外の場合に重課がどれだけ効くかを並べます。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    <strong>2026年5月1日から</strong>の税額表(令和8年度税制改正後)にもとづく計算です。自家用の乗用車・検査対象軽自動車のみに対応しており、事業用・トラック・バス・特種用途車・二輪車には対応していません。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>車検の見積書にある<strong>自動車重量税</strong>がいくらになるかがわかります。13年・18年を超えた車がどれだけ高くなるかも比べられるので、乗り続けるか買い替えるかの判断に使えます。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>車種を選び、乗用車なら車検証の「車両重量」を入れます。</li>
+    <li>車検の区分(継続検査2年か新車新規登録3年)を選びます。</li>
+    <li>初度登録からの経過年数を入れると、13年・18年の重課が自動で反映されます。</li>
+    <li>エコカー減税の対象なら、区分を選ぶと軽減後の税額になります。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>乗用車</strong> = 1年・0.5トンあたりの単価 × 0.5トンきざみの段数 × 車検年数</li>
+    <li><strong>軽自動車</strong> = 1年あたりの定額 × 車検年数(車両重量に関係なく定額)</li>
+    <li><strong>エコカー減税</strong> = 本則税率 × (1 − 軽減率)。100円未満は切り捨て</li>
+  </ul>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>1年あたりの単価(2026年5月1日から。自家用)</caption>
+      <thead><tr><th>区分</th><th>乗用車(0.5トンあたり)</th><th>軽自動車(1台あたり)</th></tr></thead>
+      <tbody>
+        <tr><td>本則税率(エコカー)</td><td>2,500円</td><td>2,500円</td></tr>
+        <tr><td>当分の間税率(エコカー以外・13年未満)</td><td>4,100円</td><td>3,300円</td></tr>
+        <tr><td>13年経過</td><td>5,700円</td><td>4,100円</td></tr>
+        <tr><td>18年経過</td><td>6,300円</td><td>4,400円</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="table-scroll">
+    <table class="data-table">
+      <caption>継続検査(2年・自家用乗用車)の税額の例</caption>
+      <thead><tr><th>車両重量</th><th>エコカー(本則)</th><th>エコカー以外</th><th>13年経過</th><th>18年経過</th></tr></thead>
+      <tbody>
+        <tr><td>0.5トン以下</td><td>5,000円</td><td>8,200円</td><td>11,400円</td><td>12,600円</td></tr>
+        <tr><td>〜1トン</td><td>10,000円</td><td>16,400円</td><td>22,800円</td><td>25,200円</td></tr>
+        <tr><td>〜1.5トン</td><td>15,000円</td><td>24,600円</td><td>34,200円</td><td>37,800円</td></tr>
+        <tr><td>〜2トン</td><td>20,000円</td><td>32,800円</td><td>45,600円</td><td>50,400円</td></tr>
+        <tr><td>〜2.5トン</td><td>25,000円</td><td>41,000円</td><td>57,000円</td><td>63,000円</td></tr>
+        <tr><td>〜3トン</td><td>30,000円</td><td>49,200円</td><td>68,400円</td><td>75,600円</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>国土交通省「自動車重量税額について」(税額表PDFの配布ページ)<br>
+      <a href="https://www.mlit.go.jp/jidosha/jidosha_fr1_000076.html" rel="noopener" target="_blank">https://www.mlit.go.jp/jidosha/jidosha_fr1_000076.html</a>(2026年7月29日参照)</li>
+    <li>国土交通省「2026年5月1日からの自動車重量税の税額表(継続車検を受ける場合)」<br>
+      <a href="https://www.mlit.go.jp/jidosha/content/001884517.pdf" rel="noopener" target="_blank">https://www.mlit.go.jp/jidosha/content/001884517.pdf</a>(2026年7月29日参照)</li>
+    <li>国土交通省「2026年5月1日からの自動車重量税の税額表(新車新規登録を受ける場合)」<br>
+      <a href="https://www.mlit.go.jp/jidosha/content/001999427.pdf" rel="noopener" target="_blank">https://www.mlit.go.jp/jidosha/content/001999427.pdf</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>税額は<strong>2026年5月1日から適用</strong>の税額表(令和8年度税制改正後)によります。税率は毎年度の税制改正で変わることがあります。</li>
+    <li>自家用の乗用車(3トンまで)と検査対象軽自動車(二輪を除く)のみに対応しています。事業用・トラック・バス・特種用途車・二輪車は税額が異なります。</li>
+    <li>エコカー減税の区分(免税・75%・50%・25%軽減)は、燃費基準の達成度と排出ガス規制の適合状況で決まります。ご自身の車がどの区分かは、販売店や車検証の記載でご確認ください。</li>
+    <li>「13年経過」は、登録車では初度登録年月から12年10か月以後に車検証の交付等を受ける場合、軽自動車では初度検査年から13年を経過した年の11月以後に受ける場合に適用されます。本ツールは経過年数から簡易に判定しています。</li>
+    <li>車検費用には自動車重量税のほかに自賠責保険料・印紙代・整備費用がかかります。ここで出るのは重量税だけです。</li>
+    <li>継続検査では75%・50%・25%の軽減は使えません(免税・本則税率・当分の間税率のいずれか)。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">13年を超えると重量税はどれくらい上がりますか?</h3>
+  <p class="faq-a">エコカー以外の自家用乗用車で、継続検査2年の場合は約1.39倍(0.5トンあたり8,200円→11,400円)になります。18年を超えるとさらに上がり、約1.54倍(12,600円)になります。</p>
+  <h3 class="faq-q">車両重量と車両総重量は違いますか?</h3>
+  <p class="faq-a">違います。乗用車の重量税は「車両重量」(人が乗っていない状態の重さ)で決まります。「車両総重量」は乗車定員分の重さを加えたもので、トラックやバスの重量税に使われます。</p>
+  <h3 class="faq-q">軽自動車の重量税は重さで変わりますか?</h3>
+  <p class="faq-a">変わりません。検査対象軽自動車(二輪を除く)は車両重量に関係なく定額です。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_weight: "車両重量を1〜3000kgの範囲で入力してください。",
+    invalid_years: "車検の区分を選び直してください。",
+    invalid_grade: "エコカー減税の区分を選び直してください。",
+    invalid_elapsed: "経過年数を0〜100年の範囲で入力してください。"
+  };
+  var GRADE_LABEL = {
+    exempt: "免税", standard: "本則税率(エコカー)", reduce75: "75%軽減",
+    reduce50: "50%軽減", reduce25: "25%軽減",
+    normal: "当分の間税率(13年未満)", over13: "当分の間税率(13年経過)", over18: "当分の間税率(18年経過)"
+  };
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var kindEl = document.getElementById("kind");
+  var weightEl = document.getElementById("weight");
+  var weightLabel = document.getElementById("weight-label");
+  var yearsEl = document.getElementById("years");
+  var elapsedEl = document.getElementById("elapsed");
+  var ecoEl = document.getElementById("eco");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function yen(v) { return Math.round(v).toLocaleString("ja-JP") + "円"; }
+
+  function run() {
+    var isKei = kindEl.value === "kei";
+    weightLabel.hidden = isKei;
+    if (!isKei && weightEl.value === "") { box.hidden = true; advBox.hidden = true; return; }
+    if (elapsedEl.value === "") { box.hidden = true; advBox.hidden = true; return; }
+
+    var weight = isKei ? 0 : parseFloat(weightEl.value);
+    var years = parseInt(yearsEl.value, 10);
+    var grade = ecoEl.value;
+    if (grade === "auto") {
+      var g = JuryozeiCalc.gradeByAge(parseFloat(elapsedEl.value));
+      if (!g.ok) {
+        box.innerHTML = '<p class="result-error">' + esc(ERRORS[g.code]) + "</p>";
+        box.hidden = false;
+        advBox.hidden = true;
+        return;
+      }
+      grade = g.grade;
+    }
+    var r = JuryozeiCalc.calculate(weight, years, grade, isKei);
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      advBox.hidden = true;
+      return;
+    }
+    box.innerHTML =
+      '<div class="result-main">' + esc(yen(r.taxYen)) + "</div>" +
+      "<p>適用区分: " + esc(GRADE_LABEL[grade]) + " / 車検 " + esc(years) + "年分</p>" +
+      (isKei ? "<p>軽自動車は車両重量に関係なく定額です。</p>"
+             : "<p>重量区分: " + esc(r.step) + "段目(" + esc(r.step * 0.5) + "トンまで)</p>");
+    box.hidden = false;
+    runAdv(weight, years, isKei);
+  }
+
+  function runAdv(weight, years, isKei) {
+    var rows = [["normal", "13年未満"], ["over13", "13年経過"], ["over18", "18年経過"]];
+    var html = "";
+    for (var i = 0; i < rows.length; i++) {
+      var r = JuryozeiCalc.calculate(weight, years, rows[i][0], isKei);
+      if (!r.ok) { advBox.hidden = true; return; }
+      html += "<p>" + esc(rows[i][1]) + ": " + esc(yen(r.taxYen)) + "</p>";
+    }
+    advBox.innerHTML = '<div class="result-main">エコカー以外の場合の比較</div>' + html;
+    advBox.hidden = false;
+  }
+
+  [weightEl, elapsedEl].forEach(function (el) { el.addEventListener("input", run); });
+  [kindEl, yearsEl, ecoEl].forEach(function (el) { el.addEventListener("change", run); });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>世界の時差計算(検討中) | 計算ツールボックス</title>
+  <meta name="description" content="日本時間と海外都市の現地時間を相互換算します。サマータイムも自動で反映します。">
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link rel="stylesheet" href="../lab.css">
+  <style>
+    /* 出典の長いURLが画面からはみ出さないようにする */
+    .sources a { overflow-wrap: anywhere; word-break: break-word; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <a class="site-brand" href="../"><svg class="site-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7.5h8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>計算ツールボックス</a>
+  <a class="site-search-link" href="../">検討中の一覧</a>
+</header>
+<main>
+  <p class="lab-note">このページは<strong>検討中のツール</strong>です。公開サイトの一覧・検索には出ていません。</p>
+
+  <h1>世界の時差計算</h1>
+  <form class="tool-form" id="tool-form">
+    <div class="field-row">
+      <label>基準の都市
+        <select id="from"></select>
+      </label>
+      <label>相手の都市
+        <select id="to"></select>
+      </label>
+    </div>
+    <span class="field-note">基準の都市での日時</span>
+    <div class="field-row">
+      <label>年
+        <select id="y"></select>
+      </label>
+      <label>月
+        <select id="mo"></select>
+      </label>
+      <label>日
+        <select id="d"></select>
+      </label>
+    </div>
+    <div class="field-row">
+      <label>時
+        <select id="h"></select>
+      </label>
+      <label>分
+        <select id="mi"></select>
+      </label>
+    </div>
+    <div class="tool-result" id="result" hidden aria-live="polite"></div>
+  </form>
+
+  <details class="adv-box">
+    <summary><span class="plus">＋</span>詳細機能: 主要都市の現地時間を一覧で見る</summary>
+    <div class="adv-inner">
+      <h3 class="adv-h">同じ瞬間の各都市の時刻</h3>
+      <p class="adv-note">上で指定した日時と同じ瞬間を、主要な都市の現地時間で並べます。</p>
+      <div class="tool-result" id="adv-result" hidden aria-live="polite"></div>
+    </div>
+  </details>
+
+  <div class="note-box">
+    サマータイム(夏時間)の<strong>切替日と切替時刻は国ごとに違い、制度自体も変わることがあります</strong>。表示はお使いの端末が持つタイムゾーンデータにもとづくため、遠い将来の日付では実際とずれる可能性があります。重要な予定は現地の公式情報でご確認ください。
+  </div>
+
+  <div class="lead-card"><span class="lead-label">このツールでわかること</span><p>都市と日時を選ぶだけで、<strong>相手の国では何月何日の何時か</strong>がすぐわかります。サマータイムの有無も自動で判定するので、「夏と冬で1時間ずれる」といった間違いを防げます。海外との会議設定、国際発送、旅行の予約にどうぞ。</p></div>
+
+  <h2>使い方</h2>
+  <ol class="steps">
+    <li>基準の都市(日本の予定なら東京)と、相手の都市を選びます。</li>
+    <li>基準の都市での日時を選ぶと、その瞬間に相手の都市の現地時間が表示されます。ボタンは不要です。</li>
+    <li>複数の国と調整するときは「＋詳細機能」で主要都市の一覧を確認してください。</li>
+  </ol>
+
+  <h2>計算方法と根拠</h2>
+  <ul class="method">
+    <li><strong>換算</strong> = 基準都市の壁時計時刻 → そのタイムゾーンのUTCオフセットを引いてUTCの瞬間を求める → 相手のタイムゾーンのオフセットを足して現地時刻にする</li>
+    <li><strong>UTCオフセットとサマータイムの規則</strong> = IANA Time Zone Database。お使いの端末(ブラウザ・OS)に組み込まれているデータを、標準機能の Intl.DateTimeFormat 経由で参照します(外部への通信は行いません)</li>
+    <li><strong>サマータイム中かどうか</strong> = その年で最も小さいオフセット(標準時)より進んでいれば実施中と判定</li>
+    <li><strong>存在しない時刻・2回ある時刻</strong> = 切替の前後のオフセットから候補を作り、壁時計時刻が一致するものだけを採用。0件なら「存在しない時刻」、2件なら「2回ある時刻」として表示</li>
+  </ul>
+
+  <h3>出典(一次情報)</h3>
+  <ul class="sources">
+    <li>IANA Time Zone Database(tz database。世界のUTCオフセットとサマータイム規則の標準データベース)<br>
+      <a href="https://www.iana.org/time-zones" rel="noopener" target="_blank">https://www.iana.org/time-zones</a>(2026年7月29日参照)</li>
+  </ul>
+
+  <h2>計算の前提と注意</h2>
+  <ul class="cautions">
+    <li>オフセットとサマータイムの規則は、<strong>お使いの端末が持つタイムゾーンデータの版</strong>で決まります。各国の制度変更が端末に反映されていない場合、将来の日付の結果がずれることがあります。</li>
+    <li>都市名は代表的なものを挙げています。同じ国でも地域によってタイムゾーンが異なる場合があります(米国・オーストラリア・ブラジルなど)。</li>
+    <li>サマータイム切替の当日は、存在しない時刻(1時間飛ばされる)や2回ある時刻(1時間巻き戻る)が生じます。該当する場合は画面に注意を表示します。</li>
+    <li>秒は扱いません(分単位)。</li>
+    <li>日本にはサマータイムがないため、日本時間は年間を通じてUTC+9で一定です。</li>
+  </ul>
+
+  <h2 id="faq">よくある質問</h2>
+  <h3 class="faq-q">同じ都市なのに時差が季節で変わるのはなぜですか?</h3>
+  <p class="faq-a">サマータイム(夏時間)を実施している国では、夏の間だけ時計を1時間進めるためです。たとえば日本とニューヨークの時差は、夏は13時間、冬は14時間になります。</p>
+  <h3 class="faq-q">切替日の午前2時台の予定はどうなりますか?</h3>
+  <p class="faq-a">春の切替(時計を進める)では2時台が存在しないため、指定するとその分だけ先に送られます。秋の切替(時計を戻す)では1時台が2回あるため、どちらの回かで実際の時刻が1時間変わります。このツールでは該当する場合に注意を表示します。</p>
+  <h3 class="faq-q">サマータイムを実施しているかどうかはどこでわかりますか?</h3>
+  <p class="faq-a">結果欄にUTCオフセットとあわせて表示します。その年で最も小さいオフセット(=標準時)より進んでいれば、その日はサマータイム実施中です。</p>
+
+  <h2>関連ツール</h2>
+  <ul class="related">
+    <li><a href="../">検討中のツール一覧へ</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>入力した値はすべてお使いの端末内で計算され、サーバーには送信されません。</p>
+  <nav>
+    <a href="../">検討中の一覧</a>
+    <a href="../../">計算ツールボックス</a>
+  </nav>
+  <p>本サイトの計算結果はすべて概算です。正確な数値は各ページ記載の一次情報・公的機関の窓口でご確認ください。</p>
+  <p>© 2026 計算ツールボックス</p>
+</footer>
+<script src="./calc.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ERRORS = {
+    invalid_from_zone: "基準の都市を選び直してください。",
+    invalid_to_zone: "相手の都市を選び直してください。",
+    invalid_datetime: "日時を選び直してください。"
+  };
+  // 都市名とIANAタイムゾーン名の対応
+  var CITIES = [
+    ["東京", "Asia/Tokyo"],
+    ["ソウル", "Asia/Seoul"],
+    ["北京・上海", "Asia/Shanghai"],
+    ["台北", "Asia/Taipei"],
+    ["香港", "Asia/Hong_Kong"],
+    ["シンガポール", "Asia/Singapore"],
+    ["バンコク", "Asia/Bangkok"],
+    ["ジャカルタ", "Asia/Jakarta"],
+    ["ハノイ", "Asia/Ho_Chi_Minh"],
+    ["マニラ", "Asia/Manila"],
+    ["デリー・コルカタ", "Asia/Kolkata"],
+    ["ドバイ", "Asia/Dubai"],
+    ["イスタンブール", "Europe/Istanbul"],
+    ["モスクワ", "Europe/Moscow"],
+    ["ロンドン", "Europe/London"],
+    ["パリ", "Europe/Paris"],
+    ["ベルリン", "Europe/Berlin"],
+    ["ローマ", "Europe/Rome"],
+    ["マドリード", "Europe/Madrid"],
+    ["アムステルダム", "Europe/Amsterdam"],
+    ["チューリッヒ", "Europe/Zurich"],
+    ["ストックホルム", "Europe/Stockholm"],
+    ["カイロ", "Africa/Cairo"],
+    ["ヨハネスブルグ", "Africa/Johannesburg"],
+    ["ニューヨーク", "America/New_York"],
+    ["シカゴ", "America/Chicago"],
+    ["デンバー", "America/Denver"],
+    ["ロサンゼルス", "America/Los_Angeles"],
+    ["ホノルル", "Pacific/Honolulu"],
+    ["アンカレッジ", "America/Anchorage"],
+    ["トロント", "America/Toronto"],
+    ["バンクーバー", "America/Vancouver"],
+    ["メキシコシティ", "America/Mexico_City"],
+    ["サンパウロ", "America/Sao_Paulo"],
+    ["ブエノスアイレス", "America/Argentina/Buenos_Aires"],
+    ["シドニー", "Australia/Sydney"],
+    ["ブリスベン", "Australia/Brisbane"],
+    ["パース", "Australia/Perth"],
+    ["オークランド", "Pacific/Auckland"],
+    ["グアム", "Pacific/Guam"],
+    ["キリスィマスィ島(UTC+14)", "Pacific/Kiritimati"],
+    ["協定世界時(UTC)", "UTC"]
+  ];
+  var HIGHLIGHT = ["Asia/Tokyo", "Europe/London", "Europe/Paris", "America/New_York",
+    "America/Los_Angeles", "Asia/Shanghai", "Asia/Singapore", "Australia/Sydney", "UTC"];
+  var WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
+
+  var box = document.getElementById("result");
+  var advBox = document.getElementById("adv-result");
+  var fromEl = document.getElementById("from");
+  var toEl = document.getElementById("to");
+  var yEl = document.getElementById("y");
+  var moEl = document.getElementById("mo");
+  var dEl = document.getElementById("d");
+  var hEl = document.getElementById("h");
+  var miEl = document.getElementById("mi");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function fill(el, from, to, suffix, selected, step) {
+    var html = "";
+    for (var v = from; v <= to; v += (step || 1)) {
+      html += '<option value="' + v + '"' + (v === selected ? " selected" : "") + ">" + v + suffix + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function fillCities(el, selected) {
+    var html = "";
+    for (var i = 0; i < CITIES.length; i++) {
+      html += '<option value="' + CITIES[i][1] + '"' + (CITIES[i][1] === selected ? " selected" : "") +
+        ">" + CITIES[i][0] + "</option>";
+    }
+    el.innerHTML = html;
+  }
+  function val(el) { return parseInt(el.value, 10); }
+  function daysInMonth(y, m) { return new Date(Date.UTC(y, m, 0)).getUTCDate(); }
+  function jp(x) {
+    return x.year + "年" + x.month + "月" + x.day + "日(" + WEEKDAYS[x.weekday] + ") " +
+      ("0" + x.hour).slice(-2) + ":" + ("0" + x.minute).slice(-2);
+  }
+  function diffText(minutes) {
+    var sign = minutes < 0 ? "遅い" : "進んでいる";
+    var abs = Math.abs(minutes);
+    if (abs === 0) return "時差なし";
+    var h = Math.floor(abs / 60);
+    var m = abs % 60;
+    return (h > 0 ? h + "時間" : "") + (m > 0 ? m + "分" : "") + sign;
+  }
+
+  var now = new Date();
+  fillCities(fromEl, "Asia/Tokyo");
+  fillCities(toEl, "America/New_York");
+  fill(yEl, 2000, 2100, "年", now.getFullYear());
+  fill(moEl, 1, 12, "月", now.getMonth() + 1);
+  fill(dEl, 1, 31, "日", now.getDate());
+  fill(hEl, 0, 23, "時", now.getHours());
+  fill(miEl, 0, 55, "分", 0, 5);
+
+  function run() {
+    var keep = val(dEl);
+    var max = daysInMonth(val(yEl), val(moEl));
+    if (keep > max) fill(dEl, 1, max, "日", max);
+    else if (dEl.options.length !== max) fill(dEl, 1, max, "日", keep);
+
+    var r = JisaCalc.convert(fromEl.value, toEl.value,
+      val(yEl), val(moEl), val(dEl), val(hEl), val(miEl));
+    if (!r.ok) {
+      box.innerHTML = '<p class="result-error">' + esc(ERRORS[r.code] || "入力値を確認してください。") + "</p>";
+      box.hidden = false;
+      advBox.hidden = true;
+      return;
+    }
+    var toName = toEl.options[toEl.selectedIndex].textContent;
+    var fromName = fromEl.options[fromEl.selectedIndex].textContent;
+    box.innerHTML =
+      '<div class="result-main">' + esc(toName) + " " + esc(jp(r.to)) + "</div>" +
+      "<p>" + esc(fromName) + " " + esc(jp(r.from)) + " と同じ瞬間です。</p>" +
+      "<p>" + esc(toName) + " は " + esc(fromName) + " より " + esc(diffText(r.diffMinutes)) +
+      "(UTC" + esc(r.to.offsetText) + " / " + esc(fromName) + " は UTC" + esc(r.from.offsetText) + ")</p>" +
+      (r.to.isDst ? "<p>" + esc(toName) + " はサマータイム実施中です。</p>" : "") +
+      (r.skipped ? '<p class="result-error">指定した時刻はサマータイム開始で存在しません。切替後の時刻に送って計算しています。</p>' : "") +
+      (r.ambiguous ? '<p class="result-error">指定した時刻はサマータイム終了でこの日に2回あります。1回目(夏時間側)として計算しています。</p>' : "");
+    box.hidden = false;
+
+    var rows = "";
+    for (var i = 0; i < HIGHLIGHT.length; i++) {
+      var c = JisaCalc.convert(fromEl.value, HIGHLIGHT[i], val(yEl), val(moEl), val(dEl), val(hEl), val(miEl));
+      if (!c.ok) continue;
+      var name = HIGHLIGHT[i];
+      for (var j = 0; j < CITIES.length; j++) {
+        if (CITIES[j][1] === HIGHLIGHT[i]) { name = CITIES[j][0]; break; }
+      }
+      rows += "<p>" + esc(name) + ": " + esc(jp(c.to)) + "(UTC" + esc(c.to.offsetText) + ")" +
+        (c.to.isDst ? " 夏時間" : "") + "</p>";
+    }
+    advBox.innerHTML = rows;
+    advBox.hidden = false;
+  }
+
+  [fromEl, toEl, yEl, moEl, dEl, hEl, miEl].forEach(function (el) { el.addEventListener("change", run); });
+  document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
+})();
+</script>
+</body>
+</html>

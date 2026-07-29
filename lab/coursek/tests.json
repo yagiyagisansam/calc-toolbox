@@ -1,0 +1,133 @@
+{
+  "tool": "coursek",
+  "module": "calc.js",
+  "global": "CoursekCalc",
+  "cases": [
+    {
+      "name": "代表例: 6時間・10km・登り下り各1000mは 10.8+3+10+0.6=24.4",
+      "func": "constant",
+      "args": [6, 10, 1000, 1000],
+      "expect": { "ok": true, "constant": 24.4, "parts": { "time": 10.8, "distance": 3, "up": 10, "down": 0.6 } }
+    },
+    {
+      "name": "消費エネルギー: コース定数24.4 × 60kg = 1464kcal",
+      "func": "calculate",
+      "args": [6, 10, 1000, 1000, 60],
+      "expect": { "ok": true, "constant": 24.4, "kcal": 1464, "label": "20前後" }
+    },
+    {
+      "name": "富士山クラス: 10時間・14km・登り下り各1450mは37.6",
+      "func": "constant",
+      "args": [10, 14, 1450, 1450],
+      "expect": { "ok": true, "constant": 37.6, "parts": { "time": 18, "distance": 4.2, "up": 14.5, "down": 0.87 } }
+    },
+    {
+      "name": "体力度: コース定数37.6は「40以上(日帰りでは困難)」",
+      "func": "calculate",
+      "args": [10, 14, 1450, 1450, 70],
+      "expect": { "ok": true, "kcal": 2632, "label": "40以上" }
+    },
+    {
+      "name": "小さな山: 30分・1km・登り下り各100mは2.3",
+      "func": "constant",
+      "args": [0.5, 1, 100, 100],
+      "expect": { "ok": true, "constant": 2.3 }
+    },
+    {
+      "name": "4時間・8km・登り下り各600mは16.0",
+      "func": "constant",
+      "args": [4, 8, 600, 600],
+      "expect": { "ok": true, "constant": 16 }
+    },
+    {
+      "name": "境界値: 登り下りともに0mでも計算できる",
+      "func": "constant",
+      "args": [2, 5, 0, 0],
+      "expect": { "ok": true, "constant": 5.1 }
+    },
+    {
+      "name": "体力度の境界: 14.9は「10前後(初心者向き)」",
+      "func": "level",
+      "args": [14.9],
+      "expect": { "ok": true, "label": "10前後" }
+    },
+    {
+      "name": "体力度の境界: 15.0ちょうどは「20前後(一般的な登山者向き)」",
+      "func": "level",
+      "args": [15],
+      "expect": { "ok": true, "label": "20前後" }
+    },
+    {
+      "name": "体力度の境界: 25.0ちょうどは「30前後(健脚者向き)」",
+      "func": "level",
+      "args": [25],
+      "expect": { "ok": true, "label": "30前後" }
+    },
+    {
+      "name": "体力度の境界: 35.0ちょうどは「40以上」",
+      "func": "level",
+      "args": [35],
+      "expect": { "ok": true, "label": "40以上" }
+    },
+    {
+      "name": "異常入力: 行動時間0はエラー",
+      "func": "constant",
+      "args": [0, 10, 1000, 1000],
+      "expect": { "ok": false, "code": "invalid_hours" }
+    },
+    {
+      "name": "異常入力: 行動時間が数値でないときはエラー",
+      "func": "constant",
+      "args": ["abc", 10, 1000, 1000],
+      "expect": { "ok": false, "code": "invalid_hours" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "constant",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_hours" }
+    },
+    {
+      "name": "異常入力: 距離0はエラー",
+      "func": "constant",
+      "args": [6, 0, 1000, 1000],
+      "expect": { "ok": false, "code": "invalid_km" }
+    },
+    {
+      "name": "異常入力: 登りの標高差が負の値はエラー",
+      "func": "constant",
+      "args": [6, 10, -1, 1000],
+      "expect": { "ok": false, "code": "invalid_up" }
+    },
+    {
+      "name": "異常入力: 下りの標高差が上限超(20001m)はエラー",
+      "func": "constant",
+      "args": [6, 10, 1000, 20001],
+      "expect": { "ok": false, "code": "invalid_down" }
+    },
+    {
+      "name": "異常入力: 体重が下限未満(10kg)はエラー",
+      "func": "calculate",
+      "args": [6, 10, 1000, 1000, 10],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "異常入力: 体重が上限超(201kg)はエラー",
+      "func": "calculate",
+      "args": [6, 10, 1000, 1000, 201],
+      "expect": { "ok": false, "code": "invalid_weight" }
+    },
+    {
+      "name": "境界値: 体重の下限20kgちょうどは計算できる",
+      "func": "calculate",
+      "args": [6, 10, 1000, 1000, 20],
+      "expect": { "ok": true, "kcal": 488 }
+    },
+    {
+      "name": "異常入力: コース定数が負の値はエラー",
+      "func": "level",
+      "args": [-1],
+      "expect": { "ok": false, "code": "invalid_constant" }
+    }
+  ]
+}

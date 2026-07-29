@@ -1,0 +1,178 @@
+{
+  "tool": "ldl",
+  "module": "calc.js",
+  "global": "LdlCalc",
+  "cases": [
+    {
+      "name": "代表例: TC220・HDL60・TG150ならLDL=220-60-30=130(境界域)",
+      "func": "calculate",
+      "args": [220, 60, 150],
+      "expect": {
+        "ok": true, "ldl": 130, "ldlCategory": "borderline",
+        "nonHdl": 160, "nonHdlCategory": "borderline", "friedewaldUsable": true
+      }
+    },
+    {
+      "name": "代表例: TC200・HDL50・TG100ならLDL=200-50-20=130、non-HDL=150(境界域)",
+      "func": "calculate",
+      "args": [200, 50, 100],
+      "expect": { "ok": true, "ldl": 130, "nonHdl": 150, "nonHdlCategory": "borderline" }
+    },
+    {
+      "name": "高値の例: TC250・HDL40・TG200ならLDL=170で高LDL血症、non-HDL=210で高non-HDL血症",
+      "func": "calculate",
+      "args": [250, 40, 200],
+      "expect": {
+        "ok": true, "ldl": 170, "ldlCategory": "high",
+        "nonHdl": 210, "nonHdlCategory": "high", "tgCategory": "high"
+      }
+    },
+    {
+      "name": "境界値: LDLちょうど140は高LDLコレステロール血症(TC210・HDL50・TG100)",
+      "func": "calculate",
+      "args": [210, 50, 100],
+      "expect": { "ok": true, "ldl": 140, "ldlCategory": "high" }
+    },
+    {
+      "name": "境界値: LDLちょうど120は境界域(TC210・HDL70・TG100)",
+      "func": "calculate",
+      "args": [210, 70, 100],
+      "expect": { "ok": true, "ldl": 120, "ldlCategory": "borderline" }
+    },
+    {
+      "name": "境界値: LDL119は基準内(TC209・HDL70・TG100)",
+      "func": "calculate",
+      "args": [209, 70, 100],
+      "expect": { "ok": true, "ldl": 119, "ldlCategory": "normal" }
+    },
+    {
+      "name": "境界値: TG399ならFriedewald式が使える(LDL=300-50-79.8=170.2)",
+      "func": "calculate",
+      "args": [300, 50, 399],
+      "expect": { "ok": true, "ldl": 170.2, "friedewaldUsable": true, "tgOver400": false }
+    },
+    {
+      "name": "境界値: TGちょうど400はFriedewald式が使えずLDLはnull(non-HDLのみ)",
+      "func": "calculate",
+      "args": [300, 50, 400],
+      "expect": {
+        "ok": true, "ldl": null, "ldlCategory": null,
+        "nonHdl": 250, "friedewaldUsable": false, "tgOver400": true
+      }
+    },
+    {
+      "name": "随時(非空腹時)採血ではFriedewald式が使えずLDLはnullになる",
+      "func": "calculate",
+      "args": [220, 60, 150, false],
+      "expect": { "ok": true, "ldl": null, "friedewaldUsable": false, "nonHdl": 160 }
+    },
+    {
+      "name": "TGの判定は採血条件で変わる: 空腹時TG150は高TG血症",
+      "func": "calculate",
+      "args": [200, 60, 150, true],
+      "expect": { "ok": true, "tgCategory": "high" }
+    },
+    {
+      "name": "TGの判定は採血条件で変わる: 随時TG150は基準内(基準は175以上)",
+      "func": "calculate",
+      "args": [200, 60, 150, false],
+      "expect": { "ok": true, "tgCategory": "normal" }
+    },
+    {
+      "name": "境界値: HDLちょうど40は低HDL血症ではない(40未満が該当)",
+      "func": "calculate",
+      "args": [200, 40, 100],
+      "expect": { "ok": true, "hdlCategory": "normal" }
+    },
+    {
+      "name": "境界値: HDL39は低HDLコレステロール血症",
+      "func": "calculate",
+      "args": [200, 39, 100],
+      "expect": { "ok": true, "hdlCategory": "low" }
+    },
+    {
+      "name": "境界値: non-HDLちょうど170は高non-HDLコレステロール血症(TC230・HDL60)",
+      "func": "calculate",
+      "args": [230, 60, 100],
+      "expect": { "ok": true, "nonHdl": 170, "nonHdlCategory": "high" }
+    },
+    {
+      "name": "単位換算: コレステロール140mg/dLは約3.62mmol/L",
+      "func": "convertUnit",
+      "args": [140, "cholesterol", "toMmol"],
+      "expect": { "ok": true, "value": 3.62 }
+    },
+    {
+      "name": "単位換算: 中性脂肪150mg/dLは約1.69mmol/L",
+      "func": "convertUnit",
+      "args": [150, "triglyceride", "toMmol"],
+      "expect": { "ok": true, "value": 1.69 }
+    },
+    {
+      "name": "単位換算: コレステロール3mmol/Lは116.0mg/dL",
+      "func": "convertUnit",
+      "args": [3, "cholesterol", "toMgdl"],
+      "expect": { "ok": true, "value": 116 }
+    },
+    {
+      "name": "異常入力: HDLが総コレステロール以上はありえないのでエラー",
+      "func": "calculate",
+      "args": [100, 150, 100],
+      "expect": { "ok": false, "code": "inconsistent_values" }
+    },
+    {
+      "name": "異常入力: LDLの計算結果がマイナスになる組み合わせはエラー",
+      "func": "calculate",
+      "args": [150, 100, 350],
+      "expect": { "ok": false, "code": "inconsistent_values" }
+    },
+    {
+      "name": "異常入力: 総コレステロール0はエラー",
+      "func": "calculate",
+      "args": [0, 50, 100],
+      "expect": { "ok": false, "code": "invalid_tc" }
+    },
+    {
+      "name": "異常入力: 総コレステロールが負の値はエラー",
+      "func": "calculate",
+      "args": [-200, 50, 100],
+      "expect": { "ok": false, "code": "invalid_tc" }
+    },
+    {
+      "name": "異常入力: 中性脂肪0はエラー",
+      "func": "calculate",
+      "args": [200, 50, 0],
+      "expect": { "ok": false, "code": "invalid_tg" }
+    },
+    {
+      "name": "異常入力: 中性脂肪が範囲超過(10000)はエラー",
+      "func": "calculate",
+      "args": [200, 50, 10000],
+      "expect": { "ok": false, "code": "invalid_tg" }
+    },
+    {
+      "name": "異常入力: HDLが範囲超過(300)はエラー",
+      "func": "calculate",
+      "args": [400, 300, 100],
+      "expect": { "ok": false, "code": "invalid_hdl" }
+    },
+    {
+      "name": "異常入力: 数値でない総コレステロールはエラー",
+      "func": "calculate",
+      "args": ["abc", 50, 100],
+      "expect": { "ok": false, "code": "invalid_tc" }
+    },
+    {
+      "name": "異常入力: 引数なしはエラー",
+      "func": "calculate",
+      "args": [],
+      "expect": { "ok": false, "code": "invalid_tc" }
+    },
+    {
+      "name": "異常入力: 単位換算で種類が不正はエラー",
+      "func": "convertUnit",
+      "args": [140, "glucose", "toMmol"],
+      "expect": { "ok": false, "code": "invalid_kind" }
+    }
+  ]
+}
