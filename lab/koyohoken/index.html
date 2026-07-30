@@ -54,6 +54,7 @@
           <input type="number" id="adv-monthly" inputmode="numeric" step="1" min="0" placeholder="300000">
         </label>
         <label>年間の賞与合計(円)
+          <span class="field-note">賞与がなければ空欄のまま(0円として計算)</span>
           <input type="number" id="adv-bonus" inputmode="numeric" step="1" min="0" placeholder="900000">
         </label>
       </div>
@@ -194,9 +195,10 @@
   }
 
   function runAdv() {
-    if (monthlyEl.value.trim() === "" || bonusEl.value.trim() === "") { advBox.hidden = true; return; }
+    if (monthlyEl.value.trim() === "") { advBox.hidden = true; return; }
     var r = KoyohokenCalc.annual(
-      parseFloat(monthlyEl.value), parseFloat(bonusEl.value),
+      parseFloat(monthlyEl.value),
+      bonusEl.value.trim() === "" ? 0 : parseFloat(bonusEl.value),
       bizEl.value, parseInt(yearEl.value, 10)
     );
     if (!r.ok) { err(advBox, r.code); return; }
