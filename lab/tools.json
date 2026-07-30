@@ -45,7 +45,7 @@
   "src": "日本",
   "sourceName": "厚生労働省「禁煙支援マニュアル・ニコチン依存症管理料について」(平成18年度たばこ・アルコール対策担当者講習会 資料)。",
   "sourceUrl": "https://www.mhlw.go.jp/topics/tobacco/houkoku/061122f.html",
-  "tests": 22
+  "tests": 24
  },
  {
   "slug": "bsa",
@@ -229,8 +229,8 @@
  },
  {
   "slug": "getsurei",
-  "name": "月齢・月の満ち欠け計算",
-  "desc": "指定した日時の月齢と月相(新月・上弦・満月・下弦)、次の満月・新月の日時を表示します。",
+  "name": "月の満ち欠け・月齢計算",
+  "desc": "指定した日時の月の満ち欠け(新月・上弦・満月・下弦)と月齢、次の満月・新月の日時を表示します。",
   "cat": "日付",
   "field": "",
   "why": "十五夜・お月見、釣りや農作業の目安、写真撮影の計画など日本での実用需要があり、完全にクライアント計算で完結する。",
@@ -549,7 +549,7 @@
   "src": "日本",
   "sourceName": "厚生労働省保険局「高額療養費制度を利用される皆さまへ(平成30年8月診療分から)」",
   "sourceUrl": "https://www.mhlw.go.jp/content/000333280.pdf",
-  "tests": 23
+  "tests": 24
  },
  {
   "slug": "koteishisan",
@@ -573,7 +573,7 @@
   "src": "日本",
   "sourceName": "厚生労働省「令和8(2026)年度 雇用保険料率のご案内」",
   "sourceUrl": "https://www.mhlw.go.jp/content/001692566.pdf",
-  "tests": 21
+  "tests": 22
  },
  {
   "slug": "kurisage",
@@ -777,7 +777,7 @@
   "src": "分野",
   "sourceName": "ISO 16:1975 \"Acoustics — Standard tuning frequency (Standard",
   "sourceUrl": "https://www.iso.org/standard/3601.html",
-  "tests": 25
+  "tests": 28
  },
  {
   "slug": "paint",
@@ -1017,7 +1017,7 @@
   "src": "日本",
   "sourceName": "東京都主税局「不動産取得税」(税率・免税点・課税標準の特例・軽減の計算式)",
   "sourceUrl": "https://www.tax.metro.tokyo.lg.jp/shisan/fudosan.html",
-  "tests": 24
+  "tests": 26
  },
  {
   "slug": "souzokuzei",

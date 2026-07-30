@@ -30,7 +30,11 @@
         <input type="number" id="height" inputmode="decimal" step="0.1" min="35" max="140" placeholder="75">
       </label>
       <label>月齢(か月)
+        <span class="field-note">生年月日を入れると自動で入ります</span>
         <input type="number" id="age" inputmode="numeric" step="1" min="0" max="71" placeholder="12">
+      </label>
+      <label>生年月日から月齢を出す(任意)
+        <input type="date" id="birth" min="2018-01-01" max="2099-12-31">
       </label>
     </div>
     <div class="tool-result" id="result" hidden aria-live="polite"></div>
@@ -182,6 +186,29 @@
       "<p>この身長の標準体重は " + esc(o.standardWeightKg.toFixed(2)) + " kg です。</p>";
     advBox.hidden = false;
   }
+
+  // 生年月日から満月齢(か月)を出す。誕生日の応当日で数え、応当日前は1つ引く
+  var birthEl = document.getElementById("birth");
+  function monthsBetween(birth, today) {
+    var m = (today.getFullYear() - birth.getFullYear()) * 12 + (today.getMonth() - birth.getMonth());
+    if (today.getDate() < birth.getDate()) m -= 1;
+    return m;
+  }
+  birthEl.addEventListener("change", function () {
+    if (birthEl.value === "") return;
+    var p = birthEl.value.split("-");
+    var b = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2]));
+    var now = new Date();
+    var t = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+    var m = monthsBetween(b, t);
+    if (m < 0 || m > 71) {
+      box.innerHTML = '<p class="result-error">生年月日から出した月齢が対象範囲(0〜71か月)の外です。</p>';
+      box.hidden = false;
+      return;
+    }
+    aEl.value = String(m);
+    run();
+  });
 
   [wEl, hEl, aEl].forEach(function (el) { el.addEventListener("input", run); });
   sexEl.addEventListener("change", run);

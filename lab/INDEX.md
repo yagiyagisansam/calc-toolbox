@@ -4,7 +4,7 @@
 
 | # | ツール名 | カテゴリ | 概要 | テスト | 出典 |
 |---|---|---|---|---|---|
-| 4 | [ブリンクマン指数(喫煙指数)計算](./brinkman/index.html) | 健康 | 1日の喫煙本数と喫煙年数からブリンクマン指数を計算し、リスクの目安と禁煙治療の保険適用の目安を示します。 | 22件 | [厚生労働省「禁煙支援マニュアル・ニコチン依存症管理料について」(平成18年度たばこ・アルコール対策担当者講習会 資料)。](https://www.mhlw.go.jp/topics/tobacco/houkoku/061122f.html) |
+| 4 | [ブリンクマン指数(喫煙指数)計算](./brinkman/index.html) | 健康 | 1日の喫煙本数と喫煙年数からブリンクマン指数を計算し、リスクの目安と禁煙治療の保険適用の目安を示します。 | 24件 | [厚生労働省「禁煙支援マニュアル・ニコチン依存症管理料について」(平成18年度たばこ・アルコール対策担当者講習会 資料)。](https://www.mhlw.go.jp/topics/tobacco/houkoku/061122f.html) |
 | 5 | [体表面積(BSA)計算](./bsa/index.html) | 健康 | 身長と体重から体表面積(BSA)を藤本式・DuBois式で計算します。 | 22件 | [日本臨床腫瘍研究グループ(JCOG)「体表面積、Ccr計算」(両式の係数・指数の記載)](https://jcog.jp/doctor/tool/calc/) |
 | 8 | [登山コース定数・消費エネルギー計算](./coursek/index.html) | 健康 | 行動時間・距離・累積標高差からコース定数(体力度)と行動中の消費エネルギーを計算します。 | 21件 | [山と溪谷オンライン(山と溪谷編集部)「体力度を数値化する『コース定数』とは?」2024年7月1日掲載。鹿屋体育大学 山本](https://www.yamakei-online.com/yama-ya/detail.php?id=363) |
 | 11 | [eGFR(腎機能)計算](./egfr/index.html) | 健康 | 血清クレアチニン値・年齢・性別から推算糸球体濾過量(eGFR)を求め、CKDのGFR区分を判定します。 | 24件 | [日本腎臓学会「CKD診療ガイド2012」eGFR男女・年齢別早見表(推算式の記載あり)](https://cdn.jsn.or.jp/guideline/pdf/CKDguide2012_3.pdf) |
@@ -42,9 +42,9 @@
 | 35 | [自動車重量税の計算](./juryozei/index.html) | お金 | 車両重量・車検の有効期間・エコカー減税の区分・経過年数から、車検時に納める自動車重量税を計算します。 | 29件 | [国土交通省「自動車重量税額について」(税額表PDFの配布ページ)](https://www.mlit.go.jp/jidosha/jidosha_fr1_000076.html) |
 | 36 | [住宅ローン控除 計算](./jutaku-kojo/index.html) | お金 | 年末ローン残高と住宅の区分から、住宅借入金等特別控除の控除額と、所得税・住民税それぞれから引ける額を計算します。 | 27件 | [国税庁 タックスアンサー No.1211-1「住宅の新築等をし、令和4年以降に居住の用に供した場合(住宅借入金等特別控除](https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1211-1.htm) |
 | 45 | [老齢基礎年金 受給額計算](./kiso-nenkin/index.html) | お金 | 国民年金の納付月数・免除月数から、65歳から受け取れる老齢基礎年金の年額と月額を計算します。 | 22件 | [日本年金機構「老齢基礎年金の受給要件・支給開始時期・年金額」(計算式・免除期間の割合・受給資格期間10年)](https://www.nenkin.go.jp/service/jukyu/seido/roureinenkin/jukyu-yoken/20150401-02.html) |
-| 46 | [高額療養費 自己負担限度額の計算](./kogaku/index.html) | お金 | 1か月の医療費と所得区分から、高額療養費制度の自己負担限度額と払い戻し額を計算します。 | 23件 | [厚生労働省保険局「高額療養費制度を利用される皆さまへ(平成30年8月診療分から)」](https://www.mhlw.go.jp/content/000333280.pdf) |
+| 46 | [高額療養費 自己負担限度額の計算](./kogaku/index.html) | お金 | 1か月の医療費と所得区分から、高額療養費制度の自己負担限度額と払い戻し額を計算します。 | 24件 | [厚生労働省保険局「高額療養費制度を利用される皆さまへ(平成30年8月診療分から)」](https://www.mhlw.go.jp/content/000333280.pdf) |
 | 47 | [固定資産税・都市計画税 計算](./koteishisan/index.html) | お金 | 土地と家屋の評価額から、年間の固定資産税・都市計画税を住宅用地の特例込みで概算します。 | 20件 | [総務省「地方税制度|固定資産税」(税率1.4%、住宅用地の特例1/6・1/3、新築住宅の減額)](https://www.soumu.go.jp/main_sosiki/jichi_zeisei/czaisei/czaisei_seido/150790_15.html) |
-| 48 | [雇用保険料 計算](./koyohoken/index.html) | お金 | 賃金総額と事業の種類から、雇用保険料の労働者負担・事業主負担を令和8年度・令和7年度の料率で計算します。 | 21件 | [厚生労働省「令和8(2026)年度 雇用保険料率のご案内」](https://www.mhlw.go.jp/content/001692566.pdf) |
+| 48 | [雇用保険料 計算](./koyohoken/index.html) | お金 | 賃金総額と事業の種類から、雇用保険料の労働者負担・事業主負担を令和8年度・令和7年度の料率で計算します。 | 22件 | [厚生労働省「令和8(2026)年度 雇用保険料率のご案内」](https://www.mhlw.go.jp/content/001692566.pdf) |
 | 49 | [年金の繰上げ・繰下げ受給 増減額計算](./kurisage/index.html) | お金 | 年金の受給開始を60〜75歳の間で変えた場合の増減率・年金額・損益分岐年齢を計算します。 | 23件 | [日本年金機構「年金の繰上げ受給」](https://www.nenkin.go.jp/service/jukyu/seido/roureinenkin/kuriage-kurisage/20140421-01.html) |
 | 52 | [給与所得控除・給与所得の計算](./kyuyo-kojo/index.html) | お金 | 給与収入(年収)から給与所得控除額と給与所得の金額を計算します。令和7年分以降の速算表に対応。 | 22件 | [国税庁「No.1410 給与所得控除」(令和7年分以降/令和2年分から令和6年分の速算表)](https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1410.htm) |
 | 75 | [最低賃金チェック](./saitei-chingin/index.html) | お金 | 月給や日給を時給に換算し、令和7年度の都道府県別の地域別最低賃金を下回っていないかを判定します。 | 23件 | [厚生労働省「地域別最低賃金の全国一覧」](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/roudoukijun/minimumichiran/) |
@@ -54,13 +54,13 @@
 | 81 | [減価償却費 計算](./shokyaku/index.html) | お金 | 取得価額と法定耐用年数から、定額法・定率法による各年の減価償却費と未償却残高を計算します。 | 23件 |  |
 | 82 | [所得税額 計算(速算表)](./shotokuzei/index.html) | お金 | 課税される所得金額から、所得税と復興特別所得税を含めた税額を国税庁の速算表で計算します。 | 20件 | [国税庁「タックスアンサー No.2260 所得税の税率」(令和7年4月1日現在法令等)](https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2260.htm) |
 | 84 | [出産手当金・出産育児一時金 計算](./shussan/index.html) | お金 | 産前産後休業中に受け取れる出産手当金と出産育児一時金の合計見込み額を計算します。 | 26件 | [全国健康保険協会(協会けんぽ)「出産手当金」](https://www.kyoukaikenpo.or.jp/benefit/childbirth/001/index.html) |
-| 85 | [不動産取得税 計算](./shutokuzei/index.html) | お金 | 土地・建物を取得したときに一度だけかかる不動産取得税を、住宅の軽減措置込みで計算します。 | 24件 | [東京都主税局「不動産取得税」(税率・免税点・課税標準の特例・軽減の計算式)](https://www.tax.metro.tokyo.lg.jp/shisan/fudosan.html) |
+| 85 | [不動産取得税 計算](./shutokuzei/index.html) | お金 | 土地・建物を取得したときに一度だけかかる不動産取得税を、住宅の軽減措置込みで計算します。 | 26件 | [東京都主税局「不動産取得税」(税率・免税点・課税標準の特例・軽減の計算式)](https://www.tax.metro.tokyo.lg.jp/shisan/fudosan.html) |
 | 86 | [相続税 概算計算](./souzokuzei/index.html) | お金 | 遺産総額と法定相続人の構成から、相続税の総額と一人あたりの負担額を概算します。 | 21件 | [国税庁 タックスアンサー No.4152「相続税の計算」(令和7年4月1日現在法令等)](https://www.nta.go.jp/taxes/shiraberu/taxanswer/sozoku/4152.htm) |
 | 90 | [退職金の税金・手取り計算](./taishokukin/index.html) | お金 | 退職金の額と勤続年数から退職所得控除・所得税・復興特別所得税・住民税を計算し、手取り額を出します。 | 21件 | [国税庁「No.1420 退職金を受け取ったとき(退職所得)」(令和7年4月1日現在法令等)](https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1420.htm) |
 | 94 | [登録免許税 計算](./torokuzei/index.html) | お金 | 不動産の所有権移転・保存登記や抵当権設定にかかる登録免許税を、軽減措置つきで計算します。 | 22件 | [国税庁 タックスアンサー No.7191「登録免許税の税額表」[令和7年4月1日現在法令等]](https://www.nta.go.jp/taxes/shiraberu/taxanswer/inshi/7191.htm) |
 | 100 | [贈与税(暦年課税)計算](./zoyozei/index.html) | お金 | 1年間にもらった財産の額から、暦年課税の贈与税額を一般税率・特例税率の両方で計算します。 | 24件 | [国税庁 タックスアンサー No.4408「贈与税の計算と税率(暦年課税)」(ページ表記の基準時点: 令和7年4月1日現在](https://www.nta.go.jp/taxes/shiraberu/taxanswer/zoyo/4408.htm) |
 | 12 | [干支・十干十二支の計算](./eto/index.html) | 日付・時間 | 生年から十二支と十干を求め、還暦(60年周期)や年男・年女かどうかを判定します。 | 27件 | [国立天文台 暦計算室「暦Wiki/干支」(十干と十二支を組み合わせて60まで数える方法。壬申の乱・戊辰戦争の例)](https://eco.mtk.nao.ac.jp/koyomi/wiki/B4B3BBD9.html) |
-| 20 | [月齢・月の満ち欠け計算](./getsurei/index.html) | 日付・時間 | 指定した日時の月齢と月相(新月・上弦・満月・下弦)、次の満月・新月の日時を表示します。 | 24件 | [国立天文台 暦計算室(朔弦望・月齢)。本ツールの計算結果は同室が公表する令和8年](https://eco.mtk.nao.ac.jp/koyomi/) |
+| 20 | [月の満ち欠け・月齢計算](./getsurei/index.html) | 日付・時間 | 指定した日時の月の満ち欠け(新月・上弦・満月・下弦)と月齢、次の満月・新月の日時を表示します。 | 24件 | [国立天文台 暦計算室(朔弦望・月齢)。本ツールの計算結果は同室が公表する令和8年](https://eco.mtk.nao.ac.jp/koyomi/) |
 | 23 | [日の出・日の入り時刻計算](./hinode/index.html) | 日付・時間 | 緯度経度と日付から、日の出・南中・日の入りの時刻と昼の長さをNOAAの式で計算します。 | 22件 | [NOAA Global Monitoring Laboratory "Solar Calculation Details](https://gml.noaa.gov/grad/solcalc/calcdetails.html) |
 | 27 | [育児休業 取得可能期間の計算](./ikuji-kikan/index.html) | 日付・時間 | 子の生年月日から、育児休業の一歳到達日・1歳6か月・2歳までの延長期限と、出生時育児休業(産後パパ育休)の期間を計算します。 | 21件 | [育児休業、介護休業等育児又は家族介護を行う労働者の福祉に関する法律(平成3年法律第76号)](https://laws.e-gov.go.jp/law/403AC0000000076) |
 | 32 | [世界の時差計算](./jisa/index.html) | 日付・時間 | 日本時間と海外都市の現地時間を相互換算します。サマータイムも自動で反映します。 | 25件 | [IANA Time Zone Database(tz database。世界のUTCオフセットとサマータイム規則の標準デ](https://www.iana.org/time-zones) |
@@ -98,7 +98,7 @@
 | 56 | [部屋の広さから必要ルーメン計算](./lumen/index.html) | 暮らし・変換 | 畳数から、シーリングライトに必要な明るさ(lm)と適用畳数の目安を計算します。 | 27件 | [一般社団法人 日本照明工業会「LED照明器具の適用畳数について」(ガイドA121:2023にもとづく表示基準)](https://www.jlma.or.jp/led-navi/contents/cont22_LEDCeiling.htm) |
 | 60 | [モバイルバッテリー mAh⇔Wh・充電回数](./mobabatt/index.html) | 暮らし・変換 | モバイルバッテリーのmAhをWhに換算して飛行機への持ち込み可否を判定し、スマホを何回充電できるかを計算します。 | 26件 | [日本航空「国内線 制限のあるお手荷物」(Wh = 定格容量(Ah)× 定格電圧(V)、160Wh超は持ち込み不可、預け入](https://www.jal.co.jp/jp/ja/dom/baggage/limit/) |
 | 63 | [オモリ号数⇔g⇔oz 換算](./omori/index.html) | 暮らし・変換 | 釣りのオモリ・シンカーの号数、グラム、オンスを相互に換算します。1号=3.75g、1oz=28.349523125gで計算。 | 23件 | [計量単位令(平成4年政令第357号) 別表第六(「もんめ」= キログラムの0.003750倍)](https://laws.e-gov.go.jp/law/404CO0000000357) |
-| 65 | [音名⇔周波数 換算(平均律)](./onkai/index.html) | 暮らし・変換 | 12平均律で音名から周波数(Hz)を求め、基準ピッチ440/442Hzの違いやセントのずれも計算します。 | 25件 | [ISO 16:1975 "Acoustics — Standard tuning frequency (Standard](https://www.iso.org/standard/3601.html) |
+| 65 | [音名⇔周波数 換算(平均律)](./onkai/index.html) | 暮らし・変換 | 12平均律で音名から周波数(Hz)を求め、基準ピッチ440/442Hzの違いやセントのずれも計算します。 | 28件 | [ISO 16:1975 "Acoustics — Standard tuning frequency (Standard](https://www.iso.org/standard/3601.html) |
 | 66 | [塗料の必要量・缶数 計算](./paint/index.html) | 暮らし・変換 | 塗装面積と標準塗布量・塗り回数・ロス率から、必要な塗料の量と買うべき缶数を計算します。 | 24件 | [児玉塗料店「塗装に必要な塗布量の計算方法」(必要量 = 1m²あたりの使用量 × 塗装面積、缶数 = 必要量 ÷ 缶の容](https://www.kodama-t.co.jp/paint-top/tofuryou/) |
 | 67 | [釣り糸 号数⇔lb⇔mm 換算](./peline/index.html) | 暮らし・変換 | ナイロン・フロロ・PEラインの号数と強度(lb・kg)、標準直径(mm)を相互に換算します。 | 26件 |  |
 | 69 | [ポータブル電源 稼働時間計算](./portable/index.html) | 暮らし・変換 | ポータブル電源の容量と家電の消費電力から、実際に使える時間と必要な容量を計算します。 | 22件 | [Jackery Japan(メーカー)「ポータブル電源で電化製品を使える時間は?計算方法を分かりやすく解説」](https://www.jackery.jp/blogs/power-station/using-time-of-power-station) |
