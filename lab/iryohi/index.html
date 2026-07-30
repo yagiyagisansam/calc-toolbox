@@ -23,15 +23,15 @@
   <form class="tool-form" id="tool-form">
     <label>1年間の医療費の合計(円)
       <span class="field-note">1月1日〜12月31日に実際に支払った額。生計を一にする家族の分も合算できます</span>
-      <input type="number" id="medical" inputmode="numeric" step="1000" min="0" max="100000000" placeholder="500000">
+      <input type="number" id="medical" inputmode="numeric" step="1000" min="0" max="100000000" value="500000">
     </label>
     <label>保険金などで補填された額(円)
       <span class="field-note">高額療養費・出産育児一時金・入院給付金など。なければ0</span>
-      <input type="number" id="comp" inputmode="numeric" step="1000" min="0" max="100000000" placeholder="0">
+      <input type="number" id="comp" inputmode="numeric" step="1000" min="0" max="100000000" value="0">
     </label>
     <label>総所得金額等(円)
       <span class="field-note">給与だけの人は「給与所得控除後の金額」(源泉徴収票の2つ目の金額)</span>
-      <input type="number" id="income" inputmode="numeric" step="10000" min="0" max="1000000000" placeholder="5000000">
+      <input type="number" id="income" inputmode="numeric" step="10000" min="0" max="1000000000" value="5000000">
     </label>
     <label>適用される所得税率
       <select id="rate">
@@ -189,6 +189,7 @@
     advBox.hidden = false;
   }
   taxableEl.addEventListener("input", runAdv);
+  run();
 })();
 </script>
 </body>

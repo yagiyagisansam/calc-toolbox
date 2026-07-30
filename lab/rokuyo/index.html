@@ -196,6 +196,15 @@
     el.addEventListener("change", run);
   });
   document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+
+  // 開いてすぐ今日の六曜が見えるように、初期値を今日の日付にする
+  if (dateEl.value === "") {
+    var now = new Date();
+    dateEl.value = now.getFullYear() + "-" +
+      ("0" + (now.getMonth() + 1)).slice(-2) + "-" +
+      ("0" + now.getDate()).slice(-2);
+  }
+  run();
 })();
 </script>
 </body>

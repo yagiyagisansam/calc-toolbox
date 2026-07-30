@@ -116,6 +116,7 @@
     <li><strong>土地の当初税額</strong> = 評価額 × 1/2 × 3%(令和9年3月31日までの宅地等の特例)</li>
     <li><strong>土地の減額額</strong> = 「45,000円」と「(評価額 × 1/2 ÷ 地積) × 住宅の床面積の2倍(200㎡が上限) × 持分 × 3%」の大きい方</li>
     <li><strong>土地の納付税額</strong> = 当初税額 − 減額額(マイナスになる場合は0円)</li>
+    <li><strong>端数処理</strong> = 課税標準は1,000円未満切り捨て、税額は100円未満切り捨て(地方税法第20条の4の2)</li>
   </ul>
 
   <h3>出典(一次情報)</h3>
@@ -250,11 +251,12 @@
       advBox.hidden = false;
       return;
     }
-    var houseBefore = Math.floor(houseValue * 0.03);
-    var before = houseBefore + landResult.baseTax;
+    var houseBefore = ShutokuzeiCalc.houseTax(houseValue, 0).tax;
+    var landBefore = Math.floor(landResult.baseTax / 100) * 100;
+    var before = houseBefore + landBefore;
     advBox.innerHTML =
       '<div class="result-main">軽減で ' + esc(yen(before - total)) + " 減っています</div>" +
-      "<p>軽減なしの税額: 建物 " + esc(yen(houseBefore)) + " + 土地 " + esc(yen(landResult.baseTax)) +
+      "<p>軽減なしの税額: 建物 " + esc(yen(houseBefore)) + " + 土地 " + esc(yen(landBefore)) +
       " = " + esc(yen(before)) + "</p>" +
       "<p>土地の減額額は「45,000円」と「" + esc(yen(landResult.reductionB)) +
       "(1㎡あたり " + esc(yen(landResult.unitPrice)) + " × " + esc(landResult.cappedArea) +

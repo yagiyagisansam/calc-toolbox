@@ -221,8 +221,11 @@
     }
     var body = '<div class="result-main">満 ' + esc(r.age) + " 歳</div>";
     if (r.isFeb29Birth) {
-      body += "<p>2月29日生まれです。基準日の年に年齢が増えるのは " + esc(r.birthdayThisYear) +
-        " の終了時になります。</p>";
+      body += r.birthdayThisYear.slice(5) === "02-29"
+        ? "<p>2月29日生まれです。基準日の年はうるう年で誕生日(" + esc(r.birthdayThisYear) +
+          ")がありますが、年齢が増えるのはその前日(2月28日)の終了時です。</p>"
+        : "<p>2月29日生まれです。基準日の年は平年のため、年齢が増えるのは " + esc(r.birthdayThisYear) +
+          "(2月の末日)の終了時になります。</p>";
     } else {
       body += "<p>基準日の年に年齢が増えるのは " + esc(r.birthdayThisYear) + " の前日の終了時です。</p>";
     }

@@ -164,11 +164,15 @@
   function yen(v) { return Math.round(v).toLocaleString("ja-JP") + "円"; }
 
   function run() {
-    if (incomeEl.value === "" || socialEl.value === "") { box.hidden = true; return; }
+    if (incomeEl.value === "") { box.hidden = true; return; }
+    var incomeMan = parseFloat(incomeEl.value);
+    // 社会保険料が未入力でも目安が出るよう、案内どおり「年収の約15%」を仮定する
+    var socialAssumed = socialEl.value === "";
+    var socialMan = socialAssumed ? incomeMan * 0.15 : parseFloat(socialEl.value);
     var other = otherEl.value === "" ? 0 : parseFloat(otherEl.value) * 10000;
     var r = FurusatoCalc.estimate(
-      parseFloat(incomeEl.value) * 10000,
-      parseFloat(socialEl.value) * 10000,
+      incomeMan * 10000,
+      socialMan * 10000,
       spouseEl.checked,
       other
     );
@@ -182,7 +186,11 @@
       "<p>計算上の上限: " + esc(yen(r.limitYen)) + "(1,000円未満を切り捨てた安全側の目安を上に表示しています)</p>" +
       "<p>給与所得: " + esc(yen(r.salaryIncomeYen)) + " / 所得税の課税所得: " + esc(yen(r.taxableIncomeYen)) +
         "(税率 " + esc(r.ratePercent) + "%)</p>" +
-      "<p>住民税の所得割額(概算): " + esc(yen(r.shotokuwariYen)) + "</p>";
+      "<p>住民税の所得割額(概算): " + esc(yen(r.shotokuwariYen)) + "</p>" +
+      (socialAssumed
+        ? "<p>社会保険料が未入力のため、年収の15%(" + esc(Math.round(socialMan * 10) / 10) +
+          "万円)と仮定しています。実際の額を入れるとより正確になります。</p>"
+        : "");
     box.hidden = false;
   }
 

@@ -100,6 +100,24 @@
       "expect": { "ok": true, "freq": 220 }
     },
     {
+      "name": "全角入力: Ａ４(全角英数字)も半角に直して440Hzになる",
+      "func": "noteToFreq",
+      "args": ["Ａ４", 440],
+      "expect": { "ok": true, "freq": 440, "midi": 69, "name": "A4" }
+    },
+    {
+      "name": "全角入力: Ｃ＃３(全角のシャープ)も読み取れる",
+      "func": "noteToFreq",
+      "args": ["Ｃ＃３", 440],
+      "expect": { "ok": true, "midi": 49, "name": "C#3" }
+    },
+    {
+      "name": "全角入力: Ｃ−１(全角マイナス)も読み取れる",
+      "func": "noteToFreq",
+      "args": ["Ｃ−１", 440],
+      "expect": { "ok": true, "midi": 0, "freq": 8.18 }
+    },
+    {
       "name": "異常入力: 存在しない音名(H4)はエラー",
       "func": "noteToFreq",
       "args": ["H4", 440],

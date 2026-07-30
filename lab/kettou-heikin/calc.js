@@ -38,8 +38,10 @@
   }
 
   function round(v, digits) {
+    // 28.7 × 6.5 − 46.7 のような十進では .X5 ちょうどになる値が、二進浮動小数の誤差で
+    // わずかに小さくなり切り捨てられるのを防ぐため、有効12桁に整えてから四捨五入する
     var f = Math.pow(10, digits);
-    return Math.round(v * f) / f;
+    return Math.round(parseFloat((v * f).toPrecision(12))) / f;
   }
 
   /**

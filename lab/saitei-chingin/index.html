@@ -172,6 +172,10 @@
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
   function yen(n) { return Number(n).toLocaleString("ja-JP", { maximumFractionDigits: 2 }); }
+  function jaDate(iso) {
+    var p = String(iso).split("-");
+    return p.length === 3 ? (+p[0]) + "年" + (+p[1]) + "月" + (+p[2]) + "日" : iso;
+  }
   function err(target, code) {
     target.innerHTML = '<p class="result-error">' + esc(ERRORS[code] || "入力値を確認してください。") + "</p>";
     target.hidden = false;
@@ -232,7 +236,7 @@
       '<div class="result-main">時給換算 ' + esc(yen(r.hourly)) + " 円</div>" +
       "<p>" + esc(r.prefectureName) + "の最低賃金 " + esc(yen(r.minimumWage)) + " 円を" +
       (r.meets ? "満たしています" : "下回っています") + "(差 " + esc(yen(r.diff)) + " 円)</p>" +
-      "<p>" + esc(r.fiscalYearLabel) + "の額(発効日 " + esc(r.effective) + ")</p>";
+      "<p>" + esc(r.fiscalYearLabel) + "の額(発効日 " + esc(jaDate(r.effective)) + ")</p>";
     box.hidden = false;
   }
 

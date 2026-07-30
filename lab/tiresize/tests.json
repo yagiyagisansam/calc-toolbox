@@ -55,13 +55,13 @@
       "name": "判定: 634.5→631.9mm(平成19年以降製作)は基準内",
       "func": "speedoJudge",
       "args": [634.5, 631.9, "h19", 40],
-      "expect": { "ok": true, "v2": 39.84, "minV2": 30.91, "maxV2": 40, "pass": true }
+      "expect": { "ok": true, "v2": 39.84, "minV2": 30.91, "maxV2": 42.55, "pass": true }
     },
     {
       "name": "判定: 634.5→701.8mm(平成19年以降製作)は上限超過で基準外",
       "func": "speedoJudge",
       "args": [634.5, 701.8, "h19", 40],
-      "expect": { "ok": true, "v2": 44.24, "maxV2": 40, "pass": false }
+      "expect": { "ok": true, "v2": 44.24, "maxV2": 42.55, "pass": false }
     },
     {
       "name": "判定: 同じ外径差でも平成18年以前製作なら上限44.44km/hで基準内",
@@ -85,7 +85,7 @@
       "name": "境界値: 同じ外径ちょうど(V2=V1)は平成19年以降でも基準内",
       "func": "speedoJudge",
       "args": [634.5, 634.5, "h19", 40],
-      "expect": { "ok": true, "v2": 40, "maxV2": 40, "pass": true }
+      "expect": { "ok": true, "v2": 40, "maxV2": 42.55, "pass": true }
     },
     {
       "name": "指示速度を省略すると40km/hで判定する",

@@ -41,12 +41,12 @@
       }
     },
     {
-      "name": "糖尿病型の目安: HbA1c 6.5%は eAG 139.8mg/dL",
+      "name": "糖尿病型の目安: HbA1c 6.5%は eAG 139.9mg/dL(139.85の四捨五入)",
       "func": "toEag",
       "args": [6.5],
       "expect": {
         "ok": true,
-        "eagMgDl": 139.8,
+        "eagMgDl": 139.9,
         "eagMmolL": 7.75
       }
     },

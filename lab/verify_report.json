@@ -1,402 +1,402 @@
 {
  "bakers": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/bakers/\", wai"
  },
  "bitrate": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/bitrate/\", wa"
  },
  "bpmdelay": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/bpmdelay/\", w"
  },
  "brinkman": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/brinkman/\", w"
  },
  "bsa": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/bsa/\", waitin"
  },
  "caketin": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/caketin/\", wa"
  },
  "cooler": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/cooler/\", wai"
  },
  "coursek": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/coursek/\", wa"
  },
  "dof": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/dof/\", waitin"
  },
  "dpi": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/dpi/\", waitin"
  },
  "egfr": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/egfr/\", waiti"
  },
  "eto": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/eto/\", waitin"
  },
  "ev": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/ev/\", waiting"
  },
  "fire": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/fire/\", waiti"
  },
  "furusato": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/furusato/\", w"
  },
  "fuyo-kojo": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/fuyo-kojo/\", "
  },
  "gacha": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/gacha/\", wait"
  },
  "gearratio": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/gearratio/\", "
  },
  "gensen": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/gensen/\", wai"
  },
  "getsurei": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/getsurei/\", w"
  },
  "hainenrei": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/hainenrei/\", "
  },
  "himando": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/himando/\", wa"
  },
  "hinode": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/hinode/\", wai"
  },
  "hiryo": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/hiryo/\", wait"
  },
  "hyoko": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/hyoko/\", wait"
  },
  "hyperfocal": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/hyperfocal/\","
  },
  "ikuji-kikan": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/ikuji-kikan/\""
  },
  "ikuji-kyufu": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/ikuji-kyufu/\""
  },
  "inshizei": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/inshizei/\", w"
  },
  "iryohi": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/iryohi/\", wai"
  },
  "jidoshazei": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/jidoshazei/\","
  },
  "jisa": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/jisa/\", waiti"
  },
  "juminzei": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/juminzei/\", w"
  },
  "junaru": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/junaru/\", wai"
  },
  "juryozei": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/juryozei/\", w"
  },
  "jutaku-kojo": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/jutaku-kojo/\""
  },
  "kabegami": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/kabegami/\", w"
  },
  "kabuma": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/kabuma/\", wai"
  },
  "kami": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/kami/\", waiti"
  },
  "kaup": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/kaup/\", waiti"
  },
  "kazoedoshi": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/kazoedoshi/\","
  },
  "ketsuatsu": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/ketsuatsu/\", "
  },
  "kettou-heikin": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/kettou-heikin"
  },
  "kishaku": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/kishaku/\", wa"
  },
  "kiso-nenkin": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/kiso-nenkin/\""
  },
  "kogaku": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/kogaku/\", wai"
  },
  "koteishisan": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/koteishisan/\""
  },
  "koyohoken": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/koyohoken/\", "
  },
  "kurisage": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/kurisage/\", w"
  },
  "kutsu": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/kutsu/\", wait"
  },
  "kyusu": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/kyusu/\", wait"
  },
  "kyuyo-kojo": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/kyuyo-kojo/\","
  },
  "lbm": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/lbm/\", waitin"
  },
  "ldl": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/ldl/\", waitin"
  },
  "led": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/led/\", waitin"
  },
  "lumen": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/lumen/\", wait"
  },
  "menkyo-koshin": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/menkyo-koshin"
  },
  "metabo": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/metabo/\", wai"
  },
  "mets": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/mets/\", waiti"
  },
  "mobabatt": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/mobabatt/\", w"
  },
  "nendo": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/nendo/\", wait"
  },
  "nomimizu": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/nomimizu/\", w"
  },
  "omori": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/omori/\", wait"
  },
  "onerm": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/onerm/\", wait"
  },
  "onkai": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/onkai/\", wait"
  },
  "paint": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/paint/\", wait"
  },
  "peline": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/peline/\", wai"
  },
  "petfood": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/petfood/\", wa"
  },
  "portable": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/portable/\", w"
  },
  "renryo": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/renryo/\", wai"
  },
  "rohrer": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/rohrer/\", wai"
  },
  "rokuyo": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/rokuyo/\", wai"
  },
  "saddle": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/saddle/\", wai"
  },
  "saidai-sanso": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/saidai-sanso/"
  },
  "saitei-chingin": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/saitei-chingi"
  },
  "sanzen": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/sanzen/\", wai"
  },
  "sekki": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/sekki/\", wait"
  },
  "shakaihoken": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/shakaihoken/\""
  },
  "shitsugyo": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/shitsugyo/\", "
  },
  "shobyo": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/shobyo/\", wai"
  },
  "shokyaku": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/shokyaku/\", w"
  },
  "shotokuzei": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/shotokuzei/\","
  },
  "shuban": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/shuban/\", wai"
  },
  "shussan": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/shussan/\", wa"
  },
  "shutokuzei": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/shutokuzei/\","
  },
  "souzokuzei": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/souzokuzei/\","
  },
  "suibun": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/suibun/\", wai"
  },
  "tairyoku": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/tairyoku/\", w"
  },
  "taishibo": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/taishibo/\", w"
  },
  "taishokukin": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/taishokukin/\""
  },
  "teinen": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/teinen/\", wai"
  },
  "tiresize": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/tiresize/\", w"
  },
  "todokede": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/todokede/\", w"
  },
  "torokuzei": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/torokuzei/\", "
  },
  "uruudoshi": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/uruudoshi/\", "
  },
  "wbgt": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/wbgt/\", waiti"
  },
  "whr": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/whr/\", waitin"
  },
  "yakudoshi": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/yakudoshi/\", "
  },
  "youbi": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/youbi/\", wait"
  },
  "zoyozei": {
-  "ok": true,
-  "note": ""
+  "ok": false,
+  "note": "Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:juminzei/lab/zoyozei/\", wa"
  }
 }

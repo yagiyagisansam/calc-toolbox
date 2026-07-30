@@ -30,12 +30,13 @@
   var MAX_YEARS = 100;        // 喫煙年数の上限
 
   // 区分の境目。level は英小文字のキーで返し、日本語の説明は画面側で付ける。
+  // 3つ目の値が true の区分は「超」(その値ちょうどは含まない)、false は「以上」。
+  // 出典の表現に合わせる: 保険適用は「200以上」、がんリスクは「400を超えると」「1,200を超えると」。
   var LEVELS = [
-    [1200, "over_1200"],
-    [600, "over_600"],
-    [400, "over_400"],
-    [200, "over_200"],
-    [0, "under_200"]
+    [1200, "over_1200", true],
+    [600, "over_600", true],
+    [400, "over_400", true],
+    [200, "over_200", false]
   ];
 
   function isFiniteNumber(v) {
@@ -46,12 +47,13 @@
    * 指数からリスク区分のキーを求める。
    * @param {number} index ブリンクマン指数
    * @returns {"over_1200"|"over_600"|"over_400"|"over_200"|"under_200"}
-   *   over_1200=1200以上 / over_600=600以上 / over_400=400以上 /
+   *   over_1200=1200超 / over_600=600超 / over_400=400超 /
    *   over_200=200以上(禁煙治療の保険適用の目安) / under_200=200未満
    */
   function levelOf(index) {
     for (var i = 0; i < LEVELS.length; i++) {
-      if (index >= LEVELS[i][0]) return LEVELS[i][1];
+      var strict = LEVELS[i][2];
+      if (strict ? index > LEVELS[i][0] : index >= LEVELS[i][0]) return LEVELS[i][1];
     }
     return "under_200";
   }

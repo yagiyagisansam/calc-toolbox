@@ -180,7 +180,7 @@
       widthEl.value === "" ? 0 : parseFloat(widthEl.value));
     if (e.ok) {
       html += "<p>推定周長: " + esc(e.circumferenceMm.toLocaleString("ja-JP")) + "mm(外径 " +
-        esc(e.outerDiameterMm) + "mm)</p>";
+        esc(e.outerDiameterMm) + 'mm)</p><p><button type="button" id="apply-circ">この推定値をタイヤ周長に使う</button></p>';
     } else {
       html += "<p>" + esc(ERRORS[e.code] || "入力値を確認してください。") + "</p>";
     }
@@ -198,6 +198,15 @@
 
   [frontEl, rearEl, circEl, cadEl, rimEl, widthEl, speedEl].forEach(function (el) {
     el.addEventListener("input", run);
+  });
+  // 推定周長を周長欄へ反映するボタン(結果はinnerHTMLで作り直されるため委譲で受ける)
+  advBox.addEventListener("click", function (ev) {
+    if (ev.target && ev.target.id === "apply-circ") {
+      var e = GearRatioCalc.circumferenceFromEtrto(
+        rimEl.value === "" ? 0 : parseFloat(rimEl.value),
+        widthEl.value === "" ? 0 : parseFloat(widthEl.value));
+      if (e.ok) { circEl.value = e.circumferenceMm; run(); }
+    }
   });
   document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
 })();

@@ -74,6 +74,19 @@
       }
     },
     {
+      "name": "70歳以上一般の外来のみ+多数回該当: 外来の限度額18,000円のまま(多数回該当は世帯単位のみ)",
+      "func": "calculate",
+      "args": [200000, 20, "o70_ippan", true, "current", true],
+      "expect": {
+        "ok": true,
+        "windowYen": 40000,
+        "limitYen": 18000,
+        "refundYen": 22000,
+        "kind": "outpatient",
+        "multipleApplied": false
+      }
+    },
+    {
       "name": "令和8年8月から: 区分ア 総医療費100万円は270,300円+(100万-901,000)×1%=271,290円",
       "func": "calculate",
       "args": [1000000, 30, "u70_a", false, "r8", false],

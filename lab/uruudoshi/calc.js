@@ -119,8 +119,9 @@
    * @returns {{ok:true, age:number, isFeb29Birth:boolean, birthdayThisYear:string}
    *          |{ok:false, code:"invalid_birth_date"|"invalid_reference_date"|"reference_before_birth"}}
    *   age は基準日時点の満年齢。isFeb29Birth は2月29日生まれかどうか。
-   *   birthdayThisYear は基準日の年における「年齢が増える日」("YYYY-MM-DD")。
-   *   2月29日生まれで基準日の年が平年のときは2月28日になる
+   *   birthdayThisYear は基準日の年における誕生日の応当日("YYYY-MM-DD")。
+   *   2月29日生まれで基準日の年が平年のときは2月28日になる。
+   *   年齢が増えるのは応当日の前日の終了時(2月29日生まれの平年は2月28日=末日の終了時)
    */
   function ageOn(birthYear, birthMonth, birthDay, refYear, refMonth, refDay) {
     if (!validDate(birthYear, birthMonth, birthDay)) {

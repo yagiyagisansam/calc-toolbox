@@ -100,7 +100,7 @@
       "expect": { "ok": false, "code": "invalid_count" }
     },
     {
-      "name": "期待値: 1%・天井100回・1回300円なら期待63.4回・19019円・天井到達36.6%",
+      "name": "期待値: 1%・天井100回・1回300円なら期待63.4回・19019円・天井のN回目を引く確率は0.99^99=36.97%",
       "func": "expected",
       "args": [1, 100, 300],
       "expect": {
@@ -109,7 +109,7 @@
         "expectedPulls": 63.4,
         "expectedCost": 19019,
         "maxCost": 30000,
-        "pityReachPercent": 36.6
+        "pityReachPercent": 36.97
       }
     },
     {
@@ -119,10 +119,10 @@
       "expect": { "ok": true, "expectedPullsNoPity": 33.33, "expectedPulls": 33.26, "pityReachPercent": 0.23 }
     },
     {
-      "name": "境界値: 天井1回(下限)なら必ず1回で終わり課金額は1回分",
+      "name": "境界値: 天井1回(下限)なら必ず1回で終わり課金額は1回分・天井まで引く確率は100%",
       "func": "expected",
       "args": [1, 1, 300],
-      "expect": { "ok": true, "expectedPulls": 1, "expectedCost": 300, "maxCost": 300 }
+      "expect": { "ok": true, "expectedPulls": 1, "expectedCost": 300, "maxCost": 300, "pityReachPercent": 100 }
     },
     {
       "name": "境界値: 1回あたり課金額0円でも計算でき期待課金額は0円",

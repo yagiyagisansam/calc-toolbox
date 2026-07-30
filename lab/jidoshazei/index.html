@@ -23,7 +23,7 @@
   <form class="tool-form" id="tool-form">
     <label>総排気量(cc)
       <span class="field-note">車検証の「総排気量」。例: 1500</span>
-      <input type="number" id="cc" inputmode="numeric" step="1" min="1" max="20000" placeholder="1500">
+      <input type="number" id="cc" inputmode="numeric" step="1" min="1" max="20000" value="1500">
     </label>
     <div class="field-row">
       <label>用途
@@ -234,6 +234,7 @@
     el.addEventListener("change", run);
   });
   document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
 })();
 </script>
 </body>

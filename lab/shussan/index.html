@@ -186,6 +186,22 @@
   var box = el("result");
   var advBox = el("adv-result");
 
+  // 出産前の利用者が大半なので、実際の出産日を手で触るまでは予定日に自動で合わせる
+  var birthTouched = false;
+  function syncBirth() {
+    if (birthTouched) return;
+    el("b-year").value = el("due-year").value;
+    el("b-month").value = el("due-month").value;
+    var max = daysInMonth(val("b-year"), val("b-month"));
+    fillSelect("b-day", 1, max, "日", Math.min(val("due-day"), max));
+  }
+  ["due-year", "due-month", "due-day"].forEach(function (id) {
+    el(id).addEventListener("change", syncBirth);
+  });
+  ["b-year", "b-month", "b-day"].forEach(function (id) {
+    el(id).addEventListener("change", function () { birthTouched = true; });
+  });
+
   function run() {
     adjustDays("due-year", "due-month", "due-day");
     adjustDays("b-year", "b-month", "b-day");

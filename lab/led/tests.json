@@ -34,10 +34,10 @@
       "expect": { "ok": true, "ohm": 130, "e24": 130, "actualCurrentMa": 10 }
     },
     {
-      "name": "定格電力: 消費7.28Wなら2倍以上で10Wを推奨",
+      "name": "定格電力: 消費7.28Wは2倍の14.56Wが必要で、10Wでは足りないため15Wを推奨",
       "func": "calculate",
       "args": [24, 3.2, 350],
-      "expect": { "ok": true, "watt": 7.28, "recommendedWatt": 10 }
+      "expect": { "ok": true, "watt": 7.28, "recommendedWatt": 15 }
     },
     {
       "name": "E12系列も返す: 5V・Vf3.2Vの90ΩはE12で82Ω(近い)・100Ω(以上で最小)",

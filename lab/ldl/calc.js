@@ -22,7 +22,8 @@
  * - 単位はすべて mg/dL。
  * - 診断基準はスクリーニングのための値であり、治療の目標値とは異なる。
  * - 計算結果は健診結果の読み方を補うためのもので、診断ではない。
- * - 計算値は小数第1位で四捨五入して返す。判定は丸める前の値で行う。
+ * - 計算値は小数第1位で四捨五入して返す。判定は表示と同じ丸め後の値で行う
+ *   (丸め前の値で判定すると、表示値140.0なのに判定が境界域になる等のずれが生じるため)。
  */
 (function (global) {
   "use strict";
@@ -102,7 +103,7 @@
       // 計算値がマイナスになる組み合わせは入力の誤りとみなす
       if (raw < 0) return { ok: false, code: "inconsistent_values" };
       ldl = round1(raw);
-      ldlCat = ldlCategory(raw);
+      ldlCat = ldlCategory(ldl);
     }
 
     return {
@@ -110,7 +111,7 @@
       ldl: ldl,
       ldlCategory: ldlCat,
       nonHdl: round1(nonHdl),
-      nonHdlCategory: nonHdlCategory(nonHdl),
+      nonHdlCategory: nonHdlCategory(round1(nonHdl)),
       hdlCategory: hdlCategory(hdl),
       tgCategory: tgCategory(tg, fasting),
       friedewaldUsable: usable,

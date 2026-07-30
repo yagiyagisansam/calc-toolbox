@@ -56,12 +56,19 @@
    * 音名の文字列をMIDIノート番号に変換する
    * @param {string} noteName 音名。例 "A4" "C#3" "Bb5" "F♯2" "E♭4" "C-1"
    *   英字1文字(A〜G)+ 変化記号(#/♯/b/♭、省略可)+ オクターブ番号(-1〜9)
+   *   全角の英字・数字・記号(Ａ４、Ｃ＃３ など)も半角に直して受け付ける
    * @returns {{ok:true, midi:number}|{ok:false, code:"invalid_note"|"note_out_of_range"}}
    */
   function noteToMidi(noteName) {
     if (typeof noteName !== "string") return { ok: false, code: "invalid_note" };
+    // 全角の英数字・＃を半角に直し(日本語キーボード対策)、全角マイナスも半角に寄せる
+    var s = noteName
+      .replace(/[Ａ-Ｚａ-ｚ０-９＃]/g, function (c) {
+        return String.fromCharCode(c.charCodeAt(0) - 0xFEE0);
+      })
+      .replace(/[−－]/g, "-");
     // 記号を半角に寄せ、先頭の音名だけ大文字にする(小文字の b は変化記号なので残す)
-    var s = noteName.trim().replace(/\s+/g, "").replace(/♯/g, "#").replace(/♭/g, "b");
+    s = s.trim().replace(/\s+/g, "").replace(/♯/g, "#").replace(/♭/g, "b");
     s = s.charAt(0).toUpperCase() + s.slice(1);
     var m = /^([A-G])([#b]?)(-?\d{1,2})$/.exec(s);
     if (!m) return { ok: false, code: "invalid_note" };

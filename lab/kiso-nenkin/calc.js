@@ -15,6 +15,10 @@
  *   昭和31年4月1日以前生まれは月額70,408円。前年度から1.9%の引上げ。
  * - 厚生労働省「令和8年度の年金額改定についてお知らせします」(令和8年1月23日 報道発表)
  *   https://www.mhlw.go.jp/content/12600000/001672868.pdf (2026年7月29日参照)
+ * - 日本年金機構「年金額の端数処理」
+ *   https://www.nenkin.go.jp/service/jukyu/seido/kyotsu/nenkingaku/20140421-01.html (2026年7月30日参照)
+ *   個人の年金額に1円未満の端数が生じたときは、50銭未満は切捨て・50銭以上1円未満は1円に切上げ
+ *   (100円単位の端数処理が適用されるのは法定の満額そのもの)。
  *
  * 制度・料率の時点:
  * - 満額の既定値 847,300円 は令和8(2026)年度の額(月額70,608円 × 12か月 = 847,296円 を、
@@ -49,12 +53,13 @@
   }
 
   /**
-   * 年金額の100円単位への端数処理(50円未満切捨て・50円以上100円未満切上げ)。
+   * 個人の年金額の1円単位への端数処理(50銭未満切捨て・50銭以上1円未満切上げ)。
+   * 100円単位の端数処理は法定の満額に対するもので、月数に応じて計算した個人の額には適用しない。
    * @param {number} yen 端数処理前の年額(円)
-   * @returns {number} 100円単位に丸めた年額(円)
+   * @returns {number} 1円単位に丸めた年額(円)
    */
-  function roundTo100(yen) {
-    return Math.round(yen / 100) * 100;
+  function roundYen(yen) {
+    return Math.round(yen);
   }
 
   /**
@@ -86,7 +91,7 @@
    *            annualYen:number, monthlyYen:number, ratePercent:number}
    *          |{ok:false, code:"invalid_paid"|"invalid_full"|"invalid_three_quarter"|"invalid_half"|"invalid_quarter"|"invalid_full_amount"|"months_over_limit"}}
    *   creditedMonths は割合をかけた後の月数(小数第2位で四捨五入)。480月を上限とする。
-   *   annualYen は 満額 × creditedMonths ÷ 480 を100円単位に丸めた額。
+   *   annualYen は 満額 × creditedMonths ÷ 480 を1円単位に丸めた額(50銭未満切捨て・50銭以上切上げ)。
    *   monthlyYen は annualYen ÷ 12 の1円未満切捨て。
    *   eligible は 納付済+免除の実月数が120月(10年)以上かどうか。false でも金額は計算して返す。
    */
@@ -135,7 +140,7 @@
     var credited = sumMonths(paidMonths, newList, RATES_NEW) + sumMonths(0, oldList, RATES_OLD);
     credited = Math.min(credited, FULL_MONTHS);
 
-    var annual = roundTo100(amount * credited / FULL_MONTHS);
+    var annual = roundYen(amount * credited / FULL_MONTHS);
     return {
       ok: true,
       eligible: totalMonths >= ELIGIBLE_MONTHS,

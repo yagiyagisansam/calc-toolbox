@@ -82,7 +82,8 @@
    *   resistorV:       抵抗にかかる電圧(V、小数第3位で丸め)
    *   ohm:             必要な抵抗値(Ω、小数第2位で丸め)
    *   watt/milliWatt:  抵抗の消費電力(W は小数第4位、mW は小数第2位で丸め)
-   *   recommendedWatt: 消費電力の2倍以上で入手しやすい定格電力(W)
+   *   recommendedWatt: 消費電力の2倍以上で入手しやすい定格電力(W)。
+   *                    10Wでも足りない場合は必要値(消費電力×2)を整数に切り上げた値
    *   e24/e12:         もっとも近いE24・E12の標準抵抗値(Ω)
    *   e24Up/e12Up:     必要値以上でもっとも小さい標準抵抗値(Ω。電流が増えないので安全側)
    *   actualCurrentMa: e24Up の抵抗を使ったときに実際に流れる電流(mA、小数第2位で丸め)
@@ -108,10 +109,12 @@
     var ohm = resistorV / amp;
     var watt = resistorV * amp;
     var need = watt * DERATING;
-    var recommended = POWER_RATINGS[POWER_RATINGS.length - 1];
+    var recommended = null;
     for (var i = 0; i < POWER_RATINGS.length; i++) {
       if (POWER_RATINGS[i] >= need) { recommended = POWER_RATINGS[i]; break; }
     }
+    // 最大の定格(10W)でも足りないときは、必要値を整数に切り上げて示す
+    if (recommended === null) recommended = Math.ceil(need);
     var a = pickFromSeries(ohm, E24);
     var b = pickFromSeries(ohm, E12);
     return {
@@ -158,10 +161,12 @@
     var amp = resistorV / ohm;
     var watt = resistorV * amp;
     var need = watt * DERATING;
-    var recommended = POWER_RATINGS[POWER_RATINGS.length - 1];
+    var recommended = null;
     for (var i = 0; i < POWER_RATINGS.length; i++) {
       if (POWER_RATINGS[i] >= need) { recommended = POWER_RATINGS[i]; break; }
     }
+    // 最大の定格(10W)でも足りないときは、必要値を整数に切り上げて示す
+    if (recommended === null) recommended = Math.ceil(need);
     return {
       ok: true,
       currentMa: round(amp * 1000, 2),

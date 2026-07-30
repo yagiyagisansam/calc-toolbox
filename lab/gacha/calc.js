@@ -117,7 +117,9 @@
    *   expectedPulls:       天井を考えた期待回数(小数第2位で丸め)
    *   expectedCost:        期待課金額(円、1円未満を四捨五入)
    *   maxCost:             天井まで引いた場合の最大課金額(円)
-   *   pityReachPercent:    天井まで引くことになる確率(%、小数第2位で丸め)
+   *   pityReachPercent:    天井まで引くことになる確率(%、小数第2位で丸め)。
+   *                        天井のN回目を引くのは最初のN−1回がすべて外れたときなので(1−p)^(N−1)。
+   *                        (天井1回なら必ず1回引くので100%になる)
    */
   function expected(ratePercent, pity, costPerPull) {
     var p = toProbability(ratePercent);
@@ -128,13 +130,14 @@
     }
     var miss = Math.pow(1 - p, pity);
     var pulls = (1 - miss) / p;
+    var reach = Math.pow(1 - p, pity - 1); // 最初のN−1回がすべて外れて天井のN回目を引く確率
     return {
       ok: true,
       expectedPullsNoPity: round(1 / p, 2),
       expectedPulls: round(pulls, 2),
       expectedCost: Math.round(pulls * costPerPull),
       maxCost: Math.round(pity * costPerPull),
-      pityReachPercent: round(miss * 100, 2)
+      pityReachPercent: round(reach * 100, 2)
     };
   }
 

@@ -82,16 +82,16 @@
       "expect": { "ok": true, "level": 2 }
     },
     {
-      "name": "境界ヒップ: 男性ウエスト90cmならヒップ100.0cm以下で腹部肥満",
+      "name": "境界ヒップ: 男性ウエスト90cmならヒップ100.5cm以下で腹部肥満(丸めたWHR0.90≧0.90)",
       "func": "hipLimit",
       "args": ["male", 90],
-      "expect": { "ok": true, "cutoff": 0.9, "hipLimitCm": 100 }
+      "expect": { "ok": true, "cutoff": 0.9, "hipLimitCm": 100.5 }
     },
     {
-      "name": "境界ヒップ: 女性ウエスト85cmならヒップ100.0cm以下で腹部肥満",
+      "name": "境界ヒップ: 女性ウエスト85cmならヒップ100.5cm以下で腹部肥満(丸めたWHR0.85≧0.85)",
       "func": "hipLimit",
       "args": ["female", 85],
-      "expect": { "ok": true, "cutoff": 0.85, "hipLimitCm": 100 }
+      "expect": { "ok": true, "cutoff": 0.85, "hipLimitCm": 100.5 }
     },
     {
       "name": "異常入力: 性別の指定が不正はエラー",

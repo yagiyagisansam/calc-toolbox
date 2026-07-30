@@ -10,22 +10,22 @@
       "expect": { "ok": true, "eligible": true, "creditedMonths": 480, "annualYen": 847300, "monthlyYen": 70608, "ratePercent": 100 }
     },
     {
-      "name": "30年(360月)納付なら満額の4分の3で635,500円",
+      "name": "30年(360月)納付なら満額の4分の3で635,475円(1円単位の端数処理)",
       "func": "calculate",
       "args": [360, 0, 0, 0, 0],
-      "expect": { "ok": true, "creditedMonths": 360, "annualYen": 635500, "ratePercent": 75 }
+      "expect": { "ok": true, "creditedMonths": 360, "annualYen": 635475, "ratePercent": 75 }
     },
     {
-      "name": "納付240月+全額免除240月は240+120=360月分と同じ635,500円",
+      "name": "納付240月+全額免除240月は240+120=360月分と同じ635,475円",
       "func": "calculate",
       "args": [240, 240, 0, 0, 0],
-      "expect": { "ok": true, "totalMonths": 480, "creditedMonths": 360, "annualYen": 635500 }
+      "expect": { "ok": true, "totalMonths": 480, "creditedMonths": 360, "annualYen": 635475 }
     },
     {
-      "name": "境界値: 受給資格ちょうど120月は受給資格あり・211,800円",
+      "name": "境界値: 受給資格ちょうど120月は受給資格あり・211,825円",
       "func": "calculate",
       "args": [120, 0, 0, 0, 0],
-      "expect": { "ok": true, "eligible": true, "totalMonths": 120, "annualYen": 211800, "monthlyYen": 17650 }
+      "expect": { "ok": true, "eligible": true, "totalMonths": 120, "annualYen": 211825, "monthlyYen": 17652 }
     },
     {
       "name": "境界値: 119月は受給資格なし(金額は参考値として計算)",
@@ -43,7 +43,7 @@
       "name": "一部免除あり: 納付300+全額60+4分の3免除40+半額40+4分の1免除40は420月分",
       "func": "calculate",
       "args": [300, 60, 40, 40, 40],
-      "expect": { "ok": true, "totalMonths": 480, "creditedMonths": 420, "annualYen": 741400, "ratePercent": 87.5 }
+      "expect": { "ok": true, "totalMonths": 480, "creditedMonths": 420, "annualYen": 741388, "ratePercent": 87.5 }
     },
     {
       "name": "満額を指定: 昭和31年4月1日以前生まれの844,900円は月額70,408円",
@@ -55,7 +55,7 @@
       "name": "平成21年3月以前分の全額免除は3分の1(納付240+新120+旧120で340月分)",
       "func": "calculateMixed",
       "args": [240, [120, 0, 0, 0], [120, 0, 0, 0]],
-      "expect": { "ok": true, "totalMonths": 480, "creditedMonths": 340, "annualYen": 600200 }
+      "expect": { "ok": true, "totalMonths": 480, "creditedMonths": 340, "annualYen": 600171 }
     },
     {
       "name": "免除の割合(平成21年4月以降): 全額1/2・4分の3免除5/8・半額3/4・4分の1免除7/8",

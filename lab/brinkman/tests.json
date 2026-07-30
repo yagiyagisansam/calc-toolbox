@@ -4,22 +4,22 @@
   "global": "BrinkmanCalc",
   "cases": [
     {
-      "name": "1日20本を20年で指数400(肺がんリスクの目安)・20パックイヤー",
+      "name": "1日20本を20年で指数400ちょうど(出典の「400を超えると」には未達で200以上の区分)・20パックイヤー",
       "func": "calculate",
       "args": [20, 20],
-      "expect": { "ok": true, "index": 400, "level": "over_400", "packYears": 20, "insuranceEligible": true }
+      "expect": { "ok": true, "index": 400, "level": "over_200", "packYears": 20, "insuranceEligible": true }
     },
     {
-      "name": "1日20本を30年で指数600",
+      "name": "1日20本を30年で指数600(400超の区分)",
       "func": "calculate",
       "args": [20, 30],
-      "expect": { "ok": true, "index": 600, "level": "over_600", "packYears": 30 }
+      "expect": { "ok": true, "index": 600, "level": "over_400", "packYears": 30 }
     },
     {
-      "name": "1日20本を60年で指数1200(喉頭がんリスクの目安)",
+      "name": "1日20本を60年で指数1200ちょうど(出典の「1,200を超えると」には未達で600超の区分)",
       "func": "calculate",
       "args": [20, 60],
-      "expect": { "ok": true, "index": 1200, "level": "over_1200" }
+      "expect": { "ok": true, "index": 1200, "level": "over_600" }
     },
     {
       "name": "境界値: 1日10本を20年で指数200ちょうど(保険適用の目安)",
@@ -58,21 +58,33 @@
       "expect": "over_200"
     },
     {
-      "name": "区分: 400ちょうどは400以上",
+      "name": "区分: 400ちょうどは「400を超える」に当たらず200以上の区分",
       "func": "levelOf",
       "args": [400],
+      "expect": "over_200"
+    },
+    {
+      "name": "区分: 400を少しでも超えると400超の区分",
+      "func": "levelOf",
+      "args": [400.1],
       "expect": "over_400"
     },
     {
-      "name": "区分: 600ちょうどは600以上",
+      "name": "区分: 600ちょうどは400超の区分",
       "func": "levelOf",
       "args": [600],
+      "expect": "over_400"
+    },
+    {
+      "name": "区分: 1200ちょうどは「1,200を超える」に当たらず600超の区分",
+      "func": "levelOf",
+      "args": [1200],
       "expect": "over_600"
     },
     {
-      "name": "区分: 1200ちょうどは1200以上",
+      "name": "区分: 1201は1200超の区分",
       "func": "levelOf",
-      "args": [1200],
+      "args": [1201],
       "expect": "over_1200"
     },
     {

@@ -174,7 +174,9 @@
     var month = e < 14 ? e - 1 : e - 13;
     var year = month > 2 ? c - 4716 : c - 4715;
     var minutes = Math.round(f * 1440);
-    if (minutes >= 1440) { minutes -= 1440; day += 1; }
+    // 23:59:30以降が1440分に丸められたときは、翌日0:00として再変換する
+    // (day += 1 だけでは月末・年末で実在しない日付になるため)
+    if (minutes >= 1440) return dateFromJd(z + 0.5);
     return {
       year: year, month: month, day: day,
       hour: Math.floor(minutes / 60), minute: minutes % 60

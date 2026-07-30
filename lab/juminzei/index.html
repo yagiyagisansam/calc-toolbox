@@ -27,11 +27,11 @@
   <form class="tool-form" id="tool-form">
     <label>年収(給与収入・円)
       <span class="field-note">税金や社会保険料が引かれる前の金額。源泉徴収票の「支払金額」</span>
-      <input type="number" id="income" inputmode="numeric" step="10000" min="0" max="1000000000" placeholder="例: 5000000">
+      <input type="number" id="income" inputmode="numeric" step="10000" min="0" max="1000000000" value="5000000">
     </label>
     <label>1年間に支払った社会保険料(円)
       <span class="field-note">厚生年金・健康保険・雇用保険の合計。源泉徴収票の「社会保険料等の金額」</span>
-      <input type="number" id="insurance" inputmode="numeric" step="1000" min="0" max="1000000000" placeholder="例: 700000">
+      <input type="number" id="insurance" inputmode="numeric" step="1000" min="0" max="1000000000" value="700000">
     </label>
     <div class="field-row">
       <label>配偶者控除の対象
@@ -114,6 +114,7 @@
     <li>住宅ローン控除・ふるさと納税・配当割額控除などの<strong>税額控除は反映していません</strong>。これらがある場合、実際の税額はもっと低くなります。</li>
     <li>所得税法第28条第4項の「別表第五」(収入660万円未満の速算表)ではなく第3項の算式で計算しているため、実際の額と数百円ずれることがあります。</li>
     <li>所得が一定額以下の人は<strong>非課税</strong>になりますが(限度額は自治体の条例で異なる)、その判定は行っていません。</li>
+    <li>基礎控除は43万円固定、配偶者控除は33万円固定で計算しています。合計所得金額が2,400万円を超える場合の基礎控除の逓減・消失や、納税者の合計所得が900万円を超える場合の配偶者控除の減額・消失(1,000万円超で適用なし)、合計所得2,500万円超で調整控除が受けられない点は反映していないため、高所得の場合は実際より少なく出ます。</li>
     <li>16歳未満の扶養親族には扶養控除がないため、人数に含めないでください。</li>
     <li>政令指定都市では内訳(道府県2%+市8%)が変わりますが、合計10%・調整控除の合計5%は同じです。</li>
   </ul>
@@ -204,6 +205,7 @@
   [incomeEl, insEl, kintouEl].forEach(function (el) { el.addEventListener("input", run); });
   [spouseEl, depsEl].forEach(function (el) { el.addEventListener("change", run); });
   document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
 })();
 </script>
 </body>

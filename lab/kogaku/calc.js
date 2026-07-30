@@ -93,7 +93,8 @@
     if (typeof outpatientOnly !== "boolean") return { ok: false, code: "invalid_outpatient" };
 
     var kind, value;
-    if (outpatientOnly && row.out !== null && !multiple) {
+    if (outpatientOnly && row.out !== null) {
+      // 外来(個人ごと)の限度額には多数回該当の適用はない(多数回該当は世帯単位の限度額のみ)
       kind = "outpatient";
       value = row.out;
     } else if (multiple && row.multi !== null) {

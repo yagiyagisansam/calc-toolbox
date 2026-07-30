@@ -96,10 +96,14 @@
 
   /**
    * 腹部肥満の境界となるヒップ周囲径(このヒップ以下だと腹部肥満になる)を返す。
+   * calculate と同じく「小数第2位に四捨五入したWHRが基準値以上」という判定に合わせるため、
+   * 境界は waist ÷ (cutoff − 0.005) で求め、小数第1位に切り捨てる。
+   * (単純に waist ÷ cutoff とすると、丸めで腹部肥満と判定されるヒップ(例: 男性
+   *  ウエスト85cm・ヒップ94.5cm → WHR 0.90)が境界より大きくなり、表示が矛盾する)
    * @param {"male"|"female"} sex 性別
    * @param {number} waistCm ウエスト周囲径(cm)
    * @returns {{ok:true, cutoff:number, hipLimitCm:number}|{ok:false, code:string}}
-   *   hipLimitCm: ウエストを保ったままなら、この値以下のヒップで腹部肥満になる(小数第1位)
+   *   hipLimitCm: ウエストを保ったままなら、この値以下のヒップで腹部肥満の判定になる(小数第1位)
    */
   function hipLimit(sex, waistCm) {
     if (sex !== "male" && sex !== "female") return { ok: false, code: "invalid_sex" };
@@ -107,7 +111,7 @@
       return { ok: false, code: "invalid_waist" };
     }
     var cutoff = WHR_CUTOFF[sex];
-    return { ok: true, cutoff: cutoff, hipLimitCm: Math.round((waistCm / cutoff) * 10) / 10 };
+    return { ok: true, cutoff: cutoff, hipLimitCm: Math.floor((waistCm / (cutoff - 0.005)) * 10) / 10 };
   }
 
   var api = {

@@ -205,8 +205,11 @@
       return;
     }
     if (r.deadline === null) {
-      box.innerHTML = '<div class="result-main">期限の定めなし</div>' +
-        "<p>この届出には提出期限が定められていません(" + esc(m[3]) + ")。</p>";
+      box.innerHTML = kindEl.value === "moveOut"
+        ? '<div class="result-main">引っ越す前に(あらかじめ)届出</div>' +
+          "<p>転出届は「あらかじめ」届け出ることとされています(" + esc(m[3]) + ")。転出の予定日 " + esc(jp(r.startDate)) + " までに手続きしてください。日数の定めはありません。</p>"
+        : '<div class="result-main">期限の定めなし</div>' +
+          "<p>この届出には提出期限が定められていません(" + esc(m[3]) + ")。</p>";
       box.hidden = false;
       advBox.hidden = true;
       return;

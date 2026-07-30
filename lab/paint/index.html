@@ -162,12 +162,19 @@
   }
 
   function applyMode() {
+    var rateNote = rateLabel.querySelector(".field-note");
     if (modeEl.value === "kg") {
       rateLabel.firstChild.nodeValue = "標準塗布量(kg/m²/回)";
       canLabel.firstChild.nodeValue = "1缶の内容量(kg)";
+      rateNote.textContent = "塗料カタログの「使用量」「標準所要量」など。1回塗りあたりの値";
+      rateEl.placeholder = "例: 0.11";
+      canEl.placeholder = "例: 15";
     } else {
       rateLabel.firstChild.nodeValue = "標準塗り面積(m²/L/回)";
       canLabel.firstChild.nodeValue = "1缶の内容量(L)";
+      rateNote.textContent = "塗料カタログの「塗り面積」など。1Lで塗れる面積(1回塗りあたり)";
+      rateEl.placeholder = "例: 8";
+      canEl.placeholder = "例: 7";
     }
   }
 

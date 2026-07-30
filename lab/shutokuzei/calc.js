@@ -16,6 +16,8 @@
  * - 併用住宅・共有・長期優良住宅・買取再販などの個別の取扱いは含まない。
  * - 免税点は令和8年4月1日以降の取得の額(土地16万円・新築等の家屋66万円・その他の家屋34万円)。
  * - 軽減を受けるには床面積などの要件と申告が必要。ここでの計算は要件を満たす前提の目安。
+ * - 端数処理: 課税標準は1,000円未満切捨て、税額(確定金額)は100円未満切捨て
+ *   (地方税法第20条の4の2)。
  */
 (function (global) {
   "use strict";
@@ -52,22 +54,32 @@
     return isFiniteNumber(v) && v >= 0 && v <= MAX_VALUE;
   }
 
+  /** 課税標準の1,000円未満切捨て(地方税法第20条の4の2第1項) */
+  function floor1000(n) {
+    return Math.floor(n / 1000) * 1000;
+  }
+
+  /** 税額の100円未満切捨て(地方税法第20条の4の2第3項) */
+  function floor100(n) {
+    return Math.floor(n / 100) * 100;
+  }
+
   /**
    * 住宅(家屋)の不動産取得税額を求める
    * @param {number} value 家屋の固定資産税評価額(円)
    * @param {number} deduction 控除額(円)。新築住宅は12000000、中古住宅は usedHouseDeduction の値
    * @returns {{ok:true, taxableBase:number, rate:number, tax:number}
    *          |{ok:false, code:"invalid_value"|"invalid_deduction"}}
-   *   taxableBase: 控除後の課税標準(円。マイナスにはならず0で止まる)
-   *   tax: 税額(円、1円未満切り捨て)
+   *   taxableBase: 控除後の課税標準(円。マイナスにはならず0で止まり、1,000円未満切捨て)
+   *   tax: 税額(円、100円未満切り捨て)
    */
   function houseTax(value, deduction) {
     if (!validValue(value)) return { ok: false, code: "invalid_value" };
     if (!isFiniteNumber(deduction) || deduction < 0 || deduction > MAX_VALUE) {
       return { ok: false, code: "invalid_deduction" };
     }
-    var base = Math.max(0, value - deduction);
-    return { ok: true, taxableBase: base, rate: RATE_HOUSE, tax: Math.floor(base * RATE_HOUSE) };
+    var base = floor1000(Math.max(0, value - deduction));
+    return { ok: true, taxableBase: base, rate: RATE_HOUSE, tax: floor100(Math.round(base * RATE_HOUSE)) };
   }
 
   /**
@@ -77,7 +89,8 @@
    */
   function nonHouseTax(value) {
     if (!validValue(value)) return { ok: false, code: "invalid_value" };
-    return { ok: true, taxableBase: value, rate: RATE_NON_HOUSE, tax: Math.floor(value * RATE_NON_HOUSE) };
+    var base = floor1000(value);
+    return { ok: true, taxableBase: base, rate: RATE_NON_HOUSE, tax: floor100(Math.round(base * RATE_NON_HOUSE)) };
   }
 
   /**
@@ -127,9 +140,9 @@
    * @returns {{ok:true, baseTax:number, reductionA:number, reductionB:number,
    *            reduction:number, tax:number, cappedArea:number, unitPrice:number}
    *          |{ok:false, code:"invalid_value"|"invalid_land_area"|"invalid_floor_area"|"invalid_share"}}
-   *   baseTax: 当初税額(円、1円未満切り捨て)
+   *   baseTax: 当初税額(円。課税標準は1,000円未満切捨て)
    *   reduction: 実際に減額される額(円、1円未満切り捨て)
-   *   tax: 納付税額(円。マイナスにはならず0で止まる)
+   *   tax: 納付税額(円。マイナスにはならず0で止まり、100円未満切捨て)
    *   cappedArea: 計算に使った「住宅の床面積の2倍(上限200㎡)」(㎡)
    */
   function landTax(landValue, landAreaM2, floorAreaM2, share) {
@@ -143,9 +156,9 @@
     if (!isFiniteNumber(share) || share <= 0 || share > 1) {
       return { ok: false, code: "invalid_share" };
     }
-    var halfValue = landValue / 2;
-    var baseTax = Math.floor(halfValue * RATE_LAND);
-    var unitPrice = halfValue / landAreaM2;
+    var taxableBase = floor1000(landValue / 2);
+    var baseTax = Math.round(taxableBase * RATE_LAND);
+    var unitPrice = taxableBase / landAreaM2;
     var cappedArea = Math.min(floorAreaM2 * 2, LAND_AREA_CAP);
     var reductionB = Math.floor(unitPrice * cappedArea * share * RATE_LAND);
     var reduction = Math.max(LAND_REDUCTION_FLAT, reductionB);
@@ -155,7 +168,7 @@
       reductionA: LAND_REDUCTION_FLAT,
       reductionB: reductionB,
       reduction: reduction,
-      tax: Math.max(0, baseTax - reduction),
+      tax: floor100(Math.max(0, baseTax - reduction)),
       cappedArea: cappedArea,
       unitPrice: Math.round(unitPrice)
     };
@@ -170,8 +183,8 @@
    */
   function plainLandTax(landValue, isResidentialLand) {
     if (!validValue(landValue)) return { ok: false, code: "invalid_value" };
-    var base = isResidentialLand ? landValue / 2 : landValue;
-    return { ok: true, taxableBase: base, rate: RATE_LAND, tax: Math.floor(base * RATE_LAND) };
+    var base = floor1000(isResidentialLand ? landValue / 2 : landValue);
+    return { ok: true, taxableBase: base, rate: RATE_LAND, tax: floor100(Math.round(base * RATE_LAND)) };
   }
 
   /**
@@ -212,8 +225,8 @@
     if (!h.ok) return h;
     var l = landTax(landValue, landAreaM2, floorAreaM2, 1);
     if (!l.ok) return l;
-    var hBefore = Math.floor(houseValue * RATE_HOUSE);
-    var lBefore = l.baseTax;
+    var hBefore = floor100(Math.round(floor1000(houseValue) * RATE_HOUSE));
+    var lBefore = floor100(l.baseTax);
     return {
       ok: true,
       houseTax: h.tax,
