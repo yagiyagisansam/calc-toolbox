@@ -39,7 +39,7 @@
       <input type="number" id="wage" inputmode="numeric" step="1" min="0" placeholder="例: 200000">
     </label>
     <label id="hours-label">1か月平均所定労働時間(時間)
-      <span class="field-note">年間の所定労働時間 ÷ 12。わからないときは「＋詳細機能」で計算できます</span>
+      <span class="field-note" id="hours-note">年間の所定労働時間 ÷ 12。わからないときは「＋詳細機能」で計算できます</span>
       <input type="number" id="hours" inputmode="decimal" step="0.01" min="0" placeholder="例: 160">
     </label>
     <label id="excluded-label">最低賃金に算入しない手当の合計(円)
@@ -189,18 +189,26 @@
 
   function applyMode() {
     var mode = modeEl.value;
+    var hoursNote = document.getElementById("hours-note");
     if (mode === "monthly") {
       wageLabel.firstChild.nodeValue = "月給(円)";
+      wageEl.placeholder = "例: 200000";
       hoursLabel.firstChild.nodeValue = "1か月平均所定労働時間(時間)";
+      hoursNote.textContent = "年間の所定労働時間 ÷ 12。わからないときは「＋詳細機能」で計算できます";
+      hoursEl.placeholder = "例: 160";
       hoursLabel.hidden = false;
       excludedLabel.hidden = false;
     } else if (mode === "daily") {
       wageLabel.firstChild.nodeValue = "日給(円)";
+      wageEl.placeholder = "例: 9000";
       hoursLabel.firstChild.nodeValue = "1日の所定労働時間(時間)";
+      hoursNote.textContent = "その日に働くことになっている時間(休憩を除く)";
+      hoursEl.placeholder = "例: 8";
       hoursLabel.hidden = false;
       excludedLabel.hidden = false;
     } else {
       wageLabel.firstChild.nodeValue = "時給(円)";
+      wageEl.placeholder = "例: 1200";
       hoursLabel.hidden = true;
       excludedLabel.hidden = true;
     }

@@ -186,12 +186,13 @@
     var isKei = kindEl.value === "kei";
     weightLabel.hidden = isKei;
     if (!isKei && weightEl.value === "") { box.hidden = true; advBox.hidden = true; return; }
-    if (elapsedEl.value === "") { box.hidden = true; advBox.hidden = true; return; }
 
     var weight = isKei ? 0 : parseFloat(weightEl.value);
     var years = parseInt(yearsEl.value, 10);
     var grade = ecoEl.value;
     if (grade === "auto") {
+      // 経過年数は「エコカー以外(減税なし)」で重課を自動判定するときだけ使う
+      if (elapsedEl.value === "") { box.hidden = true; advBox.hidden = true; return; }
       var g = JuryozeiCalc.gradeByAge(parseFloat(elapsedEl.value));
       if (!g.ok) {
         box.innerHTML = '<p class="result-error">' + esc(ERRORS[g.code]) + "</p>";

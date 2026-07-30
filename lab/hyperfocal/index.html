@@ -23,10 +23,10 @@
   <form class="tool-form" id="tool-form">
     <div class="field-row">
       <label>焦点距離(mm)
-        <input type="number" id="focal" inputmode="decimal" step="0.1" min="1" max="3000" placeholder="24">
+        <input type="number" id="focal" inputmode="decimal" step="0.1" min="1" max="3000" value="24">
       </label>
       <label>F値
-        <input type="number" id="fnum" inputmode="decimal" step="0.1" min="0.5" max="128" placeholder="11">
+        <input type="number" id="fnum" inputmode="decimal" step="0.1" min="0.5" max="128" value="11">
       </label>
     </div>
     <label>センサーサイズ
@@ -198,6 +198,7 @@
   [focalEl, fnumEl, cocEl].forEach(function (el) { el.addEventListener("input", run); });
   sensorEl.addEventListener("change", run);
   document.getElementById("tool-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
 })();
 </script>
 </body>
