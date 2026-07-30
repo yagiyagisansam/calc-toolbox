@@ -60,6 +60,12 @@
       "expect": { "ok": true, "employee": 503.51, "employeeDeduction": 504 }
     },
     {
+      "name": "境界値: 端数が50銭5厘(10.505円)も50銭1厘以上として切り上げて11円(令和7年度・賃金1,910円)",
+      "func": "calculate",
+      "args": [1910, "general", 2025],
+      "expect": { "ok": true, "employee": 10.51, "employeeDeduction": 11 }
+    },
+    {
       "name": "境界値: 賃金0円なら保険料も0円",
       "func": "calculate",
       "args": [0, "general"],

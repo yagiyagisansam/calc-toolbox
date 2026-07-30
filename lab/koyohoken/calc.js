@@ -64,8 +64,9 @@
   function roundDeduction(v) {
     var whole = Math.floor(v);
     var frac = v - whole;
-    // 浮動小数の誤差で 0.5 が 0.5000000001 にならないよう、1銭未満は切り捨ててから比較する
-    frac = Math.floor(frac * 100 + 1e-6) / 100;
+    // 判定の単位は厘(0.001円)。50銭5厘(0.505円)のような端数も「50銭1厘以上」として
+    // 切り上げられるよう、1厘未満だけを浮動小数の誤差対策として切り捨ててから比較する
+    frac = Math.floor(frac * 1000 + 1e-6) / 1000;
     return frac <= 0.5 ? whole : whole + 1;
   }
 
