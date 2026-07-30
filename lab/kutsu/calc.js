@@ -139,7 +139,7 @@
     // 表の最小行よりハーフサイズ(約0.4cm)以上小さい足長は換算表の範囲外とする
     if (footLengthCm < rows[0][0] - HALF_SIZE_CM) return { ok: false, code: "invalid_length" };
     for (var i = 0; i < rows.length; i++) {
-      // 0.05cm の余裕を見て浮動小数の誤差を吸収する
+      // ごく小さな余裕(1e-9)で浮動小数の誤差だけを吸収する
       if (footLengthCm <= rows[i][0] + 1e-9) {
         return {
           ok: true,

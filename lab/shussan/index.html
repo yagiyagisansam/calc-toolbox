@@ -196,9 +196,11 @@
     fillSelect("b-day", 1, max, "日", Math.min(val("due-day"), max));
   }
   ["due-year", "due-month", "due-day"].forEach(function (id) {
+    el(id).addEventListener("input", syncBirth);
     el(id).addEventListener("change", syncBirth);
   });
   ["b-year", "b-month", "b-day"].forEach(function (id) {
+    el(id).addEventListener("input", function () { birthTouched = true; });
     el(id).addEventListener("change", function () { birthTouched = true; });
   });
 

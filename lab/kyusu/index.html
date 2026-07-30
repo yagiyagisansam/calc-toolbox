@@ -206,6 +206,8 @@
 
     var ls = KyusuCalc.lineSpacing(v, parseFloat(el("ratio").value), from);
     if (!ls.ok) {
+      // 文字サイズ0は換算としては有効だが、行送りの計算はできないため静かに隠す
+      if (v === 0) { advBox.hidden = true; return; }
       advBox.innerHTML = '<p class="result-error">' + esc(ERRORS[ls.code] || "入力値を確認してください。") + "</p>";
       advBox.hidden = false;
       return;

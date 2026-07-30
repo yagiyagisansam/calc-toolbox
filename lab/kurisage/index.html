@@ -178,6 +178,11 @@
         }
       }
       html += "<p>損益分岐年齢: " + esc(beText(r)) + "</p>";
+      if (r.breakEvenYears !== null) {
+        html += "<p>" + (r.type === "kuriage"
+          ? "この年齢より長生きすると、65歳から受け取った場合の総額が繰上げを上回ります。"
+          : "この年齢より長生きすると、繰り下げた場合の総額が65歳開始を上回ります。") + "</p>";
+      }
       box.innerHTML = html;
       box.hidden = false;
     }
