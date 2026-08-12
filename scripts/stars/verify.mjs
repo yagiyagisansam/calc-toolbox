@@ -262,6 +262,54 @@ try {
     console.log(`\nスクリーンショット: ${shotPath}`);
   }
 
+  // ---- 申請ページ ----
+  console.log("\n申請ページ (stars/submit.html):");
+  await page.goto(`http://127.0.0.1:${PORT}/stars/submit.html`, { waitUntil: "load", timeout: 60000 });
+  await page.waitForFunction(() => window.StarsSubmit, { timeout: 30000 }).catch(() => {});
+
+  const prefCount = await page.locator("#f-pref option").count();
+  check("都道府県が47件そろう", prefCount === 48, `${prefCount - 1} 件(先頭の案内を除く)`);
+
+  const groupCount = await page.locator("#f-pref optgroup").count();
+  check("地方ごとにまとまっている", groupCount === 8, `${groupCount} 区分`);
+
+  // 未入力のまま送ると、何が足りないか教えてくれる
+  await page.locator("#submit-button").click();
+  await page.waitForTimeout(200);
+  const emptyMsg = await page.locator("#submit-message").textContent();
+  check("場所未選択のまま送ると案内が出る", /場所を選/.test(emptyMsg), emptyMsg);
+
+  // 地図をタップした代わりに、地点を直接指定する
+  await page.evaluate(() => window.StarsSubmit.pick(36.12, 137.55)); // 乗鞍畳平
+  await page.waitForTimeout(300);
+  const readout = await page.locator("#pick-readout").textContent();
+  check("選んだ地点の座標が出る", /36\.12/.test(readout), readout);
+
+  const darkness = await page.locator("#pick-darkness").textContent();
+  check("選んだ地点の暗さの目安が出る", /空の暗さ/.test(darkness), darkness);
+
+  // 範囲外は受け付けない
+  await page.evaluate(() => window.StarsSubmit.pick(48.9, 2.35)); // パリ
+  await page.waitForTimeout(200);
+  const outMsg = await page.locator("#submit-message").textContent();
+  check("日本の範囲外は断る", /日本国内/.test(outMsg), outMsg);
+
+  // 名前が無いまま送ると教えてくれる
+  await page.evaluate(() => window.StarsSubmit.pick(36.12, 137.55));
+  await page.locator("#submit-button").click();
+  await page.waitForTimeout(200);
+  const nameMsg = await page.locator("#submit-message").textContent();
+  check("スポット名が無いと案内が出る", /スポット名/.test(nameMsg), nameMsg);
+
+  // URL の形式
+  await page.locator("#f-name").fill("乗鞍畳平");
+  await page.locator("#f-pref").selectOption("岐阜県");
+  await page.locator("#f-url").fill("http://example.com");
+  await page.locator("#submit-button").click();
+  await page.waitForTimeout(200);
+  const urlMsg = await page.locator("#submit-message").textContent();
+  check("http:// のURLは断る", /https/.test(urlMsg), urlMsg);
+
   console.log("\nページのエラー:");
   check("JavaScript のエラーが無い", errors.length === 0, errors.slice(0, 3).join(" / "));
   check("CSP 違反が無い", cspViolations.length === 0, cspViolations.slice(0, 3).join(" / "));
