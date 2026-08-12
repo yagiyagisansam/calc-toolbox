@@ -2,6 +2,8 @@
 /*
  * 星見スポットのページをブラウザで開いて動作を確認する開発用スクリプト。
  * 使い方: node scripts/stars/verify.mjs [--headed] [--shot 出力先.png]
+ *          node scripts/stars/verify.mjs --relay --shot-dir 出力先/
+ *            → 地図タイルと天気を Node 経由で中継し、本番と同じ絵を各ページぶん保存する
  *
  * 確認すること:
  *   - JavaScript のエラーが出ないこと
@@ -63,6 +65,18 @@ const argv = process.argv.slice(2);
 const headed = argv.includes("--headed");
 const shotIndex = argv.indexOf("--shot");
 const shotPath = shotIndex >= 0 ? argv[shotIndex + 1] : null;
+const shotDirIndex = argv.indexOf("--shot-dir");
+const shotDir = shotDirIndex >= 0 ? argv[shotDirIndex + 1] : null;
+
+/* 各ページの見た目を保存する(--shot-dir を付けたときだけ) */
+let shotNo = 0;
+async function capture(name) {
+  if (!shotDir) return;
+  shotNo++;
+  const file = path.join(shotDir, `${String(shotNo).padStart(2, "0")}_${name}.png`);
+  await page.screenshot({ path: file });
+  console.log(`  (画面を保存: ${file})`);
+}
 
 let failed = 0;
 function check(name, ok, detail) {
@@ -139,6 +153,33 @@ const STUB_SPOTS = [
   }
 ];
 
+/*
+ * --relay: 本番と同じ絵を撮るためのモード。
+ *
+ * この環境ではブラウザが外に出られないが、Node は出られる。そこで地図タイルと
+ * 天気予報だけ Node の fetch で取ってきてブラウザに返す。
+ * 公開前に実際の見た目を確認したいときに使う。
+ * (掲載スポットは差し替えのまま。データベースが空でも中身のある絵になるよう)
+ */
+const relay = argv.includes("--relay");
+if (relay) {
+  for (const pattern of ["**://tiles.openfreemap.org/**", "**://api.open-meteo.com/**"]) {
+    await page.route(pattern, async (route) => {
+      try {
+        const res = await fetch(route.request().url());
+        const body = Buffer.from(await res.arrayBuffer());
+        await route.fulfill({
+          status: res.status,
+          contentType: res.headers.get("content-type") || "application/octet-stream",
+          body
+        });
+      } catch (e) {
+        await route.abort();
+      }
+    });
+  }
+}
+
 if (!argv.includes("--live")) {
   await page.route("**://*.supabase.co/rest/v1/rpc/stars_public_spots", async (route) => {
     await route.fulfill({
@@ -148,7 +189,7 @@ if (!argv.includes("--live")) {
     });
   });
 
-  await page.route("**://api.open-meteo.com/**", async (route) => {
+  if (!relay) await page.route("**://api.open-meteo.com/**", async (route) => {
     const url = new URL(route.request().url());
     const lats = url.searchParams.get("latitude").split(",").map(Number);
     const lons = url.searchParams.get("longitude").split(",").map(Number);
@@ -255,7 +296,8 @@ try {
    * 間違えると南北がずれる。見た目では気づきにくいのでここで押さえる。
    * 差し替えた予報は「北ほど曇り・南ほど快晴」なので、北端は最低・南端は最高になる。
    */
-  if (!argv.includes("--live")) {
+  // 中継モードや --live では本物の天気になるため、作り物の傾斜を前提にした検算は飛ばす
+  if (!relay && !argv.includes("--live")) {
     const bandsAt = await page.evaluate(() => {
       const c = window.StarsMap.canvas();
       const ctx = c.getContext("2d");
@@ -282,6 +324,8 @@ try {
     check("南端(快晴・暗所)は最高の段階になる", bandsAt.ishigaki === "excellent", String(bandsAt.ishigaki));
     check("都心は低い段階になる", ["none", "bad"].includes(bandsAt.tokyo), String(bandsAt.tokyo));
   }
+
+  await capture("map");
 
   // 凡例
   const legendRows = await page.locator(".legend-row").count();
@@ -338,6 +382,7 @@ try {
 
   const darkness = await page.locator("#pick-darkness").textContent();
   check("選んだ地点の暗さの目安が出る", /空の暗さ/.test(darkness), darkness);
+  await capture("submit");
 
   // 範囲外は受け付けない
   await page.evaluate(() => window.StarsSubmit.pick(48.9, 2.35)); // パリ
@@ -375,10 +420,13 @@ try {
 
   const rowCount = await page.locator("#spot-rows tr").count();
   check("スポットが表に並ぶ", rowCount === 3, `${rowCount} 行`);
+  await capture("list");
 
   // 差し替えた予報では南ほど快晴。乗鞍(暗い山)が都心より上に来るはず
-  const firstRow = await page.locator("#spot-rows tr").first().textContent();
-  check("星見レベル順で暗い場所が上に来る", /乗鞍/.test(firstRow), firstRow.slice(0, 40));
+  if (!relay && !argv.includes("--live")) {
+    const firstRow = await page.locator("#spot-rows tr").first().textContent();
+    check("星見レベル順で暗い場所が上に来る", /乗鞍/.test(firstRow), firstRow.slice(0, 40));
+  }
 
   // 地方タブでの絞り込み
   await page.getByRole("button", { name: "関東" }).click();
@@ -428,6 +476,7 @@ try {
 
   const detailAccess = await page.locator("#detail-access").textContent();
   check("アクセス情報が出る", /シャトルバス/.test(detailAccess), detailAccess.slice(0, 30));
+  await capture("spot");
 
   // 未登録の項目は「登録なし」と出す(空欄のままにしない)
   await page.goto(
@@ -470,6 +519,7 @@ try {
 
   const lpMeta = await page.locator("#lp-meta").textContent();
   check("光害データの作成情報が出る", /現在のデータ/.test(lpMeta), lpMeta.slice(0, 80));
+  await capture("about");
 
   // 説明の数値が実データと一致していること(説明だけ古くなるのを防ぐ)
   const refMatches = await page.evaluate(async () => {
