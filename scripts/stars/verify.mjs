@@ -96,7 +96,51 @@ const page = await browser.newPage({ viewport: { width: 430, height: 860 } }); /
  * 作り物の中身は「北ほど曇り、南ほど快晴」という分かりやすい傾斜にしてあり、
  * 地図に南北の階調が出れば、格子の補間と色分けが効いていることになる。
  */
+/*
+ * 掲載スポットの応答も差し替える。
+ * 実際のデータベースの中身に左右されず、一覧と詳細が正しく組み立つかを見たいため。
+ * 2件だけ返す(暗い山と明るい都心)。
+ */
+const STUB_SPOTS = [
+  {
+    spot_id: "11111111-1111-4111-8111-111111111111",
+    name: "乗鞍畳平",
+    name_kana: "のりくらたたみだいら",
+    pref: "岐阜県",
+    region: "中部",
+    lat: 36.12,
+    lon: 137.55,
+    elevation_m: 2702,
+    access: "夏季はシャトルバスのみ。マイカー規制あり。",
+    facilities: "トイレあり",
+    note: "国内でも指折りの暗さ。",
+    source_url: "https://example.com/norikura"
+  },
+  {
+    spot_id: "22222222-2222-4222-8222-222222222222",
+    name: "都心の公園",
+    name_kana: null,
+    pref: "東京都",
+    region: "関東",
+    lat: 35.69,
+    lon: 139.7,
+    elevation_m: 30,
+    access: null,
+    facilities: null,
+    note: null,
+    source_url: null
+  }
+];
+
 if (!argv.includes("--live")) {
+  await page.route("**://*.supabase.co/rest/v1/rpc/stars_public_spots", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(STUB_SPOTS)
+    });
+  });
+
   await page.route("**://api.open-meteo.com/**", async (route) => {
     const url = new URL(route.request().url());
     const lats = url.searchParams.get("latitude").split(",").map(Number);
@@ -322,10 +366,77 @@ try {
   const listNight = await page.locator("#night-range").textContent();
   check("今夜の時間帯が出る", /の夜の予報/.test(listNight), listNight);
 
-  // このリポジトリの検証環境では Supabase に繋がらないので、
-  // 「スポットが0件でも壊れず案内が出る」ことを確かめる
-  const listStatus = await page.locator("#status").textContent();
-  check("スポットが無くても案内が出る", listStatus.length > 0, listStatus);
+  const rowCount = await page.locator("#spot-rows tr").count();
+  check("スポットが表に並ぶ", rowCount === 2, `${rowCount} 行`);
+
+  // 差し替えた予報では南ほど快晴。乗鞍(暗い山)が都心より上に来るはず
+  const firstRow = await page.locator("#spot-rows tr").first().textContent();
+  check("星見レベル順で暗い場所が上に来る", /乗鞍/.test(firstRow), firstRow.slice(0, 40));
+
+  // 地方タブでの絞り込み
+  await page.getByRole("button", { name: "関東" }).click();
+  await page.waitForTimeout(200);
+  const kantoRows = await page.locator("#spot-rows tr").count();
+  const kantoText = await page.locator("#spot-rows").textContent();
+  check("地方タブで絞り込める", kantoRows === 1 && /都心/.test(kantoText), `${kantoRows} 行`);
+
+  // 掲載の無い地方は、その旨を出す
+  await page.getByRole("button", { name: "四国" }).click();
+  await page.waitForTimeout(200);
+  const shikoku = await page.locator("#status").textContent();
+  check("掲載の無い地方は案内を出す", /四国/.test(shikoku), shikoku);
+
+  // 並べ替え
+  await page.getByRole("button", { name: "全国" }).click();
+  await page.locator("#sort-select").selectOption("name");
+  await page.waitForTimeout(200);
+  const byName = await page.locator("#spot-rows tr").first().textContent();
+  check("名前順に並べ替えできる", /乗鞍|都心/.test(byName), byName.slice(0, 20));
+
+  // ---- スポット詳細 ----
+  console.log("\nスポット詳細 (stars/spot.html):");
+  await page.goto(`http://127.0.0.1:${PORT}/stars/spot.html`, { waitUntil: "load", timeout: 60000 });
+  await page.waitForTimeout(400);
+  const noId = await page.locator("#status").textContent();
+  check("id が無いときは案内を出す", /指定されて/.test(noId), noId);
+
+  await page.goto(
+    `http://127.0.0.1:${PORT}/stars/spot.html?id=${STUB_SPOTS[0].spot_id}`,
+    { waitUntil: "load", timeout: 60000 }
+  );
+  await page.waitForFunction(() => window.StarsSpot && window.StarsSpot.state.ready, { timeout: 30000 })
+    .catch(() => {});
+
+  const spotName = await page.locator("#spot-name").textContent();
+  check("スポット名が出る", spotName === "乗鞍畳平", spotName);
+
+  const hourRows = await page.locator("#hourly-rows tr").count();
+  check("時間別予報が並ぶ", hourRows > 0, `${hourRows} 時点`);
+
+  const bestRows = await page.locator("#hourly-rows tr.is-best").count();
+  check("ベスト時刻がちょうど1つ示される", bestRows === 1, `${bestRows} 行`);
+
+  const factMoon = await page.locator("#fact-moon").textContent();
+  check("月の情報が出る", /月齢/.test(factMoon), factMoon);
+
+  const detailAccess = await page.locator("#detail-access").textContent();
+  check("アクセス情報が出る", /シャトルバス/.test(detailAccess), detailAccess.slice(0, 30));
+
+  // 未登録の項目は「登録なし」と出す(空欄のままにしない)
+  await page.goto(
+    `http://127.0.0.1:${PORT}/stars/spot.html?id=${STUB_SPOTS[1].spot_id}`,
+    { waitUntil: "load", timeout: 60000 }
+  );
+  await page.waitForFunction(() => window.StarsSpot && window.StarsSpot.state.ready, { timeout: 30000 })
+    .catch(() => {});
+  const emptyAccess = await page.locator("#detail-access").textContent();
+  check("未登録の項目は登録なしと出る", emptyAccess === "登録なし", emptyAccess);
+
+  // 存在しない id
+  await page.goto(`http://127.0.0.1:${PORT}/stars/spot.html?id=deadbeef`, { waitUntil: "load", timeout: 60000 });
+  await page.waitForTimeout(600);
+  const missing = await page.locator("#status").textContent();
+  check("見つからない id は案内を出す", /見つかりません/.test(missing), missing);
 
   // ---- 説明ページ ----
   console.log("\n説明ページ (stars/about.html):");
