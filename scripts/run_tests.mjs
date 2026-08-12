@@ -6,8 +6,8 @@
  *
  * tests.json の形式は2通り(どちらも test.html 側と共通):
  *   1) 1モジュール:  { "module": "calc.js", "global": "BmiCalc", "cases": [...] }
- *   2) 複数モジュール: { "modules": { "StarsScore": "score.js", "StarsMoon": "moon.js" },
- *                       "cases": [{ "global": "StarsMoon", ... }] }
+ *   2) 複数モジュール: { "modules": { "StarsScore": "score.js", "StarsSky": "sky.js" },
+ *                       "cases": [{ "global": "StarsSky", ... }] }
  * 2) は星見スポット(stars/)のように、1つのプロダクトが複数の純関数モジュールを
  *    持つ場合に使う。cases の "global" で呼び先を選ぶ。
  */

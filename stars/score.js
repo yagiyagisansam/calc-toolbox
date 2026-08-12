@@ -12,7 +12,7 @@
  *   3. 降水確率  Open-Meteo の precipitation_probability(%)
  *   4. 視程・湿度 Open-Meteo の visibility(m) と relative_humidity_2m(%)。
  *                もやや靄の効果。地点単位の予報にのみ含まれる。
- *   5. 月        moon.js が返す「月による空の明るさへの寄与」(0〜1)
+ *   5. 月        sky.js が返す「月による空の明るさへの寄与」(0〜1)
  *
  * 前提と限界(サイト側に明記すること):
  *   - 光害指標は VIIRS 夜間光にもとづく相対値で、絶対的な空の明るさ(SQM値)ではない。
@@ -109,7 +109,7 @@
    * @param {number} input.precipPct 降水確率(%)。省略可
    * @param {number} input.visibilityM 視程(m)。省略可
    * @param {number} input.humidityPct 相対湿度(%)。省略可
-   * @param {number} input.moonBrightness 月の寄与(0〜1)。moon.js の brightness()。省略可
+   * @param {number} input.moonBrightness 月の寄与(0〜1)。sky.js の brightness()。省略可
    * @returns {{score:number, band:object, darkness:number, factors:object, hasAirQuality:boolean}}
    */
   function evaluate(input) {
@@ -166,6 +166,35 @@
     return 100 * sky * cloud * precip * moon;
   }
 
+  /**
+   * 地図のラスタ描画用の早見表を作る。
+   *
+   * ラスタは1回の描画で百万画素近くを塗るため、画素ごとに Math.pow を呼ぶと
+   * 端末によっては目に見えて遅くなる。光害指標は 0〜255 の整数、雲量と降水確率は
+   * 0〜100 の整数に丸めて差し支えないので、あらかじめ表にしておいて掛けるだけにする。
+   * 表の中身は evaluate/quick と同じ CONFIG から作るので、値がずれることはない。
+   *
+   * @returns {{sky:Float32Array, cloud:Float32Array, precip:Float32Array}}
+   */
+  function buildTables() {
+    var sky = new Float32Array(256);
+    for (var i = 0; i < 256; i++) {
+      sky[i] = CONFIG.darknessFloor + (1 - CONFIG.darknessFloor) * darknessFromIndex(i);
+    }
+    var cloud = new Float32Array(101);
+    var precip = new Float32Array(101);
+    for (var p = 0; p <= 100; p++) {
+      cloud[p] = Math.pow(1 - p / 100, CONFIG.cloudExponent);
+      precip[p] = 1 - (p / 100) * CONFIG.precipWeight;
+    }
+    return { sky: sky, cloud: cloud, precip: precip };
+  }
+
+  /** 月の寄与(0〜1) → 掛ける係数。ラスタ描画では1フレームに1回しか呼ばない。 */
+  function moonFactor(moonBrightness) {
+    return 1 - clamp(moonBrightness, 0, 1) * CONFIG.moonWeight;
+  }
+
   /** スコア → 表示の段階 */
   function bandOf(score) {
     for (var i = 0; i < BANDS.length; i++) {
@@ -186,6 +215,8 @@
     evaluate: evaluate,
     quick: quick,
     darknessFromIndex: darknessFromIndex,
+    buildTables: buildTables,
+    moonFactor: moonFactor,
     bandOf: bandOf,
     bandIndex: bandIndex,
     BANDS: BANDS,

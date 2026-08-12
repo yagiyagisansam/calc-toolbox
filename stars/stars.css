@@ -1,0 +1,410 @@
+/*
+ * 星見スポットの専用スタイル。
+ * 計算ツールの shared/style.css は使わない(別プロダクトのため)。
+ *
+ * 地図そのものは常に暗色にしている(palette.js の説明を参照)。
+ * ページの枠は端末のライト/ダーク設定に従う。
+ */
+
+:root {
+  /* 地図に重なるパネルは、地図と地続きに見えるよう常に暗色で描く */
+  --map-surface: #0c0c0c;
+  --panel-bg: rgba(16, 18, 24, 0.88);
+  --panel-border: rgba(255, 255, 255, 0.14);
+  --panel-ink: #ffffff;
+  --panel-ink-2: #c3c2b7;
+  --panel-ink-3: #898781;
+
+  /* ページの枠(ヘッダー・フッター)はライト既定 */
+  --page-bg: #f9f9f7;
+  --page-ink: #0b0b0b;
+  --page-ink-2: #52514e;
+  --page-line: #e1e0d9;
+  --link: #1c5cab;
+
+  --radius: 10px;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page-bg: #0d0d0d;
+    --page-ink: #ffffff;
+    --page-ink-2: #c3c2b7;
+    --page-line: #2c2c2a;
+    --link: #86b6ef;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.stars-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: var(--page-bg);
+  color: var(--page-ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+}
+
+a {
+  color: var(--link);
+}
+
+/* ---- ヘッダー ---- */
+
+.stars-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--page-line);
+}
+
+.stars-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--page-ink);
+}
+
+.stars-brand-mark {
+  color: #6da7ec;
+}
+
+.stars-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-left: auto;
+  font-size: 14px;
+}
+
+/* ---- 地図 ---- */
+
+.stars-main {
+  position: relative;
+  flex: 1 1 auto;
+  /* 画面いっぱいに近い高さを確保しつつ、ヘッダー・フッターぶんを残す */
+  min-height: 68vh;
+  background: var(--map-surface);
+}
+
+.stars-map {
+  position: absolute;
+  inset: 0;
+}
+
+/* 地図に重なる部品の共通の見た目 */
+.stars-topbar,
+.stars-legend,
+.stars-spot-card,
+.stars-status {
+  position: absolute;
+  z-index: 2;
+  background: var(--panel-bg);
+  color: var(--panel-ink);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(6px);
+}
+
+.stars-topbar {
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  padding: 10px 12px;
+  max-width: 520px;
+}
+
+.stars-night-range {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: var(--panel-ink-2);
+}
+
+.stars-time {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stars-time label {
+  font-size: 13px;
+  color: var(--panel-ink-2);
+}
+
+.stars-time input[type="range"] {
+  flex: 1 1 auto;
+  min-width: 0;
+  accent-color: #6da7ec;
+}
+
+.stars-time output {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.stars-moon {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--panel-ink-2);
+}
+
+.stars-status {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  padding: 10px 16px;
+  font-size: 14px;
+  max-width: 80%;
+  text-align: center;
+}
+
+.stars-basemap-note {
+  position: absolute;
+  z-index: 2;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  background: rgba(16, 18, 24, 0.9);
+  border: 1px solid var(--panel-border);
+  color: var(--panel-ink-2);
+  font-size: 12px;
+  transform: translateY(calc(100% + 8px));
+}
+
+.stars-weather-note {
+  position: absolute;
+  z-index: 2;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  background: rgba(16, 18, 24, 0.9);
+  border: 1px solid #eda100;
+  color: var(--panel-ink);
+  font-size: 12px;
+  transform: translateY(calc(100% + 8px));
+}
+
+.stars-status.is-error {
+  border-color: #d03b3b;
+}
+
+/* ---- 凡例 ---- */
+
+.stars-legend {
+  left: 10px;
+  bottom: 34px;
+  padding: 10px 12px;
+  max-width: 260px;
+  font-size: 13px;
+}
+
+.stars-legend h2 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--panel-ink-2);
+}
+
+.legend-row {
+  display: grid;
+  grid-template-columns: 16px auto 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 1px 0;
+}
+
+.legend-chip {
+  width: 16px;
+  height: 12px;
+  border-radius: 3px;
+  /* 隣り合う色が地続きに見えないよう、地図色の細い縁を回す */
+  box-shadow: 0 0 0 1px var(--map-surface);
+}
+
+.legend-label {
+  white-space: nowrap;
+}
+
+.legend-note {
+  color: var(--panel-ink-3);
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stars-opacity {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--panel-border);
+  font-size: 12px;
+  color: var(--panel-ink-2);
+}
+
+.stars-opacity input[type="range"] {
+  flex: 1 1 auto;
+  min-width: 0;
+  accent-color: #6da7ec;
+}
+
+.stars-spot-count {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--panel-ink-3);
+}
+
+/* ---- スポットのピンと詳細 ---- */
+
+.stars-pin {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 2px solid #0c0c0c;
+  border-radius: 50%;
+  background: #eda100;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  position: relative;
+}
+
+.stars-pin-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: #184f95;
+  color: #fff;
+  font-size: 11px;
+  line-height: 17px;
+  text-align: center;
+}
+
+.stars-spot-card {
+  right: 10px;
+  bottom: 34px;
+  left: 10px;
+  max-width: 340px;
+  margin-left: auto;
+  padding: 12px 14px;
+}
+
+.stars-spot-card h2 {
+  margin: 0 0 2px;
+  font-size: 16px;
+}
+
+.stars-spot-place {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: var(--panel-ink-3);
+}
+
+.stars-spot-score {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+
+.stars-spot-score strong {
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+}
+
+.stars-spot-note,
+.stars-spot-others {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: var(--panel-ink-2);
+}
+
+.stars-spot-link {
+  display: inline-block;
+  margin-top: 2px;
+  color: #9ec5f4;
+  font-size: 13px;
+}
+
+/* ---- フッター ---- */
+
+.stars-footer {
+  padding: 12px 14px 20px;
+  border-top: 1px solid var(--page-line);
+  font-size: 12px;
+  color: var(--page-ink-2);
+}
+
+.stars-footer p {
+  margin: 0 0 6px;
+}
+
+/* ---- 画面が狭いとき ---- */
+
+@media (max-width: 640px) {
+  .stars-main {
+    min-height: 74vh;
+  }
+
+  .stars-legend {
+    max-width: none;
+    right: 10px;
+    bottom: 34px;
+  }
+
+  .legend-note {
+    display: none;
+  }
+
+  .stars-spot-card {
+    max-width: none;
+    margin-left: 0;
+  }
+
+  /* 凡例と詳細カードが重ならないよう、カードが出ているときは凡例を隠す */
+  .stars-spot-card:not([hidden]) ~ .stars-legend {
+    display: none;
+  }
+}
+
+/* MapLibre の帰属表示を暗色パネルに馴染ませる */
+.maplibregl-ctrl-attrib {
+  background: rgba(16, 18, 24, 0.8) !important;
+  color: var(--panel-ink-2) !important;
+  font-size: 11px;
+}
+
+.maplibregl-ctrl-attrib a {
+  color: var(--panel-ink-2) !important;
+}

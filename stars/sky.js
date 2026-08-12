@@ -1,5 +1,9 @@
 /*
- * 月の位置・月齢の計算ロジック
+ * 空の計算(太陽と月の位置・月齢)
+ *
+ * 星見の判断に必要なのは「いつ空が暗くなるか(太陽)」と
+ * 「月がどれだけ空を明るくするか(月)」の2つ。月の満ち欠けは太陽との
+ * 位置関係で決まるので、どちらもこのモジュールにまとめてある。
  *
  * 計算式の根拠:
  * - Jean Meeus "Astronomical Algorithms" (2nd ed., 1998) の簡略式。
@@ -14,7 +18,7 @@
  * - 経度は東経を正とする一般的な向きで受け取る(内部で西経正に変換する)。
  * - 月出・月入りの時刻は扱わない。必要なのは「指定時刻に月が空のどこにあるか」だけ。
  *
- * ブラウザでは window.StarsMoon、Node(テストランナー・生成スクリプト)では
+ * ブラウザでは window.StarsSky、Node(テストランナー・生成スクリプト)では
  * module.exports で公開する。
  */
 (function (global) {
@@ -187,6 +191,89 @@
   }
 
   /**
+   * 指定時刻・指定地点での太陽の高度(度)。負なら地平線の下。
+   * 小数第2位に丸めて返す(この用途に必要な精度をはるかに上回っており、
+   * 環境ごとの三角関数の最下位ビットの差でテストが揺れるのも防げる)。
+   * @param {Date|string} date 時刻
+   * @param {number} lat 緯度(度)
+   * @param {number} lon 経度(度)
+   */
+  function sunAltitudeDeg(date, lat, lon) {
+    var d = toDays(date instanceof Date ? date : new Date(date));
+    var c = sunCoords(d);
+    var H = siderealTime(d, RAD * -lon) - c.ra;
+    return Math.round((altitude(H, RAD * lat, c.dec) / RAD) * 100) / 100;
+  }
+
+  // 天文薄明の境目。太陽がこれより下にあれば空は充分に暗い。
+  var ASTRONOMICAL_TWILIGHT_DEG = -18;
+
+  /**
+   * 「その日の夕方から翌朝まで」のうち、空が充分に暗い時間帯を返す。
+   *
+   * 太陽高度が閾値を下回る最初の時刻と、再び上回る最後の時刻を、
+   * 10分刻みで走査して求める(閉じた式を解くより短く、白夜でも破綻しない)。
+   * 高緯度の夏など一晩中暗くならない場合は null を返す。
+   *
+   * 走査の起点はその地点の南中時刻(経度から求める)にする。閲覧者の端末の
+   * タイムゾーンには依存しない ── 日本国外から日本の夜を見ても正しく出る。
+   *
+   * @param {string|Date} day 夕方を迎える日。"YYYY-MM-DD" 文字列を推奨
+   *        (Date を渡した場合は UTC での年月日を使う)
+   * @param {number} lat 緯度(度)
+   * @param {number} lon 経度(度)
+   * @param {number} [thresholdDeg] 暗いとみなす太陽高度(既定 -18度=天文薄明)
+   * @returns {{start:Date, end:Date}|null}
+   */
+  function nightWindow(day, lat, lon, thresholdDeg) {
+    var limit = typeof thresholdDeg === "number" ? thresholdDeg : ASTRONOMICAL_TWILIGHT_DEG;
+    var stepMs = 10 * 60 * 1000;
+
+    var y, m, d;
+    if (typeof day === "string") {
+      var parts = day.slice(0, 10).split("-");
+      y = Number(parts[0]);
+      m = Number(parts[1]) - 1;
+      d = Number(parts[2]);
+    } else {
+      y = day.getUTCFullYear();
+      m = day.getUTCMonth();
+      d = day.getUTCDate();
+    }
+
+    // その地点の南中(太陽が最も高くなる)時刻。経度15度で1時間ずれる。
+    var solarNoonUtcMin = (12 - lon / 15) * 60;
+    var from = new Date(Date.UTC(y, m, d, 0, 0, 0) + solarNoonUtcMin * 60000);
+    var steps = (24 * 60) / 10;
+
+    var start = null;
+    var end = null;
+    for (var i = 0; i <= steps; i++) {
+      var t = new Date(from.getTime() + i * stepMs);
+      if (sunAltitudeDeg(t, lat, lon) < limit) {
+        if (start === null) start = t;
+        end = t;
+      }
+    }
+    if (start === null || start.getTime() === end.getTime()) return null;
+    return { start: start, end: end };
+  }
+
+  /**
+   * nightWindow を文字列で返す表示・テスト用の版。
+   * @returns {{start:string, end:string, hours:number}|null} 時刻は ISO 文字列(UTC)
+   */
+  function nightWindowSummary(day, lat, lon, thresholdDeg) {
+    var w = nightWindow(day, lat, lon, thresholdDeg);
+    if (!w) return null;
+    return {
+      start: w.start.toISOString().slice(0, 16) + "Z",
+      end: w.end.toISOString().slice(0, 16) + "Z",
+      hours: Math.round(((w.end - w.start) / 3600000) * 10) / 10
+    };
+  }
+
+  /**
    * 画面表示用にまとめた値。桁を丸めてあるので、そのまま表示にもテストにも使える。
    * @param {Date|string} date 時刻(文字列なら Date に変換する)
    * @param {number} lat 緯度(度)
@@ -228,12 +315,16 @@
     illumination: illumination,
     brightness: brightness,
     summary: summary,
-    SYNODIC_MONTH: SYNODIC_MONTH
+    sunAltitudeDeg: sunAltitudeDeg,
+    nightWindow: nightWindow,
+    nightWindowSummary: nightWindowSummary,
+    SYNODIC_MONTH: SYNODIC_MONTH,
+    ASTRONOMICAL_TWILIGHT_DEG: ASTRONOMICAL_TWILIGHT_DEG
   };
 
   if (typeof module !== "undefined" && module.exports) {
     module.exports = api;
   } else {
-    global.StarsMoon = api;
+    global.StarsSky = api;
   }
 })(typeof window !== "undefined" ? window : globalThis);

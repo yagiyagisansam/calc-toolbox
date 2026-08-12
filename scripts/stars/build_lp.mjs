@@ -35,7 +35,7 @@ import { skyGlow } from "./glow.mjs";
 
 const require = createRequire(import.meta.url);
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
-const Moon = require(path.join(ROOT, "stars", "moon.js"));
+const Sky = require(path.join(ROOT, "stars", "sky.js"));
 
 // ---- 設定 --------------------------------------------------------------
 
@@ -114,7 +114,7 @@ function ymd(date) {
 function moonFractionAt(date) {
   const t = new Date(date);
   t.setUTCHours(Math.floor(OVERPASS_UTC_HOUR), (OVERPASS_UTC_HOUR % 1) * 60, 0, 0);
-  return Moon.illumination(t).fraction;
+  return Sky.illumination(t).fraction;
 }
 
 /**

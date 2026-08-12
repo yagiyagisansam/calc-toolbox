@@ -2,7 +2,7 @@
   "tool": "stars",
   "modules": {
     "StarsScore": "score.js",
-    "StarsMoon": "moon.js"
+    "StarsSky": "sky.js"
   },
   "global": "StarsScore",
   "cases": [
@@ -161,14 +161,14 @@
 
     {
       "name": "月: 新月の夜(2026-08-12 東京)は輝面比0・影響なし",
-      "global": "StarsMoon",
+      "global": "StarsSky",
       "func": "summary",
       "args": ["2026-08-12T21:00:00+09:00", 35.68, 139.76],
       "expect": { "illuminationPct": 0, "brightness": 0, "phaseLabel": "新月" }
     },
     {
       "name": "月: 満月の夜(2026-07-29 東京)は輝面比100・高度28.2度",
-      "global": "StarsMoon",
+      "global": "StarsSky",
       "func": "summary",
       "args": ["2026-07-29T22:00:00+09:00", 35.68, 139.76],
       "expect": {
@@ -180,17 +180,67 @@
     },
     {
       "name": "月: 満月でも地平線下なら影響ゼロ",
-      "global": "StarsMoon",
+      "global": "StarsSky",
       "func": "summary",
       "args": ["2026-07-29T10:00:00+09:00", 35.68, 139.76],
       "expect": { "illuminationPct": 100, "altitudeDeg": -67.8, "brightness": 0 }
     },
     {
       "name": "月: 上弦(2026-08-20頃)は輝面比がおよそ半分",
-      "global": "StarsMoon",
+      "global": "StarsSky",
       "func": "summary",
       "args": ["2026-08-20T21:00:00+09:00", 35.68, 139.76],
       "expect": { "phaseLabel": "上弦" }
+    },
+
+    {
+      "name": "夜: 東京の夏至前後は夜が短い(7.2時間)",
+      "global": "StarsSky",
+      "func": "nightWindowSummary",
+      "args": ["2026-08-12", 35.68, 139.76],
+      "expect": { "start": "2026-08-12T11:10Z", "end": "2026-08-12T18:20Z", "hours": 7.2 }
+    },
+    {
+      "name": "夜: 東京の冬至は夜が長い(11時間)",
+      "global": "StarsSky",
+      "func": "nightWindowSummary",
+      "args": ["2026-12-21", 35.68, 139.76],
+      "expect": { "hours": 11 }
+    },
+    {
+      "name": "夜: 夏の稚内は東京より夜が短い",
+      "global": "StarsSky",
+      "func": "nightWindowSummary",
+      "args": ["2026-08-12", 45.42, 141.67],
+      "expect": { "hours": 5.5 }
+    },
+    {
+      "name": "夜: 夏の石垣島は東京より夜が長い",
+      "global": "StarsSky",
+      "func": "nightWindowSummary",
+      "args": ["2026-08-12", 24.34, 124.16],
+      "expect": { "hours": 8.2 }
+    },
+    {
+      "name": "夜: 白夜(6月のトロムソ)は暗くならないので null",
+      "global": "StarsSky",
+      "func": "nightWindowSummary",
+      "args": ["2026-06-21", 69.65, 18.96],
+      "expect": null
+    },
+    {
+      "name": "太陽: 東京の正午は高度が正",
+      "global": "StarsSky",
+      "func": "sunAltitudeDeg",
+      "args": ["2026-08-12T12:00:00+09:00", 35.68, 139.76],
+      "expect": 69.23
+    },
+    {
+      "name": "太陽: 東京の深夜は地平線下",
+      "global": "StarsSky",
+      "func": "sunAltitudeDeg",
+      "args": ["2026-08-13T00:00:00+09:00", 35.68, 139.76],
+      "expect": -39.24
     }
   ]
 }

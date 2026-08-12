@@ -1,0 +1,4 @@
+maplibre-gl 5.24.0
+BSD-3-Clause (LICENSE.txt を同梱)
+取り込み: node scripts/stars/copy_vendor.mjs
+更新日: 2026-08-12
