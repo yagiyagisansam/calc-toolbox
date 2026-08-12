@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tiles.openfreemap.org; connect-src 'self' https://tiles.openfreemap.org https://api.open-meteo.com https://ssxskriqlaiohdutxprn.supabase.co; worker-src 'self' blob:; font-src 'self'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>星見スポットの詳しい予報 | 今夜のオススメ星見スポット</title>
+  <meta name="description" content="星見スポットごとの今夜の時間別予報。星見レベル・雲量・降水確率・視程・湿度・月の高度を1時間ごとに表示します。">
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="./vendor/maplibre-gl.css">
+  <link rel="stylesheet" href="./stars.css">
+  <!-- @meta start -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230c0f1a'/%3E%3Cpath d='M16 6l2.6 6.6L25.5 14l-5.3 4.4 1.7 6.9L16 21.6l-5.9 3.7 1.7-6.9L6.5 14l6.9-1.4z' fill='%23cde2fb'/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0c0c0c">
+  <!-- @meta end -->
+</head>
+<body class="stars-body stars-body--doc">
+
+<header class="stars-header">
+  <a class="stars-brand" href="./">
+    <span class="stars-brand-mark" aria-hidden="true">★</span>
+    <span>今夜の星見スポット</span>
+  </a>
+  <nav class="stars-nav">
+    <a href="./">地図</a>
+    <a href="./list.html">地域別の一覧</a>
+    <a href="./about.html">データについて</a>
+  </nav>
+</header>
+
+<main class="stars-doc">
+  <h1 id="spot-name">スポットを読み込んでいます…</h1>
+  <p id="spot-place" class="stars-lead"></p>
+
+  <p id="status" class="stars-message" role="status" hidden></p>
+
+  <section id="summary" class="stars-summary" hidden>
+    <div class="stars-summary-main">
+      <p class="stars-summary-label">今夜のベスト</p>
+      <p class="stars-summary-score"><strong id="best-score">—</strong><span id="best-band"></span></p>
+      <p class="stars-summary-at" id="best-at"></p>
+    </div>
+    <dl class="stars-summary-facts">
+      <dt>空の暗さ</dt><dd id="fact-darkness">—</dd>
+      <dt>月</dt><dd id="fact-moon">—</dd>
+      <dt>暗い時間帯</dt><dd id="fact-night">—</dd>
+      <dt>標高</dt><dd id="fact-elev">—</dd>
+    </dl>
+  </section>
+
+  <div id="spot-map" class="stars-pick-map" hidden></div>
+
+  <h2>今夜の時間別予報</h2>
+  <div class="stars-table-wrap">
+    <table class="stars-table" id="hourly-table" hidden>
+      <thead>
+        <tr>
+          <th scope="col">時刻</th>
+          <th scope="col">星見<br>レベル</th>
+          <th scope="col">雲量</th>
+          <th scope="col">降水<br>確率</th>
+          <th scope="col">視程</th>
+          <th scope="col">湿度</th>
+          <th scope="col">月の<br>高度</th>
+        </tr>
+      </thead>
+      <tbody id="hourly-rows"></tbody>
+    </table>
+  </div>
+
+  <section id="spot-details" hidden>
+    <h2>この場所について</h2>
+    <dl class="stars-details">
+      <dt>アクセス・駐車</dt><dd id="detail-access">—</dd>
+      <dt>設備</dt><dd id="detail-facilities">—</dd>
+      <dt>ひとこと</dt><dd id="detail-note">—</dd>
+      <dt>参考</dt><dd id="detail-source">—</dd>
+    </dl>
+    <p class="stars-help">
+      内容は利用者からの申請にもとづくものです。現地の規則や季節による通行止めは、
+      お出かけ前に必ずご自身でお確かめください。
+    </p>
+  </section>
+
+  <p><a href="./list.html">← 地域別の一覧へ戻る</a></p>
+</main>
+
+<footer class="stars-footer">
+  <p>
+    天気: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Weather data by Open-Meteo.com</a>(CC BY 4.0、日本国内は気象庁モデル) /
+    光害: <a href="https://gibs.earthdata.nasa.gov/" target="_blank" rel="noopener">NASA GIBS</a> VIIRS 夜間光 /
+    地図: <a href="https://openfreemap.org/" target="_blank" rel="noopener">OpenFreeMap</a>、
+    <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a>
+  </p>
+  <p>
+    <a href="../">計算ツールボックス</a> ・ <a href="../contact.html?tool=stars">お問い合わせ</a>
+  </p>
+</footer>
+
+<script src="./vendor/maplibre-gl-csp.js"></script>
+<script src="../tools/poll/config.js"></script>
+<script src="./config.js"></script>
+<script src="./palette.js"></script>
+<script src="./sky.js"></script>
+<script src="./score.js"></script>
+<script src="./lp.js"></script>
+<script src="./net.js"></script>
+<script src="./spot.js"></script>
+</body>
+</html>

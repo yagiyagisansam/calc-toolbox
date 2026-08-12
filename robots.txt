@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /tools/*/test.html
+Disallow: /stars/test.html
 Disallow: /lab/
 
 Sitemap: https://quick-calc.site/sitemap.xml

@@ -310,6 +310,52 @@ try {
   const urlMsg = await page.locator("#submit-message").textContent();
   check("http:// のURLは断る", /https/.test(urlMsg), urlMsg);
 
+  // ---- 一覧ページ ----
+  console.log("\n一覧ページ (stars/list.html):");
+  await page.goto(`http://127.0.0.1:${PORT}/stars/list.html`, { waitUntil: "load", timeout: 60000 });
+  await page.waitForFunction(() => window.StarsList && window.StarsList.state.ready, { timeout: 30000 })
+    .catch(() => {});
+
+  const tabCount = await page.locator(".stars-tab").count();
+  check("地方タブが9個(全国+8地方)", tabCount === 9, `${tabCount} 個`);
+
+  const listNight = await page.locator("#night-range").textContent();
+  check("今夜の時間帯が出る", /の夜の予報/.test(listNight), listNight);
+
+  // このリポジトリの検証環境では Supabase に繋がらないので、
+  // 「スポットが0件でも壊れず案内が出る」ことを確かめる
+  const listStatus = await page.locator("#status").textContent();
+  check("スポットが無くても案内が出る", listStatus.length > 0, listStatus);
+
+  // ---- 説明ページ ----
+  console.log("\n説明ページ (stars/about.html):");
+  await page.goto(`http://127.0.0.1:${PORT}/stars/about.html`, { waitUntil: "load", timeout: 60000 });
+  await page.waitForFunction(() => document.querySelectorAll("#ref-rows tr").length > 0, { timeout: 20000 })
+    .catch(() => {});
+
+  const bandRows = await page.locator(".stars-band-row").count();
+  check("段階の説明が6段ぶん出る", bandRows === 6, `${bandRows} 行`);
+
+  const refRows = await page.locator("#ref-rows tr").count();
+  check("校正に使った地点が表になる", refRows >= 5, `${refRows} 件`);
+
+  const lpMeta = await page.locator("#lp-meta").textContent();
+  check("光害データの作成情報が出る", /現在のデータ/.test(lpMeta), lpMeta.slice(0, 80));
+
+  // 説明の数値が実データと一致していること(説明だけ古くなるのを防ぐ)
+  const refMatches = await page.evaluate(async () => {
+    const meta = await (await fetch("./data/lp-japan.json")).json();
+    const rows = [...document.querySelectorAll("#ref-rows tr")];
+    return rows.every((tr, i) => {
+      const cells = tr.querySelectorAll("td");
+      return (
+        tr.querySelector("th").textContent === meta.references[i].name &&
+        cells[0].textContent === String(meta.references[i].value)
+      );
+    });
+  });
+  check("表の値が実データと一致する", refMatches === true, String(refMatches));
+
   console.log("\nページのエラー:");
   check("JavaScript のエラーが無い", errors.length === 0, errors.slice(0, 3).join(" / "));
   check("CSP 違反が無い", cspViolations.length === 0, cspViolations.slice(0, 3).join(" / "));

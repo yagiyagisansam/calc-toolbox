@@ -573,3 +573,270 @@ textarea.stars-input {
   font-size: 13px;
   color: var(--page-ink-2);
 }
+
+/* ---- 一覧の絞り込み ---- */
+
+.stars-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px 16px;
+  margin: 0 0 14px;
+}
+
+.stars-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.stars-tab {
+  padding: 6px 12px;
+  border: 1px solid var(--page-line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--page-ink);
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.stars-tab[aria-pressed="true"] {
+  background: #1c5cab;
+  border-color: #1c5cab;
+  color: #fff;
+  font-weight: 700;
+}
+
+.stars-sort {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--page-ink-2);
+}
+
+.stars-sort .stars-input {
+  width: auto;
+  padding: 6px 8px;
+  font-size: 14px;
+}
+
+/* ---- 一覧の表 ---- */
+
+.stars-table-wrap {
+  /* 幅の狭い画面では表だけを横スクロールさせる(ページ全体は横に動かさない) */
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.stars-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.stars-table th,
+.stars-table td {
+  padding: 9px 8px;
+  border-bottom: 1px solid var(--page-line);
+  text-align: left;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.stars-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--page-bg);
+  border-bottom: 2px solid var(--page-line);
+  font-size: 12px;
+  color: var(--page-ink-2);
+  line-height: 1.3;
+}
+
+.stars-table tbody th {
+  font-weight: 700;
+  white-space: normal;
+  min-width: 11em;
+}
+
+.stars-cell-sub {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--page-ink-2);
+}
+
+.stars-band-chip {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  border-radius: 3px;
+  vertical-align: -1px;
+  box-shadow: 0 0 0 1px var(--page-line);
+}
+
+/* ---- 詳細ページ ---- */
+
+.stars-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 28px;
+  margin: 0 0 18px;
+  padding: 14px;
+  border: 1px solid var(--page-line);
+  border-radius: var(--radius);
+}
+
+.stars-summary-main {
+  flex: 0 0 auto;
+}
+
+.stars-summary-label {
+  margin: 0;
+  font-size: 12px;
+  color: var(--page-ink-2);
+}
+
+.stars-summary-score {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 2px 0;
+}
+
+.stars-summary-score strong {
+  font-size: 28px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.stars-summary-at {
+  margin: 0;
+  font-size: 13px;
+  color: var(--page-ink-2);
+}
+
+.stars-summary-facts {
+  flex: 1 1 260px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 12px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.stars-summary-facts dt {
+  color: var(--page-ink-2);
+  white-space: nowrap;
+}
+
+.stars-summary-facts dd {
+  margin: 0;
+}
+
+.stars-details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 14px;
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+
+.stars-details dt {
+  color: var(--page-ink-2);
+  white-space: nowrap;
+}
+
+.stars-details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.stars-table tr.is-best {
+  background: rgba(28, 92, 171, 0.1);
+}
+
+.stars-table tr.is-best th {
+  position: relative;
+}
+
+.stars-table tr.is-best th::before {
+  content: "★";
+  margin-right: 4px;
+  color: #1c5cab;
+}
+
+@media (max-width: 480px) {
+  .stars-details,
+  .stars-summary-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .stars-details dt,
+  .stars-summary-facts dt {
+    margin-top: 6px;
+    font-size: 12px;
+  }
+}
+
+/* ---- 説明ページ ---- */
+
+.stars-table--plain th,
+.stars-table--plain td {
+  white-space: normal;
+}
+
+.stars-table--plain tbody th {
+  min-width: 8em;
+}
+
+.stars-band-list {
+  margin: 0 0 20px;
+}
+
+.stars-band-row {
+  display: grid;
+  grid-template-columns: 14px 5em 6.5em 1fr;
+  align-items: baseline;
+  gap: 10px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--page-line);
+  font-size: 14px;
+}
+
+.stars-band-range {
+  font-size: 13px;
+  color: var(--page-ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.stars-band-note {
+  font-size: 13px;
+  color: var(--page-ink-2);
+}
+
+.stars-limits {
+  margin: 0 0 12px;
+  padding-left: 1.2em;
+  font-size: 15px;
+}
+
+.stars-limits li {
+  margin-bottom: 10px;
+}
+
+@media (max-width: 480px) {
+  .stars-band-row {
+    grid-template-columns: 14px 1fr;
+    row-gap: 2px;
+  }
+
+  .stars-band-range,
+  .stars-band-note {
+    grid-column: 2;
+  }
+}
