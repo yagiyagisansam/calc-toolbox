@@ -79,15 +79,34 @@
 
     var source = el("detail-source");
     source.textContent = "";
-    if (spot.source_url) {
+    if (isSafeUrl(spot.source_url)) {
       var a = document.createElement("a");
       a.href = spot.source_url;
       a.textContent = spot.source_url;
       a.target = "_blank";
       a.rel = "noopener nofollow";
       source.appendChild(a);
+    } else if (spot.source_url) {
+      // https 以外は、リンクにせず文字として出す
+      source.textContent = spot.source_url;
     } else {
       source.textContent = "登録なし";
+    }
+  }
+
+  /**
+   * リンクとして開いてよいURLか。
+   *
+   * 申請時にデータベース側のトリガが https:// だけを通しているが、
+   * ここは外から来た文字列がそのまま href に入る唯一の場所なので、
+   * 表示側でも確かめる。javascript: や data: を踏ませないため。
+   */
+  function isSafeUrl(url) {
+    if (typeof url !== "string") return false;
+    try {
+      return new URL(url).protocol === "https:";
+    } catch (e) {
+      return false;
     }
   }
 

@@ -73,33 +73,24 @@ function check(name, ok, detail) {
 const server = await serve();
 
 /*
- * この実行環境では外向きの通信がプロキシ経由になっている。ブラウザは
- * HTTPS_PROXY 環境変数を見ないので、起動時に渡してやる必要がある。
- * 検証用サーバー(127.0.0.1)はプロキシを通さない。
- * 通常の開発機ではプロキシ設定が無いので、そのまま直結になる。
- */
-/*
  * この検証環境のブラウザは外部へ出られない(タイル配信も天気APIも届かない)。
- * 天気は下の page.route で差し替えるので通信は不要。地図の下地は届かないままだが、
- * 「下地が無くても色分けは動く」ことこそ確かめたい挙動なので、それでよい。
+ * 天気とスポットは下の page.route で差し替えるので通信は不要。
+ * 地図の下地は届かないままだが、「下地が無くても色分けは動く」ことこそ
+ * 確かめたい挙動なので、それでよい。
  */
 const browser = await chromium.launch({ headless: !headed });
 const page = await browser.newPage({ viewport: { width: 430, height: 860 } }); // iPhone に近い縦長
 
 /*
- * 天気予報の応答を差し替える。
+ * 外部からの応答を差し替える。
  *
- * 外部サービスの状態に左右されず、決まった入力に対して決まった色分けが
- * 出ることを確かめたいので、既定では作り物の予報を返す。
- * --live を付けたときだけ本物の Open-Meteo に問い合わせる。
+ * 外部サービスの状態や、データベースの実際の中身に左右されず、
+ * 決まった入力に対して決まった結果が出ることを確かめたい。
+ * --live を付けたときだけ本物に問い合わせる。
  *
- * 作り物の中身は「北ほど曇り、南ほど快晴」という分かりやすい傾斜にしてあり、
+ * 天気は「北ほど曇り、南ほど快晴」という分かりやすい傾斜にしてあり、
  * 地図に南北の階調が出れば、格子の補間と色分けが効いていることになる。
- */
-/*
- * 掲載スポットの応答も差し替える。
- * 実際のデータベースの中身に左右されず、一覧と詳細が正しく組み立つかを見たいため。
- * 2件だけ返す(暗い山と明るい都心)。
+ * スポットは3件(暗い山・危険なURL・明るい都心)。
  */
 const STUB_SPOTS = [
   {
@@ -115,6 +106,22 @@ const STUB_SPOTS = [
     facilities: "トイレあり",
     note: "国内でも指折りの暗さ。",
     source_url: "https://example.com/norikura"
+  },
+  {
+    // 表示側が危険なURLをリンクにしないことを確かめるための1件。
+    // データベース側のトリガは https:// しか通さないが、表示側でも守れているか見る。
+    spot_id: "33333333-3333-4333-8333-333333333333",
+    name: "危険なURLの検査用",
+    name_kana: null,
+    pref: "長野県",
+    region: "中部",
+    lat: 36.2,
+    lon: 138.0,
+    elevation_m: null,
+    access: null,
+    facilities: null,
+    note: null,
+    source_url: "javascript:alert(1)"
   },
   {
     spot_id: "22222222-2222-4222-8222-222222222222",
@@ -367,7 +374,7 @@ try {
   check("今夜の時間帯が出る", /の夜の予報/.test(listNight), listNight);
 
   const rowCount = await page.locator("#spot-rows tr").count();
-  check("スポットが表に並ぶ", rowCount === 2, `${rowCount} 行`);
+  check("スポットが表に並ぶ", rowCount === 3, `${rowCount} 行`);
 
   // 差し替えた予報では南ほど快晴。乗鞍(暗い山)が都心より上に来るはず
   const firstRow = await page.locator("#spot-rows tr").first().textContent();
@@ -424,13 +431,24 @@ try {
 
   // 未登録の項目は「登録なし」と出す(空欄のままにしない)
   await page.goto(
-    `http://127.0.0.1:${PORT}/stars/spot.html?id=${STUB_SPOTS[1].spot_id}`,
+    `http://127.0.0.1:${PORT}/stars/spot.html?id=${STUB_SPOTS[2].spot_id}`,
     { waitUntil: "load", timeout: 60000 }
   );
   await page.waitForFunction(() => window.StarsSpot && window.StarsSpot.state.ready, { timeout: 30000 })
     .catch(() => {});
   const emptyAccess = await page.locator("#detail-access").textContent();
   check("未登録の項目は登録なしと出る", emptyAccess === "登録なし", emptyAccess);
+
+  // https 以外のURLはリンクにしない
+  await page.goto(
+    `http://127.0.0.1:${PORT}/stars/spot.html?id=${STUB_SPOTS[1].spot_id}`,
+    { waitUntil: "load", timeout: 60000 }
+  );
+  await page.waitForFunction(() => window.StarsSpot && window.StarsSpot.state.ready, { timeout: 30000 })
+    .catch(() => {});
+  const unsafeLinks = await page.locator("#detail-source a").count();
+  const unsafeText = await page.locator("#detail-source").textContent();
+  check("https 以外のURLはリンクにしない", unsafeLinks === 0 && /javascript/.test(unsafeText), `${unsafeLinks} 個のリンク`);
 
   // 存在しない id
   await page.goto(`http://127.0.0.1:${PORT}/stars/spot.html?id=deadbeef`, { waitUntil: "load", timeout: 60000 });
