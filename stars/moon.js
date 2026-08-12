@@ -186,10 +186,48 @@
     return frac * Math.sin(pos.altitude);
   }
 
+  /**
+   * 画面表示用にまとめた値。桁を丸めてあるので、そのまま表示にもテストにも使える。
+   * @param {Date|string} date 時刻(文字列なら Date に変換する)
+   * @param {number} lat 緯度(度)
+   * @param {number} lon 経度(度)
+   * @returns {{ageDays:number, illuminationPct:number, altitudeDeg:number, brightness:number, phaseLabel:string}}
+   */
+  function summary(date, lat, lon) {
+    var d = date instanceof Date ? date : new Date(date);
+    var illum = illumination(d);
+    var pos = position(d, lat, lon);
+    return {
+      ageDays: Math.round(illum.ageDays * 10) / 10,
+      illuminationPct: Math.round(illum.fraction * 100),
+      altitudeDeg: Math.round(pos.altitudeDeg * 10) / 10,
+      brightness: Math.round(brightness(d, lat, lon) * 1000) / 1000,
+      phaseLabel: phaseLabel(illum.phase)
+    };
+  }
+
+  // 月齢の呼び名。境目は朔望月を8等分した一般的な区切りに合わせる。
+  var PHASE_LABELS = [
+    "新月",
+    "三日月",
+    "上弦",
+    "十三夜",
+    "満月",
+    "寝待月",
+    "下弦",
+    "有明月"
+  ];
+
+  function phaseLabel(phase) {
+    var i = Math.round(phase * 8) % 8;
+    return PHASE_LABELS[i];
+  }
+
   var api = {
     position: position,
     illumination: illumination,
     brightness: brightness,
+    summary: summary,
     SYNODIC_MONTH: SYNODIC_MONTH
   };
 
