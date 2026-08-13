@@ -45,11 +45,17 @@
       <select class="stars-input" id="sort-select">
         <option value="score">今夜の星見レベル順</option>
         <option value="darkness">空の暗さ順</option>
+        <option value="near" id="sort-near" hidden>現在地から近い順</option>
         <option value="name">名前順</option>
         <option value="pref">都道府県順</option>
       </select>
     </div>
   </div>
+
+  <p class="stars-here-row">
+    <button type="button" class="stars-button stars-button--sub" id="use-here" hidden>現在地からの距離を表示</button>
+    <span class="stars-help" id="here-note" hidden>距離は直線距離の目安です（道のりではありません）。</span>
+  </p>
 
   <p id="status" class="stars-message" role="status">読み込んでいます…</p>
 
@@ -105,6 +111,7 @@
 <script src="./sky.js"></script>
 <script src="./score.js"></script>
 <script src="./lp.js"></script>
+<script src="./here.js"></script>
 <script src="./net.js"></script>
 <script src="./list.js"></script>
 </body>

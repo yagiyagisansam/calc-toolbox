@@ -377,6 +377,21 @@ try {
   check("凡例が6段階ぶん出る", legendRows === 6, `${legendRows} 行`);
 
   /*
+   * 現在地ボタンが、凡例などの重なる部品に隠されていないこと。
+   * 地図の操作ボタンは右下に積まれるので、凡例を画面の右端まで広げると
+   * 上に覆いかぶさって押せなくなる。目で見ても気づきにくい壊れ方なので、
+   * その座標にいる最前面の要素を実際に調べる。
+   */
+  const geoHit = await page.evaluate(() => {
+    const b = document.querySelector(".maplibregl-ctrl-geolocate");
+    if (!b) return { found: false };
+    const r = b.getBoundingClientRect();
+    const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    return { found: true, covered: !b.contains(top) && top !== b };
+  });
+  check("現在地ボタンが他の部品に隠れていない", geoHit.found && !geoHit.covered, geoHit.found ? "" : "ボタンが無い");
+
+  /*
    * 表示する項目の切り替え(総合・空の暗さ・天気)。
    *
    * 見るべきは「切り替えると絵が変わること」だけではない。
@@ -445,6 +460,59 @@ try {
   await page.getByRole("button", { name: "総合" }).click();
   await page.waitForTimeout(400);
 
+  /*
+   * どの夜を見るか(今夜・明日・明後日)。
+   * キャッシュは78時間ぶん持っているので、切り替えても通信は起きず、
+   * 切り出す時刻の範囲だけが変わる。見出しの日付が1日進むことで確かめる。
+   */
+  const dayTabs = await page.locator(".stars-day-tab").count();
+  check("夜を選ぶタブが3つ出る", dayTabs === 3, `${dayTabs} 個`);
+  const nightBefore = await page.locator("#night-range").textContent();
+  await page.getByRole("button", { name: "明日" }).click();
+  await page.waitForTimeout(700);
+  const nightAfter = await page.locator("#night-range").textContent();
+  const dayOffset = await page.evaluate(() => window.StarsApp.state.dayOffset);
+  check(
+    "明日を選ぶと対象の夜が1日進む",
+    dayOffset === 1 && nightBefore !== nightAfter,
+    `${(nightBefore || "").slice(0, 12)} → ${(nightAfter || "").slice(0, 12)}`
+  );
+  await page.getByRole("button", { name: "今夜" }).click();
+  await page.waitForTimeout(700);
+
+  /*
+   * 画面の状態がURLに残り、そのURLで開き直すと同じ画面になること。
+   * 「この夜のこの時刻のこの場所」を人に送れないと、せっかく見つけた条件を
+   * 共有できない。再読み込みで初期表示に戻ってしまうのも同じ問題。
+   */
+  await page.getByRole("button", { name: "空の暗さ" }).click();
+  // 予報の時間数は日によって変わる(更新が滞れば数時間しか無い)ので、端に寄せる
+  const sliderMax = Number(await page.locator("#time-slider").getAttribute("max"));
+  const wantTime = Math.min(2, Math.max(0, sliderMax));
+  await page.locator("#time-slider").fill(String(wantTime));
+  await page.waitForTimeout(500);
+  const shared = page.url();
+  check(
+    "画面の状態がURLに残る",
+    /#.*d=0/.test(shared) && /layer=sky/.test(shared) && shared.includes("t=" + wantTime),
+    shared.slice(shared.indexOf("#"))
+  );
+
+  await page.goto(shared, { waitUntil: "load", timeout: 60000 });
+  await page.waitForFunction(() => window.StarsApp && window.StarsApp.state.ready, { timeout: 60000 });
+  const restored = await page.evaluate(() => ({
+    t: window.StarsApp.state.timeIndex,
+    layer: window.StarsMap.layer()
+  }));
+  check(
+    "URLを開き直すと同じ画面に戻る",
+    restored.t === wantTime && restored.layer === "sky",
+    `時刻${restored.t} / ${restored.layer}`
+  );
+
+  await page.getByRole("button", { name: "総合" }).click();
+  await page.waitForTimeout(400);
+
   // 時刻スライダーを動かすと描き直される
   const slider = page.locator("#time-slider");
   const maxIndex = Number(await slider.getAttribute("max"));
@@ -460,7 +528,7 @@ try {
 
   // 月の表示
   const moon = await page.locator("#moon-label").textContent();
-  check("月の情報が出る", /月齢/.test(moon), moon);
+  check("月の情報が出る", /光っている/.test(moon), moon);
 
   // 夜の時間帯の表示
   const night = await page.locator("#night-range").textContent();
@@ -627,7 +695,12 @@ try {
   );
 
   const factMoon = await page.locator("#fact-moon").textContent();
-  check("月の情報が出る", /月齢/.test(factMoon), factMoon);
+  check("月の情報が出る", /光っている/.test(factMoon), factMoon);
+  check(
+    "月が一晩中どうしているかが分かる",
+    /月の出|月の入り|一晩中/.test(factMoon),
+    factMoon
+  );
 
   const detailAccess = await page.locator("#detail-access").textContent();
   check("アクセス情報が出る", /シャトルバス/.test(detailAccess), detailAccess.slice(0, 30));

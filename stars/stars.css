@@ -135,6 +135,33 @@ a {
   max-width: 520px;
 }
 
+/* どの夜を見るか(今夜・明日・明後日) */
+.stars-day-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 8px;
+}
+
+.stars-day-tab {
+  flex: 0 0 auto;
+  padding: 4px 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--panel-ink-2);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.3;
+  cursor: pointer;
+}
+
+.stars-day-tab.is-on {
+  border-color: transparent;
+  background: var(--panel-ink);
+  color: var(--panel-bg-solid);
+  font-weight: 600;
+}
+
 .stars-night-range {
   margin: 0 0 6px;
   font-size: 13px;
@@ -262,6 +289,12 @@ a {
   background: var(--panel-ink);
   color: var(--panel-bg-solid);
   font-weight: 600;
+}
+
+.stars-legend-hint {
+  margin: -2px 0 8px;
+  font-size: 11px;
+  color: var(--panel-ink-3);
 }
 
 .stars-layer-note {
@@ -428,8 +461,15 @@ a {
 
   .stars-legend {
     max-width: none;
-    right: 10px;
+    /* 地図の操作ボタン(拡大縮小・現在地)は右下に積まれる。
+       凡例を画面の右端まで広げるとその上に覆いかぶさり、
+       現在地ボタンが押せなくなるので、その列ぶんを空けておく。 */
+    right: 58px;
     bottom: 34px;
+  }
+
+  .stars-spot-card {
+    right: 58px;
   }
 
   /*
@@ -635,6 +675,26 @@ textarea.stars-input {
 .stars-button:disabled {
   background: #898781;
   cursor: default;
+}
+
+/* 本筋ではない操作(現在地の取得など)。主ボタンより弱く見せる */
+.stars-button--sub {
+  display: inline-block;
+  width: auto;
+  padding: 8px 14px;
+  border: 1px solid var(--page-line);
+  background: transparent;
+  color: var(--link);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.stars-here-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0 0 12px;
 }
 
 .stars-message {

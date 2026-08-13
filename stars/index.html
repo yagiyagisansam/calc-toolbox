@@ -39,6 +39,7 @@
   <div id="map" class="stars-map"></div>
 
   <div class="stars-topbar">
+    <div id="day-tabs" class="stars-day-tabs" role="group" aria-label="どの夜を見るか"></div>
     <p id="night-range" class="stars-night-range">今夜の時間帯を計算しています…</p>
     <div class="stars-time">
       <label for="time-slider">時刻</label>
@@ -63,6 +64,7 @@
 
   <section class="stars-legend" aria-labelledby="legend-title">
     <h2 id="legend-title">星見レベル</h2>
+    <p class="stars-legend-hint">明るい色ほど星が見えやすい場所です。</p>
     <div id="layer-tabs" class="stars-layer-tabs" role="group" aria-label="表示する項目"></div>
     <div id="legend-items"></div>
     <p id="layer-note" class="stars-layer-note"></p>
@@ -99,6 +101,7 @@
 <script src="./sky.js"></script>
 <script src="./score.js"></script>
 <script src="./lp.js"></script>
+<script src="./here.js"></script>
 <script src="./net.js"></script>
 <script src="./map.js"></script>
 <script src="./app.js"></script>

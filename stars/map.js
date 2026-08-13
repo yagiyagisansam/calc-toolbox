@@ -28,6 +28,7 @@
   var Palette = global.StarsPalette;
   var Sky = global.StarsSky;
   var LP = global.StarsLP;
+  var Here = global.StarsHere;
 
   var RAD = Math.PI / 180;
 
@@ -56,6 +57,8 @@
     basemap: "loading", // loading | loaded | failed
     basemapStyle: null, // 読み込めた下地のスタイル(海の塗り分けを写し取るのに使う)
     onBasemapFail: null,
+    here: null, // 現在地(許可されたときだけ)
+    onLocate: null,
     // 行ごと・列ごとにあらかじめ計算しておく値
     rowLat: null,
     rowLpOffset: null, // 光害ラスタの行頭の添字
@@ -117,6 +120,23 @@
     });
     map.touchZoomRotate.disableRotation();
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
+    /*
+     * 現在地。星見は「ここから行ける範囲でどこが暗いか」を決める行為なので、
+     * 自分の位置が地図に出ないと色分けを見ても距離感がつかめない
+     * (レビューで4名が指摘)。許可しなければ何も起きない。
+     */
+    var geolocate = new maplibregl.GeolocateControl({
+      positionOptions: { enableHighAccuracy: false },
+      trackUserLocation: false,
+      showAccuracyCircle: false
+    });
+    map.addControl(geolocate, "bottom-right");
+    geolocate.on("geolocate", function (e) {
+      var here = { lat: e.coords.latitude, lon: e.coords.longitude };
+      state.here = here;
+      if (Here) Here.remember(here);
+      if (state.onLocate) state.onLocate(here);
+    });
     map.addControl(
       new maplibregl.AttributionControl({
         compact: true,
@@ -533,6 +553,15 @@
     render: render,
     setGrid: setGrid,
     setLayer: setLayer,
+    /** 表示中の項目 */
+    layer: function () {
+      return state.layer;
+    },
+    /** 現在地が分かったときに呼ばれる関数を登録する */
+    onLocate: function (fn) {
+      state.onLocate = fn;
+      if (state.here) fn(state.here);
+    },
     setOpacity: setOpacity,
     setSpots: setSpots,
     flyTo: flyTo,

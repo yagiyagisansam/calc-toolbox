@@ -23,6 +23,8 @@
     lastRenderMs: null,
     ready: false,
     weatherAvailable: true,
+    dayOffset: 0, // 0=今夜 1=明日 2=明後日
+    window: null, // 表示中の夜の時間帯
     error: null
   };
 
@@ -127,7 +129,7 @@
    * 要素ごとに見られるようにして、たとえば「天気は最高だが場所が明るい」
    * ＝ もう少し足を伸ばせば見える、という判断ができるようにする。
    */
-  function buildLayerTabs() {
+  function buildLayerTabs(initialLayer) {
     var box = el("layer-tabs");
     if (!box) return;
 
@@ -159,7 +161,7 @@
       });
       box.appendChild(b);
     });
-    select("total");
+    select(initialLayer || "total");
   }
 
   function setStatus(message, isError) {
@@ -179,15 +181,20 @@
     if (moon) {
       var c = MapView.map() ? MapView.map().getCenter() : { lat: 36, lng: 138 };
       var s = Sky.summary(when, c.lat, c.lng);
+      /*
+       * 「月齢」「輝面比」は天文の言葉なので、意味が伝わる形に言い換える。
+       * 月あかりの強さを判断するのに要るのは「どれだけ光っているか」と
+       * 「空に出ているか」の2つだけ(レビューで3名が用語の難しさを指摘)。
+       */
       moon.textContent =
         "月: " +
         s.phaseLabel +
-        "(月齢" +
-        s.ageDays +
-        "・輝面比" +
+        "・" +
         s.illuminationPct +
-        "%)" +
-        (s.altitudeDeg > 0 ? " 高度" + Math.round(s.altitudeDeg) + "度" : " 地平線下");
+        "%光っている" +
+        (s.altitudeDeg > 0
+          ? "（空に出ています・高さ" + Math.round(s.altitudeDeg) + "度）"
+          : "（沈んでいて影響なし）");
     }
   }
 
@@ -200,9 +207,12 @@
       renderQueued = false;
       state.lastRenderMs = MapView.render(state.timeIndex);
       updateTimeLabel();
+      writeUrlState();
     });
   }
 
+  // 日付を切り替えるたびに呼ばれるので、聞き手を足すのは最初の1回だけにする
+  var sliderBound = false;
   function buildSlider() {
     var slider = el("time-slider");
     if (!slider) return;
@@ -210,6 +220,8 @@
     slider.max = String(state.times.length - 1);
     slider.value = String(state.timeIndex);
     slider.disabled = false;
+    if (sliderBound) return;
+    sliderBound = true;
     slider.addEventListener("input", function () {
       state.timeIndex = Number(slider.value);
       requestRender();
@@ -287,19 +299,201 @@
       });
   }
 
-  // ---- 起動 ---------------------------------------------------------------
+  // ---- 画面の状態をURLに残す ----------------------------------------------
 
-  function start() {
-    buildLegend();
-    buildLayerTabs();
-    setStatus("光害データを読み込んでいます…");
+  /*
+   * 「この夜のこの時刻の、この場所」をそのまま人に送れるようにする。
+   * 状態がURLに無いと、リンクを渡しても相手には初期表示しか見えず、
+   * 再読み込みでも自分の見ていた画面に戻れない(レビューで3名が指摘)。
+   *
+   * 履歴に積むと戻るボタンが操作のたびに1つずつ戻ることになって煩いので、
+   * replaceState で現在の1件を書き換える。
+   */
+  function writeUrlState() {
+    if (!state.ready || !MapView.map()) return;
+    var map = MapView.map();
+    var c = map.getCenter();
+    var parts = [
+      "d=" + state.dayOffset,
+      "t=" + state.timeIndex,
+      "layer=" + MapView.layer(),
+      "z=" + Math.round(map.getZoom() * 10) / 10,
+      "c=" + Math.round(c.lng * 1000) / 1000 + "," + Math.round(c.lat * 1000) / 1000
+    ];
+    try {
+      history.replaceState(null, "", "#" + parts.join("&"));
+    } catch (e) {
+      /* 書けない環境では諦める(表示には影響しない) */
+    }
+  }
 
-    var ymd = tonightDate();
+  /** URL のハッシュから状態を読む。壊れていれば無視して既定値を使う */
+  function readUrlState() {
+    var out = {};
+    var hash = (location.hash || "").replace(/^#/, "");
+    if (!hash) return out;
+    hash.split("&").forEach(function (pair) {
+      var i = pair.indexOf("=");
+      if (i < 0) return;
+      var key = pair.slice(0, i);
+      var value = pair.slice(i + 1);
+      if (key === "d") {
+        var d = Number(value);
+        if (d === 0 || d === 1 || d === 2) out.dayOffset = d;
+      } else if (key === "t") {
+        var t = Number(value);
+        if (isFinite(t) && t >= 0) out.timeIndex = t;
+      } else if (key === "layer") {
+        out.layer = Score.layerOf(value).key;
+      } else if (key === "z") {
+        var z = Number(value);
+        if (isFinite(z)) out.zoom = z;
+      } else if (key === "c") {
+        var xy = value.split(",").map(Number);
+        if (xy.length === 2 && isFinite(xy[0]) && isFinite(xy[1])) out.center = xy;
+      }
+    });
+    return out;
+  }
+
+  // ---- 日付の切り替え -----------------------------------------------------
+
+  /**
+   * ymd に日数を足す(日付の文字列演算)。
+   * Date に足すと時差の扱いで1日ずれることがあるので、文字列のまま扱う。
+   */
+  function addDays(ymd, days) {
+    var t = Date.UTC(
+      Number(ymd.slice(0, 4)),
+      Number(ymd.slice(5, 7)) - 1,
+      Number(ymd.slice(8, 10))
+    );
+    return new Date(t + days * 86400000).toISOString().slice(0, 10);
+  }
+
+  /*
+   * 選べる夜。キャッシュは78時間先まで持っているので、今夜・明日・明後日が入る。
+   * 星見は前もって日を決める行為なので、今夜しか見られないと計画に使えない。
+   */
+  var DAY_CHOICES = [
+    { offset: 0, label: "今夜" },
+    { offset: 1, label: "明日" },
+    { offset: 2, label: "明後日" }
+  ];
+
+  function buildDayTabs() {
+    var box = el("day-tabs");
+    if (!box) return;
+    DAY_CHOICES.forEach(function (choice) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "stars-day-tab";
+      b.textContent = choice.label;
+      b.dataset.offset = String(choice.offset);
+      b.addEventListener("click", function () {
+        if (state.dayOffset === choice.offset) return;
+        selectDay(choice.offset);
+      });
+      box.appendChild(b);
+    });
+    markDayTabs();
+  }
+
+  function markDayTabs() {
+    var box = el("day-tabs");
+    if (!box) return;
+    Array.prototype.forEach.call(box.children, function (b) {
+      var on = Number(b.dataset.offset) === state.dayOffset;
+      b.classList.toggle("is-on", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+
+  function selectDay(offset) {
+    state.dayOffset = offset;
+    markDayTabs();
+    loadNight().catch(function (err) {
+      setStatus(String(err && err.message ? err.message : err), true);
+    });
+  }
+
+  // ---- 夜ごとの読み込み ---------------------------------------------------
+
+  /**
+   * 選ばれている夜の予報を読み込んで、地図とスライダーを組み直す。
+   *
+   * キャッシュ本体は一度しか取りに行かない(net.js が覚えている)ので、
+   * 日付を切り替えても通信は発生せず、切り出す時刻の範囲が変わるだけ。
+   */
+  function loadNight(wantTimeIndex) {
+    var ymd = addDays(tonightDate(), state.dayOffset);
     var window_ = nationalNightWindow(ymd);
     if (!window_) {
       setStatus("この日は夜のデータを作れませんでした", true);
-      return;
+      return Promise.resolve();
     }
+    state.window = window_;
+    setStatus("天気予報を取得しています…");
+
+    // 予報が取れなくても、光害だけの表示に切り替えて地図は使えるようにする
+    return Net.fetchGrid(window_.start, window_.end)
+      .catch(function () {
+        return Net.emptyGrid(window_.start, window_.end);
+      })
+      .then(function (grid) {
+        state.grid = grid;
+        state.times = grid.times;
+        // URL で時刻を指定されていればそれを、無ければ最も晴れる時刻を初期値にする
+        state.timeIndex =
+          typeof wantTimeIndex === "number" && wantTimeIndex < grid.times.length
+            ? wantTimeIndex
+            : bestTimeIndex(grid);
+        state.weatherAvailable = grid.weatherAvailable !== false;
+        MapView.setGrid(grid);
+        buildSlider();
+        requestRender();
+        setStatus("");
+        state.ready = true;
+        writeUrlState();
+
+        var head = el("night-range");
+        if (head) {
+          head.textContent =
+            jstDate(window_.start) +
+            "の夜 " +
+            jstTime(window_.start) +
+            "〜" +
+            jstTime(window_.end) +
+            "（この時間帯は空が暗く、星がよく見えます）";
+        }
+
+        /*
+         * 予報が無い/その夜を賄えていないときは、必ずその旨を出す。
+         * 黙って残っている数時間ぶんだけを描くと「その夜ぜんぶの予報」に見えてしまう。
+         * 見出しを書き換えたあとに追記すること(先に足すと上書きで消える)。
+         */
+        var note = el("weather-note");
+        var coverage = Net.coverageNote(grid);
+        if (note) {
+          note.hidden = !coverage;
+          note.textContent = coverage || "";
+        }
+        if (!coverage && grid.updatedAt && head) {
+          head.textContent += "／予報は " + jstTime(grid.updatedAt) + " 時点";
+        }
+      });
+  }
+
+  // ---- 起動 ---------------------------------------------------------------
+
+  function start() {
+    var initial = readUrlState();
+    if (typeof initial.dayOffset === "number") state.dayOffset = initial.dayOffset;
+
+    buildLegend();
+    buildLayerTabs(initial.layer);
+    buildDayTabs();
+    setStatus("光害データを読み込んでいます…");
 
     LP.load(CONFIG.lightPollution.dataDir)
       .then(function () {
@@ -316,55 +510,19 @@
             note.textContent = "地図の下地を読み込めませんでした(色分けと時刻の操作は使えます)";
           }
         });
+        if (initial.center) {
+          map.jumpTo({
+            center: initial.center,
+            zoom: typeof initial.zoom === "number" ? initial.zoom : map.getZoom()
+          });
+        }
+        map.on("moveend", writeUrlState);
         return map;
       })
       .then(function () {
-        setStatus("天気予報を取得しています…");
-        // 予報が取れなくても、光害だけの表示に切り替えて地図は使えるようにする
-        return Net.fetchGrid(window_.start, window_.end).catch(function () {
-          return Net.emptyGrid(window_.start, window_.end);
-        });
+        return loadNight(initial.timeIndex);
       })
-      .then(function (grid) {
-        state.grid = grid;
-        state.times = grid.times;
-        state.timeIndex = bestTimeIndex(grid);
-        MapView.setGrid(grid);
-        buildSlider();
-        requestRender();
-        setStatus("");
-        state.ready = true;
-        state.weatherAvailable = grid.weatherAvailable !== false;
-
-        // 予報が無い/今夜を賄えていないときは、必ずその旨を出す。
-        // 黙って残っている数時間ぶんだけを描くと「今夜ぜんぶの予報」に見えてしまう。
-        var coverage = Net.coverageNote(grid);
-        if (coverage) {
-          var wn = el("weather-note");
-          if (wn) {
-            wn.hidden = false;
-            wn.textContent = coverage;
-          }
-        } else if (grid.updatedAt) {
-          // いつ時点の予報かを出す(夜間は1時間ごとに更新される)
-          var upd = el("night-range");
-          if (upd) {
-            upd.textContent += "／予報は " + jstTime(grid.updatedAt) + " 時点";
-          }
-        }
-
-        var head = el("night-range");
-        if (head) {
-          head.textContent =
-            jstDate(window_.start) +
-            "の夜 " +
-            jstTime(window_.start) +
-            "〜" +
-            jstTime(window_.end) +
-            "(空が充分に暗い時間帯)";
-        }
-        return loadSpots();
-      })
+      .then(loadSpots)
       .catch(function (err) {
         state.error = String(err && err.message ? err.message : err);
         setStatus(state.error, true);
@@ -388,6 +546,8 @@
     start: start,
     state: state,
     tonightDate: tonightDate,
-    nationalNightWindow: nationalNightWindow
+    nationalNightWindow: nationalNightWindow,
+    selectDay: selectDay,
+    addDays: addDays
   };
 })(typeof window !== "undefined" ? window : globalThis);

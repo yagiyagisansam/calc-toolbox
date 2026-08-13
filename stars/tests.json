@@ -402,6 +402,36 @@
       }
     },
     {
+      "name": "月の出入り: 新月の夜(2026-08-12 東京)は一晩中沈んでいる",
+      "global": "StarsSky",
+      "func": "moonRiseSetSummary",
+      "args": [
+        "2026-08-12T11:10:00Z",
+        "2026-08-12T18:20:00Z",
+        35.68,
+        139.76
+      ],
+      "expect": {
+        "rise": null,
+        "set": null,
+        "upAtStart": false
+      }
+    },
+    {
+      "name": "月の出入り: 満月の夜(2026-07-29 東京)は日没時にはもう出ている",
+      "global": "StarsSky",
+      "func": "moonRiseSetSummary",
+      "args": [
+        "2026-07-29T11:00:00Z",
+        "2026-07-29T19:00:00Z",
+        35.68,
+        139.76
+      ],
+      "expect": {
+        "upAtStart": true
+      }
+    },
+    {
       "name": "夜: 東京の夏至前後は夜が短い(7.2時間)",
       "global": "StarsSky",
       "func": "nightWindowSummary",

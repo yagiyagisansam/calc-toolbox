@@ -114,12 +114,25 @@
     setText("best-at", jstDate(best.at) + " " + jstTime(best.at) + " ごろ");
     setText("fact-darkness", Math.round(best.darkness * 100) + "%（光害の少なさ）");
 
+    /*
+     * 月は「どれだけ光っているか」と「その夜のいつ空に出ているか」の2つが要る。
+     * 前者だけでは、朝まで昇ってこないのか22時に沈むのかが分からず、
+     * 撮影や観測の時間割が組めない(レビューで写真用途から指摘)。
+     * 天文の言葉(月齢・輝面比)は括弧に残し、平易な言い方を主にする。
+     */
     var moon = Sky.summary(best.at, Number(spot.lat), Number(spot.lon));
-    setText(
-      "fact-moon",
-      moon.phaseLabel + "・月齢" + moon.ageDays + "・輝面比" + moon.illuminationPct + "%" +
-        (moon.altitudeDeg > 0 ? "（高度" + Math.round(moon.altitudeDeg) + "度）" : "（地平線下）")
-    );
+    var moonText =
+      moon.phaseLabel + "・" + moon.illuminationPct + "%光っている" +
+      "（月齢" + moon.ageDays + "）";
+    if (night) {
+      var rs = Sky.moonRiseSet(night.start, night.end, Number(spot.lat), Number(spot.lon));
+      if (rs.rise) moonText += "／月の出 " + jstTime(rs.rise);
+      if (rs.set) moonText += "／月の入り " + jstTime(rs.set);
+      if (!rs.rise && !rs.set) {
+        moonText += rs.upAtStart ? "／一晩中出ています" : "／一晩中沈んでいます";
+      }
+    }
+    setText("fact-moon", moonText);
     setText(
       "fact-night",
       night ? jstTime(night.start) + "〜" + jstTime(night.end) : "この日は充分に暗くなりません"

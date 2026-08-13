@@ -17,6 +17,7 @@
   var Palette = global.StarsPalette;
   var LP = global.StarsLP;
   var Net = global.StarsNet;
+  var Here = global.StarsHere;
 
   var JST = "Asia/Tokyo";
 
@@ -24,6 +25,7 @@
     spots: [], // 予報とスコアを載せたスポット
     region: null, // 絞り込み中の地方(nullで全国)
     sort: "score",
+    here: null, // 現在地(許可されたときだけ。距離の表示と並べ替えに使う)
     ready: false,
     error: null
   };
@@ -121,9 +123,58 @@
       pref: function (a, b) {
         return String(a.pref).localeCompare(String(b.pref), "ja") ||
           String(a.name).localeCompare(String(b.name), "ja");
+      },
+      near: function (a, b) {
+        if (!state.here) return 0;
+        return distanceOf(a) - distanceOf(b);
       }
     };
     return list.sort(sorters[state.sort] || sorters.score);
+  }
+
+  /** 現在地からの直線距離(km)。現在地が無ければ比較で最後に回るよう大きな値を返す */
+  function distanceOf(spot) {
+    if (!state.here) return Infinity;
+    return Here.distanceKm(state.here, { lat: Number(spot.lat), lon: Number(spot.lon) });
+  }
+
+  /**
+   * 現在地を使えるようにする。
+   * 位置情報は毎回尋ねるものではないので、地図ページで許可済みなら
+   * 覚えてある値をそのまま使い、無いときだけボタンを出す。
+   */
+  function setupHere() {
+    var button = el("use-here");
+    var option = el("sort-near");
+    if (!Here) return;
+
+    function apply(here) {
+      state.here = here;
+      if (!here) return;
+      if (option) option.hidden = false;
+      if (button) button.hidden = true;
+      var note = el("here-note");
+      if (note) note.hidden = false;
+      renderTable();
+    }
+
+    apply(Here.recall());
+    if (state.here || !button) return;
+
+    button.hidden = false;
+    button.addEventListener("click", function () {
+      button.disabled = true;
+      button.textContent = "現在地を調べています…";
+      Here.ask().then(function (here) {
+        button.disabled = false;
+        button.textContent = "現在地からの距離を表示";
+        if (here) {
+          apply(here);
+        } else {
+          setStatus("現在地を取得できませんでした。端末の位置情報の設定をご確認ください。", true);
+        }
+      });
+    });
   }
 
   function renderTable() {
@@ -157,8 +208,18 @@
       th.appendChild(link);
       var pref = document.createElement("span");
       pref.className = "stars-cell-sub";
-      pref.textContent = spot.pref;
+      // 子連れではトイレと駐車の有無が最優先なので、詳細を開かなくても分かるようにする
+      pref.textContent = spot.pref + facilityMarks(spot);
       th.appendChild(pref);
+
+      // 現在地が分かっていれば直線距離を添える(道のりではない旨は表の下に明記)
+      if (state.here) {
+        var dist = document.createElement("span");
+        dist.className = "stars-cell-sub";
+        dist.textContent =
+          "直線 約" + Math.round(Here.distanceKm(state.here, { lat: Number(spot.lat), lon: Number(spot.lon) })) + "km";
+        th.appendChild(dist);
+      }
       tr.appendChild(th);
 
       // 星見レベル
@@ -193,6 +254,19 @@
     var td = document.createElement("td");
     td.textContent = text;
     return td;
+  }
+
+  /**
+   * 設備の有無を短い印にする。
+   * 申請は自由記述なので、書かれていれば有り・触れていなければ何も出さない
+   * (「無い」と断定はできないため)。
+   */
+  function facilityMarks(spot) {
+    var text = (spot.facilities || "") + " " + (spot.access || "");
+    var marks = [];
+    if (/トイレ|お手洗|便所/.test(text) && !/トイレ(は)?(無|な)し/.test(text)) marks.push("トイレ");
+    if (/駐車|パーキング|停め/.test(text)) marks.push("駐車");
+    return marks.length ? "・" + marks.join("・") : "";
   }
 
   function buildTabs(regions) {
@@ -307,6 +381,8 @@
         }
         state.ready = true;
       });
+
+    setupHere();
 
     el("sort-select").addEventListener("change", function (e) {
       state.sort = e.target.value;

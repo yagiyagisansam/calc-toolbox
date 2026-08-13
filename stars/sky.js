@@ -16,7 +16,8 @@
  * - 引数の Date は UTC として扱う(JavaScript の Date は内部的に UTC のため、
  *   日本時刻の Date をそのまま渡してよい)。
  * - 経度は東経を正とする一般的な向きで受け取る(内部で西経正に変換する)。
- * - 月出・月入りの時刻は扱わない。必要なのは「指定時刻に月が空のどこにあるか」だけ。
+ * - 月の出入りは「その夜のあいだに起きるか」だけを10分刻みで拾う(moonRiseSet)。
+ *   暦としての正確な時刻ではなく、今夜いつ月が邪魔になるかが分かればよい。
  *
  * ブラウザでは window.StarsSky、Node(テストランナー・生成スクリプト)では
  * module.exports で公開する。
@@ -295,6 +296,51 @@
    * nightWindow を文字列で返す表示・テスト用の版。
    * @returns {{start:string, end:string, hours:number}|null} 時刻は ISO 文字列(UTC)
    */
+  /**
+   * 指定した時間帯のあいだの、月の出と月の入り。
+   *
+   * なぜ「その夜のあいだ」で切るか:
+   *   撮影や観測で知りたいのは「今夜いつ月が邪魔になるか」であって、
+   *   暦としての月の出時刻ではない。夜が明けてからの出没は関係がない。
+   *   月あかりが無い時間帯を狙うのが星見なので、ここが判断の要になる。
+   *
+   * 求め方は太陽と同じで、10分刻みで高度を見て符号が変わる所を拾う。
+   * 分単位まで詰める必要は無い(予報が1時間刻みのため)。
+   *
+   * @param {Date} from 走査の開始
+   * @param {Date} to 走査の終了
+   * @param {number} lat 緯度(度)
+   * @param {number} lon 経度(度)
+   * @returns {{rise:Date|null, set:Date|null, upAtStart:boolean}}
+   *          rise/set は、その時間帯に起きなければ null
+   */
+  function moonRiseSet(from, to, lat, lon) {
+    var stepMs = 10 * 60 * 1000;
+    var prevUp = position(from, lat, lon).altitudeDeg > 0;
+    var upAtStart = prevUp;
+    var rise = null;
+    var set = null;
+
+    for (var t = from.getTime() + stepMs; t <= to.getTime(); t += stepMs) {
+      var when = new Date(t);
+      var up = position(when, lat, lon).altitudeDeg > 0;
+      if (up && !prevUp && rise === null) rise = when;
+      if (!up && prevUp && set === null) set = when;
+      prevUp = up;
+    }
+    return { rise: rise, set: set, upAtStart: upAtStart };
+  }
+
+  /** 検証しやすいよう、月の出入りを文字列に丸めたもの */
+  function moonRiseSetSummary(fromIso, toIso, lat, lon) {
+    var r = moonRiseSet(new Date(fromIso), new Date(toIso), lat, lon);
+    return {
+      rise: r.rise ? r.rise.toISOString().slice(0, 16) + "Z" : null,
+      set: r.set ? r.set.toISOString().slice(0, 16) + "Z" : null,
+      upAtStart: r.upAtStart
+    };
+  }
+
   function nightWindowSummary(day, lat, lon, thresholdDeg) {
     var w = nightWindow(day, lat, lon, thresholdDeg);
     if (!w) return null;
@@ -350,6 +396,8 @@
     sunAltitudeDeg: sunAltitudeDeg,
     nightWindow: nightWindow,
     nightWindowSummary: nightWindowSummary,
+    moonRiseSet: moonRiseSet,
+    moonRiseSetSummary: moonRiseSetSummary,
     currentNightDate: currentNightDate,
     SYNODIC_MONTH: SYNODIC_MONTH,
     ASTRONOMICAL_TWILIGHT_DEG: ASTRONOMICAL_TWILIGHT_DEG
