@@ -383,8 +383,59 @@ a {
     bottom: 34px;
   }
 
+  /*
+   * 狭い画面では凡例を「6段階の帯」に組み替える。
+   * 縦に6行並べると凡例だけで200px近く使い、地図に残るのが画面の3分の1ほどになって
+   * 近畿から九州が凡例の裏に隠れてしまう。横一列なら同じ情報が3分の1の高さで収まる。
+   */
+  #legend-items {
+    display: flex;
+    gap: 2px;
+  }
+
+  .legend-row {
+    display: block;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0;
+    text-align: center;
+  }
+
+  .legend-chip {
+    display: block;
+    width: 100%;
+    height: 10px;
+    /* 帯としてつながって見えるよう、両端だけ角を丸め、縁は取る */
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .legend-row:first-child .legend-chip {
+    border-radius: 3px 0 0 3px;
+  }
+
+  .legend-row:last-child .legend-chip {
+    border-radius: 0 3px 3px 0;
+  }
+
+  .legend-label {
+    display: block;
+    margin-top: 3px;
+    font-size: 10px;
+  }
+
   .legend-note {
     display: none;
+  }
+
+  .stars-opacity {
+    margin-top: 6px;
+    padding-top: 6px;
+  }
+
+  .stars-spot-count {
+    margin-top: 6px;
+    font-size: 11px;
   }
 
   .stars-spot-card {

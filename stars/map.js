@@ -53,6 +53,7 @@
     timeIndex: 0,
     opacity: null, // ラスタの不透明度(初期値は palette.js)
     basemap: "loading", // loading | loaded | failed
+    basemapStyle: null, // 読み込めた下地のスタイル(海の塗り分けを写し取るのに使う)
     onBasemapFail: null,
     // 行ごと・列ごとにあらかじめ計算しておく値
     rowLat: null,
@@ -172,6 +173,44 @@
       // 地名・道路のラベルより下に入れて、ラベルが読めるようにする
       map.getLayer(CONFIG.map.insertBelowLayerId) ? CONFIG.map.insertBelowLayerId : undefined
     );
+    addSeaMask();
+  }
+
+  /**
+   * 海と湖を色分けの上から塗りつぶす。
+   *
+   * 星見レベルは緯度経度さえあれば計算できるので、そのまま描くと海の上まで
+   * 一面が色で埋まる。海は「今夜どこへ行くか」の候補にならないうえ、
+   * 全面が塗られると海岸線が消えて日本のかたちが分からなくなり、
+   * 自分の行ける範囲がどこなのか読み取れない。
+   *
+   * そこで下地がもっている水域の面をそのまま色分けの上に重ね直す。
+   * 下地と同じ源・同じ絞り込み・同じ色を使うので、海岸線は完全に一致する。
+   * 下地が読めていないとき(state.basemapStyle が無いとき)は何もしない
+   * ＝ 従来どおり全面が色分けになる。
+   */
+  function addSeaMask() {
+    var map = state.map;
+    if (!map || !state.basemapStyle || map.getLayer("stars-sea")) return;
+    if (!map.getSource("openmaptiles")) return;
+    var water = null;
+    state.basemapStyle.layers.forEach(function (l) {
+      if (l.id === "water" && l.type === "fill") water = l;
+    });
+    if (!water) return;
+
+    map.addLayer(
+      {
+        id: "stars-sea",
+        type: "fill",
+        source: water.source,
+        "source-layer": water["source-layer"],
+        filter: water.filter,
+        paint: water.paint
+      },
+      // 色分けのすぐ上。地名や道路のラベルより下のまま。
+      map.getLayer(CONFIG.map.insertBelowLayerId) ? CONFIG.map.insertBelowLayerId : undefined
+    );
   }
 
   /**
@@ -185,6 +224,7 @@
         return r.json();
       })
       .then(function (style) {
+        state.basemapStyle = style;
         state.map.once("styledata", function () {
           addScoreLayer();
           if (state.grid) render(state.timeIndex);

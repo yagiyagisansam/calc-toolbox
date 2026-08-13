@@ -254,8 +254,15 @@
           var series = Net.gridSeries(grid, lat, lon);
           var lpIndex = LP.isReady() ? LP.index(lat, lon) : null;
 
-          state.hours = series.times.map(function (t, i) {
+          state.hours = [];
+          series.times.forEach(function (t, i) {
             var when = new Date(t * 1000);
+            // 予報は1時間刻みなので、上で外側の丸い時刻まで広げて取ってきている。
+            // その両端は空がまだ(もう)暗くない時刻なので、表にも「今夜のベスト」にも
+            // 入れない。ここを外すと、薄明が始まった後の時刻がベストに選ばれてしまう
+            // (一覧ページの bestOfNight と同じ絞り込み)。
+            if (when < night.start || when > night.end) return;
+
             var result = Score.evaluate({
               lpIndex: lpIndex === null ? undefined : lpIndex,
               cloudPct: series.cloud[i],
@@ -264,7 +271,7 @@
               humidityPct: series.humidity[i],
               moonBrightness: Sky.brightness(when, lat, lon)
             });
-            return {
+            state.hours.push({
               at: when,
               score: result.score,
               band: result.band,
@@ -274,10 +281,16 @@
               visibility: series.visibility[i],
               humidity: series.humidity[i],
               moonAlt: Sky.position(when, lat, lon).altitudeDeg
-            };
+            });
           });
 
           renderHours(spot, state.hours, night);
+          // 暗い時間帯が1時間に満たないと、予報の刻みに乗る時刻が1つも残らない
+          if (!state.hours.length) {
+            setStatus("今夜は空が充分に暗い時間帯が短く、1時間ごとの予報に乗りません。", false);
+            state.ready = true;
+            return;
+          }
           setStatus("", false);
           state.ready = true;
         });

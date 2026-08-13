@@ -156,17 +156,31 @@ const STUB_SPOTS = [
 /*
  * --relay: 本番と同じ絵を撮るためのモード。
  *
- * この環境ではブラウザが外に出られないが、Node は出られる。そこで地図タイルと
- * 天気予報だけ Node の fetch で取ってきてブラウザに返す。
+ * この環境ではブラウザが外に出られないが、Node は出られる。そこで外部への
+ * 問い合わせだけ Node の fetch で取ってきてブラウザに返す。
  * 公開前に実際の見た目を確認したいときに使う。
- * (掲載スポットは差し替えのまま。データベースが空でも中身のある絵になるよう)
+ *
+ * --live と併せると、天気は本物のサーバー側キャッシュ(stars_weather_cache)、
+ * 掲載スポットも本物のデータベースの中身になる。
+ * --relay だけなら地図タイルだけ本物で、天気とスポットは下の差し替えを使う。
  */
 const relay = argv.includes("--relay");
 if (relay) {
-  for (const pattern of ["**://tiles.openfreemap.org/**"]) {
+  const patterns = ["**://tiles.openfreemap.org/**"];
+  if (argv.includes("--live")) patterns.push("**://*.supabase.co/**");
+  for (const pattern of patterns) {
     await page.route(pattern, async (route) => {
+      const req = route.request();
       try {
-        const res = await fetch(route.request().url());
+        // apikey などの認証ヘッダをそのまま渡す(Supabase はこれが無いと弾く)
+        const headers = { ...req.headers() };
+        delete headers.host;
+        delete headers["content-length"];
+        const res = await fetch(req.url(), {
+          method: req.method(),
+          headers,
+          body: req.postData() ?? undefined
+        });
         const body = Buffer.from(await res.arrayBuffer());
         await route.fulfill({
           status: res.status,
@@ -180,7 +194,12 @@ if (relay) {
   }
 }
 
-if (!argv.includes("--live")) {
+/*
+ * --stub-spots: 掲載スポットだけ差し替える。
+ * 公開前の見た目確認で「本物の天気 × 中身のある一覧」を見たいときに使う
+ * (データベースにまだ承認済みのスポットが無くても、一覧と詳細の絵が撮れる)。
+ */
+if (!argv.includes("--live") || argv.includes("--stub-spots")) {
   await page.route("**://*.supabase.co/rest/v1/rpc/stars_public_spots", async (route) => {
     await route.fulfill({
       status: 200,
@@ -188,7 +207,9 @@ if (!argv.includes("--live")) {
       body: JSON.stringify(STUB_SPOTS)
     });
   });
+}
 
+if (!argv.includes("--live")) {
   /*
    * 天気はサーバー側のキャッシュ(stars_weather_cache)から読むようになったので、
    * その1行を差し替える。中身は「北ほど曇り、南ほど快晴」という分かりやすい傾斜。
@@ -432,6 +453,17 @@ try {
   check("スポットが表に並ぶ", rowCount === 3, `${rowCount} 行`);
   await capture("list");
 
+  /* 乗鞍の行から点数とベスト時刻を控えておき、後で詳細ページと突き合わせる */
+  let listBest = null;
+  {
+    const cells = page.locator("#spot-rows tr", { hasText: "乗鞍畳平" }).locator("td, th");
+    const texts = await cells.allTextContents();
+    const joined = texts.join(" ");
+    const score = (joined.match(/([\d.]+)点/) || [])[1];
+    const at = (joined.match(/(\d{2}:\d{2})/) || [])[1];
+    if (score && at) listBest = { score, at };
+  }
+
   // 差し替えた予報では南ほど快晴。乗鞍(暗い山)が都心より上に来るはず
   if (!relay && !argv.includes("--live")) {
     const firstRow = await page.locator("#spot-rows tr").first().textContent();
@@ -480,6 +512,36 @@ try {
 
   const bestRows = await page.locator("#hourly-rows tr.is-best").count();
   check("ベスト時刻がちょうど1つ示される", bestRows === 1, `${bestRows} 行`);
+
+  /*
+   * ベスト時刻が「暗い時間帯」の中に入っていること。
+   * 予報は1時間刻みなので取得は外側の丸い時刻まで広げているが、その両端は
+   * まだ(もう)暗くない。以前はそこまで候補に入れてしまい、薄明が始まった後の
+   * 時刻がベストに選ばれて、一覧ページの結果ともずれていた。
+   */
+  const bestAt = await page.locator("#best-at").textContent();
+  const nightText = await page.locator("#fact-night").textContent();
+  const toMin = (s) => {
+    const [h, m] = s.split(":").map(Number);
+    return h * 60 + m;
+  };
+  const bestHm = (bestAt.match(/(\d{2}:\d{2})/) || [])[1];
+  const span = nightText.match(/(\d{2}:\d{2})〜(\d{2}:\d{2})/);
+  let inWindow = false;
+  if (bestHm && span) {
+    // 夜は日をまたぐので、開始を0分とした経過分に直してから比べる
+    const wrap = (t) => (toMin(t) - toMin(span[1]) + 1440) % 1440;
+    inWindow = wrap(bestHm) <= wrap(span[2]);
+  }
+  check("ベスト時刻が暗い時間帯の中にある", inWindow, `${bestHm} / ${span ? span[0] : nightText}`);
+
+  // 一覧の「ベスト時刻」と詳細の「今夜のベスト」は同じ計算のはずなので一致する
+  const bestScore = (await page.locator("#best-score").textContent()).trim();
+  check(
+    "一覧と詳細でベストが一致する",
+    listBest !== null && bestHm === listBest.at && bestScore.startsWith(listBest.score),
+    `一覧 ${listBest ? listBest.at + " " + listBest.score : "—"} / 詳細 ${bestHm} ${bestScore}`
+  );
 
   const factMoon = await page.locator("#fact-moon").textContent();
   check("月の情報が出る", /月齢/.test(factMoon), factMoon);
