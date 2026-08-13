@@ -291,7 +291,7 @@
             state.ready = true;
             return;
           }
-          setStatus("", false);
+          setStatus(Net.coverageNote(grid) || "", false);
           state.ready = true;
         });
       })

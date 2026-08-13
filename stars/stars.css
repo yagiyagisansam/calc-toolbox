@@ -340,7 +340,7 @@ a {
   padding: 0;
   border: 2px solid #0c0c0c;
   border-radius: 50%;
-  /* 色分けが黄色系なので、ピンはその外の色にする(白＝どの段の上でも見える) */
+  /* 色分けが黄〜青紫まで回るので、ピンはその外側の白にする(どの段の上でも見える) */
   background: #ffffff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
   cursor: pointer;

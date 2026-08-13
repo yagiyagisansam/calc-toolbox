@@ -128,7 +128,10 @@
       cols: cols,
       grid: meta,
       updatedAt: new Date(row.updated_at),
-      weatherAvailable: true
+      weatherAvailable: true,
+      // 求めた時間帯のうち、実際に予報があった範囲(欠けの検出に使う)
+      requestedFrom: from,
+      requestedTo: to
     };
 
     ["cloud", "precip", "visibility", "humidity"].forEach(function (key) {
@@ -146,6 +149,49 @@
     });
 
     return out;
+  }
+
+  /**
+   * 予報が今夜を賄えているかを確かめ、足りなければ知らせる文言を返す。
+   *
+   * 定期取得が止まると、キャッシュは「古いが空ではない」状態になる。
+   * このとき何も言わずに残っている数時間ぶんだけを描くと、
+   * 利用者には「今夜ぜんぶの予報」に見えてしまい、いちばん危ない。
+   * 欠けているなら必ず画面に出すこと。
+   *
+   * @returns {string|null} 問題が無ければ null
+   */
+  function coverageNote(grid) {
+    if (!grid || grid.weatherAvailable === false) {
+      return "天気予報を取得できませんでした。空の暗さ(光害)だけで表示しています。";
+    }
+    if (!grid.times || !grid.times.length) return null;
+
+    var last = grid.times[grid.times.length - 1];
+    var first = grid.times[0];
+    var missingEnd = grid.requestedTo - last;
+    var missingStart = first - grid.requestedFrom;
+    if (missingEnd < 3600 && missingStart < 3600) return null;
+
+    var fmt = function (unix) {
+      return new Intl.DateTimeFormat("ja-JP", {
+        timeZone: "Asia/Tokyo",
+        month: "numeric",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      }).format(new Date(unix * 1000));
+    };
+    return (
+      "予報の更新が滞っています。今夜は " +
+      fmt(first) +
+      " 〜 " +
+      fmt(last) +
+      " のぶんしかありません" +
+      (grid.updatedAt ? "(最終更新 " + fmt(grid.updatedAt.getTime() / 1000) + ")" : "") +
+      "。"
+    );
   }
 
   /**
@@ -258,6 +304,7 @@
   global.StarsNet = {
     fetchGrid: fetchGrid,
     emptyGrid: emptyGrid,
+    coverageNote: coverageNote,
     gridSeries: gridSeries,
     publicSpots: publicSpots,
     submitSpot: submitSpot,

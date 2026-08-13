@@ -336,12 +336,14 @@
         state.ready = true;
         state.weatherAvailable = grid.weatherAvailable !== false;
 
-        if (!state.weatherAvailable) {
+        // 予報が無い/今夜を賄えていないときは、必ずその旨を出す。
+        // 黙って残っている数時間ぶんだけを描くと「今夜ぜんぶの予報」に見えてしまう。
+        var coverage = Net.coverageNote(grid);
+        if (coverage) {
           var wn = el("weather-note");
           if (wn) {
             wn.hidden = false;
-            wn.textContent =
-              "天気予報を取得できませんでした。空の暗さ(光害)だけで表示しています。";
+            wn.textContent = coverage;
           }
         } else if (grid.updatedAt) {
           // いつ時点の予報かを出す(夜間は1時間ごとに更新される)

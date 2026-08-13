@@ -290,6 +290,9 @@
             spot.best = bestOfNight(spot, grid, ymd);
           });
           renderTable();
+          // 予報が今夜を賄えていないときは黙らない(地図ページと同じ扱い)
+          var coverage = Net.coverageNote(grid);
+          setStatus(coverage || "", !!coverage);
           state.ready = true;
         });
       })
