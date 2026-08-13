@@ -216,11 +216,12 @@ if (!argv.includes("--live")) {
    * 地図に南北の階調が出れば、格子の補間と色分けが効いていることになる。
    */
   await page.route("**://*.supabase.co/rest/v1/stars_weather_cache**", async (route) => {
-    const meta = { south: 24, north: 46, west: 123, east: 146, step: 1, hours: 30 };
+    // 本番の stars_grid_def() と同じ値にしておく(日付の切り替えまで検証するため)
+    const meta = { south: 24, north: 46, west: 123, east: 146, step: 1, hours: 78, parts: 6 };
     const rows = (meta.north - meta.south) / meta.step + 1;
     const cols = (meta.east - meta.west) / meta.step + 1;
 
-    // いまの時刻を丸めた点から30時間ぶん
+    // いまの時刻を丸めた点から meta.hours ぶん
     const base = Math.floor(Date.now() / 3600000) * 3600;
     const times = [];
     for (let h = 0; h < meta.hours; h++) times.push(base + h * 3600);

@@ -28,13 +28,13 @@
 --
 -- 仕組み:
 --   pg_cron が pg_net で取得を要求し(stars_weather_request)、
---   その8分後に応答を取り込む(stars_weather_collect)。
+--   そのあと応答を取り込む(stars_weather_collect)。
 --   pg_net は非同期なので、要求と取り込みを分けている。
 --   取り込んだものは stars_weather_cache に1行だけ入り、匿名でも読める。
 --
---   要求は6つに分け、20秒ずつ空けて投げる。まとめて投げると上流の
---   「1分あたり600地点」に当たって全部が弾かれるため(下の parts を参照)。
---   6分割ぶんを投げ終えるまで約2分かかるので、取り込みは8分後にしている。
+--   要求は6つに分け、cron で1分ずつずらして投げる。まとめて投げると上流の
+--   「600回/分」に当たって全部が弾かれるため(下の parts を参照)。
+--   0〜5分で投げ、8分に取り込む。
 --
 -- 出典表示(CC BY 4.0)はサイト側のフッターで行っている。
 -- =============================================================
@@ -67,7 +67,7 @@ as $$
     -- 上流の制限は「1分あたり600地点」。2分割(276地点ずつ)を同時に投げると
     -- 一瞬で552地点になり、その山で 503 The service is overloaded / 429 を返された
     -- (2026-08-14 実際に丸1日更新が止まった)。
-    -- 6分割して20秒ずつ空けて投げると、1分あたり最大でも約276地点に収まる。
+    -- 6分割して1分ずつずらして投げると、1分あたり92地点に収まる。
     'parts', 6
   );
 $$;
@@ -141,9 +141,17 @@ alter table public.stars_weather_status enable row level security;
 revoke all on table public.stars_weather_status from anon, authenticated;
 
 
--- ---- ⑤ 取得を要求する ----
-create or replace function public.stars_weather_request()
-returns int
+-- ---- ⑤ 取得を要求する(1回につき1分割ぶん) ----
+-- 引数で分割の番号を受け取り、その1つだけを投げてすぐ返る。
+--
+-- なぜ関数の中で待たないか:
+--   全分割を1つの関数の中で pg_sleep を挟みながら投げると、関数が
+--   100秒ほど返ってこない。cron は耐えるが、SQL エディタから手で叩くと
+--   接続が先に切れて Load failed になり、動作確認ができない
+--   (2026-08-14 実際に踏んだ)。
+--   間隔は cron 側で開ける ── 分割ごとに1分ずらして登録する(⑦)。
+create or replace function public.stars_weather_request(p_part int)
+returns bigint
 language plpgsql
 security definer
 set search_path = public
@@ -151,44 +159,44 @@ as $$
 declare
   d      jsonb := public.stars_grid_def();
   parts  int   := (d->>'parts')::int;
-  i      int;
   lats   text;
   lons   text;
   url    text;
   rid    bigint;
 begin
+  if p_part < 1 or p_part > parts then
+    raise exception '分割の番号は 1〜% です(渡された値: %)', parts, p_part;
+  end if;
+
   -- 分割数を減らしたときに取り残しが出ないよう、範囲外の行は消しておく
   delete from public.stars_weather_pending where kind = 'grid' and part > parts;
 
-  for i in 1..parts loop
-    select string_agg(lat::text, ',' order by rn), string_agg(lon::text, ',' order by rn)
-      into lats, lons
-      from public.stars_grid_points(i);
+  select string_agg(lat::text, ',' order by rn), string_agg(lon::text, ',' order by rn)
+    into lats, lons
+    from public.stars_grid_points(p_part);
 
-    url := 'https://api.open-meteo.com/v1/forecast'
-        || '?latitude=' || lats
-        || '&longitude=' || lons
-        || '&hourly=cloud_cover,precipitation_probability,visibility,relative_humidity_2m'
-        || '&forecast_hours=' || (d->>'hours')
-        || '&timeformat=unixtime&timezone=GMT';
+  url := 'https://api.open-meteo.com/v1/forecast'
+      || '?latitude=' || lats
+      || '&longitude=' || lons
+      || '&hourly=cloud_cover,precipitation_probability,visibility,relative_humidity_2m'
+      || '&forecast_hours=' || (d->>'hours')
+      || '&timeformat=unixtime&timezone=GMT';
 
-    select net.http_get(url, timeout_milliseconds => 60000) into rid;
+  select net.http_get(url, timeout_milliseconds => 60000) into rid;
 
-    insert into public.stars_weather_pending (kind, part, request_id, requested_at)
-    values ('grid', i, rid, now())
-    on conflict (kind, part)
-      do update set request_id = excluded.request_id, requested_at = now();
+  insert into public.stars_weather_pending (kind, part, request_id, requested_at)
+  values ('grid', p_part, rid, now())
+  on conflict (kind, part)
+    do update set request_id = excluded.request_id, requested_at = now();
 
-    -- 山にして投げない。上流の1分あたりの上限に当たると全部が弾かれる。
-    if i < parts then
-      perform pg_sleep(20);
-    end if;
-  end loop;
-  return parts;
+  return rid;
 end;
 $$;
 
-revoke all on function public.stars_weather_request() from public, anon, authenticated;
+revoke all on function public.stars_weather_request(int) from public, anon, authenticated;
+
+-- 旧版(引数なしで全分割をまとめて投げる)は、1分あたりの上限に当たるので捨てる
+drop function if exists public.stars_weather_request();
 
 
 -- ---- ⑥ 応答を取り込む ----
@@ -287,17 +295,43 @@ revoke all on function public.stars_weather_collect() from public, anon, authent
 -- pg_cron の時刻は UTC。日本時間 = UTC + 9時間。
 --   UTC 9〜18時          = 日本時間 18時〜翌3時(毎時。星を見る時間帯)
 --   UTC 21, 0, 3, 6時    = 日本時間 6, 9, 12, 15時(3時間ごと)
--- 要求を出し、その8分後に取り込む(6分割を20秒ずつ空けて投げ終えるまで約2分かかる)。
-select cron.unschedule('stars-weather-request')
-  where exists (select 1 from cron.job where jobname = 'stars-weather-request');
-select cron.unschedule('stars-weather-collect')
-  where exists (select 1 from cron.job where jobname = 'stars-weather-collect');
+--
+-- 分割ごとに1分ずつずらして投げる。まとめて投げると上流の
+-- 「600回/分」に当たって全部が弾かれるため(⑤の説明を参照)。
+--   0分 → 分割1、1分 → 分割2 … 5分 → 分割6、8分 → 取り込み
+do $do$
+declare
+  hours text := '0,3,6,9,10,11,12,13,14,15,16,17,18,21';
+  parts int  := (public.stars_grid_def()->>'parts')::int;
+  i     int;
+  name  text;
+begin
+  -- 以前の登録(分割なし版・古い分割数ぶん)をすべて片づける
+  for name in
+    select jobname from cron.job where jobname like 'stars-weather%'
+  loop
+    perform cron.unschedule(name);
+  end loop;
 
-select cron.schedule('stars-weather-request', '0 0,3,6,9,10,11,12,13,14,15,16,17,18,21 * * *',
-  $$select public.stars_weather_request();$$);
-select cron.schedule('stars-weather-collect', '8 0,3,6,9,10,11,12,13,14,15,16,17,18,21 * * *',
-  $$select public.stars_weather_collect();$$);
+  for i in 1..parts loop
+    perform cron.schedule(
+      'stars-weather-request-' || i,
+      (i - 1) || ' ' || hours || ' * * *',
+      format('select public.stars_weather_request(%s);', i)
+    );
+  end loop;
+
+  -- 投げ終える(分割数ぶんの分)より後に取り込む
+  perform cron.schedule(
+    'stars-weather-collect',
+    (parts + 2) || ' ' || hours || ' * * *',
+    'select public.stars_weather_collect();'
+  );
+end;
+$do$;
 
 
--- ---- ⑧ 今すぐ1回取得する(次の定期実行を待たないため) ----
-select public.stars_weather_request();
+-- ---- ⑧ 今すぐ1回ぶんだけ試す ----
+-- 全分割をここで投げると1分あたりの上限に当たるので、1つだけにしておく。
+-- 残りは次の定期実行で揃う。
+select public.stars_weather_request(1) as 要求id;
