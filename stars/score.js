@@ -79,6 +79,46 @@
     { key: "none", min: 0, label: "不可", note: "星見には向かない" }
   ];
 
+  /*
+   * 地図で切り替えられる表示。
+   *
+   * 総合だけだと「点が低いのは曇っているからか、街明かりのせいか」が分からない。
+   * 掛け算のどの要素を含めるかを切り替えられるようにして、理由まで読めるようにする。
+   *
+   *   sky     … 光害(その場所が本来どれだけ暗いか)。今夜の天気では変わらない
+   *   weather … 雲量・降水確率・視程・湿度。時刻で変わる
+   *   moon    … 月あかり。全国でほぼ同じなので単独の地図にはしない
+   *
+   * どの表示でも「明るいほど星見に向く」の向きは変えない(読み替えが要らないように)。
+   */
+  var LAYERS = [
+    {
+      key: "total",
+      label: "総合",
+      parts: { sky: true, weather: true, moon: true },
+      note: "空の暗さ・天気・月をすべて掛け合わせた、今夜の星見レベルです。"
+    },
+    {
+      key: "sky",
+      label: "空の暗さ",
+      parts: { sky: true, weather: false, moon: false },
+      note: "街明かりだけで見た、その場所が本来もっている暗さです。天気と月は含みません(時刻を変えても変わりません)。"
+    },
+    {
+      key: "weather",
+      label: "天気",
+      parts: { sky: false, weather: true, moon: false },
+      note: "雲量・降水確率・視程・湿度だけで見た空模様です。場所の暗さと月は含みません。"
+    }
+  ];
+
+  function layerOf(key) {
+    for (var i = 0; i < LAYERS.length; i++) {
+      if (LAYERS[i].key === key) return LAYERS[i];
+    }
+    return LAYERS[0];
+  }
+
   function clamp(v, lo, hi) {
     return v < lo ? lo : v > hi ? hi : v;
   }
@@ -245,7 +285,9 @@
     moonFactor: moonFactor,
     bandOf: bandOf,
     bandIndex: bandIndex,
+    layerOf: layerOf,
     BANDS: BANDS,
+    LAYERS: LAYERS,
     CONFIG: CONFIG
   };
 

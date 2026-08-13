@@ -52,6 +52,7 @@
     grid: null, // StarsNet.fetchGrid の結果
     timeIndex: 0,
     opacity: null, // ラスタの不透明度(初期値は palette.js)
+    layer: "total", // 表示中の項目(StarsScore.LAYERS の key)
     basemap: "loading", // loading | loaded | failed
     basemapStyle: null, // 読み込めた下地のスタイル(海の塗り分けを写し取るのに使う)
     onBasemapFail: null,
@@ -328,6 +329,23 @@
    * 指定した時刻の色分けを描き直す。
    * @param {number} timeIndex fetchGrid が返した times の添字
    */
+  /** すべて1の変換表(表示に含めない要素の代わりに使う)。長さごとに1つ作り置く */
+  var onesCache = {};
+  function ones(n) {
+    if (!onesCache[n]) {
+      var a = new Float64Array(n);
+      a.fill(1);
+      onesCache[n] = a;
+    }
+    return onesCache[n];
+  }
+
+  /** 表示する項目を切り替える(total | sky | weather) */
+  function setLayer(key) {
+    state.layer = Score.layerOf(key).key;
+    return state.layer;
+  }
+
   function render(timeIndex) {
     if (!state.grid || !state.canvas) return;
 
@@ -345,21 +363,26 @@
     var rows = state.grid.rows;
     var cols = state.grid.cols;
 
-    var skyT = state.tables.sky;
-    var cloudT = state.tables.cloud;
-    var precipT = state.tables.precip;
+    /*
+     * 表示中の項目に含まれない要素は「1を返す表」に差し替える。
+     * こうすると画素ごとの掛け算の形は変わらないので、切り替えても速度が落ちない。
+     */
+    var parts = Score.layerOf(state.layer).parts;
+    var skyT = parts.sky ? state.tables.sky : ones(state.tables.sky.length);
+    var cloudT = parts.weather ? state.tables.cloud : ones(state.tables.cloud.length);
+    var precipT = parts.weather ? state.tables.precip : ones(state.tables.precip.length);
     var visT = state.tables.visibility;
     var humidT = state.tables.humidity;
     var visStep = state.tables.visibilityStepM;
     var visMax = visT.length - 1;
 
-    // 天気が無いとき(光害だけの表示)は、視程・湿度で減点しない
-    var hasAir = state.grid.weatherAvailable !== false;
+    // 天気が無いとき(光害だけの表示)と、天気を含めない項目では、視程・湿度で減点しない
+    var hasAir = state.grid.weatherAvailable !== false && parts.weather;
 
     // 月の影響は全国でほとんど変わらないので、地図の中心で一度だけ求める
     var when = new Date(state.grid.times[timeIndex] * 1000);
     var center = state.map ? state.map.getCenter() : { lat: 36, lng: 138 };
-    var moonF = Score.moonFactor(Sky.brightness(when, center.lat, center.lng));
+    var moonF = parts.moon ? Score.moonFactor(Sky.brightness(when, center.lat, center.lng)) : 1;
 
     var bands = Score.BANDS;
     var nBands = bands.length;
@@ -509,6 +532,7 @@
     },
     render: render,
     setGrid: setGrid,
+    setLayer: setLayer,
     setOpacity: setOpacity,
     setSpots: setSpots,
     flyTo: flyTo,

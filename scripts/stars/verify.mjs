@@ -356,11 +356,94 @@ try {
     check("都心は低い段階になる", ["none", "bad"].includes(bandsAt.tokyo), String(bandsAt.tokyo));
   }
 
+  /*
+   * 絵を保存する前に下地のタイルが出そろうのを待つ。
+   * 中継モードは1タイルずつ Node を経由するので遅く、待たずに撮ると
+   * 「海が塗り分けられていない」ように見える絵になってしまう(実際は読み込み中)。
+   */
+  if (shotDir) {
+    await page
+      .waitForFunction(() => {
+        const m = window.StarsMap && window.StarsMap.map();
+        return !!m && m.areTilesLoaded();
+      }, { timeout: 30000 })
+      .catch(() => {});
+    await page.waitForTimeout(600);
+  }
   await capture("map");
 
   // 凡例
   const legendRows = await page.locator(".legend-row").count();
   check("凡例が6段階ぶん出る", legendRows === 6, `${legendRows} 行`);
+
+  /*
+   * 表示する項目の切り替え(総合・空の暗さ・天気)。
+   *
+   * 見るべきは「切り替えると絵が変わること」だけではない。
+   * ・空の暗さ … 天気を含まないので、作り物の南北の傾斜が消えて
+   *              稚内(曇り100%)でも都心より良くなるはず
+   * ・天気     … 光害を含まないので、都心と奥多摩が同じ段階になるはず
+   * ここを間違えると「切り替わっているように見えて中身は総合のまま」に気づけない。
+   */
+  const layerTabCount = await page.locator(".stars-layer-tab").count();
+  check("表示する項目のタブが3つ出る", layerTabCount === 3, `${layerTabCount} 個`);
+  const layerTabOn = await page.locator(".stars-layer-tab.is-on").textContent();
+  check("既定は総合", layerTabOn === "総合", String(layerTabOn));
+
+  const sampleBands = () =>
+    page.evaluate(() => {
+      const c = window.StarsMap.canvas();
+      const ctx = c.getContext("2d");
+      const b = window.StarsLP.raw().meta.bbox;
+      const RAD = Math.PI / 180;
+      const mercY = (la) => Math.log(Math.tan(Math.PI / 4 + (la * RAD) / 2));
+      const yTop = mercY(b.north);
+      const yBot = mercY(b.south);
+      const rgbs = window.StarsPalette.BAND_RGB.map((v) => v.join(","));
+      const at = (lat, lon) => {
+        const x = Math.min(Math.round(((lon - b.west) / (b.east - b.west)) * c.width), c.width - 1);
+        const y = Math.min(Math.round(((mercY(lat) - yTop) / (yBot - yTop)) * c.height), c.height - 1);
+        const d = ctx.getImageData(x, y, 1, 1).data;
+        return rgbs.indexOf(`${d[0]},${d[1]},${d[2]}`); // 0が最良・5が最悪
+      };
+      return { wakkanai: at(45.4, 141.7), tokyo: at(35.7, 139.8), okutama: at(35.83, 139.0) };
+    });
+
+  const totalBands = await sampleBands();
+
+  await page.getByRole("button", { name: "空の暗さ" }).click();
+  await page.waitForTimeout(400);
+  const skyBands = await sampleBands();
+  await capture("map-sky");
+  check(
+    "空の暗さでは天気の影響が消える",
+    skyBands.wakkanai < totalBands.wakkanai && skyBands.wakkanai < skyBands.tokyo,
+    `稚内 総合${totalBands.wakkanai}→暗さ${skyBands.wakkanai} / 都心${skyBands.tokyo}`
+  );
+
+  await page.getByRole("button", { name: "天気" }).click();
+  await page.waitForTimeout(400);
+  const weatherBands = await sampleBands();
+  await capture("map-weather");
+  /*
+   * 総合は「天気 × 光害」なので、光害を外した天気だけの段階が総合より
+   * 悪くなることはない。そして都心と奥多摩は同じ天気の格子なので、
+   * 光害を外せば段階がほぼ揃う(総合では光害の差で大きく開く)。
+   * 本物の天気では偶然の一致に頼れないので、開きが縮むことで見る。
+   */
+  const gapTotal = Math.abs(totalBands.tokyo - totalBands.okutama);
+  const gapWeather = Math.abs(weatherBands.tokyo - weatherBands.okutama);
+  check(
+    "天気では光害の影響が消える",
+    weatherBands.tokyo <= totalBands.tokyo && gapWeather <= gapTotal && gapWeather <= 1,
+    `都心${weatherBands.tokyo} / 奥多摩${weatherBands.okutama}(総合は ${totalBands.tokyo} と ${totalBands.okutama})`
+  );
+
+  const note = await page.locator("#layer-note").textContent();
+  check("項目の説明が入れ替わる", /雲量/.test(note), note.slice(0, 24));
+
+  await page.getByRole("button", { name: "総合" }).click();
+  await page.waitForTimeout(400);
 
   // 時刻スライダーを動かすと描き直される
   const slider = page.locator("#time-slider");

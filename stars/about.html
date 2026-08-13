@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="./stars.css">
   <!-- @meta start -->
   <link rel="canonical" href="https://quick-calc.site/stars/about.html">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230c0f1a'/%3E%3Cpath d='M16 6l2.6 6.6L25.5 14l-5.3 4.4 1.7 6.9L16 21.6l-5.9 3.7 1.7-6.9L6.5 14l6.9-1.4z' fill='%23cde2fb'/%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230c0f1a'/%3E%3Cpath d='M16 6l2.6 6.6L25.5 14l-5.3 4.4 1.7 6.9L16 21.6l-5.9 3.7 1.7-6.9L6.5 14l6.9-1.4z' fill='%23fdd171'/%3E%3C/svg%3E">
   <meta name="theme-color" content="#0c0c0c">
   <meta property="og:type" content="article">
   <meta property="og:title" content="データについて（出典・計算方法・限界）">
@@ -65,6 +65,27 @@
   <p class="stars-help">
     地図では海と湖に色を塗っていません。星見レベル自体は海の上でも計算できますが、
     出かけ先の候補にならないうえ、一面を塗ると海岸線が消えて場所を読み取れなくなるためです。
+  </p>
+
+  <h3>項目ごとに見る</h3>
+  <p>
+    地図では表示を3つに切り替えられます。総合の点だけでは
+    「低いのは曇っているからか、街明かりのせいか」が分かりません。
+    要素を分けて見ることで、たとえば「天気は最高だが場所が明るい」＝
+    もう少し足を伸ばせば見える、といった判断ができます。
+  </p>
+  <table class="stars-table stars-table--plain">
+    <thead>
+      <tr><th scope="col">表示</th><th scope="col">含めるもの</th><th scope="col">時刻で変わるか</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">総合</th><td>空の暗さ・天気・月</td><td>変わる</td></tr>
+      <tr><th scope="row">空の暗さ</th><td>光害だけ</td><td>変わらない</td></tr>
+      <tr><th scope="row">天気</th><td>雲量・降水確率・視程・湿度</td><td>変わる</td></tr>
+    </tbody>
+  </table>
+  <p class="stars-help">
+    どの表示でも「明るい色ほど星見に向く」の向きは同じです。
   </p>
 
   <h2>データの出典</h2>

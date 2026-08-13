@@ -290,6 +290,59 @@
       "expect": 5
     },
     {
+      "name": "表示項目: 総合は3要素すべてを含む",
+      "func": "layerOf",
+      "args": [
+        "total"
+      ],
+      "expect": {
+        "key": "total",
+        "parts": {
+          "sky": true,
+          "weather": true,
+          "moon": true
+        }
+      }
+    },
+    {
+      "name": "表示項目: 空の暗さは光害だけ",
+      "func": "layerOf",
+      "args": [
+        "sky"
+      ],
+      "expect": {
+        "parts": {
+          "sky": true,
+          "weather": false,
+          "moon": false
+        }
+      }
+    },
+    {
+      "name": "表示項目: 天気は光害と月を含まない",
+      "func": "layerOf",
+      "args": [
+        "weather"
+      ],
+      "expect": {
+        "parts": {
+          "sky": false,
+          "weather": true,
+          "moon": false
+        }
+      }
+    },
+    {
+      "name": "表示項目: 知らない名前は総合に落とす",
+      "func": "layerOf",
+      "args": [
+        "なにか"
+      ],
+      "expect": {
+        "key": "total"
+      }
+    },
+    {
       "name": "月: 新月の夜(2026-08-12 東京)は輝面比0・影響なし",
       "global": "StarsSky",
       "func": "summary",

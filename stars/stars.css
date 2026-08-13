@@ -10,6 +10,8 @@
   /* 地図に重なるパネルは、地図と地続きに見えるよう常に暗色で描く */
   --map-surface: #0c0c0c;
   --panel-bg: rgba(16, 18, 24, 0.88);
+  /* 上のパネル色から透明度を抜いたもの。選択中のボタンの文字色に使う */
+  --panel-bg-solid: #10121a;
   --panel-border: rgba(255, 255, 255, 0.14);
   --panel-ink: #ffffff;
   --panel-ink-2: #c3c2b7;
@@ -84,7 +86,7 @@ a {
 }
 
 .stars-brand-mark {
-  color: #6da7ec;
+  color: #e0a41a;
 }
 
 .stars-nav {
@@ -233,6 +235,42 @@ a {
   color: var(--panel-ink-2);
 }
 
+/* 表示する項目の切り替え(総合・空の暗さ・天気) */
+.stars-layer-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 8px;
+}
+
+.stars-layer-tab {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 5px 4px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--panel-ink-2);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.2;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.stars-layer-tab.is-on {
+  border-color: transparent;
+  background: var(--panel-ink);
+  color: var(--panel-bg-solid);
+  font-weight: 600;
+}
+
+.stars-layer-note {
+  margin: 6px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--panel-ink-3);
+}
+
 .legend-row {
   display: grid;
   grid-template-columns: 16px auto 1fr;
@@ -261,13 +299,23 @@ a {
   text-overflow: ellipsis;
 }
 
+.stars-legend-more {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid var(--panel-border);
+}
+
+.stars-legend-more > summary {
+  font-size: 11px;
+  color: var(--panel-ink-3);
+  cursor: pointer;
+}
+
 .stars-opacity {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid var(--panel-border);
   font-size: 12px;
   color: var(--panel-ink-2);
 }
@@ -292,7 +340,8 @@ a {
   padding: 0;
   border: 2px solid #0c0c0c;
   border-radius: 50%;
-  background: #eda100;
+  /* 色分けが黄色系なので、ピンはその外の色にする(白＝どの段の上でも見える) */
+  background: #ffffff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
   cursor: pointer;
   position: relative;
@@ -306,7 +355,7 @@ a {
   height: 17px;
   padding: 0 4px;
   border-radius: 9px;
-  background: #184f95;
+  background: #0c0c0c;
   color: #fff;
   font-size: 11px;
   line-height: 17px;
@@ -430,7 +479,6 @@ a {
 
   .stars-opacity {
     margin-top: 6px;
-    padding-top: 6px;
   }
 
   .stars-spot-count {

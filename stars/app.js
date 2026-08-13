@@ -120,6 +120,48 @@
     });
   }
 
+  /*
+   * 表示する項目(総合・空の暗さ・天気)の切り替え。
+   *
+   * 総合の点だけでは「低いのは曇っているからか、街明かりのせいか」が読めない。
+   * 要素ごとに見られるようにして、たとえば「天気は最高だが場所が明るい」
+   * ＝ もう少し足を伸ばせば見える、という判断ができるようにする。
+   */
+  function buildLayerTabs() {
+    var box = el("layer-tabs");
+    if (!box) return;
+
+    function select(key) {
+      var chosen = MapView.setLayer(key);
+      Array.prototype.forEach.call(box.children, function (b) {
+        var on = b.dataset.layer === chosen;
+        b.classList.toggle("is-on", on);
+        b.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+      var note = el("layer-note");
+      if (note) note.textContent = Score.layerOf(chosen).note;
+      var title = el("legend-title");
+      if (title) {
+        title.textContent =
+          chosen === "total" ? "星見レベル" : Score.layerOf(chosen).label + "（星見のしやすさ）";
+      }
+      if (state.ready) requestRender();
+    }
+
+    Score.LAYERS.forEach(function (layer) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "stars-layer-tab";
+      b.dataset.layer = layer.key;
+      b.textContent = layer.label;
+      b.addEventListener("click", function () {
+        select(layer.key);
+      });
+      box.appendChild(b);
+    });
+    select("total");
+  }
+
   function setStatus(message, isError) {
     var box = el("status");
     if (!box) return;
@@ -249,6 +291,7 @@
 
   function start() {
     buildLegend();
+    buildLayerTabs();
     setStatus("光害データを読み込んでいます…");
 
     var ymd = tonightDate();
