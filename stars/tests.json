@@ -9,81 +9,167 @@
     {
       "name": "光害: 指標の下限は完全な暗さ",
       "func": "darknessFromIndex",
-      "args": [10],
+      "args": [
+        10
+      ],
       "expect": 1
     },
     {
       "name": "光害: 下限より小さい値も1で頭打ち",
       "func": "darknessFromIndex",
-      "args": [0],
+      "args": [
+        0
+      ],
       "expect": 1
     },
     {
       "name": "光害: 都心(255)の暗さは0",
       "func": "darknessFromIndex",
-      "args": [255],
+      "args": [
+        255
+      ],
       "expect": 0
     },
     {
       "name": "光害: 255を超える値も0で頭打ち",
       "func": "darknessFromIndex",
-      "args": [300],
+      "args": [
+        300
+      ],
       "expect": 0
     },
     {
       "name": "光害: 乗鞍畳平クラス(110)は0.8",
       "func": "darknessFromIndex",
-      "args": [110],
+      "args": [
+        110
+      ],
       "expect": 0.8
     },
     {
       "name": "光害: 奥多摩クラス(150)は0.45",
       "func": "darknessFromIndex",
-      "args": [150],
+      "args": [
+        150
+      ],
       "expect": 0.45
     },
     {
       "name": "光害: アンカーの中間は直線補間(40と70の中点)",
       "func": "darknessFromIndex",
-      "args": [55],
+      "args": [
+        55
+      ],
       "expect": 0.915
     },
-
     {
       "name": "スコア: 暗所・快晴・新月は最高ランク",
       "func": "evaluate",
-      "args": [{ "lpIndex": 105, "cloudPct": 0, "precipPct": 0, "moonBrightness": 0 }],
-      "expect": { "score": 85.8, "darkness": 0.81, "band": { "key": "excellent" } }
+      "args": [
+        {
+          "lpIndex": 105,
+          "cloudPct": 0,
+          "precipPct": 0,
+          "moonBrightness": 0
+        }
+      ],
+      "expect": {
+        "score": 85.8,
+        "darkness": 0.81,
+        "band": {
+          "key": "excellent"
+        }
+      }
     },
     {
       "name": "スコア: 曇天は暗所でも0",
       "func": "evaluate",
-      "args": [{ "lpIndex": 105, "cloudPct": 100, "precipPct": 0, "moonBrightness": 0 }],
-      "expect": { "score": 0, "band": { "key": "none" } }
+      "args": [
+        {
+          "lpIndex": 105,
+          "cloudPct": 100,
+          "precipPct": 0,
+          "moonBrightness": 0
+        }
+      ],
+      "expect": {
+        "score": 0,
+        "band": {
+          "key": "none"
+        }
+      }
     },
     {
       "name": "スコア: 雲量50は大きく減点される",
       "func": "evaluate",
-      "args": [{ "lpIndex": 105, "cloudPct": 50, "precipPct": 0, "moonBrightness": 0 }],
-      "expect": { "score": 37.3, "band": { "key": "poor" } }
+      "args": [
+        {
+          "lpIndex": 105,
+          "cloudPct": 50,
+          "precipPct": 0,
+          "moonBrightness": 0
+        }
+      ],
+      "expect": {
+        "score": 37.3,
+        "band": {
+          "key": "poor"
+        }
+      }
     },
     {
       "name": "スコア: 満月が天頂だと暗所でも大きく落ちる",
       "func": "evaluate",
-      "args": [{ "lpIndex": 105, "cloudPct": 0, "precipPct": 0, "moonBrightness": 1 }],
-      "expect": { "score": 34.3, "band": { "key": "bad" } }
+      "args": [
+        {
+          "lpIndex": 105,
+          "cloudPct": 0,
+          "precipPct": 0,
+          "moonBrightness": 1
+        }
+      ],
+      "expect": {
+        "score": 34.3,
+        "band": {
+          "key": "bad"
+        }
+      }
     },
     {
       "name": "スコア: 都心は快晴・新月でも悪い",
       "func": "evaluate",
-      "args": [{ "lpIndex": 254, "cloudPct": 0, "precipPct": 0, "moonBrightness": 0 }],
-      "expect": { "score": 25.2, "band": { "key": "bad" } }
+      "args": [
+        {
+          "lpIndex": 254,
+          "cloudPct": 0,
+          "precipPct": 0,
+          "moonBrightness": 0
+        }
+      ],
+      "expect": {
+        "score": 25.2,
+        "band": {
+          "key": "bad"
+        }
+      }
     },
     {
       "name": "スコア: 都市の外れ(奥多摩)は快晴・新月でまずまず",
       "func": "evaluate",
-      "args": [{ "lpIndex": 150, "cloudPct": 0, "precipPct": 0, "moonBrightness": 0 }],
-      "expect": { "score": 58.8, "band": { "key": "fair" } }
+      "args": [
+        {
+          "lpIndex": 150,
+          "cloudPct": 0,
+          "precipPct": 0,
+          "moonBrightness": 0
+        }
+      ],
+      "expect": {
+        "score": 58.8,
+        "band": {
+          "key": "fair"
+        }
+      }
     },
     {
       "name": "スコア: 視程・湿度が良好なら減点しない",
@@ -98,7 +184,10 @@
           "humidityPct": 50
         }
       ],
-      "expect": { "score": 85.8, "hasAirQuality": true }
+      "expect": {
+        "score": 85.8,
+        "hasAirQuality": true
+      }
     },
     {
       "name": "スコア: 靄(視程5km・湿度95%)は半分近くまで落ちる",
@@ -113,64 +202,117 @@
           "humidityPct": 95
         }
       ],
-      "expect": { "score": 42.4, "band": { "key": "poor" }, "hasAirQuality": true }
+      "expect": {
+        "score": 42.4,
+        "band": {
+          "key": "poor"
+        },
+        "hasAirQuality": true
+      }
     },
     {
       "name": "スコア: 視程・湿度が無いときは減点せずフラグで区別する",
       "func": "evaluate",
-      "args": [{ "lpIndex": 105, "cloudPct": 0, "precipPct": 0, "moonBrightness": 0 }],
-      "expect": { "hasAirQuality": false }
+      "args": [
+        {
+          "lpIndex": 105,
+          "cloudPct": 0,
+          "precipPct": 0,
+          "moonBrightness": 0
+        }
+      ],
+      "expect": {
+        "hasAirQuality": false
+      }
     },
     {
       "name": "スコア: 降水確率が高い夜はほぼ不可",
       "func": "evaluate",
-      "args": [{ "lpIndex": 105, "cloudPct": 60, "precipPct": 80, "moonBrightness": 0 }],
-      "expect": { "score": 14.8, "band": { "key": "none" } }
+      "args": [
+        {
+          "lpIndex": 105,
+          "cloudPct": 60,
+          "precipPct": 80,
+          "moonBrightness": 0
+        }
+      ],
+      "expect": {
+        "score": 14.8,
+        "band": {
+          "key": "none"
+        }
+      }
     },
-
     {
       "name": "段階: 80はちょうど最高",
       "func": "bandOf",
-      "args": [80],
-      "expect": { "key": "excellent" }
+      "args": [
+        80
+      ],
+      "expect": {
+        "key": "excellent"
+      }
     },
     {
       "name": "段階: 79.9は良い",
       "func": "bandOf",
-      "args": [79.9],
-      "expect": { "key": "good" }
+      "args": [
+        79.9
+      ],
+      "expect": {
+        "key": "good"
+      }
     },
     {
       "name": "段階: 0は不可",
       "func": "bandOf",
-      "args": [0],
-      "expect": { "key": "none" }
+      "args": [
+        0
+      ],
+      "expect": {
+        "key": "none"
+      }
     },
     {
       "name": "段階: 添字は最良が0",
       "func": "bandIndex",
-      "args": [100],
+      "args": [
+        100
+      ],
       "expect": 0
     },
     {
       "name": "段階: 添字は最悪が5",
       "func": "bandIndex",
-      "args": [0],
+      "args": [
+        0
+      ],
       "expect": 5
     },
-
     {
       "name": "月: 新月の夜(2026-08-12 東京)は輝面比0・影響なし",
       "global": "StarsSky",
       "func": "summary",
-      "args": ["2026-08-12T21:00:00+09:00", 35.68, 139.76],
-      "expect": { "illuminationPct": 0, "brightness": 0, "phaseLabel": "新月" }
+      "args": [
+        "2026-08-12T21:00:00+09:00",
+        35.68,
+        139.76
+      ],
+      "expect": {
+        "illuminationPct": 0,
+        "brightness": 0,
+        "phaseLabel": "新月"
+      }
     },
     {
       "name": "月: 満月の夜(2026-07-29 東京)は輝面比100・高度28.2度",
       "global": "StarsSky",
       "func": "summary",
-      "args": ["2026-07-29T22:00:00+09:00", 35.68, 139.76],
+      "args": [
+        "2026-07-29T22:00:00+09:00",
+        35.68,
+        139.76
+      ],
       "expect": {
         "illuminationPct": 100,
         "altitudeDeg": 28.2,
@@ -182,65 +324,171 @@
       "name": "月: 満月でも地平線下なら影響ゼロ",
       "global": "StarsSky",
       "func": "summary",
-      "args": ["2026-07-29T10:00:00+09:00", 35.68, 139.76],
-      "expect": { "illuminationPct": 100, "altitudeDeg": -67.8, "brightness": 0 }
+      "args": [
+        "2026-07-29T10:00:00+09:00",
+        35.68,
+        139.76
+      ],
+      "expect": {
+        "illuminationPct": 100,
+        "altitudeDeg": -67.8,
+        "brightness": 0
+      }
     },
     {
       "name": "月: 上弦(2026-08-20頃)は輝面比がおよそ半分",
       "global": "StarsSky",
       "func": "summary",
-      "args": ["2026-08-20T21:00:00+09:00", 35.68, 139.76],
-      "expect": { "phaseLabel": "上弦" }
+      "args": [
+        "2026-08-20T21:00:00+09:00",
+        35.68,
+        139.76
+      ],
+      "expect": {
+        "phaseLabel": "上弦"
+      }
     },
-
     {
       "name": "夜: 東京の夏至前後は夜が短い(7.2時間)",
       "global": "StarsSky",
       "func": "nightWindowSummary",
-      "args": ["2026-08-12", 35.68, 139.76],
-      "expect": { "start": "2026-08-12T11:10Z", "end": "2026-08-12T18:20Z", "hours": 7.2 }
+      "args": [
+        "2026-08-12",
+        35.68,
+        139.76
+      ],
+      "expect": {
+        "start": "2026-08-12T11:10Z",
+        "end": "2026-08-12T18:20Z",
+        "hours": 7.2
+      }
     },
     {
       "name": "夜: 東京の冬至は夜が長い(11時間)",
       "global": "StarsSky",
       "func": "nightWindowSummary",
-      "args": ["2026-12-21", 35.68, 139.76],
-      "expect": { "hours": 11 }
+      "args": [
+        "2026-12-21",
+        35.68,
+        139.76
+      ],
+      "expect": {
+        "hours": 11
+      }
     },
     {
       "name": "夜: 夏の稚内は東京より夜が短い",
       "global": "StarsSky",
       "func": "nightWindowSummary",
-      "args": ["2026-08-12", 45.42, 141.67],
-      "expect": { "hours": 5.5 }
+      "args": [
+        "2026-08-12",
+        45.42,
+        141.67
+      ],
+      "expect": {
+        "hours": 5.5
+      }
     },
     {
       "name": "夜: 夏の石垣島は東京より夜が長い",
       "global": "StarsSky",
       "func": "nightWindowSummary",
-      "args": ["2026-08-12", 24.34, 124.16],
-      "expect": { "hours": 8.2 }
+      "args": [
+        "2026-08-12",
+        24.34,
+        124.16
+      ],
+      "expect": {
+        "hours": 8.2
+      }
     },
     {
       "name": "夜: 白夜(6月のトロムソ)は暗くならないので null",
       "global": "StarsSky",
       "func": "nightWindowSummary",
-      "args": ["2026-06-21", 69.65, 18.96],
+      "args": [
+        "2026-06-21",
+        69.65,
+        18.96
+      ],
       "expect": null
     },
     {
       "name": "太陽: 東京の正午は高度が正",
       "global": "StarsSky",
       "func": "sunAltitudeDeg",
-      "args": ["2026-08-12T12:00:00+09:00", 35.68, 139.76],
+      "args": [
+        "2026-08-12T12:00:00+09:00",
+        35.68,
+        139.76
+      ],
       "expect": 69.23
     },
     {
       "name": "太陽: 東京の深夜は地平線下",
       "global": "StarsSky",
       "func": "sunAltitudeDeg",
-      "args": ["2026-08-13T00:00:00+09:00", 35.68, 139.76],
+      "args": [
+        "2026-08-13T00:00:00+09:00",
+        35.68,
+        139.76
+      ],
       "expect": -39.24
+    },
+    {
+      "name": "今夜の判定: 前夜が明けたあと(8/13 11:34 JST)は当日の夜",
+      "global": "StarsSky",
+      "func": "currentNightDate",
+      "args": [
+        35.68,
+        139.76,
+        "2026-08-13T02:34:00Z"
+      ],
+      "expect": "2026-08-13"
+    },
+    {
+      "name": "今夜の判定: 前夜が継続中(8/13 02:00 JST)は前日の夜",
+      "global": "StarsSky",
+      "func": "currentNightDate",
+      "args": [
+        35.68,
+        139.76,
+        "2026-08-12T17:00:00Z"
+      ],
+      "expect": "2026-08-12"
+    },
+    {
+      "name": "今夜の判定: 夜が進行中(8/12 22:00 JST)は当日の夜",
+      "global": "StarsSky",
+      "func": "currentNightDate",
+      "args": [
+        35.68,
+        139.76,
+        "2026-08-12T13:00:00Z"
+      ],
+      "expect": "2026-08-12"
+    },
+    {
+      "name": "今夜の判定: 日没前(8/13 18:00 JST)は当日の夜",
+      "global": "StarsSky",
+      "func": "currentNightDate",
+      "args": [
+        35.68,
+        139.76,
+        "2026-08-13T09:00:00Z"
+      ],
+      "expect": "2026-08-13"
+    },
+    {
+      "name": "今夜の判定: 天文薄明が始まった後(8/13 04:30 JST)は当日の夜",
+      "global": "StarsSky",
+      "func": "currentNightDate",
+      "args": [
+        35.68,
+        139.76,
+        "2026-08-12T19:30:00Z"
+      ],
+      "expect": "2026-08-13"
     }
   ]
 }

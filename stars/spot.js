@@ -1,8 +1,8 @@
 /*
  * スポットの詳細。?id=<spot_id> で1件を表示する。
  *
- * 一覧と同じく、視程・湿度も含めた地点ごとの予報で計算する。
- * こちらは「今夜のうち最も良い時刻」だけでなく、1時間ごとの推移も出す。
+ * 天気はサーバー側にキャッシュされた全国の格子から、最も近い格子点を読む
+ * (→ scripts/stars/weather-cache.sql)。1時間ごとの推移を出す。
  */
 (function (global) {
   "use strict";
@@ -33,20 +33,9 @@
     }).format(d);
   }
 
-  function tonightDate() {
-    var now = new Date();
-    var parts = {};
-    new Intl.DateTimeFormat("ja-JP", {
-      timeZone: JST, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", hour12: false
-    })
-      .formatToParts(now)
-      .forEach(function (p) {
-        if (p.type !== "literal") parts[p.type] = p.value;
-      });
-    var hour = Number(parts.hour === "24" ? "0" : parts.hour);
-    var d = new Date(Date.UTC(Number(parts.year), Number(parts.month) - 1, Number(parts.day)));
-    if (hour < 12) d.setUTCDate(d.getUTCDate() - 1);
-    return d.toISOString().slice(0, 10);
+  /** 「今夜」の対象日。そのスポットの位置で判定する(sky.js に集約) */
+  function tonightDate(lat, lon) {
+    return Sky.currentNightDate(lat, lon, new Date());
   }
 
   function setStatus(message, isError) {
@@ -234,7 +223,6 @@
     }
 
     setStatus("読み込んでいます…", false);
-    var ymd = tonightDate();
 
     Promise.all([
       LP.load(CONFIG.lightPollution.dataDir).catch(function () {}),
@@ -254,7 +242,7 @@
 
         var lat = Number(spot.lat);
         var lon = Number(spot.lon);
-        var night = Sky.nightWindow(ymd, lat, lon);
+        var night = Sky.nightWindow(tonightDate(lat, lon), lat, lon);
         if (!night) {
           setStatus("この日は空が充分に暗くなる時間帯がありません。", false);
           return null;
@@ -262,20 +250,18 @@
         var from = new Date(Math.floor(night.start.getTime() / 3600000) * 3600000);
         var to = new Date(Math.ceil(night.end.getTime() / 3600000) * 3600000);
 
-        return Net.fetchSpotForecasts([{ lat: lat, lon: lon }], from, to).then(function (list) {
-          var hourly = list[0].hourly;
+        return Net.fetchGrid(from, to).then(function (grid) {
+          var series = Net.gridSeries(grid, lat, lon);
           var lpIndex = LP.isReady() ? LP.index(lat, lon) : null;
 
-          state.hours = hourly.time.map(function (t, i) {
+          state.hours = series.times.map(function (t, i) {
             var when = new Date(t * 1000);
-            var visibility = hourly.visibility ? hourly.visibility[i] : null;
-            var humidity = hourly.relative_humidity_2m ? hourly.relative_humidity_2m[i] : null;
             var result = Score.evaluate({
               lpIndex: lpIndex === null ? undefined : lpIndex,
-              cloudPct: hourly.cloud_cover[i],
-              precipPct: hourly.precipitation_probability[i],
-              visibilityM: visibility === null ? undefined : visibility,
-              humidityPct: humidity === null ? undefined : humidity,
+              cloudPct: series.cloud[i],
+              precipPct: series.precip[i],
+              visibilityM: series.visibility[i],
+              humidityPct: series.humidity[i],
               moonBrightness: Sky.brightness(when, lat, lon)
             });
             return {
@@ -283,10 +269,10 @@
               score: result.score,
               band: result.band,
               darkness: result.darkness,
-              cloud: hourly.cloud_cover[i],
-              precip: hourly.precipitation_probability[i],
-              visibility: visibility,
-              humidity: humidity,
+              cloud: series.cloud[i],
+              precip: series.precip[i],
+              visibility: series.visibility[i],
+              humidity: series.humidity[i],
               moonAlt: Sky.position(when, lat, lon).altitudeDeg
             };
           });

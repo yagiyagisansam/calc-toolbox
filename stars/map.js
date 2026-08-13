@@ -220,8 +220,6 @@
     if (state.opacity === null) state.opacity = Palette.OVERLAY_ALPHA;
 
     var lp = LP.raw();
-    var g = CONFIG.grid;
-    var gCols = Math.round((g.east - g.west) / g.stepDeg) + 1;
 
     // --- 行(緯度)ごと ---
     var yTop = mercY(b.north);
@@ -238,12 +236,6 @@
 
       var lpRow = Math.floor(((b.north - lat) / (b.north - b.south)) * lp.height);
       state.rowLpOffset[y] = Math.min(Math.max(lpRow, 0), lp.height - 1) * lp.width;
-
-      // 天気の格子は北から南へ並んでいる
-      var gr = (g.north - lat) / g.stepDeg;
-      var gr0 = Math.floor(gr);
-      state.rowGrid0[y] = gr0;
-      state.rowGridW[y] = gr - gr0;
     }
 
     // --- 列(経度)ごと ---
@@ -256,13 +248,38 @@
       state.colLon[x] = lon;
       var lpCol = Math.floor(((lon - b.west) / (b.east - b.west)) * lp.width);
       state.colLp[x] = Math.min(Math.max(lpCol, 0), lp.width - 1);
+    }
+  }
 
-      var gc = (lon - g.west) / g.stepDeg;
+  /*
+   * 天気の格子と canvas の対応表を作る。
+   *
+   * 格子の刻みや範囲はサーバー側のキャッシュ(meta)から来るので、
+   * サイト側で決め打ちせず、データが届いてから計算する。
+   * こうしておけば、格子を細かくしても直すのはデータベース側だけで済む。
+   */
+  function buildGridMapping(grid) {
+    var g = grid.grid;
+    var h = state.canvas.height;
+    var w = state.canvas.width;
+
+    state.rowGrid0 = new Int32Array(h);
+    state.rowGridW = new Float32Array(h);
+    for (var y = 0; y < h; y++) {
+      var gr = (g.north - state.rowLat[y]) / g.step;
+      var gr0 = Math.floor(gr);
+      state.rowGrid0[y] = gr0;
+      state.rowGridW[y] = gr - gr0;
+    }
+
+    state.colGrid0 = new Int32Array(w);
+    state.colGridW = new Float32Array(w);
+    for (var x = 0; x < w; x++) {
+      var gc = (state.colLon[x] - g.west) / g.step;
       var gc0 = Math.floor(gc);
       state.colGrid0[x] = gc0;
       state.colGridW[x] = gc - gc0;
     }
-    state.gridCols = gCols;
   }
 
   // ---- 描画 ---------------------------------------------------------------
@@ -283,12 +300,21 @@
 
     var cloud = state.grid.cloud[timeIndex];
     var precip = state.grid.precip[timeIndex];
+    var vis = state.grid.visibility[timeIndex];
+    var humid = state.grid.humidity[timeIndex];
     var rows = state.grid.rows;
     var cols = state.grid.cols;
 
     var skyT = state.tables.sky;
     var cloudT = state.tables.cloud;
     var precipT = state.tables.precip;
+    var visT = state.tables.visibility;
+    var humidT = state.tables.humidity;
+    var visStep = state.tables.visibilityStepM;
+    var visMax = visT.length - 1;
+
+    // 天気が無いとき(光害だけの表示)は、視程・湿度で減点しない
+    var hasAir = state.grid.weatherAvailable !== false;
 
     // 月の影響は全国でほとんど変わらないので、地図の中心で一度だけ求める
     var when = new Date(state.grid.times[timeIndex] * 1000);
@@ -318,17 +344,22 @@
         if (gc0 < 0) { gc0 = 0; gc1 = 0; wx = 0; }
         else if (gc1 > cols - 1) { gc0 = cols - 1; gc1 = cols - 1; wx = 0; }
 
-        // 粗い格子から双一次補間で雲量と降水確率を求める
+        // 粗い格子から双一次補間で各要素を求める
         var iA0 = rowA + gc0, iA1 = rowA + gc1, iB0 = rowB + gc0, iB1 = rowB + gc1;
-        var c =
-          (cloud[iA0] * (1 - wx) + cloud[iA1] * wx) * (1 - wy) +
-          (cloud[iB0] * (1 - wx) + cloud[iB1] * wx) * wy;
-        var pr =
-          (precip[iA0] * (1 - wx) + precip[iA1] * wx) * (1 - wy) +
-          (precip[iB0] * (1 - wx) + precip[iB1] * wx) * wy;
+        var wA = (1 - wx) * (1 - wy), wB = wx * (1 - wy), wC = (1 - wx) * wy, wD = wx * wy;
+        var c = cloud[iA0] * wA + cloud[iA1] * wB + cloud[iB0] * wC + cloud[iB1] * wD;
+        var pr = precip[iA0] * wA + precip[iA1] * wB + precip[iB0] * wC + precip[iB1] * wD;
+
+        var air = 1;
+        if (hasAir) {
+          var vm = vis[iA0] * wA + vis[iA1] * wB + vis[iB0] * wC + vis[iB1] * wD;
+          var hm = humid[iA0] * wA + humid[iA1] * wB + humid[iB0] * wC + humid[iB1] * wD;
+          var vi = (vm / visStep) | 0;
+          air = visT[vi > visMax ? visMax : vi] * humidT[hm | 0];
+        }
 
         var lpv = lpData[lpOff + state.colLp[x]];
-        var score = 100 * skyT[lpv] * cloudT[c | 0] * precipT[pr | 0] * moonF;
+        var score = 100 * skyT[lpv] * cloudT[c | 0] * precipT[pr | 0] * air * moonF;
 
         // 段階を引く(上から順に見る。段数は6なので分岐で十分速い)
         var bi = nBands - 1;
@@ -357,6 +388,7 @@
   /** 天気データを差し替える(取得しなおしたとき) */
   function setGrid(grid) {
     state.grid = grid;
+    buildGridMapping(grid);
   }
 
   /** ラスタの濃さを変える(0で非表示) */

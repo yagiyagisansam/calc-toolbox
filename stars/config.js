@@ -21,34 +21,21 @@
       insertBelowLayerId: "water_name"
     },
 
-    // ---- 天気の取得グリッド ----
-    // 与那国(123.0E)から小笠原(142.2E)まで含む範囲。1度刻み。
-    // 雲は数十kmの単位でしか変わらないので、これ以上細かくしても
-    // 通信量が増えるだけで地図の見え方は変わらない。
+    // ---- 天気の格子(予備の値) ----
+    // 実際に使う格子の定義はサーバー側のキャッシュ(meta)から来る。
+    // ここに書いてあるのは、天気をまったく取得できなかったときに
+    // 「光害だけの表示」を組み立てるための入れ物にすぎない。
+    // 格子を変えるときは scripts/stars/weather-cache.sql の stars_grid_def() を直す。
     grid: {
       south: 24,
       north: 46,
-      west: 122,
-      east: 147,
+      west: 123,
+      east: 146,
       stepDeg: 1
     },
 
-    // ---- Open-Meteo ----
+    // ---- 天気予報 ----
     weather: {
-      endpoint: "https://api.open-meteo.com/v1/forecast",
-      // 地図のラスタ用(通信量を抑えるため2項目だけ)
-      gridVariables: ["cloud_cover", "precipitation_probability"],
-      // スポットの詳細・一覧用(視程と湿度も含めた全項目)
-      spotVariables: [
-        "cloud_cover",
-        "precipitation_probability",
-        "visibility",
-        "relative_humidity_2m"
-      ],
-      // 取得結果を sessionStorage に置いておく時間
-      cacheMinutes: 60,
-      // 一覧・詳細で一度に問い合わせる地点数の上限
-      maxSpotsPerRequest: 100,
       // 出典表示(CC BY 4.0 のため必須)
       attribution: {
         text: "Weather data by Open-Meteo.com",

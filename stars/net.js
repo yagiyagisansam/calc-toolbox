@@ -1,12 +1,23 @@
 /*
  * 外部との通信。
- *   - 天気予報: Open-Meteo(APIキー不要・CC BY 4.0)
- *   - スポットの保存/取得: Supabase の REST API を fetch で直叩き
- *     (SDKは使わない。ビルド工程を持たず CSP の script-src を 'self' に保つため)
  *
- * Supabase の接続情報は統計ツールと同じものを使う(../tools/poll/config.js の
- * POLL_CONFIG)。anonキーは公開前提で、権限はデータベース側の RLS で絞ってある。
- * 承認前のスポットは anon から読めず、公開用の関数だけが承認済みを返す。
+ * 天気予報:
+ *   ブラウザは Open-Meteo に**直接は問い合わせない**。
+ *   全国の格子は誰が見ても同じなので、サーバー側(Supabase)が3時間に1回だけ
+ *   取得してキャッシュしたものを読む(scripts/stars/weather-cache.sql)。
+ *
+ *   当初は訪問者ごとに552地点を問い合わせていたが、それだと地図を1回開くだけで
+ *   無料枠(600回/分)をほぼ使い切り、複数人が同時に使えなかった。
+ *   いまの方式なら上流への呼び出しは訪問者数に関係なく1日8回で一定になる。
+ *
+ *   格子の刻みや範囲はキャッシュの meta に入っている。サイト側で決め打ちせず
+ *   そちらに従う(両方に同じ数値を書くとずれるため)。
+ *
+ * スポットの保存/取得:
+ *   Supabase の REST API を fetch で直叩き(SDKは使わない。ビルド工程を持たず
+ *   CSP の script-src を 'self' に保つため)。
+ *   接続情報は統計ツールと同じ ../tools/poll/config.js の POLL_CONFIG。
+ *   承認前のスポットは anon から読めず、公開用の関数だけが承認済みを返す。
  *
  * window.StarsNet で公開する。
  */
@@ -15,211 +26,7 @@
 
   var CONFIG = global.STARS_CONFIG;
 
-  // ---- 共通 -------------------------------------------------------------
-
-  function cacheGet(key) {
-    try {
-      var raw = sessionStorage.getItem(key);
-      if (!raw) return null;
-      var box = JSON.parse(raw);
-      if (Date.now() - box.at > CONFIG.weather.cacheMinutes * 60000) return null;
-      return box.value;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  function cacheSet(key, value) {
-    try {
-      sessionStorage.setItem(key, JSON.stringify({ at: Date.now(), value: value }));
-    } catch (e) {
-      // 容量超過などは無視する(キャッシュは無くても動く)
-    }
-  }
-
-  // Open-Meteo は「時刻の文字列」を分単位まで受け取る
-  function hourParam(date) {
-    var p = function (n) {
-      return String(n).padStart(2, "0");
-    };
-    return (
-      date.getUTCFullYear() +
-      "-" +
-      p(date.getUTCMonth() + 1) +
-      "-" +
-      p(date.getUTCDate()) +
-      "T" +
-      p(date.getUTCHours()) +
-      ":00"
-    );
-  }
-
-  /**
-   * Open-Meteo に問い合わせる。地点はカンマ区切りでまとめて渡せる。
-   * @param {Array<{lat:number, lon:number}>} points
-   * @param {string[]} variables 取得する時間別の項目
-   * @param {Date} start 開始時刻
-   * @param {Date} end 終了時刻
-   * @returns {Promise<Array>} 地点ごとの結果(points と同じ並び)
-   */
-  function fetchForecast(points, variables, start, end) {
-    var url = new URL(CONFIG.weather.endpoint);
-    url.searchParams.set("latitude", points.map(function (p) { return p.lat; }).join(","));
-    url.searchParams.set("longitude", points.map(function (p) { return p.lon; }).join(","));
-    url.searchParams.set("hourly", variables.join(","));
-    url.searchParams.set("start_hour", hourParam(start));
-    url.searchParams.set("end_hour", hourParam(end));
-    // 時刻は UTC で受け取り、表示するときに変換する(閲覧者の地域に依存させない)
-    url.searchParams.set("timeformat", "unixtime");
-    url.searchParams.set("timezone", "GMT");
-
-    return fetch(url.toString()).then(function (r) {
-      if (!r.ok) throw new Error("天気予報を取得できませんでした (" + r.status + ")");
-      return r.json();
-    }).then(function (json) {
-      // 地点が1つのときはオブジェクト、複数のときは配列で返る
-      return Array.isArray(json) ? json : [json];
-    });
-  }
-
-  // ---- 地図用のグリッド ---------------------------------------------------
-
-  /** 設定にしたがって格子状の地点一覧を作る */
-  function gridPoints() {
-    var g = CONFIG.grid;
-    var pts = [];
-    var rows = 0;
-    var cols = 0;
-    for (var lat = g.north; lat >= g.south - 1e-9; lat -= g.stepDeg) {
-      cols = 0;
-      for (var lon = g.west; lon <= g.east + 1e-9; lon += g.stepDeg) {
-        pts.push({ lat: Math.round(lat * 100) / 100, lon: Math.round(lon * 100) / 100 });
-        cols++;
-      }
-      rows++;
-    }
-    return { points: pts, rows: rows, cols: cols };
-  }
-
-  /**
-   * 地図のラスタ用に、格子の各点の雲量・降水確率を取得する。
-   * 戻り値は時刻ごとの2次元配列(北→南、西→東の並び)。
-   * @param {Date} start
-   * @param {Date} end
-   * @returns {Promise<{times:number[], rows:number, cols:number, grid:object,
-   *                    cloud:Float32Array[], precip:Float32Array[]}>}
-   */
-  function fetchGrid(start, end) {
-    var key = "stars:grid:" + hourParam(start) + ":" + hourParam(end);
-    var cached = cacheGet(key);
-    if (cached) return Promise.resolve(inflateGrid(cached));
-
-    var g = gridPoints();
-    return fetchForecast(g.points, CONFIG.weather.gridVariables, start, end).then(function (list) {
-      if (list.length !== g.points.length) {
-        throw new Error("天気予報の地点数が合いません (" + list.length + "/" + g.points.length + ")");
-      }
-      var times = list[0].hourly.time;
-      // 通信量を抑えるため、キャッシュには整数の配列だけを入れる
-      var packed = {
-        times: times,
-        rows: g.rows,
-        cols: g.cols,
-        grid: CONFIG.grid,
-        cloud: list.map(function (e) { return e.hourly.cloud_cover; }),
-        precip: list.map(function (e) { return e.hourly.precipitation_probability; })
-      };
-      cacheSet(key, packed);
-      return inflateGrid(packed);
-    });
-  }
-
-  /**
-   * 天気を取得できなかったときに使う、雲量ゼロの格子。
-   *
-   * 予報が無くても「その場所がどれだけ暗いか」は変わらないので、
-   * 光害だけの表示に切り替えて地図は使えるようにする。
-   * 呼び出し側は「天気は反映されていない」と画面に明示すること。
-   */
-  function emptyGrid(start, end) {
-    var g = gridPoints();
-    var times = [];
-    for (var t = start.getTime(); t <= end.getTime(); t += 3600000) times.push(t / 1000);
-    var n = g.rows * g.cols;
-    var cloud = [];
-    var precip = [];
-    for (var i = 0; i < times.length; i++) {
-      cloud.push(new Float32Array(n));
-      precip.push(new Float32Array(n));
-    }
-    return {
-      times: times,
-      rows: g.rows,
-      cols: g.cols,
-      grid: CONFIG.grid,
-      cloud: cloud,
-      precip: precip,
-      weatherAvailable: false
-    };
-  }
-
-  /* 地点ごとの配列を「時刻ごとの格子」に組み替える(ラスタ描画で引きやすい形) */
-  function inflateGrid(packed) {
-    var nt = packed.times.length;
-    var n = packed.rows * packed.cols;
-    var cloud = [];
-    var precip = [];
-    for (var t = 0; t < nt; t++) {
-      var c = new Float32Array(n);
-      var p = new Float32Array(n);
-      for (var i = 0; i < n; i++) {
-        var cv = packed.cloud[i] && packed.cloud[i][t];
-        var pv = packed.precip[i] && packed.precip[i][t];
-        // 欠測は「曇っている」側に倒さず、雲ゼロ扱いにもしない。
-        // 直前の値を引き継ぎ、最初から無い場合だけ 0 とする。
-        c[i] = cv === null || cv === undefined ? (t > 0 ? cloud[t - 1][i] : 0) : cv;
-        p[i] = pv === null || pv === undefined ? (t > 0 ? precip[t - 1][i] : 0) : pv;
-      }
-      cloud.push(c);
-      precip.push(p);
-    }
-    return {
-      times: packed.times,
-      rows: packed.rows,
-      cols: packed.cols,
-      grid: packed.grid,
-      cloud: cloud,
-      precip: precip,
-      weatherAvailable: true
-    };
-  }
-
-  // ---- スポット単位の予報 -------------------------------------------------
-
-  /**
-   * スポットごとの詳しい予報(視程・湿度を含む)をまとめて取得する。
-   * @param {Array<{lat:number, lon:number}>} spots
-   * @param {Date} start
-   * @param {Date} end
-   */
-  function fetchSpotForecasts(spots, start, end) {
-    if (!spots.length) return Promise.resolve([]);
-    var max = CONFIG.weather.maxSpotsPerRequest;
-    var chunks = [];
-    for (var i = 0; i < spots.length; i += max) chunks.push(spots.slice(i, i + max));
-
-    return Promise.all(
-      chunks.map(function (chunk) {
-        return fetchForecast(chunk, CONFIG.weather.spotVariables, start, end);
-      })
-    ).then(function (results) {
-      return results.reduce(function (acc, r) {
-        return acc.concat(r);
-      }, []);
-    });
-  }
-
-  // ---- Supabase ----------------------------------------------------------
+  // ---- Supabase の共通部分 -----------------------------------------------
 
   function conf() {
     var c = global.POLL_CONFIG;
@@ -243,6 +50,163 @@
   function restBase() {
     return conf().url.replace(/\/+$/, "") + "/rest/v1";
   }
+
+  // ---- 天気予報(キャッシュを読む) ----------------------------------------
+
+  var gridPromise = null;
+
+  /**
+   * サーバー側にキャッシュされた全国の格子を読む。
+   * 何度呼んでも1回しか取りに行かない(同じページ内で使い回す)。
+   * @returns {Promise<object>} 生のキャッシュ {payload, meta, updated_at}
+   */
+  function fetchCachedGrid() {
+    if (gridPromise) return gridPromise;
+    if (!backendReady()) return Promise.reject(new Error("接続設定がありません"));
+
+    gridPromise = fetch(
+      restBase() + "/stars_weather_cache?kind=eq.grid&select=payload,meta,updated_at",
+      { headers: headers() }
+    )
+      .then(function (r) {
+        if (!r.ok) throw new Error("天気予報を取得できませんでした (" + r.status + ")");
+        return r.json();
+      })
+      .then(function (rows) {
+        if (!rows.length) throw new Error("天気予報がまだ用意されていません");
+        return rows[0];
+      });
+
+    return gridPromise;
+  }
+
+  /**
+   * 指定した時間帯の格子を返す。
+   *
+   * キャッシュは30時間ぶんを持っているので、そこから必要な時刻だけを切り出す。
+   * 戻り値は時刻ごとの配列(北→南、西→東の並び)。
+   *
+   * @param {Date} start
+   * @param {Date} end
+   * @returns {Promise<{times:number[], rows:number, cols:number, grid:object,
+   *                    cloud:Float32Array[], precip:Float32Array[],
+   *                    visibility:Float32Array[], humidity:Float32Array[],
+   *                    updatedAt:Date, weatherAvailable:boolean}>}
+   */
+  function fetchGrid(start, end) {
+    return fetchCachedGrid().then(function (row) {
+      return sliceGrid(row, start, end);
+    });
+  }
+
+  /** キャッシュの生データから、必要な時刻ぶんだけを取り出して組み替える */
+  function sliceGrid(row, start, end) {
+    var meta = row.meta;
+    var p = row.payload;
+    var from = start.getTime() / 1000;
+    var to = end.getTime() / 1000;
+
+    var idx = [];
+    for (var t = 0; t < p.times.length; t++) {
+      if (p.times[t] >= from && p.times[t] <= to) idx.push(t);
+    }
+    // 求めた時間帯がキャッシュの範囲から外れている(更新が止まっている等)
+    if (!idx.length) throw new Error("この時間帯の予報がまだありません");
+
+    var rows = Math.round((meta.north - meta.south) / meta.step) + 1;
+    var cols = Math.round((meta.east - meta.west) / meta.step) + 1;
+    var n = rows * cols;
+    if (p.cloud.length !== n) {
+      throw new Error("予報の地点数が合いません (" + p.cloud.length + "/" + n + ")");
+    }
+
+    var out = {
+      times: idx.map(function (t) {
+        return p.times[t];
+      }),
+      rows: rows,
+      cols: cols,
+      grid: meta,
+      updatedAt: new Date(row.updated_at),
+      weatherAvailable: true
+    };
+
+    ["cloud", "precip", "visibility", "humidity"].forEach(function (key) {
+      var series = [];
+      for (var k = 0; k < idx.length; k++) {
+        var arr = new Float32Array(n);
+        for (var i = 0; i < n; i++) {
+          var v = p[key] && p[key][i] ? p[key][i][idx[k]] : null;
+          // 欠測は直前の時刻の値を引き継ぐ(最初から無い場合だけ0)
+          arr[i] = v === null || v === undefined ? (k > 0 ? series[k - 1][i] : 0) : v;
+        }
+        series.push(arr);
+      }
+      out[key] = series;
+    });
+
+    return out;
+  }
+
+  /**
+   * 天気を取得できなかったときに使う、雲量ゼロの格子。
+   *
+   * 予報が無くても「その場所がどれだけ暗いか」は変わらないので、
+   * 光害だけの表示に切り替えて地図は使えるようにする。
+   * 呼び出し側は「天気は反映されていない」と画面に明示すること。
+   */
+  function emptyGrid(start, end) {
+    var g = CONFIG.grid;
+    var rows = Math.round((g.north - g.south) / g.stepDeg) + 1;
+    var cols = Math.round((g.east - g.west) / g.stepDeg) + 1;
+    var n = rows * cols;
+    var times = [];
+    for (var t = start.getTime(); t <= end.getTime(); t += 3600000) times.push(t / 1000);
+
+    var out = {
+      times: times,
+      rows: rows,
+      cols: cols,
+      grid: { south: g.south, north: g.north, west: g.west, east: g.east, step: g.stepDeg },
+      updatedAt: null,
+      weatherAvailable: false
+    };
+    ["cloud", "precip", "visibility", "humidity"].forEach(function (key) {
+      out[key] = times.map(function () {
+        return new Float32Array(n);
+      });
+    });
+    return out;
+  }
+
+  /**
+   * 格子から1地点の時系列を取り出す(最も近い格子点)。
+   * 一覧とスポット詳細は、これを使って地点ごとのスコアを出す。
+   *
+   * @param {object} grid fetchGrid の戻り値
+   * @param {number} lat
+   * @param {number} lon
+   * @returns {{times:number[], cloud:number[], precip:number[],
+   *            visibility:number[], humidity:number[]}}
+   */
+  function gridSeries(grid, lat, lon) {
+    var g = grid.grid;
+    var r = Math.round((g.north - lat) / g.step);
+    var c = Math.round((lon - g.west) / g.step);
+    r = Math.min(Math.max(r, 0), grid.rows - 1);
+    c = Math.min(Math.max(c, 0), grid.cols - 1);
+    var i = r * grid.cols + c;
+
+    var series = { times: grid.times };
+    ["cloud", "precip", "visibility", "humidity"].forEach(function (key) {
+      series[key] = grid[key].map(function (arr) {
+        return arr[i];
+      });
+    });
+    return series;
+  }
+
+  // ---- スポット -----------------------------------------------------------
 
   /**
    * 承認済みスポットの一覧。未承認のものはデータベース側で除かれるため、
@@ -294,8 +258,7 @@
   global.StarsNet = {
     fetchGrid: fetchGrid,
     emptyGrid: emptyGrid,
-    fetchSpotForecasts: fetchSpotForecasts,
-    gridPoints: gridPoints,
+    gridSeries: gridSeries,
     publicSpots: publicSpots,
     submitSpot: submitSpot,
     backendReady: backendReady

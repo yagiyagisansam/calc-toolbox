@@ -1,9 +1,9 @@
 /*
  * 地域別の一覧。
  *
- * 地図の色分けは通信量を抑えるため雲量と降水確率だけで作っているが、
- * この一覧は掲載中のスポットだけを相手にするので、視程と湿度も含めた
- * 地点ごとの予報を取り、全要因でスコアを出す。表の説明にもその旨を書いてある。
+ * 天気はサーバー側にキャッシュされた全国の格子(1度刻み)から読む。
+ * 訪問者ごとに Open-Meteo へ問い合わせると、人数ぶんだけ上流の呼び出しが
+ * 増えて同時に使えなくなるため(→ scripts/stars/weather-cache.sql)。
  *
  * 1スポットにつき「今夜のうち最も条件がよい時刻とその点数」を出す。
  * 星見は一晩じゅう外にいるわけではないので、最高値のほうが判断に使える。
@@ -50,30 +50,9 @@
     }).format(date);
   }
 
-  function jstHour(date) {
-    return Number(
-      new Intl.DateTimeFormat("ja-JP", { timeZone: JST, hour: "2-digit", hour12: false }).format(date)
-    );
-  }
-
-  /** 「今夜」の対象日(深夜〜明け方に見ている人には、続いている夜を見せる) */
+  /** 「今夜」の対象日(前夜がまだ明けていなければ前日)。判定は sky.js に集約 */
   function tonightDate() {
-    var now = new Date();
-    var f = new Intl.DateTimeFormat("ja-JP", {
-      timeZone: JST,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit"
-    });
-    var parts = {};
-    f.formatToParts(now).forEach(function (p) {
-      if (p.type !== "literal") parts[p.type] = p.value;
-    });
-    var ymd = parts.year + "-" + parts.month + "-" + parts.day;
-    if (jstHour(now) >= 12) return ymd;
-    var d = new Date(Date.UTC(Number(parts.year), Number(parts.month) - 1, Number(parts.day)));
-    d.setUTCDate(d.getUTCDate() - 1);
-    return d.toISOString().slice(0, 10);
+    return Sky.currentNightDate(36, 138, new Date());
   }
 
   function setStatus(message, isError) {
@@ -89,25 +68,25 @@
    * 1スポットぶんの予報から、今夜のうち最も条件がよい時刻を選ぶ。
    * その地点で空が充分に暗い時間帯だけを対象にする(全国の時間帯ではなく)。
    */
-  function bestOfNight(spot, forecast, ymd) {
+  function bestOfNight(spot, grid, ymd) {
     var lat = Number(spot.lat);
     var lon = Number(spot.lon);
     var window_ = Sky.nightWindow(ymd, lat, lon);
     var lpIndex = LP.isReady() ? LP.index(lat, lon) : null;
+    var series = Net.gridSeries(grid, lat, lon);
 
-    var hourly = forecast.hourly;
     var best = null;
-    for (var i = 0; i < hourly.time.length; i++) {
-      var when = new Date(hourly.time[i] * 1000);
+    for (var i = 0; i < series.times.length; i++) {
+      var when = new Date(series.times[i] * 1000);
       // その地点で暗くない時刻は候補から外す
       if (window_ && (when < window_.start || when > window_.end)) continue;
 
       var result = Score.evaluate({
         lpIndex: lpIndex === null ? undefined : lpIndex,
-        cloudPct: hourly.cloud_cover[i],
-        precipPct: hourly.precipitation_probability[i],
-        visibilityM: hourly.visibility ? hourly.visibility[i] : undefined,
-        humidityPct: hourly.relative_humidity_2m ? hourly.relative_humidity_2m[i] : undefined,
+        cloudPct: series.cloud[i],
+        precipPct: series.precip[i],
+        visibilityM: series.visibility[i],
+        humidityPct: series.humidity[i],
         moonBrightness: Sky.brightness(when, lat, lon)
       });
       if (!best || result.score > best.score) {
@@ -115,7 +94,7 @@
           score: result.score,
           band: result.band,
           at: when,
-          cloud: hourly.cloud_cover[i],
+          cloud: series.cloud[i],
           darkness: result.darkness
         };
       }
@@ -286,9 +265,9 @@
           return null;
         }
 
-        setStatus("今夜の予報を取得しています…", false);
-        // 取得は「全国でいちばん早く暗くなる〜いちばん遅くまで暗い」を覆う範囲でまとめて行い、
-        // 地点ごとの時間帯での絞り込みは受け取ってから行う
+        setStatus("今夜の予報を読み込んでいます…", false);
+        // 掲載スポット全部を覆う時間帯を求め、格子から一度に切り出す。
+        // 地点ごとの絞り込みは受け取ってから行う。
         var starts = [];
         var ends = [];
         spots.forEach(function (s) {
@@ -306,15 +285,9 @@
         var from = new Date(Math.floor(Math.min.apply(null, starts) / 3600000) * 3600000);
         var to = new Date(Math.ceil(Math.max.apply(null, ends) / 3600000) * 3600000);
 
-        return Net.fetchSpotForecasts(
-          spots.map(function (s) {
-            return { lat: Number(s.lat), lon: Number(s.lon) };
-          }),
-          from,
-          to
-        ).then(function (forecasts) {
-          spots.forEach(function (spot, i) {
-            spot.best = forecasts[i] ? bestOfNight(spot, forecasts[i], ymd) : null;
+        return Net.fetchGrid(from, to).then(function (grid) {
+          spots.forEach(function (spot) {
+            spot.best = bestOfNight(spot, grid, ymd);
           });
           renderTable();
           state.ready = true;

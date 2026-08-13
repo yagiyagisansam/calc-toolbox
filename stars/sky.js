@@ -260,6 +260,38 @@
   }
 
   /**
+   * 「いまの夜」がどの日の夜かを返す。
+   *
+   * 夜は日付をまたぐので、単純に「今日」を使うと、深夜0時を過ぎた瞬間に
+   * 見ている夜が翌日の夜に切り替わってしまう。かといって「正午より前なら前日」
+   * のような時刻での線引きも誤る ── 朝5時に前夜が明けたあと正午までの間は、
+   * 前夜ではなく「これから来る今夜」を見せるべきだから。
+   *
+   * そこで前夜の暗い時間帯が今も続いているかを実際に計算して決める。
+   *
+   * @param {number} lat 緯度(度)
+   * @param {number} lon 経度(度)
+   * @param {Date|string} [now] いまの時刻(省略時は現在)
+   * @returns {string} "YYYY-MM-DD"(その日の夕方から始まる夜)
+   */
+  function currentNightDate(lat, lon, now) {
+    var t = now ? (now instanceof Date ? now : new Date(now)) : new Date();
+    // その地点の地方時での日付(閲覧者の端末のタイムゾーンには依存させない)
+    var localMs = t.getTime() + (lon / 15) * 3600000;
+    var today = new Date(localMs).toISOString().slice(0, 10);
+
+    var parts = today.split("-").map(Number);
+    var prev = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
+    prev.setUTCDate(prev.getUTCDate() - 1);
+    var yesterday = prev.toISOString().slice(0, 10);
+
+    // 前夜がまだ明けていなければ、その夜を見せる
+    var w = nightWindow(yesterday, lat, lon);
+    if (w && t <= w.end) return yesterday;
+    return today;
+  }
+
+  /**
    * nightWindow を文字列で返す表示・テスト用の版。
    * @returns {{start:string, end:string, hours:number}|null} 時刻は ISO 文字列(UTC)
    */
@@ -318,6 +350,7 @@
     sunAltitudeDeg: sunAltitudeDeg,
     nightWindow: nightWindow,
     nightWindowSummary: nightWindowSummary,
+    currentNightDate: currentNightDate,
     SYNODIC_MONTH: SYNODIC_MONTH,
     ASTRONOMICAL_TWILIGHT_DEG: ASTRONOMICAL_TWILIGHT_DEG
   };

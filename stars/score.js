@@ -66,6 +66,9 @@
     moonWeight: 0.6
   };
 
+  // 早見表で視程を引くときの刻み(m)
+  var VISIBILITY_STEP_M = 100;
+
   // 表示の段階。色は palette.js が持つ(ここでは意味だけを定義する)。
   var BANDS = [
     { key: "excellent", min: 80, label: "最高", note: "天の川がはっきり見える条件" },
@@ -154,16 +157,23 @@
 
   /**
    * 地図のラスタ描画用の軽量版。1画素ごとに呼ぶのでオブジェクトを作らない。
-   * 視程・湿度は持たないため減点しない(evaluate で省略した場合と同じ)。
+   * evaluate と同じ要素を同じ重みで掛ける(地図と一覧で判定が食い違わないように)。
    * @returns {number} 0〜100
    */
-  function quick(lpIndex, cloudPct, precipPct, moonBrightness) {
+  function quick(lpIndex, cloudPct, precipPct, visibilityM, humidityPct, moonBrightness) {
     var darkness = darknessFromIndex(lpIndex);
     var sky = CONFIG.darknessFloor + (1 - CONFIG.darknessFloor) * darkness;
     var cloud = Math.pow(1 - clamp(cloudPct, 0, 100) / 100, CONFIG.cloudExponent);
     var precip = 1 - (clamp(precipPct, 0, 100) / 100) * CONFIG.precipWeight;
+    var vis = clamp(visibilityM / CONFIG.visibilityFull, 0, 1);
+    var air =
+      (CONFIG.visibilityFloor + (1 - CONFIG.visibilityFloor) * vis) *
+      (1 -
+        (clamp(humidityPct - CONFIG.humidityThreshold, 0, 100 - CONFIG.humidityThreshold) /
+          (100 - CONFIG.humidityThreshold)) *
+          CONFIG.humidityWeight);
     var moon = 1 - clamp(moonBrightness, 0, 1) * CONFIG.moonWeight;
-    return 100 * sky * cloud * precip * moon;
+    return 100 * sky * cloud * precip * air * moon;
   }
 
   /**
@@ -183,11 +193,27 @@
     }
     var cloud = new Float32Array(101);
     var precip = new Float32Array(101);
+    var humidity = new Float32Array(101);
     for (var p = 0; p <= 100; p++) {
       cloud[p] = Math.pow(1 - p / 100, CONFIG.cloudExponent);
       precip[p] = 1 - (p / 100) * CONFIG.precipWeight;
+      var over = clamp(p - CONFIG.humidityThreshold, 0, 100 - CONFIG.humidityThreshold);
+      humidity[p] = 1 - (over / (100 - CONFIG.humidityThreshold)) * CONFIG.humidityWeight;
     }
-    return { sky: sky, cloud: cloud, precip: precip };
+    // 視程は 100m 刻みで引く(0〜20km)
+    var steps = Math.round(CONFIG.visibilityFull / VISIBILITY_STEP_M);
+    var visibility = new Float32Array(steps + 1);
+    for (var v = 0; v <= steps; v++) {
+      visibility[v] = CONFIG.visibilityFloor + (1 - CONFIG.visibilityFloor) * (v / steps);
+    }
+    return {
+      sky: sky,
+      cloud: cloud,
+      precip: precip,
+      humidity: humidity,
+      visibility: visibility,
+      visibilityStepM: VISIBILITY_STEP_M
+    };
   }
 
   /** 月の寄与(0〜1) → 掛ける係数。ラスタ描画では1フレームに1回しか呼ばない。 */

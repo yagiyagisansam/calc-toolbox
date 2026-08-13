@@ -30,26 +30,6 @@
 
   var JST = "Asia/Tokyo";
 
-  /** 日本時間での「年月日」と「時」を取り出す */
-  function jstParts(date) {
-    var f = new Intl.DateTimeFormat("ja-JP", {
-      timeZone: JST,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      hour12: false
-    });
-    var o = {};
-    f.formatToParts(date).forEach(function (p) {
-      if (p.type !== "literal") o[p.type] = p.value;
-    });
-    return {
-      ymd: o.year + "-" + o.month + "-" + o.day,
-      hour: Number(o.hour === "24" ? "0" : o.hour)
-    };
-  }
-
   /** 日本時間での時刻表示(例 21:00) */
   function jstTime(date) {
     return new Intl.DateTimeFormat("ja-JP", {
@@ -70,21 +50,13 @@
     }).format(date);
   }
 
-  function addDays(ymd, n) {
-    var p = ymd.split("-").map(Number);
-    var d = new Date(Date.UTC(p[0], p[1] - 1, p[2]));
-    d.setUTCDate(d.getUTCDate() + n);
-    return d.toISOString().slice(0, 10);
-  }
-
   /**
-   * 「今夜」の対象日を決める。
-   * 深夜〜明け方(日本時間で12時より前)に見ている人にとっての「今夜」は
-   * 前日の夕方から続いている夜なので、その場合は前日を返す。
+   * 「今夜」の対象日。前夜がまだ明けていなければ前日を返す。
+   * 判定は sky.js に置いてある(一覧・詳細でも同じものを使うため)。
+   * 日本の中心付近を代表点にする。
    */
   function tonightDate() {
-    var p = jstParts(new Date());
-    return p.hour < 12 ? addDays(p.ymd, -1) : p.ymd;
+    return Sky.currentNightDate(36, 138, new Date());
   }
 
   /**
@@ -229,12 +201,18 @@
     el("spot-place").textContent = spot.pref + (spot.elevation_m ? " ・標高" + spot.elevation_m + "m" : "");
 
     var when = new Date(state.times[state.timeIndex] * 1000);
-    var lpIndex = LP.index(Number(spot.lat), Number(spot.lon));
+    var lat = Number(spot.lat);
+    var lon = Number(spot.lon);
+    var lpIndex = LP.index(lat, lon);
+    var series = state.grid ? Net.gridSeries(state.grid, lat, lon) : null;
+    var i = state.timeIndex;
     var result = Score.evaluate({
       lpIndex: lpIndex === null ? undefined : lpIndex,
-      cloudPct: sampleGrid("cloud", Number(spot.lat), Number(spot.lon)),
-      precipPct: sampleGrid("precip", Number(spot.lat), Number(spot.lon)),
-      moonBrightness: Sky.brightness(when, Number(spot.lat), Number(spot.lon))
+      cloudPct: series ? series.cloud[i] : 0,
+      precipPct: series ? series.precip[i] : 0,
+      visibilityM: series && state.weatherAvailable ? series.visibility[i] : undefined,
+      humidityPct: series && state.weatherAvailable ? series.humidity[i] : undefined,
+      moonBrightness: Sky.brightness(when, lat, lon)
     });
     el("spot-score").textContent = result.score + " / 100";
     el("spot-band").textContent = result.band.label;
@@ -245,18 +223,6 @@
     others.textContent = list.length > 1 ? "この付近に他 " + (list.length - 1) + " 件" : "";
 
     MapView.flyTo(Number(spot.lat), Number(spot.lon));
-  }
-
-  /** 天気の粗い格子から、指定地点の値を最近傍で読む */
-  function sampleGrid(kind, lat, lon) {
-    var grid = state.grid;
-    if (!grid) return 0;
-    var g = CONFIG.grid;
-    var r = Math.round((g.north - lat) / g.stepDeg);
-    var c = Math.round((lon - g.west) / g.stepDeg);
-    r = Math.min(Math.max(r, 0), grid.rows - 1);
-    c = Math.min(Math.max(c, 0), grid.cols - 1);
-    return grid[kind][state.timeIndex][r * grid.cols + c];
   }
 
   function loadSpots() {
@@ -333,6 +299,12 @@
             wn.hidden = false;
             wn.textContent =
               "天気予報を取得できませんでした。空の暗さ(光害)だけで表示しています。";
+          }
+        } else if (grid.updatedAt) {
+          // いつ時点の予報かを出す(3時間ごとに更新される)
+          var upd = el("night-range");
+          if (upd) {
+            upd.textContent += "／予報は " + jstTime(grid.updatedAt) + " 時点";
           }
         }
 

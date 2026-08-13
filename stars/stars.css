@@ -840,3 +840,23 @@ textarea.stars-input {
     grid-column: 2;
   }
 }
+
+/* 画面が狭いときは、副次的な列を隠して表を画面内に収める。
+   (横スクロールできてはいるが、右端が切れていることに気づきにくいため) */
+@media (max-width: 560px) {
+  .stars-table th:nth-child(4),
+  .stars-table td:nth-child(4),
+  .stars-table th:nth-child(5),
+  .stars-table td:nth-child(5) {
+    display: none;
+  }
+
+  .stars-table th,
+  .stars-table td {
+    padding: 9px 6px;
+  }
+
+  .stars-table tbody th {
+    min-width: 8em;
+  }
+}

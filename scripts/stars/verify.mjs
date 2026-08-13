@@ -163,7 +163,7 @@ const STUB_SPOTS = [
  */
 const relay = argv.includes("--relay");
 if (relay) {
-  for (const pattern of ["**://tiles.openfreemap.org/**", "**://api.open-meteo.com/**"]) {
+  for (const pattern of ["**://tiles.openfreemap.org/**"]) {
     await page.route(pattern, async (route) => {
       try {
         const res = await fetch(route.request().url());
@@ -189,36 +189,46 @@ if (!argv.includes("--live")) {
     });
   });
 
-  if (!relay) await page.route("**://api.open-meteo.com/**", async (route) => {
-    const url = new URL(route.request().url());
-    const lats = url.searchParams.get("latitude").split(",").map(Number);
-    const lons = url.searchParams.get("longitude").split(",").map(Number);
-    const vars = url.searchParams.get("hourly").split(",");
-    const startMs = Date.parse(url.searchParams.get("start_hour") + ":00Z");
-    const endMs = Date.parse(url.searchParams.get("end_hour") + ":00Z");
-    const times = [];
-    for (let t = startMs; t <= endMs; t += 3600000) times.push(t / 1000);
+  /*
+   * 天気はサーバー側のキャッシュ(stars_weather_cache)から読むようになったので、
+   * その1行を差し替える。中身は「北ほど曇り、南ほど快晴」という分かりやすい傾斜。
+   * 地図に南北の階調が出れば、格子の補間と色分けが効いていることになる。
+   */
+  await page.route("**://*.supabase.co/rest/v1/stars_weather_cache**", async (route) => {
+    const meta = { south: 24, north: 46, west: 123, east: 146, step: 1, hours: 30 };
+    const rows = (meta.north - meta.south) / meta.step + 1;
+    const cols = (meta.east - meta.west) / meta.step + 1;
 
-    const body = lats.map((lat, i) => {
-      const hourly = { time: times };
-      // 緯度で 0〜100% に変化させる(北 46度=曇り / 南 24度=快晴)
-      const cloud = Math.round(((lat - 24) / 22) * 100);
-      vars.forEach((v) => {
-        const value =
-          v === "cloud_cover" ? cloud
-            : v === "precipitation_probability" ? Math.round(cloud / 2)
-              : v === "visibility" ? 20000
-                : v === "relative_humidity_2m" ? 60
-                  : 0;
-        hourly[v] = times.map(() => value);
-      });
-      return { latitude: lat, longitude: lons[i], timezone: "GMT", hourly };
-    });
+    // いまの時刻を丸めた点から30時間ぶん
+    const base = Math.floor(Date.now() / 3600000) * 3600;
+    const times = [];
+    for (let h = 0; h < meta.hours; h++) times.push(base + h * 3600);
+
+    const cloud = [];
+    const precip = [];
+    const visibility = [];
+    const humidity = [];
+    for (let r = 0; r < rows; r++) {
+      const lat = meta.north - r * meta.step;
+      const c = Math.round(((lat - meta.south) / (meta.north - meta.south)) * 100);
+      for (let k = 0; k < cols; k++) {
+        cloud.push(times.map(() => c));
+        precip.push(times.map(() => Math.round(c / 2)));
+        visibility.push(times.map(() => 20000));
+        humidity.push(times.map(() => 60));
+      }
+    }
 
     await route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify(body)
+      body: JSON.stringify([
+        {
+          payload: { times, cloud, precip, visibility, humidity },
+          meta: { ...meta, points: rows * cols },
+          updated_at: new Date(base * 1000).toISOString()
+        }
+      ])
     });
   });
 }
