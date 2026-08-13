@@ -9,12 +9,23 @@
 --   429 で弾かれた。
 --
 --   そこで「全国の格子は誰が見ても同じ」という性質を使い、
---   3時間に1回だけこちらで取得して全員に配る。
---   上流への呼び出しは訪問者数に関係なく 552地点 × 8回/日 = 約4,400回/日 で、
---   無料枠(10,000回/日)に収まる。ブラウザは Open-Meteo に一切触れない。
+--   こちらで定期的に取得して全員に配る。
+--   上流への呼び出しは訪問者数に関係なく一定になる。
+--   ブラウザは Open-Meteo に一切触れない。
+--
+-- 更新の頻度(2026-08-13 Hiroさん指示: 夜間は1時間に1回):
+--   Open-Meteo の無料枠は1日10,000回。1回の更新で552地点ぶんを使うので、
+--   1日に回せるのは最大18回。実際に見られるのは夜なので、そこへ厚く配る。
+--     ・17時〜翌5時(日本時間)は毎時       … 13回
+--     ・14時(日本時間)に1回               …  1回(夕方の来訪前に新しくしておく)
+--   合わせて14回 = 7,728回/日 で、枠の約77%。手で何回か試しても余裕がある。
+--   1回の取得で30時間先まで持つので、日中に見ても「今夜」は必ず含まれている。
+--
+--   ※ 格子を細かくする(地点数を増やす)ときは、
+--     (地点数) × (1日の更新回数) ≦ 10,000 を必ず確かめること。
 --
 -- 仕組み:
---   pg_cron が3時間ごとに pg_net で取得を要求し(stars_weather_request)、
+--   pg_cron が pg_net で取得を要求し(stars_weather_request)、
 --   その3分後に応答を取り込む(stars_weather_collect)。
 --   pg_net は非同期なので、要求と取り込みを分けている。
 --   取り込んだものは stars_weather_cache に1行だけ入り、匿名でも読める。
@@ -30,7 +41,7 @@ create extension if not exists pg_net;
 -- サイト側はこの値をキャッシュの meta から読むので、ここだけを直せばよい。
 -- 対象地域を広げるときは south/north/west/east を変える。
 -- ただし地点数を増やすと上流の呼び出し数も増えるので、
---   (地点数) × 8回/日 ≦ 10,000 に収まるか確認すること。
+--   (地点数) × (1日の更新回数) ≦ 10,000 に収まるか確認すること。
 create or replace function public.stars_grid_def()
 returns jsonb
 language sql
@@ -38,8 +49,8 @@ immutable
 as $$
   select jsonb_build_object(
     'south', 24, 'north', 46, 'west', 123, 'east', 146, 'step', 1,
-    -- 何時間先まで持つか。3時間ごとの更新が1回飛んでも
-    -- 「今夜」を賄えるだけの余裕を見ている。
+    -- 何時間先まで持つか。更新が数回飛んでも「今夜」を賄えるだけの余裕を見ている。
+    -- 日中は更新が1回しかないので、そこを跨げる長さが要る。
     'hours', 30,
     -- 1回のURLが長くなりすぎないよう分割する数
     'parts', 2
@@ -214,14 +225,19 @@ revoke all on function public.stars_weather_collect() from public, anon, authent
 
 
 -- ---- ⑦ 定期実行 ----
--- 3時間ごとに要求し、その3分後に取り込む。
+-- pg_cron の時刻は UTC。日本時間 = UTC + 9時間。
+--   UTC 8〜20時  = 日本時間 17時〜翌5時(毎時。星を見る時間帯)
+--   UTC 5時      = 日本時間 14時(夕方の来訪前に1回)
+-- 要求を出し、その3分後に取り込む。
 select cron.unschedule('stars-weather-request')
   where exists (select 1 from cron.job where jobname = 'stars-weather-request');
 select cron.unschedule('stars-weather-collect')
   where exists (select 1 from cron.job where jobname = 'stars-weather-collect');
 
-select cron.schedule('stars-weather-request', '0 */3 * * *', $$select public.stars_weather_request();$$);
-select cron.schedule('stars-weather-collect', '3 */3 * * *', $$select public.stars_weather_collect();$$);
+select cron.schedule('stars-weather-request', '0 5,8,9,10,11,12,13,14,15,16,17,18,19,20 * * *',
+  $$select public.stars_weather_request();$$);
+select cron.schedule('stars-weather-collect', '3 5,8,9,10,11,12,13,14,15,16,17,18,19,20 * * *',
+  $$select public.stars_weather_collect();$$);
 
 
 -- ---- ⑧ 今すぐ1回取得する(次の定期実行を待たないため) ----

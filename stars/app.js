@@ -301,7 +301,7 @@
               "天気予報を取得できませんでした。空の暗さ(光害)だけで表示しています。";
           }
         } else if (grid.updatedAt) {
-          // いつ時点の予報かを出す(3時間ごとに更新される)
+          // いつ時点の予報かを出す(夜間は1時間ごとに更新される)
           var upd = el("night-range");
           if (upd) {
             upd.textContent += "／予報は " + jstTime(grid.updatedAt) + " 時点";
