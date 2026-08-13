@@ -13,13 +13,14 @@
 --   上流への呼び出しは訪問者数に関係なく一定になる。
 --   ブラウザは Open-Meteo に一切触れない。
 --
--- 更新の頻度(2026-08-13 Hiroさん指示: 夜間は1時間に1回):
+-- 更新の頻度(2026-08-13 Hiroさん指示):
 --   Open-Meteo の無料枠は1日10,000回。1回の更新で552地点ぶんを使うので、
 --   1日に回せるのは最大18回。実際に見られるのは夜なので、そこへ厚く配る。
---     ・17時〜翌5時(日本時間)は毎時       … 13回
---     ・14時(日本時間)に1回               …  1回(夕方の来訪前に新しくしておく)
+--     ・18時〜翌3時(日本時間)は毎時   … 10回
+--     ・それ以外は3時間ごと(6/9/12/15時) …  4回
 --   合わせて14回 = 7,728回/日 で、枠の約77%。手で何回か試しても余裕がある。
---   1回の取得で30時間先まで持つので、日中に見ても「今夜」は必ず含まれている。
+--   更新の間隔は最大でも3時間。1回の取得で30時間先まで持つので、
+--   いつ見ても「今夜」は必ず含まれている。
 --
 --   ※ 格子を細かくする(地点数を増やす)ときは、
 --     (地点数) × (1日の更新回数) ≦ 10,000 を必ず確かめること。
@@ -50,7 +51,6 @@ as $$
   select jsonb_build_object(
     'south', 24, 'north', 46, 'west', 123, 'east', 146, 'step', 1,
     -- 何時間先まで持つか。更新が数回飛んでも「今夜」を賄えるだけの余裕を見ている。
-    -- 日中は更新が1回しかないので、そこを跨げる長さが要る。
     'hours', 30,
     -- 1回のURLが長くなりすぎないよう分割する数
     'parts', 2
@@ -226,17 +226,17 @@ revoke all on function public.stars_weather_collect() from public, anon, authent
 
 -- ---- ⑦ 定期実行 ----
 -- pg_cron の時刻は UTC。日本時間 = UTC + 9時間。
---   UTC 8〜20時  = 日本時間 17時〜翌5時(毎時。星を見る時間帯)
---   UTC 5時      = 日本時間 14時(夕方の来訪前に1回)
+--   UTC 9〜18時          = 日本時間 18時〜翌3時(毎時。星を見る時間帯)
+--   UTC 21, 0, 3, 6時    = 日本時間 6, 9, 12, 15時(3時間ごと)
 -- 要求を出し、その3分後に取り込む。
 select cron.unschedule('stars-weather-request')
   where exists (select 1 from cron.job where jobname = 'stars-weather-request');
 select cron.unschedule('stars-weather-collect')
   where exists (select 1 from cron.job where jobname = 'stars-weather-collect');
 
-select cron.schedule('stars-weather-request', '0 5,8,9,10,11,12,13,14,15,16,17,18,19,20 * * *',
+select cron.schedule('stars-weather-request', '0 0,3,6,9,10,11,12,13,14,15,16,17,18,21 * * *',
   $$select public.stars_weather_request();$$);
-select cron.schedule('stars-weather-collect', '3 5,8,9,10,11,12,13,14,15,16,17,18,19,20 * * *',
+select cron.schedule('stars-weather-collect', '3 0,3,6,9,10,11,12,13,14,15,16,17,18,21 * * *',
   $$select public.stars_weather_collect();$$);
 
 
