@@ -28,9 +28,13 @@
 --
 -- 仕組み:
 --   pg_cron が pg_net で取得を要求し(stars_weather_request)、
---   その3分後に応答を取り込む(stars_weather_collect)。
+--   その8分後に応答を取り込む(stars_weather_collect)。
 --   pg_net は非同期なので、要求と取り込みを分けている。
 --   取り込んだものは stars_weather_cache に1行だけ入り、匿名でも読める。
+--
+--   要求は6つに分け、20秒ずつ空けて投げる。まとめて投げると上流の
+--   「1分あたり600地点」に当たって全部が弾かれるため(下の parts を参照)。
+--   6分割ぶんを投げ終えるまで約2分かかるので、取り込みは8分後にしている。
 --
 -- 出典表示(CC BY 4.0)はサイト側のフッターで行っている。
 -- =============================================================
@@ -59,8 +63,12 @@ as $$
     -- したがってここを伸ばしても上流への負荷と無料枠の消費は変わらない。
     -- 増えるのは配信量だけ(gzip で約74KB → 約190KB)。
     'hours', 78,
-    -- 1回のURLが長くなりすぎないよう分割する数
-    'parts', 2
+    -- 分割数。
+    -- 上流の制限は「1分あたり600地点」。2分割(276地点ずつ)を同時に投げると
+    -- 一瞬で552地点になり、その山で 503 The service is overloaded / 429 を返された
+    -- (2026-08-14 実際に丸1日更新が止まった)。
+    -- 6分割して20秒ずつ空けて投げると、1分あたり最大でも約276地点に収まる。
+    'parts', 6
   );
 $$;
 
@@ -119,6 +127,20 @@ alter table public.stars_weather_pending enable row level security;
 revoke all on table public.stars_weather_pending from anon, authenticated;
 
 
+-- ---- ④-2 直近の取り込み結果 ----
+-- 取り込みは「失敗しても0を返して前回を残す」ので、cron の記録は succeeded になる。
+-- それだと止まっていることに気づけないため、結果をここに1行だけ残す。
+create table if not exists public.stars_weather_status (
+  kind   text primary key,
+  ok     boolean not null,
+  detail text,
+  at     timestamptz not null default now()
+);
+
+alter table public.stars_weather_status enable row level security;
+revoke all on table public.stars_weather_status from anon, authenticated;
+
+
 -- ---- ⑤ 取得を要求する ----
 create or replace function public.stars_weather_request()
 returns int
@@ -135,6 +157,9 @@ declare
   url    text;
   rid    bigint;
 begin
+  -- 分割数を減らしたときに取り残しが出ないよう、範囲外の行は消しておく
+  delete from public.stars_weather_pending where kind = 'grid' and part > parts;
+
   for i in 1..parts loop
     select string_agg(lat::text, ',' order by rn), string_agg(lon::text, ',' order by rn)
       into lats, lons
@@ -153,6 +178,11 @@ begin
     values ('grid', i, rid, now())
     on conflict (kind, part)
       do update set request_id = excluded.request_id, requested_at = now();
+
+    -- 山にして投げない。上流の1分あたりの上限に当たると全部が弾かれる。
+    if i < parts then
+      perform pg_sleep(20);
+    end if;
   end loop;
   return parts;
 end;
@@ -182,15 +212,32 @@ declare
   humid   jsonb := '[]'::jsonb;
   got     int   := 0;
 begin
+  -- 分割数を変えたときに古い行が残っていても数が合うよう、範囲を絞る
   for r in
-    select * from public.stars_weather_pending where kind = 'grid' order by part
+    select * from public.stars_weather_pending
+    where kind = 'grid' and part between 1 and parts
+    order by part
   loop
     select content::jsonb into body
     from net._http_response
     where id = r.request_id and status_code = 200;
 
-    -- まだ届いていない・失敗した場合は、前回のキャッシュを保ったまま諦める
+    -- まだ届いていない・失敗した場合は、前回のキャッシュを保ったまま諦める。
+    -- ただし理由は必ず残す。ここを黙って0で返していたため、cron は succeeded、
+    -- キャッシュは古いまま、という気づきにくい壊れ方をした(2026-08-14)。
     if body is null or jsonb_typeof(body) <> 'array' then
+      insert into public.stars_weather_status (kind, ok, detail, at)
+      values (
+        'grid',
+        false,
+        'part ' || r.part || ': ' || coalesce(
+          (select coalesce(x.error_msg, x.status_code::text || ' ' || left(x.content, 120))
+             from net._http_response x where x.id = r.request_id),
+          '応答なし'),
+        now()
+      )
+      on conflict (kind) do update
+        set ok = excluded.ok, detail = excluded.detail, at = excluded.at;
       return 0;
     end if;
 
@@ -212,6 +259,11 @@ begin
   if got <> parts or times is null then
     return 0;
   end if;
+
+  insert into public.stars_weather_status (kind, ok, detail, at)
+  values ('grid', true, got || '件すべて取り込み', now())
+  on conflict (kind) do update
+    set ok = excluded.ok, detail = excluded.detail, at = excluded.at;
 
   insert into public.stars_weather_cache (kind, payload, meta, updated_at)
   values (
@@ -235,7 +287,7 @@ revoke all on function public.stars_weather_collect() from public, anon, authent
 -- pg_cron の時刻は UTC。日本時間 = UTC + 9時間。
 --   UTC 9〜18時          = 日本時間 18時〜翌3時(毎時。星を見る時間帯)
 --   UTC 21, 0, 3, 6時    = 日本時間 6, 9, 12, 15時(3時間ごと)
--- 要求を出し、その3分後に取り込む。
+-- 要求を出し、その8分後に取り込む(6分割を20秒ずつ空けて投げ終えるまで約2分かかる)。
 select cron.unschedule('stars-weather-request')
   where exists (select 1 from cron.job where jobname = 'stars-weather-request');
 select cron.unschedule('stars-weather-collect')
@@ -243,7 +295,7 @@ select cron.unschedule('stars-weather-collect')
 
 select cron.schedule('stars-weather-request', '0 0,3,6,9,10,11,12,13,14,15,16,17,18,21 * * *',
   $$select public.stars_weather_request();$$);
-select cron.schedule('stars-weather-collect', '3 0,3,6,9,10,11,12,13,14,15,16,17,18,21 * * *',
+select cron.schedule('stars-weather-collect', '8 0,3,6,9,10,11,12,13,14,15,16,17,18,21 * * *',
   $$select public.stars_weather_collect();$$);
 
 
