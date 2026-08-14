@@ -193,6 +193,71 @@ function ok(cond, label, detail) {
   ok(high > 0.4 && high < 0.5, "満月が高いときの brightness がおかしい", `${high}`);
 }
 
+/* ---- 4-2. 沈んでいる月は点数に影響しないこと ------------------------------ */
+{
+  /*
+   * 「満月だろうと沈んでいれば影響なし」が点数に反映されているかを確かめる。
+   *
+   * 月齢や輝面比は点数に一切入らない。効くのは brightness だけで、
+   * これは地平線下で 0 を返す。つまり満月の夜でも、月が沈んでいる時間帯は
+   * 新月の夜とまったく同じ点数になっていなければならない。
+   * ここが崩れると「今夜は満月だからやめよう」と、
+   * 実際には月あかりのない好条件の夜を捨てさせてしまう。
+   */
+  const Score = require(path.join(ROOT, "stars", "score.js"));
+  const LAT = 35.6581;
+  const LON = 139.7414;
+
+  const scoreAt = (iso) => {
+    const d = new Date(iso);
+    return Score.evaluate({
+      lpIndex: 105, cloudPct: 0, precipPct: 0,
+      moonBrightness: Sky.brightness(d, LAT, LON)
+    }).score;
+  };
+
+  // 2026-07-29 は満月(輝面比 99.9%)
+  const fullUp = new Date("2026-07-29T16:00:00Z");   // 満月が高く昇っている
+  const fullDown = new Date("2026-07-29T01:00:00Z"); // 同じ満月の日だが沈んでいる
+  const newMoon = new Date("2026-08-12T13:00:00Z");  // 新月
+
+  ok(
+    Sky.illumination(fullDown).fraction > 0.99,
+    "前提: 2026-07-29 は満月のはず",
+    String(Sky.illumination(fullDown).fraction)
+  );
+  ok(
+    Sky.position(fullDown, LAT, LON).altitudeDeg < 0,
+    "前提: その時刻の月は地平線下のはず",
+    String(Sky.position(fullDown, LAT, LON).altitudeDeg)
+  );
+
+  ok(
+    Sky.brightness(fullDown, LAT, LON) === 0,
+    "満月でも沈んでいれば月あかりは0",
+    String(Sky.brightness(fullDown, LAT, LON))
+  );
+  ok(
+    scoreAt(fullDown.toISOString()) === scoreAt(newMoon.toISOString()),
+    "満月でも沈んでいれば新月と同じ点数",
+    `満月(沈) ${scoreAt(fullDown.toISOString())} / 新月 ${scoreAt(newMoon.toISOString())}`
+  );
+  ok(
+    scoreAt(fullUp.toISOString()) < scoreAt(fullDown.toISOString()) - 10,
+    "満月が出ているときは、はっきり点が下がる",
+    `満月(出) ${scoreAt(fullUp.toISOString())} / 満月(沈) ${scoreAt(fullDown.toISOString())}`
+  );
+
+  // 高いほど効く(sin(高度)の重み)。低い満月は高い満月より点が高い。
+  const low = new Date("2026-07-29T19:00:00Z");
+  ok(
+    scoreAt(low.toISOString()) > scoreAt(fullUp.toISOString()),
+    "同じ満月でも、低いほうが影響が小さい",
+    `低い ${scoreAt(low.toISOString())} / 高い ${scoreAt(fullUp.toISOString())}`
+  );
+  console.log("月あかり: 沈んだ月は点数に影響しないことを確認");
+}
+
 /* ---- 5. 端末のタイムゾーンに左右されないこと ----------------------------- */
 {
   /*

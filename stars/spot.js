@@ -141,23 +141,21 @@
     setText("fact-darkness", Math.round(best.darkness * 100) + "%（光害の少なさ）");
 
     /*
-     * 月は「どれだけ光っているか」と「その夜のいつ空に出ているか」の2つが要る。
-     * 前者だけでは、朝まで昇ってこないのか22時に沈むのかが分からず、
-     * 撮影や観測の時間割が組めない(レビューで写真用途から指摘)。
-     * 天文の言葉(月齢・輝面比)は括弧に残し、平易な言い方を主にする。
+     * 月は「その夜のいつ空に出ているか」を先に出す。
+     *
+     * 満月でも沈んでいれば星見への影響はゼロで、逆に細い月でも高く昇っていれば効く。
+     * 点数の計算もそうなっている(brightness は地平線下で 0 を返し、
+     * 出ている間は sin(高度) で重みを付ける。月齢は点数に一切入らない)。
+     * 先に月齢や輝面比を見せると、影響の有無を取り違えさせる ──
+     * 「今夜は満月だからやめよう」と、実は月が出ない夜を捨ててしまう。
+     * 満ち欠けは、いつ出入りするかを読んだあとの補足でよい。
      */
     var moon = Sky.summary(best.at, Number(spot.lat), Number(spot.lon));
-    var moonText =
+    var moonText = moonWhenText(night, spot);
+    if (moonText) moonText += "／";
+    moonText +=
       moon.phaseLabel + "・" + moon.illuminationPct + "%光っている" +
       "（月齢" + moon.ageDays + "）";
-    if (night) {
-      var rs = Sky.moonRiseSet(night.start, night.end, Number(spot.lat), Number(spot.lon));
-      if (rs.rise) moonText += "／月の出 " + jstTime(rs.rise);
-      if (rs.set) moonText += "／月の入り " + jstTime(rs.set);
-      if (!rs.rise && !rs.set) {
-        moonText += rs.upAtStart ? "／一晩中出ています" : "／一晩中沈んでいます";
-      }
-    }
     setText("fact-moon", moonText);
     setText(
       "fact-night",
@@ -209,6 +207,23 @@
 
       tbody.appendChild(tr);
     });
+  }
+
+  /**
+   * その夜のあいだ、月がいつ空に出ているかを一言で表す。
+   * 月あかりを避けたい人が最初に知りたいのはこれ。
+   */
+  function moonWhenText(night, spot) {
+    if (!night) return "";
+    var rs = Sky.moonRiseSet(night.start, night.end, Number(spot.lat), Number(spot.lon));
+    if (rs.rise && rs.set) {
+      return rs.rise < rs.set
+        ? jstTime(rs.rise) + "に出て " + jstTime(rs.set) + "に沈みます"
+        : jstTime(rs.set) + "に沈み " + jstTime(rs.rise) + "にまた出ます";
+    }
+    if (rs.set) return jstTime(rs.set) + "に沈みます（それ以降は月あかりの影響なし）";
+    if (rs.rise) return jstTime(rs.rise) + "に出てきます（それまでは月あかりの影響なし）";
+    return rs.upAtStart ? "一晩中出ています" : "一晩中沈んでいます（月あかりの影響なし）";
   }
 
   function cell(text) {
