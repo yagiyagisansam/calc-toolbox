@@ -764,6 +764,37 @@ try {
   });
   check("表の値が実データと一致する", refMatches === true, String(refMatches));
 
+  /*
+   * 枠(iframe)の中で開かれたら中身を見せないこと。
+   * GitHub Pages では frame-ancestors / X-Frame-Options を送れない
+   * (frame-ancestors は <meta> では無視される)ので、guard.js で塞いでいる。
+   * 効いているかは目で見て分からないので、実際に枠に入れて確かめる。
+   */
+  console.log("\nクリックジャッキング対策 (stars/guard.js):");
+  {
+    const outer = await browser.newPage();
+    await outer.setContent(
+      `<!doctype html><title>枠の検査</title>
+       <iframe id="f" src="http://127.0.0.1:${PORT}/stars/list.html" width="300" height="200"></iframe>`,
+      { waitUntil: "load" }
+    );
+    await outer.waitForTimeout(2500);
+    // 枠から抜け出せていれば、外側のページ自体が対象ページへ移動している
+    const brokeOut = outer.url().includes("/stars/list.html");
+    // 抜け出せない場合に備えて、中身が隠されているかも見る
+    let hidden = false;
+    try {
+      const frame = outer.frames().find((f) => f.url().includes("/stars/list.html"));
+      if (frame) {
+        hidden = await frame.evaluate(() => getComputedStyle(document.documentElement).display === "none");
+      }
+    } catch (e) {
+      hidden = true; // 枠が消えている = 抜け出した
+    }
+    check("枠の中では表示しない", brokeOut || hidden, brokeOut ? "枠から抜け出した" : hidden ? "中身を隠した" : "枠の中で表示されている");
+    await outer.close();
+  }
+
   console.log("\nページのエラー:");
   check("JavaScript のエラーが無い", errors.length === 0, errors.slice(0, 3).join(" / "));
   check("CSP 違反が無い", cspViolations.length === 0, cspViolations.slice(0, 3).join(" / "));

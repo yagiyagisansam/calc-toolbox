@@ -81,6 +81,9 @@ as $$
 $$;
 
 
+revoke all on function public.stars_grid_def() from public, anon, authenticated;
+
+
 -- ---- ①-2 上流へ取りに行く地点の表 ----
 -- 全552地点のうち、どれを取りに行くかを1行の並びで受け取って組み立てる。
 -- 並びは scripts/stars/land_grid.mjs --mask が作る
@@ -183,6 +186,9 @@ as $$
   where f.pos > (n.c * (p_part - 1)) / d.parts
     and f.pos <= (n.c * p_part) / d.parts;
 $$;
+
+
+revoke all on function public.stars_grid_points(int) from public, anon, authenticated;
 
 
 -- ---- ③ キャッシュ本体 ----

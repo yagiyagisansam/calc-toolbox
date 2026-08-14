@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'; require-trusted-types-for 'script'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>データについて（出典・計算方法・限界） | 今夜のオススメ星見スポット</title>
   <meta name="description" content="星見レベルの計算方法、光害データ（VIIRS夜間光）の作り方、天気予報の出典、そしてこの判定の限界を説明します。">
@@ -96,17 +96,17 @@
     <tbody>
       <tr>
         <th scope="row">天気予報</th>
-        <td><a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>（日本国内は気象庁の数値予報モデル）</td>
+        <td><a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>（日本国内は気象庁の数値予報モデル）</td>
         <td>CC BY 4.0</td>
       </tr>
       <tr>
         <th scope="row">夜間光（光害の元データ）</th>
-        <td><a href="https://gibs.earthdata.nasa.gov/" target="_blank" rel="noopener">NASA GIBS</a> / VIIRS Suomi-NPP</td>
+        <td><a href="https://gibs.earthdata.nasa.gov/" target="_blank" rel="noopener noreferrer">NASA GIBS</a> / VIIRS Suomi-NPP</td>
         <td>NASA EOSDIS（利用制限なし・出典明記）</td>
       </tr>
       <tr>
         <th scope="row">地図</th>
-        <td><a href="https://openfreemap.org/" target="_blank" rel="noopener">OpenFreeMap</a> / <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></td>
+        <td><a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">OpenFreeMap</a> / <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a></td>
         <td>ODbL</td>
       </tr>
       <tr>
@@ -196,10 +196,10 @@
 
 <footer class="stars-footer">
   <p>
-    天気: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Weather data by Open-Meteo.com</a> /
-    光害: <a href="https://gibs.earthdata.nasa.gov/" target="_blank" rel="noopener">NASA GIBS</a> VIIRS 夜間光 /
-    地図: <a href="https://openfreemap.org/" target="_blank" rel="noopener">OpenFreeMap</a>、
-    <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a>
+    天気: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Weather data by Open-Meteo.com</a> /
+    光害: <a href="https://gibs.earthdata.nasa.gov/" target="_blank" rel="noopener noreferrer">NASA GIBS</a> VIIRS 夜間光 /
+    地図: <a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">OpenFreeMap</a>、
+    <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a>
   </p>
   <p>
     <a href="../">計算ツールボックス</a> ・ <a href="../contact.html?tool=stars">お問い合わせ</a> ・
@@ -207,6 +207,7 @@
   </p>
 </footer>
 
+<script src="./guard.js"></script>
 <script src="./palette.js"></script>
 <script src="./score.js"></script>
 <script src="./about.js"></script>

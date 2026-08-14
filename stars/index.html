@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tiles.openfreemap.org; connect-src 'self' https://tiles.openfreemap.org https://ssxskriqlaiohdutxprn.supabase.co; worker-src 'self' blob:; font-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org; connect-src 'self' https://tiles.openfreemap.org https://ssxskriqlaiohdutxprn.supabase.co; worker-src 'self' blob:; font-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>今夜のオススメ星見スポット | 光害マップ×天気予報で日本全国を色分け</title>
   <meta name="description" content="今夜どこへ行けば星が見えるかを日本全国の地図で色分け表示。VIIRS夜間光による光害と、雲量・降水確率・月齢を合わせて星見レベルを判定します。地域別の一覧とスポット申請にも対応。">
@@ -83,10 +83,10 @@
 
 <footer class="stars-footer">
   <p>
-    天気: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Weather data by Open-Meteo.com</a>(CC BY 4.0、日本国内は気象庁モデル) /
-    光害: <a href="https://gibs.earthdata.nasa.gov/" target="_blank" rel="noopener">NASA GIBS</a> VIIRS 夜間光 /
-    地図: <a href="https://openfreemap.org/" target="_blank" rel="noopener">OpenFreeMap</a>、
-    <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a>
+    天気: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Weather data by Open-Meteo.com</a>(CC BY 4.0、日本国内は気象庁モデル) /
+    光害: <a href="https://gibs.earthdata.nasa.gov/" target="_blank" rel="noopener noreferrer">NASA GIBS</a> VIIRS 夜間光 /
+    地図: <a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">OpenFreeMap</a>、
+    <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a>
   </p>
   <p>
     表示は目安です。判定の作り方と限界は<a href="./about.html">データについて</a>をご覧ください。
@@ -94,6 +94,7 @@
   </p>
 </footer>
 
+<script src="./guard.js"></script>
 <script src="./vendor/maplibre-gl-csp.js"></script>
 <script src="../tools/poll/config.js"></script>
 <script src="./config.js"></script>
