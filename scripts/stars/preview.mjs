@@ -72,6 +72,7 @@ const SPOTS = candidates.map((s, i) => ({
   name: s.name,
   name_kana: null,
   pref: s.pref,
+  city: s.city,
   region: regionOf(s.pref),
   lat: s.lat,
   lon: s.lon,
@@ -210,6 +211,21 @@ console.log("iPhone 相当 (430×860):");
   await page.getByRole("button", { name: "中部" }).click().catch(() => {});
   await page.waitForTimeout(300);
   await shot(page, "03_一覧_iPhone_中部で絞り込み");
+
+  // 地名で探して近い順にしたところ
+  await page.getByRole("button", { name: "全国" }).click().catch(() => {});
+  await page.locator("#place-search").click();
+  await page.locator("#place-search").fill("秩父");
+  await page
+    .waitForFunction(() => {
+      const box = document.getElementById("place-results");
+      return box && !box.hidden && box.children.length > 0;
+    }, { timeout: 20000 })
+    .catch(() => {});
+  await shot(page, "06_一覧_地名の候補");
+  await page.locator("#place-results .stars-suggest-item").first().click().catch(() => {});
+  await page.waitForTimeout(400);
+  await shot(page, "07_一覧_近い順");
 
   const target = SPOTS.find((s) => s.pref === WANT_PREF) || SPOTS[0];
   await page.goto(

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://ssxskriqlaiohdutxprn.supabase.co; font-src 'self'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'; require-trusted-types-for 'script'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org; connect-src 'self' https://tiles.openfreemap.org https://ssxskriqlaiohdutxprn.supabase.co; worker-src 'self' blob:; font-src 'self'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>星見スポットの地域別一覧 | 今夜のオススメ星見スポット</title>
   <meta name="description" content="掲載中の星見スポットを地方・都道府県別に一覧表示します。今夜の星見レベル、雲量、月の条件、標高を表で見比べられます。">
@@ -38,22 +38,65 @@
   <h1>星見スポットの地域別一覧</h1>
   <p id="night-range" class="stars-lead">今夜の時間帯を計算しています…</p>
 
+  <!--
+    どこから探すかを決める欄。
+    地名を打つ・地図をタップする・現在地を使う、の3通りで「基準点」を置き、
+    そこから近い順に並べ替えられるようにする。
+  -->
+  <div class="stars-origin">
+    <label class="stars-label" for="place-search">地名・住所でさがす</label>
+    <div class="stars-search-row">
+      <input class="stars-input" id="place-search" type="search" autocomplete="off"
+             placeholder="例: 秩父市、奥多摩、あちむら" aria-describedby="place-help"
+             aria-controls="place-results" aria-expanded="false" role="combobox">
+      <button type="button" class="stars-button stars-button--sub" id="pick-on-map">地図で選ぶ</button>
+      <button type="button" class="stars-button stars-button--sub" id="use-here">現在地</button>
+    </div>
+    <p class="stars-help" id="place-help">
+      市区町村・山・湖・峠などから探せます。選ぶとそこから近い順に並びます。
+    </p>
+    <ul class="stars-suggest" id="place-results" role="listbox" hidden></ul>
+
+    <div class="stars-pickmap" id="pick-map-wrap" hidden>
+      <div id="pick-map" class="stars-pickmap-canvas"></div>
+      <p class="stars-help">地図をタップすると、その場所が基準点になります。</p>
+    </div>
+
+    <p class="stars-origin-current" id="origin-current" hidden>
+      <span id="origin-label"></span>
+      <button type="button" class="stars-linkbutton" id="origin-clear">解除</button>
+    </p>
+  </div>
+
   <div class="stars-filters">
     <div class="stars-tabs" id="region-tabs" role="group" aria-label="地方でしぼりこむ"></div>
-    <div class="stars-sort">
-      <label for="sort-select">並び順</label>
-      <select class="stars-input" id="sort-select">
-        <option value="score">今夜の星見レベル順</option>
-        <option value="darkness">空の暗さ順</option>
-        <option value="near" id="sort-near" hidden>現在地から近い順</option>
-        <option value="name">名前順</option>
-        <option value="pref">都道府県順</option>
-      </select>
+    <div class="stars-selects">
+      <div class="stars-sort">
+        <label for="pref-select">都道府県</label>
+        <select class="stars-input" id="pref-select">
+          <option value="">すべて</option>
+        </select>
+      </div>
+      <div class="stars-sort">
+        <label for="city-select">市区町村</label>
+        <select class="stars-input" id="city-select" disabled>
+          <option value="">すべて</option>
+        </select>
+      </div>
+      <div class="stars-sort">
+        <label for="sort-select">並び順</label>
+        <select class="stars-input" id="sort-select">
+          <option value="score">今夜の星見レベル順</option>
+          <option value="darkness">空の暗さ順</option>
+          <option value="near" id="sort-near" hidden>近い順</option>
+          <option value="name">名前順</option>
+          <option value="pref">都道府県順</option>
+        </select>
+      </div>
     </div>
   </div>
 
   <p class="stars-here-row">
-    <button type="button" class="stars-button stars-button--sub" id="use-here" hidden>現在地からの距離を表示</button>
     <span class="stars-help" id="here-note" hidden>距離は直線距離の目安です（道のりではありません）。</span>
   </p>
 
@@ -117,7 +160,10 @@
 <footer class="stars-footer">
   <p>
     天気: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Weather data by Open-Meteo.com</a>(CC BY 4.0、モデルは Open-Meteo の Best Match) /
-    光害: <a href="https://gibs.earthdata.nasa.gov/" target="_blank" rel="noopener noreferrer">NASA GIBS</a> VIIRS 夜間光
+    光害: <a href="https://gibs.earthdata.nasa.gov/" target="_blank" rel="noopener noreferrer">NASA GIBS</a> VIIRS 夜間光 /
+    地名: <a href="https://www.geonames.org/" target="_blank" rel="noopener noreferrer">GeoNames</a>(CC BY 4.0) /
+    地図: <a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">OpenFreeMap</a>,
+    © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>
   </p>
   <p>
     <a href="../">計算ツールボックス</a> ・ <a href="../contact.html?tool=stars">お問い合わせ</a>
@@ -133,7 +179,14 @@
 <script src="./score.js"></script>
 <script src="./lp.js"></script>
 <script src="./here.js"></script>
+<script src="./places.js"></script>
 <script src="./net.js"></script>
+<!--
+  地図は「地図で選ぶ」を押したときだけ使う。読み込み自体は先に済ませておく
+  (ボタンを押してから取りに行くと、待たされてから地図が出ることになる)。
+-->
+<script src="./vendor/maplibre-gl-csp.js"></script>
+<link rel="stylesheet" href="./vendor/maplibre-gl.css">
 <script src="./list.js"></script>
 </body>
 </html>

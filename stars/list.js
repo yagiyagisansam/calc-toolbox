@@ -18,14 +18,22 @@
   var LP = global.StarsLP;
   var Net = global.StarsNet;
   var Here = global.StarsHere;
+  var Places = global.StarsPlaces;
 
   var JST = "Asia/Tokyo";
 
   var state = {
     spots: [], // 予報とスコアを載せたスポット
     region: null, // 絞り込み中の地方(nullで全国)
+    pref: null, // 絞り込み中の都道府県(nullですべて)
+    city: null, // 絞り込み中の市区町村(nullですべて)
     sort: "score",
-    here: null, // 現在地(許可されたときだけ。距離の表示と並べ替えに使う)
+    /*
+     * 「近い順」の基準にする場所。
+     * 現在地・地名検索・地図のタップ、どれで決めても同じここに入る。
+     * { lat, lon, label } の形。label は画面に出す名前。
+     */
+    origin: null,
     ready: false,
     error: null
   };
@@ -122,7 +130,10 @@
 
   function visibleSpots() {
     var list = state.spots.filter(function (s) {
-      return !state.region || s.region === state.region;
+      if (state.region && s.region !== state.region) return false;
+      if (state.pref && s.pref !== state.pref) return false;
+      if (state.city && cityOf(s) !== state.city) return false;
+      return true;
     });
     var sorters = {
       score: function (a, b) {
@@ -139,56 +150,426 @@
           String(a.name).localeCompare(String(b.name), "ja");
       },
       near: function (a, b) {
-        if (!state.here) return 0;
+        if (!state.origin) return 0;
         return distanceOf(a) - distanceOf(b);
       }
     };
     return list.sort(sorters[state.sort] || sorters.score);
   }
 
-  /** 現在地からの直線距離(km)。現在地が無ければ比較で最後に回るよう大きな値を返す */
+  /** 基準点からの直線距離(km)。基準点が無ければ比較で最後に回るよう大きな値を返す */
   function distanceOf(spot) {
-    if (!state.here) return Infinity;
-    return Here.distanceKm(state.here, { lat: Number(spot.lat), lon: Number(spot.lon) });
+    if (!state.origin) return Infinity;
+    return Here.distanceKm(state.origin, { lat: Number(spot.lat), lon: Number(spot.lon) });
   }
 
   /**
-   * 現在地を使えるようにする。
+   * スポットの市区町村。
+   * 申請時に入れてもらう city をそのまま使う。座標から推測はしない ──
+   * 市境の近くでは隣の町に化けるし、化けても誰も気づけない。
+   */
+  function cityOf(spot) {
+    return spot.city || null;
+  }
+
+  // ---- 基準点(どこから近い順に並べるか) -----------------------------------
+
+  /**
+   * 基準点を決める。現在地・地名検索・地図のタップ、どれもここに集める。
+   * 入口が3つあっても中の扱いを1つにしておかないと、片方だけ直し忘れる。
+   *
+   * @param {{lat:number, lon:number}} point
+   * @param {string} label 画面に出す名前(「秩父市」「地図で指定した場所」など)
+   */
+  function setOrigin(point, label) {
+    if (!point || !isFinite(point.lat) || !isFinite(point.lon)) return;
+    state.origin = { lat: point.lat, lon: point.lon, label: label || "指定した場所" };
+
+    var option = el("sort-near");
+    if (option) option.hidden = false;
+    var note = el("here-note");
+    if (note) note.hidden = false;
+
+    var box = el("origin-current");
+    var text = el("origin-label");
+    if (box && text) {
+      text.textContent = "基準: " + state.origin.label;
+      box.hidden = false;
+    }
+
+    // 基準点を決めた人は近い順が見たいはずなので、そちらへ切り替える
+    state.sort = "near";
+    var sortSelect = el("sort-select");
+    if (sortSelect) sortSelect.value = "near";
+
+    if (marker) marker.setLngLat([state.origin.lon, state.origin.lat]);
+    renderTable();
+  }
+
+  function clearOrigin() {
+    state.origin = null;
+    var box = el("origin-current");
+    if (box) box.hidden = true;
+    var note = el("here-note");
+    if (note) note.hidden = true;
+    var option = el("sort-near");
+    if (option) option.hidden = true;
+    if (state.sort === "near") {
+      state.sort = "score";
+      var sortSelect = el("sort-select");
+      if (sortSelect) sortSelect.value = "score";
+    }
+    renderTable();
+  }
+
+  /**
+   * 現在地を使う。
    * 位置情報は毎回尋ねるものではないので、地図ページで許可済みなら
-   * 覚えてある値をそのまま使い、無いときだけボタンを出す。
+   * 覚えてある値をそのまま使う。
    */
   function setupHere() {
     var button = el("use-here");
-    var option = el("sort-near");
-    if (!Here) return;
+    if (!Here || !button) return;
 
-    function apply(here) {
-      state.here = here;
-      if (!here) return;
-      if (option) option.hidden = false;
-      if (button) button.hidden = true;
-      var note = el("here-note");
-      if (note) note.hidden = false;
-      renderTable();
-    }
+    var remembered = Here.recall();
+    if (remembered) setOrigin(remembered, "現在地");
 
-    apply(Here.recall());
-    if (state.here || !button) return;
-
-    button.hidden = false;
     button.addEventListener("click", function () {
       button.disabled = true;
-      button.textContent = "現在地を調べています…";
+      button.textContent = "調べています…";
       Here.ask().then(function (here) {
         button.disabled = false;
-        button.textContent = "現在地からの距離を表示";
+        button.textContent = "現在地";
         if (here) {
-          apply(here);
+          setOrigin(here, "現在地");
         } else {
           setStatus("現在地を取得できませんでした。端末の位置情報の設定をご確認ください。", true);
         }
       });
     });
+  }
+
+  // ---- 地名でさがす -------------------------------------------------------
+
+  /**
+   * 検索の候補を出す。
+   *
+   * 索引(places.json)と、掲載スポットの名前の両方を見る。
+   * 索引は市区町村・山・湖などを網羅しているが、「四国カルスト」のような
+   * 通称は入っていないことがある。掲載スポット名も引くことで、
+   * 利用者が実際に見ている名前で辿れるようにする。
+   */
+  function suggest(query) {
+    var q = Places ? Places.normalize(query) : String(query || "").trim();
+    if (!q) return [];
+
+    var out = [];
+
+    // まず掲載スポットそのもの(その名前で探した人は、それを見たいはず)
+    state.spots.forEach(function (spot) {
+      var name = String(spot.name || "");
+      var kana = String(spot.name_kana || "");
+      if (name.indexOf(q) >= 0 || (kana && kana.indexOf(q) >= 0)) {
+        out.push({
+          label: name,
+          sub: spot.pref + (spot.city ? " " + spot.city : "") + "・掲載スポット",
+          lat: Number(spot.lat),
+          lon: Number(spot.lon)
+        });
+      }
+    });
+
+    if (Places && Places.isReady()) {
+      Places.search(q, 12).forEach(function (place) {
+        out.push({
+          label: place.name,
+          sub: place.pref + "・" + place.kind,
+          lat: place.lat,
+          lon: place.lon,
+          pref: place.pref,
+          kind: place.kind
+        });
+      });
+    }
+
+    return out.slice(0, 12);
+  }
+
+  function renderSuggest(items) {
+    var box = el("place-results");
+    var input = el("place-search");
+    if (!box) return;
+    box.textContent = "";
+
+    if (!items.length) {
+      box.hidden = true;
+      if (input) input.setAttribute("aria-expanded", "false");
+      return;
+    }
+
+    items.forEach(function (item) {
+      var li = document.createElement("li");
+      li.setAttribute("role", "option");
+
+      var button = document.createElement("button");
+      button.type = "button";
+      button.className = "stars-suggest-item";
+
+      var name = document.createElement("span");
+      name.className = "stars-suggest-name";
+      name.textContent = item.label;
+      button.appendChild(name);
+
+      var sub = document.createElement("span");
+      sub.className = "stars-suggest-sub";
+      sub.textContent = item.sub;
+      button.appendChild(sub);
+
+      button.addEventListener("click", function () {
+        setOrigin({ lat: item.lat, lon: item.lon }, item.label);
+        /*
+         * 都道府県で探したときは、その県だけに絞り込む。
+         * 「埼玉県」と打った人は埼玉のスポットが見たいのであって、
+         * 埼玉から近い順に全国を見たいわけではない。
+         */
+        if (item.kind === "都道府県") {
+          setPref(item.label);
+        }
+        renderSuggest([]);
+        var field = el("place-search");
+        if (field) field.value = item.label;
+      });
+
+      li.appendChild(button);
+      box.appendChild(li);
+    });
+
+    box.hidden = false;
+    if (input) input.setAttribute("aria-expanded", "true");
+  }
+
+  function setupSearch() {
+    var input = el("place-search");
+    if (!input) return;
+
+    /*
+     * 索引は約176KB(gzip後)ある。一覧を開いただけの人に読ませる必要はないので、
+     * 検索欄に触れてから取りに行く。
+     */
+    var started = false;
+    function ensureLoaded() {
+      if (started || !Places) return Promise.resolve();
+      started = true;
+      return Places.load(CONFIG.lightPollution.dataDir).catch(function () {
+        setStatus("地名データを読み込めませんでした。掲載スポット名では探せます。", true);
+      });
+    }
+
+    input.addEventListener("focus", ensureLoaded);
+    input.addEventListener("input", function () {
+      var value = input.value;
+      if (!value.trim()) {
+        renderSuggest([]);
+        return;
+      }
+      ensureLoaded().then(function () {
+        renderSuggest(suggest(value));
+      });
+    });
+
+    // 候補の外を触ったら閉じる
+    document.addEventListener("click", function (e) {
+      var box = el("place-results");
+      if (!box || box.hidden) return;
+      if (e.target === input || box.contains(e.target)) return;
+      renderSuggest([]);
+    });
+
+    var clear = el("origin-clear");
+    if (clear) {
+      clear.addEventListener("click", function () {
+        clearOrigin();
+        input.value = "";
+        renderSuggest([]);
+      });
+    }
+  }
+
+  // ---- 地図で選ぶ ---------------------------------------------------------
+
+  var pickMap = null;
+  var marker = null;
+
+  /**
+   * 地図をタップして基準点を置く。
+   * 地図は押されたときに初めて作る(開かない人には作らない)。
+   */
+  function setupPickMap() {
+    var button = el("pick-on-map");
+    var wrap = el("pick-map-wrap");
+    if (!button || !wrap) return;
+
+    button.addEventListener("click", function () {
+      var open = wrap.hidden;
+      wrap.hidden = !open;
+      button.textContent = open ? "地図を閉じる" : "地図で選ぶ";
+      if (!open || pickMap) {
+        if (pickMap) pickMap.resize();
+        return;
+      }
+      if (!global.maplibregl) {
+        setStatus("地図を読み込めませんでした。地名でお探しください。", true);
+        return;
+      }
+
+      global.maplibregl.setWorkerUrl("./vendor/maplibre-gl-csp-worker.js");
+      pickMap = new global.maplibregl.Map({
+        container: "pick-map",
+        // config.js の center は MapLibre と同じ [経度, 緯度] の順で持っている
+        style: CONFIG.map.styleUrl,
+        center: state.origin
+          ? [state.origin.lon, state.origin.lat]
+          : CONFIG.map.center,
+        zoom: state.origin ? 8 : 4,
+        attributionControl: { compact: true },
+        pitchWithRotate: false,
+        dragRotate: false,
+        touchPitch: false,
+        maxPitch: 0
+      });
+      pickMap.touchZoomRotate.disableRotation();
+      pickMap.addControl(new global.maplibregl.NavigationControl({ showCompass: false }), "top-right");
+
+      marker = new global.maplibregl.Marker({ color: "#fdd171" });
+      if (state.origin) marker.setLngLat([state.origin.lon, state.origin.lat]).addTo(pickMap);
+
+      pickMap.on("click", function (e) {
+        var point = { lat: e.lngLat.lat, lon: e.lngLat.lng };
+        if (!marker._map) marker.addTo(pickMap);
+        marker.setLngLat([point.lon, point.lat]);
+        setOrigin(point, describePoint(point));
+      });
+    });
+  }
+
+  /**
+   * 地図で置いた場所に名前をつける。
+   * 索引の中でいちばん近い市区町村を使う。緯度経度だけ出しても伝わらないため。
+   */
+  function describePoint(point) {
+    if (!Places || !Places.isReady()) {
+      return "地図で指定した場所 (" + point.lat.toFixed(2) + ", " + point.lon.toFixed(2) + ")";
+    }
+    /*
+     * 近さは市区町村の代表点で測る。厳密な行政界ではないので「付近」と書く。
+     * 遠すぎるとき(離島や海上)は無理に地名をつけず、座標をそのまま出す。
+     */
+    var nearest = nearestCity(point);
+    if (nearest && nearest.km < 60) return nearest.name + "付近";
+    return "地図で指定した場所 (" + point.lat.toFixed(2) + ", " + point.lon.toFixed(2) + ")";
+  }
+
+  /** 索引の市区町村のうち、その地点にいちばん近いもの */
+  function nearestCity(point) {
+    var meta = Places && Places.meta();
+    if (!meta) return null;
+    var best = null;
+    var bestKm = Infinity;
+    for (var i = 0; i < meta.places.length; i++) {
+      var row = meta.places[i];
+      var kind = meta.kinds[row[3]];
+      if (kind !== "市・郡" && kind !== "町・村・区") continue;
+      var km = Here.distanceKm(point, { lat: row[4], lon: row[5] });
+      if (km < bestKm) {
+        bestKm = km;
+        best = row[0];
+      }
+    }
+    return best ? { name: best, km: bestKm } : null;
+  }
+
+  // ---- 都道府県・市区町村のしぼりこみ ---------------------------------------
+
+  function setPref(pref) {
+    state.pref = pref || null;
+    state.city = null;
+    var prefSelect = el("pref-select");
+    if (prefSelect && prefSelect.value !== (pref || "")) prefSelect.value = pref || "";
+    /*
+     * 県を選んだら地方タブは全国に戻す。
+     * 「関東」タブのまま「大阪府」を選ぶと何も出ず、理由も分からないため。
+     */
+    if (state.pref) {
+      state.region = null;
+      highlightTabs();
+    }
+    buildCityOptions();
+    renderTable();
+  }
+
+  /**
+   * 市区町村の選択肢を作る。
+   * 出すのは「掲載スポットが実際にある市区町村」だけ。
+   * 全国1900件を並べても、ほとんどが空振りになって選ぶ意味がない。
+   */
+  function buildCityOptions() {
+    var select = el("city-select");
+    if (!select) return;
+    select.textContent = "";
+
+    var head = document.createElement("option");
+    head.value = "";
+    head.textContent = "すべて";
+    select.appendChild(head);
+
+    var cities = [];
+    state.spots.forEach(function (spot) {
+      var city = cityOf(spot);
+      if (!city) return;
+      if (state.pref && spot.pref !== state.pref) return;
+      if (cities.indexOf(city) < 0) cities.push(city);
+    });
+    cities.sort(function (a, b) {
+      return a.localeCompare(b, "ja");
+    });
+
+    cities.forEach(function (city) {
+      var option = document.createElement("option");
+      option.value = city;
+      option.textContent = city;
+      select.appendChild(option);
+    });
+
+    select.disabled = cities.length === 0;
+    select.value = state.city || "";
+  }
+
+  /** 掲載スポットのある都道府県だけを選択肢にする */
+  function buildPrefOptions() {
+    var select = el("pref-select");
+    if (!select) return;
+    select.textContent = "";
+
+    var head = document.createElement("option");
+    head.value = "";
+    head.textContent = "すべて";
+    select.appendChild(head);
+
+    var prefs = [];
+    state.spots.forEach(function (spot) {
+      if (spot.pref && prefs.indexOf(spot.pref) < 0) prefs.push(spot.pref);
+    });
+    prefs.sort(function (a, b) {
+      return a.localeCompare(b, "ja");
+    });
+
+    prefs.forEach(function (pref) {
+      var option = document.createElement("option");
+      option.value = pref;
+      option.textContent = pref;
+      select.appendChild(option);
+    });
+    select.value = state.pref || "";
   }
 
   function renderTable() {
@@ -229,12 +610,11 @@
       pref.textContent = spot.pref + facilityMarks(spot);
       th.appendChild(pref);
 
-      // 現在地が分かっていれば直線距離を添える(道のりではない旨は表の下に明記)
-      if (state.here) {
+      // 基準点が決まっていれば直線距離を添える(道のりではない旨は表の下に明記)
+      if (state.origin) {
         var dist = document.createElement("span");
         dist.className = "stars-cell-sub";
-        dist.textContent =
-          "直線 約" + Math.round(Here.distanceKm(state.here, { lat: Number(spot.lat), lon: Number(spot.lon) })) + "km";
+        dist.textContent = "直線 約" + Math.round(distanceOf(spot)) + "km";
         th.appendChild(dist);
       }
       tr.appendChild(th);
@@ -299,14 +679,32 @@
       button.className = "stars-tab";
       button.textContent = item.label;
       button.setAttribute("aria-pressed", String(state.region === item.key));
+      button.dataset.region = item.key === null ? "" : item.key;
       button.addEventListener("click", function () {
         state.region = item.key;
-        Array.prototype.forEach.call(box.children, function (b) {
-          b.setAttribute("aria-pressed", String(b === button));
-        });
+        /*
+         * 地方を選んだら都道府県・市区町村の絞り込みは外す。
+         * 「中部」と「埼玉県」を同時に効かせると何も出ず、理由も分からない。
+         */
+        state.pref = null;
+        state.city = null;
+        var prefSelect = el("pref-select");
+        if (prefSelect) prefSelect.value = "";
+        buildCityOptions();
+        highlightTabs();
         renderTable();
       });
       box.appendChild(button);
+    });
+  }
+
+  /** いま選ばれている地方タブに印をつける */
+  function highlightTabs() {
+    var box = el("region-tabs");
+    if (!box) return;
+    Array.prototype.forEach.call(box.children, function (b) {
+      var key = b.dataset.region || null;
+      b.setAttribute("aria-pressed", String(key === state.region));
     });
   }
 
@@ -357,6 +755,9 @@
       .then(function (results) {
         var spots = results[1] || [];
         state.spots = spots;
+        // 選択肢は「実際に掲載があるもの」だけにする(空振りを選ばせない)
+        buildPrefOptions();
+        buildCityOptions();
         if (!spots.length) {
           renderTable();
           state.ready = true;
@@ -410,9 +811,20 @@
       });
 
     setupHere();
+    setupSearch();
+    setupPickMap();
 
     el("sort-select").addEventListener("change", function (e) {
       state.sort = e.target.value;
+      renderTable();
+    });
+
+    el("pref-select").addEventListener("change", function (e) {
+      setPref(e.target.value);
+    });
+
+    el("city-select").addEventListener("change", function (e) {
+      state.city = e.target.value || null;
       renderTable();
     });
   }

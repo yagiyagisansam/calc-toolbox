@@ -191,6 +191,7 @@ const STUB_SPOTS = [
   {
     spot_id: "11111111-1111-4111-8111-111111111111",
     name: "乗鞍畳平",
+    city: "高山市",
     name_kana: "のりくらたたみだいら",
     pref: "岐阜県",
     region: "中部",
@@ -207,6 +208,7 @@ const STUB_SPOTS = [
     // データベース側のトリガは https:// しか通さないが、表示側でも守れているか見る。
     spot_id: "33333333-3333-4333-8333-333333333333",
     name: "危険なURLの検査用",
+    city: "佐久市",
     name_kana: null,
     pref: "長野県",
     region: "中部",
@@ -221,6 +223,7 @@ const STUB_SPOTS = [
   {
     spot_id: "22222222-2222-4222-8222-222222222222",
     name: "都心の公園",
+    city: "千代田区",
     name_kana: null,
     pref: "東京都",
     region: "関東",
@@ -240,6 +243,7 @@ const STUB_SPOTS = [
   {
     spot_id: "44444444-4444-4444-8444-444444444444",
     name: "稚内の丘",
+    city: "稚内市",
     name_kana: "わっかないのおか",
     pref: "北海道",
     region: "北海道",
@@ -254,6 +258,7 @@ const STUB_SPOTS = [
   {
     spot_id: "55555555-5555-4555-8555-555555555555",
     name: "石垣島の浜",
+    city: "石垣市",
     name_kana: "いしがきじまのはま",
     pref: "沖縄県",
     region: "九州・沖縄",
@@ -771,6 +776,123 @@ try {
   await page.waitForTimeout(200);
   const shikoku = await page.locator("#status").textContent();
   check("掲載の無い地方は案内を出す", /四国/.test(shikoku), shikoku);
+
+  // ---- 地名でさがす / 絞り込み / 近い順 ----
+  await page.getByRole("button", { name: "全国" }).click();
+  await page.waitForTimeout(150);
+
+  // 都道府県のしぼりこみ
+  await page.locator("#pref-select").selectOption("岐阜県");
+  await page.waitForTimeout(200);
+  {
+    const names = await page.locator("#spot-rows tr th a").allTextContents();
+    check("都道府県でしぼりこめる", names.length === 1 && names[0] === "乗鞍畳平", names.join(" / "));
+  }
+
+  // 市区町村のしぼりこみ(その県にあるものだけが選択肢に出る)
+  {
+    const cities = await page.locator("#city-select option").allTextContents();
+    check(
+      "市区町村の選択肢がその県のものになる",
+      cities.length === 2 && cities[1] === "高山市",
+      cities.join(" / ")
+    );
+    await page.locator("#city-select").selectOption("高山市");
+    await page.waitForTimeout(200);
+    const names = await page.locator("#spot-rows tr th a").allTextContents();
+    check("市区町村でしぼりこめる", names.length === 1 && names[0] === "乗鞍畳平", names.join(" / "));
+  }
+
+  // 地方タブを押すと県の絞り込みは外れる(同時に効かせると何も出なくなるため)
+  await page.getByRole("button", { name: "関東" }).click();
+  await page.waitForTimeout(200);
+  {
+    const prefValue = await page.locator("#pref-select").inputValue();
+    const names = await page.locator("#spot-rows tr th a").allTextContents();
+    check(
+      "地方タブを押すと都道府県のしぼりこみが外れる",
+      prefValue === "" && names.length === 1 && names[0] === "都心の公園",
+      `県=${prefValue || "(なし)"} / ${names.join(" / ")}`
+    );
+  }
+  await page.getByRole("button", { name: "全国" }).click();
+  await page.waitForTimeout(150);
+
+  // 地名の検索。索引(places.json)を読んで候補を出す
+  await page.locator("#place-search").click();
+  await page.locator("#place-search").fill("石垣");
+  await page.waitForFunction(
+    () => {
+      const box = document.getElementById("place-results");
+      return box && !box.hidden && box.children.length > 0;
+    },
+    { timeout: 20000 }
+  ).catch(() => {});
+  {
+    const items = await page.locator("#place-results .stars-suggest-name").allTextContents();
+    check("地名の候補が出る", items.length > 0 && items.some((t) => /石垣/.test(t)), items.slice(0, 4).join(" / "));
+  }
+
+  // かなで打っても当たること(iPhone の予測変換はカナが出やすい)
+  await page.locator("#place-search").fill("ちちぶ");
+  await page.waitForTimeout(400);
+  {
+    const items = await page.locator("#place-results .stars-suggest-name").allTextContents();
+    check("かなでも地名を探せる", items.some((t) => /秩父/.test(t)), items.slice(0, 4).join(" / "));
+  }
+
+  // 候補を選ぶと基準点になり、そこから近い順に並ぶ
+  await page.locator("#place-search").fill("石垣市");
+  await page.waitForTimeout(400);
+  await page.locator("#place-results .stars-suggest-item").first().click();
+  await page.waitForTimeout(300);
+  {
+    const sortValue = await page.locator("#sort-select").inputValue();
+    const origin = await page.locator("#origin-label").textContent();
+    const names = await page.locator("#spot-rows tr th a").allTextContents();
+    check(
+      "地名を選ぶと近い順に切り替わる",
+      sortValue === "near" && /石垣/.test(origin || ""),
+      `並び=${sortValue} / ${origin}`
+    );
+    check(
+      "石垣島の浜がいちばん近い",
+      names[0] === "石垣島の浜",
+      names.join(" / ")
+    );
+    check(
+      "稚内の丘がいちばん遠い",
+      names[names.length - 1] === "稚内の丘",
+      names[names.length - 1]
+    );
+  }
+
+  // 距離が表に出る
+  {
+    const firstRow = await page.locator("#spot-rows tr").first().textContent();
+    check("直線距離が表に出る", /直線 約\d+km/.test(firstRow), (firstRow.match(/直線 約\d+km/) || ["なし"])[0]);
+  }
+
+  // 基準点を解除すると元の並びに戻る
+  await page.locator("#origin-clear").click();
+  await page.waitForTimeout(250);
+  {
+    const sortValue = await page.locator("#sort-select").inputValue();
+    const hidden = await page.locator("#origin-current").isHidden();
+    check("基準点を解除できる", sortValue === "score" && hidden, `並び=${sortValue} / 表示=${hidden ? "消えた" : "残った"}`);
+  }
+
+  // 地図で選ぶ(地図そのものはこの環境ではタイルが来ないが、開けることを見る)
+  await page.getByRole("button", { name: "地図で選ぶ" }).click();
+  await page.waitForTimeout(600);
+  {
+    const shown = await page.locator("#pick-map-wrap").isVisible();
+    const hasCanvas = await page.locator("#pick-map canvas").count();
+    check("地図で選ぶが開く", shown && hasCanvas > 0, `表示=${shown} / canvas=${hasCanvas}`);
+  }
+  await capture("list-search");
+  await page.getByRole("button", { name: "地図を閉じる" }).click();
+  await page.waitForTimeout(200);
 
   // 並べ替え
   await page.getByRole("button", { name: "全国" }).click();

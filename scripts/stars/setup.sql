@@ -85,6 +85,9 @@ create table if not exists public.stars_spots (
   name           text not null check (char_length(name) between 2 and 60),
   name_kana      text check (name_kana is null or char_length(name_kana) <= 80),
   pref           text not null references public.stars_prefectures (pref),
+  -- 市区町村。一覧の絞り込みに使う。座標から推測はしない ──
+  -- 市境の近くでは隣の町に化けるし、化けても誰も気づけないため。
+  city           text check (city is null or char_length(city) <= 40),
   -- region は pref から自動で埋める(申請者に選ばせない。食い違いを防ぐため)
   region         text not null,
   lat            double precision not null,
@@ -109,6 +112,7 @@ create table if not exists public.stars_spots (
 
 -- 既に動いている環境向け(caution を後から足したため)
 alter table public.stars_spots add column if not exists caution text;
+alter table public.stars_spots add column if not exists city text;
 do $$
 begin
   if not exists (
@@ -141,7 +145,7 @@ create policy stars_spots_anon_insert on public.stars_spots
 -- 読み取りは一切許可しない(公開分は stars_public_spots() 経由でだけ返す)
 revoke all on table public.stars_spots from anon, authenticated;
 -- 列単位で絞る。status・region・approved_at・created_at は申請者に触らせない
-grant insert (name, name_kana, pref, lat, lon, elevation_m, access, facilities, note, caution, source_url, submitter_hint)
+grant insert (name, name_kana, pref, city, lat, lon, elevation_m, access, facilities, note, caution, source_url, submitter_hint)
   on public.stars_spots to anon;
 
 
@@ -211,6 +215,7 @@ returns table (
   name        text,
   name_kana   text,
   pref        text,
+  city        text,
   region      text,
   lat         double precision,
   lon         double precision,
@@ -226,7 +231,7 @@ stable
 security definer
 set search_path = public
 as $$
-  select s.spot_id, s.name, s.name_kana, s.pref, s.region, s.lat, s.lon,
+  select s.spot_id, s.name, s.name_kana, s.pref, s.city, s.region, s.lat, s.lon,
          s.elevation_m, s.access, s.facilities, s.note, s.caution, s.source_url
   from public.stars_spots s
   where s.status = 'approved'

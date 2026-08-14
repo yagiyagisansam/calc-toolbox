@@ -652,6 +652,137 @@ textarea.stars-input {
   color: var(--page-ink-2);
 }
 
+/* ---- どこから探すか(一覧ページ) ---------------------------------------- */
+
+.stars-origin {
+  margin: 14px 0 10px;
+}
+
+.stars-search-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.stars-search-row .stars-input {
+  flex: 1 1 12em;
+  min-width: 0;
+}
+
+.stars-search-row .stars-button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+/* 検索候補。入力欄のすぐ下に重ならず続けて出す(スマホで指が届く位置) */
+.stars-suggest {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  border: 1px solid var(--page-line);
+  border-radius: 8px;
+  overflow: hidden;
+  max-height: 46vh;
+  overflow-y: auto;
+}
+
+.stars-suggest li + li {
+  border-top: 1px solid var(--page-line);
+}
+
+.stars-suggest-item {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  background: none;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  /* 指で押せる大きさを確保する */
+  min-height: 44px;
+}
+
+.stars-suggest-item:hover,
+.stars-suggest-item:focus-visible {
+  background: var(--page-bg-2, rgba(127, 127, 127, 0.12));
+}
+
+.stars-suggest-name {
+  display: block;
+  font-weight: 600;
+}
+
+.stars-suggest-sub {
+  display: block;
+  font-size: 12px;
+  color: var(--page-ink-2);
+}
+
+.stars-pickmap {
+  margin-top: 10px;
+}
+
+.stars-pickmap-canvas {
+  width: 100%;
+  height: 320px;
+  border: 1px solid var(--page-line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.stars-origin-current {
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+.stars-linkbutton {
+  border: 0;
+  background: none;
+  padding: 0 2px;
+  margin-left: 8px;
+  font: inherit;
+  font-size: 12px;
+  color: var(--page-link, #1a4fb4);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* 都道府県・市区町村・並び順。狭い画面では折り返す */
+.stars-selects {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+/*
+ * 3つの選択(都道府県・市区町村・並び順)。
+ * 横並びのままだとラベルが1文字ずつ縦に潰れ、選択肢が画面からはみ出す
+ * (iPhone 幅で実際にそうなった)。ラベルを上に置いて縦に組む。
+ */
+.stars-selects .stars-sort {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 3px;
+  flex: 1 1 9em;
+  min-width: 0;
+  margin-left: 0;
+}
+
+.stars-selects .stars-sort > label {
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.stars-selects .stars-sort .stars-input {
+  width: 100%;
+  min-width: 0;
+}
+
 /*
  * お出かけ前の注意(一覧ページ)。
  * 警告色で身構えさせるものではなく、読めば分かる程度の控えめな見た目にする。
