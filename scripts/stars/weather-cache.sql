@@ -150,7 +150,7 @@ revoke all on table public.stars_weather_status from anon, authenticated;
 --   接続が先に切れて Load failed になり、動作確認ができない
 --   (2026-08-14 実際に踏んだ)。
 --   間隔は cron 側で開ける ── 分割ごとに1分ずらして登録する(⑦)。
-create or replace function public.stars_weather_request(p_part int)
+create or replace function public.stars_weather_request(p_part int, p_only_if_failed boolean default false)
 returns bigint
 language plpgsql
 security definer
@@ -166,6 +166,16 @@ declare
 begin
   if p_part < 1 or p_part > parts then
     raise exception '分割の番号は 1〜% です(渡された値: %)', parts, p_part;
+  end if;
+
+  -- 取り直し用。すでに200が取れている分割は投げ直さない(枠を無駄にしないため)
+  if p_only_if_failed and exists (
+    select 1
+    from public.stars_weather_pending p
+    join net._http_response x on x.id = p.request_id
+    where p.kind = 'grid' and p.part = p_part and x.status_code = 200
+  ) then
+    return null;
   end if;
 
   -- 分割数を減らしたときに取り残しが出ないよう、範囲外の行は消しておく
@@ -193,10 +203,11 @@ begin
 end;
 $$;
 
-revoke all on function public.stars_weather_request(int) from public, anon, authenticated;
+revoke all on function public.stars_weather_request(int, boolean) from public, anon, authenticated;
 
 -- 旧版(引数なしで全分割をまとめて投げる)は、1分あたりの上限に当たるので捨てる
 drop function if exists public.stars_weather_request();
+drop function if exists public.stars_weather_request(int);
 
 
 -- ---- ⑥ 応答を取り込む ----
@@ -303,6 +314,10 @@ do $do$
 declare
   hours text := '0,3,6,9,10,11,12,13,14,15,16,17,18,21';
   parts int  := (public.stars_grid_def()->>'parts')::int;
+  -- 毎時0分は世界中の定期実行が集中して上流が混む。実際 12:00 の要求は
+  -- 503 The service is overloaded で弾かれ、その40分後に同じ要求が通った。
+  -- そこで0分を避けて7分から投げる。
+  first int := 7;
   i     int;
   name  text;
 begin
@@ -313,18 +328,40 @@ begin
     perform cron.unschedule(name);
   end loop;
 
+  -- 1回目: 7分から1分ずつずらして全分割を投げる
   for i in 1..parts loop
     perform cron.schedule(
       'stars-weather-request-' || i,
-      (i - 1) || ' ' || hours || ' * * *',
+      (first + i - 1) || ' ' || hours || ' * * *',
       format('select public.stars_weather_request(%s);', i)
     );
   end loop;
 
-  -- 投げ終える(分割数ぶんの分)より後に取り込む
+  -- 投げ終えた3分後に取り込む
   perform cron.schedule(
     'stars-weather-collect',
-    (parts + 2) || ' ' || hours || ' * * *',
+    (first + parts + 2) || ' ' || hours || ' * * *',
+    'select public.stars_weather_collect();'
+  );
+
+  /*
+   * 2回目(取り直し)。
+   * 上流が一時的に混んでいると1つでも欠けて取り込みが丸ごと失敗し、
+   * 次の定期実行(最大3時間後)まで古いままになる。同じ時間帯のうちに
+   * もう一度だけ、失敗した分割にかぎって投げ直す。
+   * すでに200が取れている分割は投げないので、枠はほとんど増えない。
+   */
+  for i in 1..parts loop
+    perform cron.schedule(
+      'stars-weather-retry-' || i,
+      (first + parts + 5 + i - 1) || ' ' || hours || ' * * *',
+      format('select public.stars_weather_request(%s, true);', i)
+    );
+  end loop;
+
+  perform cron.schedule(
+    'stars-weather-collect-2',
+    (first + 2 * parts + 7) || ' ' || hours || ' * * *',
     'select public.stars_weather_collect();'
   );
 end;
