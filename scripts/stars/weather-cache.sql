@@ -363,6 +363,19 @@ begin
     into lats, lons
     from public.stars_grid_points(p_part);
 
+  /*
+   * models= は付けない。Open-Meteo の既定である Best Match に任せる。
+   *
+   * サイト側では「日本国内は気象庁モデル」と書いていたが、この URL は
+   * モデルを指定していないので、それは事実ではなかった(独立検証で指摘)。
+   * 直し方は2つあり、こちらを選んだ:
+   *   ・models=jma... と書いて文言に合わせる
+   *   ・Best Match のままにして文言を直す ← これ
+   * モデルを1つに固定すると、予報できる時間の長さ・使える要素・
+   * 上流が落ちたときの代替が、そのモデルの都合に縛られる。
+   * 78時間先まで4指標を安定して得るほうが、この用途では大事。
+   * 文言は stars/about.html などで「Best Match」と書き直してある。
+   */
   url := 'https://api.open-meteo.com/v1/forecast'
       || '?latitude=' || lats
       || '&longitude=' || lons

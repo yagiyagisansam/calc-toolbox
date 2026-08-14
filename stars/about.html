@@ -52,7 +52,7 @@
     </thead>
     <tbody>
       <tr><th scope="row">空の暗さ（光害）</th><td>VIIRS 夜間光から作った独自データ</td><td>最も暗い場所を100%として、都心では点数が4分の1まで落ちます</td></tr>
-      <tr><th scope="row">雲量</th><td>Open-Meteo（気象庁モデル）</td><td>全天が雲なら0点。少しの雲でも大きく減点します</td></tr>
+      <tr><th scope="row">雲量</th><td>Open-Meteo（Best Match）</td><td>全天が雲なら0点。少しの雲でも大きく減点します</td></tr>
       <tr><th scope="row">降水確率</th><td>Open-Meteo</td><td>雨・雪の予報を減点します</td></tr>
       <tr><th scope="row">視程・湿度</th><td>Open-Meteo</td><td>もや・靄を減点します</td></tr>
       <tr><th scope="row">月</th><td>自前の計算</td><td>満月が高く昇っているときが最大の減点です</td></tr>
@@ -96,7 +96,7 @@
     <tbody>
       <tr>
         <th scope="row">天気予報</th>
-        <td><a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>（日本国内は気象庁の数値予報モデル）</td>
+        <td><a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>（Best Match。地域と要素ごとに適した数値予報モデルを Open-Meteo が自動で選びます）</td>
         <td>CC BY 4.0</td>
       </tr>
       <tr>
