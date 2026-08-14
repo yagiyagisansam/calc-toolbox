@@ -358,7 +358,8 @@
       }
     },
     {
-      "name": "月: 満月の夜(2026-07-29 東京)は輝面比100・高度28.2度",
+      "name": "月: 満月の夜(2026-07-29 東京)は輝面比100・高度27.2度(JPL Horizons)",
+      "note": "期待値の出所: JPL Horizons, 東経139.76/北緯35.68/標高0, 2026-07-29 13:00 UTC, airless apparent topocentric elevation = 27.202735度, 輝面比 99.93%。brightness は 0.9993×sin(27.2027度)。",
       "global": "StarsSky",
       "func": "summary",
       "args": [
@@ -368,13 +369,14 @@
       ],
       "expect": {
         "illuminationPct": 100,
-        "altitudeDeg": 28.2,
-        "brightness": 0.473,
+        "altitudeDeg": 27.2,
+        "brightness": 0.457,
         "phaseLabel": "満月"
       }
     },
     {
       "name": "月: 満月でも地平線下なら影響ゼロ",
+      "note": "期待値の出所: JPL Horizons, 同地点, 2026-07-29 01:00 UTC, elevation = -68.092359度, 輝面比 99.61%。",
       "global": "StarsSky",
       "func": "summary",
       "args": [
@@ -384,7 +386,7 @@
       ],
       "expect": {
         "illuminationPct": 100,
-        "altitudeDeg": -67.8,
+        "altitudeDeg": -68.1,
         "brightness": 0
       }
     },

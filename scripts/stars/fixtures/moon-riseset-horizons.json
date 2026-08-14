@@ -1,0 +1,261 @@
+{
+ "note": "NASA/JPL Horizons の月の出・月の入り。定義は「大気差を含む月の上端が地平線に接する瞬間」で、国立天文台の月の出入りと同じ。刻み1分のため値は1分に量子化されている。",
+ "source": "https://ssd.jpl.nasa.gov/horizons/",
+ "fetchedAt": "2026-08-14T08:02:01.074Z",
+ "definition": "refracted upper limb at true visual horizon (R_T_S_ONLY='TVH')",
+ "quantizationMinutes": 1,
+ "sites": [
+  {
+   "site": {
+    "name": "東京",
+    "lat": 35.6581,
+    "lon": 139.7414
+   },
+   "events": [
+    {
+     "kind": "set",
+     "utc": "2026-08-14T10:23:00Z",
+     "altitudeDeg": -0.869011
+    },
+    {
+     "kind": "rise",
+     "utc": "2026-08-14T22:28:00Z",
+     "altitudeDeg": -0.671568
+    },
+    {
+     "kind": "set",
+     "utc": "2026-08-15T10:50:00Z",
+     "altitudeDeg": -0.952664
+    },
+    {
+     "kind": "rise",
+     "utc": "2026-08-15T23:32:00Z",
+     "altitudeDeg": -0.82463
+    },
+    {
+     "kind": "set",
+     "utc": "2026-08-16T11:16:00Z",
+     "altitudeDeg": -0.961038
+    },
+    {
+     "kind": "rise",
+     "utc": "2026-08-17T00:36:00Z",
+     "altitudeDeg": -0.681054
+    },
+    {
+     "kind": "set",
+     "utc": "2026-08-17T11:43:00Z",
+     "altitudeDeg": -1.009098
+    },
+    {
+     "kind": "rise",
+     "utc": "2026-08-18T01:38:00Z",
+     "altitudeDeg": -0.773972
+    },
+    {
+     "kind": "set",
+     "utc": "2026-08-18T12:11:00Z",
+     "altitudeDeg": -0.842675
+    },
+    {
+     "kind": "rise",
+     "utc": "2026-08-19T02:40:00Z",
+     "altitudeDeg": -0.776098
+    },
+    {
+     "kind": "set",
+     "utc": "2026-08-19T12:44:00Z",
+     "altitudeDeg": -0.948988
+    },
+    {
+     "kind": "rise",
+     "utc": "2026-08-20T03:41:00Z",
+     "altitudeDeg": -0.791377
+    },
+    {
+     "kind": "set",
+     "utc": "2026-08-20T13:21:00Z",
+     "altitudeDeg": -0.904671
+    },
+    {
+     "kind": "rise",
+     "utc": "2026-08-21T04:40:00Z",
+     "altitudeDeg": -0.786239
+    },
+    {
+     "kind": "set",
+     "utc": "2026-08-21T14:04:00Z",
+     "altitudeDeg": -0.880241
+    }
+   ]
+  },
+  {
+   "site": {
+    "name": "稚内",
+    "lat": 45.4156,
+    "lon": 141.6731
+   },
+   "events": [
+    {
+     "kind": "set",
+     "utc": "2026-08-14T10:21:00Z",
+     "altitudeDeg": -0.834583
+    },
+    {
+     "kind": "rise",
+     "utc": "2026-08-14T22:17:00Z",
+     "altitudeDeg": -0.817847
+    },
+    {
+     "kind": "set",
+     "utc": "2026-08-15T10:40:00Z",
+     "altitudeDeg": -0.893243
+    },
+    {
+     "kind": "rise",
+     "utc": "2026-08-15T23:31:00Z",
+     "altitudeDeg": -0.669454
+    },
+    {
+     "kind": "set",
+     "utc": "2026-08-16T10:58:00Z",
+     "altitudeDeg": -0.84974
+    },
+    {
+     "kind": "rise",
+     "utc": "2026-08-17T00:42:00Z",
+     "altitudeDeg": -0.724741
+    },
+    {
+     "kind": "set",
+     "utc": "2026-08-17T11:18:00Z",
+     "altitudeDeg": -0.982451
+    },
+    {
+     "kind": "rise",
+     "utc": "2026-08-18T01:52:00Z",
+     "altitudeDeg": -0.779181
+    },
+    {
+     "kind": "set",
+     "utc": "2026-08-18T11:39:00Z",
+     "altitudeDeg": -0.894766
+    },
+    {
+     "kind": "rise",
+     "utc": "2026-08-19T03:02:00Z",
+     "altitudeDeg": -0.69964
+    },
+    {
+     "kind": "set",
+     "utc": "2026-08-19T12:04:00Z",
+     "altitudeDeg": -0.824933
+    },
+    {
+     "kind": "rise",
+     "utc": "2026-08-20T04:09:00Z",
+     "altitudeDeg": -0.786354
+    },
+    {
+     "kind": "set",
+     "utc": "2026-08-20T12:36:00Z",
+     "altitudeDeg": -0.923316
+    },
+    {
+     "kind": "rise",
+     "utc": "2026-08-21T05:13:00Z",
+     "altitudeDeg": -0.751709
+    },
+    {
+     "kind": "set",
+     "utc": "2026-08-21T13:15:00Z",
+     "altitudeDeg": -0.918367
+    }
+   ]
+  },
+  {
+   "site": {
+    "name": "石垣島",
+    "lat": 24.3448,
+    "lon": 124.1572
+   },
+   "events": [
+    {
+     "kind": "set",
+     "utc": "2026-08-14T11:22:00Z",
+     "altitudeDeg": -1.00397
+    },
+    {
+     "kind": "rise",
+     "utc": "2026-08-14T23:34:00Z",
+     "altitudeDeg": -0.81928
+    },
+    {
+     "kind": "set",
+     "utc": "2026-08-15T11:55:00Z",
+     "altitudeDeg": -0.860192
+    },
+    {
+     "kind": "rise",
+     "utc": "2026-08-16T00:32:00Z",
+     "altitudeDeg": -0.686224
+    },
+    {
+     "kind": "set",
+     "utc": "2026-08-16T12:28:00Z",
+     "altitudeDeg": -0.894273
+    },
+    {
+     "kind": "rise",
+     "utc": "2026-08-17T01:28:00Z",
+     "altitudeDeg": -0.725965
+    },
+    {
+     "kind": "set",
+     "utc": "2026-08-17T13:02:00Z",
+     "altitudeDeg": -1.020551
+    },
+    {
+     "kind": "rise",
+     "utc": "2026-08-18T02:24:00Z",
+     "altitudeDeg": -0.691107
+    },
+    {
+     "kind": "set",
+     "utc": "2026-08-18T13:37:00Z",
+     "altitudeDeg": -0.969949
+    },
+    {
+     "kind": "rise",
+     "utc": "2026-08-19T03:20:00Z",
+     "altitudeDeg": -0.681361
+    },
+    {
+     "kind": "set",
+     "utc": "2026-08-19T14:15:00Z",
+     "altitudeDeg": -0.935762
+    },
+    {
+     "kind": "rise",
+     "utc": "2026-08-20T04:16:00Z",
+     "altitudeDeg": -0.678396
+    },
+    {
+     "kind": "set",
+     "utc": "2026-08-20T14:57:00Z",
+     "altitudeDeg": -0.936607
+    },
+    {
+     "kind": "rise",
+     "utc": "2026-08-21T05:11:00Z",
+     "altitudeDeg": -0.740352
+    },
+    {
+     "kind": "set",
+     "utc": "2026-08-21T15:43:00Z",
+     "altitudeDeg": -0.878568
+    }
+   ]
+  }
+ ]
+}
