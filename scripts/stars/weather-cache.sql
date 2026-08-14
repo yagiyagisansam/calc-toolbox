@@ -34,7 +34,13 @@
 --
 --   要求は6つに分け、cron で1分ずつずらして投げる。まとめて投げると上流の
 --   「600回/分」に当たって全部が弾かれるため(下の parts を参照)。
---   0〜5分で投げ、8分に取り込む。
+--
+--   上流は無料の best-effort なので、いつでも 503 を返しうる。時刻をずらすだけでは
+--   確率が下がるだけで保証にならない。そこで「揃うまで自動で追いかける」形にした:
+--     ・決められた時刻に全分割を投げる(7〜12分)
+--     ・揃っていない分割を2分おきに1つずつ投げ直す(常時)
+--     ・5分おきに取り込みを試し、全分割が揃った時点で反映する(常時)
+--   全部が200なら投げ直しは何もしないので、常時動かしても枠は消費しない。
 --
 -- 出典表示(CC BY 4.0)はサイト側のフッターで行っている。
 -- =============================================================
@@ -168,17 +174,21 @@ begin
     raise exception '分割の番号は 1〜% です(渡された値: %)', parts, p_part;
   end if;
 
-  -- 取り直し用。すでに200が取れている分割は投げ直さない(枠を無駄にしないため)
-  if p_only_if_failed and exists (
+  -- 取り直し用。いま進行中の周回のうち、まだ200が取れていない分割だけ投げ直す。
+  -- 「進行中」に限るのは、決着済みの古い周回を掘り返して枠を無駄にしないため
+  -- (pg_net は応答を数時間で消すので、古い周回は判定できなくなる)。
+  if p_only_if_failed and not exists (
     select 1
     from public.stars_weather_pending p
-    join net._http_response x on x.id = p.request_id
-    where p.kind = 'grid' and p.part = p_part and x.status_code = 200
+    left join net._http_response x on x.id = p.request_id
+    where p.kind = 'grid'
+      and p.part = p_part
+      and p.requested_at > now() - interval '45 minutes'
+      and coalesce(x.status_code, 0) <> 200
   ) then
     return null;
   end if;
 
-  -- 分割数を減らしたときに取り残しが出ないよう、範囲外の行は消しておく
   delete from public.stars_weather_pending where kind = 'grid' and part > parts;
 
   select string_agg(lat::text, ',' order by rn), string_agg(lon::text, ',' order by rn)
@@ -230,7 +240,26 @@ declare
   vis     jsonb := '[]'::jsonb;
   humid   jsonb := '[]'::jsonb;
   got     int   := 0;
+  cycle   timestamptz;
 begin
+  -- いまの周回の識別子。取り直しで投げ直すと進むので、そのときは取り込み直す。
+  select max(requested_at) into cycle
+  from public.stars_weather_pending
+  where kind = 'grid' and part between 1 and parts;
+
+  if cycle is null then
+    return 0;
+  end if;
+
+  -- この周回はもう取り込み済み。何度呼ばれても書き直さない
+  -- (取り込みを短い間隔で回すため。同じ内容で updated_at だけ進むのを防ぐ)。
+  if exists (
+    select 1 from public.stars_weather_cache
+    where kind = 'grid' and meta->>'cycle' = cycle::text
+  ) then
+    return -1;
+  end if;
+
   -- 分割数を変えたときに古い行が残っていても数が合うよう、範囲を絞る
   for r in
     select * from public.stars_weather_pending
@@ -289,7 +318,7 @@ begin
     'grid',
     jsonb_build_object('times', times, 'cloud', cloud, 'precip', precip,
                        'visibility', vis, 'humidity', humid),
-    d || jsonb_build_object('points', jsonb_array_length(cloud)),
+    d || jsonb_build_object('points', jsonb_array_length(cloud), 'cycle', cycle::text),
     now()
   )
   on conflict (kind) do update
@@ -300,6 +329,83 @@ end;
 $$;
 
 revoke all on function public.stars_weather_collect() from public, anon, authenticated;
+
+
+-- ---- ⑥-1 取り直しに使ってよい枠(1日ぶん) ----
+-- 追いかけ続けると、上流が長時間落ちているときに枠を食い潰す。
+-- 弾かれた要求も枠を消費するので、上限を決めておく。
+--
+-- 計算: 定例の取得が 14回/日 × 552地点 = 7,728回。無料枠は10,000回/日。
+--       残りは約2,272回。1回の取り直しは1分割 = 92地点なので、
+--       1日20回まで(1,840回)に抑えれば定例ぶんを侵さない。
+create table if not exists public.stars_weather_budget (
+  day     date primary key,
+  retries int not null default 0
+);
+
+alter table public.stars_weather_budget enable row level security;
+revoke all on table public.stars_weather_budget from anon, authenticated;
+
+
+-- ---- ⑥-2 まだ揃っていない分割を1つだけ投げ直す ----
+-- 一度に1つだけにするのは、まとめて投げると上流の「600回/分」に当たるため。
+-- 2分おきに呼べば、6分割すべてが失敗していても12分で揃う。
+-- 全部が200なら何も投げないので、ふだんは上流への呼び出しは発生しない。
+create or replace function public.stars_weather_retry_one()
+returns int
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  parts       int := (public.stars_grid_def()->>'parts')::int;
+  daily_limit int := 20;
+  used        int;
+  target      int;
+begin
+  -- まだ揃っていない分割のうち、いちばん若い番号を1つだけ選ぶ。
+  -- 一度に1つにするのは、まとめて投げると上流の「600回/分」に当たるため。
+  select p.part into target
+  from public.stars_weather_pending p
+  left join net._http_response x on x.id = p.request_id
+  where p.kind = 'grid'
+    and p.part between 1 and parts
+    and p.requested_at > now() - interval '45 minutes'
+    and coalesce(x.status_code, 0) <> 200
+  order by p.part
+  limit 1;
+
+  if target is null then
+    return null; -- 全部そろっている。上流へは何も投げない
+  end if;
+
+  -- 今日ぶんの枠を確かめて確保する
+  insert into public.stars_weather_budget (day, retries)
+  values (current_date, 0)
+  on conflict (day) do nothing;
+
+  update public.stars_weather_budget
+     set retries = retries + 1
+   where day = current_date and retries < daily_limit
+  returning retries into used;
+
+  if used is null then
+    -- 使い切った。追いかけをやめ、次の定例まで前回のキャッシュで持たせる。
+    insert into public.stars_weather_status (kind, ok, detail, at)
+    values ('grid', false,
+            '取り直しの枠(1日' || daily_limit || '回)を使い切りました。次の定例取得を待ちます。',
+            now())
+    on conflict (kind) do update
+      set ok = excluded.ok, detail = excluded.detail, at = excluded.at;
+    return null;
+  end if;
+
+  perform public.stars_weather_request(target, true);
+  return target;
+end;
+$$;
+
+revoke all on function public.stars_weather_retry_one() from public, anon, authenticated;
 
 
 -- ---- ⑦ 定期実行 ----
@@ -314,21 +420,22 @@ do $do$
 declare
   hours text := '0,3,6,9,10,11,12,13,14,15,16,17,18,21';
   parts int  := (public.stars_grid_def()->>'parts')::int;
-  -- 毎時0分は世界中の定期実行が集中して上流が混む。実際 12:00 の要求は
-  -- 503 The service is overloaded で弾かれ、その40分後に同じ要求が通った。
-  -- そこで0分を避けて7分から投げる。
+  -- 毎時0分は世界中の定期実行が集中するので少し外す。
+  -- ただしこれは気休めで、安定させているのは下の「揃うまで投げ直す」ほう。
   first int := 7;
   i     int;
   name  text;
 begin
-  -- 以前の登録(分割なし版・古い分割数ぶん)をすべて片づける
   for name in
     select jobname from cron.job where jobname like 'stars-weather%'
   loop
     perform cron.unschedule(name);
   end loop;
 
-  -- 1回目: 7分から1分ずつずらして全分割を投げる
+  /*
+   * ① 決められた時刻に、全分割を1分ずつずらして投げる。
+   *    ここが「いつ更新するか」を決めている本体。
+   */
   for i in 1..parts loop
     perform cron.schedule(
       'stars-weather-request-' || i,
@@ -337,31 +444,32 @@ begin
     );
   end loop;
 
-  -- 投げ終えた3分後に取り込む
+  /*
+   * ② 揃っていない分割を2分おきに1つずつ投げ直す(常時)。
+   *
+   *    上流は無料で提供されている以上、いつでも 503 を返しうる。
+   *    1回の失敗で次の定期更新まで古いままになるのが従来の弱点だった。
+   *    ここで揃うまで自動的に追いかけるので、
+   *    6分割すべてが失敗しても12分で揃い、そのあと自然に取り込まれる。
+   *
+   *    全部が200のときは何も投げない(上流への呼び出しは発生しない)ので、
+   *    常時動かしても枠は消費しない。
+   *    45分より古い周回は追いかけない(決着済みを掘り返さない)。
+   */
   perform cron.schedule(
-    'stars-weather-collect',
-    (first + parts + 2) || ' ' || hours || ' * * *',
-    'select public.stars_weather_collect();'
+    'stars-weather-retry',
+    '*/2 * * * *',
+    'select public.stars_weather_retry_one();'
   );
 
   /*
-   * 2回目(取り直し)。
-   * 上流が一時的に混んでいると1つでも欠けて取り込みが丸ごと失敗し、
-   * 次の定期実行(最大3時間後)まで古いままになる。同じ時間帯のうちに
-   * もう一度だけ、失敗した分割にかぎって投げ直す。
-   * すでに200が取れている分割は投げないので、枠はほとんど増えない。
+   * ③ 5分おきに取り込みを試す(常時)。
+   *    全分割が揃った時点で自動的に反映される。
+   *    同じ周回を取り込み済みなら何もしないので、書き直しは起きない。
    */
-  for i in 1..parts loop
-    perform cron.schedule(
-      'stars-weather-retry-' || i,
-      (first + parts + 5 + i - 1) || ' ' || hours || ' * * *',
-      format('select public.stars_weather_request(%s, true);', i)
-    );
-  end loop;
-
   perform cron.schedule(
-    'stars-weather-collect-2',
-    (first + 2 * parts + 7) || ' ' || hours || ' * * *',
+    'stars-weather-collect',
+    '*/5 * * * *',
     'select public.stars_weather_collect();'
   );
 end;
