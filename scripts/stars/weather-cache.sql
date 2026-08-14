@@ -13,12 +13,14 @@
 --   上流への呼び出しは訪問者数に関係なく一定になる。
 --   ブラウザは Open-Meteo に一切触れない。
 --
--- 更新の頻度(2026-08-13 Hiroさん指示):
---   Open-Meteo の無料枠は1日10,000回。1回の更新で552地点ぶんを使うので、
---   1日に回せるのは最大18回。実際に見られるのは夜なので、そこへ厚く配る。
+-- 更新の頻度(2026-08-13 Hiroさん指示。減らさないこと):
 --     ・18時〜翌3時(日本時間)は毎時   … 10回
 --     ・それ以外は3時間ごと(6/9/12/15時) …  4回
---   合わせて14回 = 7,728回/日 で、枠の約77%。手で何回か試しても余裕がある。
+--   合わせて14回/日。
+--
+--   1回の更新で取りに行くのは325地点(全552地点のうち陸に関わるぶんだけ。①-2 を参照)。
+--   14回 × 325地点 = 4,550回/日 で、無料枠 10,000回/日 の約46%。
+--   残りは取り直し(⑥-2)に使う。海上を落とす前は7,728回/日で余裕が無かった。
 --   更新の間隔は最大でも3時間。1回の取得で78時間先まで持つので、
 --   いつ見ても「今夜」に加えて明日・明後日の夜まで含まれている。
 --   (時間数を増やしても呼び出し回数は変わらない。下の stars_grid_def を参照)
@@ -73,31 +75,113 @@ as $$
     -- 上流の制限は「1分あたり600地点」。2分割(276地点ずつ)を同時に投げると
     -- 一瞬で552地点になり、その山で 503 The service is overloaded / 429 を返された
     -- (2026-08-14 実際に丸1日更新が止まった)。
-    -- 6分割して1分ずつずらして投げると、1分あたり92地点に収まる。
+    -- 6分割して1分ずつずらして投げると、1分あたり約54地点に収まる。
     'parts', 6
   );
 $$;
 
 
--- ---- ② 格子の地点(北→南、西→東の順に通し番号を振る) ----
+-- ---- ①-2 上流へ取りに行く地点の表 ----
+-- 全552地点のうち、どれを取りに行くかを1行の並びで受け取って組み立てる。
+-- 並びは scripts/stars/land_grid.mjs --mask が作る
+-- (北→南・西→東の順、1=取りに行く。陸から1度以内の地点だけが1になっている)。
+--
+-- 落とすのは外洋だけで、地図では海に色を塗っていないので表示には使われない。
+-- 陸の描画が落とす前と1つも変わらないことは、海岸線の全頂点について
+-- 「囲む4点がすべて残っている」ことを land_grid.mjs で検査済み。
+create table if not exists public.stars_grid_cells (
+  rn      int primary key,
+  lat     int not null,
+  lon     int not null,
+  fetched boolean not null,
+  src_pos int not null   -- 取得した配列の何番目の値を使うか(1始まり)
+);
+
+alter table public.stars_grid_cells enable row level security;
+revoke all on table public.stars_grid_cells from anon, authenticated;
+
+create or replace function public.stars_grid_build(p_mask text)
+returns int
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  d     jsonb := public.stars_grid_def();
+  total int;
+begin
+  select count(*) into total
+  from generate_series((d->>'north')::int, (d->>'south')::int, -1) la,
+       generate_series((d->>'west')::int, (d->>'east')::int, 1) lo;
+
+  if length(p_mask) <> total then
+    raise exception '並びの長さが合いません(渡された %, 必要 %)', length(p_mask), total;
+  end if;
+
+  delete from public.stars_grid_cells;
+
+  -- まず地点そのものを入れる(src_pos は後で埋める)
+  insert into public.stars_grid_cells (rn, lat, lon, fetched, src_pos)
+  select rn, lat, lon, substr(p_mask, rn::int, 1) = '1', 0
+  from (
+    select row_number() over (order by la desc, lo asc) as rn, la as lat, lo as lon
+    from generate_series((d->>'north')::int, (d->>'south')::int, -1) la,
+         generate_series((d->>'west')::int, (d->>'east')::int, 1) lo
+  ) t;
+
+  -- 取りに行く地点に、取得する配列の中での位置を振る
+  with pos as (
+    select rn, row_number() over (order by rn) as p
+    from public.stars_grid_cells where fetched
+  )
+  update public.stars_grid_cells c set src_pos = pos.p
+  from pos where pos.rn = c.rn;
+
+  -- 落とした地点には、最も近い取得地点の位置を割り当てる
+  with nearest as (
+    select c.rn,
+           (select f.src_pos
+            from public.stars_grid_cells f
+            where f.fetched
+            order by (f.lat - c.lat) ^ 2 + (f.lon - c.lon) ^ 2, f.rn
+            limit 1) as p
+    from public.stars_grid_cells c
+    where not c.fetched
+  )
+  update public.stars_grid_cells c set src_pos = nearest.p
+  from nearest where nearest.rn = c.rn;
+
+  return (select count(*) from public.stars_grid_cells where fetched);
+end;
+$$;
+
+revoke all on function public.stars_grid_build(text) from public, anon, authenticated;
+
+
+-- ---- ② 上流へ取りに行く地点 ----
+-- 全552地点のうち、陸から1度以内にある地点だけを取りに行く。
+-- 残りは外洋で、地図では海に色を塗っていないので表示に使われない。
+-- どの地点を取りに行くかは stars_grid_cells に入っている
+-- (scripts/stars/land_grid.mjs が生成。陸の描画は落とす前と1つも変わらないことを
+--  海岸線の全頂点で検査済み)。
 create or replace function public.stars_grid_points(p_part int)
 returns table (rn bigint, lat int, lon int)
 language sql
 stable
 as $$
-  with d as (select public.stars_grid_def() v),
-  pts as (
-    select row_number() over (order by la desc, lo asc) as rn, la as lat, lo as lon
-    from d,
-         generate_series((v->>'north')::int, (v->>'south')::int, -1) la,
-         generate_series((v->>'west')::int, (v->>'east')::int, 1) lo
+  with f as (
+    -- 取りに行く地点だけを、通し番号の順に並べ直す
+    select row_number() over (order by c.rn) as pos, c.lat, c.lon
+    from public.stars_grid_cells c
+    where c.fetched
   ),
-  n as (select count(*) c from pts, d)
-  select p.rn, p.lat, p.lon
-  from pts p, n, d
+  n as (select count(*) c from f),
+  d as (select (public.stars_grid_def()->>'parts')::int parts)
+  select f.pos, f.lat, f.lon
+  from f, n, d
   -- 通し番号の連続した塊に分ける(順番を保ったまま後で連結できるように)
-  where p.rn > (n.c * (p_part - 1)) / (v->>'parts')::int
-    and p.rn <= (n.c * p_part) / (v->>'parts')::int;
+  where f.pos > (n.c * (p_part - 1)) / d.parts
+    and f.pos <= (n.c * p_part) / d.parts;
 $$;
 
 
@@ -147,6 +231,34 @@ alter table public.stars_weather_status enable row level security;
 revoke all on table public.stars_weather_status from anon, authenticated;
 
 
+-- ---- ④-3 その分割が「遅れている」か ----
+-- 遅れているのは次のどちらか:
+--   ・応答が200でない(失敗した)
+--   ・いちばん新しい要求より45分以上前のまま(前の周回に取り残されている)
+-- 2つめが要るのは、手で1分割だけ投げ直したときや、一部だけ失敗が続いたときに、
+-- 残りが永久に置き去りになるのを防ぐため(実際にそれで復旧しなかった)。
+create or replace function public.stars_weather_part_stale(p_part int)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select coalesce(
+    (select coalesce(x.status_code, 0) <> 200
+            or p.requested_at < (
+                 select max(q.requested_at) from public.stars_weather_pending q
+                 where q.kind = 'grid'
+               ) - interval '45 minutes'
+     from public.stars_weather_pending p
+     left join net._http_response x on x.id = p.request_id
+     where p.kind = 'grid' and p.part = p_part),
+    true) -- まだ一度も投げていない分割も「遅れている」扱い
+$$;
+
+revoke all on function public.stars_weather_part_stale(int) from public, anon, authenticated;
+
+
 -- ---- ⑤ 取得を要求する(1回につき1分割ぶん) ----
 -- 引数で分割の番号を受け取り、その1つだけを投げてすぐ返る。
 --
@@ -174,18 +286,8 @@ begin
     raise exception '分割の番号は 1〜% です(渡された値: %)', parts, p_part;
   end if;
 
-  -- 取り直し用。いま進行中の周回のうち、まだ200が取れていない分割だけ投げ直す。
-  -- 「進行中」に限るのは、決着済みの古い周回を掘り返して枠を無駄にしないため
-  -- (pg_net は応答を数時間で消すので、古い周回は判定できなくなる)。
-  if p_only_if_failed and not exists (
-    select 1
-    from public.stars_weather_pending p
-    left join net._http_response x on x.id = p.request_id
-    where p.kind = 'grid'
-      and p.part = p_part
-      and p.requested_at > now() - interval '45 minutes'
-      and coalesce(x.status_code, 0) <> 200
-  ) then
+  -- 取り直し用。遅れている分割だけを投げ直す(判定は ④-3 に集約)。
+  if p_only_if_failed and not public.stars_weather_part_stale(p_part) then
     return null;
   end if;
 
@@ -308,6 +410,17 @@ begin
     return 0;
   end if;
 
+  /*
+   * ここまでで得たのは「取りに行った地点」ぶんだけ。
+   * サイト側は552地点ぶんの長方形の格子を前提にしているので、
+   * 落とした地点に最も近い取得地点の値を複製して元の形に戻す。
+   * こうするとサイト側の実装は一切変えなくてよい。
+   */
+  cloud  := (select jsonb_agg(cloud ->(c.src_pos - 1) order by c.rn) from public.stars_grid_cells c);
+  precip := (select jsonb_agg(precip->(c.src_pos - 1) order by c.rn) from public.stars_grid_cells c);
+  vis    := (select jsonb_agg(vis   ->(c.src_pos - 1) order by c.rn) from public.stars_grid_cells c);
+  humid  := (select jsonb_agg(humid ->(c.src_pos - 1) order by c.rn) from public.stars_grid_cells c);
+
   insert into public.stars_weather_status (kind, ok, detail, at)
   values ('grid', true, got || '件すべて取り込み', now())
   on conflict (kind) do update
@@ -335,9 +448,10 @@ revoke all on function public.stars_weather_collect() from public, anon, authent
 -- 追いかけ続けると、上流が長時間落ちているときに枠を食い潰す。
 -- 弾かれた要求も枠を消費するので、上限を決めておく。
 --
--- 計算: 定例の取得が 14回/日 × 552地点 = 7,728回。無料枠は10,000回/日。
---       残りは約2,272回。1回の取り直しは1分割 = 92地点なので、
---       1日20回まで(1,840回)に抑えれば定例ぶんを侵さない。
+-- 計算: 定例の取得が 14回/日 × 325地点 = 4,550回。無料枠は10,000回/日。
+--       残りは約5,450回。1回の取り直しは1分割 ≒ 54地点なので、
+--       1日60回まで(約3,240回)に抑えても、まだ2,000回以上の余白が残る。
+--       60回あれば、6分割すべてが失敗する周回を1日に10回ぶん救える。
 create table if not exists public.stars_weather_budget (
   day     date primary key,
   retries int not null default 0
@@ -359,20 +473,17 @@ set search_path = public
 as $$
 declare
   parts       int := (public.stars_grid_def()->>'parts')::int;
-  daily_limit int := 20;
+  daily_limit int := 60;
   used        int;
   target      int;
 begin
-  -- まだ揃っていない分割のうち、いちばん若い番号を1つだけ選ぶ。
+  -- 遅れている分割のうち、いちばん若い番号を1つだけ選ぶ。
   -- 一度に1つにするのは、まとめて投げると上流の「600回/分」に当たるため。
-  select p.part into target
-  from public.stars_weather_pending p
-  left join net._http_response x on x.id = p.request_id
-  where p.kind = 'grid'
-    and p.part between 1 and parts
-    and p.requested_at > now() - interval '45 minutes'
-    and coalesce(x.status_code, 0) <> 200
-  order by p.part
+  -- 判定は stars_weather_part_stale に集約してある(要求側と同じ条件を使う)。
+  select i into target
+  from generate_series(1, parts) i
+  where public.stars_weather_part_stale(i)
+  order by i
   limit 1;
 
   if target is null then
@@ -476,7 +587,15 @@ end;
 $do$;
 
 
--- ---- ⑧ 今すぐ1回ぶんだけ試す ----
+-- ---- ⑧ 取りに行く地点を組み立てる ----
+-- 並びは `node scripts/stars/land_grid.mjs --mask` で作り直せる。
+-- 対象地域や格子の刻みを変えたら、必ず作り直してここを差し替えること。
+select public.stars_grid_build(
+  '111111111111111111111100111111111111111101111111111111111111111001111111111111111111110011111111111111111111100011111111111111111000000011111100111111110000000011111000111111100000000111111000111111111100011111110000111111111111111111110000101111110111111111100000001111111111111111100000001111111111111111000000000111111111111011000000000001111111000011100000100001111100000001100000100000111100000001100000100000111000000000000000000011111000000001111000000111110000000001111000111111101100000000111000111100001100000000110000111100000000000000110000'
+) as 取りに行く地点数;
+
+
+-- ---- ⑨ 今すぐ1回ぶんだけ試す ----
 -- 全分割をここで投げると1分あたりの上限に当たるので、1つだけにしておく。
 -- 残りは次の定期実行で揃う。
 select public.stars_weather_request(1) as 要求id;
