@@ -150,6 +150,39 @@ const STUB_SPOTS = [
     facilities: null,
     note: null,
     source_url: null
+  },
+  /*
+   * 南北に離れた2件。日付の変わり目に「今夜」がどの日かは地点ごとに変わるので、
+   * 一覧と詳細が同じ夜を見ているかは、離れた地点でこそ確かめる必要がある
+   * (8月15日 4時の時点で、稚内は既に15日の夜・石垣島はまだ14日の夜)。
+   */
+  {
+    spot_id: "44444444-4444-4444-8444-444444444444",
+    name: "稚内の丘",
+    name_kana: "わっかないのおか",
+    pref: "北海道",
+    region: "北海道",
+    lat: 45.42,
+    lon: 141.67,
+    elevation_m: 80,
+    access: null,
+    facilities: null,
+    note: null,
+    source_url: null
+  },
+  {
+    spot_id: "55555555-5555-4555-8555-555555555555",
+    name: "石垣島の浜",
+    name_kana: "いしがきじまのはま",
+    pref: "沖縄県",
+    region: "九州・沖縄",
+    lat: 24.34,
+    lon: 124.16,
+    elevation_m: 5,
+    access: null,
+    facilities: null,
+    note: null,
+    source_url: null
   }
 ];
 
@@ -602,24 +635,47 @@ try {
   check("今夜の時間帯が出る", /の夜の予報/.test(listNight), listNight);
 
   const rowCount = await page.locator("#spot-rows tr").count();
-  check("スポットが表に並ぶ", rowCount === 3, `${rowCount} 行`);
+  check("スポットが表に並ぶ", rowCount === STUB_SPOTS.length, `${rowCount} 行`);
   await capture("list");
 
-  /* 乗鞍の行から点数とベスト時刻を控えておき、後で詳細ページと突き合わせる */
-  let listBest = null;
-  {
-    const cells = page.locator("#spot-rows tr", { hasText: "乗鞍畳平" }).locator("td, th");
-    const texts = await cells.allTextContents();
-    const joined = texts.join(" ");
-    const score = (joined.match(/([\d.]+)点/) || [])[1];
-    const at = (joined.match(/(\d{2}:\d{2})/) || [])[1];
-    if (score && at) listBest = { score, at };
+  /*
+   * 全スポットの「ベスト時刻・点数・詳細へのリンク」を控えておき、
+   * あとで1件ずつ詳細ページと突き合わせる。
+   *
+   * リンクは自分で組み立てずに、一覧が実際に出しているものをそのまま使う。
+   * 一覧が詳細へ「どの夜か」を渡せているかも、これで一緒に確かめられる。
+   */
+  const listBests = [];
+  for (const stub of STUB_SPOTS) {
+    const row = page.locator("#spot-rows tr", { hasText: stub.name });
+    if ((await row.count()) === 0) continue;
+    const joined = (await row.locator("td, th").allTextContents()).join(" ");
+    const href = await row.locator("th a").getAttribute("href");
+    listBests.push({
+      name: stub.name,
+      href: href,
+      score: (joined.match(/([\d.]+)点/) || [])[1],
+      at: (joined.match(/(\d{2}:\d{2})/) || [])[1]
+    });
   }
+  const listBest = listBests.find((b) => b.name === "乗鞍畳平") || null;
 
-  // 差し替えた予報では南ほど快晴。乗鞍(暗い山)が都心より上に来るはず
+  check(
+    "一覧の詳細リンクが「どの夜か」を渡している",
+    listBests.length > 0 && listBests.every((b) => /[?&]night=\d{4}-\d{2}-\d{2}/.test(b.href || "")),
+    listBests.map((b) => b.href).join(" / ")
+  );
+
+  // 同じ天気なら暗い場所が上に来る。乗鞍(暗い山)と都心の並びで見る。
   if (!relay && !argv.includes("--live")) {
-    const firstRow = await page.locator("#spot-rows tr").first().textContent();
-    check("星見レベル順で暗い場所が上に来る", /乗鞍/.test(firstRow), firstRow.slice(0, 40));
+    const names = await page.locator("#spot-rows tr th a").allTextContents();
+    const norikura = names.indexOf("乗鞍畳平");
+    const toshin = names.indexOf("都心の公園");
+    check(
+      "星見レベル順で暗い場所が明るい場所より上に来る",
+      norikura >= 0 && toshin >= 0 && norikura < toshin,
+      names.join(" > ")
+    );
   }
 
   // 地方タブでの絞り込み
@@ -639,8 +695,9 @@ try {
   await page.getByRole("button", { name: "全国" }).click();
   await page.locator("#sort-select").selectOption("name");
   await page.waitForTimeout(200);
-  const byName = await page.locator("#spot-rows tr").first().textContent();
-  check("名前順に並べ替えできる", /乗鞍|都心/.test(byName), byName.slice(0, 20));
+  const byName = await page.locator("#spot-rows tr th a").allTextContents();
+  // 読み(name_kana)の五十音順。「いしがきじま」がいちばん先。
+  check("名前順に並べ替えできる", byName[0] === "石垣島の浜", byName.join(" > "));
 
   // ---- スポット詳細 ----
   console.log("\nスポット詳細 (stars/spot.html):");
@@ -694,6 +751,45 @@ try {
     listBest !== null && bestHm === listBest.at && bestScore.startsWith(listBest.score),
     `一覧 ${listBest ? listBest.at + " " + listBest.score : "—"} / 詳細 ${bestHm} ${bestScore}`
   );
+
+  /*
+   * 全スポットで一致するか。一覧が出したリンクをそのまま辿る。
+   *
+   * 一覧と詳細が別々に「今夜がどの日か」を判定していたころは、日付の変わり目に
+   * 南北で食い違った(8月15日 4時の時点で、稚内は15日の夜・石垣島は14日の夜)。
+   * 稚内から石垣島まで並べて、全部一致することを見る。
+   */
+  {
+    const mismatched = [];
+    for (const b of listBests) {
+      await page.goto(`http://127.0.0.1:${PORT}/stars/${b.href.replace(/^\.\//, "")}`, {
+        waitUntil: "load",
+        timeout: 60000
+      });
+      await page
+        .waitForFunction(() => window.StarsSpot && window.StarsSpot.state.ready, { timeout: 30000 })
+        .catch(() => {});
+      const score = (await page.locator("#best-score").textContent()).trim();
+      const at = ((await page.locator("#best-at").textContent()).match(/(\d{2}:\d{2})/) || [])[1];
+      if (at !== b.at || !score.startsWith(b.score)) {
+        mismatched.push(`${b.name}: 一覧 ${b.at} ${b.score}点 / 詳細 ${at} ${score}`);
+      }
+    }
+    check(
+      `一覧と詳細が全スポットで一致する (${listBests.length}件)`,
+      mismatched.length === 0,
+      mismatched.join(" / ") || "全件一致"
+    );
+
+    // 上の繰り返しで別のスポットを開いたままなので、乗鞍へ戻す(以降の検査はこれを見る)
+    await page.goto(
+      `http://127.0.0.1:${PORT}/stars/spot.html?id=${STUB_SPOTS[0].spot_id}`,
+      { waitUntil: "load", timeout: 60000 }
+    );
+    await page
+      .waitForFunction(() => window.StarsSpot && window.StarsSpot.state.ready, { timeout: 30000 })
+      .catch(() => {});
+  }
 
   const factMoon = await page.locator("#fact-moon").textContent();
   check("月の情報が出る", /光っている/.test(factMoon), factMoon);

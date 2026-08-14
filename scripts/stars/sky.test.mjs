@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /*
- * 月の計算を「外から取ってきた値」と突き合わせる回帰テスト。
+ * 空の計算(月と、夜がどの日かの判定)を「外から取ってきた値」と
+ * 突き合わせる回帰テスト。
  *
  * なぜ tests.json と別立てにするか:
  *   tests.json の判定は完全一致で、許容誤差を書けない。
@@ -18,11 +19,12 @@
  *                   同じく Horizons。大気差込みの上端が地平線に接する瞬間。
  *   3. 月齢         このファイル内の NAOJ_AGE(国立天文台「暦象年表」の月齢)
  *
- * 使い方: node scripts/stars/moon.test.mjs
+ * 使い方: node scripts/stars/sky.test.mjs
  * ネットワークには出ない。fixture を取り直すのは fetch_fixtures.mjs。
  */
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
+import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -189,6 +191,51 @@ function ok(cond, label, detail) {
   // 高いところでは相応の値が出る(0に張り付いていない)
   const high = Sky.brightness(new Date("2026-07-29T13:00:00Z"), LAT, LON);
   ok(high > 0.4 && high < 0.5, "満月が高いときの brightness がおかしい", `${high}`);
+}
+
+/* ---- 5. 端末のタイムゾーンに左右されないこと ----------------------------- */
+{
+  /*
+   * 「今夜」がどの日かは、見ている人の端末の時計の設定ではなく、
+   * その地点の位置で決まらなければならない。日本国外から日本の夜を見ても
+   * 同じものが出る必要がある。
+   *
+   * 子プロセスで TZ を変えて確かめる(同じプロセス内では変えられない)。
+   */
+  const sites = [
+    ["代表", 36, 138],
+    ["稚内", 45.42, 141.67],
+    ["東京", 35.68, 139.76],
+    ["石垣島", 24.34, 124.16]
+  ];
+  const code =
+    'const S=require(' + JSON.stringify(path.join(ROOT, "stars", "sky.js")) + ');' +
+    'const n=new Date("2026-08-14T19:00:00Z");' +
+    'process.stdout.write(' +
+    JSON.stringify(sites.map((s) => [s[1], s[2]])) +
+    '.map(function(r){return S.currentNightDate(r[0],r[1],n);}).join(","));';
+
+  const zones = ["UTC", "Asia/Tokyo", "America/Los_Angeles", "Pacific/Kiritimati"];
+  const seen = zones.map((tz) =>
+    execFileSync(process.execPath, ["-e", code], {
+      env: { ...process.env, TZ: tz },
+      encoding: "utf8"
+    })
+  );
+
+  ok(
+    new Set(seen).size === 1,
+    "端末のタイムゾーンで「今夜」が変わってしまう",
+    zones.map((tz, i) => `${tz}: ${seen[i]}`).join(" / ")
+  );
+
+  // 中身も期待どおりか(石垣島だけ前日の夜が続いている)
+  ok(
+    seen[0] === "2026-08-15,2026-08-15,2026-08-15,2026-08-14",
+    "8/15 04:00 JST の各地点の夜",
+    seen[0]
+  );
+  console.log(`夜の判定: ${zones.length}つのタイムゾーンで同じ結果`);
 }
 
 console.log(`\n${checks - failed} / ${checks} 件通過${failed ? "(失敗あり)" : "(全通過)"}`);

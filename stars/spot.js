@@ -33,8 +33,23 @@
     }).format(d);
   }
 
-  /** 「今夜」の対象日。そのスポットの位置で判定する(sky.js に集約) */
-  function tonightDate(lat, lon) {
+  /**
+   * 「今夜」の対象日。
+   *
+   * 一覧から来たときは、一覧が使った日を URL の night= で受け取り、それに従う。
+   * 一覧と詳細で別々に判定すると、日付の変わり目に食い違う ──
+   * 8月15日 4時(日本時間)の時点で、東経138度あたりは既に「8月15日の夜」だが、
+   * 石垣島はまだ「8月14日の夜」が明けていない。同じスポットについて
+   * 一覧が15日の夜、詳細が14日の夜を見せる、ということが起きていた。
+   *
+   * 直接開かれたときだけ、そのスポットの位置で判定する。
+   *
+   * @param {number} lat
+   * @param {number} lon
+   * @param {string} [fromUrl] URL で指定された "YYYY-MM-DD"
+   */
+  function tonightDate(lat, lon, fromUrl) {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(fromUrl || "")) return fromUrl;
     return Sky.currentNightDate(lat, lon, new Date());
   }
 
@@ -250,7 +265,10 @@
   // ---- 起動 ---------------------------------------------------------------
 
   function start() {
-    var id = new URLSearchParams(location.search).get("id");
+    var params = new URLSearchParams(location.search);
+    var id = params.get("id");
+    // 一覧が使った「今夜」の日。食い違いを避けるため、あればこちらを優先する。
+    var nightParam = params.get("night");
     if (!id) {
       setStatus("スポットが指定されていません。一覧から選び直してください。", true);
       return;
@@ -280,7 +298,7 @@
 
         var lat = Number(spot.lat);
         var lon = Number(spot.lon);
-        var night = Sky.nightWindow(tonightDate(lat, lon), lat, lon);
+        var night = Sky.nightWindow(tonightDate(lat, lon, nightParam), lat, lon);
         if (!night) {
           setStatus("この日は空が充分に暗くなる時間帯がありません。", false);
           return null;

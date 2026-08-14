@@ -24,6 +24,7 @@
     ready: false,
     weatherAvailable: true,
     dayOffset: 0, // 0=今夜 1=明日 2=明後日
+    nightDate: null, // 表示中の夜 "YYYY-MM-DD"(スポット詳細へ渡す)
     window: null, // 表示中の夜の時間帯
     error: null
   };
@@ -272,7 +273,10 @@
     el("spot-score").textContent = result ? result.score + " / 100" : "データなし";
     el("spot-band").textContent = result ? result.band.label : "";
     el("spot-note").textContent = spot.note || "";
-    el("spot-detail-link").href = "./spot.html?id=" + encodeURIComponent(spot.spot_id);
+    // 地図が出している夜をそのまま詳細へ渡す(別々に判定すると日付の変わり目でずれる)
+    el("spot-detail-link").href =
+      "./spot.html?id=" + encodeURIComponent(spot.spot_id) +
+      (state.nightDate ? "&night=" + encodeURIComponent(state.nightDate) : "");
 
     var others = el("spot-others");
     others.textContent = list.length > 1 ? "この付近に他 " + (list.length - 1) + " 件" : "";
@@ -428,6 +432,8 @@
    */
   function loadNight(wantTimeIndex) {
     var ymd = addDays(tonightDate(), state.dayOffset);
+    // 地図が今どの夜を出しているか。スポットの詳細へ渡して食い違いを防ぐ。
+    state.nightDate = ymd;
     var window_ = nationalNightWindow(ymd);
     if (!window_) {
       setStatus("この日は夜のデータを作れませんでした", true);

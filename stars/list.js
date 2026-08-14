@@ -52,9 +52,20 @@
     }).format(date);
   }
 
-  /** 「今夜」の対象日(前夜がまだ明けていなければ前日)。判定は sky.js に集約 */
-  function tonightDate() {
-    return Sky.currentNightDate(36, 138, new Date());
+  /**
+   * 「今夜」の対象日(前夜がまだ明けていなければ前日)。判定は sky.js に集約。
+   *
+   * 地点ごとに求める。全国を1つの日で代表させると、日付の変わり目に食い違う ──
+   * 8月15日 4時(日本時間)の時点で、東経138度あたりは既に「8月15日の夜」だが、
+   * 石垣島はまだ「8月14日の夜」が明けていない。以前は (36,138) の判定を
+   * 全スポットに当てていたので、石垣島の一覧は15日の夜、詳細は14日の夜を
+   * 見せていた。
+   *
+   * now は起動時に1回だけ取った時刻を渡すこと。スポットごとに new Date() を
+   * 呼ぶと、処理の途中で日付が変わったときに一部だけ別の夜になる。
+   */
+  function tonightDateAt(lat, lon, now) {
+    return Sky.currentNightDate(lat, lon, now);
   }
 
   function setStatus(message, isError) {
@@ -70,10 +81,11 @@
    * 1スポットぶんの予報から、今夜のうち最も条件がよい時刻を選ぶ。
    * その地点で空が充分に暗い時間帯だけを対象にする(全国の時間帯ではなく)。
    */
-  function bestOfNight(spot, grid, ymd) {
+  function bestOfNight(spot, grid) {
     var lat = Number(spot.lat);
     var lon = Number(spot.lon);
-    var window_ = Sky.nightWindow(ymd, lat, lon);
+    // その夜がどの日かはスポットごとに決まっている(start で入れてある)
+    var window_ = Sky.nightWindow(spot.nightDate, lat, lon);
     var lpIndex = LP.isReady() ? LP.index(lat, lon) : null;
     var series = Net.gridSeries(grid, lat, lon);
 
@@ -205,7 +217,10 @@
       var th = document.createElement("th");
       th.scope = "row";
       var link = document.createElement("a");
-      link.href = "./spot.html?id=" + encodeURIComponent(spot.spot_id);
+      // 詳細が同じ夜を見るように、一覧が使った日を渡す
+      link.href =
+        "./spot.html?id=" + encodeURIComponent(spot.spot_id) +
+        (spot.nightDate ? "&night=" + encodeURIComponent(spot.nightDate) : "");
       link.textContent = spot.name;
       th.appendChild(link);
       var pref = document.createElement("span");
@@ -298,7 +313,14 @@
   // ---- 起動 ---------------------------------------------------------------
 
   function start() {
-    var ymd = tonightDate();
+    /*
+     * 「いま」は起動時に1回だけ取り、全スポットの日付判定に同じ値を使う。
+     * スポットごとに new Date() を呼ぶと、たまたま処理中に日付が変わったときに
+     * 一部のスポットだけ別の夜になる。
+     */
+    var now = new Date();
+    // 見出し用の代表日。個々のスポットは自分の位置で判定する。
+    var ymd = tonightDateAt(36, 138, now);
 
     fetch("./data/prefs.json")
       .then(function (r) {
@@ -347,7 +369,10 @@
         var starts = [];
         var ends = [];
         spots.forEach(function (s) {
-          var w = Sky.nightWindow(ymd, Number(s.lat), Number(s.lon));
+          // その夜がどの日かはスポットの位置で決まる。ここで決めて持たせ、
+          // 点数の計算にも詳細へのリンクにも同じ値を使う。
+          s.nightDate = tonightDateAt(Number(s.lat), Number(s.lon), now);
+          var w = Sky.nightWindow(s.nightDate, Number(s.lat), Number(s.lon));
           if (w) {
             starts.push(w.start.getTime());
             ends.push(w.end.getTime());
@@ -363,7 +388,7 @@
 
         return Net.fetchGrid(from, to).then(function (grid) {
           spots.forEach(function (spot) {
-            spot.best = bestOfNight(spot, grid, ymd);
+            spot.best = bestOfNight(spot, grid);
           });
           renderTable();
           // 予報が今夜を賄えていないときは黙らない(地図ページと同じ扱い)

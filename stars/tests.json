@@ -63,6 +63,27 @@
       "expect": 0.915
     },
     {
+      "name": "夜の判定: 8/15 04:00 JST では代表地点(36,138)は8月15日の夜",
+      "global": "StarsSky",
+      "func": "currentNightDate",
+      "args": [36, 138, "2026-08-14T19:00:00Z"],
+      "expect": "2026-08-15"
+    },
+    {
+      "name": "夜の判定: 同時刻でも石垣島はまだ8月14日の夜(一覧と詳細でずれた原因)",
+      "global": "StarsSky",
+      "func": "currentNightDate",
+      "args": [24.34, 124.16, "2026-08-14T19:00:00Z"],
+      "expect": "2026-08-14"
+    },
+    {
+      "name": "夜の判定: 同時刻の稚内は8月15日の夜",
+      "global": "StarsSky",
+      "func": "currentNightDate",
+      "args": [45.42, 141.67, "2026-08-14T19:00:00Z"],
+      "expect": "2026-08-15"
+    },
+    {
       "name": "スコア: 雲量が無いときは点を付けない(快晴に化けさせない)",
       "func": "evaluate",
       "args": [
