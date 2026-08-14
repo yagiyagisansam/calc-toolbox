@@ -93,6 +93,11 @@ create table if not exists public.stars_spots (
   access         text check (access is null or char_length(access) <= 400),
   facilities     text check (facilities is null or char_length(facilities) <= 400),
   note           text check (note is null or char_length(note) <= 1000),
+  -- 行く前に知っておくべきこと(冬期閉鎖・トイレ無し・道が狭い・野生動物など)。
+  -- note(ひとこと)と分けているのは、性質がまるで違うため。
+  -- ひとことは「よい所」を伝える文で、こちらは「気をつける所」。
+  -- 同じ欄に混ぜると、危険の告知が感想文に埋もれる。
+  caution        text check (caution is null or char_length(caution) <= 500),
   source_url     text check (source_url is null or char_length(source_url) <= 300),
   status         text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
   reject_reason  text,
@@ -101,6 +106,20 @@ create table if not exists public.stars_spots (
   created_at     timestamptz not null default now(),
   approved_at    timestamptz
 );
+
+-- 既に動いている環境向け(caution を後から足したため)
+alter table public.stars_spots add column if not exists caution text;
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'stars_spots_caution_check'
+  ) then
+    alter table public.stars_spots
+      add constraint stars_spots_caution_check
+      check (caution is null or char_length(caution) <= 500);
+  end if;
+end
+$$;
 
 create index if not exists stars_spots_status_region_idx on public.stars_spots (status, region);
 create index if not exists stars_spots_location_idx on public.stars_spots (lat, lon);
@@ -122,7 +141,7 @@ create policy stars_spots_anon_insert on public.stars_spots
 -- 読み取りは一切許可しない(公開分は stars_public_spots() 経由でだけ返す)
 revoke all on table public.stars_spots from anon, authenticated;
 -- 列単位で絞る。status・region・approved_at・created_at は申請者に触らせない
-grant insert (name, name_kana, pref, lat, lon, elevation_m, access, facilities, note, source_url, submitter_hint)
+grant insert (name, name_kana, pref, lat, lon, elevation_m, access, facilities, note, caution, source_url, submitter_hint)
   on public.stars_spots to anon;
 
 
@@ -199,6 +218,7 @@ returns table (
   access      text,
   facilities  text,
   note        text,
+  caution     text,
   source_url  text
 )
 language sql
@@ -207,7 +227,7 @@ security definer
 set search_path = public
 as $$
   select s.spot_id, s.name, s.name_kana, s.pref, s.region, s.lat, s.lon,
-         s.elevation_m, s.access, s.facilities, s.note, s.source_url
+         s.elevation_m, s.access, s.facilities, s.note, s.caution, s.source_url
   from public.stars_spots s
   where s.status = 'approved'
     and (p_region is null or s.region = p_region)

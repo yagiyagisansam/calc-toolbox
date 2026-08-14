@@ -652,6 +652,37 @@ textarea.stars-input {
   color: var(--page-ink-2);
 }
 
+/*
+ * お出かけ前の注意(一覧ページ)。
+ * 警告色で身構えさせるものではなく、読めば分かる程度の控えめな見た目にする。
+ * ただし畳んで隠すことはしない ── 開かなければ読めない注意は無いのと同じで、
+ * 夜の屋外へ人を送り出すページで省いてよい内容ではない。
+ */
+.stars-care-title {
+  margin-top: 22px;
+  font-size: 15px;
+}
+
+.stars-care {
+  margin: 8px 0 0;
+  padding: 12px 14px 12px 30px;
+  border: 1px solid var(--page-line);
+  border-radius: 8px;
+  background: var(--page-bg-2, transparent);
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--page-ink-2);
+}
+
+.stars-care li + li {
+  margin-top: 4px;
+}
+
+.stars-care strong {
+  color: var(--page-ink);
+  font-weight: 600;
+}
+
 .stars-checklist {
   margin: 0 0 10px;
   padding-left: 1.2em;

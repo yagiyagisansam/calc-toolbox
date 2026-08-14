@@ -242,6 +242,7 @@
       access: value("f-access"),
       facilities: value("f-facilities"),
       note: value("f-note"),
+      caution: value("f-caution"),
       source_url: value("f-url"),
       submitter_hint: deviceId()
     };

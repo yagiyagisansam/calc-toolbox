@@ -79,6 +79,7 @@
     el("spot-details").hidden = false;
     setText("detail-access", spot.access || "登録なし");
     setText("detail-facilities", spot.facilities || "登録なし");
+    setText("detail-caution", spot.caution || "特にありません");
     setText("detail-note", spot.note || "登録なし");
 
     var source = el("detail-source");

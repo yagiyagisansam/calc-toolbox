@@ -21,7 +21,8 @@
    "src": "https://www.visit-hokkaido.jp/spot/detail_10362.html",
    "lp": 82,
    "score": 89.2,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "青森県",
@@ -38,7 +39,8 @@
    "src": "https://tripto.jp/blogs/210",
    "lp": 97,
    "score": 87,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "岩手県",
@@ -55,7 +57,8 @@
    "src": "https://sora-lab.net/iwate_top3/",
    "lp": 103,
    "score": 86.1,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "宮城県",
@@ -72,7 +75,8 @@
    "src": "https://www.nap-camp.com/mag/12024",
    "lp": 94,
    "score": 87.4,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "秋田県",
@@ -89,7 +93,8 @@
    "src": "https://nikaho-kanko.jp/nikahokogen/",
    "lp": 97,
    "score": 87,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "山形県",
@@ -99,14 +104,15 @@
    "lon": 140.418,
    "free": "無料",
    "resv": "不要",
-   "night": "要確認",
+   "night": "夏〜秋は可",
    "access": "蔵王エコーライン沿い・駐車場あり",
-   "caution": "蔵王エコーラインは夜間通行止(17時〜翌7時)区間あり。要確認",
-   "evidence": "口コミ",
-   "src": "https://tripto.jp/blogs/210",
+   "caution": "蔵王エコーラインは11月上旬〜4月下旬が終日閉鎖、10月中旬と4月下旬〜5月上旬は17時〜翌8時が夜間通行止め。5月中旬〜10月中旬なら夜間も通れます。",
+   "evidence": "公式",
+   "src": "https://www.pref.miyagi.jp/soshiki/ok-doboku/gs-douro-kisei-echo.html",
    "lp": 117,
    "score": 80.8,
-   "band": "最高"
+   "band": "最高",
+   "note": "標高約1000m。夏でも涼しく空気が澄んでいます。"
   },
   {
    "pref": "福島県",
@@ -123,7 +129,8 @@
    "src": "https://www.city.tamura.lg.jp/soshiki/20/hosihomura-osirasee.html",
    "lp": 110,
    "score": 85,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "茨城県",
@@ -140,7 +147,8 @@
    "src": "https://sora-lab.net/ibaraki_top5/",
    "lp": 120,
    "score": 79,
-   "band": "良い"
+   "band": "良い",
+   "note": null
   },
   {
    "pref": "栃木県",
@@ -152,12 +160,13 @@
    "resv": "不要",
    "night": "24時間",
    "access": "国道120号沿い・県営無料130台・24時間トイレ",
-   "caution": "標高1395mで夏でも冷える。冬期は積雪",
+   "caution": "標高1395mで夏でも冷えます。冬期は積雪。",
    "evidence": "公式",
    "src": "https://www.star-nikko.org/spot/yumoto/senjogahara.html",
    "lp": 122,
    "score": 77.8,
-   "band": "良い"
+   "band": "良い",
+   "note": "県営の無料駐車場で、24時間使えるトイレがあります。"
   },
   {
    "pref": "群馬県",
@@ -174,7 +183,8 @@
    "src": "https://gunma-kanko.jp/features/240",
    "lp": 114,
    "score": 82.6,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "埼玉県",
@@ -191,7 +201,8 @@
    "src": "https://arakawa-park.jp/archives/114",
    "lp": 120,
    "score": 79,
-   "band": "良い"
+   "band": "良い",
+   "note": null
   },
   {
    "pref": "千葉県",
@@ -208,7 +219,8 @@
    "src": "https://kurashi-no.jp/I0042323",
    "lp": 127,
    "score": 74.6,
-   "band": "良い"
+   "band": "良い",
+   "note": null
   },
   {
    "pref": "東京都",
@@ -220,12 +232,13 @@
    "resv": "不要",
    "night": "24時間",
    "access": "島内舗装路・よたね広場はトイレ自販機あり",
-   "caution": "島へは船か飛行機。国内有数の暗さ(星空保護区認定)",
+   "caution": "島へは船か飛行機。最終便の時刻を先に調べておくこと。",
    "evidence": "公式",
    "src": "https://kozushima.com/star/",
    "lp": 64,
    "score": 92.1,
-   "band": "最高"
+   "band": "最高",
+   "note": "国内有数の暗さ。島全体が星空保護区に認定されています。"
   },
   {
    "pref": "神奈川県",
@@ -242,7 +255,8 @@
    "src": "https://www.star-watching.com/kanagawa/",
    "lp": 140,
    "score": 65.7,
-   "band": "良い"
+   "band": "良い",
+   "note": null
   },
   {
    "pref": "新潟県",
@@ -259,7 +273,8 @@
    "src": "https://www.week.co.jp/matome/kankou/hoshizora-tentaikansoku/",
    "lp": 105,
    "score": 85.8,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "富山県",
@@ -276,7 +291,8 @@
    "src": "https://iko-yo.net/facilities?prefecture_ids%5B%5D=16&tags%5B%5D=%E6%98%9F%E7%A9%BA%E8%A6%B3%E5%AF%9F",
    "lp": 116,
    "score": 81.4,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "石川県",
@@ -293,7 +309,8 @@
    "src": "https://keisuketsubohi.com/mawaki_iseki_star/",
    "lp": 95,
    "score": 87.3,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "福井県",
@@ -305,12 +322,13 @@
    "resv": "不要",
    "night": "要確認",
    "access": "県道241号・駐車場あり",
-   "caution": "南六呂師は星空保護区認定。冬期は積雪",
+   "caution": "冬期は積雪。スタッドレスタイヤが要ります。",
    "evidence": "公式",
    "src": "https://star.ono-kankou.jp/about/",
    "lp": 122,
    "score": 77.8,
-   "band": "良い"
+   "band": "良い",
+   "note": "南六呂師は星空保護区に認定されています。"
   },
   {
    "pref": "山梨県",
@@ -327,7 +345,8 @@
    "src": "https://www.fujikanko-travel.jp/sightseeing/65/",
    "lp": 119,
    "score": 79.6,
-   "band": "良い"
+   "band": "良い",
+   "note": null
   },
   {
    "pref": "長野県",
@@ -339,12 +358,13 @@
    "resv": "不要",
    "night": "要確認",
    "access": "国道153号沿い・スキー場駐車場",
-   "caution": "日本一の星空で知られる阿智村。集落・保育園周辺は避けること",
+   "caution": "集落や保育園のそばは避けてください。国道沿いのスキー場駐車場を使うこと。",
    "evidence": "口コミ",
    "src": "https://anatato.jp/achi-murasyoku-hoshizora-muryou-spots/",
    "lp": 117,
    "score": 80.8,
-   "band": "最高"
+   "band": "最高",
+   "note": "日本一の星空で知られる阿智村。"
   },
   {
    "pref": "岐阜県",
@@ -361,7 +381,8 @@
    "src": "https://kurashi-no.jp/I0042331",
    "lp": 112,
    "score": 83.8,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "静岡県",
@@ -378,7 +399,8 @@
    "src": "https://hosizora-trip.jp/%E9%9D%99%E5%B2%A1%E7%9C%8C/162/",
    "lp": 81,
    "score": 89.4,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "愛知県",
@@ -395,7 +417,8 @@
    "src": "https://www.okuminavi.jp/star/spot/detail/9/",
    "lp": 115,
    "score": 82,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "三重県",
@@ -412,7 +435,8 @@
    "src": "https://www.iseshima-kanko.jp/feature/starrysky",
    "lp": 107,
    "score": 85.5,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "滋賀県",
@@ -429,7 +453,8 @@
    "src": "https://koukasnote.com/blogs/shiga-star/",
    "lp": 121,
    "score": 78.4,
-   "band": "良い"
+   "band": "良い",
+   "note": null
   },
   {
    "pref": "京都府",
@@ -446,7 +471,8 @@
    "src": "https://tripto.jp/blogs/205",
    "lp": 96,
    "score": 87.1,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "大阪府",
@@ -463,7 +489,8 @@
    "src": "https://taka-style.net/milkyway-kansai",
    "lp": 166,
    "score": 52.8,
-   "band": "まずまず"
+   "band": "まずまず",
+   "note": null
   },
   {
    "pref": "兵庫県",
@@ -480,7 +507,8 @@
    "src": "https://keisuketsubohi.com/hoshi-tonominekougen/",
    "lp": 116,
    "score": 81.4,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "奈良県",
@@ -497,7 +525,8 @@
    "src": "https://hoshifullsato.com/locations/nara_nosegawa_tsuruhimepark/",
    "lp": 110,
    "score": 85,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "和歌山県",
@@ -514,7 +543,8 @@
    "src": "https://www.wakayama-kanko.or.jp/spots/detail_1056.html",
    "lp": 127,
    "score": 74.6,
-   "band": "良い"
+   "band": "良い",
+   "note": null
   },
   {
    "pref": "鳥取県",
@@ -526,12 +556,13 @@
    "resv": "不要",
    "night": "要確認",
    "access": "大山環状道路沿い・無料駐車場",
-   "caution": "施設は営業時間あり。県公式の星空スポットマップに掲載",
+   "caution": "売店などの施設は営業時間あり。駐車場の夜間利用は現地の掲示に従うこと。",
    "evidence": "公式",
    "src": "https://www.pref.tottori.lg.jp/269109.htm",
    "lp": 100,
    "score": 86.5,
-   "band": "最高"
+   "band": "最高",
+   "note": "鳥取県公式の星空スポットマップに載っています。"
   },
   {
    "pref": "島根県",
@@ -548,7 +579,8 @@
    "src": "https://www.kankou-shimane.com/destination/20674",
    "lp": 85,
    "score": 88.8,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "岡山県",
@@ -558,14 +590,15 @@
    "lon": 133.53,
    "free": "無料",
    "resv": "不要",
-   "night": "要確認",
+   "night": "深夜可",
    "access": "井原市管理の公園・駐車場あり",
-   "caution": "日本三選星名所。美星町は光害防止条例あり",
+   "caution": "トイレがありません。ふもとで済ませてください。夜間も駐車場に入れます。",
    "evidence": "公式",
-   "src": "https://www.ibarakankou.jp/sightseeing-information/experience/DB140.html",
+   "src": "https://biseikankou.jp/observatory/17-10.html",
    "lp": 120,
    "score": 79,
-   "band": "良い"
+   "band": "良い",
+   "note": "日本三選星名所。美星町には光害防止条例があります。"
   },
   {
    "pref": "広島県",
@@ -582,7 +615,8 @@
    "src": "https://dive-hiroshima.com/feature/feature-105882/",
    "lp": 93,
    "score": 87.6,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "山口県",
@@ -599,7 +633,8 @@
    "src": "https://yamaguchi-tourism.jp/spot/detail_19584.html",
    "lp": 100,
    "score": 86.5,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "徳島県",
@@ -609,14 +644,15 @@
    "lon": 134.421,
    "free": "無料",
    "resv": "不要",
-   "night": "要確認",
+   "night": "夜間可",
    "access": "村道・広い駐車場・車を降りてすぐ",
-   "caution": "トイレは夜間閉鎖。ふもとで済ませること。風車が近い",
-   "evidence": "口コミ",
-   "src": "https://wave-news.net/tokushima-star/",
+   "caution": "トイレは夜間閉鎖。ふもとで済ませること。村がルートについて注意喚起を出しているので事前に確認を。",
+   "evidence": "公式",
+   "src": "https://www.vill.sanagochi.lg.jp/docs/2020040100025/",
    "lp": 103,
    "score": 86.1,
-   "band": "最高"
+   "band": "最高",
+   "note": "佐那河内村が夜間の星空観察を紹介しています。"
   },
   {
    "pref": "香川県",
@@ -633,7 +669,8 @@
    "src": "https://www.my-kagawa.jp/point/490/",
    "lp": 117,
    "score": 80.8,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "愛媛県",
@@ -650,7 +687,8 @@
    "src": "https://www.traver.as-uni-hey.com/shikoku-starrysky/",
    "lp": 89,
    "score": 88.2,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "高知県",
@@ -667,7 +705,8 @@
    "src": "https://represent-kochi.com/enjoy/6277/",
    "lp": 85,
    "score": 88.8,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "福岡県",
@@ -684,7 +723,8 @@
    "src": "https://www.crossroadfukuoka.jp/feature/star",
    "lp": 110,
    "score": 85,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "佐賀県",
@@ -701,7 +741,8 @@
    "src": "https://www.nap-camp.com/mag/8917",
    "lp": 118,
    "score": 80.2,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "長崎県",
@@ -718,7 +759,8 @@
    "src": "https://nagasaki-search.com/9262/",
    "lp": 131,
    "score": 71.9,
-   "band": "良い"
+   "band": "良い",
+   "note": null
   },
   {
    "pref": "熊本県",
@@ -735,7 +777,8 @@
    "src": "https://www.welcomekyushu.jp/article/?mode=detail&id=274",
    "lp": 109,
    "score": 85.2,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "大分県",
@@ -752,7 +795,8 @@
    "src": "https://nipponosanpo.com/2026/02/10/kinds/star/3698/",
    "lp": 94,
    "score": 87.4,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "宮崎県",
@@ -769,7 +813,8 @@
    "src": "https://nipponosanpo.com/2026/01/19/matome/3301/",
    "lp": 94,
    "score": 87.4,
-   "band": "最高"
+   "band": "最高",
+   "note": null
   },
   {
    "pref": "鹿児島県",
@@ -779,14 +824,15 @@
    "lon": 130.803,
    "free": "無料",
    "resv": "不要",
-   "night": "要確認",
+   "night": "金土日祝〜22時",
    "access": "県道71号沿い・駐車場あり",
-   "caution": "輝北天球館は有料・営業時間あり。星空日本一に4回選出",
+   "caution": "公園の開園は水木9〜18時・金土日祝9〜22時、月火は休園。星を見るなら金土日祝の日没後〜22時まで。",
    "evidence": "公式",
-   "src": "https://www.kagoshima-kankou.com/guide/10341",
+   "src": "https://www.kihokuuwaba.jp/facility.html",
    "lp": 88,
    "score": 88.3,
-   "band": "最高"
+   "band": "最高",
+   "note": "環境省の星空観測で日本一に4回選ばれた場所です。"
   },
   {
    "pref": "沖縄県",
@@ -798,12 +844,13 @@
    "resv": "不要",
    "night": "24時間",
    "access": "国道58号終点・無料駐車場70台",
-   "caution": "沖縄本島最北端。強風時は注意。ハブに注意",
+   "caution": "強風時は注意。ハブがいるので草むらに入らないこと。",
    "evidence": "口コミ",
    "src": "https://www.okinawastory.jp/news/tourism/4229",
    "lp": 41,
    "score": 96.1,
-   "band": "最高"
+   "band": "最高",
+   "note": "沖縄本島最北端。周囲に人工光がほとんどありません。"
   }
  ]
 }
