@@ -923,6 +923,27 @@ try {
   const refRows = await page.locator("#ref-rows tr").count();
   check("校正に使った地点が表になる", refRows >= 5, `${refRows} 件`);
 
+  /*
+   * 判定の限界を伏せないこと。星見レベルは学会や気象機関の尺度ではなく
+   * このサイトが決めた指数なので、そう書いてあることを検査でも守る。
+   */
+  const aboutText = await page.locator("main").textContent();
+  check(
+    "星見レベルが独自の指数だと明記されている",
+    /独自に決めた指数/.test(aboutText) && /相対的な比較/.test(aboutText),
+    /独自に決めた指数/.test(aboutText) ? "明記あり" : "明記なし"
+  );
+  check(
+    "下地が読めないときは海にも色が乗ることを書いている",
+    /下地が読み込めなかったときは海にも色が乗ります/.test(aboutText),
+    /海にも色が乗ります/.test(aboutText) ? "明記あり" : "明記なし"
+  );
+  check(
+    "予報モデルを Best Match と正しく書いている",
+    /Best Match/.test(aboutText) && !/気象庁/.test(aboutText),
+    /気象庁/.test(aboutText) ? "気象庁モデルと書いたままになっている" : "Best Match と明記"
+  );
+
   const lpMeta = await page.locator("#lp-meta").textContent();
   check("光害データの作成情報が出る", /現在のデータ/.test(lpMeta), lpMeta.slice(0, 80));
   await capture("about");

@@ -84,6 +84,41 @@
       "expect": "2026-08-15"
     },
     {
+      "name": "スコア: 降水確率100%なら最良の条件でも「悪い」止まり",
+      "func": "evaluate",
+      "args": [
+        {
+          "lpIndex": 105,
+          "cloudPct": 0,
+          "precipPct": 100,
+          "moonBrightness": 0
+        }
+      ],
+      "expect": {
+        "score": 34.3,
+        "band": {
+          "key": "bad"
+        }
+      }
+    },
+    {
+      "name": "スコア: 降水確率100%で雲もあれば「不可」",
+      "func": "evaluate",
+      "args": [
+        {
+          "lpIndex": 105,
+          "cloudPct": 40,
+          "precipPct": 100,
+          "moonBrightness": 0
+        }
+      ],
+      "expect": {
+        "band": {
+          "key": "none"
+        }
+      }
+    },
+    {
       "name": "スコア: 雲量が無いときは点を付けない(快晴に化けさせない)",
       "func": "evaluate",
       "args": [

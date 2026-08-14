@@ -206,12 +206,53 @@ export async function build() {
 }
 
 /**
+ * 線分が通り抜ける格子のマスを、取りこぼしなく列挙する。
+ *
+ * 端点だけを見ると足りない。たとえば (35.9,136.1) から (35.9,138.9) への
+ * 1本の線分は、136〜137・137〜138・138〜139 の3マスを通るが、
+ * 端点が入っているのは両端の2マスだけで、真ん中のマスは見落とす。
+ *
+ * 緯度・経度が整数をまたぐ位置をすべて求め、隣り合う交点の中点を取る。
+ * 中点は必ずどれか1つのマスの内側にあるので、これでマスが漏れなく挙がる。
+ */
+function cellsCrossed(latA, lonA, latB, lonB) {
+  const ts = [0, 1];
+  const crossings = (a, b) => {
+    if (a === b) return;
+    const lo = Math.min(a, b);
+    const hi = Math.max(a, b);
+    for (let v = Math.ceil(lo); v <= Math.floor(hi); v++) {
+      const t = (v - a) / (b - a);
+      if (t > 0 && t < 1) ts.push(t);
+    }
+  };
+  crossings(latA, latB);
+  crossings(lonA, lonB);
+  ts.sort((x, y) => x - y);
+
+  const cells = [];
+  for (let i = 0; i + 1 < ts.length; i++) {
+    const t = (ts[i] + ts[i + 1]) / 2;
+    const lat = latA + (latB - latA) * t;
+    const lon = lonA + (lonB - lonA) * t;
+    cells.push([Math.floor(lat), Math.floor(lon)]);
+  }
+  return cells;
+}
+
+/**
  * 陸の描画が落とす前とまったく同じになることを確かめる。
  *
  * 画面の1画素は、それを囲む4つの格子点から双一次補間で作られる。
  * したがって「陸のどの位置についても、それを囲む4点がすべて残っている」なら、
- * 陸の値は落とす前と1つも変わらない。ここではそれを海岸線の頂点すべてで確かめる
- * (頂点は陸の位置そのものなので、陸の中でも最も外側=危ない側を突いている)。
+ * 陸の値は落とす前と1つも変わらない。
+ *
+ * 見るのは海岸線の全線分。以前は頂点だけを見ていたが、それでは
+ * 長い線分が横切る途中のマスを見落とす(上の cellsCrossed の説明を参照)。
+ * Natural Earth の 1:10m は頂点が密なので実際に見落としは無かったが、
+ * 「たまたま無かった」と「無いことを確かめた」は別物なので線分で見る。
+ *
+ * 海岸線は陸の縁そのもの ── 陸の中でいちばん外側=危ない側を突いている。
  */
 export function verifyLandUnaffected(points, rings) {
   const kept = new Set();
@@ -220,21 +261,38 @@ export function verifyLandUnaffected(points, rings) {
   const inGrid = (lat, lon) =>
     lat >= GRID.south && lat <= GRID.north && lon >= GRID.west && lon <= GRID.east;
 
-  let checked = 0;
+  let segments = 0;
+  let cells = 0;
+  const seen = new Set();
   const bad = [];
+
   for (const { ring } of rings) {
-    for (const [lon, lat] of ring) {
-      if (!inGrid(lat, lon)) continue;
-      checked++;
-      for (const la of [Math.floor(lat), Math.ceil(lat)]) {
-        for (const lo of [Math.floor(lon), Math.ceil(lon)]) {
-          if (!inGrid(la, lo)) continue;
-          if (!kept.has(`${la},${lo}`)) bad.push(`陸(${lat.toFixed(2)},${lon.toFixed(2)}) の隅(${la},${lo})`);
+    for (let i = 0; i + 1 < ring.length; i++) {
+      const [lonA, latA] = ring[i];
+      const [lonB, latB] = ring[i + 1];
+      // 両端とも格子の外なら、その線分は対象外
+      if (!inGrid(latA, lonA) && !inGrid(latB, lonB)) continue;
+      segments++;
+
+      for (const [la, lo] of cellsCrossed(latA, lonA, latB, lonB)) {
+        const key = `${la},${lo}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        cells++;
+
+        // そのマスの4隅がすべて残っているか
+        for (const cla of [la, la + 1]) {
+          for (const clo of [lo, lo + 1]) {
+            if (!inGrid(cla, clo)) continue;
+            if (!kept.has(`${cla},${clo}`)) {
+              bad.push(`マス(${la},${lo}) の隅(${cla},${clo}) が無い`);
+            }
+          }
         }
       }
     }
   }
-  return { checked, bad: bad.slice(0, 5), badCount: bad.length };
+  return { segments, cells, bad: bad.slice(0, 5), badCount: bad.length };
 }
 
 /**
@@ -312,7 +370,9 @@ if (process.argv[1] && process.argv[1].endsWith("land_grid.mjs")) {
 
     const v = verifyLandUnaffected(points, rings);
     if (v.badCount === 0) {
-      console.log(`陸の値は不変 : 海岸線 ${v.checked} 頂点すべてで、囲む4点が残っている`);
+      console.log(
+        `陸の値は不変 : 海岸線 ${v.segments} 線分が横切る ${v.cells} マスすべてで、4隅が残っている`
+      );
     } else {
       console.log(`陸の値が変わる: ${v.badCount} 箇所`);
       v.bad.forEach((b) => console.log("   " + b));
