@@ -20,6 +20,7 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(cd "$HERE/../.." && pwd)"
 PORT="${PGTEST_PORT:-55432}"
 BASE="${PGTEST_DIR:-/tmp/stars-pgtest-$$}"
 
@@ -67,35 +68,53 @@ $PSQL -f "$HERE/pgtest_stubs.sql" >/dev/null
 echo "weather-cache.sql を流します"
 # 本番向けの cron 登録と「いますぐ1回投げる」は、テストでは邪魔なので落とす。
 # 落とす箇所は行番号ではなく見出しで探す(SQL を編集してもずれないように)。
-python3 - "$HERE/weather-cache.sql" "$BASE/schema.sql" <<'PY'
-import io, sys
-src, dst = sys.argv[1], sys.argv[2]
-s = io.open(src, encoding="utf-8").read()
-
-cut  = s.index("-- ---- ⑦ 定期実行 ----")
-grid = s.index("-- ---- ⑧ 取りに行く地点を組み立てる ----")
-end  = s.index("-- ---- ⑨ 今すぐ1回ぶんだけ試す ----")
-s = s[:cut] + s[grid:end]
-
-# 拡張はこの環境に無い。pgtest_stubs.sql の作り物で代用する。
-s = s.replace("create extension if not exists pg_cron;", "")
-s = s.replace("create extension if not exists pg_net;", "")
-
-# テストで時刻を操れるようにする。
-#
-# PostgreSQL は search_path に pg_catalog を書かない限り、pg_catalog を
-# いちばん先に見る。そのままだと now() は必ず本物になり、
-# 「3時間後の周回」のような場面を実際に3時間待たずには作れない。
-# public を先に見るようにして、pgtest_stubs.sql の public.now() を使わせる。
-# 置き換えるのは名前の解決順だけで、関数の中身は本番と同じものを試す。
-n = s.count("set search_path = public\n")
-assert n >= 5, "search_path の書き換え対象が見つかりません (%d 件)" % n
-s = s.replace("set search_path = public\n", "set search_path = public, pg_catalog\n")
-
-io.open(dst, "w", encoding="utf-8").write(s)
-PY
+python3 "$HERE/pgtest_trim.py" "$HERE/weather-cache.sql" "$BASE/schema.sql"
 $PSQL -f "$BASE/schema.sql" >/dev/null
 
+# ---- 既に古い版が動いている環境へ上書きできるか ----
+#
+# 本番はまっさらではない。列を足したり関数の形を変えたりしたとき、
+# 上書きで流して通るかは実際にやってみないと分からない
+# (setup.sql では create or replace で関数を置き換えられず途中停止した)。
+echo
+echo "古い版への上書き:"
+OLD_WC="$BASE/old-weather-cache.sql"
+if git -C "$ROOT" show 38ba645:scripts/stars/weather-cache.sql > "$OLD_WC" 2>/dev/null; then
+  $PSQL -c "drop schema if exists public cascade; create schema public;" >/dev/null
+  $PSQL -f "$HERE/pgtest_stubs.sql" >/dev/null
+  python3 "$HERE/pgtest_trim.py" "$OLD_WC" "$BASE/old-schema.sql"
+
+  if $PSQL -f "$BASE/old-schema.sql" >/dev/null 2>"$BASE/wc1"; then
+    echo "  ok   古い版が入った"
+  else
+    echo "  失敗 古い版の投入: $(tail -2 "$BASE/wc1")" >&2; exit 1
+  fi
+
+  # 本番と同じく、取得中の要求が残っている状態にしておく
+  $PSQL -c "insert into stars_weather_pending (kind, part, request_id, requested_at) values ('grid', 1, 1, now());" >/dev/null 2>&1 || true
+
+  if $PSQL -f "$BASE/schema.sql" >/dev/null 2>"$BASE/wc2"; then
+    echo "  ok   新しい版を上書きできた"
+  else
+    echo "  失敗 上書き: $(tail -3 "$BASE/wc2")" >&2; exit 1
+  fi
+
+  NN=$($PSQL -tAc "select is_nullable from information_schema.columns where table_name='stars_weather_pending' and column_name='cycle_at';" | tr -d "[:space:]")
+  if [ "$NN" = "NO" ]; then
+    echo "  ok   cycle_at が追加され、既存行も埋まった"
+  else
+    echo "  失敗 cycle_at が NOT NULL になっていない($NN)" >&2; exit 1
+  fi
+else
+  echo "  info 古い版を取り出せないため、上書きの確認は省略"
+fi
+
+# 上書きの検査で中身を触ったので、本体のテストは作り直した環境で行う
+$PSQL -c "drop schema if exists public cascade; create schema public;" >/dev/null
+$PSQL -f "$HERE/pgtest_stubs.sql" >/dev/null
+$PSQL -f "$BASE/schema.sql" >/dev/null
+
+echo
 echo "テストを流します"
 echo
 $PSQL -f "$HERE/weather-cache.test.sql"

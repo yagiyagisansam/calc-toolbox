@@ -14,6 +14,7 @@ node scripts/stars/land_grid.mjs  # 取りに行く地点の検査
 node scripts/stars/verify.mjs     # ブラウザでの動作確認（Playwright が要る）
 bash  scripts/stars/pgtest.sh     # 天気キャッシュのSQL（PostgreSQL が要る）
 bash  scripts/stars/setup.test.sh # setup.sql が新規・更新どちらでも通るか
+bash  scripts/stars/migrate.test.sh # 本番へ渡す差分SQLが、いまの本番の版に当たるか
 ```
 
 `verify.mjs` と `pgtest.sh` 以外は Node だけで動き、外部への通信もしない。
