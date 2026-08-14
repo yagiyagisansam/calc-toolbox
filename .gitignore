@@ -1,0 +1,11 @@
+# このリポジトリは素の静的サイトで、中身がそのまま公開される。
+# 開発時にしか使わないものが混ざらないようにする。
+
+# Playwright を `npm install --no-save playwright` でリポジトリ内に
+# 入れたときに出来る(scripts/stars/README.md を参照)。
+# 公開先へ push すると数百MBが配信対象に入ってしまう。
+node_modules/
+package-lock.json
+
+# 検証で撮った画面
+scripts/stars/shots/

@@ -13,12 +13,69 @@
  *
  * 注意: この検証環境では外部のタイルサーバーに繋がらないことがある。
  * タイルが出なくても、色分けと操作が動くことを合格条件にしている。
+ *
+ * Playwright の入れ方は scripts/stars/README.md を参照。
  */
-import { chromium } from "/opt/node22/lib/node_modules/playwright/index.mjs";
 import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { pathToFileURL, fileURLToPath } from "node:url";
+
+/*
+ * Playwright を見つける。
+ *
+ * 以前はこの環境の絶対パス(/opt/node22/lib/node_modules/playwright/index.mjs)を
+ * 直接書いていた。手元では動くが、他の誰かが新規に checkout しても動かない。
+ * Windows では動きようがない。検証スクリプトが特定の1台でしか走らないのでは
+ * 「検証してある」と言えないので、普通の解決に直した。
+ *
+ * 順番:
+ *   1. ふつうに import する(リポジトリ内の node_modules、または npm link 済み)
+ *   2. グローバルに入っている場所を npm に聞く(-g で入れた場合)
+ * どちらも駄目なら、入れ方を示して終わる。
+ */
+async function loadChromium() {
+  try {
+    return (await import("playwright")).chromium;
+  } catch (e) {
+    /* 次を試す */
+  }
+
+  try {
+    const root = execFileSync("npm", ["root", "-g"], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+      shell: process.platform === "win32" // Windows の npm は npm.cmd
+    }).trim();
+    if (root) {
+      // パスに空白や日本語が入っていても壊れないよう、必ず file:// URL に直す
+      const entry = pathToFileURL(path.join(root, "playwright", "index.mjs")).href;
+      return (await import(entry)).chromium;
+    }
+  } catch (e) {
+    /* 下の案内へ */
+  }
+
+  console.error(
+    [
+      "Playwright が見つかりません。次のどちらかで入れてください。",
+      "",
+      "  リポジトリの中に入れる場合:",
+      "    npm install --no-save playwright",
+      "    npx playwright install chromium",
+      "",
+      "  端末全体に入れる場合:",
+      "    npm install -g playwright",
+      "    npx playwright install chromium",
+      "",
+      "詳しくは scripts/stars/README.md を参照してください。"
+    ].join("\n")
+  );
+  process.exit(2);
+}
+
+const chromium = await loadChromium();
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const PORT = 8788;
@@ -92,7 +149,31 @@ const server = await serve();
  * 地図の下地は届かないままだが、「下地が無くても色分けは動く」ことこそ
  * 確かめたい挙動なので、それでよい。
  */
-const browser = await chromium.launch({ headless: !headed });
+let browser;
+try {
+  browser = await chromium.launch({ headless: !headed });
+} catch (err) {
+  /*
+   * Playwright は入っているが、対応するブラウザの実体が無い。
+   * 素の例外だと何をすればよいか分からないので、手順を示して止める。
+   * (Playwright を入れ直すと、対応するブラウザの版も変わる。
+   *  すでに別の場所にブラウザがあるなら PLAYWRIGHT_BROWSERS_PATH で指せる。)
+   */
+  console.error(
+    [
+      "ブラウザを起動できませんでした。",
+      "",
+      String(err && err.message ? err.message : err).split("\n")[0],
+      "",
+      "次で入れてください:",
+      "  npx playwright install chromium",
+      "",
+      "別の場所に入れてある場合は PLAYWRIGHT_BROWSERS_PATH で指定できます。",
+      "詳しくは scripts/stars/README.md を参照してください。"
+    ].join("\n")
+  );
+  process.exit(2);
+}
 const page = await browser.newPage({ viewport: { width: 430, height: 860 } }); // iPhone に近い縦長
 
 /*
