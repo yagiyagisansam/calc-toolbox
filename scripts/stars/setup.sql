@@ -209,6 +209,14 @@ revoke all on function public.check_stars_spot_insert() from public, anon, authe
 
 
 -- ---- ④ 公開用(承認済みだけを返す) ----
+/*
+ * 返す列を増やしたときは、create or replace では置き換えられない
+ * (PostgreSQL は戻り値の型の変更を許さない)。先に落としてから作り直す。
+ * これを書いていなかったため、既に動いている環境へ流すと
+ *   Row type defined by OUT parameters is different
+ * で途中停止した(scripts/stars/setup.test.sh で検出)。
+ */
+drop function if exists public.stars_public_spots(text);
 create or replace function public.stars_public_spots(p_region text default null)
 returns table (
   spot_id     uuid,
@@ -246,17 +254,21 @@ grant execute on function public.stars_public_spots(text) to anon, authenticated
 -- 使い方は scripts/stars/ops.md を参照。
 
 -- 未承認の一覧
+-- 同上。承認画面に出す列を増やしたので、先に落としてから作り直す。
+drop function if exists public.stars_ops_pending(text, int);
 create or replace function public.stars_ops_pending(p_token text, p_limit int default 50)
 returns table (
   spot_id        uuid,
   name           text,
   pref           text,
+  city           text,
   lat            double precision,
   lon            double precision,
   elevation_m    int,
   access         text,
   facilities     text,
   note           text,
+  caution        text,
   source_url     text,
   submitter_hint text,
   created_at     timestamptz
@@ -271,8 +283,8 @@ begin
     raise exception 'unauthorized';
   end if;
   return query
-    select s.spot_id, s.name, s.pref, s.lat, s.lon, s.elevation_m,
-           s.access, s.facilities, s.note, s.source_url, s.submitter_hint, s.created_at
+    select s.spot_id, s.name, s.pref, s.city, s.lat, s.lon, s.elevation_m,
+           s.access, s.facilities, s.note, s.caution, s.source_url, s.submitter_hint, s.created_at
     from public.stars_spots s
     where s.status = 'pending'
     order by s.created_at

@@ -13,6 +13,7 @@ node scripts/stars/glow.test.mjs  # 大気散乱
 node scripts/stars/land_grid.mjs  # 取りに行く地点の検査
 node scripts/stars/verify.mjs     # ブラウザでの動作確認（Playwright が要る）
 bash  scripts/stars/pgtest.sh     # 天気キャッシュのSQL（PostgreSQL が要る）
+bash  scripts/stars/setup.test.sh # setup.sql が新規・更新どちらでも通るか
 ```
 
 `verify.mjs` と `pgtest.sh` 以外は Node だけで動き、外部への通信もしない。
@@ -75,6 +76,11 @@ bash scripts/stars/pgtest.sh
 必要なのは `initdb` / `pg_ctl` / `psql`。
 Debian・Ubuntu では PATH に入っていないので、
 スクリプトが `/usr/lib/postgresql/*/bin` を自分で探す。
+
+`setup.test.sh` は、`setup.sql` を「まっさらな環境」と
+「すでに古い版が入っている環境」の両方に流して確かめる。
+列を足したときに `create or replace` では関数を置き換えられない、
+という失敗を実際に踏んだので、渡す前に必ずこれを通すこと。
 
 **本番の Supabase では絶対に走らせないこと。**
 キャッシュを書き換えるうえ、pg_net / pg_cron を作り物に差し替える。
