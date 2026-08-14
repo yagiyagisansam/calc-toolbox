@@ -828,6 +828,12 @@ textarea.stars-input {
   color: var(--page-ink-2);
 }
 
+/* 予報が欠けている時刻。点を付けずに「データなし」と出す欄 */
+.stars-cell-none {
+  color: var(--page-ink-2);
+  font-style: italic;
+}
+
 .stars-band-chip {
   display: inline-block;
   width: 12px;

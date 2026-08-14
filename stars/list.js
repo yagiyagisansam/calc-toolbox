@@ -91,6 +91,8 @@
         humidityPct: series.humidity[i],
         moonBrightness: Sky.brightness(when, lat, lon)
       });
+      // 予報が欠けている時刻はベストの候補にしない(0点でも満点でもなく「無い」)
+      if (!result) continue;
       if (!best || result.score > best.score) {
         best = {
           score: result.score,

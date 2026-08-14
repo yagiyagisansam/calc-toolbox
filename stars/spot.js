@@ -104,7 +104,17 @@
     tbody.textContent = "";
     if (!hours.length) return;
 
-    var best = hours.reduce(function (a, b) {
+    // 予報が欠けている時刻はベストの候補にしない
+    var scored = hours.filter(function (h) {
+      return h.score !== null;
+    });
+    if (!scored.length) {
+      el("hourly-table").hidden = false;
+      renderRows(tbody, hours, null);
+      return;
+    }
+
+    var best = scored.reduce(function (a, b) {
       return b.score > a.score ? b : a;
     });
 
@@ -139,14 +149,29 @@
     );
 
     el("hourly-table").hidden = false;
+    renderRows(tbody, hours, best);
+  }
+
+  function renderRows(tbody, hours, best) {
     hours.forEach(function (h) {
       var tr = document.createElement("tr");
-      if (h === best) tr.className = "is-best";
+      if (best && h === best) tr.className = "is-best";
 
       var th = document.createElement("th");
       th.scope = "row";
       th.textContent = jstTime(h.at);
       tr.appendChild(th);
+
+      // 予報が欠けている時刻。快晴として点を付けず、はっきり「データなし」と出す。
+      if (h.score === null) {
+        var none = document.createElement("td");
+        none.className = "stars-cell-none";
+        none.colSpan = 6;
+        none.textContent = "データなし";
+        tr.appendChild(none);
+        tbody.appendChild(tr);
+        return;
+      }
 
       var td = document.createElement("td");
       var chip = document.createElement("span");
@@ -284,6 +309,12 @@
               humidityPct: series.humidity[i],
               moonBrightness: Sky.brightness(when, lat, lon)
             });
+            // 予報が欠けている時刻。行は残して「データなし」と出す
+            // (黙って飛ばすと、その時刻が無かったように見えてしまう)。
+            if (!result) {
+              state.hours.push({ at: when, score: null, band: null });
+              return;
+            }
             state.hours.push({
               at: when,
               score: result.score,

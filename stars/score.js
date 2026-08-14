@@ -119,6 +119,11 @@
     return LAYERS[0];
   }
 
+  // 「使える数値か」。null / undefined / NaN / Infinity / 文字列を弾く。
+  function isNum(v) {
+    return typeof v === "number" && isFinite(v);
+  }
+
   function clamp(v, lo, hi) {
     return v < lo ? lo : v > hi ? hi : v;
   }
@@ -153,26 +158,37 @@
    * @param {number} input.visibilityM 視程(m)。省略可
    * @param {number} input.humidityPct 相対湿度(%)。省略可
    * @param {number} input.moonBrightness 月の寄与(0〜1)。sky.js の brightness()。省略可
-   * @returns {{score:number, band:object, darkness:number, factors:object, hasAirQuality:boolean}}
+   * @returns {{score:number, band:object, darkness:number, factors:object,
+   *            hasAirQuality:boolean, unknown:boolean}|null}
+   *          雲量が分からないときは null(「分からない」と「快晴」を区別する)
    */
   function evaluate(input) {
     var darkness = darknessFromIndex(
       typeof input.lpIndex === "number" ? input.lpIndex : CONFIG.darknessAnchors[0].index
     );
 
-    var cloud = clamp(Number(input.cloudPct) || 0, 0, 100);
-    var precip = clamp(Number(input.precipPct) || 0, 0, 100);
-    var moon = clamp(Number(input.moonBrightness) || 0, 0, 1);
+    /*
+     * 雲量が無い・数値でないときに 0 として続けてはいけない。
+     * 雲量 0 は「快晴」という最も強い主張で、欠測がそのまま最高評価になる。
+     * 以前は `Number(x) || 0` としていたため、NaN も null も快晴になっていた。
+     * 分からないものは分からないと返す。
+     */
+    if (!isNum(input.cloudPct)) return null;
+
+    var cloud = clamp(input.cloudPct, 0, 100);
+    // 降水確率と月は、無ければ「影響なし」でよい(欠けても評価を持ち上げない)
+    var precip = isNum(input.precipPct) ? clamp(input.precipPct, 0, 100) : 0;
+    var moon = isNum(input.moonBrightness) ? clamp(input.moonBrightness, 0, 1) : 0;
 
     // 視程・湿度は地点単位の予報にしか含まれない。無いときは減点しない。
-    var hasAir = typeof input.visibilityM === "number" || typeof input.humidityPct === "number";
+    var hasAir = isNum(input.visibilityM) || isNum(input.humidityPct);
     var visFactor = 1;
-    if (typeof input.visibilityM === "number") {
+    if (isNum(input.visibilityM)) {
       var v = clamp(input.visibilityM / CONFIG.visibilityFull, 0, 1);
       visFactor = CONFIG.visibilityFloor + (1 - CONFIG.visibilityFloor) * v;
     }
     var humFactor = 1;
-    if (typeof input.humidityPct === "number") {
+    if (isNum(input.humidityPct)) {
       var over = clamp(input.humidityPct - CONFIG.humidityThreshold, 0, 100 - CONFIG.humidityThreshold);
       humFactor = 1 - (over / (100 - CONFIG.humidityThreshold)) * CONFIG.humidityWeight;
     }
@@ -198,9 +214,11 @@
   /**
    * 地図のラスタ描画用の軽量版。1画素ごとに呼ぶのでオブジェクトを作らない。
    * evaluate と同じ要素を同じ重みで掛ける(地図と一覧で判定が食い違わないように)。
-   * @returns {number} 0〜100
+   * @returns {number} 0〜100。値が欠けているときは NaN(呼び出し側で塗らない)
    */
   function quick(lpIndex, cloudPct, precipPct, visibilityM, humidityPct, moonBrightness) {
+    // NaN が来たら NaN のまま返す。0 に丸めると欠測が快晴になる。
+    if (!isNum(cloudPct)) return NaN;
     var darkness = darknessFromIndex(lpIndex);
     var sky = CONFIG.darknessFloor + (1 - CONFIG.darknessFloor) * darkness;
     var cloud = Math.pow(1 - clamp(cloudPct, 0, 100) / 100, CONFIG.cloudExponent);

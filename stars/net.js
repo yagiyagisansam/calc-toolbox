@@ -99,53 +99,191 @@
     });
   }
 
-  /** キャッシュの生データから、必要な時刻ぶんだけを取り出して組み替える */
-  function sliceGrid(row, start, end) {
-    var meta = row.meta;
-    var p = row.payload;
-    var from = start.getTime() / 1000;
-    var to = end.getTime() / 1000;
+  /*
+   * 4つの指標と、それぞれの妥当な範囲。サーバー側(weather-cache.sql)と同じ。
+   * 両方で見るのは、サーバーを直せない状況(古いキャッシュが残っている、
+   * 別のところから配られた等)でも、画面が嘘をつかないようにするため。
+   */
+  var SERIES_KEYS = ["cloud", "precip", "visibility", "humidity"];
+  var SERIES_RANGE = {
+    cloud: [0, 100],
+    precip: [0, 100],
+    visibility: [0, 1000000],
+    humidity: [0, 100]
+  };
 
-    var idx = [];
-    for (var t = 0; t < p.times.length; t++) {
-      if (p.times[t] >= from && p.times[t] <= to) idx.push(t);
-    }
-    // 求めた時間帯がキャッシュの範囲から外れている(更新が止まっている等)
-    if (!idx.length) throw new Error("この時間帯の予報がまだありません");
+  // 欠測を直前の値で埋めてよい上限。1時間を超えて続く欠けは埋めない。
+  var IMPUTE_MAX_STEPS = 1;
+
+  function isNum(v) {
+    return typeof v === "number" && isFinite(v);
+  }
+
+  /*
+   * キャッシュの中身が使える形かを確かめる。
+   *
+   * なぜここまで見るか:
+   *   以前は p.cloud の長さしか見ておらず、欠測を 0 に置き換えていた。
+   *   雲量の 0 は「快晴」を意味するので、データが欠けているときに
+   *   画面は最高の評価を出す。「分からない」より「快晴だと言い切る」ほうが
+   *   害が大きい ── 出かけた先で曇っていた、が起きる。
+   *   形がおかしければ描かずにその旨を出す。
+   */
+  function validateCache(row) {
+    var meta = row && row.meta;
+    var p = row && row.payload;
+    if (!meta || !p) throw new Error("天気予報の形式が正しくありません");
+
+    ["south", "north", "west", "east", "step"].forEach(function (k) {
+      if (!isNum(meta[k])) throw new Error("天気予報の格子の定義が壊れています");
+    });
 
     var rows = Math.round((meta.north - meta.south) / meta.step) + 1;
     var cols = Math.round((meta.east - meta.west) / meta.step) + 1;
     var n = rows * cols;
-    if (p.cloud.length !== n) {
-      throw new Error("予報の地点数が合いません (" + p.cloud.length + "/" + n + ")");
+    if (!(rows > 1 && cols > 1)) throw new Error("天気予報の格子の定義が壊れています");
+
+    if (!Array.isArray(p.times) || !p.times.length) {
+      throw new Error("天気予報に時刻が入っていません");
     }
+    for (var t = 0; t < p.times.length; t++) {
+      if (!isNum(p.times[t])) throw new Error("天気予報の時刻が数値ではありません");
+      if (t > 0 && p.times[t] <= p.times[t - 1]) {
+        throw new Error("天気予報の時刻が並んでいません");
+      }
+    }
+    var nt = p.times.length;
+
+    SERIES_KEYS.forEach(function (key) {
+      var all = p[key];
+      if (!Array.isArray(all) || all.length !== n) {
+        throw new Error("予報の地点数が合いません (" + key + ")");
+      }
+      var lo = SERIES_RANGE[key][0];
+      var hi = SERIES_RANGE[key][1];
+      for (var i = 0; i < n; i++) {
+        var s = all[i];
+        if (!Array.isArray(s) || s.length !== nt) {
+          throw new Error("予報の時間数が合いません (" + key + ")");
+        }
+        for (var k = 0; k < nt; k++) {
+          var v = s[k];
+          if (v === null) continue; // 欠測。後で埋めるか「不明」にする
+          if (!isNum(v) || v < lo || v > hi) {
+            throw new Error("予報に使えない値が入っています (" + key + ")");
+          }
+        }
+      }
+    });
+
+    return { rows: rows, cols: cols, n: n, nt: nt };
+  }
+
+  /*
+   * 欠測を埋める。埋めるのは直前の値で、最大1時間まで。
+   *
+   * 埋めきれないもの(先頭から欠けている・1時間を超えて続く)は NaN のままにする。
+   * 0 にはしない ── 雲量の 0 は「快晴」という強い主張になってしまうため。
+   * NaN の地点は、地図では色を塗らず、一覧・詳細では「データなし」と出す。
+   */
+  function imputeSeries(all, n, nt) {
+    var out = [];
+    var k;
+    for (k = 0; k < nt; k++) out.push(new Float32Array(n));
+
+    var filled = 0;
+    var missing = 0;
+    for (var i = 0; i < n; i++) {
+      var s = all[i];
+      var carried = 0;
+      var last = NaN;
+      for (k = 0; k < nt; k++) {
+        var v = s[k];
+        if (v === null || v === undefined) {
+          if (isFinite(last) && carried < IMPUTE_MAX_STEPS) {
+            carried++;
+            filled++;
+            out[k][i] = last;
+          } else {
+            missing++;
+            out[k][i] = NaN;
+          }
+        } else {
+          carried = 0;
+          last = v;
+          out[k][i] = v;
+        }
+      }
+    }
+    return { series: out, filled: filled, missing: missing };
+  }
+
+  /*
+   * キャッシュを1回だけ検証・補完して持っておく。
+   * ページの中で時間帯を変えるたびに全点を見直すのは無駄なので、
+   * 結果を生データの隣に貼り付けておく。
+   */
+  function prepare(row) {
+    if (row.__prepared) return row.__prepared;
+
+    var shape = validateCache(row);
+    var p = row.payload;
+    var prepared = {
+      rows: shape.rows,
+      cols: shape.cols,
+      n: shape.n,
+      times: p.times,
+      meta: row.meta,
+      updatedAt: new Date(row.updated_at),
+      filled: 0,
+      missing: 0,
+      series: {}
+    };
+
+    SERIES_KEYS.forEach(function (key) {
+      var r = imputeSeries(p[key], shape.n, shape.nt);
+      prepared.series[key] = r.series;
+      prepared.filled += r.filled;
+      prepared.missing += r.missing;
+    });
+
+    row.__prepared = prepared;
+    return prepared;
+  }
+
+  /** キャッシュの生データから、必要な時刻ぶんだけを取り出して組み替える */
+  function sliceGrid(row, start, end) {
+    var pre = prepare(row);
+    var from = start.getTime() / 1000;
+    var to = end.getTime() / 1000;
+
+    var idx = [];
+    for (var t = 0; t < pre.times.length; t++) {
+      if (pre.times[t] >= from && pre.times[t] <= to) idx.push(t);
+    }
+    // 求めた時間帯がキャッシュの範囲から外れている(更新が止まっている等)
+    if (!idx.length) throw new Error("この時間帯の予報がまだありません");
 
     var out = {
       times: idx.map(function (t) {
-        return p.times[t];
+        return pre.times[t];
       }),
-      rows: rows,
-      cols: cols,
-      grid: meta,
-      updatedAt: new Date(row.updated_at),
+      rows: pre.rows,
+      cols: pre.cols,
+      grid: pre.meta,
+      updatedAt: pre.updatedAt,
       weatherAvailable: true,
+      // 欠測をどう扱ったか。画面に出すために持ち回す。
+      imputed: { filled: pre.filled, missing: pre.missing, maxHours: IMPUTE_MAX_STEPS },
       // 求めた時間帯のうち、実際に予報があった範囲(欠けの検出に使う)
       requestedFrom: from,
       requestedTo: to
     };
 
-    ["cloud", "precip", "visibility", "humidity"].forEach(function (key) {
-      var series = [];
-      for (var k = 0; k < idx.length; k++) {
-        var arr = new Float32Array(n);
-        for (var i = 0; i < n; i++) {
-          var v = p[key] && p[key][i] ? p[key][i][idx[k]] : null;
-          // 欠測は直前の時刻の値を引き継ぐ(最初から無い場合だけ0)
-          arr[i] = v === null || v === undefined ? (k > 0 ? series[k - 1][i] : 0) : v;
-        }
-        series.push(arr);
-      }
-      out[key] = series;
+    SERIES_KEYS.forEach(function (key) {
+      out[key] = idx.map(function (t) {
+        return pre.series[key][t];
+      });
     });
 
     return out;
@@ -171,7 +309,6 @@
     var first = grid.times[0];
     var missingEnd = grid.requestedTo - last;
     var missingStart = first - grid.requestedFrom;
-    if (missingEnd < 3600 && missingStart < 3600) return null;
 
     var fmt = function (unix) {
       return new Intl.DateTimeFormat("ja-JP", {
@@ -183,15 +320,25 @@
         hour12: false
       }).format(new Date(unix * 1000));
     };
-    return (
-      "予報の更新が滞っています。今夜は " +
-      fmt(first) +
-      " 〜 " +
-      fmt(last) +
-      " のぶんしかありません" +
-      (grid.updatedAt ? "(最終更新 " + fmt(grid.updatedAt.getTime() / 1000) + ")" : "") +
-      "。"
-    );
+
+    if (missingEnd >= 3600 || missingStart >= 3600) {
+      return (
+        "予報の更新が滞っています。今夜は " +
+        fmt(first) +
+        " 〜 " +
+        fmt(last) +
+        " のぶんしかありません" +
+        (grid.updatedAt ? "(最終更新 " + fmt(grid.updatedAt.getTime() / 1000) + ")" : "") +
+        "。"
+      );
+    }
+
+    // 時間帯は足りているが、値そのものが欠けている地点がある
+    if (grid.imputed && grid.imputed.missing > 0) {
+      return "予報の一部が欠けています。値が無い地域は色を塗らず「データなし」と表示しています。";
+    }
+
+    return null;
   }
 
   /**
@@ -301,13 +448,22 @@
     });
   }
 
-  global.StarsNet = {
+  var api = {
     fetchGrid: fetchGrid,
     emptyGrid: emptyGrid,
     coverageNote: coverageNote,
     gridSeries: gridSeries,
     publicSpots: publicSpots,
     submitSpot: submitSpot,
-    backendReady: backendReady
+    backendReady: backendReady,
+    /*
+     * キャッシュの生データを検証して切り出す部分。通信を伴わないので、
+     * 壊れた応答をどう扱うかをここだけ取り出して試せる
+     * (scripts/stars/net.test.mjs)。
+     */
+    sliceGrid: sliceGrid
   };
+
+  global.StarsNet = api;
+  if (typeof module !== "undefined" && module.exports) module.exports = api;
 })(typeof window !== "undefined" ? window : globalThis);

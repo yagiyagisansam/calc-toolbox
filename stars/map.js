@@ -433,12 +433,32 @@
         var c = cloud[iA0] * wA + cloud[iA1] * wB + cloud[iB0] * wC + cloud[iB1] * wD;
         var pr = precip[iA0] * wA + precip[iA1] * wB + precip[iB0] * wC + precip[iB1] * wD;
 
+        /*
+         * 値が欠けている地点は NaN で入っている(net.js が 0 で埋めない)。
+         * ここで弾かないと `c | 0` が 0 になり、「雲量0%＝快晴」として
+         * いちばん良い色で塗ってしまう。分からないところは塗らない。
+         */
+        var known = c === c && pr === pr;
+
         var air = 1;
         if (hasAir) {
           var vm = vis[iA0] * wA + vis[iA1] * wB + vis[iB0] * wC + vis[iB1] * wD;
           var hm = humid[iA0] * wA + humid[iA1] * wB + humid[iB0] * wC + humid[iB1] * wD;
-          var vi = (vm / visStep) | 0;
-          air = visT[vi > visMax ? visMax : vi] * humidT[hm | 0];
+          if (vm !== vm || hm !== hm) {
+            known = false;
+          } else {
+            var vi = (vm / visStep) | 0;
+            air = visT[vi > visMax ? visMax : vi] * humidT[hm | 0];
+          }
+        }
+
+        if (!known) {
+          out[p] = 0;
+          out[p + 1] = 0;
+          out[p + 2] = 0;
+          out[p + 3] = 0; // 透明のまま(下地の地図がそのまま見える)
+          p += 4;
+          continue;
         }
 
         var lpv = lpData[lpOff + state.colLp[x]];

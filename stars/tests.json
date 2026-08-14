@@ -63,6 +63,56 @@
       "expect": 0.915
     },
     {
+      "name": "スコア: 雲量が無いときは点を付けない(快晴に化けさせない)",
+      "func": "evaluate",
+      "args": [
+        {
+          "lpIndex": 105,
+          "precipPct": 0,
+          "moonBrightness": 0
+        }
+      ],
+      "expect": null
+    },
+    {
+      "name": "スコア: 雲量が null なら点を付けない",
+      "func": "evaluate",
+      "args": [
+        {
+          "lpIndex": 105,
+          "cloudPct": null,
+          "precipPct": 0
+        }
+      ],
+      "expect": null
+    },
+    {
+      "name": "スコア: 雲量が文字列なら点を付けない",
+      "func": "evaluate",
+      "args": [
+        {
+          "lpIndex": 105,
+          "cloudPct": "0",
+          "precipPct": 0
+        }
+      ],
+      "expect": null
+    },
+    {
+      "name": "スコア: 降水確率が欠けても雲量があれば出せる(影響なしとして扱う)",
+      "func": "evaluate",
+      "args": [
+        {
+          "lpIndex": 105,
+          "cloudPct": 0,
+          "moonBrightness": 0
+        }
+      ],
+      "expect": {
+        "score": 85.8
+      }
+    },
+    {
       "name": "スコア: 暗所・快晴・新月は最高ランク",
       "func": "evaluate",
       "args": [

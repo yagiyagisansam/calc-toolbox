@@ -262,14 +262,15 @@
     var i = state.timeIndex;
     var result = Score.evaluate({
       lpIndex: lpIndex === null ? undefined : lpIndex,
-      cloudPct: series ? series.cloud[i] : 0,
-      precipPct: series ? series.precip[i] : 0,
+      cloudPct: series ? series.cloud[i] : undefined,
+      precipPct: series ? series.precip[i] : undefined,
       visibilityM: series && state.weatherAvailable ? series.visibility[i] : undefined,
       humidityPct: series && state.weatherAvailable ? series.humidity[i] : undefined,
       moonBrightness: Sky.brightness(when, lat, lon)
     });
-    el("spot-score").textContent = result.score + " / 100";
-    el("spot-band").textContent = result.band.label;
+    // 予報が無い・欠けている。快晴として点を付けず、そのまま伝える。
+    el("spot-score").textContent = result ? result.score + " / 100" : "データなし";
+    el("spot-band").textContent = result ? result.band.label : "";
     el("spot-note").textContent = spot.note || "";
     el("spot-detail-link").href = "./spot.html?id=" + encodeURIComponent(spot.spot_id);
 
