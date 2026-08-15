@@ -655,6 +655,35 @@ try {
   );
 
   /*
+   * 格子の外を渡したとき。
+   * 添字だけを端に寄せて重みをそのままにすると、外へ向けて値が伸びる
+   * (補間ではなく外挿になる)。端の値をそのまま返すこと。
+   */
+  {
+    const edge = await page.evaluate(() => {
+      const k = window.StarsApp.state.timeIndex || 0;
+      const g = window.StarsApp.state.grid.grid;
+      const rows = window.StarsApp.state.grid.rows;
+      const cols = window.StarsApp.state.grid.cols;
+      const at = (lat, lon) => window.StarsMap.moonFactorAt(k, lat, lon);
+      const south = g.north - (rows - 1) * g.step;
+      const east = g.west + (cols - 1) * g.step;
+      return {
+        north: [at(g.north, g.west), at(g.north + 20, g.west)],
+        south: [at(south, g.west), at(south - 20, g.west)],
+        west: [at(g.north, g.west), at(g.north, g.west - 20)],
+        east: [at(g.north, east), at(g.north, east + 20)]
+      };
+    });
+    const same = Object.keys(edge).filter((k) => edge[k][0] === edge[k][1]);
+    check(
+      "格子の外は端の値をそのまま返す(外挿しない)",
+      same.length === 4,
+      Object.keys(edge).map((k) => `${k}:${edge[k][0]}→${edge[k][1]}`).join(" / ")
+    );
+  }
+
+  /*
    * どの夜を見るか(今夜・明日・明後日)。
    * キャッシュは78時間ぶん持っているので、切り替えても通信は起きず、
    * 切り出す時刻の範囲だけが変わる。見出しの日付が1日進むことで確かめる。

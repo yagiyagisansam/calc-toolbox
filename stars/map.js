@@ -654,10 +654,19 @@
       var rows = state.grid.rows;
       var cols = state.grid.cols;
       var t = moonTable(timeIndex);
-      var gr = (g.north - lat) / g.step;
-      var gc = (lon - g.west) / g.step;
-      var r0 = Math.min(Math.max(Math.floor(gr), 0), rows - 1);
-      var c0 = Math.min(Math.max(Math.floor(gc), 0), cols - 1);
+      /*
+       * 格子の外は端の値をそのまま返す。
+       *
+       * 添字だけを端に寄せて重み(wx/wy)をそのままにすると、外側では
+       * 1を超える重みで足すことになり、格子の外へ向けて値が伸びていく
+       * (補間ではなく外挿になる)。描画は格子の内側しか触らないので
+       * 表には出ないが、検証からこの関数を直に呼ぶと外挿値が返る。
+       * 重みも一緒に端へ寄せる。
+       */
+      var gr = Math.min(Math.max((g.north - lat) / g.step, 0), rows - 1);
+      var gc = Math.min(Math.max((lon - g.west) / g.step, 0), cols - 1);
+      var r0 = Math.min(Math.floor(gr), rows - 1);
+      var c0 = Math.min(Math.floor(gc), cols - 1);
       var r1 = Math.min(r0 + 1, rows - 1);
       var c1 = Math.min(c0 + 1, cols - 1);
       var wy = gr - r0;

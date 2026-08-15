@@ -27,6 +27,8 @@ import { createRequire } from "node:module";
 import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { gunzipSync } from "node:zlib";
+import { createHash } from "node:crypto";
 
 const require = createRequire(import.meta.url);
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -317,6 +319,23 @@ function ok(cond, label, detail) {
     for (const r of fx.requests || []) {
       ok(r.url && r.params && r.params.SITE_COORD, `${name}: 問い合わせの中身が残っている`, r.label);
       ok(/^sha256:[0-9a-f]{64}$/.test(r.responseSha256 || ""), `${name}: 応答の指紋がある`, r.label);
+      /*
+       * 指紋だけでは、後から「その応答が本当にこれだった」ことを示せない。
+       * 比べる相手が無いためで、ハッシュは過去の応答の存在を証明しない。
+       * 生の応答も残し、そこから指紋を計算し直せることを確かめる。
+       */
+      let recomputed = null;
+      try {
+        const raw = gunzipSync(Buffer.from(r.responseGzipBase64 || "", "base64")).toString("utf8");
+        recomputed = "sha256:" + createHash("sha256").update(raw, "utf8").digest("hex");
+      } catch (e) {
+        /* 生の応答が無いか壊れている */
+      }
+      ok(
+        recomputed === r.responseSha256,
+        `${name}: 生の応答から指紋を計算し直せる`,
+        `${r.label} / ${recomputed || "生の応答が無い"}`
+      );
       ok(typeof r.apiVersion === "string", `${name}: API の版が残っている`, String(r.apiVersion));
       // 標高は 0km で問い合わせている。この前提は文書にも書いてある
       ok(/,0'$/.test(r.params.SITE_COORD), `${name}: 標高0kmで問い合わせている`, r.params.SITE_COORD);

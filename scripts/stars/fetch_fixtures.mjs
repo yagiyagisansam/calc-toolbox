@@ -28,6 +28,7 @@ const run = promisify(execFile);
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
+import { gzipSync, gunzipSync } from "node:zlib";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const HORIZONS_URL = "https://ssd.jpl.nasa.gov/api/horizons.api";
@@ -88,6 +89,16 @@ async function horizonsCall(label, params) {
     apiVersion: apiVersionOf(text),
     responseSha256: digest(text),
     responseBytes: Buffer.byteLength(text, "utf8"),
+    /*
+     * 生の応答そのものを残す(gzip して base64)。
+     *
+     * ハッシュだけでは、後から「その応答が本当にこれだった」ことを
+     * 示せない。比べる相手が無いためで、ハッシュは過去の応答の存在を
+     * 証明しない。1回ぶん8KB前後、12回で100KB弱なので、そのまま持つ。
+     * これは配信されない開発用ファイル(scripts/ の下)なので、
+     * 利用者の通信量には関係しない。
+     */
+    responseGzipBase64: gzipSync(Buffer.from(text, "utf8")).toString("base64"),
     at: new Date().toISOString()
   });
   return text;
