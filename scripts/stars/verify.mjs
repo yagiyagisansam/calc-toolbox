@@ -174,7 +174,14 @@ try {
   );
   process.exit(2);
 }
-const page = await browser.newPage({ viewport: { width: 430, height: 860 } }); // iPhone に近い縦長
+/*
+ * 画面の幅。既定は iPhone に近い縦長(Hiroさんの主環境がそれなので)。
+ * --width で変えられる。狭い端末・タブレット・机上の3つで通しておくと、
+ * 選択欄が縦積みになる・並びが折り返す、といった崩れに気づける。
+ */
+const widthArg = Number((argv.find((a) => a.startsWith("--width=")) || "").split("=")[1]);
+const VIEW_W = Number.isFinite(widthArg) && widthArg > 0 ? widthArg : 430;
+const page = await browser.newPage({ viewport: { width: VIEW_W, height: 860 } });
 
 /*
  * 外部からの応答を差し替える。

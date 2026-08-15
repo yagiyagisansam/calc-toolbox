@@ -21,6 +21,14 @@ bash  scripts/stars/migrate.test.sh # 本番へ渡す差分SQLが、いまの本
 
 `verify.mjs` と `pgtest.sh` 以外は Node だけで動き、外部への通信もしない。
 
+画面の幅は `--width=390` のように変えられる(既定は 430px = iPhone に近い縦長)。
+狭い端末・タブレット・机上の3つで通しておくと、
+選択欄が縦積みになる・並びが折り返す、といった崩れに気づける。
+
+```bash
+for w in 390 768 1280; do node scripts/stars/verify.mjs --width=$w; done
+```
+
 ## Playwright（verify.mjs に必要）
 
 どちらか一方でよい。
