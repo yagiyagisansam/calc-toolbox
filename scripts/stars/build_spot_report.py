@@ -30,6 +30,16 @@ pdfmetrics.registerFont(TTFont("JP", FONT_PATH))
 
 # 星見レベルの段階に対応する色。地図・凡例と同じ多色の並びを使う
 # (stars/palette.js の BAND_COLORS_ON_MAP)。紙なので白地に載る濃さのほう。
+VERDICTS = ["掲載可", "条件付き可", "保留", "除外"]
+
+# 判定の色。掲載可を緑、除外を赤にせず、落ち着いた色で塗り分ける
+VERDICT_COLOR = {
+    "掲載可": colors.HexColor("#e4f0e4"),
+    "条件付き可": colors.HexColor("#f2f0dd"),
+    "保留": colors.HexColor("#eeeeee"),
+    "除外": colors.HexColor("#fde8e8"),
+}
+
 BAND_COLOR = {
     "最高": colors.HexColor("#cfc302"),
     "良い": colors.HexColor("#db973b"),
@@ -59,7 +69,8 @@ S_NOTE = st("n", 7.2, 9.4, color=colors.HexColor("#555555"))
 
 
 def p(text, style=S_CELL):
-    return Paragraph(text, style)
+    # 空欄は「—」で埋める。None をそのまま渡すと reportlab が落ちる
+    return Paragraph("—" if text is None or text == "" else str(text), style)
 
 
 def build(spots, out_path):
@@ -108,19 +119,24 @@ def build(spots, out_path):
     story.append(Paragraph("裏取りの状況（この欄はレポート限り。サイトには載せません）", S_H2))
     story.append(Spacer(1, 1.5 * mm))
 
-    n_official = sum(1 for s in spots if s["evidence"] == "公式")
-    n_review = sum(1 for s in spots if s["evidence"] == "口コミ")
-    n_night_ok = sum(1 for s in spots if s["night"] != "要確認")
-    n_night_chk = sum(1 for s in spots if s["night"] == "要確認")
+    n = {v: sum(1 for s in spots if s["verdict"] == v) for v in VERDICTS}
+    n_official = sum(1 for s in spots
+                     if any(x["kind"] == "公式" for x in s.get("sources", [])))
 
     story.append(Paragraph(
-        f"・出典が自治体・観光協会などの<b>公式ページ: {n_official}件</b>／"
-        f"観光メディア・個人ブログなど<b>公式以外: {n_review}件</b>（表の「裏取り」欄）<br/>"
-        f"・夜間の立入可否が<b>確認できたもの: {n_night_ok}件</b>／"
-        f"<b>要確認: {n_night_chk}件</b>（表の「夜間」欄）<br/>"
-        "・「要確認」は、その場所が使えないという意味ではなく、"
-        "夜間の駐車場開放を明記した一次情報に行き当たらなかったという意味です。"
-        "掲載前に管理者へ確認するか、公開時に注記を添えることをおすすめします。<br/>"
+        f"・<b>掲載可: {n['掲載可']}件</b>／<b>条件付き可: {n['条件付き可']}件</b>／"
+        f"<b>保留: {n['保留']}件</b>／<b>除外: {n['除外']}件</b>（表の「判定」欄）<br/>"
+        f"・公式（自治体・道路管理者・施設運営者・公式観光組織）の出典を"
+        f"1件以上持つもの: <b>{n_official}件</b><br/>"
+        "・<b>「保留」は、その場所が使えないという意味ではありません。</b>"
+        "夜間の立入を明記した情報に行き当たらなかった、あるいは対象の駐車場を"
+        "一意に特定できなかった、という意味です。推測では埋めていません。<br/>"
+        "・<b>「除外」は、4条件のどれかを満たさないことが確認できたもの</b>です"
+        "（夜間駐車不可・有料・要予約・宿泊者への影響）。<br/>"
+        "・出典は属性ごとに分けて持っています。ある URL が「夜間」の根拠であっても、"
+        "「無料」「予約不要」の根拠になるとは限りません。"
+        "承認の対象にするものは、3条件それぞれに根拠があることを機械で確かめています"
+        "（scripts/stars/check_candidates.mjs）。<br/>"
         "・<b>光害指標と星見レベルは推測ではありません。</b>本サイトが VIIRS 夜間光から作った"
         "光害データ（stars/data/lp-japan.png、解像度 約2.7km）を実際に引いた値です。"
         "星見レベルは「快晴・月なし」の条件での上限点で、その場所が出せる最良の値です。",
@@ -167,8 +183,8 @@ def build(spots, out_path):
     story.append(Spacer(1, 2 * mm))
 
     head = ["都道府県", "スポット名", "市町村", "星見\nレベル", "点数", "光害\n指標",
-            "無料", "予約", "夜間", "アクセス・設備", "注意点", "裏取り"]
-    widths = [17, 40, 20, 15, 11, 12, 11, 11, 15, 48, 55, 12]
+            "無料", "予約", "夜間", "アクセス・設備", "注意点", "判定"]
+    widths = [17, 40, 20, 15, 11, 12, 11, 11, 15, 44, 51, 20]
     widths = [w * mm for w in widths]
 
     data = [[p("<b>%s</b>" % h.replace("\n", "<br/>"), S_CELL) for h in head]]
@@ -177,7 +193,7 @@ def build(spots, out_path):
             p(s["pref"]), p("<b>%s</b>" % s["name"]), p(s["city"]),
             p(s["band"]), p(str(s["score"])), p(str(s["lp"])),
             p(s["free"]), p(s["resv"]), p(s["night"]),
-            p(s["access"]), p(s["caution"]), p(s["evidence"]),
+            p(s["access"]), p(s["caution"]), p(s["verdict"]),
         ])
 
     t = Table(data, colWidths=widths, repeatRows=1)
@@ -197,10 +213,9 @@ def build(spots, out_path):
         # 星見レベルの欄をその段階の色で塗る(地図の凡例と同じ考え方)
         ts.append(("BACKGROUND", (3, i), (3, i), BAND_COLOR[s["band"]]))
         # 「要確認」は目で拾えるようにする(確定値と推定値を見た目でも分ける)
-        if s["night"] == "要確認":
+        if s["night"] in ("未確認", "不可"):
             ts.append(("BACKGROUND", (8, i), (8, i), colors.HexColor("#fde8e8")))
-        if s["evidence"] == "口コミ":
-            ts.append(("BACKGROUND", (11, i), (11, i), colors.HexColor("#fde8e8")))
+        ts.append(("BACKGROUND", (11, i), (11, i), VERDICT_COLOR[s["verdict"]]))
         if i % 2 == 0:
             ts.append(("BACKGROUND", (0, i), (2, i), colors.HexColor("#fafafa")))
             ts.append(("BACKGROUND", (4, i), (7, i), colors.HexColor("#fafafa")))
@@ -210,7 +225,8 @@ def build(spots, out_path):
 
     story.append(Spacer(1, 3 * mm))
     story.append(Paragraph(
-        "薄い赤の欄は、掲載前に確認が必要なところです。"
+        "「判定」の欄は 掲載可／条件付き可／保留／除外 の4段階です。"
+        "薄い赤の欄は、そのままでは掲載できないところです。"
         "「点数」は快晴・月なしの上限、「光害指標」は 0（最も暗い）〜255（都心）。",
         S_NOTE))
 
@@ -225,11 +241,22 @@ def build(spots, out_path):
         S_SMALL))
     story.append(Spacer(1, 2 * mm))
 
-    src_rows = [[p("<b>都道府県</b>", S_CELL), p("<b>種別</b>", S_CELL), p("<b>参照先</b>", S_CELL)]]
-    for s in sorted(spots, key=lambda x: PREF_ORDER.index(x["pref"])):
-        src_rows.append([p(s["pref"]), p(s["evidence"]),
-                         p('<link href="%s" color="#1a4fb4">%s</link>' % (s["src"], s["src"]), S_SMALL)])
-    t = Table(src_rows, colWidths=[22 * mm, 16 * mm, 239 * mm], repeatRows=1)
+    COVER_JA = {"night": "夜間", "free": "無料", "resv": "予約不要",
+                "city": "所在地", "access": "アクセス"}
+    src_rows = [[p("<b>都道府県</b>", S_CELL), p("<b>種別</b>", S_CELL),
+                 p("<b>何の根拠か</b>", S_CELL), p("<b>参照先</b>", S_CELL)]]
+    for sp in sorted(spots, key=lambda x: PREF_ORDER.index(x["pref"])):
+        srcs = sp.get("sources", [])
+        if not srcs:
+            src_rows.append([p(sp["pref"]), p("—"), p("—"),
+                             p("根拠として使える情報に行き当たらなかった", S_SMALL)])
+            continue
+        for src in srcs:
+            covers = "、".join(COVER_JA.get(c, c) for c in src.get("covers", [])) or "—"
+            src_rows.append([
+                p(sp["pref"]), p(src["kind"]), p(covers, S_SMALL),
+                p('<link href="%s" color="#1a4fb4">%s</link>' % (src["url"], src["url"]), S_SMALL)])
+    t = Table(src_rows, colWidths=[22 * mm, 16 * mm, 30 * mm, 209 * mm], repeatRows=1)
     t.setStyle(TableStyle([
         ("FONTNAME", (0, 0), (-1, -1), "JP"),
         ("VALIGN", (0, 0), (-1, -1), "TOP"),

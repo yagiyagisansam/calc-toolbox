@@ -10,6 +10,7 @@ node scripts/run_tests.mjs        # 全ツールの純関数テスト（stars �
 node scripts/stars/sky.test.mjs   # 月と夜の判定（JPL Horizons / 国立天文台の値と照合）
 node scripts/stars/net.test.mjs   # 壊れた天気キャッシュの扱い
 node scripts/stars/places.test.mjs # 地名の索引と検索(富士山・八ヶ岳などの代表地点)
+node scripts/stars/check_candidates.mjs # 掲載候補の判定・出典・所在地のつじつま
 node scripts/stars/glow.test.mjs  # 大気散乱
 node scripts/stars/land_grid.mjs  # 取りに行く地点の検査
 node scripts/stars/verify.mjs     # ブラウザでの動作確認（Playwright が要る）
