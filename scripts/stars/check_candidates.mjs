@@ -130,7 +130,35 @@ for (const s of data.spots) {
         `判定 ${s.verdict} / 根拠 ${[...covered].join(",") || "なし"}`
       );
     }
+
+    /*
+     * 座標が、書かれた市区町村の中にあること。
+     *
+     * 役場の代表点からの距離で見ていたころは、広い自治体で隣町の役場のほうが
+     * 近くなり、当てにならなかった。国土地理院の逆ジオコーダは行政界そのもので
+     * 答えるので、こちらを使う(結果は cityCheck に書き込んである)。
+     * 実際、47件のうち21件が別の市区町村に落ちていた。
+     * 1件は県すら違った(福岡県の候補が大分県日田市に落ちていた)。
+     *
+     * 場所が違うものを承認してはいけないので、ここは警告ではなく失敗にする。
+     */
+    ok(
+      s.cityCheck && s.cityCheck.ok === true,
+      `${at}: 承認の対象なのに座標と市区町村が一致していない`,
+      s.cityCheck
+        ? s.cityCheck.pref
+          ? `実際は ${s.cityCheck.pref}${s.cityCheck.city}`
+          : String(s.cityCheck.why)
+        : "cityCheck が無い(verify_candidate_cities.mjs を走らせること)"
+    );
   }
+
+  /* すべての候補に、いつ照合したかの記録があること */
+  ok(
+    s.cityCheck && /^\d{4}-\d{2}-\d{2}$/.test(s.cityCheck.at || ""),
+    `${at}: 所在地を照合した記録がある`,
+    s.cityCheck ? String(s.cityCheck.at) : "cityCheck が無い"
+  );
 
   for (const src of s.sources || []) {
     ok(
@@ -153,26 +181,11 @@ for (const s of data.spots) {
       ok(km <= 40, `${at}: 座標が市区町村「${s.city}」から離れすぎていない`, `${Math.round(km)}km`);
 
       /*
-       * 書かれた市区町村が、その県で「近いほう」に入っているか。
-       *
-       * 代表点までの距離だけでは、隣の自治体と取り違えても通ってしまう
-       * (椿山森林公園を日南市と書いていたが、実際は宮崎市の施設だった。
-       * どちらも宮崎県の実在の市で、代表点も40km以内にあった)。
-       * その県の市区町村を近い順に並べて、上位3件に入らなければ疑う。
-       * 代表点は役場の位置なので、広い自治体では順位が前後する。
-       * だから「間違い」とまでは言えないが、必ず人が見直すべき状態ではある。
+       * 「その県で近いほうに入っているか」という見方は、もう使わない。
+       * 役場の位置は自治体の中心ではないので、広い自治体では隣町の役場のほうが
+       * 近いことが普通にあり、正しい7件を疑って本当の誤り1件を見逃していた。
+       * 行政界そのもので判定する cityCheck(上)に置き換えた。
        */
-      const nearInPref = cities
-        .filter((c) => c.pref === s.pref)
-        .map((c) => ({ ...c, km: distKm(s.lat, s.lon, c.lat, c.lon) }))
-        .sort((a, b) => a.km - b.km)
-        .slice(0, 3);
-      if (!nearInPref.some((c) => sameCity(c.name, s.city))) {
-        warnings.push(
-          `${at}: 市区町村「${s.city}」より近い役場がある — ` +
-            nearInPref.map((c) => `${c.name}(${Math.round(c.km)}km)`).join(" / ")
-        );
-      }
     }
   }
 
