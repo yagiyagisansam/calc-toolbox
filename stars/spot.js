@@ -115,37 +115,6 @@
     }
   }
 
-  /*
-   * 「良い」の境目。独自の数字を持ち出さず、画面に出ている段階の区切りを使う。
-   * 一覧(list.js の GOOD_MIN)と同じ値でなければ、同じスポットについて
-   * 二つの画面が違うことを言うことになる。
-   */
-  var GOOD_MIN = 65;
-
-  /**
-   * 「良い」以上の時刻が何時間あり、いちばん長く続いたのが何時間か。
-   * 予報が欠けている時刻は「良くない」ではなく「分からない」ので、続きを切る。
-   */
-  function goodRuns(hours) {
-    var total = 0;
-    var run = 0;
-    var longest = 0;
-    hours.forEach(function (h) {
-      if (h.score === null) {
-        run = 0;
-        return;
-      }
-      if (h.score >= GOOD_MIN) {
-        total++;
-        run++;
-        if (run > longest) longest = run;
-      } else {
-        run = 0;
-      }
-    });
-    return { total: total, longest: longest };
-  }
-
   function renderHours(spot, hours, night) {
     var tbody = el("hourly-rows");
     tbody.textContent = "";
@@ -172,14 +141,17 @@
      * ベスト時刻に、良い条件が続く長さを添える。
      * 最高点だけだと「1時間だけ晴れる夜」と「一晩中晴れる夜」が同じに見える。
      * 出かけるかどうかを決めるのに、続き具合は点数と同じくらい効く。
+     *
+     * 数え方は Score.goodSpan に置いてある(一覧と同じ計算)。
+     * 欠測を飛ばした scored ではなく hours を渡す。飛ばすと、間の空いた
+     * 良い時刻どうしが「続いていた」ことになってしまう。
      */
-    // 欠測を飛ばした scored ではなく hours を渡す。飛ばすと、間の空いた
-    // 良い時刻どうしが「続いていた」ことになってしまう
-    var runs = goodRuns(hours);
+    var span = Score.goodSpan(hours);
     var atText = jstDate(best.at) + " " + jstTime(best.at) + " ごろ";
-    if (runs.longest > 0) {
+    if (span.longestHours > 0) {
       atText +=
-        "（「良い」以上が " + runs.total + " 時間、うち連続で " + runs.longest + " 時間）";
+        "（「良い」以上が約 " + span.totalHours + " 時間、うち続けて約 " +
+        span.longestHours + " 時間）";
     }
     setText("best-at", atText);
     setText("fact-darkness", Math.round(best.darkness * 100) + "%（光害の少なさ）");

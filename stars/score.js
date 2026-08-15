@@ -305,9 +305,75 @@
     return BANDS.length - 1;
   }
 
+  /*
+   * 「良い」の境目。独自の数字を持ち出さず、上の BANDS の区切りをそのまま使う。
+   * 一覧と詳細で別々に持っていたので、同じスポットについて二つの画面が
+   * 違うことを言う余地があった。1か所に寄せる。
+   */
+  var GOOD_MIN = 65;
+
+  /**
+   * 「良い」以上の条件が、実際に何時間ぶん続くかを求める。
+   *
+   * 数えるのは「合格した時刻の個数」ではなく「時刻と時刻のあいだの長さ」。
+   *   ・21時の1点だけが合格 → 続いた時間は 0(1点では幅が決まらない)
+   *   ・21時と22時が合格   → 1時間
+   * 個数を時間数として出していたので、常に1時間ぶん多く見せていた。
+   * 予報の刻みも1時間と決めつけない。3時間刻みなら3時間として数える。
+   *
+   * 隣り合う2点がどちらも合格のときだけ、その区間を足す。
+   * 予報が欠けている時刻(score が null)は「良くない」ではなく「分からない」
+   * なので、そこで区間を切る。
+   *
+   * @param {Array<{at:Date|number, score:number|null}>} points 時刻順に並んだ予報
+   * @param {number} [minScore] 合格とみなす点数(既定は「良い」の 65)
+   * @returns {{totalHours:number, longestHours:number, count:number}}
+   *          totalHours: 合格の区間をぜんぶ足した長さ
+   *          longestHours: 続いた中でいちばん長い区間の長さ
+   *          count: 合格した時刻の個数(参考。時間ではない)
+   */
+  function goodSpan(points, minScore) {
+    var limit = isNum(minScore) ? minScore : GOOD_MIN;
+    var total = 0;
+    var longest = 0;
+    var run = 0;
+    var count = 0;
+
+    var ms = function (p) {
+      var v = p.at instanceof Date ? p.at.getTime() : p.at;
+      return isNum(v) ? v : NaN;
+    };
+
+    for (var i = 0; i < points.length; i++) {
+      var okNow = isNum(points[i].score) && points[i].score >= limit;
+      if (okNow) count++;
+      if (i === 0) continue;
+
+      var prev = points[i - 1];
+      var okPrev = isNum(prev.score) && prev.score >= limit;
+      var span = (ms(points[i]) - ms(prev)) / 3600000;
+
+      if (okNow && okPrev && isFinite(span) && span > 0) {
+        total += span;
+        run += span;
+        if (run > longest) longest = run;
+      } else {
+        run = 0;
+      }
+    }
+
+    // 表示は1時間刻みにする。0.5時間を「0時間」と出さないよう四捨五入
+    var round = function (h) {
+      return Math.round(h * 10) / 10;
+    };
+    return { totalHours: round(total), longestHours: round(longest), count: count };
+  }
+
   var api = {
     evaluate: evaluate,
     quick: quick,
+    goodSpan: goodSpan,
+    GOOD_MIN: GOOD_MIN,
     darknessFromIndex: darknessFromIndex,
     buildTables: buildTables,
     moonFactor: moonFactor,

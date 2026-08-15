@@ -66,21 +66,33 @@
       "name": "夜の判定: 8/15 04:00 JST では代表地点(36,138)は8月15日の夜",
       "global": "StarsSky",
       "func": "currentNightDate",
-      "args": [36, 138, "2026-08-14T19:00:00Z"],
+      "args": [
+        36,
+        138,
+        "2026-08-14T19:00:00Z"
+      ],
       "expect": "2026-08-15"
     },
     {
       "name": "夜の判定: 同時刻でも石垣島はまだ8月14日の夜(一覧と詳細でずれた原因)",
       "global": "StarsSky",
       "func": "currentNightDate",
-      "args": [24.34, 124.16, "2026-08-14T19:00:00Z"],
+      "args": [
+        24.34,
+        124.16,
+        "2026-08-14T19:00:00Z"
+      ],
       "expect": "2026-08-14"
     },
     {
       "name": "夜の判定: 同時刻の稚内は8月15日の夜",
       "global": "StarsSky",
       "func": "currentNightDate",
-      "args": [45.42, 141.67, "2026-08-14T19:00:00Z"],
+      "args": [
+        45.42,
+        141.67,
+        "2026-08-14T19:00:00Z"
+      ],
       "expect": "2026-08-15"
     },
     {
@@ -680,6 +692,202 @@
         "2026-08-12T19:30:00Z"
       ],
       "expect": "2026-08-13"
+    },
+    {
+      "name": "続き具合: 合格1点だけでは「続いた時間」にしない",
+      "func": "goodSpan",
+      "args": [
+        [
+          {
+            "at": 1755000000000,
+            "score": 80
+          }
+        ]
+      ],
+      "expect": {
+        "totalHours": 0,
+        "longestHours": 0,
+        "count": 1
+      }
+    },
+    {
+      "name": "続き具合: 1時間差の合格2点は1時間",
+      "func": "goodSpan",
+      "args": [
+        [
+          {
+            "at": 1755000000000,
+            "score": 80
+          },
+          {
+            "at": 1755003600000,
+            "score": 80
+          }
+        ]
+      ],
+      "expect": {
+        "totalHours": 1,
+        "longestHours": 1,
+        "count": 2
+      }
+    },
+    {
+      "name": "続き具合: 1時間差の合格3点は2時間",
+      "func": "goodSpan",
+      "args": [
+        [
+          {
+            "at": 1755000000000,
+            "score": 80
+          },
+          {
+            "at": 1755003600000,
+            "score": 80
+          },
+          {
+            "at": 1755007200000,
+            "score": 80
+          }
+        ]
+      ],
+      "expect": {
+        "totalHours": 2,
+        "longestHours": 2,
+        "count": 3
+      }
+    },
+    {
+      "name": "続き具合: 3時間刻みなら3時間として数える",
+      "func": "goodSpan",
+      "args": [
+        [
+          {
+            "at": 1755000000000,
+            "score": 80
+          },
+          {
+            "at": 1755010800000,
+            "score": 80
+          }
+        ]
+      ],
+      "expect": {
+        "totalHours": 3,
+        "longestHours": 3,
+        "count": 2
+      }
+    },
+    {
+      "name": "続き具合: 欠測をまたいで続きにしない",
+      "func": "goodSpan",
+      "args": [
+        [
+          {
+            "at": 1755000000000,
+            "score": 80
+          },
+          {
+            "at": 1755003600000,
+            "score": null
+          },
+          {
+            "at": 1755007200000,
+            "score": 80
+          }
+        ]
+      ],
+      "expect": {
+        "totalHours": 0,
+        "longestHours": 0,
+        "count": 2
+      }
+    },
+    {
+      "name": "続き具合: 不合格をまたいで続きにしない",
+      "func": "goodSpan",
+      "args": [
+        [
+          {
+            "at": 1755000000000,
+            "score": 80
+          },
+          {
+            "at": 1755003600000,
+            "score": 80
+          },
+          {
+            "at": 1755007200000,
+            "score": 10
+          },
+          {
+            "at": 1755010800000,
+            "score": 80
+          },
+          {
+            "at": 1755014400000,
+            "score": 80
+          }
+        ]
+      ],
+      "expect": {
+        "totalHours": 2,
+        "longestHours": 1,
+        "count": 4
+      }
+    },
+    {
+      "name": "続き具合: 境目(65点)は合格に含む",
+      "func": "goodSpan",
+      "args": [
+        [
+          {
+            "at": 1755000000000,
+            "score": 65
+          },
+          {
+            "at": 1755003600000,
+            "score": 65
+          }
+        ]
+      ],
+      "expect": {
+        "totalHours": 1,
+        "longestHours": 1,
+        "count": 2
+      }
+    },
+    {
+      "name": "続き具合: 境目のすぐ下(64.9点)は合格にしない",
+      "func": "goodSpan",
+      "args": [
+        [
+          {
+            "at": 1755000000000,
+            "score": 64.9
+          },
+          {
+            "at": 1755003600000,
+            "score": 64.9
+          }
+        ]
+      ],
+      "expect": {
+        "totalHours": 0,
+        "longestHours": 0,
+        "count": 0
+      }
+    },
+    {
+      "name": "続き具合: 空の予報は0",
+      "func": "goodSpan",
+      "args": [
+        []
+      ],
+      "expect": {
+        "totalHours": 0,
+        "longestHours": 0,
+        "count": 0
+      }
     }
   ]
 }

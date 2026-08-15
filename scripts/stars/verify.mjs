@@ -887,7 +887,7 @@ try {
       // 「良い条件が N 時間続く」か「良い条件の時間なし」。後者は 0 とみなす
       run: /良い条件の時間なし/.test(joined)
         ? 0
-        : Number((joined.match(/良い条件が(\d+)時間続く/) || [])[1])
+        : Number((joined.match(/良い条件が約([\d.]+)時間続く/) || [])[1])
     });
   }
   const listBest = listBests.find((b) => b.name === "乗鞍畳平") || null;
@@ -1284,7 +1284,7 @@ try {
       const atText = await page.locator("#best-at").textContent();
       const at = (atText.match(/(\d{2}:\d{2})/) || [])[1];
       // 続く時間。詳細は 0 のとき何も書かないので、書いていなければ 0 とみなす
-      const run = Number((atText.match(/連続で\s*(\d+)\s*時間/) || [])[1] || 0);
+      const run = Number((atText.match(/続けて約\s*([\d.]+)\s*時間/) || [])[1] || 0);
       if (at !== b.at || !score.startsWith(b.score)) {
         mismatched.push(`${b.name}: 一覧 ${b.at} ${b.score}点 / 詳細 ${at} ${score}`);
       }

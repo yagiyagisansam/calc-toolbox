@@ -85,12 +85,6 @@
 
   // ---- スコアの計算 -------------------------------------------------------
 
-  /*
-   * 「良い」の境目。ここ以上の時間がどれだけ続くかを、続き具合の目安にする。
-   * 独自の数字を持ち出さず、画面に出ている段階の区切りをそのまま使う。
-   */
-  var GOOD_MIN = 65;
-
   /**
    * 1スポットぶんの予報から、今夜のうち最も条件がよい時刻を選ぶ。
    * その地点で空が充分に暗い時間帯だけを対象にする(全国の時間帯ではなく)。
@@ -108,9 +102,12 @@
     var series = Net.gridSeries(grid, lat, lon);
 
     var best = null;
-    var goodHours = 0; // 「良い」以上の時刻の数
-    var run = 0; // いま続いている良い時刻の数
-    var longestRun = 0; // 続いた中でいちばん長いもの
+    /*
+     * 続き具合は、合格した時刻の「個数」ではなく「時刻と時刻のあいだの長さ」で
+     * 数える。数え方は Score.goodSpan に置いてある(詳細ページと同じ計算)。
+     * ここでは暗い時間帯の各時刻の点数を、時刻つきで並べて渡すだけにする。
+     */
+    var points = [];
 
     for (var i = 0; i < series.times.length; i++) {
       var when = new Date(series.times[i] * 1000);
@@ -125,20 +122,10 @@
         humidityPct: series.humidity[i],
         moonBrightness: Sky.brightness(when, lat, lon)
       });
-      // 予報が欠けている時刻はベストの候補にしない(0点でも満点でもなく「無い」)
-      if (!result) {
-        // 欠測は「良くない」ではなく「分からない」。続きはここで切る
-        run = 0;
-        continue;
-      }
 
-      if (result.score >= GOOD_MIN) {
-        goodHours++;
-        run++;
-        if (run > longestRun) longestRun = run;
-      } else {
-        run = 0;
-      }
+      // 予報が欠けている時刻は「無い」として並べる(0点でも満点でもない)
+      points.push({ at: when, score: result ? result.score : null });
+      if (!result) continue;
 
       if (!best || result.score > best.score) {
         best = {
@@ -152,8 +139,10 @@
     }
 
     if (best) {
-      best.goodHours = goodHours;
-      best.longestRunHours = longestRun;
+      var span = Score.goodSpan(points);
+      best.goodHours = span.totalHours;
+      best.longestRunHours = span.longestHours;
+      best.goodCount = span.count;
     }
     return best;
   }
@@ -793,7 +782,7 @@
         run.className = "stars-cell-sub";
         run.textContent =
           spot.best.longestRunHours > 0
-            ? "良い条件が" + spot.best.longestRunHours + "時間続く"
+            ? "良い条件が約" + spot.best.longestRunHours + "時間続く"
             : "良い条件の時間なし";
         tdWhen.appendChild(run);
       } else {
