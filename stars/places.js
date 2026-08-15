@@ -59,6 +59,13 @@
     state.rows = data.places;
     state.prefs = data.prefs || [];
     state.kinds = data.kinds || [];
+    /*
+     * 比べる用の名前と読みを先に作っておく。
+     * 打たれるたびに1万件を寄せ直すと、1文字打つごとに引っかかる。
+     */
+    state.folded = data.places.map(function (row) {
+      return [fold(row[0]), fold(row[1] || "")];
+    });
     state.ready = true;
     return data;
   }
@@ -88,9 +95,43 @@
       .replace(/ゖ/g, "ヶ");
   }
 
-  /** 検索用に整える(前後の空白を落とし、カナをひらがなへ) */
+  /*
+   * 表記の揺れを1つの形に寄せる。
+   *
+   * 打つ側と索引の側で綴りが違うと、正しい地名なのに0件になる。
+   * 実際に食い違っていたもの(国土地理院の市区町村名と突き合わせて確かめた):
+   *   ケ / ヶ   金ケ崎町・七ケ宿町・保土ケ谷区 ↔ 茅ヶ崎市
+   *   異体字     諌早市↔諫早市 / 塩竃市↔塩竈市 / 桧枝岐村↔檜枝岐村 / 四条畷市↔四條畷市
+   * どちらが「正しい」かではなく、比べるときだけ同じ形に寄せる。
+   */
+  var FOLD = { 諌: "諫", 竃: "竈", 桧: "檜", 條: "条", 邊: "辺", 曾: "曽", 舘: "館" };
+  var KANJI = /[一-鿿]/;
+
+  function fold(s) {
+    var text = String(s).replace(/[諌竃桧條邊曾舘]/g, function (c) {
+      return FOLD[c];
+    });
+    /*
+     * ケ を ヶ に寄せるのは、漢字に挟まれているときだけ。
+     * 「茅ケ崎市」「金ケ崎町」の ケ は箇の略字で ヶ と同じものだが、
+     * 「ヤツガタケ」の ケ はカタカナの一音で、ひらがなの け になるべきもの。
+     * 見境なく寄せると、カタカナで打った読みが「やつがたヶ」になって
+     * 索引の「やつがたけ」と当たらなくなる。
+     */
+    return text.replace(/(.?)ケ(.?)/g, function (all, before, after) {
+      return KANJI.test(before) || KANJI.test(after) ? before + "ヶ" + after : all;
+    });
+  }
+
+  /**
+   * 検索用に整える(前後の空白を落とし、表記の揺れを寄せ、カナをひらがなへ)。
+   *
+   * 順番が大事。寄せるのを先にしないと、ケ が ひらがなの け になってしまい、
+   * そのあと ヶ へ寄せる機会が無くなる(「茅ケ崎市」が「茅け崎市」になり、
+   * 索引側の「茅ヶ崎市」と永久に一致しない)。
+   */
   function normalize(s) {
-    return toHiragana(String(s == null ? "" : s).trim());
+    return toHiragana(fold(String(s == null ? "" : s).trim()));
   }
 
   function toPlace(row) {
@@ -128,8 +169,9 @@
     var hits = [];
     for (var i = 0; i < state.rows.length; i++) {
       var row = state.rows[i];
-      var name = row[0];
-      var kana = row[1] || "";
+      // 比べるのは寄せた形。画面に出すのは元の綴り(row[0])のまま
+      var name = state.folded[i][0];
+      var kana = state.folded[i][1];
       var tier = -1;
 
       if (name === q || kana === q) tier = 0;

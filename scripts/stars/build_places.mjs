@@ -213,7 +213,28 @@ for (const line of text.split("\n")) {
     kanjiNames.push(exact);
   }
 
+  /*
+   * 市区町村は「市・町・村・区・郡」まで含んだ正式な形を選ぶ。
+   *
+   * 「短いほう」を選ぶ規則のままだと、GeoNames の別名に
+   * 「宮崎」と「宮崎市」の両方があるとき短い「宮崎」が採られ、
+   * 索引に市の付いた名前が1つも入らなくなる。
+   * その結果「宮崎市」「青森市」「田村市」と打つと0件になっていた
+   * (「宮崎」と打てば当たるが、住所を打つ人は市まで入れる)。
+   * 逆に正式な形を入れておけば、「宮崎」でも前方一致で当たる。
+   */
+  const ADMIN_TAIL = /(都|道|府|県|市|区|町|村|郡)$/;
+  const isAdmin = spec.kind === "city" || spec.kind === "pref";
+
   const name = kanjiNames.sort((a, b) => {
+    if (isAdmin) {
+      const aa = ADMIN_TAIL.test(a) ? 0 : 1;
+      const ab = ADMIN_TAIL.test(b) ? 0 : 1;
+      // 正式な形を先に。そのうえで長いほう(「北九州市若松区」>「若松区」)
+      if (aa !== ab) return aa - ab;
+      if (a.length !== b.length) return b.length - a.length;
+      return a.localeCompare(b, "ja");
+    }
     const ga = GOOD_TAIL.test(a) ? 0 : 1;
     const gb = GOOD_TAIL.test(b) ? 0 : 1;
     return ga - gb || a.length - b.length || a.localeCompare(b, "ja");
