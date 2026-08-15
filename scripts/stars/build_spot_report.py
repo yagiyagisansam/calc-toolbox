@@ -182,6 +182,59 @@ def build(spots, out_path):
 
     story.append(PageBreak())
 
+    # ---- 承認の対象になるものだけを抜き出す ----
+    #
+    # 47件の表から「いま決められるもの」を目で拾うのは骨が折れる。
+    # 掲載可と条件付き可だけを、点数の高い順に並べて先に出す。
+    story.append(Paragraph("承認の対象（この中から選んでください）", S_H2))
+    story.append(Spacer(1, 1.5 * mm))
+    ok_spots = [s for s in spots if s["verdict"] in ("掲載可", "条件付き可")]
+    ok_spots.sort(key=lambda s: -s["score"])
+    story.append(Paragraph(
+        f"4条件をすべて確認できた <b>{len(ok_spots)}件</b>です。"
+        "「条件付き可」は使えますが、時間や季節の制限があるので、"
+        "掲載するなら注意点をそのまま載せてください。<br/>"
+        "残る31件は、夜間の可否が取れていない（保留23件）か、"
+        "4条件のどれかを満たさないことが分かっている（除外4件）か、"
+        "座標が確定していない（保留のうち6件）ものです。",
+        S_SMALL))
+    story.append(Spacer(1, 2.5 * mm))
+
+    ok_head = ["判定", "都道府県", "スポット名", "市町村", "星見\nレベル", "点数",
+               "夜間", "気をつけること"]
+    ok_widths = [w * mm for w in [20, 18, 46, 22, 16, 12, 20, 123]]
+    ok_rows = [[p("<b>%s</b>" % h.replace("\n", "<br/>"), S_CELL) for h in ok_head]]
+    for s in ok_spots:
+        ok_rows.append([
+            p(s["verdict"]), p(s["pref"]), p("<b>%s</b>" % s["name"]), p(s["city"]),
+            p(s["band"]), p(str(s["score"])), p(s["night"]), p(s["caution"]),
+        ])
+    t = Table(ok_rows, colWidths=ok_widths, repeatRows=1)
+    ts = [
+        ("FONTNAME", (0, 0), (-1, -1), "JP"),
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#cccccc")),
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#eeeeee")),
+        ("ALIGN", (4, 1), (6, -1), "CENTER"),
+        ("ALIGN", (0, 1), (0, -1), "CENTER"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 2.5),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 2.5),
+        ("TOPPADDING", (0, 0), (-1, -1), 2),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
+    ]
+    for i, s in enumerate(ok_spots, start=1):
+        ts.append(("BACKGROUND", (0, i), (0, i), VERDICT_COLOR[s["verdict"]]))
+        ts.append(("BACKGROUND", (4, i), (4, i), BAND_COLOR[s["band"]]))
+    t.setStyle(TableStyle(ts))
+    story.append(t)
+    story.append(Spacer(1, 3 * mm))
+    story.append(Paragraph(
+        "この20件で公開するか、保留のうち何件かを詰めてから公開するかをお決めください。"
+        "決まれば、Supabase へ登録する SQL をこちらで作ります。",
+        S_NOTE))
+
+    story.append(PageBreak())
+
     # ---- 本表 ----
     story.append(Paragraph("候補一覧（47都道府県・各1件）", S_H2))
     story.append(Spacer(1, 2 * mm))
