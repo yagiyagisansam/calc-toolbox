@@ -1,8 +1,237 @@
 {
  "note": "NASA/JPL Horizons (DE441) から取得した月の位置。大気差を含まない、観測地点から見た値。sky.js の期待値をここから取ることで、実装で期待値を作る循環を断つ。",
  "source": "https://ssd.jpl.nasa.gov/horizons/",
- "fetchedAt": "2026-08-14T08:01:28.300Z",
+ "fetchedAt": "2026-08-15T05:48:16.680Z",
  "quantities": "azimuth/altitude = airless apparent, topocentric / illuminated fraction",
+ "siteAltitudeKm": 0,
+ "limits": "観測地点の標高は0km。地形(稜線・樹木)による遮蔽も含まない。比較しているのは大気差なしの測心高度・方位だけ。",
+ "requests": [
+  {
+   "label": "位置 東京 2026-08-14 09:00",
+   "url": "https://ssd.jpl.nasa.gov/api/horizons.api",
+   "params": {
+    "format": "text",
+    "COMMAND": "'301'",
+    "OBJ_DATA": "'NO'",
+    "MAKE_EPHEM": "'YES'",
+    "EPHEM_TYPE": "'OBSERVER'",
+    "CENTER": "'coord@399'",
+    "COORD_TYPE": "'GEODETIC'",
+    "SITE_COORD": "'139.7414,35.6581,0'",
+    "START_TIME": "'2026-08-14 09:00'",
+    "STOP_TIME": "'2026-08-14 12:00'",
+    "STEP_SIZE": "'10 m'",
+    "QUANTITIES": "'4,10'",
+    "ANG_FORMAT": "'DEG'",
+    "APPARENT": "'AIRLESS'",
+    "CAL_FORMAT": "'CAL'"
+   },
+   "apiVersion": "1.2",
+   "responseSha256": "sha256:fe5bd6470d98b21d428738191af2bb3f221e9a6c68a82dae7918e90ca7e3417d",
+   "responseBytes": 7884,
+   "at": "2026-08-15T05:48:17.509Z"
+  },
+  {
+   "label": "位置 東京 2026-08-20 09:00",
+   "url": "https://ssd.jpl.nasa.gov/api/horizons.api",
+   "params": {
+    "format": "text",
+    "COMMAND": "'301'",
+    "OBJ_DATA": "'NO'",
+    "MAKE_EPHEM": "'YES'",
+    "EPHEM_TYPE": "'OBSERVER'",
+    "CENTER": "'coord@399'",
+    "COORD_TYPE": "'GEODETIC'",
+    "SITE_COORD": "'139.7414,35.6581,0'",
+    "START_TIME": "'2026-08-20 09:00'",
+    "STOP_TIME": "'2026-08-20 21:00'",
+    "STEP_SIZE": "'60 m'",
+    "QUANTITIES": "'4,10'",
+    "ANG_FORMAT": "'DEG'",
+    "APPARENT": "'AIRLESS'",
+    "CAL_FORMAT": "'CAL'"
+   },
+   "apiVersion": "1.2",
+   "responseSha256": "sha256:04b810efe48f2dca02e9ef2940e293ae5e76b39ec2b181ab88a69cd3a92ce4ad",
+   "responseBytes": 6766,
+   "at": "2026-08-15T05:48:21.200Z"
+  },
+  {
+   "label": "位置 東京 2026-08-28 09:00",
+   "url": "https://ssd.jpl.nasa.gov/api/horizons.api",
+   "params": {
+    "format": "text",
+    "COMMAND": "'301'",
+    "OBJ_DATA": "'NO'",
+    "MAKE_EPHEM": "'YES'",
+    "EPHEM_TYPE": "'OBSERVER'",
+    "CENTER": "'coord@399'",
+    "COORD_TYPE": "'GEODETIC'",
+    "SITE_COORD": "'139.7414,35.6581,0'",
+    "START_TIME": "'2026-08-28 09:00'",
+    "STOP_TIME": "'2026-08-28 21:00'",
+    "STEP_SIZE": "'60 m'",
+    "QUANTITIES": "'4,10'",
+    "ANG_FORMAT": "'DEG'",
+    "APPARENT": "'AIRLESS'",
+    "CAL_FORMAT": "'CAL'"
+   },
+   "apiVersion": "1.2",
+   "responseSha256": "sha256:4e28c5e27661e382caa7da70244d68a960554e7a92e2655f729f5e0a4bb9e0fd",
+   "responseBytes": 6766,
+   "at": "2026-08-15T05:48:24.918Z"
+  },
+  {
+   "label": "位置 稚内 2026-08-14 09:00",
+   "url": "https://ssd.jpl.nasa.gov/api/horizons.api",
+   "params": {
+    "format": "text",
+    "COMMAND": "'301'",
+    "OBJ_DATA": "'NO'",
+    "MAKE_EPHEM": "'YES'",
+    "EPHEM_TYPE": "'OBSERVER'",
+    "CENTER": "'coord@399'",
+    "COORD_TYPE": "'GEODETIC'",
+    "SITE_COORD": "'141.6731,45.4156,0'",
+    "START_TIME": "'2026-08-14 09:00'",
+    "STOP_TIME": "'2026-08-14 12:00'",
+    "STEP_SIZE": "'10 m'",
+    "QUANTITIES": "'4,10'",
+    "ANG_FORMAT": "'DEG'",
+    "APPARENT": "'AIRLESS'",
+    "CAL_FORMAT": "'CAL'"
+   },
+   "apiVersion": "1.2",
+   "responseSha256": "sha256:07244845618611aa34e54c0fb857dd1a64b48ea3f2f5f01e490e61588ddf5fb1",
+   "responseBytes": 7884,
+   "at": "2026-08-15T05:48:28.734Z"
+  },
+  {
+   "label": "位置 稚内 2026-08-20 09:00",
+   "url": "https://ssd.jpl.nasa.gov/api/horizons.api",
+   "params": {
+    "format": "text",
+    "COMMAND": "'301'",
+    "OBJ_DATA": "'NO'",
+    "MAKE_EPHEM": "'YES'",
+    "EPHEM_TYPE": "'OBSERVER'",
+    "CENTER": "'coord@399'",
+    "COORD_TYPE": "'GEODETIC'",
+    "SITE_COORD": "'141.6731,45.4156,0'",
+    "START_TIME": "'2026-08-20 09:00'",
+    "STOP_TIME": "'2026-08-20 21:00'",
+    "STEP_SIZE": "'60 m'",
+    "QUANTITIES": "'4,10'",
+    "ANG_FORMAT": "'DEG'",
+    "APPARENT": "'AIRLESS'",
+    "CAL_FORMAT": "'CAL'"
+   },
+   "apiVersion": "1.2",
+   "responseSha256": "sha256:021f89c667b4080d8ca83483afe438a09266a1070b1567fd14c795425aad9625",
+   "responseBytes": 6766,
+   "at": "2026-08-15T05:48:32.655Z"
+  },
+  {
+   "label": "位置 稚内 2026-08-28 09:00",
+   "url": "https://ssd.jpl.nasa.gov/api/horizons.api",
+   "params": {
+    "format": "text",
+    "COMMAND": "'301'",
+    "OBJ_DATA": "'NO'",
+    "MAKE_EPHEM": "'YES'",
+    "EPHEM_TYPE": "'OBSERVER'",
+    "CENTER": "'coord@399'",
+    "COORD_TYPE": "'GEODETIC'",
+    "SITE_COORD": "'141.6731,45.4156,0'",
+    "START_TIME": "'2026-08-28 09:00'",
+    "STOP_TIME": "'2026-08-28 21:00'",
+    "STEP_SIZE": "'60 m'",
+    "QUANTITIES": "'4,10'",
+    "ANG_FORMAT": "'DEG'",
+    "APPARENT": "'AIRLESS'",
+    "CAL_FORMAT": "'CAL'"
+   },
+   "apiVersion": "1.2",
+   "responseSha256": "sha256:76d163f0db16a79de7a8e860b0be5b8609fd69b6f7cacd85f1474a63b436d46b",
+   "responseBytes": 6766,
+   "at": "2026-08-15T05:48:36.527Z"
+  },
+  {
+   "label": "位置 石垣島 2026-08-14 09:00",
+   "url": "https://ssd.jpl.nasa.gov/api/horizons.api",
+   "params": {
+    "format": "text",
+    "COMMAND": "'301'",
+    "OBJ_DATA": "'NO'",
+    "MAKE_EPHEM": "'YES'",
+    "EPHEM_TYPE": "'OBSERVER'",
+    "CENTER": "'coord@399'",
+    "COORD_TYPE": "'GEODETIC'",
+    "SITE_COORD": "'124.1572,24.3448,0'",
+    "START_TIME": "'2026-08-14 09:00'",
+    "STOP_TIME": "'2026-08-14 12:00'",
+    "STEP_SIZE": "'10 m'",
+    "QUANTITIES": "'4,10'",
+    "ANG_FORMAT": "'DEG'",
+    "APPARENT": "'AIRLESS'",
+    "CAL_FORMAT": "'CAL'"
+   },
+   "apiVersion": "1.2",
+   "responseSha256": "sha256:68a22e8f3efb82564ccef133cf4bffaf2e65af4aae03e49edf328898834ddac5",
+   "responseBytes": 7884,
+   "at": "2026-08-15T05:48:40.247Z"
+  },
+  {
+   "label": "位置 石垣島 2026-08-20 09:00",
+   "url": "https://ssd.jpl.nasa.gov/api/horizons.api",
+   "params": {
+    "format": "text",
+    "COMMAND": "'301'",
+    "OBJ_DATA": "'NO'",
+    "MAKE_EPHEM": "'YES'",
+    "EPHEM_TYPE": "'OBSERVER'",
+    "CENTER": "'coord@399'",
+    "COORD_TYPE": "'GEODETIC'",
+    "SITE_COORD": "'124.1572,24.3448,0'",
+    "START_TIME": "'2026-08-20 09:00'",
+    "STOP_TIME": "'2026-08-20 21:00'",
+    "STEP_SIZE": "'60 m'",
+    "QUANTITIES": "'4,10'",
+    "ANG_FORMAT": "'DEG'",
+    "APPARENT": "'AIRLESS'",
+    "CAL_FORMAT": "'CAL'"
+   },
+   "apiVersion": "1.2",
+   "responseSha256": "sha256:31fca314891e4932001850516b9b66f4def064293b1ddf62b85ba173458564c8",
+   "responseBytes": 6766,
+   "at": "2026-08-15T05:48:43.910Z"
+  },
+  {
+   "label": "位置 石垣島 2026-08-28 09:00",
+   "url": "https://ssd.jpl.nasa.gov/api/horizons.api",
+   "params": {
+    "format": "text",
+    "COMMAND": "'301'",
+    "OBJ_DATA": "'NO'",
+    "MAKE_EPHEM": "'YES'",
+    "EPHEM_TYPE": "'OBSERVER'",
+    "CENTER": "'coord@399'",
+    "COORD_TYPE": "'GEODETIC'",
+    "SITE_COORD": "'124.1572,24.3448,0'",
+    "START_TIME": "'2026-08-28 09:00'",
+    "STOP_TIME": "'2026-08-28 21:00'",
+    "STEP_SIZE": "'60 m'",
+    "QUANTITIES": "'4,10'",
+    "ANG_FORMAT": "'DEG'",
+    "APPARENT": "'AIRLESS'",
+    "CAL_FORMAT": "'CAL'"
+   },
+   "apiVersion": "1.2",
+   "responseSha256": "sha256:70d20d50f7cf1a88365046338cbab2544726ba7bbcf8bfce11272c119b1949ea",
+   "responseBytes": 6766,
+   "at": "2026-08-15T05:48:47.545Z"
+  }
+ ],
  "samples": [
   {
    "site": {
@@ -13,7 +242,7 @@
    "rows": [
     {
      "utc": "2026-08-14T09:00:00Z",
-     "azimuthDeg": 264.675857,
+     "azimuthDeg": 264.675856,
      "altitudeDeg": 15.680566,
      "illuminatedPct": 3.4297
     },
@@ -31,14 +260,14 @@
     },
     {
      "utc": "2026-08-14T09:30:00Z",
-     "azimuthDeg": 268.880404,
+     "azimuthDeg": 268.880403,
      "altitudeDeg": 9.690281,
      "illuminatedPct": 3.51177
     },
     {
      "utc": "2026-08-14T09:40:00Z",
      "azimuthDeg": 270.257024,
-     "altitudeDeg": 7.692458,
+     "altitudeDeg": 7.692459,
      "illuminatedPct": 3.54012
     },
     {
@@ -49,7 +278,7 @@
     },
     {
      "utc": "2026-08-14T10:00:00Z",
-     "azimuthDeg": 272.993622,
+     "azimuthDeg": 272.993621,
      "altitudeDeg": 3.701984,
      "illuminatedPct": 3.59833
     },
@@ -68,7 +297,7 @@
     {
      "utc": "2026-08-14T10:30:00Z",
      "azimuthDeg": 277.105916,
-     "altitudeDeg": -2.254439,
+     "altitudeDeg": -2.254438,
      "illuminatedPct": 3.68949
     },
     {
@@ -80,18 +309,18 @@
     {
      "utc": "2026-08-14T10:50:00Z",
      "azimuthDeg": 279.889906,
-     "altitudeDeg": -6.192984,
+     "altitudeDeg": -6.192983,
      "illuminatedPct": 3.75286
     },
     {
      "utc": "2026-08-14T11:00:00Z",
      "azimuthDeg": 281.304391,
-     "altitudeDeg": -8.149081,
+     "altitudeDeg": -8.14908,
      "illuminatedPct": 3.78532
     },
     {
      "utc": "2026-08-14T11:10:00Z",
-     "azimuthDeg": 6,
+     "azimuthDeg": 5,
      "altitudeDeg": -10.09476,
      "illuminatedPct": 3.8183
     },
@@ -104,25 +333,25 @@
     {
      "utc": "2026-08-14T11:30:00Z",
      "azimuthDeg": 6,
-     "altitudeDeg": -13.949595,
+     "altitudeDeg": -13.949594,
      "illuminatedPct": 3.88582
     },
     {
      "utc": "2026-08-14T11:40:00Z",
      "azimuthDeg": 6,
-     "altitudeDeg": -15.855918,
+     "altitudeDeg": -15.855917,
      "illuminatedPct": 3.92035
     },
     {
      "utc": "2026-08-14T11:50:00Z",
      "azimuthDeg": 6,
-     "altitudeDeg": -17.746134,
+     "altitudeDeg": -17.746133,
      "illuminatedPct": 3.95539
     },
     {
      "utc": "2026-08-14T12:00:00Z",
      "azimuthDeg": 5,
-     "altitudeDeg": -19.61857,
+     "altitudeDeg": -19.618569,
      "illuminatedPct": 3.99094
     }
    ]
@@ -136,79 +365,79 @@
    "rows": [
     {
      "utc": "2026-08-20T09:00:00Z",
-     "azimuthDeg": 186.806026,
+     "azimuthDeg": 186.806023,
      "altitudeDeg": 27.86033,
      "illuminatedPct": 52.70059
     },
     {
      "utc": "2026-08-20T10:00:00Z",
-     "azimuthDeg": 201.154176,
-     "altitudeDeg": 24.876572,
+     "azimuthDeg": 201.154173,
+     "altitudeDeg": 24.876573,
      "illuminatedPct": 52.93799
     },
     {
      "utc": "2026-08-20T11:00:00Z",
-     "azimuthDeg": 214.018137,
-     "altitudeDeg": 19.276374,
+     "azimuthDeg": 214.018134,
+     "altitudeDeg": 19.276376,
      "illuminatedPct": 53.18654
     },
     {
      "utc": "2026-08-20T12:00:00Z",
-     "azimuthDeg": 225.108745,
-     "altitudeDeg": 11.643804,
+     "azimuthDeg": 225.108743,
+     "altitudeDeg": 11.643806,
      "illuminatedPct": 53.45603
     },
     {
      "utc": "2026-08-20T13:00:00Z",
-     "azimuthDeg": 234.590299,
-     "altitudeDeg": 2.541601,
+     "azimuthDeg": 234.590297,
+     "altitudeDeg": 2.541604,
      "illuminatedPct": 53.75469
     },
     {
      "utc": "2026-08-20T14:00:00Z",
-     "azimuthDeg": 7,
-     "altitudeDeg": -7.582425,
+     "azimuthDeg": 5,
+     "altitudeDeg": -7.582423,
      "illuminatedPct": 54.08868
     },
     {
      "utc": "2026-08-20T15:00:00Z",
-     "azimuthDeg": 0,
-     "altitudeDeg": -18.400305,
+     "azimuthDeg": 8,
+     "altitudeDeg": -18.400302,
      "illuminatedPct": 54.46167
     },
     {
      "utc": "2026-08-20T16:00:00Z",
-     "azimuthDeg": 6,
-     "altitudeDeg": -29.675493,
+     "azimuthDeg": 5,
+     "altitudeDeg": -29.675491,
      "illuminatedPct": 54.87473
     },
     {
      "utc": "2026-08-20T17:00:00Z",
-     "azimuthDeg": 2,
-     "altitudeDeg": -41.228294,
+     "azimuthDeg": 0,
+     "altitudeDeg": -41.228291,
      "illuminatedPct": 55.32627
     },
     {
      "utc": "2026-08-20T18:00:00Z",
-     "azimuthDeg": 9,
-     "altitudeDeg": -52.895341,
+     "azimuthDeg": 7,
+     "altitudeDeg": -52.895338,
      "illuminatedPct": 55.81229
     },
     {
      "utc": "2026-08-20T19:00:00Z",
-     "azimuthDeg": 283.083729,
-     "altitudeDeg": -64.445577,
+     "azimuthDeg": 283.083725,
+     "altitudeDeg": -64.445574,
      "illuminatedPct": 56.32663
     },
     {
      "utc": "2026-08-20T20:00:00Z",
-     "azimuthDeg": 304.005241,
-     "altitudeDeg": -75.193187,
+     "azimuthDeg": 304.005232,
+     "altitudeDeg": -75.193184,
      "illuminatedPct": 56.86144
     },
     {
      "utc": "2026-08-20T21:00:00Z",
-     "azimuthDeg": 3.358904,
+     "azimuthDeg": 3.358883,
      "altitudeDeg": -80.982792,
      "illuminatedPct": 57.40766
     }
@@ -223,80 +452,80 @@
    "rows": [
     {
      "utc": "2026-08-28T09:00:00Z",
-     "azimuthDeg": 98.073772,
-     "altitudeDeg": -3.653285,
+     "azimuthDeg": 98.073769,
+     "altitudeDeg": -3.65329,
      "illuminatedPct": 99.93997
     },
     {
      "utc": "2026-08-28T10:00:00Z",
-     "azimuthDeg": 106.53274,
-     "altitudeDeg": 8.048683,
+     "azimuthDeg": 106.532736,
+     "altitudeDeg": 8.048678,
      "illuminatedPct": 99.91908
     },
     {
      "utc": "2026-08-28T11:00:00Z",
-     "azimuthDeg": 115.973567,
-     "altitudeDeg": 19.270119,
+     "azimuthDeg": 115.973562,
+     "altitudeDeg": 19.270115,
      "illuminatedPct": 99.89743
     },
     {
      "utc": "2026-08-28T12:00:00Z",
-     "azimuthDeg": 127.237396,
-     "altitudeDeg": 29.594388,
+     "azimuthDeg": 127.237391,
+     "altitudeDeg": 29.594384,
      "illuminatedPct": 99.87548
     },
     {
      "utc": "2026-08-28T13:00:00Z",
-     "azimuthDeg": 141.326875,
-     "altitudeDeg": 38.360503,
+     "azimuthDeg": 141.326869,
+     "altitudeDeg": 38.3605,
      "illuminatedPct": 99.85328
     },
     {
      "utc": "2026-08-28T14:00:00Z",
-     "azimuthDeg": 159.038832,
-     "altitudeDeg": 44.56622,
+     "azimuthDeg": 159.038825,
+     "altitudeDeg": 44.566218,
      "illuminatedPct": 99.83055
     },
     {
      "utc": "2026-08-28T15:00:00Z",
-     "azimuthDeg": 179.792685,
+     "azimuthDeg": 179.792676,
      "altitudeDeg": 47.033141,
      "illuminatedPct": 99.80669
     },
     {
      "utc": "2026-08-28T16:00:00Z",
-     "azimuthDeg": 200.786318,
-     "altitudeDeg": 45.127513,
+     "azimuthDeg": 200.78631,
+     "altitudeDeg": 45.127514,
      "illuminatedPct": 99.78083
     },
     {
      "utc": "2026-08-28T17:00:00Z",
-     "azimuthDeg": 219.02257,
-     "altitudeDeg": 39.363234,
+     "azimuthDeg": 219.022563,
+     "altitudeDeg": 39.363237,
      "illuminatedPct": 99.75196
     },
     {
      "utc": "2026-08-28T18:00:00Z",
-     "azimuthDeg": 233.654078,
-     "altitudeDeg": 30.908503,
+     "azimuthDeg": 233.654073,
+     "altitudeDeg": 30.908507,
      "illuminatedPct": 99.71894
     },
     {
      "utc": "2026-08-28T19:00:00Z",
-     "azimuthDeg": 245.395952,
-     "altitudeDeg": 20.814696,
+     "azimuthDeg": 245.395948,
+     "altitudeDeg": 20.8147,
      "illuminatedPct": 99.6806
     },
     {
      "utc": "2026-08-28T20:00:00Z",
-     "azimuthDeg": 255.275133,
-     "altitudeDeg": 9.792485,
+     "azimuthDeg": 255.275129,
+     "altitudeDeg": 9.792489,
      "illuminatedPct": 99.63578
     },
     {
      "utc": "2026-08-28T21:00:00Z",
-     "azimuthDeg": 264.180248,
-     "altitudeDeg": -1.701856,
+     "azimuthDeg": 264.180245,
+     "altitudeDeg": -1.701852,
      "illuminatedPct": 99.58338
     }
    ]
@@ -311,7 +540,7 @@
     {
      "utc": "2026-08-14T09:00:00Z",
      "azimuthDeg": 263.303574,
-     "altitudeDeg": 13.180228,
+     "altitudeDeg": 13.180229,
      "illuminatedPct": 3.47675
     },
     {
@@ -334,13 +563,13 @@
     },
     {
      "utc": "2026-08-14T09:40:00Z",
-     "azimuthDeg": 270.152355,
+     "azimuthDeg": 270.152354,
      "altitudeDeg": 6.250947,
      "illuminatedPct": 3.58969
     },
     {
      "utc": "2026-08-14T09:50:00Z",
-     "azimuthDeg": 271.841425,
+     "azimuthDeg": 271.841424,
      "altitudeDeg": 4.517411,
      "illuminatedPct": 3.61904
     },
@@ -352,7 +581,7 @@
     },
     {
      "utc": "2026-08-14T10:10:00Z",
-     "azimuthDeg": 275.213576,
+     "azimuthDeg": 275.213575,
      "altitudeDeg": 1.059125,
      "illuminatedPct": 3.67913
     },
@@ -370,8 +599,8 @@
     },
     {
      "utc": "2026-08-14T10:40:00Z",
-     "azimuthDeg": 280.301825,
-     "altitudeDeg": -4.08469,
+     "azimuthDeg": 280.301824,
+     "altitudeDeg": -4.084689,
      "illuminatedPct": 3.77273
     },
     {
@@ -382,13 +611,13 @@
     },
     {
      "utc": "2026-08-14T11:00:00Z",
-     "azimuthDeg": 283.748647,
+     "azimuthDeg": 283.748646,
      "altitudeDeg": -7.467663,
      "illuminatedPct": 3.83746
     },
     {
      "utc": "2026-08-14T11:10:00Z",
-     "azimuthDeg": 285.497381,
+     "azimuthDeg": 285.49738,
      "altitudeDeg": -9.140687,
      "illuminatedPct": 3.87052
     },
@@ -400,8 +629,8 @@
     },
     {
      "utc": "2026-08-14T11:30:00Z",
-     "azimuthDeg": 289.060569,
-     "altitudeDeg": -12.441676,
+     "azimuthDeg": 289.060568,
+     "altitudeDeg": -12.441675,
      "illuminatedPct": 3.93802
     },
     {
@@ -418,7 +647,7 @@
     },
     {
      "utc": "2026-08-14T12:00:00Z",
-     "azimuthDeg": 1,
+     "azimuthDeg": 0,
      "altitudeDeg": -17.254075,
      "illuminatedPct": 4.0427
     }
@@ -433,80 +662,80 @@
    "rows": [
     {
      "utc": "2026-08-20T09:00:00Z",
-     "azimuthDeg": 188.148932,
-     "altitudeDeg": 17.93461,
+     "azimuthDeg": 188.148929,
+     "altitudeDeg": 17.934611,
      "illuminatedPct": 52.70358
     },
     {
      "utc": "2026-08-20T10:00:00Z",
-     "azimuthDeg": 201.578218,
-     "altitudeDeg": 15.201448,
+     "azimuthDeg": 201.578215,
+     "altitudeDeg": 15.201449,
      "illuminatedPct": 52.96336
     },
     {
      "utc": "2026-08-20T11:00:00Z",
-     "azimuthDeg": 214.084033,
-     "altitudeDeg": 10.329172,
+     "azimuthDeg": 214.08403,
+     "altitudeDeg": 10.329174,
      "illuminatedPct": 53.23382
     },
     {
      "utc": "2026-08-20T12:00:00Z",
-     "azimuthDeg": 225.477242,
-     "altitudeDeg": 3.711787,
+     "azimuthDeg": 225.47724,
+     "altitudeDeg": 3.711789,
      "illuminatedPct": 53.52321
     },
     {
      "utc": "2026-08-20T13:00:00Z",
-     "azimuthDeg": 6,
-     "altitudeDeg": -4.238576,
+     "azimuthDeg": 3,
+     "altitudeDeg": -4.238574,
      "illuminatedPct": 53.83844
     },
     {
      "utc": "2026-08-20T14:00:00Z",
-     "azimuthDeg": 1,
-     "altitudeDeg": -13.155298,
+     "azimuthDeg": 9,
+     "altitudeDeg": -13.155296,
      "illuminatedPct": 54.18458
     },
     {
      "utc": "2026-08-20T15:00:00Z",
-     "azimuthDeg": 9,
-     "altitudeDeg": -22.73235,
+     "azimuthDeg": 7,
+     "altitudeDeg": -22.732348,
      "illuminatedPct": 54.56455
     },
     {
      "utc": "2026-08-20T16:00:00Z",
-     "azimuthDeg": 9,
-     "altitudeDeg": -32.708674,
+     "azimuthDeg": 6,
+     "altitudeDeg": -32.708672,
      "illuminatedPct": 54.97902
     },
     {
      "utc": "2026-08-20T17:00:00Z",
-     "azimuthDeg": 4,
-     "altitudeDeg": -42.830639,
+     "azimuthDeg": 1,
+     "altitudeDeg": -42.830637,
      "illuminatedPct": 55.42638
     },
     {
      "utc": "2026-08-20T18:00:00Z",
-     "azimuthDeg": 286.297123,
-     "altitudeDeg": -52.776777,
+     "azimuthDeg": 286.29712,
+     "altitudeDeg": -52.776774,
      "illuminatedPct": 55.90294
     },
     {
      "utc": "2026-08-20T19:00:00Z",
-     "azimuthDeg": 303.059422,
-     "altitudeDeg": -61.970135,
+     "azimuthDeg": 303.059416,
+     "altitudeDeg": -61.970133,
      "illuminatedPct": 56.40317
     },
     {
      "utc": "2026-08-20T20:00:00Z",
-     "azimuthDeg": 329.203125,
-     "altitudeDeg": -69.061357,
+     "azimuthDeg": 329.203117,
+     "altitudeDeg": -69.061356,
      "illuminatedPct": 56.92012
     },
     {
      "utc": "2026-08-20T21:00:00Z",
-     "azimuthDeg": 6.961577,
-     "altitudeDeg": -71.280054,
+     "azimuthDeg": 6.961567,
+     "altitudeDeg": -71.280055,
      "illuminatedPct": 57.44581
     }
    ]
@@ -520,80 +749,80 @@
    "rows": [
     {
      "utc": "2026-08-28T09:00:00Z",
-     "azimuthDeg": 98.865503,
-     "altitudeDeg": -3.636462,
+     "azimuthDeg": 98.865499,
+     "altitudeDeg": -3.636465,
      "illuminatedPct": 99.94575
     },
     {
      "utc": "2026-08-28T10:00:00Z",
-     "azimuthDeg": 109.195394,
-     "altitudeDeg": 6.447507,
+     "azimuthDeg": 109.19539,
+     "altitudeDeg": 6.447503,
      "illuminatedPct": 99.92591
     },
     {
      "utc": "2026-08-28T11:00:00Z",
-     "azimuthDeg": 120.351039,
-     "altitudeDeg": 15.936247,
+     "azimuthDeg": 120.351035,
+     "altitudeDeg": 15.936243,
      "illuminatedPct": 99.9049
     },
     {
      "utc": "2026-08-28T12:00:00Z",
-     "azimuthDeg": 132.948191,
-     "altitudeDeg": 24.383634,
+     "azimuthDeg": 132.948186,
+     "altitudeDeg": 24.383631,
      "illuminatedPct": 99.88308
     },
     {
      "utc": "2026-08-28T13:00:00Z",
-     "azimuthDeg": 147.511307,
-     "altitudeDeg": 31.199146,
+     "azimuthDeg": 147.511301,
+     "altitudeDeg": 31.199144,
      "illuminatedPct": 99.86052
     },
     {
      "utc": "2026-08-28T14:00:00Z",
-     "azimuthDeg": 164.174938,
-     "altitudeDeg": 35.668871,
+     "azimuthDeg": 164.174932,
+     "altitudeDeg": 35.66887,
      "illuminatedPct": 99.83696
     },
     {
      "utc": "2026-08-28T15:00:00Z",
-     "azimuthDeg": 182.254576,
+     "azimuthDeg": 182.254569,
      "altitudeDeg": 37.142745,
      "illuminatedPct": 99.81188
     },
     {
      "utc": "2026-08-28T16:00:00Z",
-     "azimuthDeg": 200.267169,
-     "altitudeDeg": 35.369898,
+     "azimuthDeg": 200.267162,
+     "altitudeDeg": 35.369899,
      "illuminatedPct": 99.78453
     },
     {
      "utc": "2026-08-28T17:00:00Z",
-     "azimuthDeg": 216.789099,
-     "altitudeDeg": 30.671506,
+     "azimuthDeg": 216.789093,
+     "altitudeDeg": 30.671509,
      "illuminatedPct": 99.75401
     },
     {
      "utc": "2026-08-28T18:00:00Z",
-     "azimuthDeg": 231.244746,
-     "altitudeDeg": 23.731009,
+     "azimuthDeg": 231.244741,
+     "altitudeDeg": 23.731012,
      "illuminatedPct": 99.71933
     },
     {
      "utc": "2026-08-28T19:00:00Z",
-     "azimuthDeg": 243.841522,
-     "altitudeDeg": 15.265559,
+     "azimuthDeg": 243.841518,
+     "altitudeDeg": 15.265563,
      "illuminatedPct": 99.67944
     },
     {
      "utc": "2026-08-28T20:00:00Z",
-     "azimuthDeg": 255.136394,
-     "altitudeDeg": 5.862884,
+     "azimuthDeg": 255.13639,
+     "altitudeDeg": 5.862888,
      "illuminatedPct": 99.63331
     },
     {
      "utc": "2026-08-28T21:00:00Z",
-     "azimuthDeg": 265.763446,
-     "altitudeDeg": -4.024633,
+     "azimuthDeg": 265.763442,
+     "altitudeDeg": -4.024629,
      "illuminatedPct": 99.57998
     }
    ]
@@ -614,13 +843,13 @@
     {
      "utc": "2026-08-14T09:10:00Z",
      "azimuthDeg": 262.206726,
-     "altitudeDeg": 28.401848,
+     "altitudeDeg": 28.401849,
      "illuminatedPct": 3.42728
     },
     {
      "utc": "2026-08-14T09:20:00Z",
      "azimuthDeg": 263.307296,
-     "altitudeDeg": 26.177853,
+     "altitudeDeg": 26.177854,
      "illuminatedPct": 3.45156
     },
     {
@@ -644,13 +873,13 @@
     {
      "utc": "2026-08-14T10:00:00Z",
      "azimuthDeg": 267.426267,
-     "altitudeDeg": 17.256378,
+     "altitudeDeg": 17.256379,
      "illuminatedPct": 3.55374
     },
     {
      "utc": "2026-08-14T10:10:00Z",
      "azimuthDeg": 268.405968,
-     "altitudeDeg": 15.023565,
+     "altitudeDeg": 15.023566,
      "illuminatedPct": 3.58059
     },
     {
@@ -668,7 +897,7 @@
     {
      "utc": "2026-08-14T10:40:00Z",
      "azimuthDeg": 271.280632,
-     "altitudeDeg": 8.330025,
+     "altitudeDeg": 8.330026,
      "illuminatedPct": 3.6644
     },
     {
@@ -680,25 +909,25 @@
     {
      "utc": "2026-08-14T11:00:00Z",
      "azimuthDeg": 273.173445,
-     "altitudeDeg": 3.877756,
+     "altitudeDeg": 3.877757,
      "illuminatedPct": 3.72305
     },
     {
      "utc": "2026-08-14T11:10:00Z",
-     "azimuthDeg": 274.121261,
+     "azimuthDeg": 274.12126,
      "altitudeDeg": 1.656393,
      "illuminatedPct": 3.75323
     },
     {
      "utc": "2026-08-14T11:20:00Z",
-     "azimuthDeg": 275.073686,
+     "azimuthDeg": 275.073685,
      "altitudeDeg": -0.561015,
      "illuminatedPct": 3.78397
     },
     {
      "utc": "2026-08-14T11:30:00Z",
      "azimuthDeg": 276.033476,
-     "altitudeDeg": -2.773875,
+     "altitudeDeg": -2.773874,
      "illuminatedPct": 3.81529
     },
     {
@@ -730,80 +959,80 @@
    "rows": [
     {
      "utc": "2026-08-20T09:00:00Z",
-     "azimuthDeg": 169.465127,
-     "altitudeDeg": 38.834434,
+     "azimuthDeg": 169.465123,
+     "altitudeDeg": 38.834433,
      "illuminatedPct": 52.86556
     },
     {
      "utc": "2026-08-20T10:00:00Z",
-     "azimuthDeg": 186.507799,
+     "azimuthDeg": 186.507795,
      "altitudeDeg": 39.197897,
      "illuminatedPct": 53.08307
     },
     {
      "utc": "2026-08-20T11:00:00Z",
-     "azimuthDeg": 202.587663,
-     "altitudeDeg": 35.717425,
+     "azimuthDeg": 202.587659,
+     "altitudeDeg": 35.717426,
      "illuminatedPct": 53.3004
     },
     {
      "utc": "2026-08-20T12:00:00Z",
-     "azimuthDeg": 216.090274,
-     "altitudeDeg": 29.064304,
+     "azimuthDeg": 216.090271,
+     "altitudeDeg": 29.064306,
      "illuminatedPct": 53.52958
     },
     {
      "utc": "2026-08-20T13:00:00Z",
-     "azimuthDeg": 226.751049,
-     "altitudeDeg": 20.164707,
+     "azimuthDeg": 226.751046,
+     "altitudeDeg": 20.164709,
      "illuminatedPct": 53.78173
     },
     {
      "utc": "2026-08-20T14:00:00Z",
-     "azimuthDeg": 235.048799,
-     "altitudeDeg": 9.793285,
+     "azimuthDeg": 235.048797,
+     "altitudeDeg": 9.793287,
      "illuminatedPct": 54.06624
     },
     {
      "utc": "2026-08-20T15:00:00Z",
-     "azimuthDeg": 1,
-     "altitudeDeg": -1.518692,
+     "azimuthDeg": 0,
+     "altitudeDeg": -1.518689,
      "illuminatedPct": 54.39015
     },
     {
      "utc": "2026-08-20T16:00:00Z",
-     "azimuthDeg": 7,
-     "altitudeDeg": -13.431125,
+     "azimuthDeg": 6,
+     "altitudeDeg": -13.431121,
      "illuminatedPct": 54.75774
     },
     {
      "utc": "2026-08-20T17:00:00Z",
-     "azimuthDeg": 4,
-     "altitudeDeg": -25.728315,
+     "azimuthDeg": 3,
+     "altitudeDeg": -25.728312,
      "illuminatedPct": 55.17032
     },
     {
      "utc": "2026-08-20T18:00:00Z",
-     "azimuthDeg": 1,
-     "altitudeDeg": -38.271007,
+     "azimuthDeg": 0,
+     "altitudeDeg": -38.271003,
      "illuminatedPct": 55.62626
     },
     {
      "utc": "2026-08-20T19:00:00Z",
      "azimuthDeg": 8,
-     "altitudeDeg": -50.965594,
+     "altitudeDeg": -50.965591,
      "illuminatedPct": 56.12117
     },
     {
      "utc": "2026-08-20T20:00:00Z",
-     "azimuthDeg": 6,
-     "altitudeDeg": -63.741715,
+     "azimuthDeg": 5,
+     "altitudeDeg": -63.741712,
      "illuminatedPct": 56.64827
     },
     {
      "utc": "2026-08-20T21:00:00Z",
-     "azimuthDeg": 257.7137,
-     "altitudeDeg": -76.512183,
+     "azimuthDeg": 257.713702,
+     "altitudeDeg": -76.51218,
      "illuminatedPct": 57.19889
     }
    ]
@@ -817,80 +1046,80 @@
    "rows": [
     {
      "utc": "2026-08-28T09:00:00Z",
-     "azimuthDeg": 92.179499,
-     "altitudeDeg": -16.118247,
+     "azimuthDeg": 92.179497,
+     "altitudeDeg": -16.118252,
      "illuminatedPct": 99.93416
     },
     {
      "utc": "2026-08-28T10:00:00Z",
-     "azimuthDeg": 97.805987,
-     "altitudeDeg": -2.848118,
+     "azimuthDeg": 97.805985,
+     "altitudeDeg": -2.848123,
      "illuminatedPct": 99.90968
     },
     {
      "utc": "2026-08-28T11:00:00Z",
-     "azimuthDeg": 103.814865,
-     "altitudeDeg": 10.295851,
+     "azimuthDeg": 103.814863,
+     "altitudeDeg": 10.295846,
      "illuminatedPct": 99.8843
     },
     {
      "utc": "2026-08-28T12:00:00Z",
-     "azimuthDeg": 110.876584,
-     "altitudeDeg": 23.135106,
+     "azimuthDeg": 110.876581,
+     "altitudeDeg": 23.135101,
      "illuminatedPct": 99.85889
     },
     {
      "utc": "2026-08-28T13:00:00Z",
-     "azimuthDeg": 119.978198,
-     "altitudeDeg": 35.358839,
+     "azimuthDeg": 119.978193,
+     "altitudeDeg": 35.358835,
      "illuminatedPct": 99.83391
     },
     {
      "utc": "2026-08-28T14:00:00Z",
-     "azimuthDeg": 132.769511,
-     "altitudeDeg": 46.354302,
+     "azimuthDeg": 132.769505,
+     "altitudeDeg": 46.354298,
      "illuminatedPct": 99.80936
     },
     {
      "utc": "2026-08-28T15:00:00Z",
-     "azimuthDeg": 151.699201,
-     "altitudeDeg": 54.863474,
+     "azimuthDeg": 151.699191,
+     "altitudeDeg": 54.863472,
      "illuminatedPct": 99.78484
     },
     {
      "utc": "2026-08-28T16:00:00Z",
-     "azimuthDeg": 177.737263,
+     "azimuthDeg": 177.737252,
      "altitudeDeg": 58.725642,
      "illuminatedPct": 99.75957
     },
     {
      "utc": "2026-08-28T17:00:00Z",
-     "azimuthDeg": 204.879116,
-     "altitudeDeg": 56.286131,
+     "azimuthDeg": 204.879107,
+     "altitudeDeg": 56.286133,
      "illuminatedPct": 99.73249
     },
     {
      "utc": "2026-08-28T18:00:00Z",
-     "azimuthDeg": 225.625672,
-     "altitudeDeg": 48.662069,
+     "azimuthDeg": 225.625665,
+     "altitudeDeg": 48.662073,
      "illuminatedPct": 99.70238
     },
     {
      "utc": "2026-08-28T19:00:00Z",
-     "azimuthDeg": 239.734003,
-     "altitudeDeg": 38.127794,
+     "azimuthDeg": 239.733998,
+     "altitudeDeg": 38.127799,
      "illuminatedPct": 99.66791
     },
     {
      "utc": "2026-08-28T20:00:00Z",
-     "azimuthDeg": 249.697139,
-     "altitudeDeg": 26.158774,
+     "azimuthDeg": 249.697136,
+     "altitudeDeg": 26.158779,
      "illuminatedPct": 99.62772
     },
     {
      "utc": "2026-08-28T21:00:00Z",
-     "azimuthDeg": 257.388908,
-     "altitudeDeg": 13.4872,
+     "azimuthDeg": 257.388906,
+     "altitudeDeg": 13.487205,
      "illuminatedPct": 99.58049
     }
    ]

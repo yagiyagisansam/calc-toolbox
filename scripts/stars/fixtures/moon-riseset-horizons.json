@@ -1,9 +1,88 @@
 {
  "note": "NASA/JPL Horizons の月の出・月の入り。定義は「大気差を含む月の上端が地平線に接する瞬間」で、国立天文台の月の出入りと同じ。刻み1分のため値は1分に量子化されている。",
  "source": "https://ssd.jpl.nasa.gov/horizons/",
- "fetchedAt": "2026-08-14T08:02:01.074Z",
+ "fetchedAt": "2026-08-15T05:48:50.551Z",
  "definition": "refracted upper limb at true visual horizon (R_T_S_ONLY='TVH')",
  "quantizationMinutes": 1,
+ "siteAltitudeKm": 0,
+ "limits": "観測地点の標高は0km(平均海面)。地形による遮蔽も含まない。山あいでは実際には表示より遅く出て、早く沈む。",
+ "requests": [
+  {
+   "label": "出入り 東京",
+   "url": "https://ssd.jpl.nasa.gov/api/horizons.api",
+   "params": {
+    "format": "text",
+    "COMMAND": "'301'",
+    "OBJ_DATA": "'NO'",
+    "MAKE_EPHEM": "'YES'",
+    "EPHEM_TYPE": "'OBSERVER'",
+    "CENTER": "'coord@399'",
+    "COORD_TYPE": "'GEODETIC'",
+    "SITE_COORD": "'139.7414,35.6581,0'",
+    "START_TIME": "'2026-08-14'",
+    "STOP_TIME": "'2026-08-22'",
+    "STEP_SIZE": "'1 m'",
+    "QUANTITIES": "'4'",
+    "ANG_FORMAT": "'DEG'",
+    "CAL_FORMAT": "'CAL'",
+    "R_T_S_ONLY": "'TVH'"
+   },
+   "apiVersion": "1.2",
+   "responseSha256": "sha256:07ae9824ac93bfd5288b0979bc2d153d79d02d7224fb11cd21f2033cde947fa7",
+   "responseBytes": 7482,
+   "at": "2026-08-15T05:48:51.638Z"
+  },
+  {
+   "label": "出入り 稚内",
+   "url": "https://ssd.jpl.nasa.gov/api/horizons.api",
+   "params": {
+    "format": "text",
+    "COMMAND": "'301'",
+    "OBJ_DATA": "'NO'",
+    "MAKE_EPHEM": "'YES'",
+    "EPHEM_TYPE": "'OBSERVER'",
+    "CENTER": "'coord@399'",
+    "COORD_TYPE": "'GEODETIC'",
+    "SITE_COORD": "'141.6731,45.4156,0'",
+    "START_TIME": "'2026-08-14'",
+    "STOP_TIME": "'2026-08-22'",
+    "STEP_SIZE": "'1 m'",
+    "QUANTITIES": "'4'",
+    "ANG_FORMAT": "'DEG'",
+    "CAL_FORMAT": "'CAL'",
+    "R_T_S_ONLY": "'TVH'"
+   },
+   "apiVersion": "1.2",
+   "responseSha256": "sha256:374082318e136b00737fe5ea6a1ab2f82ec88ee5c38e08335b6ef41af5f05754",
+   "responseBytes": 7482,
+   "at": "2026-08-15T05:48:55.784Z"
+  },
+  {
+   "label": "出入り 石垣島",
+   "url": "https://ssd.jpl.nasa.gov/api/horizons.api",
+   "params": {
+    "format": "text",
+    "COMMAND": "'301'",
+    "OBJ_DATA": "'NO'",
+    "MAKE_EPHEM": "'YES'",
+    "EPHEM_TYPE": "'OBSERVER'",
+    "CENTER": "'coord@399'",
+    "COORD_TYPE": "'GEODETIC'",
+    "SITE_COORD": "'124.1572,24.3448,0'",
+    "START_TIME": "'2026-08-14'",
+    "STOP_TIME": "'2026-08-22'",
+    "STEP_SIZE": "'1 m'",
+    "QUANTITIES": "'4'",
+    "ANG_FORMAT": "'DEG'",
+    "CAL_FORMAT": "'CAL'",
+    "R_T_S_ONLY": "'TVH'"
+   },
+   "apiVersion": "1.2",
+   "responseSha256": "sha256:4ff0eaa5c73e71704d2c4773fc84ee7bd1009a7d1da43c0c82c68cf6f3e2222d",
+   "responseBytes": 7482,
+   "at": "2026-08-15T05:48:59.880Z"
+  }
+ ],
  "sites": [
   {
    "site": {
@@ -30,62 +109,62 @@
     {
      "kind": "rise",
      "utc": "2026-08-15T23:32:00Z",
-     "altitudeDeg": -0.82463
+     "altitudeDeg": -0.824631
     },
     {
      "kind": "set",
      "utc": "2026-08-16T11:16:00Z",
-     "altitudeDeg": -0.961038
+     "altitudeDeg": -0.961037
     },
     {
      "kind": "rise",
      "utc": "2026-08-17T00:36:00Z",
-     "altitudeDeg": -0.681054
+     "altitudeDeg": -0.681055
     },
     {
      "kind": "set",
      "utc": "2026-08-17T11:43:00Z",
-     "altitudeDeg": -1.009098
+     "altitudeDeg": -1.009097
     },
     {
      "kind": "rise",
      "utc": "2026-08-18T01:38:00Z",
-     "altitudeDeg": -0.773972
+     "altitudeDeg": -0.773974
     },
     {
      "kind": "set",
      "utc": "2026-08-18T12:11:00Z",
-     "altitudeDeg": -0.842675
+     "altitudeDeg": -0.842673
     },
     {
      "kind": "rise",
      "utc": "2026-08-19T02:40:00Z",
-     "altitudeDeg": -0.776098
+     "altitudeDeg": -0.7761
     },
     {
      "kind": "set",
      "utc": "2026-08-19T12:44:00Z",
-     "altitudeDeg": -0.948988
+     "altitudeDeg": -0.948986
     },
     {
      "kind": "rise",
      "utc": "2026-08-20T03:41:00Z",
-     "altitudeDeg": -0.791377
+     "altitudeDeg": -0.791379
     },
     {
      "kind": "set",
      "utc": "2026-08-20T13:21:00Z",
-     "altitudeDeg": -0.904671
+     "altitudeDeg": -0.904668
     },
     {
      "kind": "rise",
      "utc": "2026-08-21T04:40:00Z",
-     "altitudeDeg": -0.786239
+     "altitudeDeg": -0.786241
     },
     {
      "kind": "set",
      "utc": "2026-08-21T14:04:00Z",
-     "altitudeDeg": -0.880241
+     "altitudeDeg": -0.880238
     }
    ]
   },
@@ -104,7 +183,7 @@
     {
      "kind": "rise",
      "utc": "2026-08-14T22:17:00Z",
-     "altitudeDeg": -0.817847
+     "altitudeDeg": -0.817848
     },
     {
      "kind": "set",
@@ -124,7 +203,7 @@
     {
      "kind": "rise",
      "utc": "2026-08-17T00:42:00Z",
-     "altitudeDeg": -0.724741
+     "altitudeDeg": -0.724742
     },
     {
      "kind": "set",
@@ -134,42 +213,42 @@
     {
      "kind": "rise",
      "utc": "2026-08-18T01:52:00Z",
-     "altitudeDeg": -0.779181
+     "altitudeDeg": -0.779182
     },
     {
      "kind": "set",
      "utc": "2026-08-18T11:39:00Z",
-     "altitudeDeg": -0.894766
+     "altitudeDeg": -0.894765
     },
     {
      "kind": "rise",
      "utc": "2026-08-19T03:02:00Z",
-     "altitudeDeg": -0.69964
+     "altitudeDeg": -0.699641
     },
     {
      "kind": "set",
      "utc": "2026-08-19T12:04:00Z",
-     "altitudeDeg": -0.824933
+     "altitudeDeg": -0.824932
     },
     {
      "kind": "rise",
      "utc": "2026-08-20T04:09:00Z",
-     "altitudeDeg": -0.786354
+     "altitudeDeg": -0.786356
     },
     {
      "kind": "set",
      "utc": "2026-08-20T12:36:00Z",
-     "altitudeDeg": -0.923316
+     "altitudeDeg": -0.923314
     },
     {
      "kind": "rise",
      "utc": "2026-08-21T05:13:00Z",
-     "altitudeDeg": -0.751709
+     "altitudeDeg": -0.751712
     },
     {
      "kind": "set",
      "utc": "2026-08-21T13:15:00Z",
-     "altitudeDeg": -0.918367
+     "altitudeDeg": -0.918365
     }
    ]
   },
@@ -188,7 +267,7 @@
     {
      "kind": "rise",
      "utc": "2026-08-14T23:34:00Z",
-     "altitudeDeg": -0.81928
+     "altitudeDeg": -0.819281
     },
     {
      "kind": "set",
@@ -198,62 +277,62 @@
     {
      "kind": "rise",
      "utc": "2026-08-16T00:32:00Z",
-     "altitudeDeg": -0.686224
+     "altitudeDeg": -0.686225
     },
     {
      "kind": "set",
      "utc": "2026-08-16T12:28:00Z",
-     "altitudeDeg": -0.894273
+     "altitudeDeg": -0.894272
     },
     {
      "kind": "rise",
      "utc": "2026-08-17T01:28:00Z",
-     "altitudeDeg": -0.725965
+     "altitudeDeg": -0.725966
     },
     {
      "kind": "set",
      "utc": "2026-08-17T13:02:00Z",
-     "altitudeDeg": -1.020551
+     "altitudeDeg": -1.020549
     },
     {
      "kind": "rise",
      "utc": "2026-08-18T02:24:00Z",
-     "altitudeDeg": -0.691107
+     "altitudeDeg": -0.691108
     },
     {
      "kind": "set",
      "utc": "2026-08-18T13:37:00Z",
-     "altitudeDeg": -0.969949
+     "altitudeDeg": -0.969947
     },
     {
      "kind": "rise",
      "utc": "2026-08-19T03:20:00Z",
-     "altitudeDeg": -0.681361
+     "altitudeDeg": -0.681363
     },
     {
      "kind": "set",
      "utc": "2026-08-19T14:15:00Z",
-     "altitudeDeg": -0.935762
+     "altitudeDeg": -0.93576
     },
     {
      "kind": "rise",
      "utc": "2026-08-20T04:16:00Z",
-     "altitudeDeg": -0.678396
+     "altitudeDeg": -0.678399
     },
     {
      "kind": "set",
      "utc": "2026-08-20T14:57:00Z",
-     "altitudeDeg": -0.936607
+     "altitudeDeg": -0.936604
     },
     {
      "kind": "rise",
      "utc": "2026-08-21T05:11:00Z",
-     "altitudeDeg": -0.740352
+     "altitudeDeg": -0.740355
     },
     {
      "kind": "set",
      "utc": "2026-08-21T15:43:00Z",
-     "altitudeDeg": -0.878568
+     "altitudeDeg": -0.878565
     }
    ]
   }

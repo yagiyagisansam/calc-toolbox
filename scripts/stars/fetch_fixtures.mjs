@@ -27,8 +27,10 @@ import { promisify } from "node:util";
 const run = promisify(execFile);
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { createHash } from "node:crypto";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
+const HORIZONS_URL = "https://ssd.jpl.nasa.gov/api/horizons.api";
 const OUT = path.join(HERE, "fixtures", "moon-horizons.json");
 const OUT_RTS = path.join(HERE, "fixtures", "moon-riseset-horizons.json");
 
@@ -46,17 +48,54 @@ const SPANS = [
   { start: "2026-08-28 09:00", stop: "2026-08-28 21:00", step: "60 m" }
 ];
 
-/* Horizons へ問い合わせて $$SOE〜$$EOE の中身を返す */
-async function horizonsRaw(params) {
+/*
+ * 取り直したときに、同じ問い合わせをしたと確かめられるようにするための記録。
+ *
+ * これまで fixture には「いつ取ったか」しか残していなかった。
+ * 数字が合わなくなったとき、こちらの実装が変わったのか、
+ * Horizons の設定を違えたのか、先方の版が上がったのかを切り分けられない。
+ * 問い合わせの中身、応答の版、応答そのものの指紋を残す。
+ */
+const requests = [];
+
+/** 応答の指紋。中身が1文字でも違えば変わる */
+function digest(text) {
+  return "sha256:" + createHash("sha256").update(text, "utf8").digest("hex");
+}
+
+/** 応答の先頭にある API の版を拾う(例: "API VERSION: 1.2") */
+function apiVersionOf(text) {
+  const m = text.match(/API VERSION:\s*(\S+)/);
+  return m ? m[1] : null;
+}
+
+/** Horizons を1回叩き、生の応答と記録を返す */
+async function horizonsCall(label, params) {
   const q = new URLSearchParams();
   for (const [k, v] of Object.entries(params)) q.append(k, v);
   /*
    * この環境では Node の fetch が Horizons に届かない(プロキシに阻まれる)ので curl を使う。
    * 取得は開発時の1回きりで、テストはこのファイルを読むだけなので実害はない。
    */
-  const args = ["-s", "--max-time", "180", "-G", "https://ssd.jpl.nasa.gov/api/horizons.api"];
+  const args = ["-s", "--max-time", "180", "-G", HORIZONS_URL];
   for (const [k, v] of q) args.push("--data-urlencode", `${k}=${v}`);
   const { stdout: text } = await run("curl", args, { maxBuffer: 32 * 1024 * 1024 });
+
+  requests.push({
+    label,
+    url: HORIZONS_URL,
+    params,
+    apiVersion: apiVersionOf(text),
+    responseSha256: digest(text),
+    responseBytes: Buffer.byteLength(text, "utf8"),
+    at: new Date().toISOString()
+  });
+  return text;
+}
+
+/* Horizons へ問い合わせて $$SOE〜$$EOE の中身を返す */
+async function horizonsRaw(label, params) {
+  const text = await horizonsCall(label, params);
   const a = text.indexOf("$$SOE");
   const b = text.indexOf("$$EOE");
   if (a < 0 || b < 0) throw new Error("Horizons の応答を読めません:\n" + text.slice(-500));
@@ -70,37 +109,26 @@ function toIso(y, mon, d, hh, mm) {
 }
 
 async function horizons(site, span) {
-  const q = new URLSearchParams();
-  const add = (k, v) => q.append(k, v);
-  add("format", "text");
-  add("COMMAND", "'301'"); // 月
-  add("OBJ_DATA", "'NO'");
-  add("MAKE_EPHEM", "'YES'");
-  add("EPHEM_TYPE", "'OBSERVER'");
-  add("CENTER", "'coord@399'"); // 地球上の指定座標から見る
-  add("COORD_TYPE", "'GEODETIC'");
-  add("SITE_COORD", `'${site.lon},${site.lat},0'`); // 東経, 北緯, 標高km
-  add("START_TIME", `'${span.start}'`);
-  add("STOP_TIME", `'${span.stop}'`);
-  add("STEP_SIZE", `'${span.step}'`);
-  add("QUANTITIES", "'4,10'"); // 4=方位/高度, 10=輝面比
-  add("ANG_FORMAT", "'DEG'");
-  add("APPARENT", "'AIRLESS'"); // 大気差を含めない
-  add("CAL_FORMAT", "'CAL'");
-
-  /*
-   * この環境では Node の fetch が Horizons に届かない(プロキシに阻まれる)ので curl を使う。
-   * 取得は開発時の1回きりで、テストはこのファイルを読むだけなので実害はない。
-   */
-  const args = ["-s", "--max-time", "120", "-G", "https://ssd.jpl.nasa.gov/api/horizons.api"];
-  for (const [k, v] of q) args.push("--data-urlencode", `${k}=${v}`);
-  const { stdout: text } = await run("curl", args, { maxBuffer: 32 * 1024 * 1024 });
-  const a = text.indexOf("$$SOE");
-  const b = text.indexOf("$$EOE");
-  if (a < 0 || b < 0) throw new Error("Horizons の応答を読めません:\n" + text.slice(-500));
+  const body = await horizonsRaw(`位置 ${site.name} ${span.start}`, {
+    format: "text",
+    COMMAND: "'301'", // 月
+    OBJ_DATA: "'NO'",
+    MAKE_EPHEM: "'YES'",
+    EPHEM_TYPE: "'OBSERVER'",
+    CENTER: "'coord@399'", // 地球上の指定座標から見る
+    COORD_TYPE: "'GEODETIC'",
+    SITE_COORD: `'${site.lon},${site.lat},0'`, // 東経, 北緯, 標高km(0 = 平均海面)
+    START_TIME: `'${span.start}'`,
+    STOP_TIME: `'${span.stop}'`,
+    STEP_SIZE: `'${span.step}'`,
+    QUANTITIES: "'4,10'", // 4=方位/高度, 10=輝面比
+    ANG_FORMAT: "'DEG'",
+    APPARENT: "'AIRLESS'", // 大気差を含めない
+    CAL_FORMAT: "'CAL'"
+  });
 
   const rows = [];
-  for (const line of text.slice(a + 5, b).trim().split("\n")) {
+  for (const line of body.split("\n")) {
     // 例: " 2026-Aug-14 10:20 Nm  275.729875  -0.274325  47.12345"
     const m = line.match(
       /^\s*(\d{4})-([A-Za-z]{3})-(\d{2})\s+(\d{2}):(\d{2})\s+\S*\s*(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)/
@@ -125,6 +153,16 @@ const out = {
   source: "https://ssd.jpl.nasa.gov/horizons/",
   fetchedAt: new Date().toISOString(),
   quantities: "azimuth/altitude = airless apparent, topocentric / illuminated fraction",
+  /*
+   * 観測地点の標高は 0 km(平均海面)で問い合わせている。
+   * 高原のスポットで地平線がどれだけ下がるかは、この比較に入っていない。
+   * 「どのスポットでも1分の精度」と読まないこと。
+   */
+  siteAltitudeKm: 0,
+  limits:
+    "観測地点の標高は0km。地形(稜線・樹木)による遮蔽も含まない。" +
+    "比較しているのは大気差なしの測心高度・方位だけ。",
+  requests: [],
   samples: []
 };
 
@@ -138,6 +176,7 @@ for (const site of SITES) {
   }
 }
 
+out.requests = requests.splice(0, requests.length);
 await mkdir(path.dirname(OUT), { recursive: true });
 await writeFile(OUT, JSON.stringify(out, null, 1) + "\n");
 console.log(
@@ -165,12 +204,17 @@ const rtsOut = {
   fetchedAt: new Date().toISOString(),
   definition: "refracted upper limb at true visual horizon (R_T_S_ONLY='TVH')",
   quantizationMinutes: 1,
+  siteAltitudeKm: 0,
+  limits:
+    "観測地点の標高は0km(平均海面)。地形による遮蔽も含まない。" +
+    "山あいでは実際には表示より遅く出て、早く沈む。",
+  requests: [],
   sites: []
 };
 
 for (const site of RTS_SITES) {
   process.stderr.write(`取得中(月の出入り): ${site.name}…\n`);
-  const body = await horizonsRaw({
+  const body = await horizonsRaw(`出入り ${site.name}`, {
     format: "text",
     COMMAND: "'301'",
     OBJ_DATA: "'NO'",
@@ -209,6 +253,7 @@ for (const site of RTS_SITES) {
   await new Promise((r) => setTimeout(r, 3000));
 }
 
+rtsOut.requests = requests.splice(0, requests.length);
 await writeFile(OUT_RTS, JSON.stringify(rtsOut, null, 1) + "\n");
 console.log(
   `保存しました: ${OUT_RTS}\n  ${rtsOut.sites.length} 地点 / ` +

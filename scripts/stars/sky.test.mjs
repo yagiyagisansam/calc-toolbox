@@ -303,6 +303,34 @@ function ok(cond, label, detail) {
   console.log(`夜の判定: ${zones.length}つのタイムゾーンで同じ結果`);
 }
 
+/* ---- 4-b. 期待値の出どころが後から辿れること ---------------------------- */
+{
+  /*
+   * 「いつ取ったか」しか残っていないと、数字が合わなくなったときに
+   * こちらの実装が変わったのか、Horizons の設定を違えたのか、
+   * 先方の版が上がったのかを切り分けられない。
+   * 問い合わせの中身・応答の版・応答の指紋が残っていることを確かめる。
+   */
+  for (const name of ["moon-horizons.json", "moon-riseset-horizons.json"]) {
+    const fx = readFixture(name);
+    ok(Array.isArray(fx.requests) && fx.requests.length > 0, `${name}: 問い合わせの記録がある`);
+    for (const r of fx.requests || []) {
+      ok(r.url && r.params && r.params.SITE_COORD, `${name}: 問い合わせの中身が残っている`, r.label);
+      ok(/^sha256:[0-9a-f]{64}$/.test(r.responseSha256 || ""), `${name}: 応答の指紋がある`, r.label);
+      ok(typeof r.apiVersion === "string", `${name}: API の版が残っている`, String(r.apiVersion));
+      // 標高は 0km で問い合わせている。この前提は文書にも書いてある
+      ok(/,0'$/.test(r.params.SITE_COORD), `${name}: 標高0kmで問い合わせている`, r.params.SITE_COORD);
+    }
+    ok(fx.siteAltitudeKm === 0, `${name}: 標高0kmの前提が記録されている`, String(fx.siteAltitudeKm));
+    ok(
+      typeof fx.limits === "string" && fx.limits.length > 10,
+      `${name}: 比較の限界が書かれている`,
+      String(fx.limits).slice(0, 30)
+    );
+  }
+  console.log("期待値の出どころ: 問い合わせの中身・API版・応答の指紋を記録済み");
+}
+
 /* ---- 5. 月あかりは地点ごとに違う ---------------------------------------- */
 /*
  * 全国の地図が月の減点を「地図の中心1点」で済ませていた不具合の証拠を、
