@@ -9,19 +9,19 @@
       "pref": "北海道",
       "name": "十勝岳望岳台",
       "city": "美瑛町",
-      "lat": 43.418,
-      "lon": 142.686,
+      "lat": 43.44764,
+      "lon": 142.64944,
       "free": "無料",
       "resv": "不要",
       "night": "24時間",
       "access": "道道966号・無料駐車場約50台",
       "caution": "冬期閉鎖(概ね1月上旬〜4月下旬)。火山地帯のため防寒必須",
-      "lp": 82,
-      "score": 89.2,
+      "lp": 86,
+      "score": 88.6,
       "band": "最高",
       "note": null,
-      "verdict": "保留",
-      "verdictWhy": "座標(43.418,142.686)が、記録している「北海道 美瑛町」ではなく 北海道上富良野町 − に落ちる(国土地理院の逆ジオコーダ)。名前と座標のどちらが正しいかを確かめるまで承認対象にしない。（元の判定: 掲載可）",
+      "verdict": "掲載可",
+      "verdictWhy": "夜間の利用が公式情報で確認できている(24時間)。座標だけが理由で保留にしていたので、確定した座標へ直して戻す",
       "sources": [
         {
           "url": "https://www.visit-hokkaido.jp/spot/detail_10362.html",
@@ -32,17 +32,28 @@
             "resv"
           ],
           "checkedAt": "2026-08-15"
+        },
+        {
+          "url": "https://tokachidake-geopark.jp/geoname/2687/",
+          "kind": "公式",
+          "covers": [
+            "city"
+          ],
+          "checkedAt": "2026-08-15"
         }
       ],
       "cityCheck": {
-        "ok": false,
-        "muniCd": "01460",
+        "ok": true,
+        "muniCd": "01459",
         "pref": "北海道",
-        "city": "上富良野町",
+        "city": "美瑛町",
         "lv01": "−",
         "source": "国土地理院 逆ジオコーダ",
         "at": "2026-08-15"
-      }
+      },
+      "coordSource": "独立検証3が公式情報から確定(https://tokachidake-geopark.jp/geoname/2687/)。旧 43.418,142.686",
+      "coordVerified": true,
+      "expectedMuniCd": "01459"
     },
     {
       "pref": "青森県",
@@ -134,19 +145,19 @@
       "pref": "宮城県",
       "name": "田束山 山頂駐車場",
       "city": "南三陸町",
-      "lat": 38.717,
-      "lon": 141.529,
+      "lat": 38.74899,
+      "lon": 141.4669,
       "free": "無料",
       "resv": "不要",
       "night": "未確認",
       "access": "山頂まで舗装路・駐車場あり",
       "caution": "冬期は除雪されず利用できない。牧野・史跡が周囲にあり、管理道と牧草地には入らない",
-      "lp": 94,
-      "score": 87.4,
+      "lp": 97,
+      "score": 87,
       "band": "最高",
       "note": null,
       "verdict": "保留",
-      "verdictWhy": "南三陸町は山頂まで車で行けて約100台と案内するが、夜間のゲート・利用時間の記載がない。環境省の管理計画に、道路が除雪されず冬期は利用できない旨がある。",
+      "verdictWhy": "座標は独立検証3が確定した。ただし夜間のゲート・利用時間の記載が無く、環境省の管理計画に冬期は除雪されず利用できない旨がある。夜間可否が取れるまで戻さない。",
       "sources": [
         {
           "url": "https://www.town.minamisanriku.miyagi.jp/soshiki/1008/2/2/1157.html",
@@ -161,13 +172,28 @@
             "night"
           ],
           "checkedAt": "2026-08-15"
+        },
+        {
+          "url": "https://www.m-kankou.jp/facility/tatsugane/",
+          "kind": "公式",
+          "covers": [
+            "city"
+          ],
+          "checkedAt": "2026-08-15"
         }
       ],
       "cityCheck": {
-        "ok": false,
-        "why": "国土地理院が市区町村を返さなかった",
+        "ok": true,
+        "muniCd": "04606",
+        "pref": "宮城県",
+        "city": "南三陸町",
+        "lv01": "歌津",
+        "source": "国土地理院 逆ジオコーダ",
         "at": "2026-08-15"
-      }
+      },
+      "coordSource": "独立検証3が公式情報から確定(https://www.m-kankou.jp/facility/tatsugane/)。旧 38.717,141.529",
+      "coordVerified": true,
+      "expectedMuniCd": "04606"
     },
     {
       "pref": "秋田県",
@@ -238,7 +264,7 @@
       "band": "最高",
       "note": "標高約1000m。夏でも涼しく空気が澄んでいます。",
       "verdict": "保留",
-      "verdictWhy": "国土地理院の逆ジオコーダが市区町村を返さない座標(38.148,140.418)。海岸や離島でこの API が答えられない場合もあるが、座標そのものの確認が取れていないので承認対象にしない。（元の判定: 条件付き可）",
+      "verdictWhy": "候補名「蔵王坊平高原」が広すぎる。上山市公式は蔵王高原坊平に複数のコース・キャンプ場・施設があることを示しており、正しい1点を決められなかった。夜間利用できる名称付きの駐車場を選び直すまで保留。代表点や近隣の水場の座標では埋めない。",
       "sources": [
         {
           "url": "https://www.pref.miyagi.jp/soshiki/ok-doboku/gs-douro-kisei-echo.html",
@@ -255,7 +281,9 @@
         "ok": false,
         "why": "国土地理院が市区町村を返さなかった",
         "at": "2026-08-15"
-      }
+      },
+      "coordVerified": false,
+      "coordSource": "独立検証3でも1点を確定できなかった(理由は verdictWhy)"
     },
     {
       "pref": "福島県",
@@ -379,21 +407,21 @@
     },
     {
       "pref": "群馬県",
-      "name": "玉原高原",
+      "name": "玉原高原駐車場",
       "city": "沼田市",
-      "lat": 36.793,
-      "lon": 139.028,
+      "lat": 36.78242,
+      "lon": 139.06719,
       "free": "無料",
       "resv": "不要",
       "night": "不可",
       "access": "県道266号・スキー場駐車場",
       "caution": "冬期はスキー場営業。夜間の駐車可否を要確認",
-      "lp": 114,
-      "score": 82.6,
-      "band": "最高",
+      "lp": 123,
+      "score": 77.2,
+      "band": "良い",
       "note": null,
       "verdict": "除外",
-      "verdictWhy": "たんばらスキーパークが冬季駐車場について「夜間の駐車はできません」と明記。夏の星空観察は参加費のある指定日イベント。無料・予約不要の候補にはできない。",
+      "verdictWhy": "座標は独立検証3が確定した。ただし、たんばらスキーパークが冬季駐車場について「夜間の駐車はできません」と明記し、夏の星空観察は参加費のある指定日イベント。座標を直しても無料・予約不要の候補にはできない。",
       "sources": [
         {
           "url": "https://www.tambara.co.jp/winter/access/",
@@ -419,17 +447,28 @@
             "resv"
           ],
           "checkedAt": "2026-08-15"
+        },
+        {
+          "url": "https://www.city.numata.gunma.jp/kanko/1016108/1016113.html",
+          "kind": "公式",
+          "covers": [
+            "city"
+          ],
+          "checkedAt": "2026-08-15"
         }
       ],
       "cityCheck": {
-        "ok": false,
-        "muniCd": "10449",
+        "ok": true,
+        "muniCd": "10206",
         "pref": "群馬県",
-        "city": "みなかみ町",
-        "lv01": "藤原",
+        "city": "沼田市",
+        "lv01": "上発知町",
         "source": "国土地理院 逆ジオコーダ",
         "at": "2026-08-15"
-      }
+      },
+      "coordSource": "独立検証3が公式情報から確定(https://www.city.numata.gunma.jp/kanko/1016108/1016113.html)。旧 36.793,139.028",
+      "coordVerified": true,
+      "expectedMuniCd": "10206"
     },
     {
       "pref": "埼玉県",
@@ -525,7 +564,7 @@
       "band": "最高",
       "note": "国内有数の暗さ。島全体が星空保護区に認定されています。",
       "verdict": "保留",
-      "verdictWhy": "国土地理院の逆ジオコーダが市区町村を返さない座標(34.243,139.135)。海岸や離島でこの API が答えられない場合もあるが、座標そのものの確認が取れていないので承認対象にしない。（元の判定: 掲載可）",
+      "verdictWhy": "候補名が別々の2地点(赤崎遊歩道 と よたね広場)を混同している。座標の正誤以前に候補の単位が誤っている。東京都公式が星空観察を明示しているのは「よたね広場」なので、そちらの単独候補へ改名して取り直すまで保留。",
       "sources": [
         {
           "url": "https://kozushima.com/star/",
@@ -542,7 +581,9 @@
         "ok": false,
         "why": "国土地理院が市区町村を返さなかった",
         "at": "2026-08-15"
-      }
+      },
+      "coordVerified": false,
+      "coordSource": "独立検証3でも1点を確定できなかった(理由は verdictWhy)"
     },
     {
       "pref": "神奈川県",
@@ -560,7 +601,7 @@
       "band": "良い",
       "note": null,
       "verdict": "保留",
-      "verdictWhy": "「山伏峠付近」では、合法に停められる区画を特定できない。座標(35.520,138.980)の最寄りは山梨県道志村で、都道府県すらはっきりしない。固有の公共駐車場名・管理者・座標が確定するまで承認対象にしない。",
+      "verdictWhy": "現座標は山梨県南都留郡道志村側で、都道府県の記載そのものが誤っている。ただし候補は無名の路肩を指しており、適法に停められる地点を確定できない。県欄だけ直して戻すことはしない。名称付きの公共駐車場を確認できなければ除外にする。",
       "sources": [
         {
           "url": "https://www.pref.yamanashi.jp/dourokisei/kisei_list.php?a=1",
@@ -579,7 +620,9 @@
         "lv01": "−",
         "source": "国土地理院 逆ジオコーダ",
         "at": "2026-08-15"
-      }
+      },
+      "coordVerified": false,
+      "coordSource": "独立検証3でも1点を確定できなかった(理由は verdictWhy)"
     },
     {
       "pref": "新潟県",
@@ -636,7 +679,7 @@
       "band": "最高",
       "note": null,
       "verdict": "保留",
-      "verdictWhy": "「大長谷」は広域の地名で、対象の駐車場を特定できない。管理者も不明。",
+      "verdictWhy": "現座標は南砺市に落ちる。「大長谷」は地域名で、富山市という記録は地域名とは整合するが地点を決める根拠にならない。候補名に対応する夜間利用可能な名称付き駐車場を特定できるまで保留。",
       "sources": [
         {
           "url": "https://www.pref.toyama.lg.jp/1501/kendodukuri/dourokouwan/douro/kj00014191.html",
@@ -655,7 +698,9 @@
         "lv01": "利賀村上百瀬",
         "source": "国土地理院 逆ジオコーダ",
         "at": "2026-08-15"
-      }
+      },
+      "coordVerified": false,
+      "coordSource": "独立検証3でも1点を確定できなかった(理由は verdictWhy)"
     },
     {
       "pref": "石川県",
@@ -872,8 +917,8 @@
       "pref": "静岡県",
       "name": "あいあい岬",
       "city": "南伊豆町",
-      "lat": 34.607,
-      "lon": 138.851,
+      "lat": 34.60947,
+      "lon": 138.8267,
       "free": "無料",
       "resv": "不要",
       "night": "24時間",
@@ -883,8 +928,8 @@
       "score": 89.4,
       "band": "最高",
       "note": null,
-      "verdict": "保留",
-      "verdictWhy": "国土地理院の逆ジオコーダが市区町村を返さない座標(34.607,138.851)。海岸や離島でこの API が答えられない場合もあるが、座標そのものの確認が取れていないので承認対象にしない。（元の判定: 条件付き可）",
+      "verdict": "条件付き可",
+      "verdictWhy": "夜間の利用は確認できているが根拠が口コミ。座標だけが理由で保留にしていたので、確定した座標へ直して戻す",
       "sources": [
         {
           "url": "https://hosizora-trip.jp/%E9%9D%99%E5%B2%A1%E7%9C%8C/162/",
@@ -895,31 +940,46 @@
             "resv"
           ],
           "checkedAt": "2026-08-15"
+        },
+        {
+          "url": "https://shizuoka-guide.com/detail/page/detail/7",
+          "kind": "公式",
+          "covers": [
+            "city"
+          ],
+          "checkedAt": "2026-08-15"
         }
       ],
       "cityCheck": {
-        "ok": false,
-        "why": "国土地理院が市区町村を返さなかった",
+        "ok": true,
+        "muniCd": "22304",
+        "pref": "静岡県",
+        "city": "南伊豆町",
+        "lv01": "中木",
+        "source": "国土地理院 逆ジオコーダ",
         "at": "2026-08-15"
-      }
+      },
+      "coordSource": "独立検証3が公式情報から確定(https://shizuoka-guide.com/detail/page/detail/7)。旧 34.607,138.851",
+      "coordVerified": true,
+      "expectedMuniCd": "22304"
     },
     {
       "pref": "愛知県",
       "name": "茶臼山高原 第4駐車場",
       "city": "豊根村",
-      "lat": 35.202,
-      "lon": 137.649,
+      "lat": 35.22182,
+      "lon": 137.65904,
       "free": "無料",
       "resv": "不要",
       "night": "24時間",
       "access": "茶臼山高原道路・24時間開放・トイレあり",
       "caution": "標高が高く夏でも冷える。冬期は路面凍結",
-      "lp": 115,
-      "score": 82,
+      "lp": 111,
+      "score": 84.4,
       "band": "最高",
       "note": null,
-      "verdict": "保留",
-      "verdictWhy": "座標(35.202,137.649)が、記録している「愛知県 豊根村」ではなく 愛知県設楽町 津具 に落ちる(国土地理院の逆ジオコーダ)。名前と座標のどちらが正しいかを確かめるまで承認対象にしない。（元の判定: 掲載可）",
+      "verdict": "掲載可",
+      "verdictWhy": "茶臼山高原の公式が第4駐車場を通常閉鎖時間外も開放と明記。座標だけが理由で保留にしていたので、確定した座標へ直して戻す",
       "sources": [
         {
           "url": "https://www.okuminavi.jp/star/spot/detail/9/",
@@ -930,17 +990,28 @@
             "resv"
           ],
           "checkedAt": "2026-08-15"
+        },
+        {
+          "url": "https://www.chausuyama.jp/news/2015051416290872.html",
+          "kind": "公式",
+          "covers": [
+            "city"
+          ],
+          "checkedAt": "2026-08-15"
         }
       ],
       "cityCheck": {
-        "ok": false,
-        "muniCd": "23561",
+        "ok": true,
+        "muniCd": "23563",
         "pref": "愛知県",
-        "city": "設楽町",
-        "lv01": "津具",
+        "city": "豊根村",
+        "lv01": "坂宇場",
         "source": "国土地理院 逆ジオコーダ",
         "at": "2026-08-15"
-      }
+      },
+      "coordSource": "独立検証3が公式情報から確定(https://www.chausuyama.jp/news/2015051416290872.html)。旧 35.202,137.649",
+      "coordVerified": true,
+      "expectedMuniCd": "23563"
     },
     {
       "pref": "三重県",
@@ -1071,21 +1142,21 @@
     },
     {
       "pref": "大阪府",
-      "name": "滝畑ダム",
+      "name": "滝畑ダム分室付近",
       "city": "河内長野市",
-      "lat": 34.395,
-      "lon": 135.512,
+      "lat": 34.39794,
+      "lon": 135.52682,
       "free": "無料",
       "resv": "不要",
       "night": "不可",
       "access": "府道218号・駐車場あり",
       "caution": "大阪府内は光害が非常に強く、府内最良でも判定は「まずまず」止まり",
-      "lp": 166,
-      "score": 52.8,
+      "lp": 167,
+      "score": 52.4,
       "band": "まずまず",
       "note": null,
       "verdict": "除外",
-      "verdictWhy": "大阪府の案内では駐車場の利用時間が10:00〜16:00。夜間は使えない。",
+      "verdictWhy": "座標は独立検証3が確定した(ダム分室。駐車区画の中心とは断定しない)。ただし大阪府の案内では駐車場の利用時間が10:00〜16:00。夜間は使えないので、座標を直しても除外のまま。",
       "sources": [
         {
           "url": "https://www.pref.osaka.lg.jp/o120170/minamikawachinm/m_index/d_damakusesu.html",
@@ -1098,14 +1169,17 @@
         }
       ],
       "cityCheck": {
-        "ok": false,
-        "muniCd": "27219",
+        "ok": true,
+        "muniCd": "27216",
         "pref": "大阪府",
-        "city": "和泉市",
-        "lv01": "槇尾山町",
+        "city": "河内長野市",
+        "lv01": "滝畑",
         "source": "国土地理院 逆ジオコーダ",
         "at": "2026-08-15"
-      }
+      },
+      "coordSource": "独立検証3が公式情報から確定(https://www.pref.osaka.lg.jp/o120170/minamikawachinm/m_index/d_damakusesu.html)。旧 34.395,135.512",
+      "coordVerified": true,
+      "expectedMuniCd": "27216"
     },
     {
       "pref": "兵庫県",
@@ -1187,21 +1261,21 @@
     },
     {
       "pref": "和歌山県",
-      "name": "みさと天文台 周辺駐車場",
+      "name": "みさと天文台",
       "city": "紀美野町",
-      "lat": 34.102,
-      "lon": 135.312,
+      "lat": 34.1445,
+      "lon": 135.40682,
       "free": "無料",
       "resv": "不要",
       "night": "不可",
       "access": "無料駐車場(第三駐車場まであり)",
       "caution": "天文台の観望は有料・営業時間あり。駐車場からの観察は要確認",
-      "lp": 127,
-      "score": 74.6,
+      "lp": 126,
+      "score": 75.3,
       "band": "良い",
       "note": null,
       "verdict": "除外",
-      "verdictWhy": "夜間観望は全員事前予約制の施設プログラム。「予約不要」を満たさない。催事外に駐車場と進入路が開くかも確認できない。",
+      "verdictWhy": "座標は独立検証3が確定した。ただし施設公式が「予約のない方、および閉館後は、駐車場を含め立入禁止」と明記。座標を直しても除外のまま。",
       "sources": [
         {
           "url": "https://www.town.kimino.wakayama.jp/sagasu/sangyoka/kankosangyo/sonotakankoujouhou/2978.html",
@@ -1222,32 +1296,35 @@
         }
       ],
       "cityCheck": {
-        "ok": false,
-        "muniCd": "30366",
+        "ok": true,
+        "muniCd": "30304",
         "pref": "和歌山県",
-        "city": "有田川町",
-        "lv01": "大字生石",
+        "city": "紀美野町",
+        "lv01": "高畑",
         "source": "国土地理院 逆ジオコーダ",
         "at": "2026-08-15"
-      }
+      },
+      "coordSource": "独立検証3が公式情報から確定(https://www.town.kimino.wakayama.jp/sagasu/sangyoka/kankosangyo/sonotakankoujouhou/2978.html)。旧 34.102,135.312",
+      "coordVerified": true,
+      "expectedMuniCd": "30304"
     },
     {
       "pref": "鳥取県",
-      "name": "大山まきばみるくの里 周辺",
+      "name": "大山まきばみるくの里",
       "city": "伯耆町",
-      "lat": 35.401,
-      "lon": 133.548,
+      "lat": 35.39843,
+      "lon": 133.51513,
       "free": "無料",
       "resv": "不要",
       "night": "未確認",
       "access": "大山環状道路沿い・無料駐車場",
       "caution": "売店などの施設は営業時間あり。駐車場の夜間利用は現地の掲示に従うこと。",
-      "lp": 100,
-      "score": 86.5,
+      "lp": 102,
+      "score": 86.2,
       "band": "最高",
       "note": "鳥取県公式の星空スポットマップに載っています。",
       "verdict": "保留",
-      "verdictWhy": "施設の営業時間は10:00〜17:00で、冬期休業と週次休業がある。周辺駐車場が時間外に開放されるかは確認できていない。",
+      "verdictWhy": "座標は独立検証3が運営者の公式住所(伯耆町小林2-11)から確定したが、その座標を国土地理院の逆ジオコーダに掛けると大山町(31386)に落ちる。公式の住所が伯耆町、座標が指す場所が大山町という食い違いで、どちらが誤りかは決められない。加えて施設の営業時間は10:00〜17:00で、時間外の駐車場開放も確認できていない。",
       "sources": [
         {
           "url": "https://www.houki-town.jp/new2/5/8/10/",
@@ -1264,6 +1341,14 @@
             "night"
           ],
           "checkedAt": "2026-08-15"
+        },
+        {
+          "url": "https://dainyu.or.jp/village-of-milk/access/",
+          "kind": "公式",
+          "covers": [
+            "city"
+          ],
+          "checkedAt": "2026-08-15"
         }
       ],
       "cityCheck": {
@@ -1271,10 +1356,13 @@
         "muniCd": "31386",
         "pref": "鳥取県",
         "city": "大山町",
-        "lv01": "大山",
+        "lv01": "赤松",
         "source": "国土地理院 逆ジオコーダ",
         "at": "2026-08-15"
-      }
+      },
+      "coordSource": "独立検証3が公式情報から確定(https://dainyu.or.jp/village-of-milk/access/)。旧 35.401,133.548 ※逆ジオコーダは大山町(31386)を返す。未解決",
+      "coordVerified": false,
+      "expectedMuniCd": "31390"
     },
     {
       "pref": "島根県",
@@ -1356,38 +1444,49 @@
     },
     {
       "pref": "広島県",
-      "name": "八幡高原",
+      "name": "臥竜山麓八幡原公園",
       "city": "北広島町",
-      "lat": 34.64,
-      "lon": 132.13,
+      "lat": 34.70793,
+      "lon": 132.18566,
       "free": "無料",
       "resv": "不要",
       "night": "未確認",
       "access": "県道40号沿い・駐車場あり",
       "caution": "西中国山地国定公園。冬期は豪雪",
-      "lp": 93,
-      "score": 87.6,
+      "lp": 88,
+      "score": 88.3,
       "band": "最高",
       "note": null,
       "verdict": "保留",
-      "verdictWhy": "「八幡高原」は集落・湿原・宿泊施設が点在する広域名。公共駐車場を特定できない。",
+      "verdictWhy": "広域名「八幡高原」を、広島県公式の「臥竜山麓八幡原公園」へ具体化し、座標もその地図点へ直した。ただし夜間利用の可否は未確認なので戻さない。",
       "sources": [
         {
           "url": "https://dive-hiroshima.com/feature/feature-105882/",
           "kind": "口コミ",
           "covers": [],
           "checkedAt": "2026-08-15"
+        },
+        {
+          "url": "https://www.pref.hiroshima.lg.jp/site/hiroshima-quasi-np/nishi2-8yawatahara.html",
+          "kind": "公式",
+          "covers": [
+            "city"
+          ],
+          "checkedAt": "2026-08-15"
         }
       ],
       "cityCheck": {
-        "ok": false,
-        "muniCd": "34368",
+        "ok": true,
+        "muniCd": "34369",
         "pref": "広島県",
-        "city": "安芸太田町",
-        "lv01": "大字横川",
+        "city": "北広島町",
+        "lv01": "東八幡原",
         "source": "国土地理院 逆ジオコーダ",
         "at": "2026-08-15"
-      }
+      },
+      "coordSource": "独立検証3が公式情報から確定(https://www.pref.hiroshima.lg.jp/site/hiroshima-quasi-np/nishi2-8yawatahara.html)。旧 34.64,132.13",
+      "coordVerified": true,
+      "expectedMuniCd": "34369"
     },
     {
       "pref": "山口県",
@@ -1559,10 +1658,10 @@
     },
     {
       "pref": "高知県",
-      "name": "天狗高原",
+      "name": "星ふるヴィレッジTENGU",
       "city": "津野町",
-      "lat": 33.482,
-      "lon": 133.031,
+      "lat": 33.47706,
+      "lon": 133.00424,
       "free": "無料",
       "resv": "不要",
       "night": "夜間可",
@@ -1573,7 +1672,7 @@
       "band": "最高",
       "note": "四国カルストで最も標高が高く(1400m超)、高知県が星空スポットとして紹介しています。",
       "verdict": "保留",
-      "verdictWhy": "座標(33.482,133.031)が、記録している「高知県 津野町」ではなく 高知県仁淀川町 別枝 に落ちる(国土地理院の逆ジオコーダ)。名前と座標のどちらが正しいかを確かめるまで承認対象にしない。（元の判定: 掲載可）",
+      "verdictWhy": "広域名「天狗高原」を、津野町条例上の位置がある「星ふるヴィレッジTENGU」へ具体化し、座標もそこへ直した。ただしホテル敷地なので、宿泊者以外の夜間滞在の可否を確認するまで戻さない。",
       "sources": [
         {
           "url": "https://kochike.jp/column/109475/",
@@ -1584,35 +1683,46 @@
             "resv"
           ],
           "checkedAt": "2026-08-15"
+        },
+        {
+          "url": "https://town.kochi-tsuno.lg.jp/reiki/reiki_honbun/r088RG00000470.html",
+          "kind": "公式",
+          "covers": [
+            "city"
+          ],
+          "checkedAt": "2026-08-15"
         }
       ],
       "cityCheck": {
-        "ok": false,
-        "muniCd": "39387",
+        "ok": true,
+        "muniCd": "39411",
         "pref": "高知県",
-        "city": "仁淀川町",
-        "lv01": "別枝",
+        "city": "津野町",
+        "lv01": "芳生野",
         "source": "国土地理院 逆ジオコーダ",
         "at": "2026-08-15"
-      }
+      },
+      "coordSource": "独立検証3が公式情報から確定(https://town.kochi-tsuno.lg.jp/reiki/reiki_honbun/r088RG00000470.html)。旧 33.482,133.031",
+      "coordVerified": true,
+      "expectedMuniCd": "39411"
     },
     {
       "pref": "福岡県",
-      "name": "星野村(池の山・星の文化館周辺)",
+      "name": "星の文化館",
       "city": "八女市",
-      "lat": 33.245,
-      "lon": 130.845,
+      "lat": 33.2435,
+      "lon": 130.75962,
       "free": "無料",
       "resv": "不要",
       "night": "未確認",
       "access": "県道52号沿い・駐車場あり",
       "caution": "星の文化館は有料・営業時間あり。周辺は集落があり配慮を",
-      "lp": 110,
-      "score": 85,
-      "band": "最高",
+      "lp": 120,
+      "score": 79,
+      "band": "良い",
       "note": null,
       "verdict": "保留",
-      "verdictWhy": "星の文化館の夜間プログラムはあるが、周辺駐車場の催事外の自由利用は確認できていない。ロッジ・キャンプ場・天文施設が隣接し、宿泊者と観測者への影響が大きい。",
+      "verdictWhy": "「星野村(池の山・星の文化館周辺)」を「星の文化館」へ具体化し、座標も八女市公式の地図点へ直した(旧座標は大分県日田市に落ちていた)。施設FAQが星空観察場所の利用を22時までとし、22時以降の敷地立入を禁じている。従来の「夜間可」は引き継がない。",
       "sources": [
         {
           "url": "https://www.city.yame.fukuoka.jp/soshiki/11/h1/3/1513929118451.html",
@@ -1622,14 +1732,17 @@
         }
       ],
       "cityCheck": {
-        "ok": false,
-        "muniCd": "44204",
-        "pref": "大分県",
-        "city": "日田市",
-        "lv01": "前津江町柚木",
+        "ok": true,
+        "muniCd": "40210",
+        "pref": "福岡県",
+        "city": "八女市",
+        "lv01": "星野村",
         "source": "国土地理院 逆ジオコーダ",
         "at": "2026-08-15"
-      }
+      },
+      "coordSource": "独立検証3が公式情報から確定(https://www.city.yame.fukuoka.jp/soshiki/11/h1/3/1513929118451.html)。旧 33.245,130.845",
+      "coordVerified": true,
+      "expectedMuniCd": "40210"
     },
     {
       "pref": "佐賀県",
@@ -1727,19 +1840,19 @@
       "pref": "熊本県",
       "name": "二本杉展望所",
       "city": "美里町",
-      "lat": 32.552,
-      "lon": 130.851,
+      "lat": 32.57544,
+      "lon": 130.90044,
       "free": "無料",
       "resv": "不要",
       "night": "未確認",
       "access": "国道445号沿い・駐車場あり",
       "caution": "峠道でカーブ多数。国道445号は雨量規制・落石注意区間。売店は営業時間あり",
-      "lp": 109,
-      "score": 85.2,
+      "lp": 98,
+      "score": 86.8,
       "band": "最高",
       "note": null,
       "verdict": "保留",
-      "verdictWhy": "道路番号が誤っていた。二本杉は国道445号側で、218号は別区間の迂回路。駐車場の夜間開放は確認できていない。445号の早楠〜二本杉には雨量規制と落石の注意がある。",
+      "verdictWhy": "座標は美里町公式の地図点へ直した。道路番号も国道445号へ訂正済み。ただし駐車場の夜間開放は確認できていない。",
       "sources": [
         {
           "url": "https://www.town.kumamoto-misato.lg.jp/material/files/group/2/280-11.pdf",
@@ -1748,17 +1861,28 @@
             "access"
           ],
           "checkedAt": "2026-08-15"
+        },
+        {
+          "url": "https://www.town.kumamoto-misato.lg.jp/soshiki/utsukushisatosose/1/6/3/82.html",
+          "kind": "公式",
+          "covers": [
+            "city"
+          ],
+          "checkedAt": "2026-08-15"
         }
       ],
       "cityCheck": {
-        "ok": false,
-        "muniCd": "43202",
+        "ok": true,
+        "muniCd": "43348",
         "pref": "熊本県",
-        "city": "八代市",
-        "lv01": "泉町柿迫",
+        "city": "美里町",
+        "lv01": "早楠",
         "source": "国土地理院 逆ジオコーダ",
         "at": "2026-08-15"
-      }
+      },
+      "coordSource": "独立検証3が公式情報から確定(https://www.town.kumamoto-misato.lg.jp/soshiki/utsukushisatosose/1/6/3/82.html)。旧 32.552,130.851",
+      "coordVerified": true,
+      "expectedMuniCd": "43348"
     },
     {
       "pref": "大分県",
@@ -1847,19 +1971,19 @@
       "pref": "鹿児島県",
       "name": "輝北うわば公園",
       "city": "鹿屋市",
-      "lat": 31.623,
-      "lon": 130.803,
+      "lat": 31.59394,
+      "lon": 130.82538,
       "free": "無料",
       "resv": "不要",
       "night": "金土日祝〜22時",
       "access": "県道71号沿い・駐車場あり",
       "caution": "公園の開園は水木9〜18時・金土日祝9〜22時、月火は休園。星を見るなら金土日祝の日没後〜22時まで。",
-      "lp": 88,
-      "score": 88.3,
+      "lp": 92,
+      "score": 87.7,
       "band": "最高",
       "note": "環境省の星空観測で日本一に4回選ばれた場所です。",
       "verdict": "保留",
-      "verdictWhy": "座標(31.623,130.803)が、記録している「鹿児島県 鹿屋市」ではなく 鹿児島県垂水市 牛根境 に落ちる(国土地理院の逆ジオコーダ)。名前と座標のどちらが正しいかを確かめるまで承認対象にしない。（元の判定: 条件付き可）",
+      "verdictWhy": "座標は独立検証3が鹿屋市公式(輝北町市成1660-3)から確定したが、その座標を国土地理院の逆ジオコーダに掛けると垂水市(46214)に落ちる。公式の住所が鹿屋市、座標が指す場所が垂水市という食い違いで、どちらが誤りかは決められない。座標が定まるまで承認対象に戻さない。",
       "sources": [
         {
           "url": "https://www.kihokuuwaba.jp/facility.html",
@@ -1870,6 +1994,14 @@
             "resv"
           ],
           "checkedAt": "2026-08-15"
+        },
+        {
+          "url": "https://www.city.kanoya.lg.jp/kouhou/shisetsu/kanko/035.html",
+          "kind": "公式",
+          "covers": [
+            "city"
+          ],
+          "checkedAt": "2026-08-15"
         }
       ],
       "cityCheck": {
@@ -1877,10 +2009,13 @@
         "muniCd": "46214",
         "pref": "鹿児島県",
         "city": "垂水市",
-        "lv01": "牛根境",
+        "lv01": "二川",
         "source": "国土地理院 逆ジオコーダ",
         "at": "2026-08-15"
-      }
+      },
+      "coordSource": "独立検証3が公式情報から確定(https://www.city.kanoya.lg.jp/kouhou/shisetsu/kanko/035.html)。旧 31.623,130.803 ※逆ジオコーダは垂水市(46214)を返す。未解決",
+      "coordVerified": false,
+      "expectedMuniCd": "46203"
     },
     {
       "pref": "沖縄県",
@@ -1924,5 +2059,6 @@
   ],
   "_判定": "verdict は 掲載可 / 条件付き可 / 保留 / 除外 の4段階。掲載可と条件付き可だけが Hiroさんの承認の対象になる。保留は「使えないとは限らないが、管理者の確認が取れていない」の意味で、推測で埋めていない。",
   "_検証": "独立検証2 (scripts/stars/INDEPENDENT-REVIEW-2.md, 2026-08-15) の調査結果を反映済み",
-  "_所在地の検査": "cityCheck は国土地理院の逆ジオコーダで、座標が実際にどの市区町村の中にあるかを確かめた結果。行政界そのもので判定しているので、役場の代表点からの距離より確か。取り直しは scripts/stars/verify_candidate_cities.mjs。"
+  "_所在地の検査": "cityCheck は国土地理院の逆ジオコーダで、座標が実際にどの市区町村の中にあるかを確かめた結果。行政界そのもので判定しているので、役場の代表点からの距離より確か。取り直しは scripts/stars/verify_candidate_cities.mjs。",
+  "_座標": "coordVerified が true のものは、公式情報から座標を確定したもの。expectedMuniCd は公式所在地から導いた期待値で、API の応答ではない。実際の照合結果は cityCheck に入る(verify_candidate_cities.mjs)。"
 }

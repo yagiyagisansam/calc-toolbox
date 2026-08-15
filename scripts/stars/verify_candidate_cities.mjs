@@ -126,6 +126,36 @@ for (const s of data.spots) {
   await new Promise((r) => setTimeout(r, 1000));
 }
 
+/*
+ * 期待していた市区町村コードと、実際の応答が食い違ったら止める。
+ *
+ * 独立検証3が公式情報から導いた expectedMuniCd は「こうなるはず」であって、
+ * API の応答ではない。食い違ったときに黙って応答のほうへ書き換えると、
+ * 「公式の所在地と、座標が指す場所が違う」という肝心の事実が消える。
+ * どちらが誤りかは人が決めるので、ここでは止めて見せるだけにする。
+ */
+{
+  const conflicts = [];
+  for (const s of data.spots) {
+    if (!s.expectedMuniCd || !s.cityCheck) continue;
+    const got = String(s.cityCheck.muniCd || "").replace(/^0+/, "");
+    const want = String(s.expectedMuniCd).replace(/^0+/, "");
+    if (got !== want) {
+      conflicts.push(
+        `${s.pref} ${s.name}: 期待 ${s.expectedMuniCd} / 応答 ${s.cityCheck.muniCd || "(なし)"}` +
+          `(${s.cityCheck.pref || "?"}${s.cityCheck.city || ""})`
+      );
+    }
+  }
+  if (conflicts.length) {
+    writeFileSync(FILE, JSON.stringify(data, null, 2) + "\n");
+    console.error("\n期待した市区町村コードと応答が食い違いました。自動では直しません:");
+    for (const c of conflicts) console.error("  ・" + c);
+    console.error("\n公式の所在地と座標のどちらが誤りかを人が決めてください。");
+    process.exit(1);
+  }
+}
+
 data._所在地の検査 =
   "cityCheck は国土地理院の逆ジオコーダで、座標が実際にどの市区町村の中にあるかを" +
   "確かめた結果。行政界そのもので判定しているので、役場の代表点からの距離より確か。" +
