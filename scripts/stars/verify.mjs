@@ -808,7 +808,11 @@ try {
       name: stub.name,
       href: href,
       score: (joined.match(/([\d.]+)点/) || [])[1],
-      at: (joined.match(/(\d{2}:\d{2})/) || [])[1]
+      at: (joined.match(/(\d{2}:\d{2})/) || [])[1],
+      // 「良い条件が N 時間続く」か「良い条件の時間なし」。後者は 0 とみなす
+      run: /良い条件の時間なし/.test(joined)
+        ? 0
+        : Number((joined.match(/良い条件が(\d+)時間続く/) || [])[1])
     });
   }
   const listBest = listBests.find((b) => b.name === "乗鞍畳平") || null;
@@ -1120,6 +1124,20 @@ try {
   );
 
   /*
+   * 良い条件が続く長さ。最高点だけだと「1時間だけ晴れる夜」と
+   * 「一晩中晴れる夜」が同じに見えるので、続き具合も出している。
+   * 一覧と詳細で別々に数えているので、食い違わないことを見る。
+   */
+  {
+    const good = listBests.filter((b) => Number.isFinite(b.run));
+    check(
+      "良い条件が続く時間が全スポットの一覧に出る",
+      good.length === listBests.length,
+      listBests.map((b) => `${b.name}:${b.run}`).join(" / ")
+    );
+  }
+
+  /*
    * 全スポットで一致するか。一覧が出したリンクをそのまま辿る。
    *
    * 一覧と詳細が別々に「今夜がどの日か」を判定していたころは、日付の変わり目に
@@ -1137,13 +1155,19 @@ try {
         .waitForFunction(() => window.StarsSpot && window.StarsSpot.state.ready, { timeout: 30000 })
         .catch(() => {});
       const score = (await page.locator("#best-score").textContent()).trim();
-      const at = ((await page.locator("#best-at").textContent()).match(/(\d{2}:\d{2})/) || [])[1];
+      const atText = await page.locator("#best-at").textContent();
+      const at = (atText.match(/(\d{2}:\d{2})/) || [])[1];
+      // 続く時間。詳細は 0 のとき何も書かないので、書いていなければ 0 とみなす
+      const run = Number((atText.match(/連続で\s*(\d+)\s*時間/) || [])[1] || 0);
       if (at !== b.at || !score.startsWith(b.score)) {
         mismatched.push(`${b.name}: 一覧 ${b.at} ${b.score}点 / 詳細 ${at} ${score}`);
       }
+      if (run !== b.run) {
+        mismatched.push(`${b.name}: 続く時間が 一覧 ${b.run} / 詳細 ${run}`);
+      }
     }
     check(
-      `一覧と詳細が全スポットで一致する (${listBests.length}件)`,
+      `一覧と詳細が全スポットで一致する (${listBests.length}件・点数と続く時間)`,
       mismatched.length === 0,
       mismatched.join(" / ") || "全件一致"
     );

@@ -85,9 +85,19 @@
 
   // ---- スコアの計算 -------------------------------------------------------
 
+  /*
+   * 「良い」の境目。ここ以上の時間がどれだけ続くかを、続き具合の目安にする。
+   * 独自の数字を持ち出さず、画面に出ている段階の区切りをそのまま使う。
+   */
+  var GOOD_MIN = 65;
+
   /**
    * 1スポットぶんの予報から、今夜のうち最も条件がよい時刻を選ぶ。
    * その地点で空が充分に暗い時間帯だけを対象にする(全国の時間帯ではなく)。
+   *
+   * 最高点だけでなく、良い条件が何時間続くかも返す。
+   * 1時間だけ晴れる夜と、一晩中晴れる夜が、最高点だけでは同じに見える。
+   * 出かけるかどうかを決めるのに、続き具合は点数と同じくらい効く。
    */
   function bestOfNight(spot, grid) {
     var lat = Number(spot.lat);
@@ -98,6 +108,10 @@
     var series = Net.gridSeries(grid, lat, lon);
 
     var best = null;
+    var goodHours = 0; // 「良い」以上の時刻の数
+    var run = 0; // いま続いている良い時刻の数
+    var longestRun = 0; // 続いた中でいちばん長いもの
+
     for (var i = 0; i < series.times.length; i++) {
       var when = new Date(series.times[i] * 1000);
       // その地点で暗くない時刻は候補から外す
@@ -112,7 +126,20 @@
         moonBrightness: Sky.brightness(when, lat, lon)
       });
       // 予報が欠けている時刻はベストの候補にしない(0点でも満点でもなく「無い」)
-      if (!result) continue;
+      if (!result) {
+        // 欠測は「良くない」ではなく「分からない」。続きはここで切る
+        run = 0;
+        continue;
+      }
+
+      if (result.score >= GOOD_MIN) {
+        goodHours++;
+        run++;
+        if (run > longestRun) longestRun = run;
+      } else {
+        run = 0;
+      }
+
       if (!best || result.score > best.score) {
         best = {
           score: result.score,
@@ -122,6 +149,11 @@
           darkness: result.darkness
         };
       }
+    }
+
+    if (best) {
+      best.goodHours = goodHours;
+      best.longestRunHours = longestRun;
     }
     return best;
   }
@@ -702,7 +734,25 @@
       }
       tr.appendChild(tdScore);
 
-      tr.appendChild(cell(spot.best ? jstTime(spot.best.at) : "—"));
+      /*
+       * ベスト時刻と、良い条件が続く長さ。
+       * 最高点だけだと「1時間だけ晴れる夜」と「一晩中晴れる夜」が同じに見える。
+       */
+      var tdWhen = document.createElement("td");
+      if (spot.best) {
+        tdWhen.appendChild(document.createTextNode(jstTime(spot.best.at)));
+        var run = document.createElement("span");
+        run.className = "stars-cell-sub";
+        run.textContent =
+          spot.best.longestRunHours > 0
+            ? "良い条件が" + spot.best.longestRunHours + "時間続く"
+            : "良い条件の時間なし";
+        tdWhen.appendChild(run);
+      } else {
+        tdWhen.textContent = "—";
+      }
+      tr.appendChild(tdWhen);
+
       tr.appendChild(cell(spot.best ? Math.round(spot.best.cloud) + "%" : "—"));
       tr.appendChild(cell(spot.best ? Math.round(spot.best.darkness * 100) + "%" : "—"));
       tr.appendChild(cell(spot.elevation_m ? spot.elevation_m + "m" : "—"));
