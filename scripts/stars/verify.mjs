@@ -758,6 +758,74 @@ try {
 
   const darkness = await page.locator("#pick-darkness").textContent();
   check("選んだ地点の暗さの目安が出る", /空の暗さ/.test(darkness), darkness);
+
+  /*
+   * 地図も枠(pick.html)の中で動くこと。
+   * MapLibre をこの画面に置くと Trusted Types を強制できない。
+   * 申請フォームは利用者の入力をそのまま扱う画面なので、そこは落とせない。
+   */
+  {
+    const hasFrame = await page
+      .frameLocator("#pick-map iframe")
+      .locator("#pick-map canvas")
+      .first()
+      .waitFor({ timeout: 20000 })
+      .then(() => true)
+      .catch(() => false);
+    check("申請の地図が枠の中で出る", hasFrame, String(hasFrame));
+
+    const tt = await page.evaluate(() => {
+      try {
+        document.createElement("div").innerHTML = "<b>試し</b>";
+        return false;
+      } catch (e) {
+        return true;
+      }
+    });
+    check("申請でも Trusted Types が効いている", tt, tt ? "" : "止まらずに書けてしまった");
+
+    const leaked = await page.evaluate(() => typeof window.maplibregl !== "undefined");
+    check("地図が申請の文書に入り込んでいない", !leaked, `maplibregl=${leaked}`);
+
+    // こちらで決めた場所に、枠の中の印が合っていること
+    const inner = page.frames().find((f) => f.url().includes("pick.html"));
+    const markAt = await inner.evaluate(() => {
+      const m = window.StarsPick.marker();
+      if (!m || !m._map) return null;
+      const p = m.getLngLat();
+      return { lat: p.lat, lon: p.lng };
+    });
+    check(
+      "枠の中の印がこちらの選んだ場所に合う",
+      markAt && Math.abs(markAt.lat - 36.12) < 0.001 && Math.abs(markAt.lon - 137.55) < 0.001,
+      markAt ? `${markAt.lat}, ${markAt.lon}` : "印が無い"
+    );
+
+    /*
+     * 印を範囲外へドラッグされた場合。
+     * 枠の中は良し悪しを決めないので、いったん海の向こうまで動く。
+     * こちらが断ったら、印を「いま受け付けている場所」へ戻すこと ──
+     * 戻さないと、印だけが範囲外に残って画面と申請内容が食い違う。
+     */
+    await inner.evaluate(() => {
+      const m = window.StarsPick.marker();
+      m.setLngLat([2.35, 48.9]); // パリ
+      m.fire("dragend");
+    });
+    await page.waitForTimeout(400);
+    const afterDrag = await inner.evaluate(() => {
+      const p = window.StarsPick.marker().getLngLat();
+      return { lat: p.lat, lon: p.lng };
+    });
+    const dragMsg = await page.locator("#submit-message").textContent();
+    check(
+      "範囲外へドラッグされたら印を戻す",
+      /日本国内/.test(dragMsg) && Math.abs(afterDrag.lat - 36.12) < 0.001,
+      `${dragMsg} / 印 ${afterDrag.lat}, ${afterDrag.lon}`
+    );
+    const readoutAfter = await page.locator("#pick-readout").textContent();
+    check("範囲外へドラッグされても座標欄は変わらない", /36\.12/.test(readoutAfter), readoutAfter);
+  }
   await capture("submit");
 
   // 範囲外は受け付けない

@@ -3,11 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org; connect-src 'self' https://tiles.openfreemap.org https://ssxskriqlaiohdutxprn.supabase.co; worker-src 'self' blob:; font-src 'self'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'">
+  <!--
+    地図は別のページ(pick.html)を枠で読み込む。MapLibre をここに置くと
+    Trusted Types を強制できない。申請フォームは利用者の入力をそのまま扱う
+    画面なので、地図の都合で守りを下げたくない。
+  -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://ssxskriqlaiohdutxprn.supabase.co; font-src 'self'; base-uri 'none'; form-action 'none'; frame-src 'self'; object-src 'none'; require-trusted-types-for 'script'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>星見スポットを申請する | 今夜のオススメ星見スポット</title>
   <meta name="description" content="おすすめの星見スポットを登録申請できます。ログインは不要です。地図で場所を選んで送信すると、管理者が内容を確認したうえで掲載します。">
-  <link rel="stylesheet" href="./vendor/maplibre-gl.css">
   <link rel="stylesheet" href="./stars.css">
   <!-- @meta start -->
   <link rel="canonical" href="https://quick-calc.site/stars/submit.html">
@@ -129,7 +133,6 @@
 </footer>
 
 <script src="./guard.js"></script>
-<script src="./vendor/maplibre-gl-csp.js"></script>
 <script src="../tools/poll/config.js"></script>
 <script src="./config.js"></script>
 <script src="./palette.js"></script>

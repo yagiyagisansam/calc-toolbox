@@ -22,8 +22,8 @@
   var SUBMITTED_KEY = "stars:submitted";
 
   var picked = null; // {lat, lon}
-  var marker = null;
-  var map = null;
+  var frame = null; // 地図を入れている枠(pick.html)
+  var frameReady = false;
 
   function el(id) {
     return document.getElementById(id);
@@ -61,74 +61,96 @@
 
   // ---- 地図で地点を選ぶ ---------------------------------------------------
 
+  /*
+   * 地図を枠(pick.html)に読み込む。
+   *
+   * 地図そのものを別のページに置いているのは、MapLibre が中で DOM への
+   * 文字列の書き込みを行うため。同居させるとこの画面で Trusted Types を
+   * 強制できない。申請フォームは利用者の入力をそのまま扱う画面なので、
+   * 地図の都合で守りを下げたくない。
+   *
+   * 場所が日本の範囲に入っているかの判断は、これまでどおりこちら側で行う。
+   * 枠の中は「タップされた」「印を動かされた」を伝えるだけで、
+   * 良し悪しは決めない。
+   */
   function setupMap() {
-    map = new maplibregl.Map({
-      container: "pick-map",
-      style: {
-        version: 8,
-        sources: {},
-        layers: [
-          { id: "background", type: "background", paint: { "background-color": "#0c0c0c" } }
-        ]
-      },
-      center: CONFIG.map.center,
-      zoom: 4.2,
-      minZoom: 3,
-      maxZoom: 16,
-      attributionControl: false,
-      pitchWithRotate: false,
-      dragRotate: false,
-      touchPitch: false,
-      maxPitch: 0
-    });
-    map.touchZoomRotate.disableRotation();
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
-    map.addControl(
-      new maplibregl.AttributionControl({ compact: true }),
-      "bottom-left"
-    );
+    var slot = el("pick-map");
+    if (!slot) return;
 
-    // 下地は後追いで読み込む(届かなくても地点選択はできる)
-    map.on("load", function () {
-      fetch(CONFIG.map.styleUrl)
-        .then(function (r) {
-          if (!r.ok) throw new Error("style");
-          return r.json();
-        })
-        .then(function (style) {
-          map.setStyle(style);
-        })
-        .catch(function () {
-          /* 下地なしのまま使う */
-        });
+    global.addEventListener("message", function (e) {
+      if (!frame || e.source !== frame.contentWindow) return;
+      if (e.origin !== global.location.origin) return;
+      var data = e.data;
+      if (!data) return;
+
+      if (data.type === "stars-pick:ready") {
+        frameReady = true;
+        frame.contentWindow.postMessage(
+          {
+            type: "stars-pick:init",
+            origin: picked,
+            zoom: 4.2,
+            minZoom: 3,
+            maxZoom: 16,
+            draggable: true
+          },
+          global.location.origin
+        );
+        return;
+      }
+
+      if (data.type === "stars-pick:picked") {
+        pick(data.lat, data.lon, data.from);
+      }
     });
 
-    map.on("click", function (e) {
-      pick(e.lngLat.lat, e.lngLat.lng);
-    });
+    frame = document.createElement("iframe");
+    frame.src = "./pick.html";
+    frame.title = "地図で場所を選ぶ";
+    frame.className = "stars-pickmap-frame";
+    /*
+     * 同じサイトの中の枠なので allow-same-origin は要る(地図の worker が
+     * 同一生成元でないと動かない)。それ以外は許さない ──
+     * 画面の乗っ取り(top への移動)、別窓、フォームの送信を止める。
+     */
+    frame.setAttribute("sandbox", "allow-scripts allow-same-origin");
+    frame.setAttribute("referrerpolicy", "same-origin");
+    slot.appendChild(frame);
   }
 
-  function pick(lat, lon) {
+  /** 枠の中の印を、こちらが決めた場所へ合わせる */
+  function syncMarker() {
+    if (!frame || !frameReady) return;
+    frame.contentWindow.postMessage(
+      picked
+        ? { type: "stars-pick:mark", lat: picked.lat, lon: picked.lon }
+        : { type: "stars-pick:unmark" },
+      global.location.origin
+    );
+  }
+
+  /**
+   * 場所を決める。日本の範囲の外なら受け付けない。
+   *
+   * 範囲外だったときは、枠の中の印を「いま受け付けている場所」へ戻す。
+   * 戻さないと、印だけが範囲外に残り、画面と実際の申請内容が食い違う
+   * (印をドラッグで海の向こうへ持って行かれた場合がこれにあたる)。
+   *
+   * @param {number} lat
+   * @param {number} lon
+   * @param {string} [from] "click" か "drag"。枠の中から来たときだけ入る
+   */
+  function pick(lat, lon, from) {
     var b = CONFIG.submitBounds;
     if (lat < b.south || lat > b.north || lon < b.west || lon > b.east) {
       showMessage("いまは日本国内のスポットだけを受け付けています。", true);
+      if (from) syncMarker();
       return;
     }
     picked = { lat: Math.round(lat * 1e5) / 1e5, lon: Math.round(lon * 1e5) / 1e5 };
 
-    if (!marker) {
-      var pin = document.createElement("div");
-      pin.className = "stars-pin";
-      marker = new maplibregl.Marker({ element: pin, draggable: true })
-        .setLngLat([picked.lon, picked.lat])
-        .addTo(map);
-      marker.on("dragend", function () {
-        var p = marker.getLngLat();
-        pick(p.lat, p.lng);
-      });
-    } else {
-      marker.setLngLat([picked.lon, picked.lat]);
-    }
+    // 枠の外(検証や現在地)から呼ばれたときは、枠の中の印も合わせる
+    if (!from) syncMarker();
 
     el("pick-readout").textContent =
       "北緯 " + picked.lat.toFixed(5) + " / 東経 " + picked.lon.toFixed(5);
@@ -302,12 +324,6 @@
   // ---- 起動 ---------------------------------------------------------------
 
   function start() {
-    if (!global.maplibregl) {
-      showMessage("地図を読み込めませんでした。ページを再読み込みしてください。", true);
-      return;
-    }
-    global.maplibregl.setWorkerUrl("./vendor/maplibre-gl-csp-worker.js");
-
     setupMap();
     fillPrefectures().catch(function () {
       showMessage("都道府県の一覧を読み込めませんでした。ページを再読み込みしてください。", true);
