@@ -8,8 +8,17 @@
  * なぜ別のページなのか:
  *   MapLibre は中で DOM への文字列の書き込みを行うため、
  *   Trusted Types を強制している文書とは同居できない。
- *   地図をここへ閉じ込めることで、呼ぶ側は
+ *   地図をこの1枚に寄せることで、呼ぶ側の文書は
  *   require-trusted-types-for 'script' を保てる。
+ *
+ * これはセキュリティ境界ではない:
+ *   枠には allow-same-origin が要る(地図の worker が同一生成元でないと動かない)。
+ *   同一生成元である以上、この文書は window.parent.document へ直に触れるし、
+ *   親にある枠の sandbox 属性を外して読み直すこともできる。
+ *   つまり、この文書が乗っ取られた場合に親を守る壁にはならない。
+ *   得られているのは「MapLibre の通常の DOM 書き込みを親の文書から外す」ことだけで、
+ *   侵害時の隔離ではない。下の postMessage の検査も、通常のメッセージの
+ *   取り違えを防ぐためのもので、乗っ取られた同一生成元の子には効かない。
  *
  * 親とのやりとり:
  *   親 → ここ  init   { origin: {lat,lon}|null, zoom, minZoom, maxZoom, draggable }
@@ -34,6 +43,23 @@
   function send(message) {
     // 相手は自分と同じ生成元(同じサイト)にしか送らない
     global.parent.postMessage(message, global.location.origin);
+  }
+
+  /*
+   * 受け取った緯度経度が数として成り立っているか。
+   *
+   * NaN はどの大小比較も false を返すので、範囲の検査をすり抜けて
+   * そのまま地図へ渡り、MapLibre の中で落ちる。
+   * これは乗っ取られた同一生成元の子への壁ではなく、
+   * 壊れた知らせを受け取ったときの取り決めとして置いている。
+   */
+  function isPoint(lat, lon) {
+    return (
+      Number.isFinite(lat) &&
+      Number.isFinite(lon) &&
+      lat >= -90 && lat <= 90 &&
+      lon >= -180 && lon <= 180
+    );
   }
 
   /*
@@ -74,7 +100,10 @@
 
   function start(options) {
     var opts = options || {};
-    var origin = opts.origin && isFinite(opts.origin.lat) ? opts.origin : null;
+    var origin =
+      opts.origin && isPoint(Number(opts.origin.lat), Number(opts.origin.lon))
+        ? opts.origin
+        : null;
 
     if (map) {
       if (origin) {
@@ -137,7 +166,7 @@
     if (q.get("view") !== "1") return false;
     var lat = Number(q.get("lat"));
     var lon = Number(q.get("lon"));
-    if (!isFinite(lat) || !isFinite(lon)) return false;
+    if (!isPoint(lat, lon)) return false;
     var zoom = Number(q.get("zoom"));
     start({ origin: { lat: lat, lon: lon }, zoom: isFinite(zoom) && zoom > 0 ? zoom : 10 });
     // 見せるだけなので、タップしても親へは何も送らない
@@ -153,8 +182,8 @@
     if (!data) return;
     if (data.type === "stars-pick:init") {
       start(data);
-    } else if (data.type === "stars-pick:mark" && map && isFinite(data.lat)) {
-      place(data.lat, data.lon);
+    } else if (data.type === "stars-pick:mark" && map && isPoint(Number(data.lat), Number(data.lon))) {
+      place(Number(data.lat), Number(data.lon));
     } else if (data.type === "stars-pick:unmark") {
       unplace();
     }

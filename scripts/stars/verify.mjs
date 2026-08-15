@@ -834,6 +834,28 @@ try {
   const outMsg = await page.locator("#submit-message").textContent();
   check("日本の範囲外は断る", /日本国内/.test(outMsg), outMsg);
 
+  /*
+   * 数として成り立たない場所。
+   * NaN はどの大小比較も false を返すので、範囲の検査を素通りして
+   * そのまま picked に入り、送信するまで誰も気づかなかった。
+   */
+  for (const [lat, lon, label] of [
+    [NaN, 137.55, "緯度がNaN"],
+    [36.12, NaN, "経度がNaN"],
+    [Infinity, 137.55, "緯度が無限大"]
+  ]) {
+    await page.evaluate(() => window.StarsSubmit.pick(36.12, 137.55)); // いったん正しい場所へ
+    await page.evaluate(([a, b]) => window.StarsSubmit.pick(a, b), [lat, lon]);
+    await page.waitForTimeout(150);
+    const msg = await page.locator("#submit-message").textContent();
+    const readout = await page.locator("#pick-readout").textContent();
+    check(
+      `${label} は受け付けない`,
+      /読み取れませんでした/.test(msg) && /36\.12/.test(readout),
+      `${msg} / ${readout}`
+    );
+  }
+
   // 名前が無いまま送ると教えてくれる
   await page.evaluate(() => window.StarsSubmit.pick(36.12, 137.55));
   await page.locator("#submit-button").click();

@@ -210,7 +210,8 @@
    * @param {string} label 画面に出す名前(「秩父市」「地図で指定した場所」など)
    */
   function setOrigin(point, label) {
-    if (!point || !isFinite(point.lat) || !isFinite(point.lon)) return;
+    if (!point || !Number.isFinite(point.lat) || !Number.isFinite(point.lon)) return;
+    if (point.lat < -90 || point.lat > 90 || point.lon < -180 || point.lon > 180) return;
     state.origin = { lat: point.lat, lon: point.lon, label: label || "指定した場所" };
 
     var option = el("sort-near");
@@ -502,7 +503,11 @@
    * MapLibre は中で DOM への文字列の書き込みを行うので、Trusted Types を
    * 強制している文書には同居できない。以前は地図を直に置いた代わりに
    * このページから require-trusted-types-for 'script' を外していた。
-   * 地図を別の1枚に閉じ込めれば、一覧のほうは強制したまま保てる。
+   * 地図を別の1枚へ寄せれば、一覧のほうは強制したまま保てる。
+   *
+   * これは依存コードの整理であって、セキュリティ境界ではない。
+   * 枠は同一生成元なので、中が乗っ取られれば親の DOM へ直に手が届く。
+   * 下の postMessage の検査も、通常のメッセージの取り違えを防ぐためのもの。
    *
    * 枠は押されたときに初めて作る(開かない人には読み込まない)。
    */
@@ -529,8 +534,12 @@
       }
 
       if (data.type === "stars-pick:picked") {
-        if (!isFinite(data.lat) || !isFinite(data.lon)) return;
-        var point = { lat: data.lat, lon: data.lon };
+        // NaN はどの大小比較も false を返すので、数として成り立つかを先に見る
+        var lat = Number(data.lat);
+        var lon = Number(data.lon);
+        if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+        if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return;
+        var point = { lat: lat, lon: lon };
         // 索引がまだ来ていなくても、待たせずに座標で決める(並べ替えは今すぐできる)
         setOrigin(point, describePoint(point));
         /*
@@ -572,9 +581,16 @@
       pickFrame.title = "地図で場所を選ぶ";
       pickFrame.className = "stars-pickmap-frame";
       /*
-       * 同じサイトの中の枠なので allow-same-origin は要る(地図の worker が
-       * 同一生成元でないと動かない)。それ以外は許さない ──
-       * 画面の乗っ取り(top への移動)、別窓、フォームの送信を止める。
+       * sandbox はセキュリティ境界ではない。
+       *
+       * allow-same-origin は外せない(地図の worker が同一生成元でないと動かない)。
+       * 同一生成元である以上、枠の中は window.parent.document へ直に触れるし、
+       * この sandbox 属性を外して読み直すこともできる。
+       * ここで止めているのは通常動作での top への移動・別窓・フォーム送信だけで、
+       * 枠の中が乗っ取られた場合の壁にはならない。
+       * 本当に分けるには、地図を別の生成元(サブドメイン等)から配ることになるが、
+       * GitHub Pages の1生成元では取れない。いまは
+       * 「MapLibre の DOM 書き込みを親の文書から外した」までの整理と位置づける。
        */
       pickFrame.setAttribute("sandbox", "allow-scripts allow-same-origin");
       pickFrame.setAttribute("referrerpolicy", "same-origin");
