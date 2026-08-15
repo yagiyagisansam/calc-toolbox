@@ -209,7 +209,17 @@
     var sortSelect = el("sort-select");
     if (sortSelect) sortSelect.value = "near";
 
-    if (marker) marker.setLngLat([state.origin.lon, state.origin.lat]);
+    /*
+     * 地図の枠が開いていれば、印も同じ場所へ動かす(地名検索で決めたときなど)。
+     * 送るのは mark(印だけ)。init を送ると、地図をタップするたびに
+     * 視界がそこへ寄り直してしまう。
+     */
+    if (pickFrame && pickReady) {
+      pickFrame.contentWindow.postMessage(
+        { type: "stars-pick:mark", lat: state.origin.lat, lon: state.origin.lon },
+        global.location.origin
+      );
+    }
     renderTable();
   }
 
@@ -413,63 +423,45 @@
 
   // ---- 地図で選ぶ ---------------------------------------------------------
 
-  var pickMap = null;
-  var marker = null;
+  var pickFrame = null;
+  var pickReady = false;
 
   /**
    * 地図をタップして基準点を置く。
-   * 地図は押されたときに初めて作る(開かない人には作らない)。
+   *
+   * 地図そのものは別のページ(pick.html)に置き、ここでは枠に読み込むだけにする。
+   * MapLibre は中で DOM への文字列の書き込みを行うので、Trusted Types を
+   * 強制している文書には同居できない。以前は地図を直に置いた代わりに
+   * このページから require-trusted-types-for 'script' を外していた。
+   * 地図を別の1枚に閉じ込めれば、一覧のほうは強制したまま保てる。
+   *
+   * 枠は押されたときに初めて作る(開かない人には読み込まない)。
    */
   function setupPickMap() {
     var button = el("pick-on-map");
     var wrap = el("pick-map-wrap");
-    if (!button || !wrap) return;
+    var slot = el("pick-map");
+    if (!button || !wrap || !slot) return;
 
-    button.addEventListener("click", function () {
-      var open = wrap.hidden;
-      wrap.hidden = !open;
-      button.textContent = open ? "地図を閉じる" : "地図で選ぶ";
-      // 地図で選んだ地点に名前をつけるのに索引が要る。開いた時点で取りに行く
-      if (open) ensureLoaded();
-      if (!open || pickMap) {
-        if (pickMap) pickMap.resize();
+    global.addEventListener("message", function (e) {
+      // 自分が作った枠から、同じ生成元で来たものだけを受ける
+      if (!pickFrame || e.source !== pickFrame.contentWindow) return;
+      if (e.origin !== global.location.origin) return;
+      var data = e.data;
+      if (!data) return;
+
+      if (data.type === "stars-pick:ready") {
+        pickReady = true;
+        pickFrame.contentWindow.postMessage(
+          { type: "stars-pick:init", origin: state.origin || null },
+          global.location.origin
+        );
         return;
       }
-      if (!global.maplibregl) {
-        setStatus("地図を読み込めませんでした。地名でお探しください。", true);
-        return;
-      }
 
-      global.maplibregl.setWorkerUrl("./vendor/maplibre-gl-csp-worker.js");
-      pickMap = new global.maplibregl.Map({
-        container: "pick-map",
-        // config.js の center は MapLibre と同じ [経度, 緯度] の順で持っている
-        style: CONFIG.map.styleUrl,
-        center: state.origin
-          ? [state.origin.lon, state.origin.lat]
-          : CONFIG.map.center,
-        zoom: state.origin ? 8 : 4,
-        attributionControl: { compact: true },
-        pitchWithRotate: false,
-        dragRotate: false,
-        touchPitch: false,
-        maxPitch: 0
-      });
-      pickMap.touchZoomRotate.disableRotation();
-      pickMap.addControl(new global.maplibregl.NavigationControl({ showCompass: false }), "top-right");
-
-      marker = new global.maplibregl.Marker({ color: "#fdd171" });
-      if (state.origin) marker.setLngLat([state.origin.lon, state.origin.lat]).addTo(pickMap);
-
-      pickMap.on("click", function (e) {
-        var point = { lat: e.lngLat.lat, lon: e.lngLat.lng };
-        /*
-         * 位置を決めてから地図に載せる。順番が逆だと、まだ基準点が無いときの
-         * 最初の1回で MapLibre が中を読みに行って落ちる
-         * (基準点がある状態で開くと marker に位置が入っているので気づけない)。
-         */
-        marker.setLngLat([point.lon, point.lat]);
-        if (!marker._map) marker.addTo(pickMap);
+      if (data.type === "stars-pick:picked") {
+        if (!isFinite(data.lat) || !isFinite(data.lon)) return;
+        var point = { lat: data.lat, lon: data.lon };
         // 索引がまだ来ていなくても、待たせずに座標で決める(並べ替えは今すぐできる)
         setOrigin(point, describePoint(point));
         /*
@@ -484,7 +476,43 @@
           if (label === state.origin.label) return;
           setOrigin(point, label);
         });
+      }
+    });
+
+    button.addEventListener("click", function () {
+      var open = wrap.hidden;
+      wrap.hidden = !open;
+      button.textContent = open ? "地図を閉じる" : "地図で選ぶ";
+      // 地図で選んだ地点に名前をつけるのに索引が要る。開いた時点で取りに行く
+      if (open) ensureLoaded();
+      if (!open) return;
+
+      if (pickFrame) {
+        // 開き直したときは、いまの基準点をもう一度渡す
+        if (pickReady) {
+          pickFrame.contentWindow.postMessage(
+            { type: "stars-pick:init", origin: state.origin || null },
+            global.location.origin
+          );
+        }
+        return;
+      }
+
+      pickFrame = document.createElement("iframe");
+      pickFrame.src = "./pick.html";
+      pickFrame.title = "地図で場所を選ぶ";
+      pickFrame.className = "stars-pickmap-frame";
+      /*
+       * 同じサイトの中の枠なので allow-same-origin は要る(地図の worker が
+       * 同一生成元でないと動かない)。それ以外は許さない ──
+       * 画面の乗っ取り(top への移動)、別窓、フォームの送信を止める。
+       */
+      pickFrame.setAttribute("sandbox", "allow-scripts allow-same-origin");
+      pickFrame.setAttribute("referrerpolicy", "same-origin");
+      pickFrame.addEventListener("error", function () {
+        setStatus("地図を読み込めませんでした。地名でお探しください。", true);
       });
+      slot.appendChild(pickFrame);
     });
   }
 
@@ -874,9 +902,9 @@
   global.StarsList = {
     state: state,
     bestOfNight: bestOfNight,
-    // 検証用。地図の click を人手でなぞるのに使う(検証環境にはタイルが来ない)
-    pickMap: function () {
-      return pickMap;
+    // 検証用。地図は枠の中(pick.html)にあるので、枠そのものを返す
+    pickFrame: function () {
+      return pickFrame;
     }
   };
 })(typeof window !== "undefined" ? window : globalThis);

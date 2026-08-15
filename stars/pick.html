@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!--
+    地点を選ぶためだけの小さなページ。一覧(list.html)から枠内に読み込んで使う。
+
+    なぜ別のページにするのか:
+      MapLibre は中で innerHTML などの DOM の書き込み口を使うので、
+      Trusted Types(script-src への文字列の混入をブラウザ側で禁じる仕組み)を
+      強制している文書には同居できない。一覧に地図を直に置いたとき、
+      そのために一覧から require-trusted-types-for を外していた。
+      守りを弱めた本人が「地図の生成を遅らせたから安全」と言っても意味がない。
+
+      地図をこの1枚に押し込め、一覧は Trusted Types を強制したまま保つ。
+      外へ出す口は「選んだ地点を親へ渡す」だけにしてある。
+
+    このページは単体で開いても意味がない(親から使われる前提)。
+  -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org; connect-src https://tiles.openfreemap.org; worker-src 'self' blob:; font-src 'self'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex">
+  <title>地図で場所を選ぶ | 今夜のオススメ星見スポット</title>
+  <link rel="stylesheet" href="./stars.css">
+  <link rel="stylesheet" href="./vendor/maplibre-gl.css">
+</head>
+<body class="stars-pickbody">
+<div id="pick-map" class="stars-pickmap-canvas"></div>
+<script src="./config.js"></script>
+<script src="./vendor/maplibre-gl-csp.js"></script>
+<script src="./pick.js"></script>
+</body>
+</html>

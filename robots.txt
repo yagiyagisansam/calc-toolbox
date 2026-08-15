@@ -2,6 +2,8 @@ User-agent: *
 Allow: /
 Disallow: /tools/*/test.html
 Disallow: /stars/test.html
+# 地図を枠で読み込むためだけのページ。単体では意味がない
+Disallow: /stars/pick.html
 Disallow: /lab/
 
 Sitemap: https://quick-calc.site/sitemap.xml

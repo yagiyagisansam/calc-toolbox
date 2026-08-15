@@ -968,11 +968,50 @@ try {
 
   // 地図で選ぶ(地図そのものはこの環境ではタイルが来ないが、開けることを見る)
   await page.getByRole("button", { name: "地図で選ぶ" }).click();
-  await page.waitForTimeout(600);
+  await page.waitForTimeout(1200);
   {
     const shown = await page.locator("#pick-map-wrap").isVisible();
-    const hasCanvas = await page.locator("#pick-map canvas").count();
-    check("地図で選ぶが開く", shown && hasCanvas > 0, `表示=${shown} / canvas=${hasCanvas}`);
+    const frame = page.frameLocator(".stars-pickmap-frame");
+    const hasCanvas = await frame
+      .locator("#pick-map canvas")
+      .first()
+      .waitFor({ timeout: 20000 })
+      .then(() => true)
+      .catch(() => false);
+    check("地図で選ぶが開く", shown && hasCanvas, `表示=${shown} / 枠の中の地図=${hasCanvas}`);
+    /*
+     * 地図が一覧の文書に入り込んでいないこと。
+     * 入り込むと Trusted Types を強制できなくなる(それで一度外していた)。
+     */
+    const leaked = await page.evaluate(() => ({
+      maplibre: typeof window.maplibregl !== "undefined",
+      canvasOutsideFrame: document.querySelectorAll("#pick-map > canvas").length
+    }));
+    check(
+      "地図が一覧の文書に入り込んでいない",
+      !leaked.maplibre && leaked.canvasOutsideFrame === 0,
+      `maplibregl=${leaked.maplibre} / 直置きcanvas=${leaked.canvasOutsideFrame}`
+    );
+
+    /*
+     * Trusted Types が本当に効いているか。
+     * meta タグに書いてあるだけでは分からないので、実際に禁じられた書き込みを
+     * 試して、ブラウザが止めることを見る。地図を分けた意味がここにある。
+     */
+    const tt = await page.evaluate(() => {
+      const div = document.createElement("div");
+      try {
+        div.innerHTML = "<b>試し書き</b>";
+        return { blocked: false, wrote: div.innerHTML };
+      } catch (e) {
+        return { blocked: true, name: e.name };
+      }
+    });
+    check(
+      "一覧では Trusted Types が効いている(innerHTML が止められる)",
+      tt.blocked,
+      tt.blocked ? tt.name : `止まらずに書けてしまった: ${tt.wrote}`
+    );
   }
   await capture("list-search");
   await page.getByRole("button", { name: "地図を閉じる" }).click();
@@ -1001,11 +1040,16 @@ try {
     check("開いただけでは地名の索引を読み込まない", touched === false, `読み込み済み=${touched}`);
   }
   await page.getByRole("button", { name: "地図で選ぶ" }).click();
-  await page.waitForTimeout(600);
-  await page.evaluate(() => {
+  await page.waitForTimeout(1200);
+  {
     // 地図の click を人手でなぞる(この環境ではタイルが来ないので座標で起こす)
-    window.StarsList.pickMap().fire("click", { lngLat: { lat: 35.44, lng: 137.68 } });
-  });
+    const frame = page.frameLocator(".stars-pickmap-frame");
+    await frame.locator("#pick-map canvas").first().waitFor({ timeout: 20000 });
+    const inner = page.frames().find((f) => f.url().includes("pick.html"));
+    await inner.evaluate(() => {
+      window.StarsPick.map().fire("click", { lngLat: { lat: 35.44, lng: 137.68 } });
+    });
+  }
   await page.waitForFunction(
     () => {
       const t = document.getElementById("origin-label");
@@ -1124,6 +1168,27 @@ try {
 
   const detailAccess = await page.locator("#detail-access").textContent();
   check("アクセス情報が出る", /シャトルバス/.test(detailAccess), detailAccess.slice(0, 30));
+
+  // 場所の地図も枠の中で動く(詳細ページも Trusted Types を強制したまま)
+  {
+    const hasFrame = await page
+      .frameLocator("#spot-map iframe")
+      .locator("#pick-map canvas")
+      .first()
+      .waitFor({ timeout: 20000 })
+      .then(() => true)
+      .catch(() => false);
+    check("場所の地図が枠の中で出る", hasFrame, String(hasFrame));
+    const tt = await page.evaluate(() => {
+      try {
+        document.createElement("div").innerHTML = "<b>試し</b>";
+        return false;
+      } catch (e) {
+        return true;
+      }
+    });
+    check("詳細でも Trusted Types が効いている", tt, tt ? "" : "止まらずに書けてしまった");
+  }
   await capture("spot");
 
   // 未登録の項目は「登録なし」と出す(空欄のままにしない)

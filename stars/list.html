@@ -3,7 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org; connect-src 'self' https://tiles.openfreemap.org https://ssxskriqlaiohdutxprn.supabase.co; worker-src 'self' blob:; font-src 'self'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'">
+  <!--
+    地図は別のページ(pick.html)に置き、ここでは枠に読み込むだけにしてある。
+    MapLibre を直に置いていたときは、そのために require-trusted-types-for を
+    外していた。地図を分けたので、この画面は強制したまま保てる。
+    地図タイルへの通信もこの画面には要らない(枠の中の話になる)。
+  -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://ssxskriqlaiohdutxprn.supabase.co; font-src 'self'; base-uri 'none'; form-action 'none'; frame-src 'self'; object-src 'none'; require-trusted-types-for 'script'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>星見スポットの地域別一覧 | 今夜のオススメ星見スポット</title>
   <meta name="description" content="掲載中の星見スポットを地方・都道府県別に一覧表示します。今夜の星見レベル、雲量、月の条件、標高を表で見比べられます。">
@@ -183,11 +189,9 @@
 <script src="./places.js"></script>
 <script src="./net.js"></script>
 <!--
-  地図は「地図で選ぶ」を押したときだけ使う。読み込み自体は先に済ませておく
-  (ボタンを押してから取りに行くと、待たされてから地図が出ることになる)。
+  MapLibre はここでは読み込まない。地図は pick.html の中で動く。
+  この画面に持ち込むと Trusted Types を強制できなくなる。
 -->
-<script src="./vendor/maplibre-gl-csp.js"></script>
-<link rel="stylesheet" href="./vendor/maplibre-gl.css">
 <script src="./list.js"></script>
 </body>
 </html>

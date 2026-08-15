@@ -733,6 +733,27 @@ textarea.stars-input {
   overflow: hidden;
 }
 
+/* 地図は別のページ(pick.html)を枠で読み込む。枠線は外側の器が持つ */
+.stars-pickmap-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* pick.html の本体。枠いっぱいに地図を敷く */
+.stars-pickbody {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.stars-pickbody .stars-pickmap-canvas {
+  height: 100vh;
+  border: 0;
+  border-radius: 0;
+}
+
 .stars-origin-current {
   margin: 8px 0 0;
   font-size: 13px;

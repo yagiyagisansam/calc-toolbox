@@ -232,50 +232,34 @@
     return td;
   }
 
+  /*
+   * 場所を地図で見せる。
+   *
+   * 地図そのものは別のページ(pick.html)で動かし、ここでは枠に読み込むだけ。
+   * MapLibre は中で DOM への文字列の書き込みを行うので、同居させると
+   * この画面で Trusted Types を強制できなくなる。見せるだけの地図のために
+   * 画面全体の守りを下げる理由はない。
+   *
+   * 渡すのは緯度・経度・拡大率だけ。向こうは数として読めなければ何もしない。
+   */
   function renderMap(spot) {
-    if (!global.maplibregl) return;
-    global.maplibregl.setWorkerUrl("./vendor/maplibre-gl-csp-worker.js");
     var box = el("spot-map");
+    if (!box) return;
+    var lat = Number(spot.lat);
+    var lon = Number(spot.lon);
+    if (!isFinite(lat) || !isFinite(lon)) return;
     box.hidden = false;
 
-    var map = new maplibregl.Map({
-      container: "spot-map",
-      style: {
-        version: 8,
-        sources: {},
-        layers: [{ id: "background", type: "background", paint: { "background-color": "#0c0c0c" } }]
-      },
-      center: [Number(spot.lon), Number(spot.lat)],
-      zoom: 10,
-      attributionControl: false,
-      pitchWithRotate: false,
-      dragRotate: false,
-      touchPitch: false,
-      maxPitch: 0
-    });
-    map.touchZoomRotate.disableRotation();
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
-    map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-left");
-
-    var pin = document.createElement("div");
-    pin.className = "stars-pin";
-    new maplibregl.Marker({ element: pin })
-      .setLngLat([Number(spot.lon), Number(spot.lat)])
-      .addTo(map);
-
-    map.on("load", function () {
-      fetch(CONFIG.map.styleUrl)
-        .then(function (r) {
-          if (!r.ok) throw new Error("style");
-          return r.json();
-        })
-        .then(function (style) {
-          map.setStyle(style);
-        })
-        .catch(function () {
-          /* 下地なしでも位置は分かる */
-        });
-    });
+    var frame = document.createElement("iframe");
+    frame.src =
+      "./pick.html?view=1&lat=" + encodeURIComponent(lat) +
+      "&lon=" + encodeURIComponent(lon) + "&zoom=10";
+    frame.title = spot.name + " の場所";
+    frame.className = "stars-pickmap-frame";
+    frame.setAttribute("sandbox", "allow-scripts allow-same-origin");
+    frame.setAttribute("referrerpolicy", "same-origin");
+    frame.setAttribute("loading", "lazy");
+    box.appendChild(frame);
   }
 
   // ---- 起動 ---------------------------------------------------------------
