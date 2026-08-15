@@ -52,6 +52,7 @@
     var d = window.CONTACT_TOOLS || {};
     if (cat === "calc") return d.calc || [];
     if (cat === "poll") return d.poll || [];
+    if (cat === "stars") return d.stars || [];
     return [];
   }
 
@@ -86,7 +87,7 @@
     var m = /[?&]tool=([a-z0-9-]{1,40})(&|$)/.exec(window.location.search);
     if (!m) return;
     var slug = m[1];
-    var cat = slug.indexOf("poll") === 0 ? "poll" : "calc";
+    var cat = slug.indexOf("poll") === 0 ? "poll" : slug.indexOf("stars") === 0 ? "stars" : "calc";
     var found = groupsFor(cat).some(function (g) {
       return g.items.some(function (it) { return it.v === slug; });
     });

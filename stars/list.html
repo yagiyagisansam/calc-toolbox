@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!--
+    地図は別のページ(pick.html)に置き、ここでは枠に読み込むだけにしてある。
+    MapLibre を直に置いていたときは、そのために require-trusted-types-for を
+    外していた。地図を分けたので、この画面は強制したまま保てる。
+    地図タイルへの通信もこの画面には要らない(枠の中の話になる)。
+  -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://ssxskriqlaiohdutxprn.supabase.co; font-src 'self'; base-uri 'none'; form-action 'none'; frame-src 'self'; object-src 'none'; require-trusted-types-for 'script'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>星見スポットの地域別一覧 | 今夜のオススメ星見スポット</title>
+  <meta name="description" content="掲載中の星見スポットを地方・都道府県別に一覧表示します。今夜の星見レベル、雲量、月の条件、標高を表で見比べられます。">
+  <link rel="stylesheet" href="./stars.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/stars/list.html">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230c0f1a'/%3E%3Cpath d='M16 6l2.6 6.6L25.5 14l-5.3 4.4 1.7 6.9L16 21.6l-5.9 3.7 1.7-6.9L6.5 14l6.9-1.4z' fill='%23fdd171'/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0c0c0c">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="星見スポットの地域別一覧">
+  <meta property="og:description" content="掲載中の星見スポットを地方・都道府県別に一覧表示します。">
+  <meta property="og:url" content="https://quick-calc.site/stars/list.html">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <!-- @meta end -->
+</head>
+<body class="stars-body stars-body--doc">
+
+<header class="stars-header">
+  <a class="stars-brand" href="./">
+    <span class="stars-brand-mark" aria-hidden="true">★</span>
+    <span>今夜の星見スポット</span>
+  </a>
+  <nav class="stars-nav">
+    <a href="./">地図</a>
+    <a href="./submit.html">スポットを申請</a>
+    <a href="./about.html">データについて</a>
+  </nav>
+</header>
+
+<main class="stars-doc">
+  <h1>星見スポットの地域別一覧</h1>
+  <p id="night-range" class="stars-lead">今夜の時間帯を計算しています…</p>
+
+  <!--
+    どこから探すかを決める欄。
+    地名を打つ・地図をタップする・現在地を使う、の3通りで「基準点」を置き、
+    そこから近い順に並べ替えられるようにする。
+  -->
+  <div class="stars-origin">
+    <label class="stars-label" for="place-search">地名・住所でさがす</label>
+    <div class="stars-search-row">
+      <input class="stars-input" id="place-search" type="search" autocomplete="off"
+             placeholder="例: 秩父市、奥多摩、あちむら" aria-describedby="place-help"
+             aria-controls="place-results" aria-expanded="false" role="combobox">
+      <button type="button" class="stars-button stars-button--sub" id="pick-on-map">地図で選ぶ</button>
+      <button type="button" class="stars-button stars-button--sub" id="use-here">現在地</button>
+    </div>
+    <p class="stars-help" id="place-help">
+      市区町村・山・湖・峠などから探せます。選ぶとそこから近い順に並びます。
+    </p>
+    <ul class="stars-suggest" id="place-results" role="listbox" hidden></ul>
+
+    <div class="stars-pickmap" id="pick-map-wrap" hidden>
+      <div id="pick-map" class="stars-pickmap-canvas"></div>
+      <p class="stars-help">地図をタップすると、その場所が基準点になります。</p>
+    </div>
+
+    <p class="stars-origin-current" id="origin-current" hidden>
+      <span id="origin-label"></span>
+      <button type="button" class="stars-linkbutton" id="origin-clear">解除</button>
+    </p>
+  </div>
+
+  <div class="stars-filters">
+    <div class="stars-tabs" id="region-tabs" role="group" aria-label="地方でしぼりこむ"></div>
+    <div class="stars-selects">
+      <div class="stars-sort">
+        <label for="pref-select">都道府県</label>
+        <select class="stars-input" id="pref-select">
+          <option value="">すべて</option>
+        </select>
+      </div>
+      <div class="stars-sort">
+        <label for="city-select">市区町村</label>
+        <select class="stars-input" id="city-select" disabled>
+          <option value="">すべて</option>
+        </select>
+      </div>
+      <div class="stars-sort">
+        <label for="sort-select">並び順</label>
+        <select class="stars-input" id="sort-select">
+          <option value="score">今夜の星見レベル順</option>
+          <option value="darkness">空の暗さ順</option>
+          <option value="near" id="sort-near" hidden>近い順</option>
+          <option value="name">名前順</option>
+          <option value="pref">都道府県順</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <p class="stars-here-row">
+    <span class="stars-help" id="here-note" hidden>距離は直線距離の目安です（道のりではありません）。</span>
+  </p>
+
+  <p id="status" class="stars-message" role="status">読み込んでいます…</p>
+
+  <div class="stars-table-wrap">
+    <table class="stars-table" id="spot-table" hidden>
+      <thead>
+        <tr>
+          <th scope="col">スポット</th>
+          <th scope="col">今夜の<br>星見レベル</th>
+          <th scope="col">ベスト時刻<br>と続き具合</th>
+          <th scope="col">雲量</th>
+          <th scope="col">空の<br>暗さ</th>
+          <th scope="col">標高</th>
+        </tr>
+      </thead>
+      <tbody id="spot-rows"></tbody>
+    </table>
+  </div>
+
+  <!-- JavaScript を使わない場合と検索エンジン向けの一覧。
+       scripts/stars/sync_spots.mjs が再生成する。手で編集しないこと。 -->
+  <!-- @spots start -->
+  <noscript>
+    <p>掲載中のスポット一覧を表示するには JavaScript を有効にしてください。</p>
+  </noscript>
+  <!-- @spots end -->
+
+  <h2>この表の見かた</h2>
+  <p>
+    「今夜の星見レベル」は、その場所の空の暗さ（光害）に、今夜の雲量・降水確率・視程・湿度・月の条件を
+    掛け合わせた 0〜100 の目安です。地図の色分けとまったく同じ計算で、こちらは
+    <strong>その地点で空が暗い時間帯のうち、最も条件のよい時刻</strong>を選んで表示しています。
+  </p>
+  <p>
+    「ベスト時刻」は、空が充分に暗い時間帯のうち最も条件がよい時刻です。
+    判定の作り方と限界は<a href="./about.html">データについて</a>をご覧ください。
+  </p>
+
+  <!--
+    お出かけ前の注意。
+    目立たせすぎず、しかし必ず目に入る位置に置く(表のすぐ下・閉じない)。
+    夜の屋外へ人を送り出すページなので、書かずに済ませてよい内容ではない。
+  -->
+  <h2 class="stars-care-title">お出かけ前に</h2>
+  <ul class="stars-care">
+    <li>掲載しているのは<strong>公共の場所</strong>です。私有地・農地・牧草地には立ち入らないでください。</li>
+    <li>夜間は静かに。<strong>エンジンのかけっぱなし、大きな音、ライトの向け方</strong>に気をつけてください。
+      近くに住んでいる方や、先に来ている方がいます。</li>
+    <li>星を見ている人の目は暗さに慣れています。<strong>白いライトを人や車の方へ向けない</strong>ようにしてください。</li>
+    <li>ごみは持ち帰り、来たときよりきれいにして帰りましょう。</li>
+    <li>山間部・海沿いは夏でも冷えます。<strong>防寒・照明・燃料</strong>は余裕をもって用意してください。</li>
+    <li>路面凍結、冬期の通行止め、野生動物との遭遇があります。<strong>現地の掲示や規制に必ず従ってください</strong>。</li>
+    <li>掲載内容は変わることがあります。<strong>駐車場の夜間の開放状況は現地の掲示が優先です。</strong></li>
+    <li>このページの情報は目安です。<strong>おでかけは自己責任でお願いします</strong>。
+      掲載内容にもとづく損害について、当サイトは責任を負いかねます。</li>
+  </ul>
+</main>
+
+<footer class="stars-footer">
+  <p>
+    天気: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Weather data by Open-Meteo.com</a>(CC BY 4.0、モデルは Open-Meteo の Best Match) /
+    光害: <a href="https://gibs.earthdata.nasa.gov/" target="_blank" rel="noopener noreferrer">NASA GIBS</a> VIIRS 夜間光 /
+    地名: <a href="https://www.geonames.org/" target="_blank" rel="noopener noreferrer">GeoNames geographical database</a> を抽出・変換
+    (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>) /
+    地図: <a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">OpenFreeMap</a>,
+    © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>
+  </p>
+  <p>
+    <a href="../">計算ツールボックス</a> ・ <a href="../contact.html?tool=stars">お問い合わせ</a>
+  </p>
+</footer>
+
+<script src="./guard.js"></script>
+<script src="../tools/poll/config.js"></script>
+<script src="./config.js"></script>
+<script src="./palette.js"></script>
+<script src="./moon-terms.js"></script>
+<script src="./sky.js"></script>
+<script src="./score.js"></script>
+<script src="./lp.js"></script>
+<script src="./here.js"></script>
+<script src="./places.js"></script>
+<script src="./net.js"></script>
+<!--
+  MapLibre はここでは読み込まない。地図は pick.html の中で動く。
+  この画面に持ち込むと Trusted Types を強制できなくなる。
+-->
+<script src="./list.js"></script>
+</body>
+</html>

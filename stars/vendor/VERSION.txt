@@ -1,0 +1,10 @@
+maplibre-gl 5.24.0
+BSD-3-Clause (LICENSE.txt を同梱)
+取り込み: node scripts/stars/copy_vendor.mjs
+更新日: 2026-08-12
+
+同梱ファイルの SHA-256(改ざんに後から気づくため。scripts/stars/copy_vendor.mjs で
+取り直したときは、npm の配布物と一致することを確かめたうえでここも更新する):
+a1f1847bac64aa00acbf80fbb79b2c5af24d8eecaaa5e2ad14080fab81f1de95  maplibre-gl-csp.js
+f950e7b15c49c8b9c7bb52136df2a2df2f6f03b83b8927774573fc98b067f7f0  maplibre-gl-csp-worker.js
+ab1e70d59ec40465bae7e7030da2f3ccf28133fd502e62bd598eefbadfd7a732  maplibre-gl.css

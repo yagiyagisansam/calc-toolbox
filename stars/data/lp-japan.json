@@ -1,0 +1,143 @@
+{
+  "layer": "VIIRS_SNPP_GapFilled_BRDF_Corrected_DayNightBand_Radiance",
+  "source": "NASA GIBS / VIIRS Suomi-NPP Gap-Filled BRDF-Corrected DayNightBand Radiance (Black Marble VNP46A2 相当)",
+  "sourceUrl": "https://gibs.earthdata.nasa.gov/",
+  "credit": "NASA Earth Observing System Data and Information System (EOSDIS) / GIBS",
+  "generatedAt": "2026-08-12T14:09:37.252Z",
+  "method": "新月前後の夜 16 枚の画素ごと中央値をとり、大気散乱((r²+h²)^-1.25 を多重ガウスで近似)で上空の明るさに変換したもの",
+  "caveat": "地形による遮蔽・大気の状態・光源の色は考慮していない。絶対的な空の明るさではなく比較用の相対指標である。",
+  "dates": [
+    "2026-08-09",
+    "2026-06-17",
+    "2026-06-16",
+    "2026-06-15",
+    "2026-05-19",
+    "2026-05-18",
+    "2026-05-17",
+    "2026-04-19",
+    "2026-04-18",
+    "2026-04-17",
+    "2026-03-21",
+    "2026-03-20",
+    "2026-03-19",
+    "2026-02-20",
+    "2026-02-19",
+    "2026-02-18"
+  ],
+  "bbox": {
+    "west": 122,
+    "south": 24,
+    "east": 154,
+    "north": 46
+  },
+  "width": 1200,
+  "height": 825,
+  "degPerPixel": {
+    "lon": 0.02666666666666667,
+    "lat": 0.02666666666666667
+  },
+  "kmPerPixel": 2.700106740936674,
+  "zeroLevel": 7,
+  "scatter": {
+    "scalesKm": [
+      3,
+      10,
+      30,
+      90,
+      250
+    ],
+    "scaleHeightKm": 10,
+    "localMix": 0.25,
+    "weights": [
+      0.07177387074099752,
+      0.259354212166332,
+      0.3079428505741823,
+      0.19988807096843736,
+      0.16104099555005102
+    ]
+  },
+  "encodingGamma": 2.5,
+  "calibration": {
+    "floor": 10,
+    "ceil": 255
+  },
+  "references": [
+    {
+      "name": "東京・新宿",
+      "lat": 35.69,
+      "lon": 139.7,
+      "value": 254,
+      "emission": 255
+    },
+    {
+      "name": "大阪・梅田",
+      "lat": 34.7,
+      "lon": 135.5,
+      "value": 244,
+      "emission": 255
+    },
+    {
+      "name": "山梨・甲府",
+      "lat": 35.66,
+      "lon": 138.57,
+      "value": 205,
+      "emission": 240
+    },
+    {
+      "name": "東京・奥多摩",
+      "lat": 35.81,
+      "lon": 139.1,
+      "value": 150,
+      "emission": 37
+    },
+    {
+      "name": "静岡・富士山頂",
+      "lat": 35.36,
+      "lon": 138.73,
+      "value": 125,
+      "emission": 13
+    },
+    {
+      "name": "長野・野辺山",
+      "lat": 35.94,
+      "lon": 138.48,
+      "value": 122,
+      "emission": 29
+    },
+    {
+      "name": "長野・上高地",
+      "lat": 36.25,
+      "lon": 137.63,
+      "value": 108,
+      "emission": 22
+    },
+    {
+      "name": "岐阜・乗鞍畳平",
+      "lat": 36.12,
+      "lon": 137.55,
+      "value": 105,
+      "emission": 19
+    },
+    {
+      "name": "沖縄・西表島",
+      "lat": 24.35,
+      "lon": 123.83,
+      "value": 34,
+      "emission": 7
+    },
+    {
+      "name": "小笠原・父島",
+      "lat": 27.09,
+      "lon": 142.19,
+      "value": 64,
+      "emission": 24
+    },
+    {
+      "name": "太平洋沖(参照の下限)",
+      "lat": 32,
+      "lon": 145,
+      "value": 13,
+      "emission": 7
+    }
+  ]
+}

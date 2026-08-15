@@ -15,9 +15,10 @@ const TOOLS = JSON.parse(dataSrc.slice(dataSrc.indexOf("= ") + 2).replace(/;\s*$
 const CAT_ORDER = ["健康", "お金", "日付", "変換"];
 const CAT_LABEL = { "健康": "健康・からだ", "お金": "お金", "日付": "日付・時間", "変換": "暮らし・変換" };
 
-// 「みんなの投票」は計算ツールではなく統計ツール側に置く
+// 「みんなの投票」「星見スポット」は計算ツールではなく、それぞれ別プロダクト側に置く
 const POLL_SLUG = "poll";
-const calcTools = TOOLS.filter((t) => t.slug !== POLL_SLUG);
+const STARS_SLUG = "stars";
+const calcTools = TOOLS.filter((t) => t.slug !== POLL_SLUG && t.slug !== STARS_SLUG);
 
 const calcGroups = CAT_ORDER.map((cat) => ({
   label: CAT_LABEL[cat] || cat,
@@ -38,10 +39,22 @@ const pollGroups = [{
   ],
 }];
 
+// 星見スポット側も、画面ごとの分かりやすい単位で分ける
+const starsGroups = [{
+  label: "今夜のオススメ星見スポット",
+  items: [
+    { v: "stars-map", n: "地図・色分けの表示" },
+    { v: "stars-list", n: "地域別の一覧・スポットの詳細" },
+    { v: "stars-submit", n: "スポットの申請" },
+    { v: "stars-data", n: "掲載内容の訂正・削除の依頼" },
+    { v: "stars", n: "その他(星見スポット全般)" },
+  ],
+}];
+
 const out =
   "// 自動生成: node scripts/build/build_contact_tools.mjs\n" +
   "// お問い合わせフォームの選択肢。ツールを追加したら再生成すること\n" +
-  "var CONTACT_TOOLS = " + JSON.stringify({ calc: calcGroups, poll: pollGroups }, null, 1) + ";\n";
+  "var CONTACT_TOOLS = " + JSON.stringify({ calc: calcGroups, poll: pollGroups, stars: starsGroups }, null, 1) + ";\n";
 
 writeFileSync(ROOT + "/shared/contact-tools.js", out, "utf8");
-console.log(`shared/contact-tools.js: 計算ツール${calcTools.length}件・みんなの投票${pollGroups[0].items.length}項目を生成しました`);
+console.log(`shared/contact-tools.js: 計算ツール${calcTools.length}件・みんなの投票${pollGroups[0].items.length}項目・星見スポット${starsGroups[0].items.length}項目を生成しました`);

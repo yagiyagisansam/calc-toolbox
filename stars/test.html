@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'; require-trusted-types-for 'script'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>テスト実行: stars | 計算ツールボックス(内部ページ)</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+<main>
+  <h1>ブラウザテスト実行: 星見スポット</h1>
+  <p>tests.json のテストケースをこのブラウザ上で実行します(内部検証用ページ。HTTPサーバー経由で開くこと)。</p>
+  <p id="summary">実行中…</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead><tr><th>結果</th><th>ケース</th><th>詳細</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+</main>
+<script src="./guard.js"></script>
+<script src="./score.js"></script>
+<script src="./moon-terms.js"></script>
+<script src="./sky.js"></script>
+<script src="./test.js"></script>
+</body>
+</html>

@@ -81,6 +81,8 @@
     .poll-card .pt b { display: block; font-size: 0.98rem; font-weight: 800; }
     .poll-card .pt small { display: block; font-size: 0.76rem; color: var(--tp-muted); margin-top: 2px; line-height: 1.5; }
     @media (prefers-color-scheme: dark) { .poll-card .pic { background: #3a2229; color: #ff8798; } }
+    .stars-card .pic { background: #dfe9fb; color: #1c5cab; }
+    @media (prefers-color-scheme: dark) { .stars-card .pic { background: #1b2740; color: #9ec5f4; } }
     .seo-list { margin-top: 34px; font-size: 0.85rem; }
     .seo-list summary { cursor: pointer; color: var(--tp-muted); font-weight: 600; }
     .seo-list h3 { font-size: 0.95rem; margin: 14px 0 4px; }
@@ -317,6 +319,14 @@
     </a>
   </div>
 
+  <div id="stars-sec">
+    <div class="tp-sec"><b>星空</b><span>計算ツールとは別のサイトです</span></div>
+    <a class="poll-card stars-card" id="stars-card" href="./stars/" data-kw="今夜のオススメ星見スポット(光害マップ×天気予報) 今夜どこへ行けば星が見えるかを、光害(空の暗さ)と雲量・月齢から日本全国の地図に色分け表示します。 星 星空 星見 天体観測 天の川 光害 暗い場所 雲量 月齢 スポット ほしぞら ほしみ てんたいかんそく あまのがわ こうがい">
+      <span class="pic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.2l2.1 5.3 5.7 .4-4.4 3.7 1.4 5.5L12 15.1 7.2 18.1l1.4-5.5-4.4-3.7 5.7-.4z"/><path d="M5.2 19.8h13.6"/><path d="M6.6 21.5h10.8"/></svg></span>
+      <span class="pt"><b>今夜のオススメ星見スポット</b><small>光害マップと天気予報を重ねて、今夜どこで星が見えるかを地図で色分け</small></span>
+    </a>
+  </div>
+
   <details class="seo-list">
     <summary>64ツールの説明つき一覧を開く</summary>
       <h3>健康</h3>
@@ -399,6 +409,10 @@
       <ul>
         <li><a href="./tools/poll/">みんなの投票(アンケート作成・リアルタイム集計)</a> — 質問と選択肢(最大10個)で投票ページのリンクを作成し、SNSで共有してみんなの回答をリアルタイム集計します。</li>
       </ul>
+      <h3>星空</h3>
+      <ul>
+        <li><a href="./stars/">今夜のオススメ星見スポット(光害マップ×天気予報)</a> — 今夜どこへ行けば星が見えるかを、光害(空の暗さ)と雲量・月齢から日本全国の地図に色分け表示します。</li>
+      </ul>
   </details>
 
   <div class="about">
@@ -440,6 +454,8 @@
   var index = tiles.map(function (t) { return norm(t.dataset.kw + " " + t.textContent); });
   var pollCard = document.getElementById("poll-card");
   var pollIndex = norm(pollCard.dataset.kw + " " + pollCard.textContent);
+  var starsCard = document.getElementById("stars-card");
+  var starsIndex = norm(starsCard.dataset.kw + " " + starsCard.textContent);
 
   // 人気: 全ユーザーの利用データに基づくランキング(RANK。週次で更新される)
   function renderPopular() {
@@ -491,6 +507,9 @@
     var pollHit = terms.length ? terms.every(function (w) { return pollIndex.indexOf(w) !== -1; }) : current === "all";
     document.getElementById("poll-sec").style.display = pollHit ? "" : "none";
     if (pollHit && terms.length) shown++;
+    var starsHit = terms.length ? terms.every(function (w) { return starsIndex.indexOf(w) !== -1; }) : current === "all";
+    document.getElementById("stars-sec").style.display = starsHit ? "" : "none";
+    if (starsHit && terms.length) shown++;
     var label = terms.length ? "検索結果" : (current === "all" ? "すべて" : CATS.filter(function (c) { return c[0] === current; })[0][1]);
     document.getElementById("genre-title").innerHTML = "<b>" + label + "</b><span>" + shown + "個</span>";
     document.getElementById("no-hit").hidden = shown > 0;

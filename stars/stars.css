@@ -1,0 +1,1210 @@
+/*
+ * 星見スポットの専用スタイル。
+ * 計算ツールの shared/style.css は使わない(別プロダクトのため)。
+ *
+ * 地図そのものは常に暗色にしている(palette.js の説明を参照)。
+ * ページの枠は端末のライト/ダーク設定に従う。
+ */
+
+:root {
+  /* 地図に重なるパネルは、地図と地続きに見えるよう常に暗色で描く */
+  --map-surface: #0c0c0c;
+  --panel-bg: rgba(16, 18, 24, 0.88);
+  /* 上のパネル色から透明度を抜いたもの。選択中のボタンの文字色に使う */
+  --panel-bg-solid: #10121a;
+  --panel-border: rgba(255, 255, 255, 0.14);
+  --panel-ink: #ffffff;
+  --panel-ink-2: #c3c2b7;
+  --panel-ink-3: #898781;
+
+  /* ページの枠(ヘッダー・フッター)はライト既定 */
+  --page-bg: #f9f9f7;
+  --page-ink: #0b0b0b;
+  --page-ink-2: #52514e;
+  --page-line: #e1e0d9;
+  --link: #1c5cab;
+
+  --radius: 10px;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page-bg: #0d0d0d;
+    --page-ink: #ffffff;
+    --page-ink-2: #c3c2b7;
+    --page-line: #2c2c2a;
+    --link: #86b6ef;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.stars-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: var(--page-bg);
+  color: var(--page-ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+}
+
+a {
+  color: var(--link);
+}
+
+/* ---- ヘッダー ---- */
+
+.stars-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--page-line);
+}
+
+.stars-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--page-ink);
+}
+
+.stars-brand-mark {
+  color: #e0a41a;
+}
+
+.stars-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-left: auto;
+  font-size: 14px;
+}
+
+/* ---- 地図 ---- */
+
+.stars-main {
+  position: relative;
+  flex: 1 1 auto;
+  /* 画面いっぱいに近い高さを確保しつつ、ヘッダー・フッターぶんを残す */
+  min-height: 68vh;
+  background: var(--map-surface);
+}
+
+.stars-map {
+  position: absolute;
+  inset: 0;
+}
+
+/* 地図に重なる部品の共通の見た目 */
+.stars-topbar,
+.stars-legend,
+.stars-spot-card,
+.stars-status {
+  position: absolute;
+  z-index: 2;
+  background: var(--panel-bg);
+  color: var(--panel-ink);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(6px);
+}
+
+.stars-topbar {
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  padding: 10px 12px;
+  max-width: 520px;
+}
+
+/* どの夜を見るか(今夜・明日・明後日) */
+.stars-day-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 8px;
+}
+
+.stars-day-tab {
+  flex: 0 0 auto;
+  padding: 4px 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--panel-ink-2);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.3;
+  cursor: pointer;
+}
+
+.stars-day-tab.is-on {
+  border-color: transparent;
+  background: var(--panel-ink);
+  color: var(--panel-bg-solid);
+  font-weight: 600;
+}
+
+.stars-night-range {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: var(--panel-ink-2);
+}
+
+.stars-time {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stars-time label {
+  font-size: 13px;
+  color: var(--panel-ink-2);
+}
+
+.stars-time input[type="range"] {
+  flex: 1 1 auto;
+  min-width: 0;
+  accent-color: #6da7ec;
+}
+
+.stars-time output {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.stars-moon {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--panel-ink-2);
+}
+
+.stars-status {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  padding: 10px 16px;
+  font-size: 14px;
+  max-width: 80%;
+  text-align: center;
+}
+
+.stars-basemap-note {
+  position: absolute;
+  z-index: 2;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  background: rgba(16, 18, 24, 0.9);
+  border: 1px solid var(--panel-border);
+  color: var(--panel-ink-2);
+  font-size: 12px;
+  transform: translateY(calc(100% + 8px));
+}
+
+.stars-weather-note {
+  position: absolute;
+  z-index: 2;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  background: rgba(16, 18, 24, 0.9);
+  border: 1px solid #eda100;
+  color: var(--panel-ink);
+  font-size: 12px;
+  transform: translateY(calc(100% + 8px));
+}
+
+.stars-status.is-error {
+  border-color: #d03b3b;
+}
+
+/* ---- 凡例 ---- */
+
+.stars-legend {
+  left: 10px;
+  bottom: 34px;
+  padding: 10px 12px;
+  max-width: 260px;
+  font-size: 13px;
+}
+
+.stars-legend h2 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--panel-ink-2);
+}
+
+/* 表示する項目の切り替え(総合・空の暗さ・天気) */
+.stars-layer-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 8px;
+}
+
+.stars-layer-tab {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 5px 4px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--panel-ink-2);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.2;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.stars-layer-tab.is-on {
+  border-color: transparent;
+  background: var(--panel-ink);
+  color: var(--panel-bg-solid);
+  font-weight: 600;
+}
+
+.stars-legend-hint {
+  margin: -2px 0 8px;
+  font-size: 11px;
+  color: var(--panel-ink-3);
+}
+
+.stars-layer-note {
+  margin: 6px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--panel-ink-3);
+}
+
+.legend-row {
+  display: grid;
+  grid-template-columns: 16px auto 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 1px 0;
+}
+
+.legend-chip {
+  width: 16px;
+  height: 12px;
+  border-radius: 3px;
+  /* 隣り合う色が地続きに見えないよう、地図色の細い縁を回す */
+  box-shadow: 0 0 0 1px var(--map-surface);
+}
+
+.legend-label {
+  white-space: nowrap;
+}
+
+.legend-note {
+  color: var(--panel-ink-3);
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stars-legend-more {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid var(--panel-border);
+}
+
+.stars-legend-more > summary {
+  font-size: 11px;
+  color: var(--panel-ink-3);
+  cursor: pointer;
+}
+
+.stars-opacity {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--panel-ink-2);
+}
+
+.stars-opacity input[type="range"] {
+  flex: 1 1 auto;
+  min-width: 0;
+  accent-color: #6da7ec;
+}
+
+.stars-spot-count {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--panel-ink-3);
+}
+
+/* ---- スポットのピンと詳細 ---- */
+
+.stars-pin {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 2px solid #0c0c0c;
+  border-radius: 50%;
+  /* 色分けが黄〜青紫まで回るので、ピンはその外側の白にする(どの段の上でも見える) */
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  position: relative;
+}
+
+.stars-pin-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: #0c0c0c;
+  color: #fff;
+  font-size: 11px;
+  line-height: 17px;
+  text-align: center;
+}
+
+.stars-spot-card {
+  right: 10px;
+  bottom: 34px;
+  left: 10px;
+  max-width: 340px;
+  margin-left: auto;
+  padding: 12px 14px;
+}
+
+.stars-spot-card h2 {
+  margin: 0 0 2px;
+  font-size: 16px;
+}
+
+.stars-spot-place {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: var(--panel-ink-3);
+}
+
+.stars-spot-score {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+
+.stars-spot-score strong {
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+}
+
+.stars-spot-note,
+.stars-spot-others {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: var(--panel-ink-2);
+}
+
+.stars-spot-link {
+  display: inline-block;
+  margin-top: 2px;
+  color: #9ec5f4;
+  font-size: 13px;
+}
+
+/* ---- フッター ---- */
+
+.stars-footer {
+  padding: 12px 14px 20px;
+  border-top: 1px solid var(--page-line);
+  font-size: 12px;
+  color: var(--page-ink-2);
+}
+
+.stars-footer p {
+  margin: 0 0 6px;
+}
+
+/* ---- 画面が狭いとき ---- */
+
+@media (max-width: 640px) {
+  .stars-main {
+    min-height: 74vh;
+  }
+
+  .stars-legend {
+    max-width: none;
+    /* 地図の操作ボタン(拡大縮小・現在地)は右下に積まれる。
+       凡例を画面の右端まで広げるとその上に覆いかぶさり、
+       現在地ボタンが押せなくなるので、その列ぶんを空けておく。 */
+    right: 58px;
+    bottom: 34px;
+  }
+
+  .stars-spot-card {
+    right: 58px;
+  }
+
+  /*
+   * 狭い画面では凡例を「6段階の帯」に組み替える。
+   * 縦に6行並べると凡例だけで200px近く使い、地図に残るのが画面の3分の1ほどになって
+   * 近畿から九州が凡例の裏に隠れてしまう。横一列なら同じ情報が3分の1の高さで収まる。
+   */
+  #legend-items {
+    display: flex;
+    gap: 2px;
+  }
+
+  .legend-row {
+    display: block;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0;
+    text-align: center;
+  }
+
+  .legend-chip {
+    display: block;
+    width: 100%;
+    height: 10px;
+    /* 帯としてつながって見えるよう、両端だけ角を丸め、縁は取る */
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .legend-row:first-child .legend-chip {
+    border-radius: 3px 0 0 3px;
+  }
+
+  .legend-row:last-child .legend-chip {
+    border-radius: 0 3px 3px 0;
+  }
+
+  .legend-label {
+    display: block;
+    margin-top: 3px;
+    font-size: 10px;
+  }
+
+  .legend-note {
+    display: none;
+  }
+
+  .stars-opacity {
+    margin-top: 6px;
+  }
+
+  .stars-spot-count {
+    margin-top: 6px;
+    font-size: 11px;
+  }
+
+  .stars-spot-card {
+    max-width: none;
+    margin-left: 0;
+  }
+
+  /* 凡例と詳細カードが重ならないよう、カードが出ているときは凡例を隠す */
+  .stars-spot-card:not([hidden]) ~ .stars-legend {
+    display: none;
+  }
+}
+
+/* MapLibre の帰属表示を暗色パネルに馴染ませる */
+.maplibregl-ctrl-attrib {
+  background: rgba(16, 18, 24, 0.8) !important;
+  color: var(--panel-ink-2) !important;
+  font-size: 11px;
+}
+
+.maplibregl-ctrl-attrib a {
+  color: var(--panel-ink-2) !important;
+}
+
+/* ---- 地図以外のページ(申請・一覧・詳細・説明) ---- */
+
+.stars-body--doc {
+  background: var(--page-bg);
+}
+
+.stars-doc {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 18px 14px 32px;
+}
+
+.stars-doc h1 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  line-height: 1.35;
+}
+
+.stars-doc h2 {
+  margin: 28px 0 8px;
+  font-size: 17px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--page-line);
+}
+
+.stars-doc h3 {
+  margin: 18px 0 6px;
+  font-size: 15px;
+}
+
+.stars-lead {
+  margin: 0 0 20px;
+  color: var(--page-ink-2);
+  font-size: 14px;
+}
+
+/* ---- フォーム ---- */
+
+.stars-form {
+  display: block;
+}
+
+.stars-field {
+  margin: 0 0 22px;
+  padding: 14px;
+  border: 1px solid var(--page-line);
+  border-radius: var(--radius);
+}
+
+.stars-field legend {
+  padding: 0 6px;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.stars-required {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #d03b3b;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.stars-label {
+  display: block;
+  margin: 14px 0 4px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.stars-input {
+  display: block;
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid var(--page-line);
+  border-radius: 8px;
+  background: var(--page-bg);
+  color: var(--page-ink);
+  /* iOS で入力欄にあわせて画面が拡大しないよう 16px を下回らせない */
+  font-size: 16px;
+  font-family: inherit;
+}
+
+.stars-input:focus {
+  outline: 2px solid #3987e5;
+  outline-offset: 1px;
+}
+
+textarea.stars-input {
+  resize: vertical;
+}
+
+.stars-help {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--page-ink-2);
+}
+
+/* ---- どこから探すか(一覧ページ) ---------------------------------------- */
+
+.stars-origin {
+  margin: 14px 0 10px;
+}
+
+.stars-search-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.stars-search-row .stars-input {
+  flex: 1 1 12em;
+  min-width: 0;
+}
+
+.stars-search-row .stars-button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+/* 検索候補。入力欄のすぐ下に重ならず続けて出す(スマホで指が届く位置) */
+.stars-suggest {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  border: 1px solid var(--page-line);
+  border-radius: 8px;
+  overflow: hidden;
+  max-height: 46vh;
+  overflow-y: auto;
+}
+
+.stars-suggest li + li {
+  border-top: 1px solid var(--page-line);
+}
+
+.stars-suggest-item {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  background: none;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  /* 指で押せる大きさを確保する */
+  min-height: 44px;
+}
+
+.stars-suggest-item:hover,
+.stars-suggest-item:focus-visible {
+  background: var(--page-bg-2, rgba(127, 127, 127, 0.12));
+}
+
+.stars-suggest-name {
+  display: block;
+  font-weight: 600;
+}
+
+.stars-suggest-sub {
+  display: block;
+  font-size: 12px;
+  color: var(--page-ink-2);
+}
+
+.stars-pickmap {
+  margin-top: 10px;
+}
+
+.stars-pickmap-canvas {
+  width: 100%;
+  height: 320px;
+  border: 1px solid var(--page-line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* 地図は別のページ(pick.html)を枠で読み込む。枠線は外側の器が持つ */
+.stars-pickmap-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* pick.html の本体。枠いっぱいに地図を敷く */
+.stars-pickbody {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.stars-pickbody .stars-pickmap-canvas {
+  height: 100vh;
+  border: 0;
+  border-radius: 0;
+}
+
+.stars-origin-current {
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+.stars-linkbutton {
+  border: 0;
+  background: none;
+  padding: 0 2px;
+  margin-left: 8px;
+  font: inherit;
+  font-size: 12px;
+  color: var(--page-link, #1a4fb4);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* 都道府県・市区町村・並び順。狭い画面では折り返す */
+.stars-selects {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+/*
+ * 3つの選択(都道府県・市区町村・並び順)。
+ * 横並びのままだとラベルが1文字ずつ縦に潰れ、選択肢が画面からはみ出す
+ * (iPhone 幅で実際にそうなった)。ラベルを上に置いて縦に組む。
+ */
+.stars-selects .stars-sort {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 3px;
+  flex: 1 1 9em;
+  min-width: 0;
+  margin-left: 0;
+}
+
+.stars-selects .stars-sort > label {
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.stars-selects .stars-sort .stars-input {
+  width: 100%;
+  min-width: 0;
+}
+
+/*
+ * お出かけ前の注意(一覧ページ)。
+ * 警告色で身構えさせるものではなく、読めば分かる程度の控えめな見た目にする。
+ * ただし畳んで隠すことはしない ── 開かなければ読めない注意は無いのと同じで、
+ * 夜の屋外へ人を送り出すページで省いてよい内容ではない。
+ */
+.stars-care-title {
+  margin-top: 22px;
+  font-size: 15px;
+}
+
+.stars-care {
+  margin: 8px 0 0;
+  padding: 12px 14px 12px 30px;
+  border: 1px solid var(--page-line);
+  border-radius: 8px;
+  background: var(--page-bg-2, transparent);
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--page-ink-2);
+}
+
+.stars-care li + li {
+  margin-top: 4px;
+}
+
+.stars-care strong {
+  color: var(--page-ink);
+  font-weight: 600;
+}
+
+.stars-checklist {
+  margin: 0 0 10px;
+  padding-left: 1.2em;
+  font-size: 14px;
+}
+
+.stars-button {
+  display: block;
+  width: 100%;
+  padding: 13px;
+  border: 0;
+  border-radius: 10px;
+  background: #1c5cab;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.stars-button:disabled {
+  background: #898781;
+  cursor: default;
+}
+
+/* 本筋ではない操作(現在地の取得など)。主ボタンより弱く見せる */
+.stars-button--sub {
+  display: inline-block;
+  width: auto;
+  padding: 8px 14px;
+  border: 1px solid var(--page-line);
+  background: transparent;
+  color: var(--link);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.stars-here-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0 0 12px;
+}
+
+.stars-message {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #1c5cab;
+  background: rgba(28, 92, 171, 0.08);
+  font-size: 14px;
+}
+
+.stars-message.is-error {
+  border-color: #d03b3b;
+  background: rgba(208, 59, 59, 0.08);
+}
+
+/* ---- 申請ページの地図 ---- */
+
+.stars-pick-map {
+  width: 100%;
+  height: 320px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--map-surface);
+}
+
+.stars-readout {
+  margin: 8px 0 0;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.stars-readout--sub {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--page-ink-2);
+}
+
+/* ---- 一覧の絞り込み ---- */
+
+.stars-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px 16px;
+  margin: 0 0 14px;
+}
+
+.stars-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.stars-tab {
+  padding: 6px 12px;
+  border: 1px solid var(--page-line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--page-ink);
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.stars-tab[aria-pressed="true"] {
+  background: #1c5cab;
+  border-color: #1c5cab;
+  color: #fff;
+  font-weight: 700;
+}
+
+.stars-sort {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--page-ink-2);
+}
+
+.stars-sort .stars-input {
+  width: auto;
+  padding: 6px 8px;
+  font-size: 14px;
+}
+
+/* ---- 一覧の表 ---- */
+
+.stars-table-wrap {
+  /* 幅の狭い画面では表だけを横スクロールさせる(ページ全体は横に動かさない) */
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.stars-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.stars-table th,
+.stars-table td {
+  padding: 9px 8px;
+  border-bottom: 1px solid var(--page-line);
+  text-align: left;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.stars-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--page-bg);
+  border-bottom: 2px solid var(--page-line);
+  font-size: 12px;
+  color: var(--page-ink-2);
+  line-height: 1.3;
+}
+
+.stars-table tbody th {
+  font-weight: 700;
+  white-space: normal;
+  min-width: 11em;
+}
+
+.stars-cell-sub {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--page-ink-2);
+}
+
+/* 予報が欠けている時刻。点を付けずに「データなし」と出す欄 */
+.stars-cell-none {
+  color: var(--page-ink-2);
+  font-style: italic;
+}
+
+.stars-band-chip {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  border-radius: 3px;
+  vertical-align: -1px;
+  box-shadow: 0 0 0 1px var(--page-line);
+}
+
+/* ---- 詳細ページ ---- */
+
+.stars-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 28px;
+  margin: 0 0 18px;
+  padding: 14px;
+  border: 1px solid var(--page-line);
+  border-radius: var(--radius);
+}
+
+.stars-summary-main {
+  flex: 0 0 auto;
+}
+
+.stars-summary-label {
+  margin: 0;
+  font-size: 12px;
+  color: var(--page-ink-2);
+}
+
+.stars-summary-score {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 2px 0;
+}
+
+.stars-summary-score strong {
+  font-size: 28px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.stars-summary-at {
+  margin: 0;
+  font-size: 13px;
+  color: var(--page-ink-2);
+}
+
+.stars-summary-facts {
+  flex: 1 1 260px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 12px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.stars-summary-facts dt {
+  color: var(--page-ink-2);
+  white-space: nowrap;
+}
+
+.stars-summary-facts dd {
+  margin: 0;
+}
+
+.stars-details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 14px;
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+
+.stars-details dt {
+  color: var(--page-ink-2);
+  white-space: nowrap;
+}
+
+.stars-details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.stars-table tr.is-best {
+  background: rgba(28, 92, 171, 0.1);
+}
+
+.stars-table tr.is-best th {
+  position: relative;
+}
+
+.stars-table tr.is-best th::before {
+  content: "★";
+  margin-right: 4px;
+  color: #1c5cab;
+}
+
+@media (max-width: 480px) {
+  .stars-details,
+  .stars-summary-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .stars-details dt,
+  .stars-summary-facts dt {
+    margin-top: 6px;
+    font-size: 12px;
+  }
+}
+
+/* ---- 説明ページ ---- */
+
+.stars-table--plain th,
+.stars-table--plain td {
+  white-space: normal;
+}
+
+.stars-table--plain tbody th {
+  min-width: 8em;
+}
+
+.stars-band-list {
+  margin: 0 0 20px;
+}
+
+.stars-band-row {
+  display: grid;
+  grid-template-columns: 14px 5em 6.5em 1fr;
+  align-items: baseline;
+  gap: 10px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--page-line);
+  font-size: 14px;
+}
+
+.stars-band-range {
+  font-size: 13px;
+  color: var(--page-ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.stars-band-note {
+  font-size: 13px;
+  color: var(--page-ink-2);
+}
+
+.stars-limits {
+  margin: 0 0 12px;
+  padding-left: 1.2em;
+  font-size: 15px;
+}
+
+.stars-limits li {
+  margin-bottom: 10px;
+}
+
+@media (max-width: 480px) {
+  .stars-band-row {
+    grid-template-columns: 14px 1fr;
+    row-gap: 2px;
+  }
+
+  .stars-band-range,
+  .stars-band-note {
+    grid-column: 2;
+  }
+}
+
+/* 画面が狭いときは、副次的な列を隠して表を画面内に収める。
+   (横スクロールできてはいるが、右端が切れていることに気づきにくいため) */
+@media (max-width: 560px) {
+  .stars-table th:nth-child(4),
+  .stars-table td:nth-child(4),
+  .stars-table th:nth-child(5),
+  .stars-table td:nth-child(5) {
+    display: none;
+  }
+
+  .stars-table th,
+  .stars-table td {
+    padding: 9px 6px;
+  }
+
+  .stars-table tbody th {
+    min-width: 8em;
+  }
+}

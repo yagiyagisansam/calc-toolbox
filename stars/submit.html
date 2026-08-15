@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!--
+    地図は別のページ(pick.html)を枠で読み込む。MapLibre をここに置くと
+    Trusted Types を強制できない。申請フォームは利用者の入力をそのまま扱う
+    画面なので、地図の都合で守りを下げたくない。
+  -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://ssxskriqlaiohdutxprn.supabase.co; font-src 'self'; base-uri 'none'; form-action 'none'; frame-src 'self'; object-src 'none'; require-trusted-types-for 'script'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>星見スポットを申請する | 今夜のオススメ星見スポット</title>
+  <meta name="description" content="おすすめの星見スポットを登録申請できます。ログインは不要です。地図で場所を選んで送信すると、管理者が内容を確認したうえで掲載します。">
+  <link rel="stylesheet" href="./stars.css">
+  <!-- @meta start -->
+  <link rel="canonical" href="https://quick-calc.site/stars/submit.html">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230c0f1a'/%3E%3Cpath d='M16 6l2.6 6.6L25.5 14l-5.3 4.4 1.7 6.9L16 21.6l-5.9 3.7 1.7-6.9L6.5 14l6.9-1.4z' fill='%23fdd171'/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0c0c0c">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="星見スポットを申請する">
+  <meta property="og:description" content="おすすめの星見スポットを、ログイン不要で登録申請できます。">
+  <meta property="og:url" content="https://quick-calc.site/stars/submit.html">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <!-- @meta end -->
+</head>
+<body class="stars-body stars-body--doc">
+
+<header class="stars-header">
+  <a class="stars-brand" href="./">
+    <span class="stars-brand-mark" aria-hidden="true">★</span>
+    <span>今夜の星見スポット</span>
+  </a>
+  <nav class="stars-nav">
+    <a href="./">地図</a>
+    <a href="./list.html">地域別の一覧</a>
+    <a href="./about.html">データについて</a>
+  </nav>
+</header>
+
+<main class="stars-doc">
+  <h1>星見スポットを申請する</h1>
+  <p class="stars-lead">
+    おすすめの星見スポットを教えてください。ログインは不要です。
+    送信された内容は管理者が確認したうえで掲載します（すぐには公開されません）。
+  </p>
+
+  <form id="submit-form" class="stars-form" novalidate>
+    <fieldset class="stars-field">
+      <legend>1. 場所を選ぶ<span class="stars-required">必須</span></legend>
+      <p class="stars-help">地図をタップすると、その地点にピンが立ちます。拡大してできるだけ正確な位置を指してください。</p>
+      <div id="pick-map" class="stars-pick-map"></div>
+      <p id="pick-readout" class="stars-readout">まだ選ばれていません</p>
+      <p id="pick-darkness" class="stars-readout stars-readout--sub"></p>
+    </fieldset>
+
+    <fieldset class="stars-field">
+      <legend>2. スポットの情報</legend>
+
+      <label class="stars-label" for="f-name">スポット名<span class="stars-required">必須</span></label>
+      <input class="stars-input" id="f-name" name="name" type="text" maxlength="60" autocomplete="off"
+             placeholder="例: 美ヶ原高原 王ヶ頭">
+
+      <label class="stars-label" for="f-kana">ふりがな</label>
+      <input class="stars-input" id="f-kana" name="name_kana" type="text" maxlength="80" autocomplete="off"
+             placeholder="例: うつくしがはらこうげん おうがとう">
+
+      <label class="stars-label" for="f-pref">都道府県<span class="stars-required">必須</span></label>
+      <select class="stars-input" id="f-pref" name="pref">
+        <option value="">選んでください</option>
+      </select>
+
+      <label class="stars-label" for="f-elev">標高（m）</label>
+      <input class="stars-input" id="f-elev" name="elevation_m" type="number" inputmode="numeric" min="-50" max="4000"
+             placeholder="例: 2034">
+
+      <label class="stars-label" for="f-access">アクセス・駐車</label>
+      <textarea class="stars-input" id="f-access" name="access" rows="3" maxlength="400"
+                placeholder="例: 県道からの林道は冬季閉鎖。駐車場20台、無料。"></textarea>
+
+      <label class="stars-label" for="f-facilities">設備</label>
+      <textarea class="stars-input" id="f-facilities" name="facilities" rows="2" maxlength="400"
+                placeholder="例: トイレあり（24時間）、自販機なし"></textarea>
+
+      <label class="stars-label" for="f-city">市区町村</label>
+      <input class="stars-input" id="f-city" name="city" type="text" maxlength="40"
+             placeholder="例: 秩父市、南伊豆町">
+      <p class="stars-help">一覧の絞り込みに使います。分かる範囲でかまいません。</p>
+
+      <label class="stars-label" for="f-caution">気をつけること</label>
+      <textarea class="stars-input" id="f-caution" name="caution" rows="3" maxlength="500"
+                placeholder="例: 冬期は道路が閉鎖されます。トイレはありません。近くに民家があるので静かに。"></textarea>
+      <p class="stars-help">行く人が事故や迷惑を避けられるよう、危ないところ・気を遣うところを書いてください。</p>
+
+      <label class="stars-label" for="f-note">ひとこと</label>
+      <textarea class="stars-input" id="f-note" name="note" rows="4" maxlength="1000"
+                placeholder="例: 南の視界が開けていて天の川がよく見えます。風が強い日は防寒必須。"></textarea>
+
+      <label class="stars-label" for="f-url">参考URL</label>
+      <input class="stars-input" id="f-url" name="source_url" type="url" maxlength="300"
+             placeholder="https://…（自治体や施設の公式ページなど）">
+      <p class="stars-help">https:// で始まるURLだけ登録できます。</p>
+    </fieldset>
+
+    <fieldset class="stars-field">
+      <legend>3. 送信前の確認</legend>
+      <ul class="stars-checklist">
+        <li>私有地・立入禁止の場所ではないこと</li>
+        <li>夜間の駐停車や滞在が禁止されていないこと</li>
+        <li>個人情報（氏名・連絡先など）を書き込んでいないこと</li>
+      </ul>
+      <p class="stars-help">
+        このフォームで氏名やメールアドレスは集めていません。連投を防ぐため、端末ごとのランダムな識別子だけを一緒に送ります。
+        詳しくは<a href="../privacy.html">プライバシーポリシー</a>をご覧ください。
+      </p>
+    </fieldset>
+
+    <p id="submit-message" class="stars-message" role="status" hidden></p>
+    <button id="submit-button" class="stars-button" type="submit">この内容で申請する</button>
+  </form>
+</main>
+
+<footer class="stars-footer">
+  <p>
+    地図: <a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">OpenFreeMap</a>、
+    <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a> /
+    光害: <a href="https://gibs.earthdata.nasa.gov/" target="_blank" rel="noopener noreferrer">NASA GIBS</a> VIIRS 夜間光
+  </p>
+  <p>
+    <a href="../">計算ツールボックス</a> ・ <a href="../contact.html?tool=stars">お問い合わせ</a>
+  </p>
+</footer>
+
+<script src="./guard.js"></script>
+<script src="../tools/poll/config.js"></script>
+<script src="./config.js"></script>
+<script src="./palette.js"></script>
+<script src="./score.js"></script>
+<script src="./lp.js"></script>
+<script src="./net.js"></script>
+<script src="./submit.js"></script>
+</body>
+</html>
