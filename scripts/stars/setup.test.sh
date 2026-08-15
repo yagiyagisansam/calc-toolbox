@@ -12,7 +12,12 @@
 #
 # 使い方:
 #   scripts/stars/setup.test.sh [比較したい古い版のパス]
-#   省略すると、直前のコミットの setup.sql を使う。
+#   省略すると OLD_SETUP_REF の版を使う。
+#
+# なぜ「直前のコミット」ではなく決め打ちの版なのか:
+#   直前のコミットを古い版として使っていたが、city / caution を足したあとは
+#   直前のコミットにもその列があるため、「列を足す道筋」を通らなくなった。
+#   テストが何も試さないまま緑になる。列を足す前の版を名指しで指す。
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -20,6 +25,8 @@ ROOT="$(cd "$HERE/../.." && pwd)"
 PORT="${PGTEST_PORT:-55433}"
 BASE="${PGTEST_DIR:-/tmp/stars-setuptest-$$}"
 OLD_SQL="${1:-}"
+# city / caution を足す前の版(この道筋を通したいので決め打ちにする)
+OLD_SETUP_REF="${OLD_SETUP_REF:-6f6e29a}"
 
 if ! command -v initdb >/dev/null 2>&1; then
   for d in /usr/lib/postgresql/*/bin; do
@@ -62,8 +69,7 @@ SQL
 
 if [ -z "$OLD_SQL" ]; then
   OLD_SQL="$BASE/old.sql"
-  git -C "$ROOT" show HEAD~1:scripts/stars/setup.sql > "$OLD_SQL" 2>/dev/null \
-    || git -C "$ROOT" show HEAD:scripts/stars/setup.sql > "$OLD_SQL"
+  git -C "$ROOT" show "$OLD_SETUP_REF:scripts/stars/setup.sql" > "$OLD_SQL"
 fi
 
 fail=0

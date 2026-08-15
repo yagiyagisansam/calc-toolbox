@@ -167,9 +167,16 @@
    * スポットの市区町村。
    * 申請時に入れてもらう city をそのまま使う。座標から推測はしない ──
    * 市境の近くでは隣の町に化けるし、化けても誰も気づけない。
+   *
+   * 前後の空白は落とす。「阿智村」と「阿智村 」が別の見出しとして
+   * 絞り込みに2つ並ぶと、利用者にはどちらを選べばよいのか分からない。
+   * データベース側でも同じことをしているが(setup.sql の検証トリガ)、
+   * 古い行や手で入れた行が残りうるので、表示側でも守る。
    */
   function cityOf(spot) {
-    return spot.city || null;
+    if (typeof spot.city !== "string") return null;
+    var city = spot.city.trim();
+    return city === "" ? null : city;
   }
 
   // ---- 基準点(どこから近い順に並べるか) -----------------------------------
@@ -272,7 +279,7 @@
       if (name.indexOf(q) >= 0 || (kana && kana.indexOf(q) >= 0)) {
         out.push({
           label: name,
-          sub: spot.pref + (spot.city ? " " + spot.city : "") + "・掲載スポット",
+          sub: spot.pref + (cityOf(spot) ? " " + cityOf(spot) : "") + "・掲載スポット",
           lat: Number(spot.lat),
           lon: Number(spot.lon)
         });

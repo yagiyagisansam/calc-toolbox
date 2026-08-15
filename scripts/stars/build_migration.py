@@ -94,8 +94,15 @@ def build_spot_columns():
     # 列の追加と、返す列が変わった2つの関数だけを切り出す
     alter = slice_between(
         src,
-        "-- 既に動いている環境向け(caution を後から足したため)",
+        "/*\n * 既に動いている環境向け(caution と city を後から足したため)。",
         "create index if not exists stars_spots_status_region_idx",
+    )
+
+    # 申請の検証(city の空白をならす処理が入った)も一緒に流す
+    trigger = slice_between(
+        src,
+        "-- ---- ③ 申請内容の検証(CAPTCHA の代わり) ----",
+        "-- ---- ④ 公開用(承認済みだけを返す) ----",
     )
     grant = "grant insert (name, name_kana, pref, city, lat, lon, elevation_m, access, facilities, note, caution, source_url, submitter_hint)\n  on public.stars_spots to anon;\n"
     if grant not in src:
@@ -134,11 +141,18 @@ def build_spot_columns():
 -- 注意:
 --   返す列が変わる関数は create or replace では置き換えられないので、
 --   先に drop してから作り直している。順番を入れ替えないこと。
+--
+--   全体が begin 〜 commit で囲んである。途中で失敗したら何も残らない。
+--   「列だけ足って制約が付いていない」という中途半端な状態を作らないため
+--   (まっさらな環境と受け付ける値が違う DB が生まれる)。
 -- =============================================================
+
+begin;
 
 """
 
     tail = """
+commit;
 
 -- ---- 確認 ----
 -- 列が増えたか
@@ -147,11 +161,19 @@ from information_schema.columns
 where table_name = 'stars_spots' and column_name in ('city', 'caution')
 order by column_name;
 
+-- 制約が付いたか(2行出れば成功)
+select conname as 制約
+from pg_constraint
+where conname in ('stars_spots_city_check', 'stars_spots_caution_check')
+order by conname;
+
 -- 公開用の関数が新しい列を返すか(空でも列名が出れば成功)
 select * from public.stars_public_spots() limit 1;
 """
 
-    out = head + alter + grant + "\n\n" + public_fn + ops_fn + revoke_ops + tail
+    out = (
+        head + alter + grant + "\n\n" + trigger + public_fn + ops_fn + revoke_ops + tail
+    )
     os.makedirs(OUT_DIR, exist_ok=True)
     path = os.path.join(OUT_DIR, "migrate-spot-columns.sql")
     io.open(path, "w", encoding="utf-8").write(out)

@@ -110,17 +110,52 @@ create table if not exists public.stars_spots (
   approved_at    timestamptz
 );
 
--- 既に動いている環境向け(caution を後から足したため)
+/*
+ * 既に動いている環境向け(caution と city を後から足したため)。
+ *
+ * add column だけでは制約が付かない。まっさらな環境では列の定義に書いた
+ * check がそのまま効くのに、既存の環境では効かないという食い違いが起きる。
+ * 同じ HEAD なのに受け付ける値が違う状態になるので、必ず名前を付けて
+ * 明示的に足す(名前は、新規に作ったときに PostgreSQL が付ける名前と同じ)。
+ *
+ * 制約を足す前に既存の値をならす。
+ * 前後の空白だけの city は無しにする(絞り込みの見出しが二重に並ぶため)。
+ * それでも40文字を超える行が残っていたら、黙って落とさずに止める ──
+ * どの行が引っかかったのかを出したうえで、人が決めるべきことなので。
+ */
 alter table public.stars_spots add column if not exists caution text;
 alter table public.stars_spots add column if not exists city text;
+
+update public.stars_spots
+   set city = nullif(btrim(city), '')
+ where city is distinct from nullif(btrim(city), '');
+
 do $$
+declare
+  v_bad text;
 begin
+  select string_agg(spot_id::text || '(' || char_length(city) || '文字)', ', ')
+    into v_bad
+    from public.stars_spots
+   where city is not null and char_length(city) > 40;
+  if v_bad is not null then
+    raise exception '市区町村が40文字を超える行があります。手で直してから流し直してください: %', v_bad;
+  end if;
+
   if not exists (
     select 1 from pg_constraint where conname = 'stars_spots_caution_check'
   ) then
     alter table public.stars_spots
       add constraint stars_spots_caution_check
       check (caution is null or char_length(caution) <= 500);
+  end if;
+
+  if not exists (
+    select 1 from pg_constraint where conname = 'stars_spots_city_check'
+  ) then
+    alter table public.stars_spots
+      add constraint stars_spots_city_check
+      check (city is null or char_length(city) <= 40);
   end if;
 end
 $$;
@@ -181,6 +216,14 @@ begin
   if btrim(new.name) = '' then
     raise exception 'empty name';
   end if;
+
+  /*
+   * 市区町村は一覧の絞り込みの見出しになる。
+   * 「阿智村」と「阿智村 」が別の見出しとして2つ並ぶと、
+   * 利用者にはどちらを選べばよいのか分からない。
+   * 前後の空白を落とし、空になったものは無しとして扱う。
+   */
+  new.city := nullif(btrim(new.city), '');
 
   -- レート制限: 同一端末は24時間で3件まで
   if (select count(*) from public.stars_spots

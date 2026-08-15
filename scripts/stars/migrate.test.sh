@@ -101,10 +101,39 @@ values ('新しい申請', null, '長野県', '阿智村', 35.44, 137.68, 1200, 
 SQL
 then ok "申請フォームが送る形の登録が通る"; else ng "登録に失敗: $(tail -2 "$BASE/a2")"; fi
 
-# 差分を当てた結果が、正本を流した結果と同じ形か
-sig_after_migration=$($PSQL -tAc "select string_agg(p.name, ',' order by p.ord)
-  from pg_proc f join lateral unnest(f.proallargtypes, f.proargnames)
-  with ordinality as p(typ, name, ord) on true where f.proname='stars_public_spots';" | tr -d '[:space:]')
+# 41文字の city は、差分を当てた側でも弾かれるか
+# (制約が差分側にだけ無いと、まっさらな環境とは違う値を受け付けてしまう)
+long_city=$(python3 -c "print('阿'*41)")
+if $PSQL >/dev/null 2>"$BASE/a3" <<SQL
+insert into public.stars_spots (name, pref, city, lat, lon, submitter_hint)
+values ('長すぎる市区町村', '長野県', '$long_city', 35.45, 137.69, 'longcity1234');
+SQL
+then ng "41文字の city が通ってしまった"; else ok "41文字の city は弾かれる"; fi
+
+# 前後の空白は保存時にならされるか
+$PSQL -c "insert into public.stars_spots (name, pref, city, lat, lon, submitter_hint)
+          values ('空白つき', '長野県', '  阿智村  ', 35.46, 137.70, 'trimcity1234');" >/dev/null 2>&1
+trimmed=$($PSQL -tAc "select city from public.stars_spots where submitter_hint='trimcity1234';")
+[ "$trimmed" = "阿智村" ] && ok "city の前後の空白がならされる" || ng "ならされていない([$trimmed])"
+
+$PSQL -c "insert into public.stars_spots (name, pref, city, lat, lon, submitter_hint)
+          values ('空白だけ', '長野県', '   ', 35.47, 137.71, 'blankcity123');" >/dev/null 2>&1
+blank=$($PSQL -tAc "select coalesce(city, '(null)') from public.stars_spots where submitter_hint='blankcity123';")
+[ "$blank" = "(null)" ] && ok "空白だけの city は無しになる" || ng "無しになっていない([$blank])"
+
+# 差分をもう一度当てても壊れないか(本番で2回貼ってしまう事故に備える)
+if $PSQL -f "$HERE/generated/migrate-spot-columns.sql" >/dev/null 2>"$BASE/a4"; then
+  ok "差分SQLを2回当てても通る"
+else
+  ng "2回目で失敗: $(tail -3 "$BASE/a4")"
+fi
+
+# 差分を当てた結果が、正本を流した結果と本当に同じ形か。
+#
+# 以前は stars_public_spots の引数名だけを見ていた。それでは
+# 「差分側にだけ city の check 制約が無い」ことに気づけない。
+# 列・制約・索引・関数の中身・権限・RLS・トリガまで並べて丸ごと比べる。
+$PSQL -f "$HERE/schema_signature.sql" > "$BASE/sig-migration.txt" 2>/dev/null
 
 base_env
 $PSQL >/dev/null <<'SQL'
@@ -114,14 +143,13 @@ do $$ begin
 end $$;
 SQL
 $PSQL -f "$HERE/setup.sql" >/dev/null 2>&1
-sig_from_source=$($PSQL -tAc "select string_agg(p.name, ',' order by p.ord)
-  from pg_proc f join lateral unnest(f.proallargtypes, f.proargnames)
-  with ordinality as p(typ, name, ord) on true where f.proname='stars_public_spots';" | tr -d '[:space:]')
+$PSQL -f "$HERE/schema_signature.sql" > "$BASE/sig-source.txt" 2>/dev/null
 
-if [ "$sig_after_migration" = "$sig_from_source" ]; then
-  ok "差分を当てた結果が、正本を流した結果と一致する"
+if diff -u "$BASE/sig-source.txt" "$BASE/sig-migration.txt" > "$BASE/sig.diff" 2>&1; then
+  ok "差分を当てた結果が、正本を流した結果と一致する($(wc -l < "$BASE/sig-source.txt") 項目)"
 else
-  ng "一致しない: 差分=$sig_after_migration / 正本=$sig_from_source"
+  ng "一致しない:"
+  sed -n '1,25p' "$BASE/sig.diff" | sed 's/^/       /'
 fi
 
 # ============================================================

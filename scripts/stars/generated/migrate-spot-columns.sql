@@ -13,13 +13,46 @@
 -- 注意:
 --   返す列が変わる関数は create or replace では置き換えられないので、
 --   先に drop してから作り直している。順番を入れ替えないこと。
+--
+--   全体が begin 〜 commit で囲んである。途中で失敗したら何も残らない。
+--   「列だけ足って制約が付いていない」という中途半端な状態を作らないため
+--   (まっさらな環境と受け付ける値が違う DB が生まれる)。
 -- =============================================================
 
--- 既に動いている環境向け(caution を後から足したため)
+begin;
+
+/*
+ * 既に動いている環境向け(caution と city を後から足したため)。
+ *
+ * add column だけでは制約が付かない。まっさらな環境では列の定義に書いた
+ * check がそのまま効くのに、既存の環境では効かないという食い違いが起きる。
+ * 同じ HEAD なのに受け付ける値が違う状態になるので、必ず名前を付けて
+ * 明示的に足す(名前は、新規に作ったときに PostgreSQL が付ける名前と同じ)。
+ *
+ * 制約を足す前に既存の値をならす。
+ * 前後の空白だけの city は無しにする(絞り込みの見出しが二重に並ぶため)。
+ * それでも40文字を超える行が残っていたら、黙って落とさずに止める ──
+ * どの行が引っかかったのかを出したうえで、人が決めるべきことなので。
+ */
 alter table public.stars_spots add column if not exists caution text;
 alter table public.stars_spots add column if not exists city text;
+
+update public.stars_spots
+   set city = nullif(btrim(city), '')
+ where city is distinct from nullif(btrim(city), '');
+
 do $$
+declare
+  v_bad text;
 begin
+  select string_agg(spot_id::text || '(' || char_length(city) || '文字)', ', ')
+    into v_bad
+    from public.stars_spots
+   where city is not null and char_length(city) > 40;
+  if v_bad is not null then
+    raise exception '市区町村が40文字を超える行があります。手で直してから流し直してください: %', v_bad;
+  end if;
+
   if not exists (
     select 1 from pg_constraint where conname = 'stars_spots_caution_check'
   ) then
@@ -27,11 +60,86 @@ begin
       add constraint stars_spots_caution_check
       check (caution is null or char_length(caution) <= 500);
   end if;
+
+  if not exists (
+    select 1 from pg_constraint where conname = 'stars_spots_city_check'
+  ) then
+    alter table public.stars_spots
+      add constraint stars_spots_city_check
+      check (city is null or char_length(city) <= 40);
+  end if;
 end
 $$;
 
 grant insert (name, name_kana, pref, city, lat, lon, elevation_m, access, facilities, note, caution, source_url, submitter_hint)
   on public.stars_spots to anon;
+
+
+-- ---- ③ 申請内容の検証(CAPTCHA の代わり) ----
+create or replace function public.check_stars_spot_insert()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_region text;
+begin
+  -- 対象範囲(日本)の外は受け付けない。海外へ広げるときはここを緩める。
+  -- クライアント側の stars/config.js の submitBounds と同じ値にしておくこと。
+  if new.lat < 20 or new.lat > 46 or new.lon < 122 or new.lon > 154 then
+    raise exception 'out of range';
+  end if;
+
+  -- 地方は都道府県から引く(申請者の入力を信用しない)
+  select region into v_region from public.stars_prefectures where pref = new.pref;
+  if v_region is null then
+    raise exception 'unknown prefecture';
+  end if;
+  new.region := v_region;
+
+  -- 参考URLは https のみ(javascript: や data: を弾く)
+  if new.source_url is not null and new.source_url !~ '^https://[^\s]+$' then
+    raise exception 'invalid url';
+  end if;
+
+  -- 改行だけ・空白だけの名前を弾く
+  if btrim(new.name) = '' then
+    raise exception 'empty name';
+  end if;
+
+  /*
+   * 市区町村は一覧の絞り込みの見出しになる。
+   * 「阿智村」と「阿智村 」が別の見出しとして2つ並ぶと、
+   * 利用者にはどちらを選べばよいのか分からない。
+   * 前後の空白を落とし、空になったものは無しとして扱う。
+   */
+  new.city := nullif(btrim(new.city), '');
+
+  -- レート制限: 同一端末は24時間で3件まで
+  if (select count(*) from public.stars_spots
+       where submitter_hint = new.submitter_hint
+         and created_at > now() - interval '24 hours') >= 3 then
+    raise exception 'rate limited';
+  end if;
+
+  -- レート制限: 全体で1時間100件まで
+  if (select count(*) from public.stars_spots
+       where created_at > now() - interval '1 hour') >= 100 then
+    raise exception 'rate limited';
+  end if;
+
+  new.status := 'pending';
+  return new;
+end;
+$$;
+
+drop trigger if exists stars_spots_check_insert on public.stars_spots;
+create trigger stars_spots_check_insert
+  before insert on public.stars_spots
+  for each row execute function public.check_stars_spot_insert();
+
+revoke all on function public.check_stars_spot_insert() from public, anon, authenticated;
 
 
 /*
@@ -115,6 +223,7 @@ $$;
 
 revoke all on function public.stars_ops_pending(text, int) from public, anon, authenticated;
 
+commit;
 
 -- ---- 確認 ----
 -- 列が増えたか
@@ -122,6 +231,12 @@ select column_name as 列
 from information_schema.columns
 where table_name = 'stars_spots' and column_name in ('city', 'caution')
 order by column_name;
+
+-- 制約が付いたか(2行出れば成功)
+select conname as 制約
+from pg_constraint
+where conname in ('stars_spots_city_check', 'stars_spots_caution_check')
+order by conname;
 
 -- 公開用の関数が新しい列を返すか(空でも列名が出れば成功)
 select * from public.stars_public_spots() limit 1;
