@@ -241,7 +241,14 @@
    * 地表から見た向きは最大で約1度ちがう(地平視差)。地平線付近では
    * 月が出ているか沈んでいるかの判定が変わるので、必ず補正する。
    */
-  function moonTopocentric(date, lat, lon) {
+  /*
+   * 月の位置のうち、地点によらない部分(赤経・赤緯・距離・恒星時)。
+   *
+   * 分けてあるのは、たくさんの地点を同じ時刻で計算するときに、
+   * 周期項の総和(60項ほど)を1回で済ませるため。全国の地図は552地点を
+   * 一度に求めるので、ここを毎回やり直すと17ミリ秒かかっていた。
+   */
+  function moonGeocentric(date) {
     var ms = date.valueOf();
     var year = new Date(ms).getUTCFullYear();
     // 位置の計算は力学時(TT)で行う
@@ -265,8 +272,21 @@
       Math.sin(bet) * Math.cos(eps) + Math.cos(bet) * Math.sin(eps) * Math.sin(lam)
     );
 
-    // 地平視差
-    var sinPi = 6378.14 / moon.dist;
+    return {
+      ra: ra,
+      dec: dec,
+      dist: moon.dist,
+      // 地平視差
+      sinPi: 6378.14 / moon.dist,
+      gast: apparentSiderealTimeDeg(jdUt, T, nut)
+    };
+  }
+
+  /* 地心の位置(moonGeocentric の結果)を、ある地点から見た向きに直す */
+  function topocentricFrom(g, lat, lon) {
+    var ra = g.ra;
+    var dec = g.dec;
+    var sinPi = g.sinPi;
 
     // 観測地点の地心座標(地球の扁平を考慮)
     var phi = RAD * lat;
@@ -276,8 +296,7 @@
     var rhoCos = Math.cos(u);
 
     // 地方視恒星時から時角
-    var gast = apparentSiderealTimeDeg(jdUt, T, nut);
-    var H = RAD * norm360(gast + lon) - ra;
+    var H = RAD * norm360(g.gast + lon) - ra;
 
     // 地心 → 測心(観測地点から見た向き)への補正
     var dRa = Math.atan2(
@@ -293,10 +312,14 @@
     return {
       hourAngle: Htopo,
       dec: decTopo,
-      dist: moon.dist,
+      dist: g.dist,
       parallax: Math.asin(sinPi),
       phi: phi
     };
+  }
+
+  function moonTopocentric(date, lat, lon) {
+    return topocentricFrom(moonGeocentric(date), lat, lon);
   }
 
   // ---- 朔(新月)の時刻 --------------------------------------------------
@@ -454,11 +477,29 @@
    * @param {number} lon 経度(度)
    */
   function brightness(date, lat, lon) {
-    var pos = position(date, lat, lon);
-    if (pos.altitude <= 0) return 0;
+    return brightnessAt(date)(lat, lon);
+  }
+
+  /**
+   * ある時刻について、地点を渡すと月あかりを返す関数を作る。
+   *
+   * brightness() を地点の数だけ呼ぶのと結果は同じだが、時刻だけで決まる部分
+   * (月の赤経・赤緯・輝面比・恒星時)を1回しか計算しない。全国の地図は
+   * 552地点を一度に求めるので、17ミリ秒が0.2ミリ秒ほどになる。
+   *
+   * @param {Date} date 時刻
+   * @returns {function(number, number): number} (緯度, 経度) → 0〜1
+   */
+  function brightnessAt(date) {
+    var g = moonGeocentric(date);
     var frac = illumination(date).fraction;
-    // 高度が低いほど大気に減光されるため sin(高度) で重みづけする
-    return frac * Math.sin(pos.altitude);
+    return function (lat, lon) {
+      var t = topocentricFrom(g, lat, lon);
+      var h = altitude(t.hourAngle, t.phi, t.dec);
+      if (h <= 0) return 0;
+      // 高度が低いほど大気に減光されるため sin(高度) で重みづけする
+      return frac * Math.sin(h);
+    };
   }
 
   /**
@@ -707,6 +748,7 @@
     position: position,
     illumination: illumination,
     brightness: brightness,
+    brightnessAt: brightnessAt,
     summary: summary,
     sunAltitudeDeg: sunAltitudeDeg,
     nightWindow: nightWindow,

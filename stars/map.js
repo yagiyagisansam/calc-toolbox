@@ -51,6 +51,7 @@
     imageData: null,
     tables: null,
     grid: null, // StarsNet.fetchGrid の結果
+    moonTables: [], // 時刻ごとの月の係数(格子と同じ並び)。setGrid で捨てる
     timeIndex: 0,
     opacity: null, // ラスタの不透明度(初期値は palette.js)
     layer: "total", // 表示中の項目(StarsScore.LAYERS の key)
@@ -341,6 +342,50 @@
       state.colGrid0[x] = gc0;
       state.colGridW[x] = gc - gc0;
     }
+
+    // 時刻が変われば月も変わる。格子が入れ替わったので作り置きは捨てる。
+    state.moonTables = [];
+  }
+
+  // ---- 月あかり -----------------------------------------------------------
+
+  /*
+   * 月の減点は地点ごとに違う。
+   *
+   * 以前は「全国でほとんど変わらない」として地図の中心1点で求めていたが、
+   * これは誤りだった。月の高度は時角で決まるので、日本の南北・東西の端では
+   * 大きく食い違う。例えば 2026-05-31 03:00 JST には稚内で -0.6度(地平線の下)、
+   * 石垣島で 24.2度になる。中心の値を全国へ掛けると、石垣島の点数を
+   * 2割ほど過大に、稚内には無いはずの減点を付けることになる。
+   *
+   * そこで天気と同じ粗い格子の上で月の係数を求め、画素ごとに同じ双一次補間で
+   * 引く。格子は1度刻みなので、隣り合う点の月高度の差はたかだか1度ほどしかなく、
+   * 補間で十分な精度が出る。
+   *
+   * 係数は時刻ごとに1回だけ作って取っておく(時刻を動かすたびに
+   * 552点ぶんの月の位置を計算し直さずに済む)。
+   */
+  function moonTable(timeIndex) {
+    var cached = state.moonTables[timeIndex];
+    if (cached) return cached;
+
+    var g = state.grid.grid;
+    var rows = state.grid.rows;
+    var cols = state.grid.cols;
+    var when = new Date(state.grid.times[timeIndex] * 1000);
+    var table = new Float64Array(rows * cols);
+    // 時刻で決まる部分は1回だけ計算する(552地点ぶんの周期項を毎回足し直さない)
+    var moonAt = Sky.brightnessAt(when);
+
+    for (var r = 0; r < rows; r++) {
+      var lat = g.north - r * g.step;
+      for (var c = 0; c < cols; c++) {
+        var lon = g.west + c * g.step;
+        table[r * cols + c] = Score.moonFactor(moonAt(lat, lon));
+      }
+    }
+    state.moonTables[timeIndex] = table;
+    return table;
   }
 
   // ---- 描画 ---------------------------------------------------------------
@@ -399,10 +444,12 @@
     // 天気が無いとき(光害だけの表示)と、天気を含めない項目では、視程・湿度で減点しない
     var hasAir = state.grid.weatherAvailable !== false && parts.weather;
 
-    // 月の影響は全国でほとんど変わらないので、地図の中心で一度だけ求める
-    var when = new Date(state.grid.times[timeIndex] * 1000);
-    var center = state.map ? state.map.getCenter() : { lat: 36, lng: 138 };
-    var moonF = parts.moon ? Score.moonFactor(Sky.brightness(when, center.lat, center.lng)) : 1;
+    /*
+     * 月あかりの係数。天気と同じ格子の上に置いて、画素ごとに補間して引く。
+     * 地図の中心は使わない ── 使うと、地図を動かしただけで同じ場所の
+     * 点数が変わってしまう(閲覧者には何が起きたのか分からない)。
+     */
+    var moonT = parts.moon ? moonTable(timeIndex) : ones(rows * cols);
 
     var bands = Score.BANDS;
     var nBands = bands.length;
@@ -460,6 +507,8 @@
           p += 4;
           continue;
         }
+
+        var moonF = moonT[iA0] * wA + moonT[iA1] * wB + moonT[iB0] * wC + moonT[iB1] * wD;
 
         var lpv = lpData[lpOff + state.colLp[x]];
         var score = 100 * skyT[lpv] * cloudT[c | 0] * precipT[pr | 0] * air * moonF;
@@ -590,6 +639,35 @@
     },
     canvas: function () {
       return state.canvas;
+    },
+    /**
+     * その時刻・その地点で掛かる月の係数(1 = 月あかりの減点なし)。
+     * 検証用。地図の中心ではなく、格子から補間した値を返すので、
+     * 画面に描かれている値そのものになる。
+     * @param {number} timeIndex 時刻の添字
+     * @param {number} lat 緯度(度)
+     * @param {number} lon 経度(度)
+     */
+    moonFactorAt: function (timeIndex, lat, lon) {
+      if (!state.grid) return null;
+      var g = state.grid.grid;
+      var rows = state.grid.rows;
+      var cols = state.grid.cols;
+      var t = moonTable(timeIndex);
+      var gr = (g.north - lat) / g.step;
+      var gc = (lon - g.west) / g.step;
+      var r0 = Math.min(Math.max(Math.floor(gr), 0), rows - 1);
+      var c0 = Math.min(Math.max(Math.floor(gc), 0), cols - 1);
+      var r1 = Math.min(r0 + 1, rows - 1);
+      var c1 = Math.min(c0 + 1, cols - 1);
+      var wy = gr - r0;
+      var wx = gc - c0;
+      return (
+        t[r0 * cols + c0] * (1 - wx) * (1 - wy) +
+        t[r0 * cols + c1] * wx * (1 - wy) +
+        t[r1 * cols + c0] * (1 - wx) * wy +
+        t[r1 * cols + c1] * wx * wy
+      );
     }
   };
 })(typeof window !== "undefined" ? window : globalThis);

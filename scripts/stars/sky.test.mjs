@@ -303,5 +303,44 @@ function ok(cond, label, detail) {
   console.log(`夜の判定: ${zones.length}つのタイムゾーンで同じ結果`);
 }
 
+/* ---- 5. 月あかりは地点ごとに違う ---------------------------------------- */
+/*
+ * 全国の地図が月の減点を「地図の中心1点」で済ませていた不具合の証拠を、
+ * テストとして残す。同じ時刻でも、日本の南北で月の高度は20度以上違う。
+ * 「全国でほとんど変わらない」という前提そのものが誤りだった。
+ *
+ * 期待値は独立検証(scripts/stars/INDEPENDENT-REVIEW-2.md §1)が
+ * 別に計算した値。実装を走らせて作った値ではない。
+ */
+{
+  const when = new Date("2026-05-30T18:00:00Z"); // 2026-05-31 03:00 JST
+  const expected = [
+    { name: "稚内", lat: 45.42, lon: 141.67, altitudeDeg: -0.6 },
+    { name: "地図の中心付近", lat: 36, lon: 138, altitudeDeg: 7.5 },
+    { name: "石垣島", lat: 24.34, lon: 124.16, altitudeDeg: 24.2 }
+  ];
+
+  for (const e of expected) {
+    const got = Sky.position(when, e.lat, e.lon).altitudeDeg;
+    ok(
+      Math.abs(got - e.altitudeDeg) <= 0.3,
+      `${e.name}の月高度が独立検証と一致する`,
+      `実装 ${got.toFixed(2)} 度 / 検証 ${e.altitudeDeg} 度`
+    );
+  }
+
+  const b = (e) => Sky.brightness(when, e.lat, e.lon);
+  ok(b(expected[0]) === 0, "地平線の下では月あかりが 0 になる", String(b(expected[0])));
+  ok(
+    b(expected[2]) - b(expected[1]) > 0.2,
+    "同じ時刻でも石垣島と本州中央で月あかりが大きく違う",
+    `石垣 ${b(expected[2]).toFixed(3)} / 中央 ${b(expected[1]).toFixed(3)}`
+  );
+  console.log(
+    `月あかりの地点差: 稚内 ${b(expected[0]).toFixed(3)} / ` +
+      `中央 ${b(expected[1]).toFixed(3)} / 石垣 ${b(expected[2]).toFixed(3)}`
+  );
+}
+
 console.log(`\n${checks - failed} / ${checks} 件通過${failed ? "(失敗あり)" : "(全通過)"}`);
 process.exit(failed ? 1 : 0);

@@ -581,6 +581,73 @@ try {
   await page.waitForTimeout(400);
 
   /*
+   * 月の減点が地点ごとに掛かるか。
+   *
+   * 以前は地図の中心1点で求めた係数を全画素へ掛けていた。日本の南北で
+   * 月の高度は20度以上違うので、これは沖縄の点数を2割ほど過大にし、
+   * 北海道には無いはずの減点を付けていた。さらに、地図を動かすだけで
+   * 同じ場所の点数が変わるという、閲覧者に説明のつかない振る舞いになる。
+   *
+   * ここでは3つを見る:
+   *   1. 地図が使う係数が、その地点で直に計算した値と一致すること
+   *   2. 同じ時刻で、南北の係数が別々に出ていること
+   *   3. 地図を動かしてから描き直しても、同じ地点の係数が変わらないこと
+   *
+   * 差し替えた予報の日付によっては新月に近く、南北の開きが小さいことがある。
+   * だから「◯以上ひらく」では見ない。地点ごとに計算しているかどうかだけを見る。
+   */
+  const moonSpread = await page.evaluate(() => {
+    const times = window.StarsApp.state.grid.times;
+    const direct = (k, lat, lon) =>
+      window.StarsScore.moonFactor(
+        window.StarsSky.brightness(new Date(times[k] * 1000), lat, lon)
+      );
+
+    // 月が全国で地平線の下の時刻もあるので、78時間ぶんの中で差が最大の時刻を探す
+    let best = { spread: -1, index: 0, north: 1, south: 1 };
+    for (let k = 0; k < times.length; k++) {
+      const north = window.StarsMap.moonFactorAt(k, 45.4, 141.7);
+      const south = window.StarsMap.moonFactorAt(k, 24.3, 124.2);
+      const spread = Math.abs(north - south);
+      if (spread > best.spread) best = { spread: spread, index: k, north: north, south: south };
+    }
+
+    // 格子は1度刻みなので、補間した値と直の値の差はごく小さいはず
+    let worst = 0;
+    for (const [lat, lon] of [[45.4, 141.7], [35.7, 139.8], [24.3, 124.2], [33.2, 130.8]]) {
+      const d = Math.abs(window.StarsMap.moonFactorAt(best.index, lat, lon) - direct(best.index, lat, lon));
+      if (d > worst) worst = d;
+    }
+    return { best: best, worstVsDirect: worst };
+  });
+  check(
+    "地図の月の減点が、その地点で直に計算した値と一致する",
+    moonSpread.worstVsDirect < 0.01,
+    `最大の差 ${moonSpread.worstVsDirect.toFixed(4)}`
+  );
+  check(
+    "月の減点が南北で別々に掛かる",
+    moonSpread.best.north !== moonSpread.best.south,
+    `最大の開き ${moonSpread.best.spread.toFixed(4)}(稚内 ${moonSpread.best.north.toFixed(4)} / 石垣 ${moonSpread.best.south.toFixed(4)})`
+  );
+
+  const moonAfterPan = await page.evaluate(async () => {
+    const k = window.StarsApp.state.timeIndex || 0;
+    const before = window.StarsMap.moonFactorAt(k, 24.3, 124.2);
+    const map = window.StarsMap.map();
+    map.jumpTo({ center: [141.7, 45.4] }); // 石垣島から遠く離れた稚内へ寄せる
+    window.StarsMap.render(k); // 動かしたあとに描き直す
+    const after = window.StarsMap.moonFactorAt(k, 24.3, 124.2);
+    map.jumpTo({ center: [138, 36] });
+    return { before: before, after: after };
+  });
+  check(
+    "地図を動かしても同じ地点の月の減点が変わらない",
+    moonAfterPan.before === moonAfterPan.after,
+    `${moonAfterPan.before} → ${moonAfterPan.after}`
+  );
+
+  /*
    * どの夜を見るか(今夜・明日・明後日)。
    * キャッシュは78時間ぶん持っているので、切り替えても通信は起きず、
    * 切り出す時刻の範囲だけが変わる。見出しの日付が1日進むことで確かめる。
