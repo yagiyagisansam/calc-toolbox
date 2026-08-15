@@ -34,6 +34,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(HERE, "..", "..");
 
 const data = JSON.parse(readFileSync(path.join(HERE, "spot-candidates.json"), "utf8"));
+const selection = JSON.parse(readFileSync(path.join(HERE, "selection-2026-08-15.json"), "utf8"));
 const places = JSON.parse(readFileSync(path.join(ROOT, "stars", "data", "places.json"), "utf8"));
 
 let failed = 0;
@@ -57,6 +58,19 @@ function ok(cond, label, detail) {
 const VERDICTS = ["掲載可", "条件付き可", "保留", "除外"];
 const APPROVABLE = ["掲載可", "条件付き可"];
 const PREF_NAMES = new Set(PREFECTURES.map(([p]) => p));
+const selectionByNo = new Map(selection.spots.map((s) => [s.no, s]));
+
+function acceptedException(s, check) {
+  return (
+    s.acceptance &&
+    s.acceptance.acceptedBy === "Hiroさん" &&
+    s.acceptance.decidedAt === selection.決定日 &&
+    Array.isArray(s.acceptance.exceptions) &&
+    s.acceptance.exceptions.some(
+      (e) => e.check === check && typeof e.reason === "string" && e.reason.length >= 10
+    )
+  );
+}
 
 /* 索引の市区町村だけを取り出す */
 const CITY_KINDS = new Set(["市・郡", "町・村・区"]);
@@ -119,13 +133,45 @@ for (const s of data.spots) {
     String(s.verdictWhy).slice(0, 40)
   );
 
+  if (s.acceptance) {
+    const selected = selectionByNo.get(s.acceptance.selectionNo);
+    ok(
+      !!selected && selected.decision === "採用" && selected.pref === s.pref &&
+        selected.name === s.acceptance.originalName,
+      `${at}: 採用例外が選別原票の採用行と一致する`,
+      `selectionNo=${s.acceptance.selectionNo} / originalName=${s.acceptance.originalName}`
+    );
+    ok(
+      s.selection?.no === s.acceptance.selectionNo && s.selection?.decision === "採用",
+      `${at}: selection と acceptance が一致する`,
+      JSON.stringify(s.selection)
+    );
+    for (const e of s.acceptance.exceptions || []) {
+      ok(
+        ["night", "city", "coordinate", "source:night", "source:free", "source:resv"].includes(e.check),
+        `${at}: 採用例外の種類が既知`,
+        String(e.check)
+      );
+    }
+  }
+
   /* ---- 2. 承認の対象にするなら、3条件それぞれに根拠が要る ---- */
   if (APPROVABLE.includes(s.verdict)) {
     const covered = new Set();
     for (const src of s.sources || []) for (const c of src.covers || []) covered.add(c);
+    if (s.acceptance) {
+      for (const e of s.acceptance.exceptions || []) {
+        const stale =
+          (e.check.startsWith("source:") && covered.has(e.check.slice(7))) ||
+          (e.check === "night" && !/要確認|未確認|不可/.test(String(s.night))) ||
+          (e.check === "city" && s.cityCheck?.ok === true) ||
+          (e.check === "coordinate" && s.coordVerified !== false);
+        ok(!stale, `${at}: 解消済みの採用例外が残っていない`, `${e.check}: ${e.reason}`);
+      }
+    }
     for (const need of ["night", "free", "resv"]) {
       ok(
-        covered.has(need),
+        covered.has(need) || acceptedException(s, `source:${need}`),
         `${at}: 承認の対象なのに ${need} の根拠が無い`,
         `判定 ${s.verdict} / 根拠 ${[...covered].join(",") || "なし"}`
       );
@@ -151,19 +197,25 @@ for (const s of data.spots) {
      * 承認の対象として出してはいけない。
      */
     ok(
-      !/要確認|未確認|不可/.test(String(s.night)),
+      !/要確認|未確認|不可/.test(String(s.night)) || acceptedException(s, "night"),
       `${at}: 承認の対象なのに夜間の欄が「${s.night}」`,
       `判定 ${s.verdict}`
     );
 
     ok(
-      s.cityCheck && s.cityCheck.ok === true,
+      (s.cityCheck && s.cityCheck.ok === true) || acceptedException(s, "city"),
       `${at}: 承認の対象なのに座標と市区町村が一致していない`,
       s.cityCheck
         ? s.cityCheck.pref
           ? `実際は ${s.cityCheck.pref}${s.cityCheck.city}`
           : String(s.cityCheck.why)
         : "cityCheck が無い(verify_candidate_cities.mjs を走らせること)"
+    );
+
+    ok(
+      s.coordVerified !== false || acceptedException(s, "coordinate"),
+      `${at}: 承認の対象なのに座標が確定していない`,
+      String(s.coordSource || "coordSource が無い")
     );
   }
 
