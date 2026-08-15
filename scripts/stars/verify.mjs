@@ -993,6 +993,57 @@ try {
    * 出ていた(火山という分類を索引から落としていたため)。
    * 「八ヶ岳」はカナをひらがなへ寄せる処理が ヶ まで変換していて0件だった。
    */
+  /*
+   * 部分一致でも出ること。
+   * 「星野」は合併で消えた村の名前で、旧市町村を索引に入れるまで0件だった。
+   * 人はいつまでも旧町村の名前で場所を呼ぶ。
+   */
+  for (const [q, want] of [["星野", "星野村"], ["望岳", "望岳台"], ["秩父", "秩父市"]]) {
+    await page.locator("#place-search").fill(q);
+    await page.waitForTimeout(500);
+    const items = await page.locator("#place-results .stars-suggest-name").allTextContents();
+    check(
+      `「${q}」(部分)で ${want} が出る`,
+      items.some((t) => t === want),
+      items.slice(0, 4).join(" / ") || "0件"
+    );
+  }
+
+  /*
+   * 主の索引に無い字(あざ)の名前。
+   * 集落の索引(別ファイル)を後から読んで拾えること。
+   * 大きいので、当たらなかったときだけ取りに行く作りになっている。
+   */
+  {
+    const before = await page.evaluate(() => window.StarsPlaces.isLocalReady());
+    check("集落の索引は当たるうちは読まない", before === false, `読み込み済み=${before}`);
+
+    await page.locator("#place-search").fill("六呂師");
+    await page.waitForFunction(
+      () => {
+        const box = document.getElementById("place-results");
+        return box && !box.hidden && box.querySelector(".stars-suggest-name");
+      },
+      { timeout: 30000 }
+    ).catch(() => {});
+    const items = await page.locator("#place-results .stars-suggest-name").allTextContents();
+    check(
+      "字(あざ)の名前は集落の索引から拾う",
+      items.some((t) => /六呂師/.test(t)),
+      items.slice(0, 3).join(" / ") || "0件"
+    );
+    const after = await page.evaluate(() => window.StarsPlaces.isLocalReady());
+    check("そのとき集落の索引を読みに行っている", after === true, `読み込み済み=${after}`);
+  }
+
+  // どこにも無い地名は、黙って閉じずにそう言う
+  await page.locator("#place-search").fill("ぬるぽ砂漠");
+  await page.waitForTimeout(800);
+  {
+    const note = await page.locator("#place-results .stars-suggest-note").textContent().catch(() => "");
+    check("見つからないときは、その旨を出す", /見つかりませんでした/.test(note || ""), String(note));
+  }
+
   for (const [q, want] of [["富士山", "山梨県"], ["八ヶ岳", "長野県"], ["阿蘇山", "熊本県"]]) {
     await page.locator("#place-search").fill(q);
     await page.waitForTimeout(400);

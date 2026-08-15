@@ -161,6 +161,64 @@ const show = (r) => `${r.name}(${r.pref}・${r.kind})`;
   );
 }
 
+/* ---- 2-e. 部分一致で結果が出る ------------------------------------------- */
+{
+  /*
+   * 「星野」「望岳」のような、地名の一部だけを打った場合。
+   * 旧市町村(合併で消えた町村)と展望台を索引に入れるまで0件だった。
+   * 人はいつまでも旧町村の名前で場所を呼ぶ。
+   */
+  const cases = [
+    ["星野", "星野村", "福岡県"],
+    ["望岳", "望岳台", "北海道"],
+    ["秩父", "秩父市", "埼玉県"],
+    ["阿蘇", "阿蘇市", "熊本県"]
+  ];
+  for (const [q, want, pref] of cases) {
+    const hits = Places.search(q, 5);
+    ok(
+      hits.some((h) => h.name === want && h.pref === pref),
+      `「${q}」(部分)で ${want} が出る`,
+      hits.slice(0, 3).map(show).join(" , ") || "0件"
+    );
+  }
+}
+
+/* ---- 2-f. 集落・字の索引(第2段) ------------------------------------------ */
+{
+  /*
+   * 主の索引には市区町村と地形しか入っていない。
+   * 「六呂師」「碇」のような字(あざ)の名前は集落の索引にしかない。
+   * 大きいので、主の索引で当たらなかったときだけ読む作りになっている。
+   */
+  ok(!Places.isLocalReady(), "集落の索引は最初は読んでいない");
+
+  const before = Places.search("六呂師", 5);
+  ok(before.length === 0, "集落の索引が無いうちは0件", before.map(show).join(" , "));
+
+  const local = JSON.parse(
+    readFileSync(path.join(ROOT, "stars", "data", "places-local.json"), "utf8")
+  );
+  Places.adoptLocal(local);
+  ok(Places.isLocalReady(), "集落の索引を読み込める");
+  ok(local.places.length > 10000, `集落が1万件以上ある`, `${local.places.length} 件`);
+
+  for (const q of ["六呂師", "碇"]) {
+    const hits = Places.search(q, 5);
+    ok(hits.length > 0, `「${q}」が集落の索引で見つかる`, hits.slice(0, 2).map(show).join(" , "));
+  }
+
+  // 主の索引で足りているときは、集落を混ぜて押し出さない
+  const fuji = Places.search("富士山", 3);
+  ok(
+    fuji[0] && fuji[0].name === "富士山" && fuji[0].pref === "山梨県",
+    "集落を読んだあとも代表地点が先頭のまま",
+    fuji.map(show).join(" , ")
+  );
+
+  ok(local.license === "CC BY 4.0", "集落の索引にもライセンスがある", String(local.license));
+}
+
 /* ---- 3. 前方一致が、完全一致の代表地点を押しのけない -------------------- */
 {
   const hits = Places.search("富士山", 8);

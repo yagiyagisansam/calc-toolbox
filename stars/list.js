@@ -344,6 +344,23 @@
     return out.slice(0, 12);
   }
 
+  /** 候補の代わりに一言だけ出す(探している最中・見つからなかったとき) */
+  function renderNote(text) {
+    var box = el("place-results");
+    if (!box) return;
+    box.textContent = "";
+    var li = document.createElement("li");
+    li.className = "stars-suggest-note";
+    li.textContent = text;
+    box.appendChild(li);
+    box.hidden = false;
+  }
+
+  /** 集落の索引を取りに行っている間の表示。黙って空欄にしない */
+  function renderSearching() {
+    renderNote("小さな地名も探しています…");
+  }
+
   function renderSuggest(items) {
     var box = el("place-results");
     var input = el("place-search");
@@ -419,6 +436,20 @@
     return placesPromise;
   }
 
+  /*
+   * 集落・字の索引を読み込む。
+   *
+   * 主の索引には市区町村と地形しか入っていないので、「六呂師」「碇」のような
+   * 字(あざ)の名前だと1件も出ない。集落まで入れると gzip 後で 178KB → 620KB に
+   * なるため、別ファイルにして「主の索引で当たらなかったとき」だけ取りに行く。
+   */
+  var localPromise = null;
+  function ensureLocalLoaded() {
+    if (!Places || !Places.loadLocal) return Promise.resolve();
+    if (!localPromise) localPromise = Places.loadLocal(CONFIG.lightPollution.dataDir);
+    return localPromise;
+  }
+
   function setupSearch() {
     var input = el("place-search");
     if (!input) return;
@@ -431,7 +462,24 @@
         return;
       }
       ensureLoaded().then(function () {
-        renderSuggest(suggest(value));
+        var items = suggest(value);
+        renderSuggest(items);
+        if (items.length) return;
+
+        /*
+         * 1件も出なかったときだけ、集落・字の索引まで探しにいく。
+         * 打ち終わった人を待たせないよう、先に「探しています」を出す。
+         * 読み込んでいる間に別の文字を打たれていたら、その結果は捨てる ──
+         * 古い問い合わせの答えで今の候補を上書きしないため。
+         */
+        renderSearching();
+        ensureLocalLoaded().then(function () {
+          if (input.value !== value) return;
+          var more = suggest(value);
+          if (more.length) renderSuggest(more);
+          // ここまで探して無ければ、黙って閉じずにそう言う
+          else renderNote("「" + value + "」に当たる地名は見つかりませんでした");
+        });
       });
     });
 
