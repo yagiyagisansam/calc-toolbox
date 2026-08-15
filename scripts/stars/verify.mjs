@@ -1040,6 +1040,22 @@ try {
     const before = await page.evaluate(() => window.StarsPlaces.isLocalReady());
     check("集落の索引は当たるうちは読まない", before === false, `読み込み済み=${before}`);
 
+    /*
+     * 446KB を取りに行く判断なので、引き金は狭くしてある。
+     *   ・1文字では取りに行かない(打ち間違いの1文字で引くのは割に合わない)
+     *   ・打ち終わるのを待つ(途中の0件のたびに始めない)
+     */
+    await page.locator("#place-search").fill("〇");
+    await page.waitForTimeout(900);
+    const afterOne = await page.evaluate(() => window.StarsPlaces.isLocalReady());
+    check("1文字では集落の索引を読みに行かない", afterOne === false, `読み込み済み=${afterOne}`);
+
+    // 打っている途中(400ms 未満)では始まらない
+    await page.locator("#place-search").fill("六呂");
+    await page.waitForTimeout(150);
+    const midTyping = await page.evaluate(() => window.StarsPlaces.isLocalReady());
+    check("打っている途中では読みに行かない", midTyping === false, `読み込み済み=${midTyping}`);
+
     await page.locator("#place-search").fill("六呂師");
     await page.waitForFunction(
       () => {

@@ -445,31 +445,61 @@
     if (!input) return;
 
     input.addEventListener("focus", ensureLoaded);
+    /*
+     * 集落の索引を取りに行く条件。
+     *
+     * 446KB(gzip)を取りに行く判断なので、引き金は狭くしてある。
+     *   ・打ち終わるのを 400ms 待つ。「六」「六呂」と途中で0件になるたびに
+     *     取りに行っていたら、打っているあいだに何度も始まってしまう
+     *   ・寄せたあとで2文字未満なら取りに行かない。1文字はほぼ必ず何か当たるが、
+     *     打ち間違いの1文字で446KBを引くのは割に合わない
+     *   ・主の索引が1件でも返したら取りに行かない
+     */
+    var LOCAL_DELAY_MS = 400;
+    var LOCAL_MIN_CHARS = 2;
+    var localTimer = null;
+
     input.addEventListener("input", function () {
       var value = input.value;
+      if (localTimer) {
+        clearTimeout(localTimer);
+        localTimer = null;
+      }
       if (!value.trim()) {
         renderSuggest([]);
         return;
       }
       ensureLoaded().then(function () {
+        // 打っている途中に前の問い合わせの答えが返っても、今の入力を上書きしない
+        if (input.value !== value) return;
         var items = suggest(value);
         renderSuggest(items);
         if (items.length) return;
 
+        var q = Places ? Places.normalize(value) : value.trim();
+        if (q.length < LOCAL_MIN_CHARS) return;
+        if (Places && Places.isLocalReady()) {
+          // 読み込み済みなら、上の suggest が集落まで見たうえで0件だった
+          renderNote("「" + value + "」に当たる地名は見つかりませんでした");
+          return;
+        }
+
         /*
-         * 1件も出なかったときだけ、集落・字の索引まで探しにいく。
-         * 打ち終わった人を待たせないよう、先に「探しています」を出す。
-         * 読み込んでいる間に別の文字を打たれていたら、その結果は捨てる ──
-         * 古い問い合わせの答えで今の候補を上書きしないため。
+         * 打ち終わるのを待ってから、集落・字の索引まで探しにいく。
+         * 待っているあいだに次の文字が来たら、上の clearTimeout で取り消す。
          */
-        renderSearching();
-        ensureLocalLoaded().then(function () {
+        localTimer = setTimeout(function () {
+          localTimer = null;
           if (input.value !== value) return;
-          var more = suggest(value);
-          if (more.length) renderSuggest(more);
-          // ここまで探して無ければ、黙って閉じずにそう言う
-          else renderNote("「" + value + "」に当たる地名は見つかりませんでした");
-        });
+          renderSearching();
+          ensureLocalLoaded().then(function () {
+            if (input.value !== value) return;
+            var more = suggest(value);
+            if (more.length) renderSuggest(more);
+            // ここまで探して無ければ、黙って閉じずにそう言う
+            else renderNote("「" + value + "」に当たる地名は見つかりませんでした");
+          });
+        }, LOCAL_DELAY_MS);
       });
     });
 
