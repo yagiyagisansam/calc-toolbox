@@ -355,22 +355,31 @@
     if (input) input.setAttribute("aria-expanded", "true");
   }
 
-  function setupSearch() {
-    var input = el("place-search");
-    if (!input) return;
-
-    /*
-     * 索引は約176KB(gzip後)ある。一覧を開いただけの人に読ませる必要はないので、
-     * 検索欄に触れてから取りに行く。
-     */
-    var started = false;
-    function ensureLoaded() {
-      if (started || !Places) return Promise.resolve();
-      started = true;
-      return Places.load(CONFIG.lightPollution.dataDir).catch(function () {
+  /*
+   * 地名の索引を読み込む。何度呼んでも取りに行くのは1回だけ。
+   *
+   * 索引は約178KB(gzip後)ある。一覧を開いただけの人に読ませる必要はないので、
+   * 「検索欄に触れる」「地図を開く」のどちらかがあってから取りに行く。
+   *
+   * 地図の側でも呼ぶのを忘れていた時期があり、検索欄に触れずに地図を開いて
+   * 地点を選ぶと、地名が出ずに座標のままになっていた
+   * (しかも、あとから索引が届いても座標のままだった)。
+   */
+  var placesPromise = null;
+  function ensureLoaded() {
+    if (!Places) return Promise.resolve();
+    if (!placesPromise) {
+      // 失敗もここで受け止める。呼ぶ側は必ず then で続けられる
+      placesPromise = Places.load(CONFIG.lightPollution.dataDir).catch(function () {
         setStatus("地名データを読み込めませんでした。掲載スポット名では探せます。", true);
       });
     }
+    return placesPromise;
+  }
+
+  function setupSearch() {
+    var input = el("place-search");
+    if (!input) return;
 
     input.addEventListener("focus", ensureLoaded);
     input.addEventListener("input", function () {
@@ -420,6 +429,8 @@
       var open = wrap.hidden;
       wrap.hidden = !open;
       button.textContent = open ? "地図を閉じる" : "地図で選ぶ";
+      // 地図で選んだ地点に名前をつけるのに索引が要る。開いた時点で取りに行く
+      if (open) ensureLoaded();
       if (!open || pickMap) {
         if (pickMap) pickMap.resize();
         return;
@@ -452,9 +463,27 @@
 
       pickMap.on("click", function (e) {
         var point = { lat: e.lngLat.lat, lon: e.lngLat.lng };
-        if (!marker._map) marker.addTo(pickMap);
+        /*
+         * 位置を決めてから地図に載せる。順番が逆だと、まだ基準点が無いときの
+         * 最初の1回で MapLibre が中を読みに行って落ちる
+         * (基準点がある状態で開くと marker に位置が入っているので気づけない)。
+         */
         marker.setLngLat([point.lon, point.lat]);
+        if (!marker._map) marker.addTo(pickMap);
+        // 索引がまだ来ていなくても、待たせずに座標で決める(並べ替えは今すぐできる)
         setOrigin(point, describePoint(point));
+        /*
+         * 索引が届いたら、同じ地点をもう一度名前にし直す。
+         * その間に別の場所を選ばれていたら何もしない ──
+         * 古い問い合わせの結果で今の表示を上書きしないため。
+         */
+        ensureLoaded().then(function () {
+          if (!state.origin) return;
+          if (state.origin.lat !== point.lat || state.origin.lon !== point.lon) return;
+          var label = describePoint(point);
+          if (label === state.origin.label) return;
+          setOrigin(point, label);
+        });
       });
     });
   }
@@ -842,5 +871,12 @@
     start();
   }
 
-  global.StarsList = { state: state, bestOfNight: bestOfNight };
+  global.StarsList = {
+    state: state,
+    bestOfNight: bestOfNight,
+    // 検証用。地図の click を人手でなぞるのに使う(検証環境にはタイルが来ない)
+    pickMap: function () {
+      return pickMap;
+    }
+  };
 })(typeof window !== "undefined" ? window : globalThis);

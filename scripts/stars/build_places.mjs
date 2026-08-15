@@ -30,6 +30,7 @@ import { gzipSync, inflateRawSync } from "node:zlib";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { PREFECTURES } from "./prefectures.mjs";
+import { EXTRA_PLACES, DROP_NAMES } from "./places-extra.mjs";
 
 const run = promisify(execFile);
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -49,6 +50,17 @@ const KINDS = {
   ADM2: { kind: "city", label: "市・郡" },
   ADM3: { kind: "city", label: "町・村・区" },
   MT: { kind: "place", label: "山" },
+  /*
+   * 火山と山地・連峰。
+   *
+   * これを落としていたせいで、富士山(3776m)が索引に入っていなかった。
+   * GeoNames では富士山の分類は MT ではなく VLC(火山)で、
+   * 「富士山」で検索すると神奈川と千葉の小さな丘(標高167m/288m)だけが出ていた。
+   * 阿蘇山・開聞岳・桜島も VLC、八ヶ岳連峰・榛名山・剱岳は MTS。
+   * 星を見に行く先として、どれも落としてよいものではない。
+   */
+  VLC: { kind: "place", label: "火山" },
+  MTS: { kind: "place", label: "山地・連峰" },
   PK: { kind: "place", label: "峰" },
   HLL: { kind: "place", label: "丘" },
   PASS: { kind: "place", label: "峠" },
@@ -89,11 +101,15 @@ const PREF_NAMES = new Set(PREFECTURES.map(([p]) => p));
 /**
  * カタカナをひらがなに寄せる。
  * 検索で「ちちぶ」と打っても「チチブ」と打っても当たるようにするため。
+ *
+ * ヶ・ヵ は変換しない(理由は stars/places.js の同名の関数に書いた)。
+ * ここと向こうで規則が食い違うと、索引と検索語が噛み合わなくなる。
  */
 function toHiragana(s) {
-  return s.replace(/[ァ-ヶ]/g, (c) =>
-    String.fromCharCode(c.charCodeAt(0) - 0x60)
-  );
+  return s
+    .replace(/[ァ-ヴ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60))
+    .replace(/ゕ/g, "ヵ")
+    .replace(/ゖ/g, "ヶ");
 }
 
 /** zip の中の1ファイルを取り出す(格納/deflate のみ。JP.zip はこれで足りる) */
@@ -165,13 +181,18 @@ const seen = new Set();
 const rows = [];
 const counts = {};
 
+const extraById = new Map(EXTRA_PLACES.map((e) => [e.id, e]));
+const extraSeen = new Set();
+
 for (const line of text.split("\n")) {
   const c = line.split("\t");
   if (c.length < 19) continue;
-  const spec = KINDS[c[7]];
+  const extra = extraById.get(c[0]);
+  const spec = extra ? { kind: "place", label: extra.label } : KINDS[c[7]];
   if (!spec) continue;
 
-  const alts = c[3].split(",");
+  const alts = extra ? [extra.name, extra.kana] : c[3].split(",");
+  if (extra) extraSeen.add(c[0]);
 
   /*
    * 表示に使う日本語名を選ぶ。
@@ -201,6 +222,9 @@ for (const line of text.split("\n")) {
   // 読み。ひらがな・カタカナだけの別名を拾ってひらがなに寄せる
   const kanaAlts = alts.filter((a) => ALL_KANA.test(a)).map(toHiragana);
   const kana = kanaAlts.sort((a, b) => b.length - a.length)[0] || "";
+
+  // 星を見に行く先の検索には使わないもの(本州・尖閣諸島など。理由は places-extra.mjs)
+  if (DROP_NAMES.has(name)) continue;
 
   const pref = c[7] === "ADM1" ? name : PREF_BY_CODE.get(c[10]) || "";
   const lat = Number(c[4]);
@@ -234,6 +258,80 @@ for (const line of text.split("\n")) {
   });
 }
 
+/* ---- 補完辞書が全部当たったか ---- */
+for (const e of EXTRA_PLACES) {
+  if (!extraSeen.has(e.id)) {
+    throw new Error(
+      `補完辞書の id ${e.id}(${e.name})が GeoNames に見つかりません。\n` +
+        `  ${e.note}\n` +
+        "  GeoNames 側で id が変わったか、消えた可能性があります。確かめてから直してください。"
+    );
+  }
+}
+
+/*
+ * ---- 都道府県が空のまま残った地点を埋める ----
+ *
+ * GeoNames の admin1 が空の行が残る。ほとんどは離島と湖で、
+ * そのままだと絞り込みの表示が「・島」「・湖」になり、
+ * どこの島なのか分からないまま候補に並ぶ。
+ *
+ * 埋め方は「いちばん近い市区町村の県」。島や湖は必ずどこかの
+ * 市区町村に属しているので、40km 以内に市区町村があればそれで足りる
+ * (いちばん遠い伊豆諸島でも本土側ではなく島の役場が当たる)。
+ * それでも見つからないものは、索引から落とす ── 県が分からない地点を
+ * 候補に出しても、利用者はどこの話か判断できない。
+ */
+{
+  const admins = rows.filter((r) => r.t === "city" && r.p);
+  const LIMIT_KM = 40;
+  let filled = 0;
+  const dropped = [];
+
+  const distKm = (a, b, c2, d) => {
+    const R = 6371;
+    const dLat = ((c2 - a) * Math.PI) / 180;
+    const dLon = ((d - b) * Math.PI) / 180;
+    const la = (a * Math.PI) / 180;
+    const lb = (c2 * Math.PI) / 180;
+    const h =
+      Math.sin(dLat / 2) ** 2 + Math.cos(la) * Math.cos(lb) * Math.sin(dLon / 2) ** 2;
+    return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+  };
+
+  for (const r of rows) {
+    if (r.p) continue;
+    let best = null;
+    let bestKm = Infinity;
+    for (const a of admins) {
+      const km = distKm(r.y, r.x, a.y, a.x);
+      if (km < bestKm) {
+        bestKm = km;
+        best = a;
+      }
+    }
+    if (best && bestKm <= LIMIT_KM) {
+      r.p = best.p;
+      filled++;
+    } else {
+      dropped.push(`${r.n}(${r.l}, 最寄り ${best ? Math.round(bestKm) : "?"}km)`);
+    }
+  }
+
+  const before = rows.length;
+  for (let i = rows.length - 1; i >= 0; i--) if (!rows[i].p) rows.splice(i, 1);
+  process.stderr.write(
+    `都道府県の補完: ${filled} 件を埋め、${before - rows.length} 件を落とした\n`
+  );
+  if (dropped.length) process.stderr.write(`  落としたもの: ${dropped.join(" / ")}\n`);
+}
+
+/* 都道府県が空の行が1件も残っていないこと(絞り込みの表示が壊れるため) */
+const noPref = rows.filter((r) => !r.p);
+if (noPref.length) {
+  throw new Error(`都道府県が空の地点が ${noPref.length} 件残っています`);
+}
+
 /*
  * 並びは「行政区分が先、そのあと地形」。
  * 同じ綴りで当たったとき、市町村を先に出したほうが住所検索として自然なため。
@@ -256,8 +354,14 @@ const out = {
   note:
     "地名から座標を引くための索引。住所検索サービスを呼ばずに済ませるために同梱している" +
     "(静的サイトで鍵を隠せる中継役がなく、外部への直叩きは先方の規約に反するため)。",
-  source: "GeoNames (https://www.geonames.org/)",
+  source: "GeoNames geographical database (https://www.geonames.org/)",
   license: "CC BY 4.0",
+  licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
+  // CC BY 4.0 は「出典・ライセンスへのリンク・変更した旨」の3つを求める。
+  // 変更した旨をここにも残す(表示はサイトのフッターと about ページ)。
+  modifications:
+    "日本の地点から星見の目印になる種別だけを抜き出し、" +
+    "日本語表記と読みを選び、都道府県を補い、配列に詰め直した",
   generatedAt: new Date().toISOString().slice(0, 10),
   counts,
   // places の1件は [名前, 読み(ひらがな), 都道府県の番号, 分類の番号, 緯度, 経度]

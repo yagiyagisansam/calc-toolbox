@@ -41,18 +41,26 @@
         if (!r.ok) throw new Error("地名データを取得できません (" + r.status + ")");
         return r.json();
       })
-      .then(function (data) {
-        if (!data || !Array.isArray(data.places)) {
-          throw new Error("地名データの形式が正しくありません");
-        }
-        state.meta = data;
-        state.rows = data.places;
-        state.prefs = data.prefs || [];
-        state.kinds = data.kinds || [];
-        state.ready = true;
-        return data;
-      });
+      .then(adopt);
     return loading;
+  }
+
+  /**
+   * 既に手元にある索引を使う。
+   * ブラウザでは load() が内部で呼ぶ。Node のテストからは直に呼ぶ
+   * (fetch を差し替えずに検索の中身を確かめるため)。
+   * @param {object} data places.json の中身
+   */
+  function adopt(data) {
+    if (!data || !Array.isArray(data.places)) {
+      throw new Error("地名データの形式が正しくありません");
+    }
+    state.meta = data;
+    state.rows = data.places;
+    state.prefs = data.prefs || [];
+    state.kinds = data.kinds || [];
+    state.ready = true;
+    return data;
   }
 
   function isReady() {
@@ -62,11 +70,22 @@
   /**
    * カタカナをひらがなに寄せる。
    * iPhone の予測変換ではカタカナが出やすいので、どちらで打っても当たるようにする。
+   *
+   * ヶ と ヵ は変換しない。
+   *   これは「小さいケ」ではなく、箇の略字として地名にそのまま入る文字で、
+   *   八ヶ岳・槍ヶ岳・霧ヶ峰・関ヶ原 のように漢字の名前の一部として現れる。
+   *   ァ〜ヶ をまとめて 0x60 引くと ヶ が ゖ(ほとんど使われない小さいけ)になり、
+   *   索引の側は「ヶ」のままなので永久に一致しなくなる。
+   *   実際、これで「八ヶ岳」も「槍ヶ岳」も1件も出ない状態になっていた。
+   *   逆に、利用者が ゖ・ゕ を打った場合は ヶ・ヵ に寄せて拾う。
    */
   function toHiragana(s) {
-    return String(s).replace(/[ァ-ヶ]/g, function (c) {
-      return String.fromCharCode(c.charCodeAt(0) - 0x60);
-    });
+    return String(s)
+      .replace(/[ァ-ヴ]/g, function (c) {
+        return String.fromCharCode(c.charCodeAt(0) - 0x60);
+      })
+      .replace(/ゕ/g, "ヵ")
+      .replace(/ゖ/g, "ヶ");
   }
 
   /** 検索用に整える(前後の空白を落とし、カナをひらがなへ) */
@@ -163,6 +182,7 @@
 
   var api = {
     load: load,
+    adopt: adopt,
     isReady: isReady,
     search: search,
     prefectures: prefectures,

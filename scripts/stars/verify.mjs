@@ -908,6 +908,23 @@ try {
     check("かなでも地名を探せる", items.some((t) => /秩父/.test(t)), items.slice(0, 4).join(" / "));
   }
 
+  /*
+   * 有名な地点が代表として出ること。
+   * 「富士山」は索引に日本最高峰が入っておらず、千葉と神奈川の丘だけが
+   * 出ていた(火山という分類を索引から落としていたため)。
+   * 「八ヶ岳」はカナをひらがなへ寄せる処理が ヶ まで変換していて0件だった。
+   */
+  for (const [q, want] of [["富士山", "山梨県"], ["八ヶ岳", "長野県"], ["阿蘇山", "熊本県"]]) {
+    await page.locator("#place-search").fill(q);
+    await page.waitForTimeout(400);
+    const first = await page.locator("#place-results .stars-suggest-item").first().textContent();
+    check(
+      `「${q}」の先頭が ${want} になる`,
+      new RegExp(want).test(first || ""),
+      (first || "0件").replace(/\s+/g, " ").trim()
+    );
+  }
+
   // 候補を選ぶと基準点になり、そこから近い順に並ぶ
   await page.locator("#place-search").fill("石垣市");
   await page.waitForTimeout(400);
@@ -968,6 +985,42 @@ try {
   const byName = await page.locator("#spot-rows tr th a").allTextContents();
   // 読み(name_kana)の五十音順。「いしがきじま」がいちばん先。
   check("名前順に並べ替えできる", byName[0] === "石垣島の浜", byName.join(" > "));
+
+  /*
+   * 検索欄に一度も触れず、地図だけを使った場合。
+   *
+   * 索引の読み込みは検索欄に触れたときにしか始まっていなかったので、
+   * この順番だと地点を選んでも地名が出ず、座標のままになっていた。
+   * しかも、あとから索引が届いても座標のままだった。
+   * ページを読み直して、その順番をそのまま再現する。
+   */
+  await page.goto(`http://127.0.0.1:${PORT}/stars/list.html`, { waitUntil: "load", timeout: 60000 });
+  await page.waitForFunction(() => window.StarsList && window.StarsList.state.ready, { timeout: 30000 });
+  {
+    const touched = await page.evaluate(() => window.StarsPlaces.isReady());
+    check("開いただけでは地名の索引を読み込まない", touched === false, `読み込み済み=${touched}`);
+  }
+  await page.getByRole("button", { name: "地図で選ぶ" }).click();
+  await page.waitForTimeout(600);
+  await page.evaluate(() => {
+    // 地図の click を人手でなぞる(この環境ではタイルが来ないので座標で起こす)
+    window.StarsList.pickMap().fire("click", { lngLat: { lat: 35.44, lng: 137.68 } });
+  });
+  await page.waitForFunction(
+    () => {
+      const t = document.getElementById("origin-label");
+      return t && t.textContent && !/\d+\.\d+, \d+\.\d+/.test(t.textContent);
+    },
+    { timeout: 20000 }
+  ).catch(() => {});
+  {
+    const label = await page.locator("#origin-label").textContent();
+    check(
+      "検索欄に触れず地図だけを使っても地名が出る",
+      /付近/.test(label || "") && !/\d+\.\d+, \d+\.\d+/.test(label || ""),
+      String(label)
+    );
+  }
 
   // ---- スポット詳細 ----
   console.log("\nスポット詳細 (stars/spot.html):");
