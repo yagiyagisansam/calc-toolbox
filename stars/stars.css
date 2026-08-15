@@ -721,6 +721,13 @@ textarea.stars-input {
   color: var(--page-ink-2);
 }
 
+/* 候補の代わりの一言(探している最中・見つからなかったとき) */
+.stars-suggest-note {
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--page-ink-2);
+}
+
 .stars-pickmap {
   margin-top: 10px;
 }

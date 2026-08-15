@@ -36,6 +36,7 @@ const run = promisify(execFile);
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(HERE, "..", "..");
 const OUT = path.join(ROOT, "stars", "data", "places.json");
+const OUT_LOCAL = path.join(ROOT, "stars", "data", "places-local.json");
 const URL_JP = "https://download.geonames.org/export/dump/JP.zip";
 
 /*
@@ -49,6 +50,18 @@ const KINDS = {
   ADM1: { kind: "pref", label: "都道府県" },
   ADM2: { kind: "city", label: "市・郡" },
   ADM3: { kind: "city", label: "町・村・区" },
+  /*
+   * 合併で無くなった市町村。
+   *
+   * 人はいつまでも旧町村の名前で場所を呼ぶ。星見の目印もそうで、
+   * 「星野村」(2010年に八女市へ)、「美星町」(2005年に井原市へ)は
+   * いまも通じる名前なのに、現行の市区町村しか索引に無いと0件になる。
+   * 表示は「旧市町村」と添えて、いまの自治体と取り違えないようにする。
+   */
+  ADM2H: { kind: "city", label: "旧市町村" },
+  ADM3H: { kind: "city", label: "旧市町村" },
+  // 展望台。星を見に行く先そのもの
+  OBPT: { kind: "place", label: "展望台" },
   MT: { kind: "place", label: "山" },
   /*
    * 火山と山地・連峰。
@@ -181,6 +194,21 @@ const seen = new Set();
 const rows = [];
 const counts = {};
 
+/*
+ * 集落・字の名前。
+ *
+ * 主の索引とは分けて持つ。星を見に行く先を探す人は「六呂師」「砥峰」「星野」
+ * のような字(あざ)の名前でも打つが、GeoNames の集落は46,573件あり、
+ * 主の索引(9,743件)に混ぜると gzip 後で178KB → 600KB を超える。
+ * 一覧を開いただけの人にそれを読ませるわけにはいかない。
+ *
+ * そこで、主の索引で1件も当たらなかったときだけ取りに行く別ファイルにする。
+ * 座標は小数3桁(約110m)。この索引は「だいたいどこか」が分かれば足りる。
+ */
+const LOCAL_CODES = new Set(["PPL", "PPLL", "PPLX", "PPLA2", "PPLA3", "PPLA4", "PPLA"]);
+const localRows = [];
+const localSeen = new Set();
+
 const extraById = new Map(EXTRA_PLACES.map((e) => [e.id, e]));
 const extraSeen = new Set();
 
@@ -189,6 +217,27 @@ for (const line of text.split("\n")) {
   if (c.length < 19) continue;
   const extra = extraById.get(c[0]);
   const spec = extra ? { kind: "place", label: extra.label } : KINDS[c[7]];
+
+  if (!spec && LOCAL_CODES.has(c[7])) {
+    const alts0 = c[3].split(",");
+    const kanji0 = alts0.filter((a) => HAS_KANJI.test(a) && !SIMPLIFIED.test(a));
+    if (!kanji0.length) continue;
+    // 集落は短い名前のほうが地名として使われる(「本町一丁目」より「本町」)
+    const nm = kanji0.sort((a, b) => a.length - b.length || a.localeCompare(b, "ja"))[0];
+    const la = Number(c[4]);
+    const lo = Number(c[5]);
+    if (!isFinite(la) || !isFinite(lo)) continue;
+    const key0 = `${nm}|${la.toFixed(2)}|${lo.toFixed(2)}`;
+    if (localSeen.has(key0)) continue;
+    localSeen.add(key0);
+    localRows.push({
+      n: nm,
+      p: PREF_BY_CODE.get(c[10]) || "",
+      y: Math.round(la * 1000) / 1000,
+      x: Math.round(lo * 1000) / 1000
+    });
+    continue;
+  }
   if (!spec) continue;
 
   const alts = extra ? [extra.name, extra.kana] : c[3].split(",");
@@ -433,3 +482,36 @@ process.stderr.write(
   `\n${OUT}\n  ${rows.length} 件 / 生 ${(bytes / 1024).toFixed(0)} KB / gzip ${(gz / 1024).toFixed(0)} KB\n` +
     Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([k, v]) => `  ${k}: ${v}`).join("\n") + "\n"
 );
+
+/* ---- 集落・字の索引(主の索引で当たらなかったときだけ読む) ---- */
+{
+  const localPrefs = [...new Set(localRows.map((r) => r.p))];
+  const localPrefIndex = new Map(localPrefs.map((v, i) => [v, i]));
+  localRows.sort((a, b) => a.n.length - b.n.length || a.n.localeCompare(b.n, "ja"));
+
+  const localOut = {
+    note:
+      "集落・字の名前と座標。主の索引(places.json)で1件も当たらなかったときだけ読む。" +
+      "「六呂師」「砥峰」「星野」のような字の名前でも探せるようにするため。" +
+      "大きいので、はじめから読むことはしない。",
+    source: "GeoNames geographical database (https://www.geonames.org/)",
+    license: "CC BY 4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
+    modifications:
+      "日本の集落・市街地の地点から日本語表記を選び、都道府県を補い、" +
+      "座標を小数3桁(約110m)に丸めて配列に詰め直した",
+    generatedAt: new Date().toISOString().slice(0, 10),
+    kind: "集落・地区",
+    // 1件は [名前, 都道府県の番号, 緯度, 経度]。読みと標高は持たない
+    format: ["name", "prefIndex", "lat", "lon"],
+    prefs: localPrefs,
+    places: localRows.map((r) => [r.n, localPrefIndex.get(r.p), r.y, r.x])
+  };
+
+  const localJson = JSON.stringify(localOut);
+  await writeFile(OUT_LOCAL, localJson);
+  process.stderr.write(
+    `\n${OUT_LOCAL}\n  ${localRows.length} 件 / 生 ${(Buffer.byteLength(localJson) / 1024).toFixed(0)} KB` +
+      ` / gzip ${(gzipSync(localJson).length / 1024).toFixed(0)} KB\n`
+  );
+}

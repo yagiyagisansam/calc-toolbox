@@ -23,10 +23,16 @@
     meta: null,
     rows: [], // [名前, 読み, 県番号, 分類番号, 緯度, 経度, 順位]
     prefs: [],
-    kinds: []
+    kinds: [],
+    // 集落・字の索引。主の索引で当たらなかったときだけ読む
+    localReady: false,
+    localRows: [],
+    localPrefs: [],
+    localFolded: []
   };
 
   var loading = null;
+  var loadingLocal = null;
 
   /**
    * 索引を読み込む。何度呼んでも1回しか取りに行かない。
@@ -70,8 +76,51 @@
     return data;
   }
 
+  /**
+   * 集落・字の索引を読み込む。
+   *
+   * 主の索引(9,743件)には市区町村と地形しか入っていない。
+   * 「六呂師」「砥峰」「星野」「鵜倉」のような字(あざ)の名前で探す人は
+   * 1件も出ないままだった。集落は46,573件あり、主の索引に混ぜると
+   * gzip 後で178KB → 600KB を超えるので、別のファイルに分けてある。
+   *
+   * 読むのは「主の索引で1件も当たらなかったとき」だけ。
+   * 何度呼んでも取りに行くのは1回。
+   *
+   * @param {string} [baseUrl] data ディレクトリの場所(既定 "./data")
+   * @returns {Promise<object|null>} 読めなければ null
+   */
+  function loadLocal(baseUrl) {
+    if (loadingLocal) return loadingLocal;
+    var base = baseUrl || "./data";
+    loadingLocal = fetch(base + "/places-local.json")
+      .then(function (r) {
+        if (!r.ok) throw new Error("集落の索引を取得できません (" + r.status + ")");
+        return r.json();
+      })
+      .then(function (data) {
+        if (!data || !Array.isArray(data.places)) throw new Error("形式が正しくありません");
+        state.localRows = data.places;
+        state.localPrefs = data.prefs || [];
+        state.localFolded = data.places.map(function (row) {
+          return fold(row[0]);
+        });
+        state.localReady = true;
+        return data;
+      })
+      .catch(function () {
+        // 読めなくても主の索引だけで動く。呼ぶ側は then で続けられる
+        return null;
+      });
+    return loadingLocal;
+  }
+
   function isReady() {
     return state.ready;
+  }
+
+  function isLocalReady() {
+    return state.localReady;
   }
 
   /**
@@ -188,8 +237,54 @@
       return a.tier - b.tier || (b.row[6] || 0) - (a.row[6] || 0);
     });
 
-    return hits.slice(0, max).map(function (h) {
+    var out = hits.slice(0, max).map(function (h) {
       return toPlace(h.row);
+    });
+
+    /*
+     * 主の索引で足りなければ、集落・字の索引からも拾う。
+     * 「六呂師」「砥峰」のような字の名前は、こちらにしか入っていない。
+     * まだ読み込んでいなければ、ここでは何も足さない
+     * (呼ぶ側が loadLocal() を済ませてから、もう一度呼ぶ)。
+     */
+    if (out.length < max && state.localReady) {
+      out = out.concat(searchLocal(q, max - out.length));
+    }
+    return out;
+  }
+
+  /** 集落・字の索引から探す。並べ方は主の索引と同じ考え方 */
+  function searchLocal(q, max) {
+    var hits = [];
+    for (var i = 0; i < state.localRows.length; i++) {
+      var name = state.localFolded[i];
+      var tier = -1;
+      if (name === q) tier = 0;
+      else if (name.indexOf(q) === 0) tier = 1;
+      else if (name.indexOf(q) >= 0) tier = 2;
+      else continue;
+      hits.push({ i: i, tier: tier });
+      // 部分一致は数が多くなりうるので、拾いすぎたら打ち切る
+      if (hits.length > 400) break;
+    }
+    // 同じ強さなら短い名前を先に(「星野」を「星野町一丁目」より先に)
+    hits.sort(function (a, b) {
+      return (
+        a.tier - b.tier ||
+        state.localRows[a.i][0].length - state.localRows[b.i][0].length
+      );
+    });
+    return hits.slice(0, max).map(function (h) {
+      var row = state.localRows[h.i];
+      return {
+        name: row[0],
+        kana: "",
+        pref: state.localPrefs[row[1]] || "",
+        kind: "集落・地区",
+        lat: row[2],
+        lon: row[3],
+        rank: 0
+      };
     });
   }
 
@@ -224,8 +319,20 @@
 
   var api = {
     load: load,
+    loadLocal: loadLocal,
     adopt: adopt,
+    /** 既に手元にある集落の索引を使う(テスト用) */
+    adoptLocal: function (data) {
+      state.localRows = data.places;
+      state.localPrefs = data.prefs || [];
+      state.localFolded = data.places.map(function (row) {
+        return fold(row[0]);
+      });
+      state.localReady = true;
+      return data;
+    },
     isReady: isReady,
+    isLocalReady: isLocalReady,
     search: search,
     prefectures: prefectures,
     citiesOf: citiesOf,
