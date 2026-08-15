@@ -1191,8 +1191,8 @@
         "source": "国土地理院 逆ジオコーダ",
         "at": "2026-08-15"
       },
-      "coordSource": "Yahoo!マップの施設地点。公式住所 阿智村浪合1192-356 と照合",
-      "coordVerified": true,
+      "coordSource": "参考値はYahoo!マップの施設地点で、公式住所 阿智村浪合1192-356 とは照合した。ただし公式発信の座標を確認できなかったため未確定",
+      "coordVerified": false,
       "selection": {
         "no": 14,
         "decision": "不採用",
