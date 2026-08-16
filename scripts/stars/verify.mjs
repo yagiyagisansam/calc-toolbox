@@ -16,107 +16,12 @@
  *
  * Playwright の入れ方は scripts/stars/README.md を参照。
  */
-import { createServer } from "node:http";
-import { readFile, stat } from "node:fs/promises";
-import { execFileSync } from "node:child_process";
 import path from "node:path";
-import { pathToFileURL, fileURLToPath } from "node:url";
-
-/*
- * Playwright を見つける。
- *
- * 以前はこの環境の絶対パス(/opt/node22/lib/node_modules/playwright/index.mjs)を
- * 直接書いていた。手元では動くが、他の誰かが新規に checkout しても動かない。
- * Windows では動きようがない。検証スクリプトが特定の1台でしか走らないのでは
- * 「検証してある」と言えないので、普通の解決に直した。
- *
- * 順番:
- *   1. ふつうに import する(リポジトリ内の node_modules、または npm link 済み)
- *   2. グローバルに入っている場所を npm に聞く(-g で入れた場合)
- * どちらも駄目なら、入れ方を示して終わる。
- */
-async function loadChromium() {
-  try {
-    return (await import("playwright")).chromium;
-  } catch (e) {
-    /* 次を試す */
-  }
-
-  try {
-    const root = execFileSync("npm", ["root", "-g"], {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"],
-      shell: process.platform === "win32" // Windows の npm は npm.cmd
-    }).trim();
-    if (root) {
-      // パスに空白や日本語が入っていても壊れないよう、必ず file:// URL に直す
-      const entry = pathToFileURL(path.join(root, "playwright", "index.mjs")).href;
-      return (await import(entry)).chromium;
-    }
-  } catch (e) {
-    /* 下の案内へ */
-  }
-
-  console.error(
-    [
-      "Playwright が見つかりません。次のどちらかで入れてください。",
-      "",
-      "  リポジトリの中に入れる場合:",
-      "    npm install --no-save playwright",
-      "    npx playwright install chromium",
-      "",
-      "  端末全体に入れる場合:",
-      "    npm install -g playwright",
-      "    npx playwright install chromium",
-      "",
-      "詳しくは scripts/stars/README.md を参照してください。"
-    ].join("\n")
-  );
-  process.exit(2);
-}
+import { ROOT, loadChromium, serve, launch, relayExternal } from "./harness.mjs";
 
 const chromium = await loadChromium();
 
-const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const PORT = 8788;
-
-const TYPES = {
-  ".html": "text/html; charset=utf-8",
-  ".js": "text/javascript; charset=utf-8",
-  ".mjs": "text/javascript; charset=utf-8",
-  ".css": "text/css; charset=utf-8",
-  ".json": "application/json; charset=utf-8",
-  ".png": "image/png",
-  ".svg": "image/svg+xml"
-};
-
-/* 公開時と同じ相対パスで読めるよう、リポジトリのルートをそのまま配信する */
-function serve() {
-  return new Promise((resolve) => {
-    const server = createServer(async (req, res) => {
-      try {
-        let rel = decodeURIComponent(req.url.split("?")[0]);
-        if (rel.endsWith("/")) rel += "index.html";
-        const file = path.join(ROOT, rel);
-        if (!file.startsWith(ROOT)) {
-          res.writeHead(403).end();
-          return;
-        }
-        const info = await stat(file);
-        if (info.isDirectory()) {
-          res.writeHead(404).end();
-          return;
-        }
-        const body = await readFile(file);
-        res.writeHead(200, { "Content-Type": TYPES[path.extname(file)] || "application/octet-stream" });
-        res.end(body);
-      } catch (e) {
-        res.writeHead(404).end("not found");
-      }
-    });
-    server.listen(PORT, () => resolve(server));
-  });
-}
 
 const argv = process.argv.slice(2);
 const headed = argv.includes("--headed");
@@ -141,7 +46,7 @@ function check(name, ok, detail) {
   if (!ok) failed++;
 }
 
-const server = await serve();
+const server = await serve(PORT);
 
 /*
  * この検証環境のブラウザは外部へ出られない(タイル配信も天気APIも届かない)。
@@ -149,31 +54,8 @@ const server = await serve();
  * 地図の下地は届かないままだが、「下地が無くても色分けは動く」ことこそ
  * 確かめたい挙動なので、それでよい。
  */
-let browser;
-try {
-  browser = await chromium.launch({ headless: !headed });
-} catch (err) {
-  /*
-   * Playwright は入っているが、対応するブラウザの実体が無い。
-   * 素の例外だと何をすればよいか分からないので、手順を示して止める。
-   * (Playwright を入れ直すと、対応するブラウザの版も変わる。
-   *  すでに別の場所にブラウザがあるなら PLAYWRIGHT_BROWSERS_PATH で指せる。)
-   */
-  console.error(
-    [
-      "ブラウザを起動できませんでした。",
-      "",
-      String(err && err.message ? err.message : err).split("\n")[0],
-      "",
-      "次で入れてください:",
-      "  npx playwright install chromium",
-      "",
-      "別の場所に入れてある場合は PLAYWRIGHT_BROWSERS_PATH で指定できます。",
-      "詳しくは scripts/stars/README.md を参照してください。"
-    ].join("\n")
-  );
-  process.exit(2);
-}
+const browser = await launch(chromium, headed);
+
 /*
  * 画面の幅。既定は iPhone に近い縦長(Hiroさんの主環境がそれなので)。
  * --width で変えられる。狭い端末・タブレット・机上の3つで通しておくと、
@@ -300,30 +182,7 @@ const relay = argv.includes("--relay");
 if (relay) {
   const patterns = ["**://tiles.openfreemap.org/**"];
   if (argv.includes("--live")) patterns.push("**://*.supabase.co/**");
-  for (const pattern of patterns) {
-    await page.route(pattern, async (route) => {
-      const req = route.request();
-      try {
-        // apikey などの認証ヘッダをそのまま渡す(Supabase はこれが無いと弾く)
-        const headers = { ...req.headers() };
-        delete headers.host;
-        delete headers["content-length"];
-        const res = await fetch(req.url(), {
-          method: req.method(),
-          headers,
-          body: req.postData() ?? undefined
-        });
-        const body = Buffer.from(await res.arrayBuffer());
-        await route.fulfill({
-          status: res.status,
-          contentType: res.headers.get("content-type") || "application/octet-stream",
-          body
-        });
-      } catch (e) {
-        await route.abort();
-      }
-    });
-  }
+  await relayExternal(page, patterns);
 }
 
 /*
