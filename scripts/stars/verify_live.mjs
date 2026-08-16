@@ -197,6 +197,14 @@ try {
   const pins = await page.locator(".stars-pin").count();
   /* 3桁目まで同じ地点は1つのピンにまとまるので「以下」で見る */
   check(`ピンが立つ(${pins} 個 / 掲載 ${EXPECT} 件)`, pins > 0 && pins <= EXPECT, `${pins} 個`);
+  const pinPositions = await page.locator(".stars-pin").evaluateAll((elements) =>
+    [...new Set(elements.map((element) => getComputedStyle(element).position))]
+  );
+  check(
+    "ピンはMapLibreの絶対配置を保つ",
+    pinPositions.length === 1 && pinPositions[0] === "absolute",
+    pinPositions.join(", ")
+  );
 
   // 適当な1件を開いて、カードに「気をつけること」が出るか
   const first = spots[0];

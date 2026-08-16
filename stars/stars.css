@@ -377,7 +377,6 @@ a {
   background: #ffffff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
   cursor: pointer;
-  position: relative;
 }
 
 .stars-pin-count {

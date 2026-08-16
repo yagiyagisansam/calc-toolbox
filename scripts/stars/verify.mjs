@@ -622,6 +622,15 @@ try {
   const night = await page.locator("#night-range").textContent();
   check("今夜の時間帯が表示される", /の夜/.test(night), night);
 
+  const pinPositions = await page.locator(".stars-pin").evaluateAll((elements) =>
+    [...new Set(elements.map((element) => getComputedStyle(element).position))]
+  );
+  check(
+    "ピンはMapLibreの絶対配置を保つ",
+    pinPositions.length === 1 && pinPositions[0] === "absolute",
+    pinPositions.join(", ")
+  );
+
   /*
    * 地図でスポットを選んだときに「気をつけること」が出るか。
    *
