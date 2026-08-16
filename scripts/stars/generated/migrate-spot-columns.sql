@@ -1,14 +1,12 @@
 -- =============================================================
--- スポット: 市区町村(city)と気をつけること(caution)を足す
+-- スポット申請: 住所を足し、座標を管理者が掲載前に確定できるようにする
 --
 -- これは scripts/stars/setup.sql の変更部分だけを切り出したもの。
 -- Supabase の SQL Editor に貼って1回実行する。何度実行しても壊れない。
 --
 -- なぜ必要か:
---   申請フォームはこの2つを送るようになっている。列が無いと
---   「column "city" of relation "stars_spots" does not exist」で
---   申請そのものが失敗する(利用者全員が投稿できない)。
---   また、承認作業でこの2つが見えないと、何が書かれたのか確認できない。
+--   申請者に地図のピン打ちを求めず、任意の住所を手掛かりとして受け付ける。
+--   座標が未確定の申請は、管理者が場所を確認してからでないと承認できない。
 --
 -- 注意:
 --   返す列が変わる関数は create or replace では置き換えられないので、
@@ -22,7 +20,7 @@
 begin;
 
 /*
- * 既に動いている環境向け(caution と city を後から足したため)。
+ * 既に動いている環境向け(申請項目を後から足したため)。
  *
  * add column だけでは制約が付かない。まっさらな環境では列の定義に書いた
  * check がそのまま効くのに、既存の環境では効かないという食い違いが起きる。
@@ -36,10 +34,16 @@ begin;
  */
 alter table public.stars_spots add column if not exists caution text;
 alter table public.stars_spots add column if not exists city text;
+alter table public.stars_spots add column if not exists address text;
+alter table public.stars_spots alter column lat drop not null;
+alter table public.stars_spots alter column lon drop not null;
 
 update public.stars_spots
    set city = nullif(btrim(city), '')
  where city is distinct from nullif(btrim(city), '');
+update public.stars_spots
+   set address = nullif(btrim(address), '')
+ where address is distinct from nullif(btrim(address), '');
 
 do $$
 declare
@@ -83,10 +87,34 @@ begin
       add constraint stars_spots_city_check
       check (city is null or char_length(city) <= 40);
   end if;
+
+  if not exists (
+    select 1 from pg_constraint con
+      join pg_class t on t.oid = con.conrelid
+      join pg_namespace n on n.oid = t.relnamespace
+     where con.conname = 'stars_spots_address_check'
+       and n.nspname = 'public' and t.relname = 'stars_spots'
+  ) then
+    alter table public.stars_spots
+      add constraint stars_spots_address_check
+      check (address is null or char_length(address) <= 200);
+  end if;
+
+  if not exists (
+    select 1 from pg_constraint con
+      join pg_class t on t.oid = con.conrelid
+      join pg_namespace n on n.oid = t.relnamespace
+     where con.conname = 'stars_spots_approved_location_check'
+       and n.nspname = 'public' and t.relname = 'stars_spots'
+  ) then
+    alter table public.stars_spots
+      add constraint stars_spots_approved_location_check
+      check (status <> 'approved' or (lat is not null and lon is not null));
+  end if;
 end
 $$;
 
-grant insert (name, name_kana, pref, city, lat, lon, elevation_m, access, facilities, note, caution, source_url, submitter_hint)
+grant insert (name, name_kana, pref, city, address, lat, lon, elevation_m, access, facilities, note, caution, source_url, submitter_hint)
   on public.stars_spots to anon;
 
 
@@ -100,9 +128,15 @@ as $$
 declare
   v_region text;
 begin
+  -- 座標は申請時には省略できるが、片方だけの値は受け付けない。
+  if (new.lat is null) <> (new.lon is null) then
+    raise exception 'incomplete location';
+  end if;
+
   -- 対象範囲(日本)の外は受け付けない。海外へ広げるときはここを緩める。
   -- クライアント側の stars/config.js の submitBounds と同じ値にしておくこと。
-  if new.lat < 20 or new.lat > 46 or new.lon < 122 or new.lon > 154 then
+  if new.lat is not null and
+     (new.lat < 20 or new.lat > 46 or new.lon < 122 or new.lon > 154) then
     raise exception 'out of range';
   end if;
 
@@ -130,6 +164,7 @@ begin
    * 前後の空白を落とし、空になったものは無しとして扱う。
    */
   new.city := nullif(btrim(new.city), '');
+  new.address := nullif(btrim(new.address), '');
 
   -- レート制限: 同一端末は24時間で3件まで
   if (select count(*) from public.stars_spots
@@ -206,6 +241,7 @@ returns table (
   name           text,
   pref           text,
   city           text,
+  address        text,
   lat            double precision,
   lon            double precision,
   elevation_m    int,
@@ -227,7 +263,7 @@ begin
     raise exception 'unauthorized';
   end if;
   return query
-    select s.spot_id, s.name, s.pref, s.city, s.lat, s.lon, s.elevation_m,
+    select s.spot_id, s.name, s.pref, s.city, s.address, s.lat, s.lon, s.elevation_m,
            s.access, s.facilities, s.note, s.caution, s.source_url, s.submitter_hint, s.created_at
     from public.stars_spots s
     where s.status = 'pending'
@@ -236,7 +272,51 @@ begin
 end;
 $$;
 
+-- 承認
+create or replace function public.stars_ops_approve(p_token text, p_id uuid)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not public.ops_auth(p_token) then
+    raise exception 'unauthorized';
+  end if;
+  if exists (select 1 from public.stars_spots where spot_id = p_id and (lat is null or lon is null)) then
+    raise exception 'location required before approval';
+  end if;
+  update public.stars_spots
+     set status = 'approved', approved_at = now(), reject_reason = null
+   where spot_id = p_id;
+  return found;
+end;
+$$;
+
+-- 申請時に未確定だった座標を、管理者が裏取り後に設定する。
+create or replace function public.stars_ops_set_location(
+  p_token text, p_id uuid, p_lat double precision, p_lon double precision
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not public.ops_auth(p_token) then
+    raise exception 'unauthorized';
+  end if;
+  if p_lat is null or p_lon is null or p_lat < 20 or p_lat > 46 or p_lon < 122 or p_lon > 154 then
+    raise exception 'out of range';
+  end if;
+  update public.stars_spots set lat = p_lat, lon = p_lon where spot_id = p_id;
+  return found;
+end;
+$$;
+
 revoke all on function public.stars_ops_pending(text, int) from public, anon, authenticated;
+revoke all on function public.stars_ops_approve(text, uuid) from public, anon, authenticated;
+revoke all on function public.stars_ops_set_location(text, uuid, double precision, double precision) from public, anon, authenticated;
 
 commit;
 
@@ -244,13 +324,14 @@ commit;
 -- 列が増えたか
 select column_name as 列
 from information_schema.columns
-where table_name = 'stars_spots' and column_name in ('city', 'caution')
+where table_name = 'stars_spots' and column_name in ('city', 'caution', 'address')
 order by column_name;
 
--- 制約が付いたか(2行出れば成功)
+-- 制約が付いたか(4行出れば成功)
 select conname as 制約
 from pg_constraint
-where conname in ('stars_spots_city_check', 'stars_spots_caution_check')
+where conname in ('stars_spots_city_check', 'stars_spots_caution_check',
+                  'stars_spots_address_check', 'stars_spots_approved_location_check')
 order by conname;
 
 -- 公開用の関数が新しい列を返すか(空でも列名が出れば成功)

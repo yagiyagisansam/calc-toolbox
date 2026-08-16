@@ -88,10 +88,12 @@ create table if not exists public.stars_spots (
   -- 市区町村。一覧の絞り込みに使う。座標から推測はしない ──
   -- 市境の近くでは隣の町に化けるし、化けても誰も気づけないため。
   city           text check (city is null or char_length(city) <= 40),
+  -- 申請者が分かる範囲で書く住所。座標の確定は管理者が掲載前に行う。
+  address        text check (address is null or char_length(address) <= 200),
   -- region は pref から自動で埋める(申請者に選ばせない。食い違いを防ぐため)
   region         text not null,
-  lat            double precision not null,
-  lon            double precision not null,
+  lat            double precision,
+  lon            double precision,
   elevation_m    int check (elevation_m is null or elevation_m between -50 and 4000),
   access         text check (access is null or char_length(access) <= 400),
   facilities     text check (facilities is null or char_length(facilities) <= 400),
@@ -107,11 +109,14 @@ create table if not exists public.stars_spots (
   -- 端末ごとの識別子(localStorage)。連投を見分けるためだけに使う。個人情報ではない
   submitter_hint text not null check (char_length(submitter_hint) between 8 and 64),
   created_at     timestamptz not null default now(),
-  approved_at    timestamptz
+  approved_at    timestamptz,
+  -- 公開中の地点だけは必ず地図上の位置を持つ。
+  constraint stars_spots_approved_location_check
+    check (status <> 'approved' or (lat is not null and lon is not null))
 );
 
 /*
- * 既に動いている環境向け(caution と city を後から足したため)。
+ * 既に動いている環境向け(申請項目を後から足したため)。
  *
  * add column だけでは制約が付かない。まっさらな環境では列の定義に書いた
  * check がそのまま効くのに、既存の環境では効かないという食い違いが起きる。
@@ -125,10 +130,16 @@ create table if not exists public.stars_spots (
  */
 alter table public.stars_spots add column if not exists caution text;
 alter table public.stars_spots add column if not exists city text;
+alter table public.stars_spots add column if not exists address text;
+alter table public.stars_spots alter column lat drop not null;
+alter table public.stars_spots alter column lon drop not null;
 
 update public.stars_spots
    set city = nullif(btrim(city), '')
  where city is distinct from nullif(btrim(city), '');
+update public.stars_spots
+   set address = nullif(btrim(address), '')
+ where address is distinct from nullif(btrim(address), '');
 
 do $$
 declare
@@ -172,6 +183,30 @@ begin
       add constraint stars_spots_city_check
       check (city is null or char_length(city) <= 40);
   end if;
+
+  if not exists (
+    select 1 from pg_constraint con
+      join pg_class t on t.oid = con.conrelid
+      join pg_namespace n on n.oid = t.relnamespace
+     where con.conname = 'stars_spots_address_check'
+       and n.nspname = 'public' and t.relname = 'stars_spots'
+  ) then
+    alter table public.stars_spots
+      add constraint stars_spots_address_check
+      check (address is null or char_length(address) <= 200);
+  end if;
+
+  if not exists (
+    select 1 from pg_constraint con
+      join pg_class t on t.oid = con.conrelid
+      join pg_namespace n on n.oid = t.relnamespace
+     where con.conname = 'stars_spots_approved_location_check'
+       and n.nspname = 'public' and t.relname = 'stars_spots'
+  ) then
+    alter table public.stars_spots
+      add constraint stars_spots_approved_location_check
+      check (status <> 'approved' or (lat is not null and lon is not null));
+  end if;
 end
 $$;
 
@@ -195,7 +230,7 @@ create policy stars_spots_anon_insert on public.stars_spots
 -- 読み取りは一切許可しない(公開分は stars_public_spots() 経由でだけ返す)
 revoke all on table public.stars_spots from anon, authenticated;
 -- 列単位で絞る。status・region・approved_at・created_at は申請者に触らせない
-grant insert (name, name_kana, pref, city, lat, lon, elevation_m, access, facilities, note, caution, source_url, submitter_hint)
+grant insert (name, name_kana, pref, city, address, lat, lon, elevation_m, access, facilities, note, caution, source_url, submitter_hint)
   on public.stars_spots to anon;
 
 
@@ -209,9 +244,15 @@ as $$
 declare
   v_region text;
 begin
+  -- 座標は申請時には省略できるが、片方だけの値は受け付けない。
+  if (new.lat is null) <> (new.lon is null) then
+    raise exception 'incomplete location';
+  end if;
+
   -- 対象範囲(日本)の外は受け付けない。海外へ広げるときはここを緩める。
   -- クライアント側の stars/config.js の submitBounds と同じ値にしておくこと。
-  if new.lat < 20 or new.lat > 46 or new.lon < 122 or new.lon > 154 then
+  if new.lat is not null and
+     (new.lat < 20 or new.lat > 46 or new.lon < 122 or new.lon > 154) then
     raise exception 'out of range';
   end if;
 
@@ -239,6 +280,7 @@ begin
    * 前後の空白を落とし、空になったものは無しとして扱う。
    */
   new.city := nullif(btrim(new.city), '');
+  new.address := nullif(btrim(new.address), '');
 
   -- レート制限: 同一端末は24時間で3件まで
   if (select count(*) from public.stars_spots
@@ -320,6 +362,7 @@ returns table (
   name           text,
   pref           text,
   city           text,
+  address        text,
   lat            double precision,
   lon            double precision,
   elevation_m    int,
@@ -341,7 +384,7 @@ begin
     raise exception 'unauthorized';
   end if;
   return query
-    select s.spot_id, s.name, s.pref, s.city, s.lat, s.lon, s.elevation_m,
+    select s.spot_id, s.name, s.pref, s.city, s.address, s.lat, s.lon, s.elevation_m,
            s.access, s.facilities, s.note, s.caution, s.source_url, s.submitter_hint, s.created_at
     from public.stars_spots s
     where s.status = 'pending'
@@ -361,9 +404,33 @@ begin
   if not public.ops_auth(p_token) then
     raise exception 'unauthorized';
   end if;
+  if exists (select 1 from public.stars_spots where spot_id = p_id and (lat is null or lon is null)) then
+    raise exception 'location required before approval';
+  end if;
   update public.stars_spots
      set status = 'approved', approved_at = now(), reject_reason = null
    where spot_id = p_id;
+  return found;
+end;
+$$;
+
+-- 申請時に未確定だった座標を、管理者が裏取り後に設定する。
+create or replace function public.stars_ops_set_location(
+  p_token text, p_id uuid, p_lat double precision, p_lon double precision
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not public.ops_auth(p_token) then
+    raise exception 'unauthorized';
+  end if;
+  if p_lat is null or p_lon is null or p_lat < 20 or p_lat > 46 or p_lon < 122 or p_lon > 154 then
+    raise exception 'out of range';
+  end if;
+  update public.stars_spots set lat = p_lat, lon = p_lon where spot_id = p_id;
   return found;
 end;
 $$;
@@ -432,6 +499,7 @@ $$;
 -- ops_* は匿名から呼べないようにする(SQL Editor からは postgres 権限で動く)
 revoke all on function public.stars_ops_pending(text, int) from public, anon, authenticated;
 revoke all on function public.stars_ops_approve(text, uuid) from public, anon, authenticated;
+revoke all on function public.stars_ops_set_location(text, uuid, double precision, double precision) from public, anon, authenticated;
 revoke all on function public.stars_ops_reject(text, uuid, text) from public, anon, authenticated;
 revoke all on function public.stars_ops_delete(text, uuid) from public, anon, authenticated;
 revoke all on function public.stars_ops_approved(text, int) from public, anon, authenticated;

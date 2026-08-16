@@ -121,6 +121,23 @@ values
 SQL
 then ok "city / caution を含む登録が通った"; else ng "登録に失敗: $(tail -2 "$BASE/e5")"; fi
 
+echo "4-2) 住所あり・座標なしの申請が通り、そのままでは承認できないこと"
+pending_id=$($PSQL -tAc "insert into public.stars_spots
+  (name, pref, city, address, lat, lon, submitter_hint)
+values ('座標未確定スポット', '長野県', '阿智村', '長野県下伊那郡阿智村浪合1192-356', null, null, 'testdevice5678')
+returning spot_id;" 2>"$BASE/e5b" | tr -d '[:space:]')
+if [ -n "$pending_id" ]; then ok "座標なしで受け付けた"; else ng "座標なし申請に失敗: $(tail -2 "$BASE/e5b")"; fi
+if $PSQL -c "select public.stars_ops_approve('test-token', '$pending_id');" >/dev/null 2>"$BASE/e5c"; then
+  ng "座標なしで承認できてしまった"
+else
+  ok "座標未確定の承認を拒否した"
+fi
+if $PSQL -c "select public.stars_ops_set_location('test-token', '$pending_id', 35.44, 137.68); select public.stars_ops_approve('test-token', '$pending_id');" >/dev/null 2>"$BASE/e5d"; then
+  ok "管理者が座標を確定した後は承認できた"
+else
+  ng "座標確定後の承認に失敗: $(tail -2 "$BASE/e5d")"
+fi
+
 echo "5) 古い版のままだと、その登録が弾かれること(放置したときに何が起きるか)"
 reset_schema
 $PSQL -f "$OLD_SQL" >/dev/null 2>&1

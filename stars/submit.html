@@ -3,15 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <!--
-    地図は別のページ(pick.html)を枠で読み込む。MapLibre をここに置くと
-    Trusted Types を強制できない。申請フォームは利用者の入力をそのまま扱う
-    画面なので、地図の都合で守りを下げたくない。
-  -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://ssxskriqlaiohdutxprn.supabase.co; font-src 'self'; base-uri 'none'; form-action 'none'; frame-src 'self'; object-src 'none'; require-trusted-types-for 'script'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://ssxskriqlaiohdutxprn.supabase.co; font-src 'self'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'; require-trusted-types-for 'script'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>星見スポットを申請する | 今夜のオススメ星見スポット</title>
-  <meta name="description" content="おすすめの星見スポットを登録申請できます。ログインは不要です。地図で場所を選んで送信すると、管理者が内容を確認したうえで掲載します。">
+  <meta name="description" content="おすすめの星見スポットをログイン不要で登録申請できます。スポット名と都道府県だけで申請でき、住所は分かる範囲で入力できます。">
   <link rel="stylesheet" href="./stars.css">
   <!-- @meta start -->
   <link rel="canonical" href="https://quick-calc.site/stars/submit.html">
@@ -19,7 +14,7 @@
   <meta name="theme-color" content="#0c0c0c">
   <meta property="og:type" content="website">
   <meta property="og:title" content="星見スポットを申請する">
-  <meta property="og:description" content="おすすめの星見スポットを、ログイン不要で登録申請できます。">
+  <meta property="og:description" content="みんなで育てる星見スポット情報。名前と都道府県だけで、気軽に掲載を申請できます。">
   <meta property="og:url" content="https://quick-calc.site/stars/submit.html">
   <meta property="og:locale" content="ja_JP">
   <meta name="twitter:card" content="summary">
@@ -28,65 +23,74 @@
 <body class="stars-body stars-body--doc">
 
 <header class="stars-header">
+  <button class="stars-menu-button" type="button" aria-label="メニューを開く"
+          aria-controls="stars-sidebar" aria-expanded="false" data-stars-menu-button>
+    <span aria-hidden="true">☰</span><span>メニュー</span>
+  </button>
   <a class="stars-brand" href="./">
     <span class="stars-brand-mark" aria-hidden="true">★</span>
     <span>今夜の星見スポット</span>
   </a>
-  <nav class="stars-nav">
-    <a href="./">地図</a>
-    <a href="./list.html">地域別の一覧</a>
+</header>
+
+<div class="stars-sidebar-backdrop" data-stars-sidebar-backdrop></div>
+<aside id="stars-sidebar" class="stars-sidebar" aria-label="星見サイトのメニュー" aria-hidden="true" data-stars-sidebar>
+  <div class="stars-sidebar-head"><strong>星見スポットをみんなで育てる</strong><button type="button" aria-label="メニューを閉じる" data-stars-menu-close>×</button></div>
+  <nav>
+    <a href="./">今夜の星見マップ</a>
+    <a href="./list.html">流星群・星空の観測スポットを探す</a>
+    <a class="is-current" href="./submit.html" aria-current="page">スポットを申請</a>
+    <a href="./intro.html">このサイトについて</a>
     <a href="./about.html">データについて</a>
   </nav>
-</header>
+  <p>知っている星見スポットを持ち寄り、管理者の確認を経て掲載するサイトです。</p>
+</aside>
 
 <main class="stars-doc">
   <h1>星見スポットを申請する</h1>
   <p class="stars-lead">
-    おすすめの星見スポットを教えてください。ログインは不要です。
-    送信された内容は管理者が確認したうえで掲載します（すぐには公開されません）。
+    あなたが知っている星見スポットを教えてください。ログインは不要です。
+    名前と都道府県だけでも申請できます。送信後、管理者が場所や利用条件を確認してから掲載します。
   </p>
 
   <form id="submit-form" class="stars-form" novalidate>
     <fieldset class="stars-field">
-      <legend>1. 場所を選ぶ<span class="stars-required">必須</span></legend>
-      <p class="stars-help">地図をタップすると、その地点にピンが立ちます。拡大してできるだけ正確な位置を指してください。</p>
-      <div id="pick-map" class="stars-pick-map"></div>
-      <p id="pick-readout" class="stars-readout">まだ選ばれていません</p>
-      <p id="pick-darkness" class="stars-readout stars-readout--sub"></p>
-    </fieldset>
-
-    <fieldset class="stars-field">
-      <legend>2. スポットの情報</legend>
+      <legend>1. 場所の情報</legend>
 
       <label class="stars-label" for="f-name">スポット名<span class="stars-required">必須</span></label>
       <input class="stars-input" id="f-name" name="name" type="text" maxlength="60" autocomplete="off"
-             placeholder="例: 美ヶ原高原 王ヶ頭">
-
-      <label class="stars-label" for="f-kana">ふりがな</label>
-      <input class="stars-input" id="f-kana" name="name_kana" type="text" maxlength="80" autocomplete="off"
-             placeholder="例: うつくしがはらこうげん おうがとう">
+             placeholder="例: ○○公園 展望駐車場">
 
       <label class="stars-label" for="f-pref">都道府県<span class="stars-required">必須</span></label>
       <select class="stars-input" id="f-pref" name="pref">
         <option value="">選んでください</option>
       </select>
 
-      <label class="stars-label" for="f-elev">標高（m）</label>
-      <input class="stars-input" id="f-elev" name="elevation_m" type="number" inputmode="numeric" min="-50" max="4000"
-             placeholder="例: 2034">
+      <label class="stars-label" for="f-city">市区町村</label>
+      <input class="stars-input" id="f-city" name="city" type="text" maxlength="40"
+             placeholder="例: 秩父市、南伊豆町">
+      <p class="stars-help">分かる範囲でかまいません。</p>
+
+      <label class="stars-label" for="f-address">住所</label>
+      <input class="stars-input" id="f-address" name="address" type="text" maxlength="200"
+             autocomplete="street-address" placeholder="例: 長野県○○市○○123（任意）">
+      <p class="stars-help">住所が分からなくても申請できます。施設名や参考URLなどをもとに管理者が場所を確認します。</p>
+    </fieldset>
+
+    <fieldset class="stars-field">
+      <legend>2. 分かることを教えてください</legend>
 
       <label class="stars-label" for="f-access">アクセス・駐車</label>
       <textarea class="stars-input" id="f-access" name="access" rows="3" maxlength="400"
-                placeholder="例: 県道からの林道は冬季閉鎖。駐車場20台、無料。"></textarea>
+                placeholder="例: 県道からの林道は冬季閉鎖。駐車場20台。"></textarea>
 
       <label class="stars-label" for="f-facilities">設備</label>
       <textarea class="stars-input" id="f-facilities" name="facilities" rows="2" maxlength="400"
                 placeholder="例: トイレあり（24時間）、自販機なし"></textarea>
 
-      <label class="stars-label" for="f-city">市区町村</label>
-      <input class="stars-input" id="f-city" name="city" type="text" maxlength="40"
-             placeholder="例: 秩父市、南伊豆町">
-      <p class="stars-help">一覧の絞り込みに使います。分かる範囲でかまいません。</p>
+      <label class="stars-label" for="f-elev">標高（m）</label>
+      <input class="stars-input" id="f-elev" name="elevation_m" type="number" inputmode="numeric" min="-50" max="4000"
+             placeholder="例: 1200">
 
       <label class="stars-label" for="f-caution">気をつけること</label>
       <textarea class="stars-input" id="f-caution" name="caution" rows="3" maxlength="500"
@@ -123,21 +127,15 @@
 
 <footer class="stars-footer">
   <p>
-    地図: <a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">OpenFreeMap</a>、
-    <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a> /
-    光害: <a href="https://gibs.earthdata.nasa.gov/" target="_blank" rel="noopener noreferrer">NASA GIBS</a> VIIRS 夜間光
-  </p>
-  <p>
-    <a href="../">計算ツールボックス</a> ・ <a href="../contact.html?tool=stars">お問い合わせ</a>
+    <a href="./intro.html">このサイトについて</a> ・ <a href="../">計算ツールボックス</a> ・
+    <a href="../contact.html?tool=stars">お問い合わせ</a>
   </p>
 </footer>
 
 <script src="./guard.js"></script>
+<script src="./nav.js"></script>
 <script src="../tools/poll/config.js"></script>
 <script src="./config.js"></script>
-<script src="./palette.js"></script>
-<script src="./score.js"></script>
-<script src="./lp.js"></script>
 <script src="./net.js"></script>
 <script src="./submit.js"></script>
 </body>

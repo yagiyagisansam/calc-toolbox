@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'; require-trusted-types-for 'script'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>このサイトについて | みんなで育てる星見スポット</title>
+  <meta name="description" content="今夜の星見スポットは、みんなの申請を管理者が確認し、日本各地の星空・流星群観測スポットを一緒に育てていくサイトです。">
+  <link rel="stylesheet" href="./stars.css">
+  <link rel="canonical" href="https://quick-calc.site/stars/intro.html">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230c0f1a'/%3E%3Cpath d='M16 6l2.6 6.6L25.5 14l-5.3 4.4 1.7 6.9L16 21.6l-5.9 3.7 1.7-6.9L6.5 14l6.9-1.4z' fill='%23fdd171'/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0c0c0c">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="みんなで育てる星見スポット">
+  <meta property="og:description" content="知っている星見スポットを持ち寄り、管理者の確認を経て掲載する参加型サイトです。">
+  <meta property="og:url" content="https://quick-calc.site/stars/intro.html">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+</head>
+<body class="stars-body stars-body--doc">
+<header class="stars-header">
+  <button class="stars-menu-button" type="button" aria-label="メニューを開く" aria-controls="stars-sidebar" aria-expanded="false" data-stars-menu-button><span aria-hidden="true">☰</span><span>メニュー</span></button>
+  <a class="stars-brand" href="./"><span class="stars-brand-mark" aria-hidden="true">★</span><span>今夜の星見スポット</span></a>
+</header>
+<div class="stars-sidebar-backdrop" data-stars-sidebar-backdrop></div>
+<aside id="stars-sidebar" class="stars-sidebar" aria-label="星見サイトのメニュー" aria-hidden="true" data-stars-sidebar>
+  <div class="stars-sidebar-head"><strong>星見スポットをみんなで育てる</strong><button type="button" aria-label="メニューを閉じる" data-stars-menu-close>×</button></div>
+  <nav>
+    <a href="./">今夜の星見マップ</a>
+    <a href="./list.html">流星群・星空の観測スポットを探す</a>
+    <a href="./submit.html">スポットを申請</a>
+    <a class="is-current" href="./intro.html" aria-current="page">このサイトについて</a>
+    <a href="./about.html">データについて</a>
+  </nav>
+  <p>知っている星見スポットを持ち寄り、管理者の確認を経て掲載するサイトです。</p>
+</aside>
+
+<main class="stars-doc stars-intro">
+  <section class="stars-intro-hero">
+    <p class="stars-eyebrow">ABOUT THIS SITE</p>
+    <h1>星見スポットを、みんなで育てる。</h1>
+    <p>地元の人が知っている場所、旅先で見つけた場所、何度も通っているお気に入り。ひとりの知識では集めきれない星見スポットを、みんなの申請で少しずつ増やしていくサイトです。</p>
+    <div class="stars-intro-actions">
+      <a class="stars-button" href="./submit.html">知っているスポットを申請する</a>
+      <a class="stars-button stars-button--sub" href="./list.html">スポットを探す</a>
+    </div>
+  </section>
+
+  <section class="stars-intro-grid" aria-label="このサイトでできること">
+    <article><span aria-hidden="true">01</span><h2>今夜の条件で探す</h2><p>天気・月・空の暗さを重ね、星空や流星群を見に行く場所を地図やランキングから探せます。</p></article>
+    <article><span aria-hidden="true">02</span><h2>知っている場所を教える</h2><p>申請はログイン不要です。名前と都道府県だけでも送れ、住所や詳しい情報は分かる範囲でかまいません。</p></article>
+    <article><span aria-hidden="true">03</span><h2>確認してから掲載する</h2><p>申請内容はすぐには公開しません。管理者が場所・夜間利用・注意事項などを確認し、掲載可否を判断します。</p></article>
+  </section>
+
+  <h2>星空を楽しめる場所を、長く守るために</h2>
+  <p>良い観測場所ほど、近隣への配慮や現地ルールが大切です。掲載情報は出発前に公式サイトと現地掲示で確認し、私有地へ入らず、夜間は静かに、ライトやごみへ配慮してください。</p>
+  <p>閉鎖や料金変更、掲載内容の誤りに気づいた場合は、<a href="../contact.html?tool=stars">お問い合わせ</a>からお知らせください。</p>
+</main>
+
+<footer class="stars-footer"><p><a href="../">計算ツールボックス</a> ・ <a href="../contact.html?tool=stars">お問い合わせ</a></p></footer>
+<script src="./guard.js"></script>
+<script src="./nav.js"></script>
+</body>
+</html>

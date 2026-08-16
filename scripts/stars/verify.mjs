@@ -692,6 +692,33 @@ try {
   });
   check("日時パネルと凡例が重ならない", !panelLayout.overlap, JSON.stringify(panelLayout));
 
+  const panelHandle = page.locator("[data-panel-handle]");
+  const panelToggle = page.locator("[data-panel-toggle]");
+  const panelBeforeMove = await page.locator(".stars-topbar").boundingBox();
+  await panelHandle.focus();
+  await page.keyboard.press("ArrowLeft");
+  const panelAfterMove = await page.locator(".stars-topbar").boundingBox();
+  check(
+    "予報パネルを矢印キーで移動できる",
+    panelBeforeMove && panelAfterMove && panelAfterMove.x < panelBeforeMove.x,
+    JSON.stringify({ before: panelBeforeMove, after: panelAfterMove })
+  );
+  await page.keyboard.press("Home");
+
+  const panelOpenHeight = (await page.locator(".stars-topbar").boundingBox()).height;
+  await panelToggle.click();
+  const panelClosed = await page.locator(".stars-topbar").evaluate((panel) => ({
+    height: panel.getBoundingClientRect().height,
+    expanded: panel.querySelector("[data-panel-toggle]").getAttribute("aria-expanded"),
+    bodyHidden: panel.querySelector("[data-panel-body]").hidden
+  }));
+  check(
+    "予報パネルを折りたたんで地図を確認できる",
+    panelClosed.bodyHidden && panelClosed.expanded === "false" && panelClosed.height < panelOpenHeight,
+    JSON.stringify(panelClosed)
+  );
+  await panelToggle.click();
+
   await page.locator(".stars-legend-summary").click();
   const collapsedLegend = await page.locator(".stars-legend").evaluate((legend) => ({
     open: legend.open,
@@ -768,137 +795,64 @@ try {
 
   const prefCount = await page.locator("#f-pref option").count();
   check("都道府県が47件そろう", prefCount === 48, `${prefCount - 1} 件(先頭の案内を除く)`);
-
   const groupCount = await page.locator("#f-pref optgroup").count();
   check("地方ごとにまとまっている", groupCount === 8, `${groupCount} 区分`);
 
-  // 未入力のまま送ると、何が足りないか教えてくれる
+  const submitShape = await page.evaluate(() => ({
+    kana: !!document.querySelector("#f-kana"),
+    address: !!document.querySelector("#f-address"),
+    addressRequired: document.querySelector("#f-address")?.required || false,
+    map: !!document.querySelector("#pick-map"),
+    frame: !!document.querySelector("iframe"),
+    introLink: !!document.querySelector('a[href="./intro.html"]')
+  }));
+  check("ふりがな欄を置かない", !submitShape.kana, JSON.stringify(submitShape));
+  check("住所欄は任意", submitShape.address && !submitShape.addressRequired, JSON.stringify(submitShape));
+  check("申請者にピン打ちを求めない", !submitShape.map && !submitShape.frame, JSON.stringify(submitShape));
+  check("サイト紹介への導線がある", submitShape.introLink, JSON.stringify(submitShape));
+
   await page.locator("#submit-button").click();
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(100);
   const emptyMsg = await page.locator("#submit-message").textContent();
-  check("場所未選択のまま送ると案内が出る", /場所を選/.test(emptyMsg), emptyMsg);
+  check("スポット名が無いと案内が出る", /スポット名/.test(emptyMsg), emptyMsg);
 
-  // 地図をタップした代わりに、地点を直接指定する
-  await page.evaluate(() => window.StarsSubmit.pick(36.12, 137.55)); // 乗鞍畳平
-  await page.waitForTimeout(300);
-  const readout = await page.locator("#pick-readout").textContent();
-  check("選んだ地点の座標が出る", /36\.12/.test(readout), readout);
-
-  const darkness = await page.locator("#pick-darkness").textContent();
-  check("選んだ地点の暗さの目安が出る", /空の暗さ/.test(darkness), darkness);
-
-  /*
-   * 地図も枠(pick.html)の中で動くこと。
-   * MapLibre をこの画面に置くと Trusted Types を強制できない。
-   * 申請フォームは利用者の入力をそのまま扱う画面なので、そこは落とせない。
-   */
-  {
-    const hasFrame = await page
-      .frameLocator("#pick-map iframe")
-      .locator("#pick-map canvas")
-      .first()
-      .waitFor({ timeout: 20000 })
-      .then(() => true)
-      .catch(() => false);
-    check("申請の地図が枠の中で出る", hasFrame, String(hasFrame));
-
-    const tt = await page.evaluate(() => {
-      try {
-        document.createElement("div").innerHTML = "<b>試し</b>";
-        return false;
-      } catch (e) {
-        return true;
-      }
-    });
-    check("申請でも Trusted Types が効いている", tt, tt ? "" : "止まらずに書けてしまった");
-
-    const leaked = await page.evaluate(() => typeof window.maplibregl !== "undefined");
-    check("地図が申請の文書に入り込んでいない", !leaked, `maplibregl=${leaked}`);
-
-    // こちらで決めた場所に、枠の中の印が合っていること
-    const inner = page.frames().find((f) => f.url().includes("pick.html"));
-    const markAt = await inner.evaluate(() => {
-      const m = window.StarsPick.marker();
-      if (!m || !m._map) return null;
-      const p = m.getLngLat();
-      return { lat: p.lat, lon: p.lng };
-    });
-    check(
-      "枠の中の印がこちらの選んだ場所に合う",
-      markAt && Math.abs(markAt.lat - 36.12) < 0.001 && Math.abs(markAt.lon - 137.55) < 0.001,
-      markAt ? `${markAt.lat}, ${markAt.lon}` : "印が無い"
-    );
-
-    /*
-     * 印を範囲外へドラッグされた場合。
-     * 枠の中は良し悪しを決めないので、いったん海の向こうまで動く。
-     * こちらが断ったら、印を「いま受け付けている場所」へ戻すこと ──
-     * 戻さないと、印だけが範囲外に残って画面と申請内容が食い違う。
-     */
-    await inner.evaluate(() => {
-      const m = window.StarsPick.marker();
-      m.setLngLat([2.35, 48.9]); // パリ
-      m.fire("dragend");
-    });
-    await page.waitForTimeout(400);
-    const afterDrag = await inner.evaluate(() => {
-      const p = window.StarsPick.marker().getLngLat();
-      return { lat: p.lat, lon: p.lng };
-    });
-    const dragMsg = await page.locator("#submit-message").textContent();
-    check(
-      "範囲外へドラッグされたら印を戻す",
-      /日本国内/.test(dragMsg) && Math.abs(afterDrag.lat - 36.12) < 0.001,
-      `${dragMsg} / 印 ${afterDrag.lat}, ${afterDrag.lon}`
-    );
-    const readoutAfter = await page.locator("#pick-readout").textContent();
-    check("範囲外へドラッグされても座標欄は変わらない", /36\.12/.test(readoutAfter), readoutAfter);
-  }
-  await capture("submit");
-
-  // 範囲外は受け付けない
-  await page.evaluate(() => window.StarsSubmit.pick(48.9, 2.35)); // パリ
-  await page.waitForTimeout(200);
-  const outMsg = await page.locator("#submit-message").textContent();
-  check("日本の範囲外は断る", /日本国内/.test(outMsg), outMsg);
-
-  /*
-   * 数として成り立たない場所。
-   * NaN はどの大小比較も false を返すので、範囲の検査を素通りして
-   * そのまま picked に入り、送信するまで誰も気づかなかった。
-   */
-  for (const [lat, lon, label] of [
-    [NaN, 137.55, "緯度がNaN"],
-    [36.12, NaN, "経度がNaN"],
-    [Infinity, 137.55, "緯度が無限大"]
-  ]) {
-    await page.evaluate(() => window.StarsSubmit.pick(36.12, 137.55)); // いったん正しい場所へ
-    await page.evaluate(([a, b]) => window.StarsSubmit.pick(a, b), [lat, lon]);
-    await page.waitForTimeout(150);
-    const msg = await page.locator("#submit-message").textContent();
-    const readout = await page.locator("#pick-readout").textContent();
-    check(
-      `${label} は受け付けない`,
-      /読み取れませんでした/.test(msg) && /36\.12/.test(readout),
-      `${msg} / ${readout}`
-    );
-  }
-
-  // 名前が無いまま送ると教えてくれる
-  await page.evaluate(() => window.StarsSubmit.pick(36.12, 137.55));
+  await page.locator("#f-name").fill("検査用星見公園");
   await page.locator("#submit-button").click();
-  await page.waitForTimeout(200);
-  const nameMsg = await page.locator("#submit-message").textContent();
-  check("スポット名が無いと案内が出る", /スポット名/.test(nameMsg), nameMsg);
+  await page.waitForTimeout(100);
+  const prefMsg = await page.locator("#submit-message").textContent();
+  check("都道府県が無いと案内が出る", /都道府県/.test(prefMsg), prefMsg);
 
-  // URL の形式
-  await page.locator("#f-name").fill("乗鞍畳平");
-  await page.locator("#f-pref").selectOption("岐阜県");
+  await page.locator("#f-pref").selectOption("長野県");
+  await page.locator("#f-address").fill("");
+  const noAddressProblem = await page.evaluate(() => window.StarsSubmit.validate());
+  const noLocationPayload = await page.evaluate(() => window.StarsSubmit.payload());
+  check("住所なしでも入力検証を通る", noAddressProblem === null, String(noAddressProblem));
+  check(
+    "申請時の座標は未確定として送る",
+    noLocationPayload.lat === null && noLocationPayload.lon === null && noLocationPayload.address === null,
+    JSON.stringify(noLocationPayload)
+  );
+
+  await page.locator("#f-address").fill("長野県下伊那郡阿智村浪合1192-356");
+  const addressPayload = await page.evaluate(() => window.StarsSubmit.payload());
+  check("入力した住所を送信内容に含める", /阿智村/.test(addressPayload.address), JSON.stringify(addressPayload));
+
   await page.locator("#f-url").fill("http://example.com");
   await page.locator("#submit-button").click();
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(100);
   const urlMsg = await page.locator("#submit-message").textContent();
   check("http:// のURLは断る", /https/.test(urlMsg), urlMsg);
+
+  const trustedTypesOnSubmit = await page.evaluate(() => {
+    try {
+      document.createElement("div").innerHTML = "<b>試し</b>";
+      return false;
+    } catch (e) {
+      return true;
+    }
+  });
+  check("申請でも Trusted Types が効いている", trustedTypesOnSubmit, String(trustedTypesOnSubmit));
+  await capture("submit");
 
   // ---- 一覧ページ ----
   console.log("\n一覧ページ (stars/list.html):");
@@ -1543,6 +1497,17 @@ try {
    *   ・星見レベルが独自の目安だと分かること
    *   ・実装(GitHub)への導線が無いこと
    */
+  console.log("\n共通メニューとサイト紹介:");
+  await page.goto(`http://127.0.0.1:${PORT}/stars/intro.html`, { waitUntil: "load", timeout: 60000 });
+  check("紹介ページに参加型のコンセプトがある", /みんなで育てる/.test(await page.locator("h1").textContent()));
+  check("紹介ページから申請できる", (await page.locator('a[href="./submit.html"]').count()) > 0);
+  const menuButton = page.locator("[data-stars-menu-button]");
+  await menuButton.click();
+  check("サイドメニューを開ける", await page.locator("[data-stars-sidebar]").evaluate((e) => e.classList.contains("is-open")));
+  check("サイドメニューに主要5画面がある", (await page.locator("[data-stars-sidebar] nav a").count()) === 5);
+  await page.keyboard.press("Escape");
+  check("Escapeでサイドメニューを閉じる", !(await page.locator("[data-stars-sidebar]").evaluate((e) => e.classList.contains("is-open"))));
+
   console.log("\n説明ページ (stars/about.html):");
   await page.goto(`http://127.0.0.1:${PORT}/stars/about.html`, { waitUntil: "load", timeout: 60000 });
 

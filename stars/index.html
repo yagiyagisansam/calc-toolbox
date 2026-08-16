@@ -24,29 +24,54 @@
 <body class="stars-body">
 
 <header class="stars-header">
+  <button class="stars-menu-button" type="button" aria-label="メニューを開く"
+          aria-controls="stars-sidebar" aria-expanded="false" data-stars-menu-button>
+    <span aria-hidden="true">☰</span><span>メニュー</span>
+  </button>
   <a class="stars-brand" href="./">
     <span class="stars-brand-mark" aria-hidden="true">★</span>
     <h1 class="stars-brand-title">今夜の星見・流星群観測スポット</h1>
   </a>
-  <nav class="stars-nav">
+</header>
+
+<div class="stars-sidebar-backdrop" data-stars-sidebar-backdrop></div>
+<aside id="stars-sidebar" class="stars-sidebar" aria-label="星見サイトのメニュー"
+       aria-hidden="true" data-stars-sidebar>
+  <div class="stars-sidebar-head">
+    <strong>星見スポットをみんなで育てる</strong>
+    <button type="button" aria-label="メニューを閉じる" data-stars-menu-close>×</button>
+  </div>
+  <nav>
+    <a class="is-current" href="./" aria-current="page">今夜の星見マップ</a>
     <a href="./list.html">流星群・星空の観測スポットを探す</a>
     <a href="./submit.html">スポットを申請</a>
+    <a href="./intro.html">このサイトについて</a>
     <a href="./about.html">データについて</a>
   </nav>
-</header>
+  <p>知っている星見スポットを持ち寄り、管理者の確認を経て掲載するサイトです。</p>
+</aside>
 
 <main class="stars-main">
   <div id="map" class="stars-map"></div>
 
-  <div class="stars-topbar">
-    <div id="day-tabs" class="stars-day-tabs" role="group" aria-label="どの夜を見るか"></div>
-    <p id="night-range" class="stars-night-range">今夜の時間帯を計算しています…</p>
-    <div class="stars-time">
-      <label for="time-slider">時刻</label>
-      <input id="time-slider" type="range" min="0" max="0" value="0" step="1" disabled>
-      <output id="time-label" for="time-slider">—</output>
+  <div id="forecast-panel" class="stars-topbar">
+    <div class="stars-panel-handle" tabindex="0" data-panel-handle
+         aria-label="予報パネルを移動。矢印キーでも動かせます">
+      <span class="stars-panel-title">予報と時刻</span>
+      <span class="stars-panel-drag-hint">ドラッグで移動</span>
+      <button type="button" class="stars-panel-toggle" data-panel-toggle
+              aria-controls="forecast-panel-body" aria-expanded="true">折りたたむ</button>
     </div>
-    <p id="moon-label" class="stars-moon">—</p>
+    <div id="forecast-panel-body" data-panel-body>
+      <div id="day-tabs" class="stars-day-tabs" role="group" aria-label="どの夜を見るか"></div>
+      <p id="night-range" class="stars-night-range">今夜の時間帯を計算しています…</p>
+      <div class="stars-time">
+        <label for="time-slider">時刻</label>
+        <input id="time-slider" type="range" min="0" max="0" value="0" step="1" disabled>
+        <output id="time-label" for="time-slider">—</output>
+      </div>
+      <p id="moon-label" class="stars-moon">—</p>
+    </div>
   </div>
 
   <p id="status" class="stars-status" role="status">読み込んでいます…</p>
@@ -101,6 +126,7 @@
 </footer>
 
 <script src="./guard.js"></script>
+<script src="./nav.js"></script>
 <script src="./vendor/maplibre-gl-csp.js"></script>
 <script src="../tools/poll/config.js"></script>
 <script src="./config.js"></script>
@@ -112,6 +138,7 @@
 <script src="./here.js"></script>
 <script src="./net.js"></script>
 <script src="./notice.js"></script>
+<script src="./panel.js"></script>
 <script src="./map.js"></script>
 <script src="./app.js"></script>
 <script src="./boot.js"></script>
