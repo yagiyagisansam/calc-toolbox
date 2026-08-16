@@ -127,28 +127,3 @@ update public.stars_spots t
    and t.status is distinct from 'approved';
 
 commit;
-
-
--- ---- 実行後の確認(読み取りだけ) ----
-
--- 1. 公開されるのが30件か
-select count(*) as 公開件数 from public.stars_public_spots();
-
--- 2. 椿山森林公園が入っていないか(0件なら正しい)
-select count(*) as 椿山の件数
-from public.stars_public_spots()
-where name like '%椿山%';
-
--- 3. 座標を確かめる3件
-select name, lat, lon
-from public.stars_public_spots()
-where name in ('大山まきばみるくの里', '大川山キャンプ場', '輝北うわば公園キャンプ場')
-order by name;
-
--- 4. 気をつけることが入っているか(30件すべてに入っている)
-select count(*) as 注意ありの件数
-from public.stars_public_spots()
-where caution is not null and caution <> '';
-
--- 5. 承認済み以外が混ざっていないか(pending と rejected の件数)
-select status, count(*) from public.stars_spots group by status order by status;

@@ -17,7 +17,7 @@ node scripts/stars/verify.mjs     # ブラウザでの動作確認（Playwright 
 bash  scripts/stars/pgtest.sh     # 天気キャッシュのSQL（PostgreSQL が要る）
 bash  scripts/stars/setup.test.sh # setup.sql が新規・更新どちらでも通るか
 bash  scripts/stars/migrate.test.sh # 本番へ渡す差分SQLが、いまの本番の版に当たるか
-bash  scripts/stars/seed.test.sh  # 掲載30件の登録SQLが、実際に通って30件入るか
+bash  scripts/stars/seed.test.sh  # 登録SQLと確認SQLが、実際に通って30件入るか
 ```
 
 `verify.mjs` と `pgtest.sh` 以外は Node だけで動き、外部への通信もしない。
@@ -99,12 +99,21 @@ Debian・Ubuntu では PATH に入っていないので、
 比べる項目は `schema_signature.sql` に書いてある ──
 列・制約・索引・**関数の中身**・権限・RLS・方針・トリガの324項目。
 
-`seed.test.sh` は、掲載30件の登録SQL(`generated/seed-spots.sql`)を
-使い捨てのデータベースに実際に流す。Hiroさんが iPhone から Supabase の
-SQL エディタへ貼るものなので、そこで初めて失敗すると手元で調べようがない。
+`seed.test.sh` は、掲載30件の登録SQL(`generated/seed-spots.sql`)と
+確認SQL(`generated/verify-spots.sql`)を、使い捨てのデータベースに実際に流す。
+Hiroさんが iPhone から Supabase の SQL エディタへ貼るものなので、
+そこで初めて失敗すると手元で調べようがない。
 最初に流したとき、`submitter_hint` の 8文字以上という決まりに引っかかって
 1件目で止まった ── 貼る前にこれを通していなければ、そのまま渡していた。
 2回流しても増えないこと、先に来ていた申請を巻き込まないことも一緒に見る。
+確認SQLのほうは、わざと1件消して **NG が出ること**まで見る。
+判定の列が常に ok を返すだけなら、確認になっていない。
+
+**登録と確認は必ず別ファイルにする。** 一度まとめて渡したところ、
+SQL エディタが最後の文の結果しか出さないため、
+貼った Hiroさんからは「案内されていないSQLが出てきて、
+最後の1行だけが表示された」ように見えた。
+渡す相手の画面に何が出るかまでが、こちらの作るものの範囲。
 
 以前は関数の引数名だけを比べていたため、差分SQL側にだけ
 `city` の40文字制約が無い状態を見逃した。同じ HEAD なのに、

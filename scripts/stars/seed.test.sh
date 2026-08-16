@@ -28,8 +28,11 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PORT="${PGTEST_PORT:-55434}"
 BASE="${PGTEST_DIR:-/tmp/stars-seedtest-$$}"
 SEED="$HERE/generated/seed-spots.sql"
+CHECK="$HERE/generated/verify-spots.sql"
 
-[ -f "$SEED" ] || { echo "$SEED がありません。build_seed_sql.py を先に流してください。" >&2; exit 1; }
+for f in "$SEED" "$CHECK"; do
+  [ -f "$f" ] || { echo "$f がありません。build_seed_sql.py を先に流してください。" >&2; exit 1; }
+done
 
 if ! command -v initdb >/dev/null 2>&1; then
   for d in /usr/lib/postgresql/*/bin; do
@@ -138,6 +141,30 @@ n2=$(val "select count(*) from public.stars_spots where submitter_hint like 'see
 echo "8) 先に来ていた申請を巻き込まないこと"
 s=$(val "select status from public.stars_spots where name = '利用者からの申請';")
 [ "$s" = "pending" ] && ok "申請は pending のまま残っている" || ng "申請の状態が $s になった"
+
+# 確認用SQLも、渡す前にここで通す。
+# 「登録SQLは試したが確認SQLは試していない」では、結局 Hiroさんに
+# 未検証のものを貼らせることになる。
+echo "9) 確認用SQLが通り、判定がすべて ok になること"
+# 判定の列(3列目)だけを取り出して、種類が ok の1つだけかを見る
+judges() { psql -h "$BASE" -p "$PORT" -U postgres -d postgres -tA -f "$CHECK" \
+             | awk -F'|' 'NF>=3 {print $3}' | sort -u | paste -sd, -; }
+if psql -h "$BASE" -p "$PORT" -U postgres -d postgres -v ON_ERROR_STOP=1 -q -f "$CHECK" \
+     >/dev/null 2>"$BASE/e3"
+then ok "通った"; else ng "失敗: $(tail -3 "$BASE/e3")"; fi
+j=$(judges)
+[ "$j" = "ok" ] && ok "6項目すべて ok" || ng "判定に ok 以外がある: $j"
+
+echo "10) 確認用SQLが、間違っているときに NG を出すこと"
+# 判定の列が飾りでないことを見る。わざと1件消して NG が出るか。
+$PSQL >/dev/null <<'SQL'
+delete from public.stars_spots where name = '辺戸岬';
+SQL
+j2=$(judges)
+case "$j2" in
+  *NG*) ok "1件欠けると NG が出る ($j2)" ;;
+  *) ng "1件消しても判定が $j2 のまま(確認になっていない)" ;;
+esac
 
 echo
 if [ "$fail" -eq 0 ]; then

@@ -9,11 +9,16 @@
   正本は scripts/stars/spot-candidates.json のほうで、
   このSQLはそこから毎回作り直す。
 
-何を作るか:
-  scripts/stars/generated/seed-spots.sql
-  Supabase の SQL Editor に貼って1回実行する。
-  begin 〜 commit で囲んであり、途中で失敗すれば何も残らない。
-  何度実行しても重複しない(既にある pref+name は入れない)。
+何を作るか(2つ。混ぜない):
+  scripts/stars/generated/seed-spots.sql   … 登録する
+    Supabase の SQL Editor に貼って1回実行する。
+    begin 〜 commit で囲んであり、途中で失敗すれば何も残らない。
+    何度実行しても重複しない(既にある pref+name は入れない)。
+  scripts/stars/generated/verify-spots.sql … 入ったか確かめる(読み取りだけ)
+
+  以前は1つのファイルにまとめていた。SQL エディタは最後の文の結果しか
+  出さないので、貼った人からは「案内されていないSQLが出てきて、
+  最後の1行だけが表示された」ように見える。分けて渡す。
 
 対象:
   verdict が「条件付き可」のもの(= Hiroさんが公開すると決めた30件)。
@@ -30,6 +35,12 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT_DIR = os.path.join(HERE, "generated")
 OUT = os.path.join(OUT_DIR, "seed-spots.sql")
+# 確認は別のファイルにする。
+# 登録と確認を1つのファイルにまとめていたが、Supabase の SQL エディタは
+# 最後の文の結果しか出さない。貼った人には「案内されていないSQLが出てきて、
+# 最後の1行だけが表示された」と見える。手順の説明で埋めるのではなく、
+# 分けて渡す。
+OUT_CHECK = os.path.join(OUT_DIR, "verify-spots.sql")
 
 PUBLISH_VERDICT = "条件付き可"
 
@@ -215,36 +226,61 @@ update public.stars_spots t
 commit;
 """
 
-tail = f"""
+"""
+確認用のSQL。
 
--- ---- 実行後の確認(読み取りだけ) ----
+作りの決まり:
+  ・文は1つだけ。SQL エディタが最後の結果しか出さないので、
+    複数に分けると前のほうが見えなくなる。
+  ・合っているかどうかを、こちらが判定して出す。
+    値を見比べる作業を人にさせない。
+  ・列は3つ、値は短い数字だけ。iPhone の画面で横に切れないようにする。
+  ・読み取りだけ。何も書き換えない。
+"""
+# 座標を取り直した3件。ここが1桁ずれても画面は正常に見えるので機械で見る。
+COORD_CHECKS = [("大山まきばみるくの里", "35.3778565", "133.5107365"),
+                ("大川山キャンプ場", "34.1148979", "133.9416574"),
+                ("輝北うわば公園キャンプ場", "31.5936", "130.827")]
+COORD_SQL = " or ".join(
+    "(name = %s and lat::text = %s and lon::text = %s)" % (q(n), q(la), q(lo))
+    for n, la, lo in COORD_CHECKS
+)
 
--- 1. 公開されるのが{len(rows)}件か
-select count(*) as 公開件数 from public.stars_public_spots();
+check_sql = f"""-- =============================================================
+-- 登録できたかの確認({len(rows)}件)
+--
+-- 読み取りだけ。何も書き換えない。
+-- 全部まとめて貼って実行すると、確かめることが1つの表に出る。
+-- 判定の列がすべて ok なら、それで終わり。
+--
+-- これは scripts/stars/spot-candidates.json から機械的に作ったもの。
+-- 手で書き換えないこと。
+-- =============================================================
 
--- 2. 椿山森林公園が入っていないか(0件なら正しい)
-select count(*) as 椿山の件数
-from public.stars_public_spots()
-where name like '%椿山%';
-
--- 3. 座標を確かめる3件
-select name, lat, lon
-from public.stars_public_spots()
-where name in ('大山まきばみるくの里', '大川山キャンプ場', '輝北うわば公園キャンプ場')
-order by name;
-
--- 4. 気をつけることが入っているか(30件すべてに入っている)
-select count(*) as 注意ありの件数
-from public.stars_public_spots()
-where caution is not null and caution <> '';
-
--- 5. 承認済み以外が混ざっていないか(pending と rejected の件数)
-select status, count(*) from public.stars_spots group by status order by status;
+select t.項目, t.結果, case when t.結果 = t.期待 then 'ok' else 'NG' end as 判定
+from (values
+  (1, '公開される件数',
+      (select count(*)::text from public.stars_public_spots()), '{len(rows)}'),
+  (2, '承認済みの件数',
+      (select count(*)::text from public.stars_spots where status = 'approved'), '{len(rows)}'),
+  (3, '椿山森林公園(入っていたら誤り)',
+      (select count(*)::text from public.stars_public_spots() where name like '%椿山%'), '0'),
+  (4, '気をつけることが入っている件数',
+      (select count(*)::text from public.stars_public_spots()
+        where caution is not null and caution <> ''), '{len(rows)}'),
+  (5, '出典が https の件数',
+      (select count(*)::text from public.stars_public_spots()
+        where source_url like 'https://%'), '{len(rows)}'),
+  (6, '座標を取り直した3件が候補どおり',
+      (select count(*)::text from public.stars_public_spots()
+        where {COORD_SQL}), '{len(COORD_CHECKS)}')
+) as t(n, 項目, 結果, 期待)
+order by t.n;
 """
 
 os.makedirs(OUT_DIR, exist_ok=True)
-out = head + body + tail
+out = head + body
 io.open(OUT, "w", encoding="utf-8").write(out)
+io.open(OUT_CHECK, "w", encoding="utf-8").write(check_sql)
 print("%s  %d行 / %d件" % (OUT, out.count("\n") + 1, len(rows)))
-for s, url, i in rows[:3]:
-    print("  例: %s %s → %s" % (s["pref"], s["name"], url))
+print("%s  %d行 (確認用・読み取りだけ)" % (OUT_CHECK, check_sql.count("\n") + 1))
