@@ -18,6 +18,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { PREFECTURES, REGIONS } from "./prefectures.mjs";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 
@@ -52,11 +53,25 @@ function buildBlock(spots) {
     ].join("\n");
   }
 
-  // 地方ごとにまとめる(表の並びと同じ考え方)
+  /*
+   * 地方ごとにまとめる。
+   *
+   * 並びは prefectures.mjs の順(北海道→東北→…→九州・沖縄)にそろえる。
+   * データベースが返した順のままだと「中国・中部・九州・沖縄・北海道…」と
+   * 文字の並び順になり、同じページの地方タブと食い違う。
+   * 都道府県の中も同じ表で並べる。
+   */
+  const prefOrder = new Map(PREFECTURES.map(([p], i) => [p, i]));
   const byRegion = new Map();
-  for (const s of spots) {
-    if (!byRegion.has(s.region)) byRegion.set(s.region, []);
-    byRegion.get(s.region).push(s);
+  for (const region of REGIONS) {
+    const list = spots
+      .filter((s) => s.region === region)
+      .sort(
+        (a, b) =>
+          (prefOrder.get(a.pref) ?? 999) - (prefOrder.get(b.pref) ?? 999) ||
+          a.name.localeCompare(b.name, "ja")
+      );
+    if (list.length) byRegion.set(region, list);
   }
 
   const lines = [

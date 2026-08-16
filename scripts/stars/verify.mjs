@@ -16,107 +16,12 @@
  *
  * Playwright の入れ方は scripts/stars/README.md を参照。
  */
-import { createServer } from "node:http";
-import { readFile, stat } from "node:fs/promises";
-import { execFileSync } from "node:child_process";
 import path from "node:path";
-import { pathToFileURL, fileURLToPath } from "node:url";
-
-/*
- * Playwright を見つける。
- *
- * 以前はこの環境の絶対パス(/opt/node22/lib/node_modules/playwright/index.mjs)を
- * 直接書いていた。手元では動くが、他の誰かが新規に checkout しても動かない。
- * Windows では動きようがない。検証スクリプトが特定の1台でしか走らないのでは
- * 「検証してある」と言えないので、普通の解決に直した。
- *
- * 順番:
- *   1. ふつうに import する(リポジトリ内の node_modules、または npm link 済み)
- *   2. グローバルに入っている場所を npm に聞く(-g で入れた場合)
- * どちらも駄目なら、入れ方を示して終わる。
- */
-async function loadChromium() {
-  try {
-    return (await import("playwright")).chromium;
-  } catch (e) {
-    /* 次を試す */
-  }
-
-  try {
-    const root = execFileSync("npm", ["root", "-g"], {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"],
-      shell: process.platform === "win32" // Windows の npm は npm.cmd
-    }).trim();
-    if (root) {
-      // パスに空白や日本語が入っていても壊れないよう、必ず file:// URL に直す
-      const entry = pathToFileURL(path.join(root, "playwright", "index.mjs")).href;
-      return (await import(entry)).chromium;
-    }
-  } catch (e) {
-    /* 下の案内へ */
-  }
-
-  console.error(
-    [
-      "Playwright が見つかりません。次のどちらかで入れてください。",
-      "",
-      "  リポジトリの中に入れる場合:",
-      "    npm install --no-save playwright",
-      "    npx playwright install chromium",
-      "",
-      "  端末全体に入れる場合:",
-      "    npm install -g playwright",
-      "    npx playwright install chromium",
-      "",
-      "詳しくは scripts/stars/README.md を参照してください。"
-    ].join("\n")
-  );
-  process.exit(2);
-}
+import { ROOT, loadChromium, serve, launch, relayExternal } from "./harness.mjs";
 
 const chromium = await loadChromium();
 
-const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const PORT = 8788;
-
-const TYPES = {
-  ".html": "text/html; charset=utf-8",
-  ".js": "text/javascript; charset=utf-8",
-  ".mjs": "text/javascript; charset=utf-8",
-  ".css": "text/css; charset=utf-8",
-  ".json": "application/json; charset=utf-8",
-  ".png": "image/png",
-  ".svg": "image/svg+xml"
-};
-
-/* 公開時と同じ相対パスで読めるよう、リポジトリのルートをそのまま配信する */
-function serve() {
-  return new Promise((resolve) => {
-    const server = createServer(async (req, res) => {
-      try {
-        let rel = decodeURIComponent(req.url.split("?")[0]);
-        if (rel.endsWith("/")) rel += "index.html";
-        const file = path.join(ROOT, rel);
-        if (!file.startsWith(ROOT)) {
-          res.writeHead(403).end();
-          return;
-        }
-        const info = await stat(file);
-        if (info.isDirectory()) {
-          res.writeHead(404).end();
-          return;
-        }
-        const body = await readFile(file);
-        res.writeHead(200, { "Content-Type": TYPES[path.extname(file)] || "application/octet-stream" });
-        res.end(body);
-      } catch (e) {
-        res.writeHead(404).end("not found");
-      }
-    });
-    server.listen(PORT, () => resolve(server));
-  });
-}
 
 const argv = process.argv.slice(2);
 const headed = argv.includes("--headed");
@@ -141,7 +46,7 @@ function check(name, ok, detail) {
   if (!ok) failed++;
 }
 
-const server = await serve();
+const server = await serve(PORT);
 
 /*
  * この検証環境のブラウザは外部へ出られない(タイル配信も天気APIも届かない)。
@@ -149,31 +54,8 @@ const server = await serve();
  * 地図の下地は届かないままだが、「下地が無くても色分けは動く」ことこそ
  * 確かめたい挙動なので、それでよい。
  */
-let browser;
-try {
-  browser = await chromium.launch({ headless: !headed });
-} catch (err) {
-  /*
-   * Playwright は入っているが、対応するブラウザの実体が無い。
-   * 素の例外だと何をすればよいか分からないので、手順を示して止める。
-   * (Playwright を入れ直すと、対応するブラウザの版も変わる。
-   *  すでに別の場所にブラウザがあるなら PLAYWRIGHT_BROWSERS_PATH で指せる。)
-   */
-  console.error(
-    [
-      "ブラウザを起動できませんでした。",
-      "",
-      String(err && err.message ? err.message : err).split("\n")[0],
-      "",
-      "次で入れてください:",
-      "  npx playwright install chromium",
-      "",
-      "別の場所に入れてある場合は PLAYWRIGHT_BROWSERS_PATH で指定できます。",
-      "詳しくは scripts/stars/README.md を参照してください。"
-    ].join("\n")
-  );
-  process.exit(2);
-}
+const browser = await launch(chromium, headed);
+
 /*
  * 画面の幅。既定は iPhone に近い縦長(Hiroさんの主環境がそれなので)。
  * --width で変えられる。狭い端末・タブレット・机上の3つで通しておくと、
@@ -208,6 +90,12 @@ const STUB_SPOTS = [
     access: "夏季はシャトルバスのみ。マイカー規制あり。",
     facilities: "トイレあり",
     note: "国内でも指折りの暗さ。",
+    /*
+     * 「気をつけること」。実際の掲載30件は全件これを持っている
+     * (有料・要予約・冬期閉鎖といった、行くかどうかを左右すること)。
+     * 地図のカードと一覧の両方に出ているかを、この1件で確かめる。
+     */
+    caution: "冬期は通行止め。夜間の駐車場利用は現地の掲示に従うこと。",
     source_url: "https://example.com/norikura"
   },
   {
@@ -294,30 +182,7 @@ const relay = argv.includes("--relay");
 if (relay) {
   const patterns = ["**://tiles.openfreemap.org/**"];
   if (argv.includes("--live")) patterns.push("**://*.supabase.co/**");
-  for (const pattern of patterns) {
-    await page.route(pattern, async (route) => {
-      const req = route.request();
-      try {
-        // apikey などの認証ヘッダをそのまま渡す(Supabase はこれが無いと弾く)
-        const headers = { ...req.headers() };
-        delete headers.host;
-        delete headers["content-length"];
-        const res = await fetch(req.url(), {
-          method: req.method(),
-          headers,
-          body: req.postData() ?? undefined
-        });
-        const body = Buffer.from(await res.arrayBuffer());
-        await route.fulfill({
-          status: res.status,
-          contentType: res.headers.get("content-type") || "application/octet-stream",
-          body
-        });
-      } catch (e) {
-        await route.abort();
-      }
-    });
-  }
+  await relayExternal(page, patterns);
 }
 
 /*
@@ -655,6 +520,35 @@ try {
   );
 
   /*
+   * 格子の外を渡したとき。
+   * 添字だけを端に寄せて重みをそのままにすると、外へ向けて値が伸びる
+   * (補間ではなく外挿になる)。端の値をそのまま返すこと。
+   */
+  {
+    const edge = await page.evaluate(() => {
+      const k = window.StarsApp.state.timeIndex || 0;
+      const g = window.StarsApp.state.grid.grid;
+      const rows = window.StarsApp.state.grid.rows;
+      const cols = window.StarsApp.state.grid.cols;
+      const at = (lat, lon) => window.StarsMap.moonFactorAt(k, lat, lon);
+      const south = g.north - (rows - 1) * g.step;
+      const east = g.west + (cols - 1) * g.step;
+      return {
+        north: [at(g.north, g.west), at(g.north + 20, g.west)],
+        south: [at(south, g.west), at(south - 20, g.west)],
+        west: [at(g.north, g.west), at(g.north, g.west - 20)],
+        east: [at(g.north, east), at(g.north, east + 20)]
+      };
+    });
+    const same = Object.keys(edge).filter((k) => edge[k][0] === edge[k][1]);
+    check(
+      "格子の外は端の値をそのまま返す(外挿しない)",
+      same.length === 4,
+      Object.keys(edge).map((k) => `${k}:${edge[k][0]}→${edge[k][1]}`).join(" / ")
+    );
+  }
+
+  /*
    * どの夜を見るか(今夜・明日・明後日)。
    * キャッシュは78時間ぶん持っているので、切り替えても通信は起きず、
    * 切り出す時刻の範囲だけが変わる。見出しの日付が1日進むことで確かめる。
@@ -727,6 +621,48 @@ try {
   // 夜の時間帯の表示
   const night = await page.locator("#night-range").textContent();
   check("今夜の時間帯が表示される", /の夜/.test(night), night);
+
+  /*
+   * 地図でスポットを選んだときに「気をつけること」が出るか。
+   *
+   * 掲載する30件は、有料・要予約・冬期閉鎖のいずれかを必ず抱えている。
+   * これが地図のカードに出ていないと、詳細ページを開かなかった人は
+   * 「今夜そのまま行ける場所」だと思って出かけることになる。
+   * 出る場合と出ない場合の両方を見る(空のときに枠だけ残らないこと)。
+   */
+  {
+    const pin = page.locator('.stars-pin[aria-label*="乗鞍畳平"]');
+    if ((await pin.count()) > 0) {
+      await pin.first().click();
+      await page.waitForTimeout(250);
+      const shown = await page.locator("#spot-caution").isVisible();
+      const text = await page.locator("#spot-caution").textContent();
+      check(
+        "地図のカードに「気をつけること」が出る",
+        shown && text.includes("冬期は通行止め"),
+        `表示${shown} / ${text}`
+      );
+      await capture("map-caution");
+
+      const plain = page.locator('.stars-pin[aria-label*="都心の公園"]');
+      if ((await plain.count()) > 0) {
+        await plain.first().click();
+        await page.waitForTimeout(250);
+        const hidden = await page.locator("#spot-caution").isHidden();
+        const empty = await page.locator("#spot-caution").textContent();
+        check(
+          "「気をつけること」が無いスポットでは枠ごと出ない",
+          hidden && empty === "",
+          `非表示${hidden} / "${empty}"`
+        );
+      }
+      await page.keyboard.press("Escape").catch(() => {});
+      await page.mouse.click(5, 5);
+      await page.waitForTimeout(150);
+    } else {
+      check("地図のカードに「気をつけること」が出る", false, "スポットのピンが出ていない");
+    }
+  }
 
   if (shotPath) {
     await page.screenshot({ path: shotPath, fullPage: false });
@@ -834,6 +770,28 @@ try {
   const outMsg = await page.locator("#submit-message").textContent();
   check("日本の範囲外は断る", /日本国内/.test(outMsg), outMsg);
 
+  /*
+   * 数として成り立たない場所。
+   * NaN はどの大小比較も false を返すので、範囲の検査を素通りして
+   * そのまま picked に入り、送信するまで誰も気づかなかった。
+   */
+  for (const [lat, lon, label] of [
+    [NaN, 137.55, "緯度がNaN"],
+    [36.12, NaN, "経度がNaN"],
+    [Infinity, 137.55, "緯度が無限大"]
+  ]) {
+    await page.evaluate(() => window.StarsSubmit.pick(36.12, 137.55)); // いったん正しい場所へ
+    await page.evaluate(([a, b]) => window.StarsSubmit.pick(a, b), [lat, lon]);
+    await page.waitForTimeout(150);
+    const msg = await page.locator("#submit-message").textContent();
+    const readout = await page.locator("#pick-readout").textContent();
+    check(
+      `${label} は受け付けない`,
+      /読み取れませんでした/.test(msg) && /36\.12/.test(readout),
+      `${msg} / ${readout}`
+    );
+  }
+
   // 名前が無いまま送ると教えてくれる
   await page.evaluate(() => window.StarsSubmit.pick(36.12, 137.55));
   await page.locator("#submit-button").click();
@@ -864,6 +822,49 @@ try {
 
   const rowCount = await page.locator("#spot-rows tr").count();
   check("スポットが表に並ぶ", rowCount === STUB_SPOTS.length, `${rowCount} 行`);
+
+  /*
+   * 一覧にも「気をつけること」が出るか。
+   *
+   * 名前の欄に入れてある。狭い画面では右の列が横スクロールの向こうへ行くので、
+   * 別の列にすると、いちばん読んでほしい人(スマートフォンの人)に届かない。
+   * 幅を変えて通しているのは、そこが崩れていないかを見るため。
+   */
+  {
+    const row = page.locator("#spot-rows tr", { hasText: "乗鞍畳平" });
+    const cautions = row.locator(".stars-cell-caution");
+    const text = (await cautions.count()) > 0 ? await cautions.first().textContent() : "";
+    check(
+      "一覧に「気をつけること」が出る",
+      (await cautions.count()) === 1 && text.includes("冬期は通行止め"),
+      `${await cautions.count()} 件 / ${text}`
+    );
+
+    /* 名前の欄の中に入っていること(横スクロールで隠れる列に混ざっていない) */
+    const inNameCell = (await row.locator("th .stars-cell-caution").count()) === 1;
+    check("「気をつけること」が名前の欄にある", inNameCell);
+
+    /* 画面の幅に収まっているか(はみ出すと読めない) */
+    const fits = await page.evaluate(() => {
+      const e = document.querySelector("#spot-rows .stars-cell-caution");
+      if (!e) return null;
+      const r = e.getBoundingClientRect();
+      return { left: Math.round(r.left), right: Math.round(r.right), w: window.innerWidth, h: Math.round(r.height) };
+    });
+    check(
+      "「気をつけること」が画面の幅に収まる",
+      fits !== null && fits.left >= 0 && fits.right <= fits.w + 1 && fits.h > 0,
+      JSON.stringify(fits)
+    );
+
+    /* 注意の無いスポットには、空の枠を出さない */
+    const plainRow = page.locator("#spot-rows tr", { hasText: "都心の公園" });
+    check(
+      "「気をつけること」が無い行には枠を出さない",
+      (await plainRow.locator(".stars-cell-caution").count()) === 0
+    );
+  }
+
   await capture("list");
 
   /*
@@ -887,7 +888,7 @@ try {
       // 「良い条件が N 時間続く」か「良い条件の時間なし」。後者は 0 とみなす
       run: /良い条件の時間なし/.test(joined)
         ? 0
-        : Number((joined.match(/良い条件が(\d+)時間続く/) || [])[1])
+        : Number((joined.match(/良い条件が約([\d.]+)時間続く/) || [])[1])
     });
   }
   const listBest = listBests.find((b) => b.name === "乗鞍畳平") || null;
@@ -1017,6 +1018,22 @@ try {
   {
     const before = await page.evaluate(() => window.StarsPlaces.isLocalReady());
     check("集落の索引は当たるうちは読まない", before === false, `読み込み済み=${before}`);
+
+    /*
+     * 446KB を取りに行く判断なので、引き金は狭くしてある。
+     *   ・1文字では取りに行かない(打ち間違いの1文字で引くのは割に合わない)
+     *   ・打ち終わるのを待つ(途中の0件のたびに始めない)
+     */
+    await page.locator("#place-search").fill("〇");
+    await page.waitForTimeout(900);
+    const afterOne = await page.evaluate(() => window.StarsPlaces.isLocalReady());
+    check("1文字では集落の索引を読みに行かない", afterOne === false, `読み込み済み=${afterOne}`);
+
+    // 打っている途中(400ms 未満)では始まらない
+    await page.locator("#place-search").fill("六呂");
+    await page.waitForTimeout(150);
+    const midTyping = await page.evaluate(() => window.StarsPlaces.isLocalReady());
+    check("打っている途中では読みに行かない", midTyping === false, `読み込み済み=${midTyping}`);
 
     await page.locator("#place-search").fill("六呂師");
     await page.waitForFunction(
@@ -1284,7 +1301,7 @@ try {
       const atText = await page.locator("#best-at").textContent();
       const at = (atText.match(/(\d{2}:\d{2})/) || [])[1];
       // 続く時間。詳細は 0 のとき何も書かないので、書いていなければ 0 とみなす
-      const run = Number((atText.match(/連続で\s*(\d+)\s*時間/) || [])[1] || 0);
+      const run = Number((atText.match(/続けて約\s*([\d.]+)\s*時間/) || [])[1] || 0);
       if (at !== b.at || !score.startsWith(b.score)) {
         mismatched.push(`${b.name}: 一覧 ${b.at} ${b.score}点 / 詳細 ${at} ${score}`);
       }
@@ -1310,9 +1327,21 @@ try {
 
   const factMoon = await page.locator("#fact-moon").textContent();
   check("月の情報が出る", /光っている/.test(factMoon), factMoon);
+  /*
+   * 月が一晩のあいだにどう動くか。
+   *
+   * 「17%光っている」だけでは、その月が空に居るのかどうかが分からない。
+   * 出入りの時刻(または一晩中どちらか)まで出て、はじめて使える情報になる。
+   *
+   * spot.js が出す言い回しは4通り:
+   *   「20:19に出て 03:29に沈みます」「20:23に沈みます(…)」
+   *   「23:10に出ます(…)」「一晩中出ています／一晩中沈んでいます(…)」
+   * どれになるかは日によって変わる。以前は「月の入り」という語を探していたので、
+   * 今日のように沈むだけの夜になると、正しい表示のまま失敗していた。
+   */
   check(
     "月が一晩中どうしているかが分かる",
-    /月の出|月の入り|一晩中/.test(factMoon),
+    /(\d{1,2}:\d{2}に(出て|出ます|沈みます))|一晩中(出て|沈んで)/.test(factMoon),
     factMoon
   );
 

@@ -277,6 +277,20 @@
     // 予報が無い・欠けている。快晴として点を付けず、そのまま伝える。
     el("spot-score").textContent = result ? result.score + " / 100" : "データなし";
     el("spot-band").textContent = result ? result.band.label : "";
+    /*
+     * 行く前に知っておくべきこと。
+     *
+     * 有料・要予約・期間閉鎖といった、行くかどうかを左右することが caution に入る。
+     * 詳細ページにしか出していなかったので、地図で選んだ人には見えず、
+     * 「今夜そのまま行ける場所」だと思って出かけてしまう恐れがあった。
+     * 中身はデータのまま出す(こちらで言い換えない)。textContent なので
+     * 何が入っていても文字として出るだけ。
+     */
+    var caution = el("spot-caution");
+    var cautionText = typeof spot.caution === "string" ? spot.caution.trim() : "";
+    caution.textContent = cautionText;
+    caution.hidden = cautionText === "";
+
     el("spot-note").textContent = spot.note || "";
     // 地図が出している夜をそのまま詳細へ渡す(別々に判定すると日付の変わり目でずれる)
     el("spot-detail-link").href =

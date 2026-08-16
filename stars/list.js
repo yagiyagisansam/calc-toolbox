@@ -85,12 +85,6 @@
 
   // ---- スコアの計算 -------------------------------------------------------
 
-  /*
-   * 「良い」の境目。ここ以上の時間がどれだけ続くかを、続き具合の目安にする。
-   * 独自の数字を持ち出さず、画面に出ている段階の区切りをそのまま使う。
-   */
-  var GOOD_MIN = 65;
-
   /**
    * 1スポットぶんの予報から、今夜のうち最も条件がよい時刻を選ぶ。
    * その地点で空が充分に暗い時間帯だけを対象にする(全国の時間帯ではなく)。
@@ -108,9 +102,12 @@
     var series = Net.gridSeries(grid, lat, lon);
 
     var best = null;
-    var goodHours = 0; // 「良い」以上の時刻の数
-    var run = 0; // いま続いている良い時刻の数
-    var longestRun = 0; // 続いた中でいちばん長いもの
+    /*
+     * 続き具合は、合格した時刻の「個数」ではなく「時刻と時刻のあいだの長さ」で
+     * 数える。数え方は Score.goodSpan に置いてある(詳細ページと同じ計算)。
+     * ここでは暗い時間帯の各時刻の点数を、時刻つきで並べて渡すだけにする。
+     */
+    var points = [];
 
     for (var i = 0; i < series.times.length; i++) {
       var when = new Date(series.times[i] * 1000);
@@ -125,20 +122,10 @@
         humidityPct: series.humidity[i],
         moonBrightness: Sky.brightness(when, lat, lon)
       });
-      // 予報が欠けている時刻はベストの候補にしない(0点でも満点でもなく「無い」)
-      if (!result) {
-        // 欠測は「良くない」ではなく「分からない」。続きはここで切る
-        run = 0;
-        continue;
-      }
 
-      if (result.score >= GOOD_MIN) {
-        goodHours++;
-        run++;
-        if (run > longestRun) longestRun = run;
-      } else {
-        run = 0;
-      }
+      // 予報が欠けている時刻は「無い」として並べる(0点でも満点でもない)
+      points.push({ at: when, score: result ? result.score : null });
+      if (!result) continue;
 
       if (!best || result.score > best.score) {
         best = {
@@ -152,8 +139,10 @@
     }
 
     if (best) {
-      best.goodHours = goodHours;
-      best.longestRunHours = longestRun;
+      var span = Score.goodSpan(points);
+      best.goodHours = span.totalHours;
+      best.longestRunHours = span.longestHours;
+      best.goodCount = span.count;
     }
     return best;
   }
@@ -221,7 +210,8 @@
    * @param {string} label 画面に出す名前(「秩父市」「地図で指定した場所」など)
    */
   function setOrigin(point, label) {
-    if (!point || !isFinite(point.lat) || !isFinite(point.lon)) return;
+    if (!point || !Number.isFinite(point.lat) || !Number.isFinite(point.lon)) return;
+    if (point.lat < -90 || point.lat > 90 || point.lon < -180 || point.lon > 180) return;
     state.origin = { lat: point.lat, lon: point.lon, label: label || "指定した場所" };
 
     var option = el("sort-near");
@@ -455,31 +445,61 @@
     if (!input) return;
 
     input.addEventListener("focus", ensureLoaded);
+    /*
+     * 集落の索引を取りに行く条件。
+     *
+     * 446KB(gzip)を取りに行く判断なので、引き金は狭くしてある。
+     *   ・打ち終わるのを 400ms 待つ。「六」「六呂」と途中で0件になるたびに
+     *     取りに行っていたら、打っているあいだに何度も始まってしまう
+     *   ・寄せたあとで2文字未満なら取りに行かない。1文字はほぼ必ず何か当たるが、
+     *     打ち間違いの1文字で446KBを引くのは割に合わない
+     *   ・主の索引が1件でも返したら取りに行かない
+     */
+    var LOCAL_DELAY_MS = 400;
+    var LOCAL_MIN_CHARS = 2;
+    var localTimer = null;
+
     input.addEventListener("input", function () {
       var value = input.value;
+      if (localTimer) {
+        clearTimeout(localTimer);
+        localTimer = null;
+      }
       if (!value.trim()) {
         renderSuggest([]);
         return;
       }
       ensureLoaded().then(function () {
+        // 打っている途中に前の問い合わせの答えが返っても、今の入力を上書きしない
+        if (input.value !== value) return;
         var items = suggest(value);
         renderSuggest(items);
         if (items.length) return;
 
+        var q = Places ? Places.normalize(value) : value.trim();
+        if (q.length < LOCAL_MIN_CHARS) return;
+        if (Places && Places.isLocalReady()) {
+          // 読み込み済みなら、上の suggest が集落まで見たうえで0件だった
+          renderNote("「" + value + "」に当たる地名は見つかりませんでした");
+          return;
+        }
+
         /*
-         * 1件も出なかったときだけ、集落・字の索引まで探しにいく。
-         * 打ち終わった人を待たせないよう、先に「探しています」を出す。
-         * 読み込んでいる間に別の文字を打たれていたら、その結果は捨てる ──
-         * 古い問い合わせの答えで今の候補を上書きしないため。
+         * 打ち終わるのを待ってから、集落・字の索引まで探しにいく。
+         * 待っているあいだに次の文字が来たら、上の clearTimeout で取り消す。
          */
-        renderSearching();
-        ensureLocalLoaded().then(function () {
+        localTimer = setTimeout(function () {
+          localTimer = null;
           if (input.value !== value) return;
-          var more = suggest(value);
-          if (more.length) renderSuggest(more);
-          // ここまで探して無ければ、黙って閉じずにそう言う
-          else renderNote("「" + value + "」に当たる地名は見つかりませんでした");
-        });
+          renderSearching();
+          ensureLocalLoaded().then(function () {
+            if (input.value !== value) return;
+            var more = suggest(value);
+            if (more.length) renderSuggest(more);
+            // ここまで探して無ければ、黙って閉じずにそう言う
+            else renderNote("「" + value + "」に当たる地名は見つかりませんでした");
+          });
+        }, LOCAL_DELAY_MS);
       });
     });
 
@@ -513,7 +533,11 @@
    * MapLibre は中で DOM への文字列の書き込みを行うので、Trusted Types を
    * 強制している文書には同居できない。以前は地図を直に置いた代わりに
    * このページから require-trusted-types-for 'script' を外していた。
-   * 地図を別の1枚に閉じ込めれば、一覧のほうは強制したまま保てる。
+   * 地図を別の1枚へ寄せれば、一覧のほうは強制したまま保てる。
+   *
+   * これは依存コードの整理であって、セキュリティ境界ではない。
+   * 枠は同一生成元なので、中が乗っ取られれば親の DOM へ直に手が届く。
+   * 下の postMessage の検査も、通常のメッセージの取り違えを防ぐためのもの。
    *
    * 枠は押されたときに初めて作る(開かない人には読み込まない)。
    */
@@ -540,8 +564,12 @@
       }
 
       if (data.type === "stars-pick:picked") {
-        if (!isFinite(data.lat) || !isFinite(data.lon)) return;
-        var point = { lat: data.lat, lon: data.lon };
+        // NaN はどの大小比較も false を返すので、数として成り立つかを先に見る
+        var lat = Number(data.lat);
+        var lon = Number(data.lon);
+        if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+        if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return;
+        var point = { lat: lat, lon: lon };
         // 索引がまだ来ていなくても、待たせずに座標で決める(並べ替えは今すぐできる)
         setOrigin(point, describePoint(point));
         /*
@@ -583,9 +611,16 @@
       pickFrame.title = "地図で場所を選ぶ";
       pickFrame.className = "stars-pickmap-frame";
       /*
-       * 同じサイトの中の枠なので allow-same-origin は要る(地図の worker が
-       * 同一生成元でないと動かない)。それ以外は許さない ──
-       * 画面の乗っ取り(top への移動)、別窓、フォームの送信を止める。
+       * sandbox はセキュリティ境界ではない。
+       *
+       * allow-same-origin は外せない(地図の worker が同一生成元でないと動かない)。
+       * 同一生成元である以上、枠の中は window.parent.document へ直に触れるし、
+       * この sandbox 属性を外して読み直すこともできる。
+       * ここで止めているのは通常動作での top への移動・別窓・フォーム送信だけで、
+       * 枠の中が乗っ取られた場合の壁にはならない。
+       * 本当に分けるには、地図を別の生成元(サブドメイン等)から配ることになるが、
+       * GitHub Pages の1生成元では取れない。いまは
+       * 「MapLibre の DOM 書き込みを親の文書から外した」までの整理と位置づける。
        */
       pickFrame.setAttribute("sandbox", "allow-scripts allow-same-origin");
       pickFrame.setAttribute("referrerpolicy", "same-origin");
@@ -761,6 +796,25 @@
         dist.textContent = "直線 約" + Math.round(distanceOf(spot)) + "km";
         th.appendChild(dist);
       }
+
+      /*
+       * 行く前に知っておくべきこと。
+       *
+       * 有料・要予約・期間閉鎖といった、行くかどうかを左右することが caution に入る。
+       * 詳細ページにしか出していなかったので、一覧で選んだ人には見えず、
+       * 「今夜そのまま行ける場所」だと思って出かけてしまう恐れがあった。
+       *
+       * 名前と同じマス(th)に置くのは、狭い画面では右側の列が隠れるため。
+       * 表がどれだけ縮んでも、名前が見えていればこれも見える。
+       * 中身はデータのまま出す(こちらで言い換えない)。
+       */
+      var cautionText = typeof spot.caution === "string" ? spot.caution.trim() : "";
+      if (cautionText) {
+        var caution = document.createElement("span");
+        caution.className = "stars-cell-caution";
+        caution.textContent = cautionText;
+        th.appendChild(caution);
+      }
       tr.appendChild(th);
 
       // 星見レベル
@@ -793,7 +847,7 @@
         run.className = "stars-cell-sub";
         run.textContent =
           spot.best.longestRunHours > 0
-            ? "良い条件が" + spot.best.longestRunHours + "時間続く"
+            ? "良い条件が約" + spot.best.longestRunHours + "時間続く"
             : "良い条件の時間なし";
         tdWhen.appendChild(run);
       } else {

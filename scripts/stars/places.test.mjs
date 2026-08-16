@@ -216,6 +216,38 @@ const show = (r) => `${r.name}(${r.pref}・${r.kind})`;
     fuji.map(show).join(" , ")
   );
 
+  /*
+   * 読み込み済みでも、主の索引が1件でも返すなら集落を足さない。
+   *
+   * 以前は「max に足りなければ足す」だったので、いったん読み込むと
+   * 主の索引が1〜11件返す検索にも集落が混ざっていた。
+   * 説明は「主の索引で0件のときだけ」なのに実装がそうなっておらず、
+   * 読み込み済みかどうかで結果が変わっていた。
+   */
+  {
+    const cases = [
+      ["阿智村", 12], // 主が1件だけ返す語
+      ["八ヶ岳", 12],
+      ["宮崎市", 12]
+    ];
+    for (const [q, max] of cases) {
+      const hits = Places.search(q, max);
+      const mixed = hits.filter((h) => h.kind === "集落・地区");
+      ok(
+        hits.length > 0 && mixed.length === 0,
+        `「${q}」は主の索引だけで返す(集落を足さない)`,
+        `${hits.length}件中 集落 ${mixed.length}件: ${hits.slice(0, 3).map(show).join(" , ")}`
+      );
+    }
+    // 逆に、主が0件のときは集落だけが返る
+    const only = Places.search("六呂師", 12);
+    ok(
+      only.length > 0 && only.every((h) => h.kind === "集落・地区"),
+      "主が0件のときは集落だけが返る",
+      only.slice(0, 3).map(show).join(" , ")
+    );
+  }
+
   ok(local.license === "CC BY 4.0", "集落の索引にもライセンスがある", String(local.license));
 }
 

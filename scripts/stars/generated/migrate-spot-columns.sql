@@ -53,8 +53,18 @@ begin
     raise exception '市区町村が40文字を超える行があります。手で直してから流し直してください: %', v_bad;
   end if;
 
+  /*
+   * 制約があるかは、名前だけでなく対象の表まで見て判断する。
+   * conname だけだと、別の表に同じ名前の制約があったときに
+   * 「もうある」と誤って判断し、こちらへ足すのを飛ばしてしまう。
+   */
   if not exists (
-    select 1 from pg_constraint where conname = 'stars_spots_caution_check'
+    select 1
+      from pg_constraint con
+      join pg_class t on t.oid = con.conrelid
+      join pg_namespace n on n.oid = t.relnamespace
+     where con.conname = 'stars_spots_caution_check'
+       and n.nspname = 'public' and t.relname = 'stars_spots'
   ) then
     alter table public.stars_spots
       add constraint stars_spots_caution_check
@@ -62,7 +72,12 @@ begin
   end if;
 
   if not exists (
-    select 1 from pg_constraint where conname = 'stars_spots_city_check'
+    select 1
+      from pg_constraint con
+      join pg_class t on t.oid = con.conrelid
+      join pg_namespace n on n.oid = t.relnamespace
+     where con.conname = 'stars_spots_city_check'
+       and n.nspname = 'public' and t.relname = 'stars_spots'
   ) then
     alter table public.stars_spots
       add constraint stars_spots_city_check

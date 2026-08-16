@@ -109,9 +109,16 @@
     frame.title = "地図で場所を選ぶ";
     frame.className = "stars-pickmap-frame";
     /*
-     * 同じサイトの中の枠なので allow-same-origin は要る(地図の worker が
-     * 同一生成元でないと動かない)。それ以外は許さない ──
-     * 画面の乗っ取り(top への移動)、別窓、フォームの送信を止める。
+     * sandbox はセキュリティ境界ではない。
+     *
+     * allow-same-origin は外せない(地図の worker が同一生成元でないと動かない)。
+     * 同一生成元である以上、枠の中は window.parent.document へ直に触れるし、
+     * この sandbox 属性を外して読み直すこともできる。
+     * ここで止めているのは通常動作での top への移動・別窓・フォーム送信だけで、
+     * 枠の中が乗っ取られた場合の壁にはならない。
+     * 本当に分けるには、地図を別の生成元(サブドメイン等)から配ることになるが、
+     * GitHub Pages の1生成元では取れない。いまは
+     * 「MapLibre の DOM 書き込みを親の文書から外した」までの整理と位置づける。
      */
     frame.setAttribute("sandbox", "allow-scripts allow-same-origin");
     frame.setAttribute("referrerpolicy", "same-origin");
@@ -141,6 +148,17 @@
    * @param {string} [from] "click" か "drag"。枠の中から来たときだけ入る
    */
   function pick(lat, lon, from) {
+    /*
+     * 数として成り立っているかを先に見る。
+     * NaN はどの大小比較も false を返すので、下の範囲の検査を素通りして
+     * そのまま picked に入り、送信時まで誰も気づかない。
+     */
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+      showMessage("場所を読み取れませんでした。地図をもう一度タップしてください。", true);
+      if (from) syncMarker();
+      return;
+    }
+
     var b = CONFIG.submitBounds;
     if (lat < b.south || lat > b.north || lon < b.west || lon > b.east) {
       showMessage("いまは日本国内のスポットだけを受け付けています。", true);

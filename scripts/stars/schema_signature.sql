@@ -73,10 +73,46 @@ select line from (
 
   union all
   -- 行レベルセキュリティと方針
-  select 8, format('rls %s enabled=%s', c.relname, c.relrowsecurity)
+  --
+  -- relforcerowsecurity(FORCE RLS)も見る。これが落ちていると、
+  -- 表の持ち主だけが RLS を素通りする状態の違いに気づけない。
+  select 8, format('rls %s enabled=%s forced=%s',
+           c.relname, c.relrowsecurity, c.relforcerowsecurity)
     from pg_class c
     join pg_namespace n on n.oid = c.relnamespace
    where n.nspname = 'public' and c.relname like 'stars\_%' and c.relkind = 'r'
+
+  union all
+  -- 表・関数の持ち主
+  select 11, format('owner table %s %s', c.relname, pg_get_userbyid(c.relowner))
+    from pg_class c
+    join pg_namespace n on n.oid = c.relnamespace
+   where n.nspname = 'public' and c.relname like 'stars\_%' and c.relkind in ('r', 'i', 'S')
+
+  union all
+  select 12, format('owner function %s(%s) %s',
+           p.proname, pg_get_function_identity_arguments(p.oid), pg_get_userbyid(p.proowner))
+    from pg_proc p
+    join pg_namespace n on n.oid = p.pronamespace
+   where n.nspname = 'public'
+     and (p.proname like 'stars\_%' or p.proname like '%\_stars\_%')
+
+  union all
+  -- スキーマそのものへの権限(誰が中に物を作れるか)
+  select 13, format('schema-grant %s %s', n.nspname,
+           coalesce(array_to_string(n.nspacl, ' '), 'default'))
+    from pg_namespace n
+   where n.nspname = 'public'
+
+  union all
+  -- 既定の権限(これから作る物に自動で付く権限)
+  select 14, format('default-privilege %s %s %s',
+           coalesce(pg_get_userbyid(d.defaclrole), '?'),
+           d.defaclobjtype,
+           coalesce(array_to_string(d.defaclacl, ' '), 'none'))
+    from pg_default_acl d
+    left join pg_namespace n on n.oid = d.defaclnamespace
+   where n.nspname is null or n.nspname = 'public'
 
   union all
   select 9, format('policy %s.%s %s %s using=%s check=%s',

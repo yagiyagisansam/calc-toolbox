@@ -23,7 +23,7 @@
  * 使い方: node scripts/stars/check_candidates.mjs
  * ネットワークには出ない。
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -34,6 +34,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(HERE, "..", "..");
 
 const data = JSON.parse(readFileSync(path.join(HERE, "spot-candidates.json"), "utf8"));
+const selection = JSON.parse(readFileSync(path.join(HERE, "selection-2026-08-15.json"), "utf8"));
 const places = JSON.parse(readFileSync(path.join(ROOT, "stars", "data", "places.json"), "utf8"));
 
 let failed = 0;
@@ -55,8 +56,23 @@ function ok(cond, label, detail) {
 }
 
 const VERDICTS = ["掲載可", "条件付き可", "保留", "除外"];
+/* Hiroさんが公開すると決めた件数。ここを動かすときは選定表も一緒に直すこと。 */
+const PUBLISH_COUNT = 30;
 const APPROVABLE = ["掲載可", "条件付き可"];
 const PREF_NAMES = new Set(PREFECTURES.map(([p]) => p));
+const selectionByNo = new Map(selection.spots.map((s) => [s.no, s]));
+
+function acceptedException(s, check) {
+  return (
+    s.acceptance &&
+    s.acceptance.acceptedBy === "Hiroさん" &&
+    s.acceptance.decidedAt === selection.決定日 &&
+    Array.isArray(s.acceptance.exceptions) &&
+    s.acceptance.exceptions.some(
+      (e) => e.check === check && typeof e.reason === "string" && e.reason.length >= 10
+    )
+  );
+}
 
 /* 索引の市区町村だけを取り出す */
 const CITY_KINDS = new Set(["市・郡", "町・村・区"]);
@@ -119,13 +135,45 @@ for (const s of data.spots) {
     String(s.verdictWhy).slice(0, 40)
   );
 
+  if (s.acceptance) {
+    const selected = selectionByNo.get(s.acceptance.selectionNo);
+    ok(
+      !!selected && selected.decision === "採用" && selected.pref === s.pref &&
+        selected.name === s.acceptance.originalName,
+      `${at}: 採用例外が選別原票の採用行と一致する`,
+      `selectionNo=${s.acceptance.selectionNo} / originalName=${s.acceptance.originalName}`
+    );
+    ok(
+      s.selection?.no === s.acceptance.selectionNo && s.selection?.decision === "採用",
+      `${at}: selection と acceptance が一致する`,
+      JSON.stringify(s.selection)
+    );
+    for (const e of s.acceptance.exceptions || []) {
+      ok(
+        ["night", "city", "coordinate", "source:night", "source:free", "source:resv"].includes(e.check),
+        `${at}: 採用例外の種類が既知`,
+        String(e.check)
+      );
+    }
+  }
+
   /* ---- 2. 承認の対象にするなら、3条件それぞれに根拠が要る ---- */
   if (APPROVABLE.includes(s.verdict)) {
     const covered = new Set();
     for (const src of s.sources || []) for (const c of src.covers || []) covered.add(c);
+    if (s.acceptance) {
+      for (const e of s.acceptance.exceptions || []) {
+        const stale =
+          (e.check.startsWith("source:") && covered.has(e.check.slice(7))) ||
+          (e.check === "night" && !/要確認|未確認|不可/.test(String(s.night))) ||
+          (e.check === "city" && s.cityCheck?.ok === true) ||
+          (e.check === "coordinate" && s.coordVerified !== false);
+        ok(!stale, `${at}: 解消済みの採用例外が残っていない`, `${e.check}: ${e.reason}`);
+      }
+    }
     for (const need of ["night", "free", "resv"]) {
       ok(
-        covered.has(need),
+        covered.has(need) || acceptedException(s, `source:${need}`),
         `${at}: 承認の対象なのに ${need} の根拠が無い`,
         `判定 ${s.verdict} / 根拠 ${[...covered].join(",") || "なし"}`
       );
@@ -142,14 +190,34 @@ for (const s of data.spots) {
      *
      * 場所が違うものを承認してはいけないので、ここは警告ではなく失敗にする。
      */
+    /*
+     * 夜間の欄が「要確認」「未確認」「不可」のまま承認の対象になっていないか。
+     *
+     * 判定(verdict)と夜間の欄が食い違っていた候補が実際にあった
+     * (三重 鵜倉園地。判定は条件付き可なのに、夜間の欄は要確認のまま)。
+     * 表を見た人は夜間の欄を読むので、そこが未確認のものを
+     * 承認の対象として出してはいけない。
+     */
     ok(
-      s.cityCheck && s.cityCheck.ok === true,
+      !/要確認|未確認|不可/.test(String(s.night)) || acceptedException(s, "night"),
+      `${at}: 承認の対象なのに夜間の欄が「${s.night}」`,
+      `判定 ${s.verdict}`
+    );
+
+    ok(
+      (s.cityCheck && s.cityCheck.ok === true) || acceptedException(s, "city"),
       `${at}: 承認の対象なのに座標と市区町村が一致していない`,
       s.cityCheck
         ? s.cityCheck.pref
           ? `実際は ${s.cityCheck.pref}${s.cityCheck.city}`
           : String(s.cityCheck.why)
         : "cityCheck が無い(verify_candidate_cities.mjs を走らせること)"
+    );
+
+    ok(
+      s.coordVerified !== false || acceptedException(s, "coordinate"),
+      `${at}: 承認の対象なのに座標が確定していない`,
+      String(s.coordSource || "coordSource が無い")
     );
   }
 
@@ -228,6 +296,79 @@ for (const s of data.spots) {
     }
   }
   ok(worst <= 1, "記録した光害の値が、いまのラスタと一致する", `最大差 ${worst}: ${worstAt}`);
+}
+
+/* ---- 8. 公開する分が、決めたとおりの中身か ---- */
+{
+  /*
+   * 公開するのは verdict が「条件付き可」のものだけ、と決めた。
+   * この数と顔ぶれは Supabase へ入れるSQLの中身そのものなので、
+   * 知らないうちに増減していないことを、ここで釘を打っておく。
+   */
+  const publish = data.spots.filter((s) => s.verdict === "条件付き可");
+  ok(publish.length === PUBLISH_COUNT, `公開対象が${PUBLISH_COUNT}件である`, `いまは ${publish.length} 件`);
+
+  /*
+   * 椿山森林公園。
+   * 独立検証で所在地が17km違っていたもので、Hiroさんが除外と決めた。
+   * 座標を直したあとに「直ったから戻す」が起きやすい所なので、
+   * 名前で名指しして塞いでおく。
+   */
+  const tsubaki = data.spots.filter((s) => s.name.includes("椿山"));
+  ok(tsubaki.length > 0, "椿山森林公園が候補に残っている(除外の記録として)");
+  for (const s of tsubaki) {
+    ok(s.verdict === "除外", `椿山森林公園が公開対象に入っていない`, `verdict が ${s.verdict}`);
+  }
+
+  /* 公開する分は、注意書きと出典が全件そろっていること */
+  for (const s of publish) {
+    const at = `${s.pref} ${s.name}`;
+    ok(
+      typeof s.caution === "string" && s.caution.trim().length > 0,
+      `${at}: 公開するなら「気をつけること」がある`
+    );
+    ok(Array.isArray(s.sources) && s.sources.length > 0, `${at}: 公開するなら出典がある`);
+  }
+
+  /* 同じ都道府県に同じ名前が2つあると、登録SQLの重複判定が壊れる */
+  const keys = new Set();
+  for (const s of publish) {
+    const key = `${s.pref} ${s.name}`;
+    ok(!keys.has(key), `公開対象に同じ都道府県・同じ名前が重なっていない`, key.replace(" ", " "));
+    keys.add(key);
+  }
+
+  /*
+   * 生成済みの登録SQLが、いまのJSONから作られたものか。
+   * 候補を直したのにSQLを作り直し忘れると、古い座標のまま登録される。
+   */
+  const sqlPath = path.join(HERE, "generated", "seed-spots.sql");
+  if (existsSync(sqlPath)) {
+    const sql = readFileSync(sqlPath, "utf8");
+    let stale = "";
+    for (const s of publish) {
+      if (!sql.includes(`'${s.name.replace(/'/g, "''")}'`)) {
+        stale = `${s.pref} ${s.name} がSQLに無い`;
+        break;
+      }
+      if (!sql.includes(String(s.lat)) || !sql.includes(String(s.lon))) {
+        stale = `${s.pref} ${s.name} の座標がSQLと違う`;
+        break;
+      }
+    }
+    ok(stale === "", "登録SQLがいまの候補JSONから作られている", stale + "(build_seed_sql.py を流し直す)");
+    /*
+     * 椿山が「入れる側」に無いこと。
+     * 説明の注釈と、実行後の確認(件数が0であることを見るselect)には
+     * 名前が出てくるので、書き込む区間だけを見る。
+     */
+    const written = sql
+      .slice(sql.indexOf("begin;"), sql.indexOf("commit;"))
+      .split("\n")
+      .filter((line) => !line.trimStart().startsWith("--"))
+      .join("\n");
+    ok(!written.includes("椿山"), "登録SQLの書き込む側に椿山森林公園が入っていない");
+  }
 }
 
 /* ---- まとめ ---- */
