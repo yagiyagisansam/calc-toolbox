@@ -194,9 +194,49 @@ try {
   const appErr = await page.evaluate(() => (window.StarsApp ? window.StarsApp.state.error : "起動していない"));
   check("地図が読み込める", !appErr, String(appErr || ""));
 
+  /*
+   * ピンは地図が動きだしてから足される。
+   * 待たずに数えると 0 のこともある(数えた直後に開けるので、
+   * 「ピンは無いがカードは出る」というありえない結果になっていた)。
+   */
+  await page.locator(".stars-pin").first().waitFor({ timeout: 30000 }).catch(() => {});
   const pins = await page.locator(".stars-pin").count();
   /* 3桁目まで同じ地点は1つのピンにまとまるので「以下」で見る */
   check(`ピンが立つ(${pins} 個 / 掲載 ${EXPECT} 件)`, pins > 0 && pins <= EXPECT, `${pins} 個`);
+  const pinPositions = await page.locator(".stars-pin").evaluateAll((elements) =>
+    [...new Set(elements.map((element) => getComputedStyle(element).position))]
+  );
+  check(
+    "ピンはMapLibreの絶対配置を保つ",
+    pinPositions.length === 1 && pinPositions[0] === "absolute",
+    pinPositions.join(", ")
+  );
+  const panelLayout = await page.evaluate(() => {
+    const topbar = document.querySelector(".stars-topbar").getBoundingClientRect();
+    const legend = document.querySelector(".stars-legend").getBoundingClientRect();
+    return {
+      overlap: !(
+        topbar.right <= legend.left ||
+        legend.right <= topbar.left ||
+        topbar.bottom <= legend.top ||
+        legend.bottom <= topbar.top
+      ),
+      legendHeight: legend.height
+    };
+  });
+  check("日時パネルと凡例が重ならない", !panelLayout.overlap, JSON.stringify(panelLayout));
+
+  await page.locator(".stars-legend-summary").click();
+  const collapsedLegend = await page.locator(".stars-legend").evaluate((legend) => ({
+    open: legend.open,
+    height: legend.getBoundingClientRect().height
+  }));
+  check(
+    "凡例を折りたたんで地図を確認できる",
+    !collapsedLegend.open && collapsedLegend.height < panelLayout.legendHeight,
+    JSON.stringify(collapsedLegend)
+  );
+  await page.locator(".stars-legend-summary").click();
 
   // 適当な1件を開いて、カードに「気をつけること」が出るか
   const first = spots[0];
