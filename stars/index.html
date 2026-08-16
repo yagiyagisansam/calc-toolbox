@@ -68,22 +68,26 @@
     <a id="spot-detail-link" class="stars-spot-link" href="./spot.html">このスポットの詳しい予報</a>
   </aside>
 
-  <section class="stars-legend" aria-labelledby="legend-title">
-    <h2 id="legend-title">星見レベル</h2>
-    <p class="stars-legend-hint">明るい色ほど星が見えやすい場所です。</p>
-    <div id="layer-tabs" class="stars-layer-tabs" role="group" aria-label="表示する項目"></div>
-    <div id="legend-items"></div>
-    <p id="layer-note" class="stars-layer-note"></p>
-    <!-- たまにしか触らないものは畳んでおく(地図に使える高さを優先するため) -->
-    <details class="stars-legend-more">
-      <summary>表示の設定</summary>
-      <div class="stars-opacity">
-        <label for="opacity-slider">濃さ</label>
-        <input id="opacity-slider" type="range" min="0" max="100" value="85" step="5">
-      </div>
-    </details>
-    <p id="spot-count" class="stars-spot-count"></p>
-  </section>
+  <details class="stars-legend" open>
+    <summary class="stars-legend-summary">
+      <span id="legend-title" class="stars-legend-title">星見レベル</span>
+    </summary>
+    <div class="stars-legend-body">
+      <p class="stars-legend-hint">明るい色ほど星が見えやすい場所です。</p>
+      <div id="layer-tabs" class="stars-layer-tabs" role="group" aria-label="表示する項目"></div>
+      <div id="legend-items"></div>
+      <p id="layer-note" class="stars-layer-note"></p>
+      <!-- たまにしか触らないものは畳んでおく(地図に使える高さを優先するため) -->
+      <details class="stars-legend-more">
+        <summary>表示の設定</summary>
+        <div class="stars-opacity">
+          <label for="opacity-slider">濃さ</label>
+          <input id="opacity-slider" type="range" min="0" max="100" value="85" step="5">
+        </div>
+      </details>
+      <p id="spot-count" class="stars-spot-count"></p>
+    </div>
+  </details>
 
 </main>
 
