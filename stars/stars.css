@@ -209,7 +209,54 @@ a {
   left: auto;
   right: 10px;
   width: min(520px, calc(100% - 310px));
-  padding: 10px 12px;
+  padding: 0 12px 10px;
+  will-change: left, top;
+}
+
+.stars-topbar.is-collapsed {
+  width: min(240px, calc(100% - 20px));
+  padding-bottom: 0;
+}
+
+.stars-panel-handle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  margin: 0 -12px 8px;
+  padding: 6px 8px 6px 12px;
+  border-bottom: 1px solid var(--panel-border);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.stars-topbar.is-collapsed .stars-panel-handle {
+  margin-bottom: 0;
+  border-bottom: 0;
+}
+
+.stars-topbar.is-dragging .stars-panel-handle { cursor: grabbing; }
+.stars-panel-handle:focus-visible { outline: 2px solid #86b6ef; outline-offset: -3px; }
+.stars-panel-title { color: var(--panel-ink); font-size: 12px; font-weight: 700; }
+.stars-panel-drag-hint { flex: 1 1 auto; color: var(--panel-ink-3); font-size: 10px; }
+.stars-panel-toggle {
+  flex: 0 0 auto;
+  min-height: 28px;
+  padding: 3px 8px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--panel-ink-2);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.stars-panel-toggle:hover,
+.stars-panel-toggle:focus-visible {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--panel-ink);
 }
 
 /* どの夜を見るか(今夜・明日・明後日) */
@@ -597,6 +644,10 @@ a {
   .stars-topbar {
     left: 10px;
     width: auto;
+  }
+
+  .stars-topbar.is-moved {
+    width: min(520px, calc(100% - 20px));
   }
 
   .stars-spot-card {
