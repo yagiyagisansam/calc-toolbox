@@ -87,6 +87,27 @@ try {
     .waitForFunction(() => window.StarsList && window.StarsList.state.ready, { timeout: 60000 })
     .catch(() => {});
 
+  const listUi = await page.evaluate(() => {
+    const slider = document.querySelector("#radius-slider");
+    return {
+      title: document.title,
+      description: document.querySelector('meta[name="description"]')?.content || "",
+      min: slider?.min,
+      max: slider?.max,
+      step: slider?.step
+    };
+  });
+  check(
+    "流星群の観測スポット検索向けSEOが本番画面にある",
+    /流星群/.test(listUi.title) && /観測スポット/.test(listUi.description),
+    JSON.stringify(listUi)
+  );
+  check(
+    "検索半径が10〜100km・10km刻み",
+    listUi.min === "10" && listUi.max === "100" && listUi.step === "10",
+    JSON.stringify(listUi)
+  );
+
   const spots = await page.evaluate(() =>
     (window.StarsList.state.spots || []).map((s) => ({
       name: s.name,
@@ -193,6 +214,20 @@ try {
     .catch(() => {});
   const appErr = await page.evaluate(() => (window.StarsApp ? window.StarsApp.state.error : "起動していない"));
   check("地図が読み込める", !appErr, String(appErr || ""));
+  const mapUi = await page.evaluate(() => {
+    const map = window.StarsMap && window.StarsMap.map();
+    const bounds = map && map.getMaxBounds();
+    return {
+      opacityControl: !!document.querySelector("#opacity-slider"),
+      bounds: bounds ? [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()] : null
+    };
+  });
+  check("濃淡設定を表示しない", !mapUi.opacityControl, JSON.stringify(mapUi));
+  check(
+    "地図の移動範囲を日本周辺に制限",
+    mapUi.bounds && mapUi.bounds.join(",") === "122,20,154,46",
+    JSON.stringify(mapUi)
+  );
 
   /*
    * ピンは地図が動きだしてから足される。

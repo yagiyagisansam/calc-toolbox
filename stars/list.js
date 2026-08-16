@@ -28,8 +28,9 @@
     pref: null, // 絞り込み中の都道府県(nullですべて)
     city: null, // 絞り込み中の市区町村(nullですべて)
     sort: "score",
+    radiusKm: 50,
     /*
-     * 「近い順」の基準にする場所。
+     * 検索円の中心にする場所。
      * 現在地・地名検索・地図のタップ、どれで決めても同じここに入る。
      * { lat, lon, label } の形。label は画面に出す名前。
      */
@@ -154,6 +155,7 @@
       if (state.region && s.region !== state.region) return false;
       if (state.pref && s.pref !== state.pref) return false;
       if (state.city && cityOf(s) !== state.city) return false;
+      if (state.origin && distanceOf(s) > state.radiusKm) return false;
       return true;
     });
     var sorters = {
@@ -169,10 +171,6 @@
       pref: function (a, b) {
         return String(a.pref).localeCompare(String(b.pref), "ja") ||
           String(a.name).localeCompare(String(b.name), "ja");
-      },
-      near: function (a, b) {
-        if (!state.origin) return 0;
-        return distanceOf(a) - distanceOf(b);
       }
     };
     return list.sort(sorters[state.sort] || sorters.score);
@@ -182,6 +180,15 @@
   function distanceOf(spot) {
     if (!state.origin) return Infinity;
     return Here.distanceKm(state.origin, { lat: Number(spot.lat), lon: Number(spot.lon) });
+  }
+
+  function isInJapan(point) {
+    var bounds = CONFIG.map.maxBounds;
+    return (
+      bounds &&
+      point.lon >= bounds[0][0] && point.lon <= bounds[1][0] &&
+      point.lat >= bounds[0][1] && point.lat <= bounds[1][1]
+    );
   }
 
   /**
@@ -200,10 +207,10 @@
     return city === "" ? null : city;
   }
 
-  // ---- 基準点(どこから近い順に並べるか) -----------------------------------
+  // ---- 検索円の中心 --------------------------------------------------------
 
   /**
-   * 基準点を決める。現在地・地名検索・地図のタップ、どれもここに集める。
+   * 検索円の中心を決める。現在地・地名検索・地図のタップ、どれもここに集める。
    * 入口が3つあっても中の扱いを1つにしておかないと、片方だけ直し忘れる。
    *
    * @param {{lat:number, lon:number}} point
@@ -211,34 +218,40 @@
    */
   function setOrigin(point, label) {
     if (!point || !Number.isFinite(point.lat) || !Number.isFinite(point.lon)) return;
-    if (point.lat < -90 || point.lat > 90 || point.lon < -180 || point.lon > 180) return;
+    if (!isInJapan(point)) {
+      setStatus("日本国内の地点を指定してください。", true);
+      return;
+    }
     state.origin = { lat: point.lat, lon: point.lon, label: label || "指定した場所" };
 
-    var option = el("sort-near");
-    if (option) option.hidden = false;
     var note = el("here-note");
     if (note) note.hidden = false;
 
     var box = el("origin-current");
     var text = el("origin-label");
     if (box && text) {
-      text.textContent = "基準: " + state.origin.label;
+      text.textContent =
+        "中心: " + state.origin.label + "（半径" + state.radiusKm + "km・星見レベル順）";
       box.hidden = false;
     }
 
-    // 基準点を決めた人は近い順が見たいはずなので、そちらへ切り替える
-    state.sort = "near";
+    // 円内の候補は、今夜の観測先として条件がよい順に見せる。
+    state.sort = "score";
     var sortSelect = el("sort-select");
-    if (sortSelect) sortSelect.value = "near";
+    if (sortSelect) sortSelect.value = "score";
 
     /*
-     * 地図の枠が開いていれば、印も同じ場所へ動かす(地名検索で決めたときなど)。
-     * 送るのは mark(印だけ)。init を送ると、地図をタップするたびに
-     * 視界がそこへ寄り直してしまう。
+     * 地図の枠が開いていれば、中心と検索円も同じ場所へ動かす。
      */
     if (pickFrame && pickReady) {
       pickFrame.contentWindow.postMessage(
-        { type: "stars-pick:mark", lat: state.origin.lat, lon: state.origin.lon },
+        {
+          type: "stars-pick:area",
+          lat: state.origin.lat,
+          lon: state.origin.lon,
+          radiusKm: state.radiusKm,
+          fit: true
+        },
         global.location.origin
       );
     }
@@ -251,14 +264,45 @@
     if (box) box.hidden = true;
     var note = el("here-note");
     if (note) note.hidden = true;
-    var option = el("sort-near");
-    if (option) option.hidden = true;
-    if (state.sort === "near") {
-      state.sort = "score";
-      var sortSelect = el("sort-select");
-      if (sortSelect) sortSelect.value = "score";
+    if (pickFrame && pickReady) {
+      pickFrame.contentWindow.postMessage({ type: "stars-pick:unmark" }, global.location.origin);
     }
     renderTable();
+  }
+
+  function setupRadius() {
+    var slider = el("radius-slider");
+    var output = el("radius-value");
+    if (!slider || !output) return;
+
+    function apply() {
+      var value = Number(slider.value);
+      state.radiusKm = Math.min(100, Math.max(10, Math.round(value / 10) * 10));
+      output.textContent = state.radiusKm + "km";
+      if (state.origin) {
+        var label = el("origin-label");
+        if (label) {
+          label.textContent =
+            "中心: " + state.origin.label + "（半径" + state.radiusKm + "km・星見レベル順）";
+        }
+        if (pickFrame && pickReady) {
+          pickFrame.contentWindow.postMessage(
+            {
+              type: "stars-pick:area",
+              lat: state.origin.lat,
+              lon: state.origin.lon,
+              radiusKm: state.radiusKm,
+              fit: true
+            },
+            global.location.origin
+          );
+        }
+        renderTable();
+      }
+    }
+
+    slider.addEventListener("input", apply);
+    apply();
   }
 
   /**
@@ -386,7 +430,7 @@
         /*
          * 都道府県で探したときは、その県だけに絞り込む。
          * 「埼玉県」と打った人は埼玉のスポットが見たいのであって、
-         * 埼玉から近い順に全国を見たいわけではない。
+         * 県境の外まで含めた円内候補を見たいとは限らない。
          */
         if (item.kind === "都道府県") {
           setPref(item.label);
@@ -557,7 +601,11 @@
       if (data.type === "stars-pick:ready") {
         pickReady = true;
         pickFrame.contentWindow.postMessage(
-          { type: "stars-pick:init", origin: state.origin || null },
+          {
+            type: "stars-pick:init",
+            origin: state.origin || null,
+            radiusKm: state.radiusKm
+          },
           global.location.origin
         );
         return;
@@ -590,7 +638,7 @@
     button.addEventListener("click", function () {
       var open = wrap.hidden;
       wrap.hidden = !open;
-      button.textContent = open ? "地図を閉じる" : "地図で選ぶ";
+      button.textContent = open ? "地図を閉じる" : "地図で中心を決める";
       // 地図で選んだ地点に名前をつけるのに索引が要る。開いた時点で取りに行く
       if (open) ensureLoaded();
       if (!open) return;
@@ -599,7 +647,11 @@
         // 開き直したときは、いまの基準点をもう一度渡す
         if (pickReady) {
           pickFrame.contentWindow.postMessage(
-            { type: "stars-pick:init", origin: state.origin || null },
+            {
+              type: "stars-pick:init",
+              origin: state.origin || null,
+              radiusKm: state.radiusKm
+            },
             global.location.origin
           );
         }
@@ -760,22 +812,35 @@
     if (!list.length) {
       table.hidden = true;
       setStatus(
-        state.region
+        state.origin
+          ? "中心から半径" + state.radiusKm + "km以内に掲載中のスポットはありません。範囲を広げてください。"
+          : state.region
           ? state.region + "に掲載中のスポットはまだありません。"
           : "掲載中のスポットはまだありません。よい場所をご存じでしたら申請してください。",
         false
       );
       return;
     }
-    setStatus("", false);
+    setStatus(
+      state.origin
+        ? "半径" + state.radiusKm + "km以内の" + list.length + "件を、今夜の星見レベル順に表示しています。"
+        : "",
+      false
+    );
     table.hidden = false;
 
-    list.forEach(function (spot) {
+    list.forEach(function (spot, index) {
       var tr = document.createElement("tr");
 
       // スポット名(詳細へのリンク)と都道府県
       var th = document.createElement("th");
       th.scope = "row";
+      if (state.origin) {
+        var rank = document.createElement("span");
+        rank.className = "stars-rank";
+        rank.textContent = index + 1 + "位";
+        th.appendChild(rank);
+      }
       var link = document.createElement("a");
       // 詳細が同じ夜を見るように、一覧が使った日を渡す
       link.href =
@@ -1026,6 +1091,7 @@
         state.ready = true;
       });
 
+    setupRadius();
     setupHere();
     setupSearch();
     setupPickMap();

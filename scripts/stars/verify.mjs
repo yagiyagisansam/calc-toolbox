@@ -260,6 +260,19 @@ try {
   console.log("地図ページ (stars/index.html):");
   await page.goto(`http://127.0.0.1:${PORT}/stars/`, { waitUntil: "load", timeout: 60000 });
 
+  const indexSeo = await page.evaluate(() => ({
+    title: document.title,
+    description: document.querySelector('meta[name="description"]')?.content || "",
+    h1: document.querySelector("h1")?.textContent || "",
+    opacityControl: !!document.querySelector("#opacity-slider")
+  }));
+  check(
+    "流星群の観測スポット検索に合うタイトル・説明・見出し",
+    /流星群/.test(indexSeo.title) && /観測スポット/.test(indexSeo.description) && /流星群/.test(indexSeo.h1),
+    JSON.stringify(indexSeo)
+  );
+  check("不要な濃淡設定が無い", !indexSeo.opacityControl, `濃淡設定=${indexSeo.opacityControl}`);
+
   // 天気の取得と最初の描画が終わるまで待つ
   const ready = await page
     .waitForFunction(() => window.StarsApp && (window.StarsApp.state.ready || window.StarsApp.state.error), {
@@ -293,6 +306,19 @@ try {
   check("初期化が完了する", ready && appState.ready, appState.error || "");
   check("今夜の時間帯が取れる", appState.times > 0, `${appState.times} 時点`);
   check("ラスタ用の canvas が作られる", !!appState.canvas, appState.canvas ? `${appState.canvas.w}x${appState.canvas.h}` : "");
+
+  const mapLimits = await page.evaluate(() => {
+    const map = window.StarsMap && window.StarsMap.map();
+    const bounds = map && map.getMaxBounds();
+    return bounds
+      ? [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()]
+      : null;
+  });
+  check(
+    "地図の移動範囲を日本周辺に制限",
+    mapLimits && mapLimits.join(",") === "122,20,154,46",
+    JSON.stringify(mapLimits)
+  );
 
   // canvas が実際に塗られているか(全部同じ色ではないこと=色分けが効いていること)
   const painted = await page.evaluate(() => {
@@ -860,6 +886,30 @@ try {
   await page.waitForFunction(() => window.StarsList && window.StarsList.state.ready, { timeout: 30000 })
     .catch(() => {});
 
+  const listSearchUi = await page.evaluate(() => {
+    const slider = document.querySelector("#radius-slider");
+    return {
+      title: document.title,
+      description: document.querySelector('meta[name="description"]')?.content || "",
+      h1: document.querySelector("h1")?.textContent || "",
+      min: slider?.min,
+      max: slider?.max,
+      step: slider?.step,
+      nearOption: !!document.querySelector('#sort-select option[value="near"]')
+    };
+  });
+  check(
+    "一覧も流星群の観測スポット検索に最適化",
+    /流星群/.test(listSearchUi.title) && /観測スポット/.test(listSearchUi.description) && /流星群/.test(listSearchUi.h1),
+    JSON.stringify(listSearchUi)
+  );
+  check(
+    "検索半径は10〜100km・10km刻み",
+    listSearchUi.min === "10" && listSearchUi.max === "100" && listSearchUi.step === "10",
+    JSON.stringify(listSearchUi)
+  );
+  check("旧『近い順』を残していない", !listSearchUi.nearOption, JSON.stringify(listSearchUi));
+
   const tabCount = await page.locator(".stars-tab").count();
   check("地方タブが9個(全国+8地方)", tabCount === 9, `${tabCount} 個`);
 
@@ -970,7 +1020,7 @@ try {
   const shikoku = await page.locator("#status").textContent();
   check("掲載の無い地方は案内を出す", /四国/.test(shikoku), shikoku);
 
-  // ---- 地名でさがす / 絞り込み / 近い順 ----
+  // ---- 地名でさがす / 絞り込み / 半径内ランキング ----
   await page.getByRole("button", { name: "全国" }).click();
   await page.waitForTimeout(150);
 
@@ -1118,7 +1168,7 @@ try {
     );
   }
 
-  // 候補を選ぶと基準点になり、そこから近い順に並ぶ
+  // 候補を選ぶと検索円の中心になり、円内だけを星見レベル順に並べる
   await page.locator("#place-search").fill("石垣市");
   await page.waitForTimeout(400);
   await page.locator("#place-results .stars-suggest-item").first().click();
@@ -1128,20 +1178,17 @@ try {
     const origin = await page.locator("#origin-label").textContent();
     const names = await page.locator("#spot-rows tr th a").allTextContents();
     check(
-      "地名を選ぶと近い順に切り替わる",
-      sortValue === "near" && /石垣/.test(origin || ""),
+      "地名を選ぶと半径内のランキングに切り替わる",
+      sortValue === "score" && /石垣/.test(origin || "") && /半径50km/.test(origin || ""),
       `並び=${sortValue} / ${origin}`
     );
     check(
-      "石垣島の浜がいちばん近い",
-      names[0] === "石垣島の浜",
+      "検索円の外にあるスポットは出さない",
+      names.length === 1 && names[0] === "石垣島の浜",
       names.join(" / ")
     );
-    check(
-      "稚内の丘がいちばん遠い",
-      names[names.length - 1] === "稚内の丘",
-      names[names.length - 1]
-    );
+    const ranks = await page.locator("#spot-rows .stars-rank").allTextContents();
+    check("円内の候補に順位が出る", ranks[0] === "1位", ranks.join(" / "));
   }
 
   // 距離が表に出る
@@ -1149,6 +1196,20 @@ try {
     const firstRow = await page.locator("#spot-rows tr").first().textContent();
     check("直線距離が表に出る", /直線 約\d+km/.test(firstRow), (firstRow.match(/直線 約\d+km/) || ["なし"])[0]);
   }
+
+  // 半径は10〜100kmを10km刻みで変えられ、範囲を広げると候補は減らない
+  await page.locator("#radius-slider").fill("10");
+  await page.waitForTimeout(200);
+  const count10 = await page.locator("#spot-rows tr").count();
+  await page.locator("#radius-slider").fill("100");
+  await page.waitForTimeout(200);
+  const count100 = await page.locator("#spot-rows tr").count();
+  const radiusText = await page.locator("#radius-value").textContent();
+  check(
+    "検索半径を10〜100kmで変更できる",
+    count100 >= count10 && radiusText === "100km",
+    `10km=${count10}件 / 100km=${count100}件 / ${radiusText}`
+  );
 
   // 基準点を解除すると元の並びに戻る
   await page.locator("#origin-clear").click();
@@ -1160,7 +1221,7 @@ try {
   }
 
   // 地図で選ぶ(地図そのものはこの環境ではタイルが来ないが、開けることを見る)
-  await page.getByRole("button", { name: "地図で選ぶ" }).click();
+  await page.getByRole("button", { name: "地図で中心を決める" }).click();
   await page.waitForTimeout(1200);
   {
     const shown = await page.locator("#pick-map-wrap").isVisible();
@@ -1232,7 +1293,7 @@ try {
     const touched = await page.evaluate(() => window.StarsPlaces.isReady());
     check("開いただけでは地名の索引を読み込まない", touched === false, `読み込み済み=${touched}`);
   }
-  await page.getByRole("button", { name: "地図で選ぶ" }).click();
+  await page.getByRole("button", { name: "地図で中心を決める" }).click();
   await page.waitForTimeout(1200);
   {
     // 地図の click を人手でなぞる(この環境ではタイルが来ないので座標で起こす)
@@ -1242,6 +1303,16 @@ try {
     await inner.evaluate(() => {
       window.StarsPick.map().fire("click", { lngLat: { lat: 35.44, lng: 137.68 } });
     });
+    await page.waitForTimeout(250);
+    const area = await inner.evaluate(() => ({
+      value: window.StarsPick.area(),
+      hasSource: !!window.StarsPick.map().getSource("stars-search-area")
+    }));
+    check(
+      "地図に検索円が出る",
+      area.hasSource && area.value && area.value.radiusKm === 50,
+      JSON.stringify(area)
+    );
   }
   await page.waitForFunction(
     () => {
