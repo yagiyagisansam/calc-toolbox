@@ -208,6 +208,12 @@ const STUB_SPOTS = [
     access: "夏季はシャトルバスのみ。マイカー規制あり。",
     facilities: "トイレあり",
     note: "国内でも指折りの暗さ。",
+    /*
+     * 「気をつけること」。実際の掲載30件は全件これを持っている
+     * (有料・要予約・冬期閉鎖といった、行くかどうかを左右すること)。
+     * 地図のカードと一覧の両方に出ているかを、この1件で確かめる。
+     */
+    caution: "冬期は通行止め。夜間の駐車場利用は現地の掲示に従うこと。",
     source_url: "https://example.com/norikura"
   },
   {
@@ -757,6 +763,48 @@ try {
   const night = await page.locator("#night-range").textContent();
   check("今夜の時間帯が表示される", /の夜/.test(night), night);
 
+  /*
+   * 地図でスポットを選んだときに「気をつけること」が出るか。
+   *
+   * 掲載する30件は、有料・要予約・冬期閉鎖のいずれかを必ず抱えている。
+   * これが地図のカードに出ていないと、詳細ページを開かなかった人は
+   * 「今夜そのまま行ける場所」だと思って出かけることになる。
+   * 出る場合と出ない場合の両方を見る(空のときに枠だけ残らないこと)。
+   */
+  {
+    const pin = page.locator('.stars-pin[aria-label*="乗鞍畳平"]');
+    if ((await pin.count()) > 0) {
+      await pin.first().click();
+      await page.waitForTimeout(250);
+      const shown = await page.locator("#spot-caution").isVisible();
+      const text = await page.locator("#spot-caution").textContent();
+      check(
+        "地図のカードに「気をつけること」が出る",
+        shown && text.includes("冬期は通行止め"),
+        `表示${shown} / ${text}`
+      );
+      await capture("map-caution");
+
+      const plain = page.locator('.stars-pin[aria-label*="都心の公園"]');
+      if ((await plain.count()) > 0) {
+        await plain.first().click();
+        await page.waitForTimeout(250);
+        const hidden = await page.locator("#spot-caution").isHidden();
+        const empty = await page.locator("#spot-caution").textContent();
+        check(
+          "「気をつけること」が無いスポットでは枠ごと出ない",
+          hidden && empty === "",
+          `非表示${hidden} / "${empty}"`
+        );
+      }
+      await page.keyboard.press("Escape").catch(() => {});
+      await page.mouse.click(5, 5);
+      await page.waitForTimeout(150);
+    } else {
+      check("地図のカードに「気をつけること」が出る", false, "スポットのピンが出ていない");
+    }
+  }
+
   if (shotPath) {
     await page.screenshot({ path: shotPath, fullPage: false });
     console.log(`\nスクリーンショット: ${shotPath}`);
@@ -915,6 +963,49 @@ try {
 
   const rowCount = await page.locator("#spot-rows tr").count();
   check("スポットが表に並ぶ", rowCount === STUB_SPOTS.length, `${rowCount} 行`);
+
+  /*
+   * 一覧にも「気をつけること」が出るか。
+   *
+   * 名前の欄に入れてある。狭い画面では右の列が横スクロールの向こうへ行くので、
+   * 別の列にすると、いちばん読んでほしい人(スマートフォンの人)に届かない。
+   * 幅を変えて通しているのは、そこが崩れていないかを見るため。
+   */
+  {
+    const row = page.locator("#spot-rows tr", { hasText: "乗鞍畳平" });
+    const cautions = row.locator(".stars-cell-caution");
+    const text = (await cautions.count()) > 0 ? await cautions.first().textContent() : "";
+    check(
+      "一覧に「気をつけること」が出る",
+      (await cautions.count()) === 1 && text.includes("冬期は通行止め"),
+      `${await cautions.count()} 件 / ${text}`
+    );
+
+    /* 名前の欄の中に入っていること(横スクロールで隠れる列に混ざっていない) */
+    const inNameCell = (await row.locator("th .stars-cell-caution").count()) === 1;
+    check("「気をつけること」が名前の欄にある", inNameCell);
+
+    /* 画面の幅に収まっているか(はみ出すと読めない) */
+    const fits = await page.evaluate(() => {
+      const e = document.querySelector("#spot-rows .stars-cell-caution");
+      if (!e) return null;
+      const r = e.getBoundingClientRect();
+      return { left: Math.round(r.left), right: Math.round(r.right), w: window.innerWidth, h: Math.round(r.height) };
+    });
+    check(
+      "「気をつけること」が画面の幅に収まる",
+      fits !== null && fits.left >= 0 && fits.right <= fits.w + 1 && fits.h > 0,
+      JSON.stringify(fits)
+    );
+
+    /* 注意の無いスポットには、空の枠を出さない */
+    const plainRow = page.locator("#spot-rows tr", { hasText: "都心の公園" });
+    check(
+      "「気をつけること」が無い行には枠を出さない",
+      (await plainRow.locator(".stars-cell-caution").count()) === 0
+    );
+  }
+
   await capture("list");
 
   /*
@@ -1377,9 +1468,21 @@ try {
 
   const factMoon = await page.locator("#fact-moon").textContent();
   check("月の情報が出る", /光っている/.test(factMoon), factMoon);
+  /*
+   * 月が一晩のあいだにどう動くか。
+   *
+   * 「17%光っている」だけでは、その月が空に居るのかどうかが分からない。
+   * 出入りの時刻(または一晩中どちらか)まで出て、はじめて使える情報になる。
+   *
+   * spot.js が出す言い回しは4通り:
+   *   「20:19に出て 03:29に沈みます」「20:23に沈みます(…)」
+   *   「23:10に出ます(…)」「一晩中出ています／一晩中沈んでいます(…)」
+   * どれになるかは日によって変わる。以前は「月の入り」という語を探していたので、
+   * 今日のように沈むだけの夜になると、正しい表示のまま失敗していた。
+   */
   check(
     "月が一晩中どうしているかが分かる",
-    /月の出|月の入り|一晩中/.test(factMoon),
+    /(\d{1,2}:\d{2}に(出て|出ます|沈みます))|一晩中(出て|沈んで)/.test(factMoon),
     factMoon
   );
 

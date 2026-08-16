@@ -23,7 +23,7 @@
  * 使い方: node scripts/stars/check_candidates.mjs
  * ネットワークには出ない。
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -56,6 +56,8 @@ function ok(cond, label, detail) {
 }
 
 const VERDICTS = ["掲載可", "条件付き可", "保留", "除外"];
+/* Hiroさんが公開すると決めた件数。ここを動かすときは選定表も一緒に直すこと。 */
+const PUBLISH_COUNT = 30;
 const APPROVABLE = ["掲載可", "条件付き可"];
 const PREF_NAMES = new Set(PREFECTURES.map(([p]) => p));
 const selectionByNo = new Map(selection.spots.map((s) => [s.no, s]));
@@ -294,6 +296,79 @@ for (const s of data.spots) {
     }
   }
   ok(worst <= 1, "記録した光害の値が、いまのラスタと一致する", `最大差 ${worst}: ${worstAt}`);
+}
+
+/* ---- 8. 公開する分が、決めたとおりの中身か ---- */
+{
+  /*
+   * 公開するのは verdict が「条件付き可」のものだけ、と決めた。
+   * この数と顔ぶれは Supabase へ入れるSQLの中身そのものなので、
+   * 知らないうちに増減していないことを、ここで釘を打っておく。
+   */
+  const publish = data.spots.filter((s) => s.verdict === "条件付き可");
+  ok(publish.length === PUBLISH_COUNT, `公開対象が${PUBLISH_COUNT}件である`, `いまは ${publish.length} 件`);
+
+  /*
+   * 椿山森林公園。
+   * 独立検証で所在地が17km違っていたもので、Hiroさんが除外と決めた。
+   * 座標を直したあとに「直ったから戻す」が起きやすい所なので、
+   * 名前で名指しして塞いでおく。
+   */
+  const tsubaki = data.spots.filter((s) => s.name.includes("椿山"));
+  ok(tsubaki.length > 0, "椿山森林公園が候補に残っている(除外の記録として)");
+  for (const s of tsubaki) {
+    ok(s.verdict === "除外", `椿山森林公園が公開対象に入っていない`, `verdict が ${s.verdict}`);
+  }
+
+  /* 公開する分は、注意書きと出典が全件そろっていること */
+  for (const s of publish) {
+    const at = `${s.pref} ${s.name}`;
+    ok(
+      typeof s.caution === "string" && s.caution.trim().length > 0,
+      `${at}: 公開するなら「気をつけること」がある`
+    );
+    ok(Array.isArray(s.sources) && s.sources.length > 0, `${at}: 公開するなら出典がある`);
+  }
+
+  /* 同じ都道府県に同じ名前が2つあると、登録SQLの重複判定が壊れる */
+  const keys = new Set();
+  for (const s of publish) {
+    const key = `${s.pref} ${s.name}`;
+    ok(!keys.has(key), `公開対象に同じ都道府県・同じ名前が重なっていない`, key.replace(" ", " "));
+    keys.add(key);
+  }
+
+  /*
+   * 生成済みの登録SQLが、いまのJSONから作られたものか。
+   * 候補を直したのにSQLを作り直し忘れると、古い座標のまま登録される。
+   */
+  const sqlPath = path.join(HERE, "generated", "seed-spots.sql");
+  if (existsSync(sqlPath)) {
+    const sql = readFileSync(sqlPath, "utf8");
+    let stale = "";
+    for (const s of publish) {
+      if (!sql.includes(`'${s.name.replace(/'/g, "''")}'`)) {
+        stale = `${s.pref} ${s.name} がSQLに無い`;
+        break;
+      }
+      if (!sql.includes(String(s.lat)) || !sql.includes(String(s.lon))) {
+        stale = `${s.pref} ${s.name} の座標がSQLと違う`;
+        break;
+      }
+    }
+    ok(stale === "", "登録SQLがいまの候補JSONから作られている", stale + "(build_seed_sql.py を流し直す)");
+    /*
+     * 椿山が「入れる側」に無いこと。
+     * 説明の注釈と、実行後の確認(件数が0であることを見るselect)には
+     * 名前が出てくるので、書き込む区間だけを見る。
+     */
+    const written = sql
+      .slice(sql.indexOf("begin;"), sql.indexOf("commit;"))
+      .split("\n")
+      .filter((line) => !line.trimStart().startsWith("--"))
+      .join("\n");
+    ok(!written.includes("椿山"), "登録SQLの書き込む側に椿山森林公園が入っていない");
+  }
 }
 
 /* ---- まとめ ---- */

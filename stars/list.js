@@ -796,6 +796,25 @@
         dist.textContent = "直線 約" + Math.round(distanceOf(spot)) + "km";
         th.appendChild(dist);
       }
+
+      /*
+       * 行く前に知っておくべきこと。
+       *
+       * 有料・要予約・期間閉鎖といった、行くかどうかを左右することが caution に入る。
+       * 詳細ページにしか出していなかったので、一覧で選んだ人には見えず、
+       * 「今夜そのまま行ける場所」だと思って出かけてしまう恐れがあった。
+       *
+       * 名前と同じマス(th)に置くのは、狭い画面では右側の列が隠れるため。
+       * 表がどれだけ縮んでも、名前が見えていればこれも見える。
+       * 中身はデータのまま出す(こちらで言い換えない)。
+       */
+      var cautionText = typeof spot.caution === "string" ? spot.caution.trim() : "";
+      if (cautionText) {
+        var caution = document.createElement("span");
+        caution.className = "stars-cell-caution";
+        caution.textContent = cautionText;
+        th.appendChild(caution);
+      }
       tr.appendChild(th);
 
       // 星見レベル

@@ -432,6 +432,16 @@ a {
   color: var(--panel-ink-2);
 }
 
+/* 地図のスポットカードでも、行く前に知っておくべきことを出す */
+.stars-spot-caution {
+  margin: 0 0 6px;
+  padding-left: 7px;
+  border-left: 2px solid var(--panel-line, var(--panel-ink-2));
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--panel-ink-2);
+}
+
 .stars-spot-link {
   display: inline-block;
   margin-top: 2px;
@@ -1015,6 +1025,35 @@ textarea.stars-input {
   display: block;
   font-size: 12px;
   font-weight: 400;
+  color: var(--page-ink-2);
+}
+
+/*
+ * 行く前に知っておくべきこと(有料・要予約・期間閉鎖など)。
+ *
+ * 目立たせすぎない。危険の告知ではなく「出かける前に読むこと」なので、
+ * 赤や太字で驚かせる必要はない。ただし読み飛ばされても困るので、
+ * 左に細い線を立てて、ひとことや設備の並びとは別のものだと分かるようにする。
+ */
+/*
+ * 「気をつけること」。名前の欄の中に置いてある。
+ *
+ * 右の列は狭い画面では横スクロールの向こうへ行くので、別の列にすると
+ * いちばん読んでほしい人(スマートフォンの人)に届かない。
+ *
+ * min-width を付けているのは、名前だけに合わせて列が細くなると
+ * 1行に4〜5文字しか入らず、読むのに難儀するため。
+ * 名前の欄は左端なので、ここが広がっても横スクロールせずに読める。
+ */
+.stars-cell-caution {
+  display: block;
+  min-width: 13em;
+  margin-top: 4px;
+  padding-left: 7px;
+  border-left: 2px solid var(--page-line);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.45;
   color: var(--page-ink-2);
 }
 
