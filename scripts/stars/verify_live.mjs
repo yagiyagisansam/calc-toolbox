@@ -194,6 +194,12 @@ try {
   const appErr = await page.evaluate(() => (window.StarsApp ? window.StarsApp.state.error : "起動していない"));
   check("地図が読み込める", !appErr, String(appErr || ""));
 
+  /*
+   * ピンは地図が動きだしてから足される。
+   * 待たずに数えると 0 のこともある(数えた直後に開けるので、
+   * 「ピンは無いがカードは出る」というありえない結果になっていた)。
+   */
+  await page.locator(".stars-pin").first().waitFor({ timeout: 30000 }).catch(() => {});
   const pins = await page.locator(".stars-pin").count();
   /* 3桁目まで同じ地点は1つのピンにまとまるので「以下」で見る */
   check(`ピンが立つ(${pins} 個 / 掲載 ${EXPECT} 件)`, pins > 0 && pins <= EXPECT, `${pins} 個`);

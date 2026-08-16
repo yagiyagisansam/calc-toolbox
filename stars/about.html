@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'; require-trusted-types-for 'script'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <title>データについて（出典・計算方法・限界） | 今夜のオススメ星見スポット</title>
-  <meta name="description" content="星見レベルの計算方法、光害データ（VIIRS夜間光）の作り方、天気予報の出典、そしてこの判定の限界を説明します。">
+  <title>データについて（出典） | 今夜のオススメ星見スポット</title>
+  <meta name="description" content="今夜のオススメ星見スポットが使っている天気予報・夜間光・地図・地名データの出典とライセンスです。">
   <link rel="stylesheet" href="./stars.css">
   <!-- @meta start -->
   <link rel="canonical" href="https://quick-calc.site/stars/about.html">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230c0f1a'/%3E%3Cpath d='M16 6l2.6 6.6L25.5 14l-5.3 4.4 1.7 6.9L16 21.6l-5.9 3.7 1.7-6.9L6.5 14l6.9-1.4z' fill='%23fdd171'/%3E%3C/svg%3E">
   <meta name="theme-color" content="#0c0c0c">
   <meta property="og:type" content="article">
-  <meta property="og:title" content="データについて（出典・計算方法・限界）">
-  <meta property="og:description" content="星見レベルの計算方法、光害データの作り方、天気予報の出典、そして判定の限界を説明します。">
+  <meta property="og:title" content="データについて（出典）">
+  <meta property="og:description" content="このサイトが使っているデータの出典とライセンスです。">
   <meta property="og:url" content="https://quick-calc.site/stars/about.html">
   <meta property="og:locale" content="ja_JP">
   <meta name="twitter:card" content="summary">
@@ -37,80 +37,11 @@
 <main class="stars-doc">
   <h1>データについて</h1>
   <p class="stars-lead">
-    このサイトが何を根拠に「星見レベル」を出しているか、そしてどこまでを信じてよいかをまとめています。
+    このサイトが使っているデータの出どころです。
+    星見スポットをお探しの方は<a href="./">地図</a>か<a href="./list.html">地域別の一覧</a>をご覧ください。
   </p>
 
-  <h2>星見レベルの計算</h2>
-  <p>
-    星が見えるかどうかは「空が暗いか」と「空が晴れているか」で決まります。
-    どれだけ暗い場所でも曇っていれば何も見えず、どれだけ晴れていても都心では暗い星が見えません。
-    そのため各要素は足し算ではなく<strong>掛け算</strong>で合成し、0〜100 の点数にしています。
-  </p>
-  <p class="stars-help">
-    「星見レベル」は<strong>このサイトが独自に決めた指数</strong>です。
-    学会や気象機関が定めた尺度ではなく、重みの置き方もこのサイトの判断によります。
-    肉眼で見える星の数や空の明るさ（SQM 値）を予測するものでもありません。
-    同じ日の2つの場所を見比べる、同じ場所の時間ごとの移り変わりを見る、
-    といった<strong>相対的な比較</strong>に使ってください。
-    重みの具体的な数値は
-    <a href="https://github.com/yagiyagisansam/calc-toolbox/blob/main/stars/score.js">score.js</a>
-    にすべて書いてあります。
-  </p>
-  <table class="stars-table stars-table--plain">
-    <thead>
-      <tr><th scope="col">要素</th><th scope="col">出どころ</th><th scope="col">効き方</th></tr>
-    </thead>
-    <tbody>
-      <tr><th scope="row">空の暗さ（光害）</th><td>VIIRS 夜間光から作った独自データ</td><td>最も暗い場所を100%として、都心では点数が4分の1まで落ちます</td></tr>
-      <tr><th scope="row">雲量</th><td>Open-Meteo（Best Match）</td><td>全天が雲なら0点。少しの雲でも大きく減点します</td></tr>
-      <tr><th scope="row">降水確率</th><td>Open-Meteo</td><td>雨・雪の予報を減点します</td></tr>
-      <tr><th scope="row">視程・湿度</th><td>Open-Meteo</td><td>もや・靄を減点します</td></tr>
-      <tr><th scope="row">月</th><td>自前の計算</td><td>満月が高く昇っているときが最大の減点です</td></tr>
-    </tbody>
-  </table>
-  <p>
-    点数は6段階に分けて色で示します。段階の区切りと意味は地図の凡例と同じです。
-  </p>
-  <div id="band-list" class="stars-band-list"></div>
-  <p class="stars-help">
-    地図では海と湖に色を塗っていません。星見レベル自体は海の上でも計算できますが、
-    出かけ先の候補にならないうえ、一面を塗ると海岸線が消えて場所を読み取れなくなるためです。
-    海を隠しているのは下地の地図が持つ水域の形なので、
-    <strong>下地が読み込めなかったときは海にも色が乗ります</strong>。
-    そのときは海岸線も出ていないので、地図の見た目で分かります。
-  </p>
-
-  <h3>点数と「続き具合」</h3>
-  <p>
-    一覧とスポットの詳細に出る点数は、<strong>その夜のうち最も条件がよい1時刻の点</strong>です。
-    ただしそれだけでは、1時間だけ晴れる夜と一晩中晴れる夜が同じ点に見えてしまいます。
-    そこで「<strong>良い</strong>」（65点）以上がその夜に何時間あり、
-    連続で何時間続くかも一緒に出しています。
-    点が同じなら、続く時間が長いほうが出かけがいがあります。
-  </p>
-
-  <h3>項目ごとに見る</h3>
-  <p>
-    地図では表示を3つに切り替えられます。総合の点だけでは
-    「低いのは曇っているからか、街明かりのせいか」が分かりません。
-    要素を分けて見ることで、たとえば「天気は最高だが場所が明るい」＝
-    もう少し足を伸ばせば見える、といった判断ができます。
-  </p>
-  <table class="stars-table stars-table--plain">
-    <thead>
-      <tr><th scope="col">表示</th><th scope="col">含めるもの</th><th scope="col">時刻で変わるか</th></tr>
-    </thead>
-    <tbody>
-      <tr><th scope="row">総合</th><td>空の暗さ・天気・月</td><td>変わる</td></tr>
-      <tr><th scope="row">空の暗さ</th><td>光害だけ</td><td>変わらない</td></tr>
-      <tr><th scope="row">天気</th><td>雲量・降水確率・視程・湿度</td><td>変わる</td></tr>
-    </tbody>
-  </table>
-  <p class="stars-help">
-    どの表示でも「明るい色ほど星見に向く」の向きは同じです。
-  </p>
-
-  <h2>データの出典</h2>
+  <h2>出典</h2>
   <table class="stars-table stars-table--plain">
     <thead>
       <tr><th scope="col">データ</th><th scope="col">提供元</th><th scope="col">ライセンス</th></tr>
@@ -118,13 +49,13 @@
     <tbody>
       <tr>
         <th scope="row">天気予報</th>
-        <td><a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>（Best Match。地域と要素ごとに適した数値予報モデルを Open-Meteo が自動で選びます）</td>
-        <td>CC BY 4.0</td>
+        <td><a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>（Best Match）</td>
+        <td><a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a></td>
       </tr>
       <tr>
-        <th scope="row">夜間光（光害の元データ）</th>
+        <th scope="row">夜間光</th>
         <td><a href="https://gibs.earthdata.nasa.gov/" target="_blank" rel="noopener noreferrer">NASA GIBS</a> / VIIRS Suomi-NPP</td>
-        <td>NASA EOSDIS（利用制限なし・出典明記）</td>
+        <td>NASA EOSDIS</td>
       </tr>
       <tr>
         <th scope="row">地図</th>
@@ -132,105 +63,21 @@
         <td>ODbL</td>
       </tr>
       <tr>
-        <th scope="row">地名（一覧の検索）</th>
-        <td>
-          <a href="https://www.geonames.org/" target="_blank" rel="noopener noreferrer">GeoNames geographical database</a>
-          を抽出・変換（星見の目印になる種別だけを取り出し、日本語表記と読みを選び、都道府県を補いました）
-        </td>
+        <th scope="row">地名</th>
+        <td><a href="https://www.geonames.org/" target="_blank" rel="noopener noreferrer">GeoNames geographical database</a></td>
         <td><a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a></td>
-      </tr>
-      <tr>
-        <th scope="row">月・太陽の位置</th>
-        <td>自前の計算（Meeus『Astronomical Algorithms』の簡略式）</td>
-        <td>—</td>
       </tr>
     </tbody>
   </table>
 
-  <h2>光害データの作り方</h2>
-  <p>
-    人工衛星が観測した夜間の明るさ（VIIRS 夜間光）をもとに、日本全域を約2.7km四方の格子で表したものです。
-    次の手順で作っています。
-  </p>
-  <ol>
-    <li><strong>月明かりのない夜だけを選ぶ</strong>：新月前後の夜を複数集めます。</li>
-    <li><strong>画素ごとの中央値をとる</strong>：平均ではなく中央値にすることで、雲や漁火、
-      花火のような一時的な光が落ちます。</li>
-    <li><strong>散乱を計算する</strong>：ここが重要です。衛星が測っているのは
-      「その地点が<em>放つ</em>光」であって「その地点の<em>上空の明るさ</em>」ではありません。
-      そのままでは、都心のすぐ隣にある明かりのない山頂が外洋と同じ「最高の星空」になってしまいます。
-      そこで、周囲の光が大気で散乱して空を明るくする分を距離で減衰させながら足し込んでいます。</li>
-  </ol>
-  <p id="lp-meta" class="stars-help"></p>
-
-  <h3>校正に使った地点</h3>
-  <p>
-    数値が実態と合っているかを、性質のわかっている場所で確かめています（0が最も暗く、255が都心）。
-  </p>
-  <div class="stars-table-wrap">
-    <table class="stars-table" id="ref-table">
-      <thead>
-        <tr>
-          <th scope="col">地点</th>
-          <th scope="col">上空の明るさ<br>（散乱込み）</th>
-          <th scope="col">地上の発光量<br>（衛星の生の値）</th>
-        </tr>
-      </thead>
-      <tbody id="ref-rows"></tbody>
-    </table>
-  </div>
-  <p class="stars-help">
-    富士山頂や奥多摩のように「地上の光は無いのに上空は明るい」場所で、
-    2つの列が大きく違うことが確かめられます。
-  </p>
-
-  <h2>この判定の限界</h2>
-  <ul class="stars-limits">
-    <li>
-      <strong>光害の値は相対的な指標です。</strong>
-      SQM値（空の明るさの実測値）やボートルスケールのような絶対的な等級ではありません。
-      場所どうしを見比べるためのものとしてお使いください。
-    </li>
-    <li>
-      <strong>地形を考慮していません。</strong>
-      山が街明かりを遮ってくれる場合も、逆に山で視界そのものが遮られる場合も反映されません。
-      谷底や山陰では、表示より実際のほうが暗い（＝良い）ことがあります。
-    </li>
-    <li>
-      <strong>天気は約110km四方の格子です。</strong>
-      全国ぶんをまとめて扱うため、地点ごとの細かい予報ではありません。
-      山間部では、谷ひとつ違うだけで実際の空模様が変わることがあります。
-    </li>
-
-    <li>
-      <strong>大気の透明度や上層の薄雲は十分に表現できません。</strong>
-      予報上は快晴でも、薄い雲や黄砂・煙霧で星が見えにくいことがあります。
-    </li>
-    <li>
-      <strong>掲載スポットの情報は利用者からの申請にもとづきます。</strong>
-      現地の規則、季節による通行止め、駐車の可否は、お出かけ前に必ずご自身でお確かめください。
-    </li>
-    <li>
-      <strong>地名の検索には載っていない場所があります。</strong>
-      元データ（GeoNames）は日本の山のうち約8割にしか日本語の表記を持っていません。
-      主な山・湖はこちらで補い、合併で消えた旧市町村名（星野村など）と
-      集落・字の名前も引けるようにしましたが、取りこぼしは残ります。
-      見つからないときは、近くの市区町村名か、地図から直接お選びください。
-    </li>
-    <li>
-      <strong>月の出入りは、地平線が平らな場合の時刻です。</strong>
-      山の稜線や木立で隠れる分は考えていないので、山あいでは表示より遅く昇り、
-      早く沈みます。標高による地平線の下がりも見ていません。
-    </li>
-  </ul>
-
-  <h2>更新のタイミング</h2>
+  <h2>ご利用にあたって</h2>
   <ul>
-    <li>天気予報：こちらで定期的に取得し、その結果を全員に配っています。
-      星を見る時間帯（18時〜翌3時）は1時間ごと、それ以外は3時間ごとです。
-      画面には「予報は◯時時点」と表示されます。</li>
-    <li>光害データ：静的なファイルとして持っており、年1回程度の更新を想定しています。</li>
-    <li>掲載スポット：管理者が承認した時点で反映されます。</li>
+    <li>「今夜の星見レベル」は、空の暗さと今夜の天気・月の条件から出した
+      <strong>このサイト独自の目安</strong>です。空の明るさ（SQM値）などの絶対的な尺度ではありません。</li>
+    <li>地形による遮蔽や、上層の薄雲・黄砂は反映していません。予報上は快晴でも見えにくいことがあります。</li>
+    <li>掲載スポットの条件（有料・要予約・冬期閉鎖など）は、各スポットの「気をつけること」に書いています。
+      <strong>出発前に、公式サイトと現地の掲示で必ずご確認ください。</strong></li>
+    <li>おでかけは自己責任でお願いします。掲載内容にもとづく損害について、当サイトは責任を負いかねます。</li>
   </ul>
 
   <p><a href="./">← 地図へ戻る</a></p>
@@ -250,8 +97,5 @@
 </footer>
 
 <script src="./guard.js"></script>
-<script src="./palette.js"></script>
-<script src="./score.js"></script>
-<script src="./about.js"></script>
 </body>
 </html>

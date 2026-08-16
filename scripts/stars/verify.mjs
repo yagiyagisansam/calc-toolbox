@@ -680,9 +680,19 @@ try {
       );
       await capture("map-caution");
 
+      /*
+       * 次のピンを押す前に、開いているカードを閉じる。
+       * カードは地図に重なるので、その裏に入ったピンは押せない
+       * (画面が広いほどカードの位置が変わるので、幅によって当たり外れが出る)。
+       * 実際の利用でも、別のスポットを見るには一度カードの外を触ることになる。
+       */
+      await page.mouse.click(5, 5);
+      await page.waitForTimeout(200);
+
       const plain = page.locator('.stars-pin[aria-label*="都心の公園"]');
       if ((await plain.count()) > 0) {
-        await plain.first().click();
+        await plain.first().scrollIntoViewIfNeeded().catch(() => {});
+        await plain.first().click({ timeout: 15000 });
         await page.waitForTimeout(250);
         const hidden = await page.locator("#spot-caution").isHidden();
         const empty = await page.locator("#spot-caution").textContent();
@@ -1434,31 +1444,34 @@ try {
   check("見つからない id は案内を出す", /見つかりません/.test(missing), missing);
 
   // ---- 説明ページ ----
+  /*
+   * このページは出典を示すためのもので、計算の中身は説明しない。
+   * 訪問者が知りたいのは「どこで星が見えるか」であって、こちらの作り方ではない。
+   * 見るのは、法律上・信義上どうしても要る3つだけ:
+   *   ・ライセンス表示(CC BY 4.0 と ODbL は表示が条件)
+   *   ・星見レベルが独自の目安だと分かること
+   *   ・実装(GitHub)への導線が無いこと
+   */
   console.log("\n説明ページ (stars/about.html):");
   await page.goto(`http://127.0.0.1:${PORT}/stars/about.html`, { waitUntil: "load", timeout: 60000 });
-  await page.waitForFunction(() => document.querySelectorAll("#ref-rows tr").length > 0, { timeout: 20000 })
-    .catch(() => {});
 
-  const bandRows = await page.locator(".stars-band-row").count();
-  check("段階の説明が6段ぶん出る", bandRows === 6, `${bandRows} 行`);
-
-  const refRows = await page.locator("#ref-rows tr").count();
-  check("校正に使った地点が表になる", refRows >= 5, `${refRows} 件`);
-
-  /*
-   * 判定の限界を伏せないこと。星見レベルは学会や気象機関の尺度ではなく
-   * このサイトが決めた指数なので、そう書いてあることを検査でも守る。
-   */
   const aboutText = await page.locator("main").textContent();
+
+  for (const [label, re] of [
+    ["Open-Meteo", /Open-Meteo/],
+    ["NASA GIBS", /NASA GIBS/],
+    ["OpenStreetMap", /OpenStreetMap/],
+    ["GeoNames", /GeoNames/]
+  ]) {
+    check(`出典に ${label} がある(ライセンスの表示条件)`, re.test(aboutText));
+  }
+  check("CC BY 4.0 を明記している", /CC BY 4\.0/.test(aboutText));
+  check("ODbL を明記している", /ODbL/.test(aboutText));
+
   check(
-    "星見レベルが独自の指数だと明記されている",
-    /独自に決めた指数/.test(aboutText) && /相対的な比較/.test(aboutText),
-    /独自に決めた指数/.test(aboutText) ? "明記あり" : "明記なし"
-  );
-  check(
-    "下地が読めないときは海にも色が乗ることを書いている",
-    /下地が読み込めなかったときは海にも色が乗ります/.test(aboutText),
-    /海にも色が乗ります/.test(aboutText) ? "明記あり" : "明記なし"
+    "星見レベルが独自の目安だと明記されている",
+    /独自の目安/.test(aboutText) && /SQM/.test(aboutText),
+    /独自の目安/.test(aboutText) ? "明記あり" : "明記なし"
   );
   check(
     "予報モデルを Best Match と正しく書いている",
@@ -1466,23 +1479,37 @@ try {
     /気象庁/.test(aboutText) ? "気象庁モデルと書いたままになっている" : "Best Match と明記"
   );
 
-  const lpMeta = await page.locator("#lp-meta").textContent();
-  check("光害データの作成情報が出る", /現在のデータ/.test(lpMeta), lpMeta.slice(0, 80));
-  await capture("about");
+  /*
+   * 実装を訪問者から辿れないようにする。
+   * 以前は score.js の GitHub へのリンクを置いていた。
+   * リンクが1本あるだけで、重みの数値も判定の作りもすべて読める。
+   */
+  {
+    const links = await page.evaluate(() =>
+      [...document.querySelectorAll("a[href]")].map((a) => a.getAttribute("href"))
+    );
+    const toRepo = links.filter((h) => /github\.com/i.test(h || ""));
+    check("実装(GitHub)へのリンクが無い", toRepo.length === 0, toRepo.join(" / "));
+  }
 
-  // 説明の数値が実データと一致していること(説明だけ古くなるのを防ぐ)
-  const refMatches = await page.evaluate(async () => {
-    const meta = await (await fetch("./data/lp-japan.json")).json();
-    const rows = [...document.querySelectorAll("#ref-rows tr")];
-    return rows.every((tr, i) => {
-      const cells = tr.querySelectorAll("td");
-      return (
-        tr.querySelector("th").textContent === meta.references[i].name &&
-        cells[0].textContent === String(meta.references[i].value)
-      );
-    });
-  });
-  check("表の値が実データと一致する", refMatches === true, String(refMatches));
+  /* 説明のためだけに読み込んでいた計算まわりのスクリプトを外したこと */
+  {
+    const srcs = await page.evaluate(() =>
+      [...document.querySelectorAll("script[src]")].map((s) => s.getAttribute("src"))
+    );
+    check(
+      "説明ページが score.js を読み込まない",
+      !srcs.some((s) => /score\.js/.test(s || "")),
+      srcs.join(" / ")
+    );
+  }
+
+  /* 作り方の説明が残っていないこと(一度消したものが戻るのを防ぐ) */
+  {
+    const leaked = ["中央値", "散乱", "校正", "掛け算", "重み"].filter((w) => aboutText.includes(w));
+    check("計算の作り方を説明していない", leaked.length === 0, leaked.join(" / "));
+  }
+  await capture("about");
 
   /*
    * 枠(iframe)の中で開かれたら中身を見せないこと。
