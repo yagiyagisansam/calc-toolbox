@@ -143,9 +143,8 @@ function weatherBody() {
   const rows = (meta.north - meta.south) / meta.step + 1;
   const cols = (meta.east - meta.west) / meta.step + 1;
   /*
-   * 本番の取得は少し前の定時に走っているので、いまより12時間前から始める。
-   * 「いま」から始めると今夜の頭が欠け、画面に「更新が滞っています」と出てしまう
-   * (これは net.js が正しく働いている証拠だが、見本としては紛らわしい)。
+   * 見本では夜の前半も描くため、いまより12時間前から予報を始める。
+   * updated_at は実際の作成時刻にして、古いキャッシュの警告とは区別する。
    */
   const base = Math.floor(Date.now() / 3600000) * 3600 - 12 * 3600;
   const times = [];
@@ -172,7 +171,7 @@ function weatherBody() {
   return [{
     payload: { times, cloud, precip, visibility, humidity },
     meta: { ...meta, points: rows * cols },
-    updated_at: new Date(base * 1000).toISOString()
+    updated_at: new Date().toISOString()
   }];
 }
 

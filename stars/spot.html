@@ -39,6 +39,12 @@
 
   <p id="status" class="stars-message" role="status" hidden></p>
 
+  <div id="weather-note" class="stars-weather-note stars-weather-note--document" role="status" hidden>
+    <span data-notice-text></span>
+    <button type="button" class="stars-notice-close" data-notice-close
+            aria-label="予報のお知らせを閉じる">×</button>
+  </div>
+
   <section id="summary" class="stars-summary" hidden>
     <div class="stars-summary-main">
       <p class="stars-summary-label">今夜のベスト</p>
@@ -118,6 +124,7 @@
 <script src="./lp.js"></script>
 <script src="./here.js"></script>
 <script src="./net.js"></script>
+<script src="./notice.js"></script>
 <script src="./spot.js"></script>
 </body>
 </html>
