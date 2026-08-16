@@ -239,7 +239,7 @@ if (!argv.includes("--live")) {
         {
           payload: { times, cloud, precip, visibility, humidity },
           meta: { ...meta, points: rows * cols },
-          updated_at: new Date(base * 1000).toISOString()
+          updated_at: new Date().toISOString()
         }
       ])
     });
@@ -306,6 +306,26 @@ try {
   check("初期化が完了する", ready && appState.ready, appState.error || "");
   check("今夜の時間帯が取れる", appState.times > 0, `${appState.times} 時点`);
   check("ラスタ用の canvas が作られる", !!appState.canvas, appState.canvas ? `${appState.canvas.w}x${appState.canvas.h}` : "");
+
+  // 予報のお知らせは地図中央を塞がず、利用者が閉じられること。
+  await page.evaluate(() => {
+    window.StarsNotice.show("weather-note", "検証用の予報のお知らせ", "verify-weather");
+  });
+  const noticeLayout = await page.locator("#weather-note").evaluate((e) => {
+    const s = getComputedStyle(e);
+    return { visible: !e.hidden, right: s.right, bottom: s.bottom, position: s.position };
+  });
+  check(
+    "予報のお知らせを地図右下に小さく表示",
+    noticeLayout.visible && noticeLayout.position === "absolute" && noticeLayout.right !== "auto" && noticeLayout.bottom !== "auto",
+    JSON.stringify(noticeLayout)
+  );
+  await page.getByRole("button", { name: "予報のお知らせを閉じる" }).click();
+  check("予報のお知らせを閉じられる", await page.locator("#weather-note").isHidden());
+  await page.evaluate(() => {
+    window.StarsNotice.show("weather-note", "検証用の予報のお知らせ", "verify-weather");
+  });
+  check("閉じた同じお知らせはセッション中に再表示しない", await page.locator("#weather-note").isHidden());
 
   const mapLimits = await page.evaluate(() => {
     const map = window.StarsMap && window.StarsMap.map();

@@ -297,9 +297,11 @@
    * 利用者には「今夜ぜんぶの予報」に見えてしまい、いちばん危ない。
    * 欠けているなら必ず画面に出すこと。
    *
+   * @param {object} grid sliceGrid の戻り値
+   * @param {Date=} now 判定時刻。省略時は現在時刻
    * @returns {string|null} 問題が無ければ null
    */
-  function coverageNote(grid) {
+  function coverageNote(grid, now) {
     if (!grid || grid.weatherAvailable === false) {
       return "天気予報を取得できませんでした。空の暗さ(光害)だけで表示しています。";
     }
@@ -308,7 +310,18 @@
     var last = grid.times[grid.times.length - 1];
     var first = grid.times[0];
     var missingEnd = grid.requestedTo - last;
-    var missingStart = first - grid.requestedFrom;
+    var nowSeconds = now instanceof Date ? now.getTime() / 1000 : Date.now() / 1000;
+    var currentHour = Math.floor(nowSeconds / 3600) * 3600;
+    /*
+     * 夜の開始後にキャッシュを更新すると、Open-Meteo の forecast_hours は
+     * 更新時点から始まるため、すでに過ぎた夕方の時刻は新しいキャッシュに無い。
+     * その過去分を「不足」と判定すると、更新直後なのに更新停止と誤表示する。
+     * 必要なのは、要求開始と現在時刻のうち遅い方から先だけ。
+     */
+    var neededFrom = Math.min(grid.requestedTo, Math.max(grid.requestedFrom, currentHour));
+    var missingStart = first - neededFrom;
+    var updatedSeconds = grid.updatedAt instanceof Date ? grid.updatedAt.getTime() / 1000 : null;
+    var staleSeconds = updatedSeconds === null ? 0 : nowSeconds - updatedSeconds;
 
     var fmt = function (unix) {
       return new Intl.DateTimeFormat("ja-JP", {
@@ -323,13 +336,22 @@
 
     if (missingEnd >= 3600 || missingStart >= 3600) {
       return (
-        "予報の更新が滞っています。今夜は " +
+        "予報データの範囲が不足しています。表示できるのは " +
         fmt(first) +
         " 〜 " +
         fmt(last) +
-        " のぶんしかありません" +
+        " です" +
         (grid.updatedAt ? "(最終更新 " + fmt(grid.updatedAt.getTime() / 1000) + ")" : "") +
         "。"
+      );
+    }
+
+    // 定例は日中でも3時間ごと。5時間以上進まなければ実際の更新停滞として知らせる。
+    if (staleSeconds >= 5 * 3600) {
+      return (
+        "予報の最終更新から5時間以上経っています" +
+        (grid.updatedAt ? "(最終更新 " + fmt(grid.updatedAt.getTime() / 1000) + ")" : "") +
+        "。最新の天気が反映されていない可能性があります。"
       );
     }
 

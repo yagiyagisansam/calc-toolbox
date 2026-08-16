@@ -13,6 +13,7 @@
   var Palette = global.StarsPalette;
   var LP = global.StarsLP;
   var Net = global.StarsNet;
+  var Notice = global.StarsNotice;
 
   var JST = "Asia/Tokyo";
   var state = { spot: null, hours: [], ready: false, error: null };
@@ -369,7 +370,10 @@
             state.ready = true;
             return;
           }
-          setStatus(Net.coverageNote(grid) || "", false);
+          if (Notice) {
+            Notice.show("weather-note", Net.coverageNote(grid, new Date()), "weather-coverage");
+          }
+          setStatus("", false);
           state.ready = true;
         });
       })

@@ -233,17 +233,55 @@ a {
 .stars-weather-note {
   position: absolute;
   z-index: 2;
-  top: 10px;
-  left: 10px;
-  right: 10px;
+  right: 52px;
+  bottom: 42px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: min(360px, calc(100% - 74px));
   margin: 0;
-  padding: 6px 10px;
+  padding: 8px 8px 8px 10px;
   border-radius: var(--radius);
   background: rgba(16, 18, 24, 0.9);
   border: 1px solid #eda100;
   color: var(--panel-ink);
   font-size: 12px;
-  transform: translateY(calc(100% + 8px));
+  line-height: 1.5;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
+}
+
+.stars-weather-note[hidden] {
+  display: none;
+}
+
+.stars-weather-note--document {
+  position: static;
+  max-width: none;
+  margin: 8px 0 12px;
+  background: #fff8e6;
+  color: var(--page-ink);
+  box-shadow: none;
+}
+
+.stars-notice-close {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  margin: -3px -3px -3px 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.stars-notice-close:hover,
+.stars-notice-close:focus-visible {
+  background: rgba(127, 127, 127, 0.2);
 }
 
 .stars-status.is-error {

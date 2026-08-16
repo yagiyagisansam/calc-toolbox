@@ -14,6 +14,7 @@
   var Palette = global.StarsPalette;
   var LP = global.StarsLP;
   var Net = global.StarsNet;
+  var Notice = global.StarsNotice;
   var MapView = global.StarsMap;
 
   var state = {
@@ -498,12 +499,8 @@
          * 黙って残っている数時間ぶんだけを描くと「その夜ぜんぶの予報」に見えてしまう。
          * 見出しを書き換えたあとに追記すること(先に足すと上書きで消える)。
          */
-        var note = el("weather-note");
-        var coverage = Net.coverageNote(grid);
-        if (note) {
-          note.hidden = !coverage;
-          note.textContent = coverage || "";
-        }
+        var coverage = Net.coverageNote(grid, new Date());
+        if (Notice) Notice.show("weather-note", coverage, "weather-coverage");
         if (!coverage && grid.updatedAt && head) {
           head.textContent += "／予報は " + jstTime(grid.updatedAt) + " 時点";
         }

@@ -71,6 +71,7 @@ function goodRow() {
 
 const START = new Date(T0 * 1000);
 const END = new Date((T0 + (NT - 1) * 3600) * 1000);
+const NOW = new Date((T0 + 1800) * 1000);
 
 function slice(row) {
   return Net.sliceGrid(row, START, END);
@@ -174,13 +175,44 @@ mustThrow("雲量が配列でない", (r) => { r.payload.cloud = "たくさん";
   const row = goodRow();
   row.payload.cloud[0][0] = null;
   const g = slice(row);
-  const note = Net.coverageNote(g);
+  const note = Net.coverageNote(g, NOW);
   ok(note !== null && /データなし|欠け/.test(note), "欠測があることが文言に出る", note);
 }
 
 {
   const g = slice(goodRow());
-  ok(Net.coverageNote(g) === null, "問題が無ければ文言は出さない", Net.coverageNote(g));
+  ok(Net.coverageNote(g, NOW) === null, "問題が無ければ文言は出さない", Net.coverageNote(g, NOW));
+}
+
+{
+  // 21時の更新では19〜20時がキャッシュから消えるが、21時半にはもう過去。
+  // 過ぎた時間を理由に「更新が滞っている」と出してはいけない。
+  const g = Net.sliceGrid(
+    goodRow(),
+    new Date((T0 - 2 * 3600) * 1000),
+    END
+  );
+  const note = Net.coverageNote(g, NOW);
+  ok(note === null, "過ぎた夜の前半が無くても更新停止扱いしない", note);
+}
+
+{
+  // 同じ欠けでも、これから必要になる時間なら不足として知らせる。
+  const g = Net.sliceGrid(
+    goodRow(),
+    new Date((T0 - 2 * 3600) * 1000),
+    END
+  );
+  const beforeNight = new Date((T0 - 3 * 3600) * 1000);
+  const note = Net.coverageNote(g, beforeNight);
+  ok(note !== null && /範囲が不足/.test(note), "未来側の不足は知らせる", note);
+}
+
+{
+  const g = slice(goodRow());
+  const sixHoursLater = new Date((T0 + 6 * 3600) * 1000);
+  const note = Net.coverageNote(g, sixHoursLater);
+  ok(note !== null && /最終更新から5時間以上/.test(note), "本当に古い更新は知らせる", note);
 }
 
 /* ---- 4. 求めた時間帯がキャッシュに無い ----------------------------------- */
