@@ -54,15 +54,24 @@
 <main class="stars-main">
   <div id="map" class="stars-map"></div>
 
-  <div class="stars-topbar">
-    <div id="day-tabs" class="stars-day-tabs" role="group" aria-label="どの夜を見るか"></div>
-    <p id="night-range" class="stars-night-range">今夜の時間帯を計算しています…</p>
-    <div class="stars-time">
-      <label for="time-slider">時刻</label>
-      <input id="time-slider" type="range" min="0" max="0" value="0" step="1" disabled>
-      <output id="time-label" for="time-slider">—</output>
+  <div id="forecast-panel" class="stars-topbar">
+    <div class="stars-panel-handle" tabindex="0" data-panel-handle
+         aria-label="予報パネルを移動。矢印キーでも動かせます">
+      <span class="stars-panel-title">予報と時刻</span>
+      <span class="stars-panel-drag-hint">ドラッグで移動</span>
+      <button type="button" class="stars-panel-toggle" data-panel-toggle
+              aria-controls="forecast-panel-body" aria-expanded="true">折りたたむ</button>
     </div>
-    <p id="moon-label" class="stars-moon">—</p>
+    <div id="forecast-panel-body" data-panel-body>
+      <div id="day-tabs" class="stars-day-tabs" role="group" aria-label="どの夜を見るか"></div>
+      <p id="night-range" class="stars-night-range">今夜の時間帯を計算しています…</p>
+      <div class="stars-time">
+        <label for="time-slider">時刻</label>
+        <input id="time-slider" type="range" min="0" max="0" value="0" step="1" disabled>
+        <output id="time-label" for="time-slider">—</output>
+      </div>
+      <p id="moon-label" class="stars-moon">—</p>
+    </div>
   </div>
 
   <p id="status" class="stars-status" role="status">読み込んでいます…</p>
@@ -129,6 +138,7 @@
 <script src="./here.js"></script>
 <script src="./net.js"></script>
 <script src="./notice.js"></script>
+<script src="./panel.js"></script>
 <script src="./map.js"></script>
 <script src="./app.js"></script>
 <script src="./boot.js"></script>

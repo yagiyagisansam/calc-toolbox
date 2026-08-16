@@ -692,6 +692,33 @@ try {
   });
   check("日時パネルと凡例が重ならない", !panelLayout.overlap, JSON.stringify(panelLayout));
 
+  const panelHandle = page.locator("[data-panel-handle]");
+  const panelToggle = page.locator("[data-panel-toggle]");
+  const panelBeforeMove = await page.locator(".stars-topbar").boundingBox();
+  await panelHandle.focus();
+  await page.keyboard.press("ArrowLeft");
+  const panelAfterMove = await page.locator(".stars-topbar").boundingBox();
+  check(
+    "予報パネルを矢印キーで移動できる",
+    panelBeforeMove && panelAfterMove && panelAfterMove.x < panelBeforeMove.x,
+    JSON.stringify({ before: panelBeforeMove, after: panelAfterMove })
+  );
+  await page.keyboard.press("Home");
+
+  const panelOpenHeight = (await page.locator(".stars-topbar").boundingBox()).height;
+  await panelToggle.click();
+  const panelClosed = await page.locator(".stars-topbar").evaluate((panel) => ({
+    height: panel.getBoundingClientRect().height,
+    expanded: panel.querySelector("[data-panel-toggle]").getAttribute("aria-expanded"),
+    bodyHidden: panel.querySelector("[data-panel-body]").hidden
+  }));
+  check(
+    "予報パネルを折りたたんで地図を確認できる",
+    panelClosed.bodyHidden && panelClosed.expanded === "false" && panelClosed.height < panelOpenHeight,
+    JSON.stringify(panelClosed)
+  );
+  await panelToggle.click();
+
   await page.locator(".stars-legend-summary").click();
   const collapsedLegend = await page.locator(".stars-legend").evaluate((legend) => ({
     open: legend.open,
