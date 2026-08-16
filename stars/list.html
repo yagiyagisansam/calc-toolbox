@@ -117,6 +117,12 @@
 
   <p id="status" class="stars-message" role="status">読み込んでいます…</p>
 
+  <div id="weather-note" class="stars-weather-note stars-weather-note--document" role="status" hidden>
+    <span data-notice-text></span>
+    <button type="button" class="stars-notice-close" data-notice-close
+            aria-label="予報のお知らせを閉じる">×</button>
+  </div>
+
   <div class="stars-table-wrap">
     <table class="stars-table" id="spot-table" hidden>
       <thead>
@@ -273,6 +279,7 @@
 <script src="./here.js"></script>
 <script src="./places.js"></script>
 <script src="./net.js"></script>
+<script src="./notice.js"></script>
 <!--
   MapLibre はここでは読み込まない。地図は pick.html の中で動く。
   この画面に持ち込むと Trusted Types を強制できなくなる。

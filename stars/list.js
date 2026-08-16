@@ -17,6 +17,7 @@
   var Palette = global.StarsPalette;
   var LP = global.StarsLP;
   var Net = global.StarsNet;
+  var Notice = global.StarsNotice;
   var Here = global.StarsHere;
   var Places = global.StarsPlaces;
 
@@ -1074,8 +1075,9 @@
           });
           renderTable();
           // 予報が今夜を賄えていないときは黙らない(地図ページと同じ扱い)
-          var coverage = Net.coverageNote(grid);
-          setStatus(coverage || "", !!coverage);
+          var coverage = Net.coverageNote(grid, new Date());
+          if (Notice) Notice.show("weather-note", coverage, "weather-coverage");
+          setStatus("", false);
           state.ready = true;
         });
       })
