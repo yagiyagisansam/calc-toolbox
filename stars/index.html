@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org; connect-src 'self' https://tiles.openfreemap.org https://ssxskriqlaiohdutxprn.supabase.co; worker-src 'self' blob:; font-src 'self'; base-uri 'none'; form-action 'self'; frame-src 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <title>今夜のオススメ星見スポット | 光害マップ×天気予報で日本全国を色分け</title>
-  <meta name="description" content="今夜どこへ行けば星が見えるかを日本全国の地図で色分け表示。VIIRS夜間光による光害と、雲量・降水確率・月齢を合わせて星見レベルを判定します。地域別の一覧とスポット申請にも対応。">
+  <title>流星群・星空の観測スポットを探す | 今夜の星見マップ</title>
+  <meta name="description" content="流星群や星空を観測できる日本全国のスポットを、今夜の天気・月・光害から探せる地図です。現在地や地名を中心に半径10〜100kmで絞り、星見レベル順のランキングも確認できます。">
   <link rel="stylesheet" href="./vendor/maplibre-gl.css">
   <link rel="stylesheet" href="./stars.css">
   <!-- @meta start -->
@@ -14,8 +14,8 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230c0f1a'/%3E%3Cpath d='M16 6l2.6 6.6L25.5 14l-5.3 4.4 1.7 6.9L16 21.6l-5.9 3.7 1.7-6.9L6.5 14l6.9-1.4z' fill='%23fdd171'/%3E%3C/svg%3E">
   <meta name="theme-color" content="#0c0c0c">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="今夜のオススメ星見スポット">
-  <meta property="og:description" content="光害マップと天気予報を組み合わせて、今夜どこで星が見えるかを日本全国の地図で色分け表示します。">
+  <meta property="og:title" content="流星群・星空の観測スポットを探す | 今夜の星見マップ">
+  <meta property="og:description" content="日本の流星群・星空観測スポットを、今夜の天気・月・光害から探せます。">
   <meta property="og:url" content="https://quick-calc.site/stars/">
   <meta property="og:locale" content="ja_JP">
   <meta name="twitter:card" content="summary">
@@ -26,10 +26,10 @@
 <header class="stars-header">
   <a class="stars-brand" href="./">
     <span class="stars-brand-mark" aria-hidden="true">★</span>
-    <span>今夜の星見スポット</span>
+    <h1 class="stars-brand-title">今夜の星見・流星群観測スポット</h1>
   </a>
   <nav class="stars-nav">
-    <a href="./list.html">地域別の一覧</a>
+    <a href="./list.html">流星群・星空の観測スポットを探す</a>
     <a href="./submit.html">スポットを申請</a>
     <a href="./about.html">データについて</a>
   </nav>
@@ -77,14 +77,6 @@
       <div id="layer-tabs" class="stars-layer-tabs" role="group" aria-label="表示する項目"></div>
       <div id="legend-items"></div>
       <p id="layer-note" class="stars-layer-note"></p>
-      <!-- たまにしか触らないものは畳んでおく(地図に使える高さを優先するため) -->
-      <details class="stars-legend-more">
-        <summary>表示の設定</summary>
-        <div class="stars-opacity">
-          <label for="opacity-slider">濃さ</label>
-          <input id="opacity-slider" type="range" min="0" max="100" value="85" step="5">
-        </div>
-      </details>
       <p id="spot-count" class="stars-spot-count"></p>
     </div>
   </details>

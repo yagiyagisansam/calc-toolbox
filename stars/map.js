@@ -112,6 +112,8 @@
       zoom: CONFIG.map.zoom,
       minZoom: CONFIG.map.minZoom,
       maxZoom: CONFIG.map.maxZoom,
+      maxBounds: CONFIG.map.maxBounds,
+      renderWorldCopies: false,
       attributionControl: false,
       // 2Dに固定する(傾き・回転は星見の判断に使わず、操作を難しくするだけ)
       pitchWithRotate: false,
@@ -543,14 +545,6 @@
     buildGridMapping(grid);
   }
 
-  /** ラスタの濃さを変える(0で非表示) */
-  function setOpacity(alpha) {
-    state.opacity = alpha;
-    if (state.map && state.map.getLayer("stars-score")) {
-      state.map.setPaintProperty("stars-score", "raster-opacity", alpha);
-    }
-  }
-
   // ---- スポットのピン -----------------------------------------------------
 
   /**
@@ -631,7 +625,6 @@
       state.onLocate = fn;
       if (state.here) fn(state.here);
     },
-    setOpacity: setOpacity,
     setSpots: setSpots,
     flyTo: flyTo,
     map: function () {
