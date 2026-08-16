@@ -39,6 +39,10 @@
   var map = null;
   var marker = null;
   var draggable = false;
+  var area = null;
+  var AREA_SOURCE = "stars-search-area";
+  var AREA_FILL = "stars-search-area-fill";
+  var AREA_LINE = "stars-search-area-line";
 
   function send(message) {
     // 相手は自分と同じ生成元(同じサイト)にしか送らない
@@ -54,11 +58,13 @@
    * 壊れた知らせを受け取ったときの取り決めとして置いている。
    */
   function isPoint(lat, lon) {
+    var bounds = CONFIG.map.maxBounds;
     return (
       Number.isFinite(lat) &&
       Number.isFinite(lon) &&
-      lat >= -90 && lat <= 90 &&
-      lon >= -180 && lon <= 180
+      bounds &&
+      lon >= bounds[0][0] && lon <= bounds[1][0] &&
+      lat >= bounds[0][1] && lat <= bounds[1][1]
     );
   }
 
@@ -96,6 +102,88 @@
 
   function unplace() {
     if (marker && marker._map) marker.remove();
+    area = null;
+    // レイヤー自体は残して中身だけ空にする。スタイル切替中に removeLayer を
+    // 呼ぶと競合するため、こちらの方が安全で、表示上も通信量も変わらない。
+    var source = map && map.getSource(AREA_SOURCE);
+    if (source) {
+      source.setData({ type: "FeatureCollection", features: [] });
+    }
+  }
+
+  /** 中心から指定km離れた点を64方向に結び、地図上の検索円にする。 */
+  function circleFeature(lat, lon, radiusKm) {
+    var earthKm = 6371.0088;
+    var angular = radiusKm / earthKm;
+    var lat1 = (lat * Math.PI) / 180;
+    var lon1 = (lon * Math.PI) / 180;
+    var ring = [];
+    for (var i = 0; i <= 64; i++) {
+      var bearing = (i / 64) * Math.PI * 2;
+      var lat2 = Math.asin(
+        Math.sin(lat1) * Math.cos(angular) +
+        Math.cos(lat1) * Math.sin(angular) * Math.cos(bearing)
+      );
+      var lon2 = lon1 + Math.atan2(
+        Math.sin(bearing) * Math.sin(angular) * Math.cos(lat1),
+        Math.cos(angular) - Math.sin(lat1) * Math.sin(lat2)
+      );
+      ring.push([(lon2 * 180) / Math.PI, (lat2 * 180) / Math.PI]);
+    }
+    return {
+      type: "Feature",
+      properties: { radiusKm: radiusKm },
+      geometry: { type: "Polygon", coordinates: [ring] }
+    };
+  }
+
+  function ensureArea() {
+    if (!map || !area) return;
+    var data = circleFeature(area.lat, area.lon, area.radiusKm);
+    var source = map.getSource(AREA_SOURCE);
+    if (source) {
+      source.setData(data);
+      return;
+    }
+    try {
+      map.addSource(AREA_SOURCE, { type: "geojson", data: data });
+      map.addLayer({
+        id: AREA_FILL,
+        type: "fill",
+        source: AREA_SOURCE,
+        paint: { "fill-color": "#fdd171", "fill-opacity": 0.14 }
+      });
+      map.addLayer({
+        id: AREA_LINE,
+        type: "line",
+        source: AREA_SOURCE,
+        paint: { "line-color": "#fdd171", "line-width": 2 }
+      });
+    } catch (e) {
+      // setStyle の途中ではまだ追加できない。次の styledata でもう一度試す。
+    }
+  }
+
+  function fitArea() {
+    if (!map || !area) return;
+    var latDeg = area.radiusKm / 111.32;
+    var lonDeg = area.radiusKm / (111.32 * Math.max(0.2, Math.cos((area.lat * Math.PI) / 180)));
+    map.fitBounds(
+      [
+        [area.lon - lonDeg, area.lat - latDeg],
+        [area.lon + lonDeg, area.lat + latDeg]
+      ],
+      { padding: 28, duration: 0, maxZoom: 10 }
+    );
+  }
+
+  function showArea(lat, lon, radiusKm, fit) {
+    var radius = Number(radiusKm);
+    if (!isPoint(lat, lon) || !Number.isFinite(radius) || radius < 10 || radius > 100) return;
+    area = { lat: lat, lon: lon, radiusKm: radius };
+    place(lat, lon);
+    ensureArea();
+    if (fit) fitArea();
   }
 
   function start(options) {
@@ -107,8 +195,11 @@
 
     if (map) {
       if (origin) {
-        place(origin.lat, origin.lon);
-        map.jumpTo({ center: [origin.lon, origin.lat], zoom: opts.zoom || 8 });
+        if (opts.radiusKm) showArea(origin.lat, origin.lon, Number(opts.radiusKm), true);
+        else {
+          place(origin.lat, origin.lon);
+          map.jumpTo({ center: [origin.lon, origin.lat], zoom: opts.zoom || 8 });
+        }
       }
       map.resize();
       return;
@@ -124,6 +215,8 @@
       zoom: origin ? opts.zoom || 8 : opts.zoom || 4,
       minZoom: opts.minZoom || undefined,
       maxZoom: opts.maxZoom || undefined,
+      maxBounds: CONFIG.map.maxBounds,
+      renderWorldCopies: false,
       attributionControl: { compact: true },
       pitchWithRotate: false,
       dragRotate: false,
@@ -132,6 +225,7 @@
     });
     map.touchZoomRotate.disableRotation();
     map.addControl(new global.maplibregl.NavigationControl({ showCompass: false }), "top-right");
+    map.on("styledata", ensureArea);
 
     // 下地は後追い。届かなくても場所は選べる
     map.on("load", function () {
@@ -148,7 +242,10 @@
         });
     });
 
-    if (origin) place(origin.lat, origin.lon);
+    if (origin) {
+      if (opts.radiusKm) showArea(origin.lat, origin.lon, Number(opts.radiusKm), true);
+      else place(origin.lat, origin.lon);
+    }
 
     map.on("click", function (e) {
       place(e.lngLat.lat, e.lngLat.lng);
@@ -184,6 +281,13 @@
       start(data);
     } else if (data.type === "stars-pick:mark" && map && isPoint(Number(data.lat), Number(data.lon))) {
       place(Number(data.lat), Number(data.lon));
+    } else if (data.type === "stars-pick:area" && map) {
+      showArea(
+        Number(data.lat),
+        Number(data.lon),
+        Number(data.radiusKm),
+        !!data.fit
+      );
     } else if (data.type === "stars-pick:unmark") {
       unplace();
     }
@@ -199,6 +303,9 @@
     },
     marker: function () {
       return marker;
+    },
+    area: function () {
+      return area;
     }
   };
 })(typeof window !== "undefined" ? window : globalThis);

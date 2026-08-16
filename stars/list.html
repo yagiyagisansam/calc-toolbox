@@ -11,16 +11,16 @@
   -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://ssxskriqlaiohdutxprn.supabase.co; font-src 'self'; base-uri 'none'; form-action 'none'; frame-src 'self'; object-src 'none'; require-trusted-types-for 'script'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <title>星見スポットの地域別一覧 | 今夜のオススメ星見スポット</title>
-  <meta name="description" content="掲載中の星見スポットを地方・都道府県別に一覧表示します。今夜の星見レベル、雲量、月の条件、標高を表で見比べられます。">
+  <title>流星群の観測スポットを近くから探す | 今夜の星見ランキング</title>
+  <meta name="description" content="流星群や星空の観測スポットを現在地・地名・地図から検索。中心から半径10〜100kmに絞り、今夜の天気・月・光害を合わせた星見レベル順のランキングで比較できます。">
   <link rel="stylesheet" href="./stars.css">
   <!-- @meta start -->
   <link rel="canonical" href="https://quick-calc.site/stars/list.html">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230c0f1a'/%3E%3Cpath d='M16 6l2.6 6.6L25.5 14l-5.3 4.4 1.7 6.9L16 21.6l-5.9 3.7 1.7-6.9L6.5 14l6.9-1.4z' fill='%23fdd171'/%3E%3C/svg%3E">
   <meta name="theme-color" content="#0c0c0c">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="星見スポットの地域別一覧">
-  <meta property="og:description" content="掲載中の星見スポットを地方・都道府県別に一覧表示します。">
+  <meta property="og:title" content="流星群の観測スポットを近くから探す">
+  <meta property="og:description" content="半径10〜100kmの範囲で、日本の流星群・星空観測スポットを今夜の星見レベル順に探せます。">
   <meta property="og:url" content="https://quick-calc.site/stars/list.html">
   <meta property="og:locale" content="ja_JP">
   <meta name="twitter:card" content="summary">
@@ -41,13 +41,17 @@
 </header>
 
 <main class="stars-doc">
-  <h1>星見スポットの地域別一覧</h1>
+  <h1>流星群・星空の観測スポットを探す</h1>
+  <p class="stars-lead">
+    現在地・地名・地図から中心を決め、半径10〜100kmにある観測スポットを
+    今夜の星見レベル順にランキング表示します。
+  </p>
   <p id="night-range" class="stars-lead">今夜の時間帯を計算しています…</p>
 
   <!--
     どこから探すかを決める欄。
-    地名を打つ・地図をタップする・現在地を使う、の3通りで「基準点」を置き、
-    そこから近い順に並べ替えられるようにする。
+    地名を打つ・地図をタップする・現在地を使う、の3通りで検索円の中心を置き、
+    半径内のスポットだけを星見レベル順に並べる。
   -->
   <div class="stars-origin">
     <label class="stars-label" for="place-search">地名・住所でさがす</label>
@@ -55,17 +59,23 @@
       <input class="stars-input" id="place-search" type="search" autocomplete="off"
              placeholder="例: 秩父市、奥多摩、あちむら" aria-describedby="place-help"
              aria-controls="place-results" aria-expanded="false" role="combobox">
-      <button type="button" class="stars-button stars-button--sub" id="pick-on-map">地図で選ぶ</button>
+      <button type="button" class="stars-button stars-button--sub" id="pick-on-map">地図で中心を決める</button>
       <button type="button" class="stars-button stars-button--sub" id="use-here">現在地</button>
     </div>
     <p class="stars-help" id="place-help">
-      市区町村・山・湖・峠などから探せます。選ぶとそこから近い順に並びます。
+      市区町村・山・湖・峠などから検索円の中心を決められます。
     </p>
     <ul class="stars-suggest" id="place-results" role="listbox" hidden></ul>
 
     <div class="stars-pickmap" id="pick-map-wrap" hidden>
       <div id="pick-map" class="stars-pickmap-canvas"></div>
-      <p class="stars-help">地図をタップすると、その場所が基準点になります。</p>
+      <p class="stars-help">地図をタップすると、その場所を中心とする検索範囲を表示します。</p>
+    </div>
+
+    <div class="stars-radius">
+      <label for="radius-slider">検索半径 <output id="radius-value" for="radius-slider">50km</output></label>
+      <input id="radius-slider" type="range" min="10" max="100" value="50" step="10">
+      <span class="stars-help">10km〜100km</span>
     </div>
 
     <p class="stars-origin-current" id="origin-current" hidden>
@@ -94,7 +104,6 @@
         <select class="stars-input" id="sort-select">
           <option value="score">今夜の星見レベル順</option>
           <option value="darkness">空の暗さ順</option>
-          <option value="near" id="sort-near" hidden>近い順</option>
           <option value="name">名前順</option>
           <option value="pref">都道府県順</option>
         </select>
@@ -103,7 +112,7 @@
   </div>
 
   <p class="stars-here-row">
-    <span class="stars-help" id="here-note" hidden>距離は直線距離の目安です（道のりではありません）。</span>
+    <span class="stars-help" id="here-note" hidden>中心からの距離は直線距離です（道のりではありません）。</span>
   </p>
 
   <p id="status" class="stars-message" role="status">読み込んでいます…</p>

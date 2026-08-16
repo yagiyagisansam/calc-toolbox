@@ -560,12 +560,6 @@
       if (card && !card.hidden && !card.contains(e.target)) card.hidden = true;
     });
 
-    var opacity = el("opacity-slider");
-    if (opacity) {
-      opacity.addEventListener("input", function () {
-        MapView.setOpacity(Number(opacity.value) / 100);
-      });
-    }
   }
 
   global.StarsApp = {

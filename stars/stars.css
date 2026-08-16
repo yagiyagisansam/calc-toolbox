@@ -89,6 +89,11 @@ a {
   color: #e0a41a;
 }
 
+.stars-brand-title {
+  margin: 0;
+  font: inherit;
+}
+
 .stars-nav {
   display: flex;
   flex-wrap: wrap;
@@ -361,33 +366,6 @@ a {
   text-overflow: ellipsis;
 }
 
-.stars-legend-more {
-  margin-top: 8px;
-  padding-top: 6px;
-  border-top: 1px solid var(--panel-border);
-}
-
-.stars-legend-more > summary {
-  font-size: 11px;
-  color: var(--panel-ink-3);
-  cursor: pointer;
-}
-
-.stars-opacity {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-  font-size: 12px;
-  color: var(--panel-ink-2);
-}
-
-.stars-opacity input[type="range"] {
-  flex: 1 1 auto;
-  min-width: 0;
-  accent-color: #6da7ec;
-}
-
 .stars-spot-count {
   margin: 8px 0 0;
   font-size: 12px;
@@ -558,10 +536,6 @@ a {
 
   .legend-note {
     display: none;
-  }
-
-  .stars-opacity {
-    margin-top: 6px;
   }
 
   .stars-spot-count {
@@ -807,6 +781,57 @@ textarea.stars-input {
 .stars-origin-current {
   margin: 8px 0 0;
   font-size: 13px;
+}
+
+.stars-radius {
+  display: grid;
+  grid-template-columns: minmax(9em, auto) minmax(12em, 1fr) auto;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--page-line);
+  border-radius: 8px;
+}
+
+.stars-radius label {
+  font-weight: 600;
+}
+
+.stars-radius output {
+  display: inline-block;
+  min-width: 3.5em;
+  color: var(--link);
+  font-variant-numeric: tabular-nums;
+}
+
+.stars-radius input[type="range"] {
+  width: 100%;
+  accent-color: #1c5cab;
+}
+
+.stars-rank {
+  display: inline-block;
+  min-width: 2.5em;
+  margin-right: 8px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--page-line);
+  color: var(--page-ink);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+@media (max-width: 560px) {
+  .stars-radius {
+    grid-template-columns: 1fr auto;
+  }
+
+  .stars-radius input[type="range"] {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
 }
 
 .stars-linkbutton {
