@@ -205,6 +205,32 @@ try {
     pinPositions.length === 1 && pinPositions[0] === "absolute",
     pinPositions.join(", ")
   );
+  const panelLayout = await page.evaluate(() => {
+    const topbar = document.querySelector(".stars-topbar").getBoundingClientRect();
+    const legend = document.querySelector(".stars-legend").getBoundingClientRect();
+    return {
+      overlap: !(
+        topbar.right <= legend.left ||
+        legend.right <= topbar.left ||
+        topbar.bottom <= legend.top ||
+        legend.bottom <= topbar.top
+      ),
+      legendHeight: legend.height
+    };
+  });
+  check("日時パネルと凡例が重ならない", !panelLayout.overlap, JSON.stringify(panelLayout));
+
+  await page.locator(".stars-legend-summary").click();
+  const collapsedLegend = await page.locator(".stars-legend").evaluate((legend) => ({
+    open: legend.open,
+    height: legend.getBoundingClientRect().height
+  }));
+  check(
+    "凡例を折りたたんで地図を確認できる",
+    !collapsedLegend.open && collapsedLegend.height < panelLayout.legendHeight,
+    JSON.stringify(collapsedLegend)
+  );
+  await page.locator(".stars-legend-summary").click();
 
   // 適当な1件を開いて、カードに「気をつけること」が出るか
   const first = spots[0];

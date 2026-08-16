@@ -129,10 +129,10 @@ a {
 
 .stars-topbar {
   top: 10px;
-  left: 10px;
+  left: auto;
   right: 10px;
+  width: min(520px, calc(100% - 310px));
   padding: 10px 12px;
-  max-width: 520px;
 }
 
 /* どの夜を見るか(今夜・明日・明後日) */
@@ -255,11 +255,40 @@ a {
   font-size: 13px;
 }
 
-.stars-legend h2 {
-  margin: 0 0 6px;
+.stars-legend-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.stars-legend-summary::-webkit-details-marker {
+  display: none;
+}
+
+.stars-legend-summary::after {
+  content: "折りたたむ";
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--panel-ink-3);
+}
+
+.stars-legend:not([open]) .stars-legend-summary::after {
+  content: "開く";
+}
+
+.stars-legend-title {
   font-size: 13px;
+  font-weight: 700;
   letter-spacing: 0.04em;
   color: var(--panel-ink-2);
+}
+
+.stars-legend-body {
+  margin-top: 6px;
 }
 
 /* 表示する項目の切り替え(総合・空の暗さ・天気) */
@@ -475,6 +504,11 @@ a {
        現在地ボタンが押せなくなるので、その列ぶんを空けておく。 */
     right: 58px;
     bottom: 34px;
+  }
+
+  .stars-topbar {
+    left: 10px;
+    width: auto;
   }
 
   .stars-spot-card {
