@@ -94,7 +94,7 @@ def build_spot_columns():
     # 列の追加と、返す列が変わった2つの関数だけを切り出す
     alter = slice_between(
         src,
-        "/*\n * 既に動いている環境向け(caution と city を後から足したため)。",
+        "/*\n * 既に動いている環境向け(申請項目を後から足したため)。",
         "create index if not exists stars_spots_status_region_idx",
     )
 
@@ -104,7 +104,7 @@ def build_spot_columns():
         "-- ---- ③ 申請内容の検証(CAPTCHA の代わり) ----",
         "-- ---- ④ 公開用(承認済みだけを返す) ----",
     )
-    grant = "grant insert (name, name_kana, pref, city, lat, lon, elevation_m, access, facilities, note, caution, source_url, submitter_hint)\n  on public.stars_spots to anon;\n"
+    grant = "grant insert (name, name_kana, pref, city, address, lat, lon, elevation_m, access, facilities, note, caution, source_url, submitter_hint)\n  on public.stars_spots to anon;\n"
     if grant not in src:
         raise SystemExit("grant 文が想定と違います")
 
@@ -125,18 +125,26 @@ def build_spot_columns():
     if revoke_ops not in src:
         raise SystemExit("stars_ops_pending の revoke が想定と違います")
 
+    approval_ops = slice_between(
+        src,
+        "-- 承認\ncreate or replace function public.stars_ops_approve",
+        "-- 却下(理由を残す)",
+    )
+    revoke_approve = "revoke all on function public.stars_ops_approve(text, uuid) from public, anon, authenticated;\n"
+    revoke_location = "revoke all on function public.stars_ops_set_location(text, uuid, double precision, double precision) from public, anon, authenticated;\n"
+    if revoke_approve not in src or revoke_location not in src:
+        raise SystemExit("承認関数の revoke が想定と違います")
+
 
     head = """-- =============================================================
--- スポット: 市区町村(city)と気をつけること(caution)を足す
+-- スポット申請: 住所を足し、座標を管理者が掲載前に確定できるようにする
 --
 -- これは scripts/stars/setup.sql の変更部分だけを切り出したもの。
 -- Supabase の SQL Editor に貼って1回実行する。何度実行しても壊れない。
 --
 -- なぜ必要か:
---   申請フォームはこの2つを送るようになっている。列が無いと
---   「column "city" of relation "stars_spots" does not exist」で
---   申請そのものが失敗する(利用者全員が投稿できない)。
---   また、承認作業でこの2つが見えないと、何が書かれたのか確認できない。
+--   申請者に地図のピン打ちを求めず、任意の住所を手掛かりとして受け付ける。
+--   座標が未確定の申請は、管理者が場所を確認してからでないと承認できない。
 --
 -- 注意:
 --   返す列が変わる関数は create or replace では置き換えられないので、
@@ -158,13 +166,14 @@ commit;
 -- 列が増えたか
 select column_name as 列
 from information_schema.columns
-where table_name = 'stars_spots' and column_name in ('city', 'caution')
+where table_name = 'stars_spots' and column_name in ('city', 'caution', 'address')
 order by column_name;
 
--- 制約が付いたか(2行出れば成功)
+-- 制約が付いたか(4行出れば成功)
 select conname as 制約
 from pg_constraint
-where conname in ('stars_spots_city_check', 'stars_spots_caution_check')
+where conname in ('stars_spots_city_check', 'stars_spots_caution_check',
+                  'stars_spots_address_check', 'stars_spots_approved_location_check')
 order by conname;
 
 -- 公開用の関数が新しい列を返すか(空でも列名が出れば成功)
@@ -172,7 +181,8 @@ select * from public.stars_public_spots() limit 1;
 """
 
     out = (
-        head + alter + grant + "\n\n" + trigger + public_fn + ops_fn + revoke_ops + tail
+        head + alter + grant + "\n\n" + trigger + public_fn + ops_fn + approval_ops +
+        revoke_ops + revoke_approve + revoke_location + tail
     )
     os.makedirs(OUT_DIR, exist_ok=True)
     path = os.path.join(OUT_DIR, "migrate-spot-columns.sql")

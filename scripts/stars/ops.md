@@ -3,6 +3,20 @@
 申請されたスポットを確認して、掲載する／しないを決める手順。
 Supabase の SQL エディタ（iPhoneのブラウザで開ける）にSQLを貼って実行する。
 
+申請フォームは座標なしでも受け付ける。`address`、市区町村、参考URLを確認し、
+座標が空の申請は承認前に次の関数で確定する。
+
+```sql
+select public.stars_ops_set_location(
+  '<TOKEN>',
+  '対象のspot_id',
+  確認済みの緯度,
+  確認済みの経度
+);
+```
+
+座標が空のまま `stars_ops_approve` を呼ぶと停止する。
+
 - 開く場所: Supabase のプロジェクト → 左メニュー **SQL Editor** → **New query**
 - `<TOKEN>` は `admin_config` に入れた管理用トークンに置き換える。
   トークンはこのリポジトリには置かない（→ `knowledge/quick-calc-ops-access`）。
@@ -31,6 +45,7 @@ select * from stars_ops_pending('<TOKEN>');
 |---|---|
 | `name` | 実在しそうな名前か。宣伝・いたずらでないか |
 | `city` | 市区町村。一覧の絞り込みに使うので、空なら埋めておくとよい |
+| `address` | 申請者が任意で書いた住所。座標を確定する手掛かりとして確認する |
 | `caution` | 気をつけること。冬期閉鎖・トイレ無し・住宅が近いなど。**ここが空でも、危ない要素を知っていれば承認前に書き足す** |
 | `pref` / `lat` / `lon` | 都道府県と座標が矛盾していないか |
 | `access` / `facilities` / `note` | 私有地・立入禁止を勧めていないか。個人情報が書かれていないか |
