@@ -349,9 +349,17 @@ a {
   transform: translateY(calc(100% + 8px));
 }
 
+/*
+ * 予報のお知らせ。
+ *
+ * z-index が凡例と同じ 2 だと、幅の狭い画面で凡例の下に潜り、
+ * 閉じるボタンを押せなくなる(390px では凡例260px + お知らせ360px が入らない)。
+ * お知らせは読んだら消すもの、凡例は出しっぱなしのものなので、
+ * 重なるときはお知らせを前に出す。
+ */
 .stars-weather-note {
   position: absolute;
-  z-index: 2;
+  z-index: 4;
   right: 52px;
   bottom: 42px;
   display: flex;

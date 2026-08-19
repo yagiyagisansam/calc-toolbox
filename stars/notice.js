@@ -36,11 +36,22 @@
     if (body) body.textContent = message;
     box.hidden = !message || read(key) === message;
 
+    /*
+     * いま出しているお知らせがどの覚え書きに属するかを、要素側に持たせる。
+     *
+     * 閉じる処理は1度しか結びつけないので、その場の key を関数の中に
+     * 閉じ込めると、最初に呼ばれたときの key を永久に使い続けることになる。
+     * あとから別の key で出したお知らせを閉じても、覚えるのは古い key の側
+     * ── 閉じたのに次も出てくる。押した時点の値を読む形にする。
+     */
+    box.__starsNoticeKey = key;
+
     if (close && !close.__starsNoticeBound) {
       close.__starsNoticeBound = true;
       close.addEventListener("click", function () {
-        var current = body ? body.textContent : "";
-        if (current) write(key, current);
+        var now = box.querySelector("[data-notice-text]");
+        var current = now ? now.textContent : "";
+        if (current) write(box.__starsNoticeKey || id, current);
         box.hidden = true;
       });
     }
