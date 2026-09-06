@@ -15,15 +15,14 @@ for (const m of iconsSrc.matchAll(/^ ([a-z]+): '(.*)',$/gm)) ICON_PATHS[m[1]] = 
 
 const GCLS = { "健康": "g0", "お金": "g1", "日付": "g2", "変換": "g3" };
 const CAT_ORDER = ["健康", "お金", "日付", "変換"];
-// 「みんなの投票」「星見スポット」は計算ツールに含めず、一覧下部に別のプロダクトとして載せる
-// (みんなの投票はHiroさん指示・2026-07-26 / 星見スポットも同じ扱い)
+// 「みんなの投票」は計算ツールに含めず、一覧下部に別のプロダクトとして載せる
+// (Hiroさん指示・2026-07-26)
 const POLL = TOOLS.find((t) => t.slug === "poll");
-const STARS = TOOLS.find((t) => t.slug === "stars");
-const OTHER_PRODUCTS = new Set(["poll", "stars"]);
+const OTHER_PRODUCTS = new Set(["poll"]);
 const CALC = TOOLS.filter((t) => !OTHER_PRODUCTS.has(t.slug));
 // 人気ランキング(全ユーザーの利用データ基準)。週次運用でSearch Console/Analyticsの
 // 実データから並びを更新して再生成する。端末ごとの個人履歴は使わない(Hiroさん指示)
-// 注意: poll と stars は計算ツールの枠に出さないため、RANKに入れないこと
+// 注意: poll は計算ツールの枠に出さないため、RANKに入れないこと
 const RANK = ["moji", "password", "waribiki", "days", "bmi", "wareki", "eigyobi", "kinenbi", "jikan", "tax", "fudosan", "heikin"];
 
 function svg(slug) {
@@ -40,8 +39,7 @@ const seoList = CAT_ORDER.map((c) =>
   `      <h3>${c === "日付" ? "日付・時間" : c === "変換" ? "暮らし・変換" : c}</h3>\n      <ul>\n` +
   CALC.filter((t) => t.cat === c).map((t) => `        <li><a href="./tools/${t.slug}/">${t.name}</a> — ${t.desc}</li>`).join("\n") +
   "\n      </ul>").join("\n") +
-  `\n      <h3>統計ツール</h3>\n      <ul>\n        <li><a href="./tools/${POLL.slug}/">${POLL.name}</a> — ${POLL.desc}</li>\n      </ul>` +
-  `\n      <h3>星空</h3>\n      <ul>\n        <li><a href="${STARS.path}">${STARS.name}</a> — ${STARS.desc}</li>\n      </ul>`;
+  `\n      <h3>統計ツール</h3>\n      <ul>\n        <li><a href="./tools/${POLL.slug}/">${POLL.name}</a> — ${POLL.desc}</li>\n      </ul>`;
 
 const html = `<!DOCTYPE html>
 <html lang="ja">
@@ -119,8 +117,6 @@ const html = `<!DOCTYPE html>
     .poll-card .pt b { display: block; font-size: 0.98rem; font-weight: 800; }
     .poll-card .pt small { display: block; font-size: 0.76rem; color: var(--tp-muted); margin-top: 2px; line-height: 1.5; }
     @media (prefers-color-scheme: dark) { .poll-card .pic { background: #3a2229; color: #ff8798; } }
-    .stars-card .pic { background: #dfe9fb; color: #1c5cab; }
-    @media (prefers-color-scheme: dark) { .stars-card .pic { background: #1b2740; color: #9ec5f4; } }
     .seo-list { margin-top: 34px; font-size: 0.85rem; }
     .seo-list summary { cursor: pointer; color: var(--tp-muted); font-weight: 600; }
     .seo-list h3 { font-size: 0.95rem; margin: 14px 0 4px; }
@@ -161,13 +157,6 @@ ${tilesHtml}
     </a>
   </div>
 
-  <div id="stars-sec">
-    <div class="tp-sec"><b>星空</b><span>計算ツールとは別のサイトです</span></div>
-    <a class="poll-card stars-card" id="stars-card" href="${STARS.path}" data-kw="${(STARS.name + " " + STARS.desc + " " + STARS.kw).replace(/"/g, "")}">
-      <span class="pic">${svg("stars")}</span>
-      <span class="pt"><b>今夜のオススメ星見スポット</b><small>光害マップと天気予報を重ねて、今夜どこで星が見えるかを地図で色分け</small></span>
-    </a>
-  </div>
 
   <details class="seo-list">
     <summary>${sorted.length}ツールの説明つき一覧を開く</summary>
@@ -213,8 +202,6 @@ ${seoList}
   var index = tiles.map(function (t) { return norm(t.dataset.kw + " " + t.textContent); });
   var pollCard = document.getElementById("poll-card");
   var pollIndex = norm(pollCard.dataset.kw + " " + pollCard.textContent);
-  var starsCard = document.getElementById("stars-card");
-  var starsIndex = norm(starsCard.dataset.kw + " " + starsCard.textContent);
 
   // 人気: 全ユーザーの利用データに基づくランキング(RANK。週次で更新される)
   function renderPopular() {
@@ -266,9 +253,6 @@ ${seoList}
     var pollHit = terms.length ? terms.every(function (w) { return pollIndex.indexOf(w) !== -1; }) : current === "all";
     document.getElementById("poll-sec").style.display = pollHit ? "" : "none";
     if (pollHit && terms.length) shown++;
-    var starsHit = terms.length ? terms.every(function (w) { return starsIndex.indexOf(w) !== -1; }) : current === "all";
-    document.getElementById("stars-sec").style.display = starsHit ? "" : "none";
-    if (starsHit && terms.length) shown++;
     var label = terms.length ? "検索結果" : (current === "all" ? "すべて" : CATS.filter(function (c) { return c[0] === current; })[0][1]);
     document.getElementById("genre-title").innerHTML = "<b>" + label + "</b><span>" + shown + "個</span>";
     document.getElementById("no-hit").hidden = shown > 0;

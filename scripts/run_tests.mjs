@@ -8,8 +8,8 @@
  *   1) 1モジュール:  { "module": "calc.js", "global": "BmiCalc", "cases": [...] }
  *   2) 複数モジュール: { "modules": { "StarsScore": "score.js", "StarsSky": "sky.js" },
  *                       "cases": [{ "global": "StarsSky", ... }] }
- * 2) は星見スポット(stars/)のように、1つのプロダクトが複数の純関数モジュールを
- *    持つ場合に使う。cases の "global" で呼び先を選ぶ。
+ * 2) は1つのプロダクトが複数の純関数モジュールを持つ場合に使う。
+ *    cases の "global" で呼び先を選ぶ。
  */
 import { readdirSync, readFileSync, existsSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -33,7 +33,7 @@ const base = args.includes("--lab") ? "lab" : "tools";
 const only = args.filter((a) => a !== "--lab");
 
 // tools/<slug>/ に加えて、計算ツールではない別プロダクト(直下に tests.json を持つ)も対象にする
-const PRODUCT_DIRS = ["stars"];
+const PRODUCT_DIRS = [];
 const targets = readdirSync(path.join(root, base), { withFileTypes: true })
   .filter((e) => e.isDirectory() && (only.length === 0 || only.includes(e.name)))
   .map((e) => ({ name: e.name, dir: path.join(root, base, e.name) }));
